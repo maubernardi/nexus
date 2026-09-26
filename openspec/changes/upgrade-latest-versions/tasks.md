@@ -21,4 +21,4 @@
 - [x] 4.1 docker-compose con PostgreSQL 18 e Keycloak 26.7.4; container healthy e realm importato
 - [x] 4.2 Workflow CI con action alle ultime major, Java 27, Node 26
 - [x] 4.3 Aggiornare README, CLAUDE.md, `openspec/config.yaml`
-- [ ] 4.4 `openspec validate --all --strict`; PR con CI verde
+- [x] 4.4 `openspec validate --all --strict`; PR con CI verde
