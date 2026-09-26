@@ -33,4 +33,4 @@
 - [x] 4.1 Creare `.github/workflows/ci.yml` con i job backend e frontend
 - [x] 4.2 Scrivere `README.md` (architettura, prerequisiti, avvio locale, profili, utenti di test, workflow OpenSpec)
 - [x] 4.3 Eseguire `openspec validate setup-project-infrastructure --strict` senza errori
-- [ ] 4.4 Primo commit e push su `github.com/maubernardi/nexus`, CI verde
+- [x] 4.4 Primo commit e push su `github.com/maubernardi/nexus`, CI verde
