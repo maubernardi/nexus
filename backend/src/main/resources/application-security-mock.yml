@@ -1,0 +1,25 @@
+# Utenti fittizi per sviluppo locale e test (header X-USER-ID). Allineati al realm Keycloak di infra/.
+nexus:
+  security:
+    mock:
+      users:
+        - username: tutor1
+          first-name: Tutor
+          last-name: Uno
+          email: tutor1@nexus.local
+          roles: [TUTOR]
+        - username: tutor2
+          first-name: Tutor
+          last-name: Due
+          email: tutor2@nexus.local
+          roles: [TUTOR]
+        - username: operatore.cc
+          first-name: Operatore
+          last-name: Call Center
+          email: operatore.cc@nexus.local
+          roles: [CALL_CENTER]
+        - username: admin
+          first-name: Amministratore
+          last-name: Nexus
+          email: admin@nexus.local
+          roles: [ADMIN]

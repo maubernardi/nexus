@@ -1,0 +1,133 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+/*
+ * Token di colore verificati per WCAG 2.2 AA (testo >= 4.5:1, componenti UI >= 3:1)
+ * sia in tema chiaro sia scuro. Il tema segue la preferenza di sistema.
+ */
+:root {
+  --radius: 0.625rem;
+  --background: #ffffff;
+  --foreground: #1a1f2b;
+  --card: #ffffff;
+  --card-foreground: #1a1f2b;
+  --popover: #ffffff;
+  --popover-foreground: #1a1f2b;
+  --primary: #0b5560;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f4f6;
+  --secondary-foreground: #1a1f2b;
+  --muted: #f1f4f6;
+  --muted-foreground: #4b5563;
+  --accent: #e0f2f1;
+  --accent-foreground: #0b3f47;
+  --destructive: #b42318;
+  --destructive-foreground: #ffffff;
+  --warning: #fef3c7;
+  --warning-foreground: #6b3a07;
+  /* separatori decorativi */
+  --border: #d5dbe1;
+  /* bordi dei controlli: contrasto non testuale >= 3:1 */
+  --input: #6b7280;
+  --ring: #0b5560;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f141a;
+    --foreground: #e8edf3;
+    --card: #161d25;
+    --card-foreground: #e8edf3;
+    --popover: #161d25;
+    --popover-foreground: #e8edf3;
+    --primary: #5ec4c9;
+    --primary-foreground: #0f141a;
+    --secondary: #1c2530;
+    --secondary-foreground: #e8edf3;
+    --muted: #1c2530;
+    --muted-foreground: #a9b4c2;
+    --accent: #153b40;
+    --accent-foreground: #c9f1f2;
+    --destructive: #f97066;
+    --destructive-foreground: #0f141a;
+    --warning: #3b2a06;
+    --warning-foreground: #fde68a;
+    --border: #2a3542;
+    --input: #7b8794;
+    --ring: #8fe3e7;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    /* rispetta la dimensione del testo scelta dall'utente (zoom 200%) */
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply min-h-dvh bg-background font-sans text-foreground antialiased;
+    line-height: 1.5;
+  }
+
+  /* Focus visibile uniforme (WCAG 2.4.7 / 2.4.11 / 2.4.13) */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* Il focus programmatico su h1 e main non deve mostrare il contorno */
+  [tabindex='-1']:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Evita che header sticky copra l'elemento con focus (WCAG 2.4.11) */
+  html {
+    scroll-padding-top: 5rem;
+  }
+}
+
+/* Movimento ridotto (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

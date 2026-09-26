@@ -1,0 +1,6 @@
+# Valori di default solo per sviluppo locale (infra/docker-compose.yml); in ambienti reali usare le variabili d'ambiente.
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/nexus}
+    username: ${DB_USERNAME:nexus}
+    password: ${DB_PASSWORD:nexus}

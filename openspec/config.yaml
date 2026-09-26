@@ -1,0 +1,38 @@
+schema: spec-driven
+
+context: |
+  Progetto: NEXUS — Progressive Web App multi-progetto per l'Area Lavoro e il Call Center Sociale
+  di una Cooperativa Sociale (gestione segnalazioni e tirocini). Brief funzionale completo in
+  CLAUDE_CODE_PROMPT.md (v5.0): modello ER, FSM del Ticket (Fasi 1-7), RBAC, generazione .docx.
+
+  Ruoli: TUTOR (mobile-first), CALL_CENTER (desktop), ADMIN.
+
+  Stack (sostituisce quello "consigliato" nel brief — Next.js/Prisma/NextAuth NON si usano):
+  - Monorepo: backend/ (Java) + frontend/ (React) + infra/ (docker-compose, Keycloak realm).
+  - Backend: Java 21, Spring Boot 3.5, Maven wrapper, Spring Web MVC, Spring Data JPA + PostgreSQL 17,
+    Flyway (unica fonte dello schema, ddl-auto=validate), Spring Security 6 OAuth2 resource server
+    con Keycloak (JWT stateless), profilo security-mock per sviluppo locale, MapStruct, Lombok,
+    springdoc-openapi, Testcontainers. Package base it.nexus. Convenzioni skill java-backend
+    (Resource -> Service/ServiceImpl -> Repository -> Entity, DTO record, errori via un unico
+    @RestControllerAdvice, @PreAuthorize su ogni endpoint, deny by default).
+  - Frontend: React 19 + TypeScript strict, Vite 7, Tailwind CSS v4 + shadcn/ui, Zustand (stato client),
+    TanStack Query (stato server), Axios, react-hook-form, react-router v6, i18next (italiano),
+    Vitest + Testing Library, pnpm. Atomic design (atoms/molecules/organisms/pages/templates).
+    Convenzioni skill react-frontend (named export, niente any, testi via t()).
+  - PWA: vite-plugin-pwa (Workbox), manifest installabile, offline shell.
+  - Accessibilità: WCAG 2.2 livello AA obbligatorio (contrasto, focus visibile, navigazione da tastiera,
+    landmark, skip link, target touch >= 24px, prefers-reduced-motion, lang="it"). Verifica automatica
+    con eslint-plugin-jsx-a11y e axe (vitest-axe) nei test.
+  - Generazione documenti Word: libreria Java (poi-tl / Apache POI) al posto di docxtemplater.
+  - CI: GitHub Actions. Repository: https://github.com/maubernardi/nexus
+
+  Lingua: il dominio usa i termini del brief (Ticket, Candidate, BoardPost, JobSlot, stati in italiano).
+  Documentazione e artefatti OpenSpec in italiano. Conventional commits.
+
+rules:
+  proposal:
+    - Includere sempre una sezione "Non-goals"
+    - Indicare l'impatto su accessibilità (WCAG 2.2 AA) e PWA quando la change tocca il frontend
+  tasks:
+    - Ogni task deve essere verificabile (build, test o controllo manuale esplicito)
+    - Suddividere i task per area (infra, backend, frontend, CI)

@@ -1,0 +1,37 @@
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+
+# Segreti — mai in git
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+id_rsa*
+
+# Backend
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+!backend/.mvn/wrapper/maven-wrapper.properties
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/dev-dist/
+frontend/coverage/
+*.tsbuildinfo
+
+# Log
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Claude Code locale
+.claude/settings.local.json
