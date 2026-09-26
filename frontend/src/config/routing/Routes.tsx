@@ -1,4 +1,4 @@
-import { type RouteObject } from 'react-router-dom';
+import { type RouteObject } from 'react-router';
 
 import { DEV_LOGIN_PATH, ProtectedPage } from '@/config/routing/ProtectedPage';
 import type { RouteHandle } from '@/config/routing/types';

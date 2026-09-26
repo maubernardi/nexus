@@ -4,13 +4,11 @@ import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    tsconfigPaths(),
     VitePWA({
       // Aggiornamento solo su conferma dell'utente: mai ricaricare durante una compilazione.
       registerType: 'prompt',
@@ -49,6 +47,29 @@ export default defineConfig({
       },
     }),
   ],
+  resolve: {
+    // alias @/* letti da tsconfig (supporto nativo di Vite 8)
+    tsconfigPaths: true,
+  },
+  build: {
+    rolldownOptions: {
+      output: {
+        // librerie in chunk separati: cambiano raramente e restano in cache tra un rilascio e l'altro
+        codeSplitting: {
+          groups: [
+            { name: 'react', test: /node_modules[\\/](react|react-dom|scheduler|react-router)[\\/]/ },
+            {
+              name: 'vendor',
+              // keycloak-js e workbox-window restano import dinamici, caricati solo se servono
+              test: (id: string) =>
+                /node_modules[\\/]/.test(id) &&
+                !/node_modules[\\/](keycloak-js|workbox-window)[\\/]/.test(id),
+            },
+          ],
+        },
+      },
+    },
+  },
   server: {
     port: 5173,
     proxy: {

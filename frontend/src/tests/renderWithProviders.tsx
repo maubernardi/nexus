@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, type RenderResult } from '@testing-library/react';
-import { createMemoryRouter, RouterProvider, type RouteObject } from 'react-router-dom';
+import { createMemoryRouter, RouterProvider, type RouteObject } from 'react-router';
 
 type RenderRoutesOptions = {
   routes: RouteObject[];

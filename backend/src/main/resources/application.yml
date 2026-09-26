@@ -47,6 +47,7 @@ management:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+    enabled: ${OPENAPI_ENABLED:true}
   api-docs:
     enabled: ${OPENAPI_ENABLED:true}
 

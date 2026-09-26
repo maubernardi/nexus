@@ -9,20 +9,22 @@ context: |
 
   Stack (sostituisce quello "consigliato" nel brief — Next.js/Prisma/NextAuth NON si usano):
   - Monorepo: backend/ (Java) + frontend/ (React) + infra/ (docker-compose, Keycloak realm).
-  - Backend: Java 21, Spring Boot 3.5, Maven wrapper, Spring Web MVC, Spring Data JPA + PostgreSQL 17,
-    Flyway (unica fonte dello schema, ddl-auto=validate), Spring Security 6 OAuth2 resource server
+  - Versioni: sempre l'ultima release stabile di ogni componente (scelta del committente), le skill valgono per le convenzioni.
+  - Backend: Java 27, Spring Boot 4.1 (Spring Framework 7, Security 7, Hibernate 7, Jackson 3), Maven wrapper,
+    Spring Web MVC, Spring Data JPA + PostgreSQL 18,
+    Flyway (unica fonte dello schema, ddl-auto=validate), Spring Security 7 OAuth2 resource server
     con Keycloak (JWT stateless), profilo security-mock per sviluppo locale, MapStruct, Lombok,
     springdoc-openapi, Testcontainers. Package base it.nexus. Convenzioni skill java-backend
     (Resource -> Service/ServiceImpl -> Repository -> Entity, DTO record, errori via un unico
     @RestControllerAdvice, @PreAuthorize su ogni endpoint, deny by default).
-  - Frontend: React 19 + TypeScript strict, Vite 7, Tailwind CSS v4 + shadcn/ui, Zustand (stato client),
-    TanStack Query (stato server), Axios, react-hook-form, react-router v6, i18next (italiano),
-    Vitest + Testing Library, pnpm. Atomic design (atoms/molecules/organisms/pages/templates).
+  - Frontend: Node 26, React 19.3 + TypeScript 6 strict, Vite 8 (Rolldown), Tailwind CSS v4 + shadcn/ui, Zustand (stato client),
+    TanStack Query (stato server), Axios, react-hook-form, React Router 8, i18next (italiano),
+    Vitest 5 + Testing Library, ESLint 10, pnpm 12. Atomic design (atoms/molecules/organisms/pages/templates).
     Convenzioni skill react-frontend (named export, niente any, testi via t()).
   - PWA: vite-plugin-pwa (Workbox), manifest installabile, offline shell.
   - Accessibilità: WCAG 2.2 livello AA obbligatorio (contrasto, focus visibile, navigazione da tastiera,
     landmark, skip link, target touch >= 24px, prefers-reduced-motion, lang="it"). Verifica automatica
-    con eslint-plugin-jsx-a11y e axe (vitest-axe) nei test.
+    con eslint-plugin-jsx-a11y e axe-core nei test.
   - Generazione documenti Word: libreria Java (poi-tl / Apache POI) al posto di docxtemplater.
   - CI: GitHub Actions. Repository: https://github.com/maubernardi/nexus
 

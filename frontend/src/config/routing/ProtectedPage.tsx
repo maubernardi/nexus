@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router';
 
 import { Button } from '@/components/ui/button';
 import { AUTH_MODE } from '@/config/auth/authConfig';

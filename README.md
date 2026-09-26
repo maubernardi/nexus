@@ -14,9 +14,9 @@ Il brief funzionale completo è in [`CLAUDE_CODE_PROMPT.md`](CLAUDE_CODE_PROMPT.
 
 ```
 nexus/
-├── backend/    Spring Boot 3.5 · Java 21 · PostgreSQL · Flyway · Spring Security (Keycloak JWT)
-├── frontend/   React 19 · Vite 7 · TypeScript · Tailwind v4 + shadcn/ui · PWA (Workbox)
-├── infra/      docker-compose: PostgreSQL 17 + Keycloak 26 (realm "nexus" importato)
+├── backend/    Spring Boot 4.1 · Java 27 · PostgreSQL · Flyway · Spring Security 7 (Keycloak JWT)
+├── frontend/   React 19.3 · React Router 8 · Vite 8 · TypeScript 6 · Tailwind v4 + shadcn/ui · PWA (Workbox)
+├── infra/      docker-compose: PostgreSQL 18 + Keycloak 26.7 (realm "nexus" importato)
 └── openspec/   specifiche e change proposal (spec-driven development)
 ```
 
@@ -30,8 +30,8 @@ nexus/
 
 ## Prerequisiti
 
-- Java 21+ (il wrapper Maven è incluso)
-- Node.js 22+ e pnpm 11 (`corepack enable`)
+- Java 27 (es. Temurin; il wrapper Maven è incluso)
+- Node.js 26 e pnpm 12 (`npm i -g pnpm`; da Node 25 corepack non è più incluso)
 - Docker (per PostgreSQL, Keycloak e i test Testcontainers)
 
 ## Avvio in locale
@@ -39,6 +39,7 @@ nexus/
 ```bash
 # 1. Infrastruttura
 cd infra && docker compose up -d        # Postgres :5432, Keycloak :8180 (admin/admin)
+#    se avevi un volume creato con PostgreSQL 17: docker compose down -v (dati solo di sviluppo)
 
 # 2. Backend (profilo "local" = Postgres + sicurezza mock)
 cd backend && ./mvnw spring-boot:run    # http://localhost:8080

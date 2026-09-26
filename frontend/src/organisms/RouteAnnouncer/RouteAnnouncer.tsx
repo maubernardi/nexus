@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useMatches } from 'react-router-dom';
+import { useLocation, useMatches } from 'react-router';
 
 import type { RouteHandle } from '@/config/routing/types';
 
