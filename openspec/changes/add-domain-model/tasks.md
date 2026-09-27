@@ -1,8 +1,8 @@
 ## 1. Infrastruttura di persistenza
 
-- [ ] 1.1 Aggiungere `io.hypersistence:hypersistence-tsid` 2.1.4 al `pom.xml` (versione esatta)
-- [ ] 1.2 Implementare `@TsidId` (generatore Hibernate 7) e `AbstractAuditingEntity` con Spring Data JPA Auditing e `AuditorAware` (username o `system`)
-- [ ] 1.3 Test unitari del generatore (ID univoci e crescenti) e dell'`AuditorAware`
+- [x] 1.1 Aggiungere `io.hypersistence:hypersistence-tsid` 2.1.4 al `pom.xml` (versione esatta)
+- [x] 1.2 Implementare `@TsidId` (generatore Hibernate 7) e `AbstractAuditingEntity` con Spring Data JPA Auditing e `AuditorAware` (username o `system`)
+- [x] 1.3 Test unitari del generatore (ID univoci e crescenti) e dell'`AuditorAware`
 
 ## 2. Migrazioni Flyway
 
