@@ -1,3 +1,8 @@
+# Versioni congelate: pnpm salva sempre versioni esatte; engineStrict vale per le dipendenze.
+# Node e pnpm del progetto sono imposti da "devEngines" in package.json (onFail: error).
+saveExact: true
+engineStrict: true
+
 allowBuilds:
   esbuild: true
   sharp: true

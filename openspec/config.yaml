@@ -9,15 +9,16 @@ context: |
 
   Stack (sostituisce quello "consigliato" nel brief — Next.js/Prisma/NextAuth NON si usano):
   - Monorepo: backend/ (Java) + frontend/ (React) + infra/ (docker-compose, Keycloak realm).
-  - Versioni: sempre l'ultima release stabile di ogni componente (scelta del committente), le skill valgono per le convenzioni.
-  - Backend: Java 27, Spring Boot 4.1 (Spring Framework 7, Security 7, Hibernate 7, Jackson 3), Maven wrapper,
+  - Versioni CONGELATE al 2026-09-27 (ultime stabili, LTS per i runtime): nessun aggiornamento senza richiesta
+    esplicita; le nuove dipendenze a versione esatta. Le skill valgono per le convenzioni, non per le versioni.
+  - Backend: Java 25 LTS, Spring Boot 4.1 (Spring Framework 7, Security 7, Hibernate 7, Jackson 3), Maven wrapper,
     Spring Web MVC, Spring Data JPA + PostgreSQL 18,
     Flyway (unica fonte dello schema, ddl-auto=validate), Spring Security 7 OAuth2 resource server
     con Keycloak (JWT stateless), profilo security-mock per sviluppo locale, MapStruct, Lombok,
     springdoc-openapi, Testcontainers. Package base it.nexus. Convenzioni skill java-backend
     (Resource -> Service/ServiceImpl -> Repository -> Entity, DTO record, errori via un unico
     @RestControllerAdvice, @PreAuthorize su ogni endpoint, deny by default).
-  - Frontend: Node 26, React 19.3 + TypeScript 6 strict, Vite 8 (Rolldown), Tailwind CSS v4 + shadcn/ui, Zustand (stato client),
+  - Frontend: Node 24.21.0 LTS, React 19.3 + TypeScript 6 strict, Vite 8 (Rolldown), Tailwind CSS v4 + shadcn/ui, Zustand (stato client),
     TanStack Query (stato server), Axios, react-hook-form, React Router 8, i18next (italiano),
     Vitest 5 + Testing Library, ESLint 10, pnpm 12. Atomic design (atoms/molecules/organisms/pages/templates).
     Convenzioni skill react-frontend (named export, niente any, testi via t()).

@@ -1,8 +1,9 @@
 # NEXUS — istruzioni per Claude Code
 
-- Versioni: usare sempre l'**ultima release stabile** di ogni componente (Java, Spring Boot, Node, React, librerie,
-  immagini Docker, GitHub Actions), anche se le skill indicano versioni più vecchie. Eccezioni documentate in
-  `openspec/changes/upgrade-latest-versions/design.md` (TypeScript 6 per typescript-eslint, versioni transitive dal BOM di Spring Boot).
+- **Versioni congelate** (matrice in `openspec/changes/upgrade-latest-versions/design.md`): stack fissato il 2026-09-27
+  alle ultime versioni stabili, LTS per i runtime (Java 25, Node 24.21.0). Prevalgono sulle versioni indicate dalle skill.
+  NON aggiornare nulla senza una richiesta esplicita; una nuova dipendenza si aggiunge all'ultima versione stabile
+  compatibile, a versione esatta (pnpm ha `saveExact`).
 - Brief funzionale: `CLAUDE_CODE_PROMPT.md`. Lo stack indicato nel brief (Next.js/Prisma/NextAuth) è **sostituito** da
   Spring Boot (`backend/`) + React/Vite (`frontend/`); vedi `openspec/config.yaml`.
 - Sviluppo spec-driven con OpenSpec: ogni nuova funzionalità passa da una change (`/opsx:propose` → `/opsx:apply` → `/opsx:archive`).
