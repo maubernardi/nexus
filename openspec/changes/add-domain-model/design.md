@@ -47,15 +47,15 @@ erDiagram
 | `user_project` | `user_id`, `project_id` | PK composta |
 | `zone`, `job_category` | `code`, `name`, `active` | `code` unico |
 | `stored_file` | `original_name`, `content_type`, `size_bytes`, `checksum_sha256`, `storage_key` | `storage_key` unico; `size_bytes >= 0` |
-| `candidate` | `owner_tutor_id`, `first_name`, `last_name`, `birth_year`, `gender`, `nationality`, `citizenship`, `residence_zone_id`, `has_driving_license`, `license_types` (`varchar[]`), `has_vehicle`, `transport_mode`, `has_law68`, `education_level`, `constraints`, `cv_file_id`, `anonymized_at` | enum via `CHECK`; ISO a 2 lettere maiuscole; patente ⇔ `cardinality(license_types) > 0`; tipi ⊆ elenco ammesso; `birth_year` tra 1900 e l'anno corrente |
+| `candidate` | `owner_tutor_id`, `first_name`, `last_name` (svuotabili solo se anonimizzato), `birth_year`, `gender`, `nationality`, `citizenship`, `residence_zone_id`, `has_driving_license`, `license_types` (`varchar[]`), `has_vehicle`, `transport_mode`, `has_law68`, `education_level`, `constraints`, `cv_file_id`, `anonymized_at` | enum via `CHECK`; ISO a 2 lettere maiuscole; patente ⇔ `cardinality(license_types) > 0`; tipi ⊆ elenco ammesso; `birth_year` tra 1900 e 2100 ("non nel futuro" lo verifica l'applicazione: un `CHECK` non può usare `current_date` in modo affidabile) |
 | `candidate_language` | `candidate_id`, `language` (ISO 639-1), `level` | (`candidate_id`, `language`) unico; `level` ∈ {A1…C2, MADRELINGUA} |
 | `company` | `name`, `vat_code`, `legal_address`, `contact_person`, `phone`, `email`, `active` | `vat_code` unico, 11 cifre |
 | `job_slot` | `company_id`, `job_category_id`, `zone_id`, `title`, `description`, `status`, `blocked_by_ticket_id`, **`version`** | `status = 'BLOCCATA'` ⇔ `blocked_by_ticket_id IS NOT NULL`; `blocked_by_ticket_id` unico |
 | `ticket` | `number`, `tutor_id`, `project_id`, `candidate_id`, `type`, `status`, `is_fast_track`, `requested_job_category_id`, `requested_job_free_text`, `board_post_id`, `assigned_cc_operator_id`, `job_slot_id`, `timer_started_at`, `timer_reminder_sent_at`, `timer_deadline_at`, **`version`** | `number` unico (sequenza); esattamente una tra categoria e testo libero; `type = 'SPECIAL'` ⇒ `board_post_id` presente; `is_fast_track` ⇒ `SPECIAL`; avvio ⇔ scadenza |
-| `ticket_status_history` | `ticket_id`, `from_status`, `to_status`, `changed_at`, `changed_by`, `note` | stati ammessi |
+| `ticket_status_history` | `ticket_id`, `from_status`, `to_status`, `note` (istante e autore = `created_at`/`created_by`) | stati ammessi |
 | `ticket_company_blacklist` | `ticket_id`, `company_id`, `reason`, `created_at`, `created_by` | PK composta |
-| `board_post` | `number`, `job_slot_id`, `title`, `project_id`, `status`, `age_min`, `age_max`, `weekly_hours`, `duration_months`, `notes`, `published_at`, `made_public_at`, `created_from_ticket_id`, **`version`** | `number` unico (sequenza); indice unico parziale su `job_slot_id` per `DRAFT`/`PUBLISHED`; `PUBLISHED` ⇒ `published_at`; `age_min <= age_max`; valori positivi |
-| `company_audit_event` | `company_id`, `ticket_id`, `event_type`, `details` (`jsonb`), `occurred_at`, `actor` | append-only (D6) |
+| `board_post` | `number`, `job_slot_id`, `title`, `project_id`, `status`, `age_min`, `age_max`, `weekly_hours`, `duration_months`, `notes`, `published_at`, `made_public_at`, `created_from_ticket_id`, **`version`** | `number` unico (sequenza); indice unico parziale su `job_slot_id` per `DRAFT`/`PUBLISHED`; `PUBLISHED` ⇒ `published_at`; `made_public_at` ⇒ `project_id` nullo; età 14–99 con `age_min <= age_max`; ore settimanali 1–60; durata 1–36 mesi |
+| `company_audit_event` | `company_id`, `ticket_id`, `event_type`, `details` (`jsonb` oggetto), `created_at`/`created_by` (istante e autore; nessuna colonna di modifica) | append-only (D6) |
 
 ## Decisions
 

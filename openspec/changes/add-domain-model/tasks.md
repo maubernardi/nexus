@@ -6,13 +6,13 @@
 
 ## 2. Migrazioni Flyway
 
-- [ ] 2.1 `V2__create_reference_tables.sql`: `project`, `zone`, `job_category`, `stored_file`
-- [ ] 2.2 `V3__create_users.sql`: `app_user`, `user_project`
-- [ ] 2.3 `V4__create_companies_and_job_slots.sql`: `company`, `job_slot` (senza la FK verso `ticket`)
-- [ ] 2.4 `V5__create_candidates.sql`: `candidate`, `candidate_language`
-- [ ] 2.5 `V6__create_tickets_and_board.sql`: sequenze, `ticket`, `board_post`, `ticket_status_history`, `ticket_company_blacklist`, FK cicliche e indice unico parziale
-- [ ] 2.6 `V7__create_company_audit_event.sql`: tabella e trigger di immutabilità
-- [ ] 2.7 Verificare `./mvnw verify` con `ddl-auto: validate` (entità e schema allineati)
+- [x] 2.1 `V2__create_reference_tables.sql`: `project`, `zone`, `job_category`, `stored_file`
+- [x] 2.2 `V3__create_users.sql`: `app_user`, `user_project`
+- [x] 2.3 `V4__create_companies_and_job_slots.sql`: `company`, `job_slot` (senza la FK verso `ticket`)
+- [x] 2.4 `V5__create_candidates.sql`: `candidate`, `candidate_language`
+- [x] 2.5 `V6__create_tickets_and_board.sql`: sequenze, `ticket`, `board_post`, `ticket_status_history`, `ticket_company_blacklist`, FK cicliche e indice unico parziale
+- [x] 2.6 `V7__create_company_audit_event.sql`: tabella e trigger di immutabilità
+- [ ] 2.7 Verificare `./mvnw verify` con `ddl-auto: validate` (entità e schema allineati) — si chiude con il gruppo 3, quando esistono le entità
 
 ## 3. Entità e repository
 
