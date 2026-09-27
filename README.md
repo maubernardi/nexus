@@ -111,4 +111,15 @@ Ogni funzionalità parte da una change proposal:
 - Tutti i **merge** li esegue il maintainer; nessun agente o automazione fa merge.
 - Nessun **push diretto su `main`** senza autorizzazione esplicita: si lavora su branch dedicati con Pull Request.
 
-Per Claude Code le regole sono imposte da `.claude/hooks/guard-git.sh` e `.claude/settings.json`.
+Le regole sono imposte su due livelli:
+
+- **GitHub — branch protection su `main`** (vale per chiunque, admin inclusi):
+  - modifiche solo tramite Pull Request;
+  - check obbligatori `Backend (Java 25 LTS)`, `Frontend (React PWA)` e `OpenSpec`, verdi e con il branch aggiornato rispetto a `main`;
+  - force push e cancellazione di `main` vietati;
+  - conversazioni della PR risolte prima del merge.
+- **Claude Code** — `.claude/hooks/guard-git.sh` e `.claude/settings.json`: i merge sono bloccati e ogni push verso `main`
+  richiede conferma esplicita.
+
+> I check obbligatori sono legati ai nomi dei job in `.github/workflows/ci.yml`: se un job viene rinominato, va aggiornata
+> anche la branch protection (Settings → Branches), altrimenti le PR restano in attesa di un check che non arriva mai.
