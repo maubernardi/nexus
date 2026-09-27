@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { SkipLink } from '@/atoms/SkipLink/SkipLink';

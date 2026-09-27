@@ -14,9 +14,9 @@ Il brief funzionale completo è in [`CLAUDE_CODE_PROMPT.md`](CLAUDE_CODE_PROMPT.
 
 ```
 nexus/
-├── backend/    Spring Boot 3.5 · Java 21 · PostgreSQL · Flyway · Spring Security (Keycloak JWT)
-├── frontend/   React 19 · Vite 7 · TypeScript · Tailwind v4 + shadcn/ui · PWA (Workbox)
-├── infra/      docker-compose: PostgreSQL 17 + Keycloak 26 (realm "nexus" importato)
+├── backend/    Spring Boot 4.1 · Java 25 LTS · PostgreSQL · Flyway · Spring Security 7 (Keycloak JWT)
+├── frontend/   React 19.3 · React Router 8 · Vite 8 · TypeScript 6 · Tailwind v4 + shadcn/ui · PWA (Workbox)
+├── infra/      docker-compose: PostgreSQL 18 + Keycloak 26.7 (realm "nexus" importato)
 └── openspec/   specifiche e change proposal (spec-driven development)
 ```
 
@@ -30,15 +30,16 @@ nexus/
 
 ## Prerequisiti
 
-- Java 21+ (il wrapper Maven è incluso)
-- Node.js 22+ e pnpm 11 (`corepack enable`)
-- Docker (per PostgreSQL, Keycloak e i test Testcontainers)
+- **JDK 25** (LTS, es. Temurin 25.0.4.1). Il wrapper Maven (3.9.16) è incluso e la build rifiuta altre versioni di JDK
+- **Node.js 24.21.0** (LTS, vedi `.nvmrc`: `nvm use`) e **pnpm 12.6.0** (`npm i -g pnpm@12.6.0`); pnpm rifiuta altre versioni di Node
+- Docker
 
 ## Avvio in locale
 
 ```bash
 # 1. Infrastruttura
 cd infra && docker compose up -d        # Postgres :5432, Keycloak :8180 (admin/admin)
+#    se avevi un volume creato con PostgreSQL 17: docker compose down -v (dati solo di sviluppo)
 
 # 2. Backend (profilo "local" = Postgres + sicurezza mock)
 cd backend && ./mvnw spring-boot:run    # http://localhost:8080
@@ -76,6 +77,17 @@ La password è la stessa per tutti in Keycloak: `password`.
 
 Variabili principali: `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `KEYCLOAK_ISSUER_URI`, `KEYCLOAK_AUDIENCE`,
 `CORS_ALLOWED_ORIGINS`, `OPENAPI_ENABLED`.
+
+## Versioni congelate
+
+Il progetto è partito il 2026-09-27 con le **ultime versioni stabili** (LTS per Java, Node e Ubuntu), ora
+**congelate**: versioni esatte in `pom.xml`, `package.json` e tag Docker; action della CI fissate per SHA. Non si
+aggiornano senza una decisione esplicita, che passa da una change OpenSpec. La matrice completa e le motivazioni sono in
+[`openspec/changes/upgrade-latest-versions/design.md`](openspec/changes/upgrade-latest-versions/design.md).
+
+| Java | Spring Boot | Node | pnpm | React | Vite | TypeScript | PostgreSQL | Keycloak |
+|---|---|---|---|---|---|---|---|---|
+| 25.0.4.1 | 4.1.1 | 24.21.0 | 12.6.0 | 19.3.0 | 8.3.1 | 6.0.3 | 18.6 | 26.7.4 |
 
 ## Comandi utili
 

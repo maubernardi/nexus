@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router';
 
 import { SkipLink } from '@/atoms/SkipLink/SkipLink';
 import type { CurrentUser } from '@/config/auth/types';

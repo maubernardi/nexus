@@ -1,5 +1,7 @@
 name: CI
 
+# Versioni congelate: action fissate per SHA (commento = tag), JDK e Node alle versioni esatte del progetto.
+
 on:
   push:
     branches: [main]
@@ -14,35 +16,35 @@ permissions:
 
 jobs:
   backend:
-    name: Backend (Java 21)
-    runs-on: ubuntu-latest
+    name: Backend (Java 25 LTS)
+    runs-on: ubuntu-26.04
     defaults:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '25.0.4'
           cache: maven
       - name: Build, unit e integration test (Testcontainers)
         run: ./mvnw -B verify
 
   frontend:
     name: Frontend (React PWA)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     defaults:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
           package_json_file: frontend/package.json
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: '22'
+          node-version-file: .nvmrc
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
@@ -57,10 +59,10 @@ jobs:
 
   openspec:
     name: OpenSpec
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: '22'
+          node-version-file: .nvmrc
       - run: npx --yes @fission-ai/openspec@1.7.0 validate --all --strict
