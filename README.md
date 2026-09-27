@@ -83,7 +83,7 @@ Variabili principali: `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `KEYCLOAK_ISSUER_U
 Il progetto è partito il 2026-09-27 con le **ultime versioni stabili** (LTS per Java, Node e Ubuntu), ora
 **congelate**: versioni esatte in `pom.xml`, `package.json` e tag Docker; action della CI fissate per SHA. Non si
 aggiornano senza una decisione esplicita, che passa da una change OpenSpec. La matrice completa e le motivazioni sono in
-[`openspec/changes/upgrade-latest-versions/design.md`](openspec/changes/upgrade-latest-versions/design.md).
+[`openspec/changes/archive/2026-09-27-upgrade-latest-versions/design.md`](openspec/changes/archive/2026-09-27-upgrade-latest-versions/design.md).
 
 | Java | Spring Boot | Node | pnpm | React | Vite | TypeScript | PostgreSQL | Keycloak |
 |---|---|---|---|---|---|---|---|---|
@@ -105,3 +105,10 @@ Ogni funzionalità parte da una change proposal:
 3. `/opsx:verify` e poi `/opsx:archive`: le delta vengono consolidate in `openspec/specs/`
 
 `openspec validate --all --strict` viene eseguito anche in CI.
+
+## Regole Git
+
+- Tutti i **merge** li esegue il maintainer; nessun agente o automazione fa merge.
+- Nessun **push diretto su `main`** senza autorizzazione esplicita: si lavora su branch dedicati con Pull Request.
+
+Per Claude Code le regole sono imposte da `.claude/hooks/guard-git.sh` e `.claude/settings.json`.
