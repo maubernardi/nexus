@@ -7,7 +7,7 @@ allowBuilds:
   esbuild: true
   sharp: true
 
-# Deroghe ai peer dependency, verificate con lint/build (vedi openspec/changes/upgrade-latest-versions/design.md):
+# Deroghe ai peer dependency, verificate con lint/build (vedi openspec/changes/archive/2026-09-27-upgrade-latest-versions/design.md):
 # - eslint-plugin-jsx-a11y 6.10.2 (ultima release) dichiara peer fino a ESLint 9 ma funziona in flat config con ESLint 10
 # - vite-plugin-pwa 1.3.0 (ultima release) dichiara peer @vite-pwa/assets-generator ^1; la 2.x genera le stesse icone
 peerDependencyRules:

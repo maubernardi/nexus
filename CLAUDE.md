@@ -1,6 +1,18 @@
 # NEXUS — istruzioni per Claude Code
 
-- **Versioni congelate** (matrice in `openspec/changes/upgrade-latest-versions/design.md`): stack fissato il 2026-09-27
+## ⛔ Regole inviolabili (Git/GitHub)
+
+1. **Tutti i merge li fa l'utente.** Mai eseguire merge: né `gh pr merge`, né `git merge`, né merge via API/UI.
+   Il lavoro si consegna su un branch dedicato con una Pull Request; l'utente decide se e quando fare il merge.
+2. **Nessun push su `main` senza il permesso esplicito dell'utente**, chiesto e ottenuto ogni volta, per QUALUNQUE modifica
+   (anche solo documentazione). Il flusso normale è: branch → push del branch → PR.
+
+Le regole sono imposte anche tecnicamente da `.claude/hooks/guard-git.sh` (PreToolUse) e da regole `deny` in
+`.claude/settings.json`: non aggirarle, non modificarle né disattivarle senza una richiesta esplicita dell'utente.
+
+## Linee guida
+
+- **Versioni congelate** (matrice in `openspec/changes/archive/2026-09-27-upgrade-latest-versions/design.md`): stack fissato il 2026-09-27
   alle ultime versioni stabili, LTS per i runtime (Java 25, Node 24.21.0). Prevalgono sulle versioni indicate dalle skill.
   NON aggiornare nulla senza una richiesta esplicita; una nuova dipendenza si aggiunge all'ultima versione stabile
   compatibile, a versione esatta (pnpm ha `saveExact`).
