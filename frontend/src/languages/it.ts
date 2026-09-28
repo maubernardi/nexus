@@ -23,7 +23,6 @@ export const it = {
     loggedAs: 'Utente collegato',
     role: 'Ruolo',
     logout: 'Esci',
-    switchUser: 'Cambia utente',
     loading: 'Caricamento del profilo utente…',
     loadError: 'Impossibile caricare il profilo utente. Riprova più tardi.',
     retry: 'Riprova',

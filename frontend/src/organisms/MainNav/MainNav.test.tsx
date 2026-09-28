@@ -28,4 +28,17 @@ describe('<MainNav>', () => {
     expect(screen.getByRole('button', { name: 'Apri menu' })).toHaveFocus();
     expect(screen.getByRole('button', { name: 'Apri menu' })).toHaveAttribute('aria-expanded', 'false');
   });
+
+  it('mostra il contenuto dedicato in cima al menu mobile', async () => {
+    renderWithProviders(<MainNav roles={['TUTOR']} mobileHeader={<p>Tutor Uno</p>} />);
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Apri menu' }));
+
+    const panel = document.getElementById(
+      screen.getByRole('button', { name: 'Chiudi menu' }).getAttribute('aria-controls') ?? '',
+    );
+    expect(panel).toHaveTextContent('Tutor Uno');
+    await expectNoAxeViolations();
+  });
 });

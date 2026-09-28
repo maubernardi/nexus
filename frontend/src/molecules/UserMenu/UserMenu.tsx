@@ -1,21 +1,20 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { LogOut, UserRound } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
-import { AUTH_MODE } from '@/config/auth/authConfig';
 import { logout } from '@/config/auth/authService';
 import type { CurrentUser } from '@/config/auth/types';
+import { UserIdentity } from '@/molecules/UserIdentity/UserIdentity';
 
 type UserMenuProps = {
   user: CurrentUser;
 };
 
+/** Identità (solo da desktop: su mobile sta nel menu a tendina) e pulsante di uscita, sempre visibile. */
 export const UserMenu = ({ user }: UserMenuProps) => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ') || user.username;
-  const primaryRole = user.roles[0];
 
   const handleLogout = async (): Promise<void> => {
     await logout();
@@ -23,23 +22,11 @@ export const UserMenu = ({ user }: UserMenuProps) => {
   };
 
   return (
-    <div className="flex items-center gap-3">
-      <p className="flex items-center gap-2 text-sm">
-        <UserRound aria-hidden="true" className="size-5 shrink-0 text-gold" />
-        <span className="sr-only">{t('user.loggedAs')}: </span>
-        <span className="flex flex-col leading-tight">
-          <span className="font-medium">{fullName}</span>
-          {primaryRole && (
-            <span className="text-xs text-gold">
-              <span className="sr-only">{t('user.role')}: </span>
-              {t(`roles.${primaryRole}`)}
-            </span>
-          )}
-        </span>
-      </p>
+    <div className="flex shrink-0 items-center gap-3">
+      <UserIdentity user={user} className="hidden md:flex" />
       <Button variant="brand" size="sm" onClick={() => void handleLogout()}>
         <LogOut aria-hidden="true" />
-        {AUTH_MODE === 'mock' ? t('user.switchUser') : t('user.logout')}
+        {t('user.logout')}
       </Button>
     </div>
   );
