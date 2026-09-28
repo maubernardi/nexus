@@ -8,7 +8,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 
+import it.nexus.services.RegisteredUserService;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -21,6 +23,7 @@ public class SecurityConfig {
 
     private final KeycloakJwtConverter jwtConverter;
     private final SecurityErrorHandlers errorHandlers;
+    private final RegisteredUserService registeredUserService;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -34,6 +37,7 @@ public class SecurityConfig {
                         .jwt(j -> j.jwtAuthenticationConverter(jwtConverter))
                         .authenticationEntryPoint(errorHandlers.authenticationEntryPoint())
                         .accessDeniedHandler(errorHandlers.accessDeniedHandler()))
+                .addFilterBefore(new RegisteredUserFilter(registeredUserService), AuthorizationFilter.class)
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(errorHandlers.authenticationEntryPoint())
                         .accessDeniedHandler(errorHandlers.accessDeniedHandler()));

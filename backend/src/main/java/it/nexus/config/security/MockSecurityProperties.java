@@ -17,10 +17,11 @@ public record MockSecurityProperties(List<MockUser> users) {
         users = users == null ? List.of() : List.copyOf(users);
     }
 
-    public record MockUser(String username, String firstName, String lastName, String email, Set<Role> roles) {
+    /** {@code id} è il soggetto dell'utente (come il {@code sub} Keycloak); l'header {@code X-USER-ID} usa lo username. */
+    public record MockUser(String id, String username, String firstName, String lastName, String email, Set<Role> roles) {
 
         public AuthenticatedUser toAuthenticatedUser() {
-            return new AuthenticatedUser(username, username, firstName, lastName, email, roles == null ? Set.of() : roles);
+            return new AuthenticatedUser(id, username, firstName, lastName, email, roles == null ? Set.of() : roles);
         }
     }
 }

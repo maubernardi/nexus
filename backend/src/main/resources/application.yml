@@ -4,12 +4,16 @@ spring:
   profiles:
     active: ${PROFILES_ACTIVE:local}
     group:
-      local: postgresql, security-mock
+      local: postgresql, security-mock, seed
       keycloak: postgresql, keycloak
       test: security-mock
   threads:
     virtual:
       enabled: true
+  datasource:
+    hikari:
+      # schema applicativo anche per le query SQL native (non solo per Hibernate)
+      schema: nexus
   jpa:
     open-in-view: false
     hibernate:

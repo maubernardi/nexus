@@ -50,16 +50,22 @@ cd frontend && pnpm install && pnpm dev # http://localhost:5173
 
 In modalità mock il frontend mostra la pagina **Accesso di sviluppo**, dove si sceglie l'utente.
 
+Il profilo `local` carica anche i **dati dimostrativi** (`backend/src/main/resources/db/seed`): progetti GOL e POLIS,
+gli utenti di test, zone e tipologie di mansione segnaposto, aziende e mansioni fittizie, candidati "Demo", 7 ticket
+in stati diversi e 3 post di bacheca. Gli script sono idempotenti; per ripartire da zero:
+`docker compose -f infra/docker-compose.yml exec postgres psql -U nexus -d nexus -c 'DROP SCHEMA nexus CASCADE'`.
+
 ### Usare Keycloak reale
 
 ```bash
-cd backend && PROFILES_ACTIVE=keycloak ./mvnw spring-boot:run
+cd backend && PROFILES_ACTIVE=keycloak,seed ./mvnw spring-boot:run
 cd frontend && VITE_AUTH_MODE=keycloak pnpm dev
 ```
 
 ### Utenti di test
 
-La password è la stessa per tutti in Keycloak: `password`.
+La password è la stessa per tutti in Keycloak: `password`. Per accedere un utente deve esistere anche in NEXUS
+(tabella `app_user`, creata dal seed): gli utenti autenticati ma non censiti o disattivati ricevono 403.
 
 | Username | Ruolo |
 |---|---|
@@ -67,13 +73,34 @@ La password è la stessa per tutti in Keycloak: `password`.
 | `operatore.cc` | CALL_CENTER |
 | `admin` | ADMIN |
 
+## Modello dati
+
+Schema PostgreSQL `nexus`, gestito solo da migrazioni Flyway (`backend/src/main/resources/db/migration`).
+Diagramma ER, tabelle e motivazioni: [`openspec/changes/add-domain-model/design.md`](openspec/changes/add-domain-model/design.md);
+requisiti in `openspec/specs/domain-model`.
+
+| Area | Tabelle |
+|---|---|
+| Riferimento | `project`, `zone`, `job_category`, `stored_file` |
+| Utenti | `app_user` (censiti da NEXUS, ruolo in copia da Keycloak), `user_project` |
+| Candidati | `candidate`, `candidate_language` |
+| Aziende | `company`, `job_slot`, `company_audit_event` (in sola aggiunta, imposto da trigger) |
+| Segnalazioni | `ticket`, `ticket_status_history`, `ticket_company_blacklist`, `board_post` |
+
+- **Identificativi**: chiave primaria TSID (64 bit), esposta nelle API come stringa di 13 caratteri; ticket e post hanno
+  anche un numero progressivo leggibile.
+- **Integrità nel database**: vincoli `CHECK`, unicità, chiavi esterne e trigger, verificati da `DomainConstraintsIT`.
+- **Audit e concorrenza**: `created/updated at/by` su tutte le tabelle; blocco ottimistico su ticket, mansioni e post.
+- **GDPR**: i candidati contengono dati di categoria particolare. Accesso controllato, nessun dato personale nei log,
+  `anonymized_at` predisposto per l'anonimizzazione.
+
 ## Profili backend
 
 | `PROFILES_ACTIVE` | Composizione | Autenticazione |
 |---|---|---|
-| `local` (default) | postgresql, security-mock | header `X-USER-ID` |
-| `keycloak` | postgresql, keycloak | JWT Keycloak |
-| `test` | Testcontainers, security-mock | header `X-USER-ID` |
+| `local` (default) | postgresql, security-mock, seed | header `X-USER-ID` |
+| `keycloak` | postgresql, keycloak (in locale aggiungere `seed`) | JWT Keycloak |
+| `test` | Testcontainers, security-mock (senza seed) | header `X-USER-ID` |
 
 Variabili principali: `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `KEYCLOAK_ISSUER_URI`, `KEYCLOAK_AUDIENCE`,
 `CORS_ALLOWED_ORIGINS`, `OPENAPI_ENABLED`.

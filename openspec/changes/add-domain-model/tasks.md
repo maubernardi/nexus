@@ -1,0 +1,50 @@
+## 1. Infrastruttura di persistenza
+
+- [x] 1.1 Aggiungere `io.hypersistence:hypersistence-tsid` 2.1.4 al `pom.xml` (versione esatta)
+- [x] 1.2 Implementare `@TsidId` (generatore Hibernate 7) e `AbstractAuditingEntity` con Spring Data JPA Auditing e `AuditorAware` (username o `system`)
+- [x] 1.3 Test unitari del generatore (ID univoci e crescenti) e dell'`AuditorAware`
+
+## 2. Migrazioni Flyway
+
+- [x] 2.1 `V2__create_reference_tables.sql`: `project`, `zone`, `job_category`, `stored_file`
+- [x] 2.2 `V3__create_users.sql`: `app_user`, `user_project`
+- [x] 2.3 `V4__create_companies_and_job_slots.sql`: `company`, `job_slot` (senza la FK verso `ticket`)
+- [x] 2.4 `V5__create_candidates.sql`: `candidate`, `candidate_language`
+- [x] 2.5 `V6__create_tickets_and_board.sql`: sequenze, `ticket`, `board_post`, `ticket_status_history`, `ticket_company_blacklist`, FK cicliche e indice unico parziale
+- [x] 2.6 `V7__create_company_audit_event.sql`: tabella e trigger di immutabilità
+- [x] 2.7 Verificare `./mvnw verify` con `ddl-auto: validate` (entità e schema allineati) — chiuso nel gruppo 3, con `DomainPersistenceIT`
+
+## 3. Entità e repository
+
+- [x] 3.1 Enum di dominio (`Role`, stati, tipi, genere, titolo di studio, patenti, mezzo di trasporto, livello linguistico)
+- [x] 3.2 Entità e repository: `Project`, `AppUser`, `Zone`, `JobCategory`, `StoredFile`
+- [x] 3.3 Entità e repository: `Candidate`, `CandidateLanguage`, `Company`, `JobSlot`
+- [x] 3.4 Entità e repository: `Ticket`, `TicketStatusHistory`, `TicketCompanyBlacklist`, `BoardPost`
+- [x] 3.5 `CompanyAuditEvent` `@Immutable` con repository di sola aggiunta e lettura
+- [x] 3.6 `toString()` delle entità senza dati personali (D9)
+
+## 4. Accesso riservato agli utenti censiti
+
+- [x] 4.1 Utenti mock con `id` fisso e realm Keycloak di sviluppo con `id` utente fissi e allineati
+- [x] 4.2 Filtro post-autenticazione: 403 per utente assente o disattivato, riallineamento del ruolo in copia
+- [x] 4.3 Adeguare `CurrentUserResourceIT` (utenti inseriti nel test) e aggiungere i casi: non censito, disattivato, ruolo cambiato
+
+## 5. Seed locale
+
+- [x] 5.1 Sotto-profilo `seed` nel gruppo `local` (`application-seed.yml` con `classpath:db/seed`)
+- [x] 5.2 `R__seed_*.sql` idempotenti: progetti, utenti e assegnazioni, zone e tipologie segnaposto, aziende, mansioni, candidati fittizi, ticket in più stati (anche speciale), post pubblico, riservato e bozza
+- [x] 5.3 Verificare avvio `local` su database vuoto, riavvio senza duplicati, profilo `test` senza seed
+
+## 6. Test d'integrazione dei vincoli (Testcontainers)
+
+- [x] 6.1 Numerazione progressiva di ticket e post; unicità (codici, `vat_code`, `external_id`, blacklist, lingua)
+- [x] 6.2 Vincoli del ticket (categoria XOR testo libero, `SPECIAL` ⇒ post, fast-track ⇒ `SPECIAL`, timer) e stati non ammessi
+- [x] 6.3 Mansione: `BLOCCATA` ⇔ ticket; un ticket per mansione; conflitto di versione tra due modifiche
+- [x] 6.4 Bacheca: un post attivo per mansione, `PUBLISHED` ⇒ data, età e valori positivi
+- [x] 6.5 Candidato: patente coerente, valori ammessi; cancellazione di un tutor con ticket rifiutata
+- [x] 6.6 Audit trail: UPDATE, DELETE e TRUNCATE rifiutati dal database
+
+## 7. Chiusura
+
+- [x] 7.1 Aggiornare README (modello dati, seed) e `openspec validate --all --strict`
+- [x] 7.2 PR con CI verde (il merge lo esegue l'utente)
