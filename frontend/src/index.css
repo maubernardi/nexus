@@ -7,54 +7,63 @@
  */
 :root {
   --radius: 0.625rem;
-  --background: #ffffff;
-  --foreground: #1a1f2b;
+  /* Palette irlandese: Irish Green #019529, Deep Emerald #014C17, Soft Sage #CAE5D1, Classic Gold #D4AF37,
+     Cream #FDFBF7. Oro mai come testo sul chiaro (2,0:1); Irish Green solo per indicatori/grafica (3,8:1). */
+  --background: #fdfbf7;
+  --foreground: #0f2417;
   --card: #ffffff;
-  --card-foreground: #1a1f2b;
+  --card-foreground: #0f2417;
   --popover: #ffffff;
-  --popover-foreground: #1a1f2b;
-  --primary: #0b5560;
-  --primary-foreground: #ffffff;
-  --secondary: #f1f4f6;
-  --secondary-foreground: #1a1f2b;
-  --muted: #f1f4f6;
-  --muted-foreground: #4b5563;
-  --accent: #e0f2f1;
-  --accent-foreground: #0b3f47;
+  --popover-foreground: #0f2417;
+  --brand: #014c17;
+  --brand-foreground: #fdfbf7;
+  --gold: #d4af37;
+  --primary: #014c17;
+  --primary-foreground: #fdfbf7;
+  --secondary: #cae5d1;
+  --secondary-foreground: #014c17;
+  --muted: #eff5ef;
+  --muted-foreground: #3f5a47;
+  --accent: #cae5d1;
+  --accent-foreground: #014c17;
   --destructive: #b42318;
   --destructive-foreground: #ffffff;
   --warning: #fef3c7;
   --warning-foreground: #6b3a07;
   /* separatori decorativi */
-  --border: #d5dbe1;
+  --border: #d6e4d9;
   /* bordi dei controlli: contrasto non testuale >= 3:1 */
-  --input: #6b7280;
-  --ring: #0b5560;
+  --input: #5b7a63;
+  /* focus: Irish Green (3,8:1 sul fondo) */
+  --ring: #019529;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0f141a;
-    --foreground: #e8edf3;
-    --card: #161d25;
-    --card-foreground: #e8edf3;
-    --popover: #161d25;
-    --popover-foreground: #e8edf3;
-    --primary: #5ec4c9;
-    --primary-foreground: #0f141a;
-    --secondary: #1c2530;
-    --secondary-foreground: #e8edf3;
-    --muted: #1c2530;
-    --muted-foreground: #a9b4c2;
-    --accent: #153b40;
-    --accent-foreground: #c9f1f2;
+    --background: #0b1a10;
+    --foreground: #f4f1e8;
+    --card: #12261a;
+    --card-foreground: #f4f1e8;
+    --popover: #12261a;
+    --popover-foreground: #f4f1e8;
+    --brand: #0e3a1c;
+    --brand-foreground: #fdfbf7;
+    --gold: #d4af37;
+    --primary: #5ccb7c;
+    --primary-foreground: #0b1a10;
+    --secondary: #1e3a27;
+    --secondary-foreground: #cae5d1;
+    --muted: #16301f;
+    --muted-foreground: #b7cdbe;
+    --accent: #1e3a27;
+    --accent-foreground: #cae5d1;
     --destructive: #f97066;
-    --destructive-foreground: #0f141a;
+    --destructive-foreground: #0b1a10;
     --warning: #3b2a06;
     --warning-foreground: #fde68a;
-    --border: #2a3542;
-    --input: #7b8794;
-    --ring: #8fe3e7;
+    --border: #25402d;
+    --input: #7f9f88;
+    --ring: #d4af37;
   }
 }
 
@@ -65,6 +74,9 @@
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-gold: var(--gold);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);

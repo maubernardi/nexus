@@ -13,13 +13,14 @@ export const AppHeader = ({ user }: AppHeaderProps) => {
   const { t } = useTranslation();
 
   return (
-    <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
+    // fondo Deep Emerald con filetto oro; dentro l'intestazione il focus è oro (il verde non si vedrebbe)
+    <header className="sticky top-0 z-30 border-b-2 border-gold bg-brand text-brand-foreground [--ring:var(--gold)]">
       <div className="relative mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div className="flex items-center gap-4">
           <Link
             to="/"
             aria-label={t('a11y.homeLink')}
-            className="flex min-h-11 items-center gap-2 rounded-md text-lg font-bold"
+            className="flex min-h-11 items-center gap-2 rounded-md text-lg font-bold tracking-wide"
           >
             <img src="/favicon.svg" alt="" className="size-8" />
             <span aria-hidden="true">{t('app.name')}</span>

@@ -19,6 +19,8 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline underline-offset-4 hover:decoration-2",
+        // pulsanti dentro l'intestazione (fondo brand): bordo oro 4,9:1, testo crema 9,9:1
+        brand: "border border-gold bg-transparent text-brand-foreground hover:bg-brand-foreground/10",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

@@ -13,10 +13,14 @@ export const HomePage = () => {
       <PageHeading>
         <span id="home-heading">{t('pages.home.heading')}</span>
       </PageHeading>
-      {user && (
-        <p className="text-lg">{t('pages.home.greeting', { name: user.firstName ?? user.username })}</p>
-      )}
-      {primaryRole && <p>{t(`pages.home.intro.${primaryRole}`)}</p>}
+      <div className="space-y-3 rounded-xl border border-l-4 border-border border-l-primary bg-card p-6 text-card-foreground shadow-sm">
+        {user && (
+          <p className="text-lg font-medium">
+            {t('pages.home.greeting', { name: user.firstName ?? user.username })}
+          </p>
+        )}
+        {primaryRole && <p>{t(`pages.home.intro.${primaryRole}`)}</p>}
+      </div>
       <p className="text-muted-foreground">{t('pages.home.comingSoon')}</p>
     </section>
   );
