@@ -20,6 +20,6 @@
 ## 4. Messa online (con il committente)
 
 - [x] 4.1 DNS IONOS: A `auth` e `www`, CAA Let's Encrypt; verifica della propagazione
-- [ ] 4.2 Esecuzione di `bootstrap.sh` sul server
-- [ ] 4.3 Primo deploy da GitHub; verifica degli scenari della spec `deployment` su `portalenexus.it`
-- [ ] 4.4 README (DNS, preparazione, deploy, tunnel per la console Keycloak), `openspec validate`, PR con CI verde
+- [x] 4.2 Esecuzione di `bootstrap.sh` sul server
+- [x] 4.3 Primo deploy da GitHub; verifica degli scenari della spec `deployment` su `portalenexus.it`
+- [x] 4.4 README (DNS, preparazione, deploy, tunnel per la console Keycloak), `openspec validate`, PR con CI verde
