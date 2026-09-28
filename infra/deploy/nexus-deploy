@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# NEXUS — script di deploy eseguito come utente `deploy`, SOLO come forced command SSH:
+#   authorized_keys: restrict,command="/usr/local/bin/nexus-deploy" ssh-ed25519 ...
+# Uso (dalla pipeline): printf '%s' "$GHCR_TOKEN" | ssh deploy@server "deploy <sha40> <github-actor>"
+# Scarica i file di infra/deploy del commit indicato dal repository pubblico, avvia le immagini taggate con quel
+# commit e attende che i servizi siano sani; se l'avvio fallisce ripristina la release precedente.
+set -euo pipefail
+
+readonly REPO="maubernardi/nexus"
+readonly BASE="/opt/nexus"
+readonly FILES=(compose.yaml postgres/init/10-create-roles.sh keycloak/nexus-realm.demo.json)
+readonly KEEP_RELEASES=5
+
+fail() { echo "ERRORE: $*" >&2; exit 2; }
+
+read -r cmd sha actor extra <<<"${SSH_ORIGINAL_COMMAND:-}"
+[[ "${cmd:-}" == "deploy" && "${sha:-}" =~ ^[0-9a-f]{40}$ && "${actor:-}" =~ ^[A-Za-z0-9][A-Za-z0-9-]{0,38}$ && -z "${extra:-}" ]] \
+  || fail "comando non consentito. Uso: deploy <sha40> <github-actor>"
+
+# un deploy alla volta
+exec 9>"$BASE/.deploy.lock"
+flock -n 9 || fail "un altro deploy è in corso"
+
+token="$(head -c 4096)"
+[[ -n "$token" ]] || fail "token GHCR mancante su stdin"
+
+compose() {
+  docker compose --project-directory "$1" -f "$1/compose.yaml" --env-file "$BASE/.env" --env-file "$1/release.env" "${@:2}"
+}
+
+cleanup() { docker logout ghcr.io >/dev/null 2>&1 || true; }
+trap cleanup EXIT
+
+release="$BASE/releases/$sha"
+echo "==> Release $sha (richiesta da $actor)"
+mkdir -p "$release"
+for f in "${FILES[@]}"; do
+  mkdir -p "$release/$(dirname "$f")"
+  curl -fsSL --retry 3 "https://raw.githubusercontent.com/$REPO/$sha/infra/deploy/$f" -o "$release/$f.tmp"
+  mv "$release/$f.tmp" "$release/$f"
+done
+chmod 755 "$release/postgres/init/10-create-roles.sh"
+echo "NEXUS_VERSION=$sha" >"$release/release.env"
+
+printf '%s' "$token" | docker login ghcr.io -u "$actor" --password-stdin >/dev/null
+echo "==> Download delle immagini"
+compose "$release" pull --quiet
+
+previous="$(readlink -f "$BASE/current" 2>/dev/null || true)"
+echo "==> Avvio (attesa servizi sani, max 7 minuti)"
+if compose "$release" up -d --remove-orphans --wait --wait-timeout 420; then
+  ln -sfn "$release" "$BASE/current"
+  echo "==> OK: in esecuzione $sha"
+  compose "$release" ps --format 'table {{.Service}}\t{{.Status}}'
+else
+  echo "==> Avvio fallito: stato e log recenti" >&2
+  compose "$release" ps -a >&2 || true
+  compose "$release" logs --tail 40 >&2 || true
+  if [[ -n "$previous" && -d "$previous" && "$previous" != "$release" ]]; then
+    echo "==> Ripristino della release precedente: $(basename "$previous")" >&2
+    compose "$previous" up -d --remove-orphans --wait --wait-timeout 420 >&2 || true
+  fi
+  exit 1
+fi
+
+# pulizia: ultime release e immagini NEXUS non più usate da oltre 10 giorni
+ls -1dt "$BASE"/releases/*/ | tail -n +$((KEEP_RELEASES + 1)) | xargs -r rm -rf
+docker image prune -af --filter "label=org.opencontainers.image.source=https://github.com/$REPO" --filter "until=240h" >/dev/null

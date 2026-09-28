@@ -13,9 +13,9 @@
 
 ## 3. Server e deploy
 
-- [ ] 3.1 `infra/deploy/bootstrap.sh` (idempotente) e script `nexus-deploy` (forced command)
-- [ ] 3.2 Workflow `deploy-demo.yml` (build, push GHCR, deploy via SSH, smoke test) con action fissate per SHA
-- [ ] 3.3 Chiave di deploy: generazione, segreti dell'environment GitHub `demo` (chiave, known_hosts verificato)
+- [x] 3.1 `infra/deploy/bootstrap.sh` (idempotente) e script `nexus-deploy` (forced command)
+- [x] 3.2 Workflow `deploy-demo.yml` (build, push GHCR, deploy via SSH, smoke test) con action fissate per SHA
+- [x] 3.3 Chiave di deploy: generazione, segreti dell'environment GitHub `demo` (chiave, known_hosts verificato)
 
 ## 4. Messa online (con il committente)
 
