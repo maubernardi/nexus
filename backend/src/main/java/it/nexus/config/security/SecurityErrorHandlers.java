@@ -28,7 +28,8 @@ public class SecurityErrorHandlers {
     }
 
     public AccessDeniedHandler accessDeniedHandler() {
-        return (request, response, ex) -> write(request, response, HttpStatus.FORBIDDEN, "Accesso negato");
+        return (request, response, ex) -> write(request, response, HttpStatus.FORBIDDEN,
+                ex instanceof UserNotEnabledException ? UserNotEnabledException.MESSAGE : "Accesso negato");
     }
 
     private void write(HttpServletRequest request, HttpServletResponse response, HttpStatus status, String message)

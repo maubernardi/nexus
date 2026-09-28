@@ -4,6 +4,8 @@ import java.io.Serial;
 
 import org.hibernate.Hibernate;
 
+import io.hypersistence.tsid.TSID;
+
 import it.nexus.domain.id.TsidId;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
@@ -43,6 +45,11 @@ public abstract class AbstractTsidEntity extends AbstractAuditingEntity {
 
     @Override
     public String toString() {
-        return Hibernate.getClass(this).getSimpleName() + "[id=" + id + "]";
+        return Hibernate.getClass(this).getSimpleName() + "[id=" + externalId() + "]";
+    }
+
+    /** Id nella forma esposta dalle API (TSID a 13 caratteri), {@code null} prima del persist. */
+    protected String externalId() {
+        return id == null ? null : TSID.from(id).toString();
     }
 }

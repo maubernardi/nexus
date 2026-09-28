@@ -101,6 +101,6 @@ public class Ticket extends AbstractTsidEntity {
 
     @Override
     public String toString() {
-        return "Ticket[id=" + getId() + ", number=" + number + ", status=" + status + "]";
+        return "Ticket[id=" + externalId() + ", number=" + number + ", status=" + status + "]";
     }
 }

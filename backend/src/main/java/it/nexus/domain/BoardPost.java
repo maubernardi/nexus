@@ -95,6 +95,6 @@ public class BoardPost extends AbstractTsidEntity {
 
     @Override
     public String toString() {
-        return "BoardPost[id=" + getId() + ", number=" + number + ", status=" + status + "]";
+        return "BoardPost[id=" + externalId() + ", number=" + number + ", status=" + status + "]";
     }
 }

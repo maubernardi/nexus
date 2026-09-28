@@ -33,8 +33,12 @@ public final class TestEntities {
     }
 
     public static AppUser user(String username, Role role) {
+        return user(username, role, "ext-" + username);
+    }
+
+    public static AppUser user(String username, Role role, String externalId) {
         AppUser user = new AppUser();
-        user.setExternalId("ext-" + username);
+        user.setExternalId(externalId);
         user.setUsername(username);
         user.setFirstName("Nome");
         user.setLastName("Cognome");

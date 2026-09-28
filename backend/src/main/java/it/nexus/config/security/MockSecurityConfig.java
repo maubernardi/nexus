@@ -8,8 +8,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 
+import it.nexus.services.RegisteredUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,6 +27,7 @@ public class MockSecurityConfig {
 
     private final MockSecurityProperties properties;
     private final SecurityErrorHandlers errorHandlers;
+    private final RegisteredUserService registeredUserService;
 
     @Bean
     SecurityFilterChain mockSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -36,6 +39,7 @@ public class MockSecurityConfig {
                         .requestMatchers(RequestsAuthorizer.PUBLIC_PATHS).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new MockHeaderAuthenticationFilter(properties), AnonymousAuthenticationFilter.class)
+                .addFilterBefore(new RegisteredUserFilter(registeredUserService), AuthorizationFilter.class)
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(errorHandlers.authenticationEntryPoint())
                         .accessDeniedHandler(errorHandlers.accessDeniedHandler()));

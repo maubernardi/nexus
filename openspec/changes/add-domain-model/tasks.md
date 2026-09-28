@@ -25,9 +25,9 @@
 
 ## 4. Accesso riservato agli utenti censiti
 
-- [ ] 4.1 Utenti mock con `id` fisso e realm Keycloak di sviluppo con `id` utente fissi e allineati
-- [ ] 4.2 Filtro post-autenticazione: 403 per utente assente o disattivato, riallineamento del ruolo in copia
-- [ ] 4.3 Adeguare `CurrentUserResourceIT` (utenti inseriti nel test) e aggiungere i casi: non censito, disattivato, ruolo cambiato
+- [x] 4.1 Utenti mock con `id` fisso e realm Keycloak di sviluppo con `id` utente fissi e allineati
+- [x] 4.2 Filtro post-autenticazione: 403 per utente assente o disattivato, riallineamento del ruolo in copia
+- [x] 4.3 Adeguare `CurrentUserResourceIT` (utenti inseriti nel test) e aggiungere i casi: non censito, disattivato, ruolo cambiato
 
 ## 5. Seed locale
 

@@ -66,6 +66,7 @@
   ],
   "users": [
     {
+      "id": "00000000-0000-4000-8000-000000000001",
       "username": "tutor1",
       "firstName": "Tutor",
       "lastName": "Uno",
@@ -84,6 +85,7 @@
       ]
     },
     {
+      "id": "00000000-0000-4000-8000-000000000002",
       "username": "tutor2",
       "firstName": "Tutor",
       "lastName": "Due",
@@ -102,6 +104,7 @@
       ]
     },
     {
+      "id": "00000000-0000-4000-8000-000000000003",
       "username": "operatore.cc",
       "firstName": "Operatore",
       "lastName": "Call Center",
@@ -120,6 +123,7 @@
       ]
     },
     {
+      "id": "00000000-0000-4000-8000-000000000004",
       "username": "admin",
       "firstName": "Amministratore",
       "lastName": "Nexus",
