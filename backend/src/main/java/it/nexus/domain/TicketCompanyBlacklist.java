@@ -3,6 +3,8 @@ package it.nexus.domain;
 import java.io.Serial;
 import java.io.Serializable;
 
+import org.springframework.data.domain.Persistable;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
@@ -11,7 +13,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PostPersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -22,13 +27,20 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "ticket_company_blacklist")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TicketCompanyBlacklist extends AbstractCreationAuditingEntity {
+public class TicketCompanyBlacklist extends AbstractCreationAuditingEntity implements Persistable<TicketCompanyBlacklist.Id> {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
     private Id id;
+
+    /**
+     * Chiave assegnata dall'applicazione: senza questo flag Spring Data tratterebbe ogni istanza come esistente e
+     * un duplicato diventerebbe un aggiornamento silenzioso invece di violare la chiave primaria.
+     */
+    @Transient
+    private boolean isNew = true;
 
     @MapsId("ticketId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -69,5 +81,16 @@ public class TicketCompanyBlacklist extends AbstractCreationAuditingEntity {
             this.ticketId = ticketId;
             this.companyId = companyId;
         }
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    @PostLoad
+    @PostPersist
+    void markNotNew() {
+        this.isNew = false;
     }
 }

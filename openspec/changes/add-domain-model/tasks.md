@@ -37,12 +37,12 @@
 
 ## 6. Test d'integrazione dei vincoli (Testcontainers)
 
-- [ ] 6.1 Numerazione progressiva di ticket e post; unicità (codici, `vat_code`, `external_id`, blacklist, lingua)
-- [ ] 6.2 Vincoli del ticket (categoria XOR testo libero, `SPECIAL` ⇒ post, fast-track ⇒ `SPECIAL`, timer) e stati non ammessi
-- [ ] 6.3 Mansione: `BLOCCATA` ⇔ ticket; un ticket per mansione; conflitto di versione tra due modifiche
-- [ ] 6.4 Bacheca: un post attivo per mansione, `PUBLISHED` ⇒ data, età e valori positivi
-- [ ] 6.5 Candidato: patente coerente, valori ammessi; cancellazione di un tutor con ticket rifiutata
-- [ ] 6.6 Audit trail: UPDATE, DELETE e TRUNCATE rifiutati dal database
+- [x] 6.1 Numerazione progressiva di ticket e post; unicità (codici, `vat_code`, `external_id`, blacklist, lingua)
+- [x] 6.2 Vincoli del ticket (categoria XOR testo libero, `SPECIAL` ⇒ post, fast-track ⇒ `SPECIAL`, timer) e stati non ammessi
+- [x] 6.3 Mansione: `BLOCCATA` ⇔ ticket; un ticket per mansione; conflitto di versione tra due modifiche
+- [x] 6.4 Bacheca: un post attivo per mansione, `PUBLISHED` ⇒ data, età e valori positivi
+- [x] 6.5 Candidato: patente coerente, valori ammessi; cancellazione di un tutor con ticket rifiutata
+- [x] 6.6 Audit trail: UPDATE, DELETE e TRUNCATE rifiutati dal database
 
 ## 7. Chiusura
 

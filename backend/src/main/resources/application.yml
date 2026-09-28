@@ -10,6 +10,10 @@ spring:
   threads:
     virtual:
       enabled: true
+  datasource:
+    hikari:
+      # schema applicativo anche per le query SQL native (non solo per Hibernate)
+      schema: nexus
   jpa:
     open-in-view: false
     hibernate:
