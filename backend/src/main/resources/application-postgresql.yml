@@ -4,3 +4,8 @@ spring:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/nexus}
     username: ${DB_USERNAME:nexus}
     password: ${DB_PASSWORD:nexus}
+  flyway:
+    # In produzione le migrazioni girano con il proprietario dello schema (FLYWAY_USERNAME), l'app con un utente
+    # senza DDL (DB_USERNAME). In sviluppo, senza variabili, coincidono.
+    user: ${FLYWAY_USERNAME:${DB_USERNAME:nexus}}
+    password: ${FLYWAY_PASSWORD:${DB_PASSWORD:nexus}}

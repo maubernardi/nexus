@@ -1,8 +1,8 @@
 ## 1. Immagini container
 
-- [ ] 1.1 `backend/Dockerfile` (runtime Temurin 25.0.4.1 JRE, utente non root, layer del jar) e verifica `docker run` locale
-- [ ] 1.2 Backend: `spring.flyway.user/password` separabili, `forward-headers-strategy`, `jwk-set-uri` configurabile (default invariati) + test verdi
-- [ ] 1.3 `frontend/Dockerfile` (Caddy 2.11.4 + `dist`) e `Caddyfile` con routing, blocco `/admin`, header di sicurezza e cache
+- [x] 1.1 `backend/Dockerfile` (runtime Temurin 25.0.4.1 JRE, utente non root, layer del jar) e verifica `docker run` locale
+- [x] 1.2 Backend: `spring.flyway.user/password` separabili, `forward-headers-strategy`, `jwk-set-uri` configurabile (default invariati) + test verdi
+- [x] 1.3 `frontend/Dockerfile` (Caddy 2.11.4 + `dist`) e `Caddyfile` con routing, blocco `/admin`, header di sicurezza e cache
 
 ## 2. Stack di produzione
 
