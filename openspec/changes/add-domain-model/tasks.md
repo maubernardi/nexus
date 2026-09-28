@@ -47,4 +47,4 @@
 ## 7. Chiusura
 
 - [x] 7.1 Aggiornare README (modello dati, seed) e `openspec validate --all --strict`
-- [ ] 7.2 PR con CI verde (il merge lo esegue l'utente)
+- [x] 7.2 PR con CI verde (il merge lo esegue l'utente)
