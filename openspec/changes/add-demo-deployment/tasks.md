@@ -6,10 +6,10 @@
 
 ## 2. Stack di produzione
 
-- [ ] 2.1 `infra/deploy/compose.yaml`: web, backend, keycloak, postgres; solo `web` con porte pubbliche; healthcheck, limiti di memoria, log
-- [ ] 2.2 Init PostgreSQL: utenti `nexus_owner`/`nexus_app`/`keycloak`, schema e default privileges
-- [ ] 2.3 Realm demo con placeholder delle password; verifica dell'import con Keycloak 26.7.4 in locale
-- [ ] 2.4 Prova completa in locale dello stack di produzione (certificati interni di Caddy, domini simulati): login, `/api/v1/me`, `/admin` bloccato, trigger non eliminabile da `nexus_app`
+- [x] 2.1 `infra/deploy/compose.yaml`: web, backend, keycloak, postgres; solo `web` con porte pubbliche; healthcheck, limiti di memoria, log
+- [x] 2.2 Init PostgreSQL: utenti `nexus_owner`/`nexus_app`/`keycloak`, schema e default privileges
+- [x] 2.3 Realm demo con placeholder delle password; verifica dell'import con Keycloak 26.7.4 in locale
+- [x] 2.4 Prova completa in locale dello stack di produzione (certificati interni di Caddy, domini simulati): login, `/api/v1/me`, `/admin` bloccato, trigger non eliminabile da `nexus_app`
 
 ## 3. Server e deploy
 

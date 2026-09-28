@@ -30,7 +30,16 @@ export default defineConfig([
         { selector: 'ExportDefaultDeclaration', message: 'Usare named export.' },
         { selector: 'TSEnumDeclaration', message: 'Usare union di tipi invece di enum.' },
       ],
-      'no-restricted-imports': ['error', { patterns: [{ group: ['../*'], message: "Usare l'alias @/." }] }],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [{ group: ['../*'], message: "Usare l'alias @/." }],
+          // l'entry principale inietta un <style> inline, bloccato dalla CSP di produzione (style-src 'self')
+          paths: [
+            { name: 'react-toastify', message: "Usare 'react-toastify/unstyled' (CSS importato come file)." },
+          ],
+        },
+      ],
     },
   },
   {
