@@ -97,9 +97,12 @@ else
 fi
 
 step "Firewall: HTTP, HTTPS, HTTP/3"
-firewall-cmd --permanent --add-service=http --add-service=https --add-port=443/udp >/dev/null
+# servizi e porte in chiamate separate: firewall-cmd non accetta --add-service e --add-port insieme
+firewall-cmd --permanent --add-service=http --add-service=https >/dev/null
+firewall-cmd --permanent --add-port=443/udp >/dev/null
 firewall-cmd --reload >/dev/null
 firewall-cmd --list-services
+firewall-cmd --list-ports
 
 step "Fatto"
 echo "Il server è pronto: il primo deploy si avvia da GitHub (Actions -> Deploy demo -> Run workflow)."
