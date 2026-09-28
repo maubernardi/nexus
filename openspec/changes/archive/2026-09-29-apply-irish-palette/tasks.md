@@ -8,4 +8,4 @@
 
 - [x] 2.1 `pnpm lint`, `format:check`, `test --run`, `build`
 - [x] 2.2 Audit axe con contrasto in Chromium reale: tema chiaro e scuro, desktop e menu mobile aperto; screenshot
-- [ ] 2.3 PR con CI verde; deploy della demo su comando del committente
+- [x] 2.3 PR con CI verde; deploy della demo su comando del committente
