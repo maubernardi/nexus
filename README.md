@@ -119,7 +119,7 @@ aggiornano senza una decisione esplicita, che passa da una change OpenSpec. La m
 ## Demo online
 
 La demo con dati fittizi è pubblicata su **https://portalenexus.it** (Keycloak su `https://auth.portalenexus.it`).
-Architettura e decisioni: [`openspec/changes/add-demo-deployment/design.md`](openspec/changes/add-demo-deployment/design.md).
+Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deployment/design.md`](openspec/changes/archive/2026-09-28-add-demo-deployment/design.md).
 
 | Cosa | Dove |
 |---|---|
