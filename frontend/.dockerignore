@@ -1,0 +1,4 @@
+# Solo PWA compilata e Caddyfile servono al build dell immagine
+*
+!dist/**
+!Caddyfile

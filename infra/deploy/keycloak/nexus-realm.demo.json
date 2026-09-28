@@ -1,0 +1,153 @@
+{
+  "realm": "nexus",
+  "enabled": true,
+  "displayName": "NEXUS",
+  "internationalizationEnabled": true,
+  "supportedLocales": [
+    "it",
+    "en"
+  ],
+  "defaultLocale": "it",
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": false,
+  "rememberMe": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "bruteForceProtected": true,
+  "failureFactor": 5,
+  "waitIncrementSeconds": 60,
+  "maxFailureWaitSeconds": 900,
+  "permanentLockout": false,
+  "passwordPolicy": "length(12) and notUsername and notEmail",
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "roles": {
+    "realm": [
+      {
+        "name": "TUTOR",
+        "description": "Tutor territoriale"
+      },
+      {
+        "name": "CALL_CENTER",
+        "description": "Operatore Call Center"
+      },
+      {
+        "name": "ADMIN",
+        "description": "Amministratore"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "nexus-frontend",
+      "name": "NEXUS PWA",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "redirectUris": [
+        "https://${NEXUS_DOMAIN}/*"
+      ],
+      "webOrigins": [
+        "https://${NEXUS_DOMAIN}"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "https://${NEXUS_DOMAIN}/*"
+      },
+      "protocolMappers": [
+        {
+          "name": "audience-nexus-backend",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "nexus-backend",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "username": "tutor1",
+      "firstName": "Tutor",
+      "lastName": "Uno",
+      "email": "tutor1@nexus.local",
+      "emailVerified": true,
+      "enabled": true,
+      "realmRoles": [
+        "TUTOR"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${NEXUS_DEMO_PASSWORD_TUTOR1}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000002",
+      "username": "tutor2",
+      "firstName": "Tutor",
+      "lastName": "Due",
+      "email": "tutor2@nexus.local",
+      "emailVerified": true,
+      "enabled": true,
+      "realmRoles": [
+        "TUTOR"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${NEXUS_DEMO_PASSWORD_TUTOR2}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000003",
+      "username": "operatore.cc",
+      "firstName": "Operatore",
+      "lastName": "Call Center",
+      "email": "operatore.cc@nexus.local",
+      "emailVerified": true,
+      "enabled": true,
+      "realmRoles": [
+        "CALL_CENTER"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${NEXUS_DEMO_PASSWORD_OPERATORE}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000004",
+      "username": "admin",
+      "firstName": "Amministratore",
+      "lastName": "Nexus",
+      "email": "admin@nexus.local",
+      "emailVerified": true,
+      "enabled": true,
+      "realmRoles": [
+        "ADMIN"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${NEXUS_DEMO_PASSWORD_ADMIN}",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}

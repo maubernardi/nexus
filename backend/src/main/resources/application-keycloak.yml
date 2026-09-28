@@ -1,3 +1,6 @@
+# Dietro un reverse proxy (produzione) si impostano anche, tramite variabili d'ambiente:
+#   SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI  chiavi lette dalla rete interna (l'issuer resta validato)
+#   SERVER_FORWARD_HEADERS_STRATEGY=framework              header X-Forwarded-* del proxy
 spring:
   security:
     oauth2:

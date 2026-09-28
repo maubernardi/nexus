@@ -1,0 +1,59 @@
+# NEXUS — reverse proxy di produzione (immagine nexus-web). HTTPS automatico con Let's Encrypt.
+# Variabili: NEXUS_DOMAIN (es. portalenexus.it), NEXUS_AUTH_DOMAIN (es. auth.portalenexus.it),
+# CADDY_GLOBAL_OPTIONS (vuota in produzione; "local_certs" per le prove in locale con CA interna).
+{
+	{$CADDY_GLOBAL_OPTIONS}
+	admin off
+}
+
+(security_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+		-Server
+	}
+}
+
+# App (PWA) e API sullo stesso dominio: niente CORS.
+{$NEXUS_DOMAIN} {
+	import security_headers
+	header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://{$NEXUS_AUTH_DOMAIN}; frame-src https://{$NEXUS_AUTH_DOMAIN}; worker-src 'self'; manifest-src 'self'; form-action 'self' https://{$NEXUS_AUTH_DOMAIN}; base-uri 'self'; object-src 'none'; frame-ancestors 'none'"
+	encode zstd gzip
+
+	# endpoint tecnici del backend: mai esposti (404 esplicito invece del fallback della PWA)
+	@internal path /actuator /actuator/* /v3/api-docs /v3/api-docs/* /swagger-ui /swagger-ui/* /swagger-ui.html
+	handle @internal {
+		respond 404
+	}
+
+	# solo /api verso il backend: actuator e OpenAPI restano raggiungibili unicamente dalla rete interna
+	handle /api/* {
+		reverse_proxy backend:8080
+	}
+
+	handle {
+		root * /srv
+		# asset con hash nel nome: cache lunga e immutabile
+		@hashed path /assets/*
+		header @hashed Cache-Control "public, max-age=31536000, immutable"
+		# service worker, manifest e shell: sempre rivalidati, così gli aggiornamenti arrivano subito
+		@shell path / /index.html /sw.js /manifest.webmanifest
+		header @shell Cache-Control "no-cache"
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+www.{$NEXUS_DOMAIN} {
+	redir https://{$NEXUS_DOMAIN}{uri} permanent
+}
+
+# Keycloak. La console di amministrazione non è esposta: si usa con un tunnel SSH.
+{$NEXUS_AUTH_DOMAIN} {
+	import security_headers
+	@admin path /admin /admin/*
+	respond @admin "Accesso non consentito" 403
+	reverse_proxy keycloak:8080
+}

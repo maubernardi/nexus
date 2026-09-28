@@ -1,0 +1,123 @@
+name: Deploy demo
+
+# Deploy su comando (Actions -> Deploy demo -> Run workflow): costruisce le immagini del commit scelto,
+# le pubblica su GHCR e le installa sul server tramite la chiave di deploy (forced command `nexus-deploy`).
+# Versioni congelate: action fissate per SHA (commento = tag).
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch, tag o commit da pubblicare
+        required: true
+        default: main
+
+concurrency:
+  group: deploy-demo
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  REGISTRY: ghcr.io/maubernardi
+  NEXUS_DOMAIN: portalenexus.it
+
+jobs:
+  build:
+    name: Build e push immagini
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      sha: ${{ steps.sha.outputs.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+      - id: sha
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: '25.0.4'
+          cache: maven
+      - name: Jar del backend (i test girano nella CI della PR)
+        working-directory: backend
+        run: ./mvnw -B -q -DskipTests package
+
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - name: Build della PWA
+        working-directory: frontend
+        env:
+          VITE_AUTH_MODE: keycloak
+          VITE_KEYCLOAK_URL: https://auth.${{ env.NEXUS_DOMAIN }}
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Build e push su GHCR
+        env:
+          SHA: ${{ steps.sha.outputs.sha }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          for image in backend:backend web:frontend; do
+            name="${image%%:*}"; dir="${image##*:}"
+            docker build -t "$REGISTRY/nexus-$name:$SHA" -t "$REGISTRY/nexus-$name:demo" "$dir"
+            docker push "$REGISTRY/nexus-$name:$SHA"
+            docker push "$REGISTRY/nexus-$name:demo"
+          done
+          docker logout ghcr.io
+
+  deploy:
+    name: Deploy sul server
+    needs: build
+    runs-on: ubuntu-26.04
+    environment:
+      name: demo
+      url: https://portalenexus.it
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Installa sul server (chiave limitata a nexus-deploy)
+        env:
+          SHA: ${{ needs.build.outputs.sha }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          printf '%s' "$GHCR_TOKEN" | ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            "deploy@$DEPLOY_HOST" "deploy $SHA $GITHUB_ACTOR"
+          rm -f ~/.ssh/deploy
+
+      - name: Verifica dall'esterno
+        run: |
+          # al primo deploy Caddy ottiene i certificati Let's Encrypt: si attende fino a 5 minuti
+          for i in $(seq 1 30); do
+            if curl -fsS -o /dev/null "https://$NEXUS_DOMAIN/" \
+              && curl -fsS "https://auth.$NEXUS_DOMAIN/realms/nexus/.well-known/openid-configuration" | grep -q '"issuer"'; then
+              break
+            fi
+            [ "$i" -eq 30 ] && { echo "Il sito non risponde"; exit 1; }
+            sleep 10
+          done
+          test "$(curl -s -o /dev/null -w '%{http_code}' "https://$NEXUS_DOMAIN/api/v1/me")" = 401
+          test "$(curl -s -o /dev/null -w '%{http_code}' "https://auth.$NEXUS_DOMAIN/admin/")" = 403
+          test "$(curl -s -o /dev/null -w '%{http_code}' "https://$NEXUS_DOMAIN/actuator/health")" = 404
+          curl -sI "https://$NEXUS_DOMAIN/" | grep -qi '^strict-transport-security'
+          echo "Demo online: https://$NEXUS_DOMAIN"

@@ -116,6 +116,28 @@ aggiornano senza una decisione esplicita, che passa da una change OpenSpec. La m
 |---|---|---|---|---|---|---|---|---|
 | 25.0.4.1 | 4.1.1 | 24.21.0 | 12.6.0 | 19.3.0 | 8.3.1 | 6.0.3 | 18.6 | 26.7.4 |
 
+## Demo online
+
+La demo con dati fittizi è pubblicata su **https://portalenexus.it** (Keycloak su `https://auth.portalenexus.it`).
+Architettura e decisioni: [`openspec/changes/add-demo-deployment/design.md`](openspec/changes/add-demo-deployment/design.md).
+
+| Cosa | Dove |
+|---|---|
+| Stack (Caddy, backend, Keycloak, PostgreSQL) | `infra/deploy/compose.yaml` |
+| Immagini | `backend/Dockerfile`, `frontend/Dockerfile` + `frontend/Caddyfile` → `ghcr.io/maubernardi/nexus-{backend,web}` |
+| Preparazione del server (una volta) | `infra/deploy/bootstrap.sh` |
+| Deploy | GitHub → Actions → **Deploy demo** → *Run workflow* (`.github/workflows/deploy-demo.yml`) |
+
+- **Deploy su comando.** Il workflow costruisce le immagini del commit scelto, le pubblica su GHCR e le installa sul
+  server con una chiave SSH che può solo eseguire `nexus-deploy`. Se l'avvio fallisce, torna alla release precedente.
+- **Segreti** in `/opt/nexus/.env` sul server (generati da `bootstrap.sh`, mai in git); le credenziali demo si
+  rileggono con `sudo cat /opt/nexus/.env`.
+- **Console di Keycloak** non esposta su Internet: `ssh -L 8081:127.0.0.1:8081 <server>`, poi
+  `http://localhost:8081/admin` (utente `admin`, password `KEYCLOAK_ADMIN_PASSWORD` del `.env`).
+- **Stato e log sul server:**
+  `cd /opt/nexus/current && sudo docker compose --env-file ../.env --env-file release.env ps` (oppure `logs -f backend`).
+- **DNS (IONOS):** A `@`, `auth`, `www` → IP del server; CAA `0 issue "letsencrypt.org"`; i record email restano.
+
 ## Comandi utili
 
 | | Backend (`backend/`) | Frontend (`frontend/`) |
