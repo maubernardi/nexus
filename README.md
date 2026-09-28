@@ -76,7 +76,7 @@ La password è la stessa per tutti in Keycloak: `password`. Per accedere un uten
 ## Modello dati
 
 Schema PostgreSQL `nexus`, gestito solo da migrazioni Flyway (`backend/src/main/resources/db/migration`).
-Diagramma ER, tabelle e motivazioni: [`openspec/changes/add-domain-model/design.md`](openspec/changes/add-domain-model/design.md);
+Diagramma ER, tabelle e motivazioni: [`openspec/changes/archive/2026-09-28-add-domain-model/design.md`](openspec/changes/archive/2026-09-28-add-domain-model/design.md);
 requisiti in `openspec/specs/domain-model`.
 
 | Area | Tabelle |
