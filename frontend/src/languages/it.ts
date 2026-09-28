@@ -2,7 +2,7 @@ export const it = {
   app: {
     name: 'NEXUS',
     fullName: 'NEXUS — Area Lavoro e Call Center Sociale',
-    footer: 'NEXUS · Cooperativa Sociale — Area Lavoro',
+    footer: 'NEXUS · Mauro Bernardi per Cooperativa Sociale "Il Girasole" — Area Lavoro',
   },
   a11y: {
     skipToContent: 'Salta al contenuto principale',
