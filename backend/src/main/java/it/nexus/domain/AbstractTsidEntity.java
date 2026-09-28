@@ -11,7 +11,8 @@ import lombok.Getter;
 
 /**
  * Base delle entità con chiave primaria TSID. Uguaglianza basata sull'id (per entità già persistite) e hashCode
- * costante per classe, così l'entità resta coerente nei Set prima e dopo il persist.
+ * costante per classe, così l'entità resta coerente nei Set prima e dopo il persist. {@code toString()} riporta solo
+ * tipo e id: le sottoclassi non devono aggiungere dati personali (niente nei log).
  */
 @Getter
 @MappedSuperclass
@@ -38,5 +39,10 @@ public abstract class AbstractTsidEntity extends AbstractAuditingEntity {
     @Override
     public final int hashCode() {
         return Hibernate.getClass(this).hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return Hibernate.getClass(this).getSimpleName() + "[id=" + id + "]";
     }
 }

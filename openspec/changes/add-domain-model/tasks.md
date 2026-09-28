@@ -12,16 +12,16 @@
 - [x] 2.4 `V5__create_candidates.sql`: `candidate`, `candidate_language`
 - [x] 2.5 `V6__create_tickets_and_board.sql`: sequenze, `ticket`, `board_post`, `ticket_status_history`, `ticket_company_blacklist`, FK cicliche e indice unico parziale
 - [x] 2.6 `V7__create_company_audit_event.sql`: tabella e trigger di immutabilità
-- [ ] 2.7 Verificare `./mvnw verify` con `ddl-auto: validate` (entità e schema allineati) — si chiude con il gruppo 3, quando esistono le entità
+- [x] 2.7 Verificare `./mvnw verify` con `ddl-auto: validate` (entità e schema allineati) — chiuso nel gruppo 3, con `DomainPersistenceIT`
 
 ## 3. Entità e repository
 
-- [ ] 3.1 Enum di dominio (`Role`, stati, tipi, genere, titolo di studio, patenti, mezzo di trasporto, livello linguistico)
-- [ ] 3.2 Entità e repository: `Project`, `AppUser`, `Zone`, `JobCategory`, `StoredFile`
-- [ ] 3.3 Entità e repository: `Candidate`, `CandidateLanguage`, `Company`, `JobSlot`
-- [ ] 3.4 Entità e repository: `Ticket`, `TicketStatusHistory`, `TicketCompanyBlacklist`, `BoardPost`
-- [ ] 3.5 `CompanyAuditEvent` `@Immutable` con repository di sola aggiunta e lettura
-- [ ] 3.6 `toString()` delle entità senza dati personali (D9)
+- [x] 3.1 Enum di dominio (`Role`, stati, tipi, genere, titolo di studio, patenti, mezzo di trasporto, livello linguistico)
+- [x] 3.2 Entità e repository: `Project`, `AppUser`, `Zone`, `JobCategory`, `StoredFile`
+- [x] 3.3 Entità e repository: `Candidate`, `CandidateLanguage`, `Company`, `JobSlot`
+- [x] 3.4 Entità e repository: `Ticket`, `TicketStatusHistory`, `TicketCompanyBlacklist`, `BoardPost`
+- [x] 3.5 `CompanyAuditEvent` `@Immutable` con repository di sola aggiunta e lettura
+- [x] 3.6 `toString()` delle entità senza dati personali (D9)
 
 ## 4. Accesso riservato agli utenti censiti
 
