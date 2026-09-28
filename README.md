@@ -50,16 +50,22 @@ cd frontend && pnpm install && pnpm dev # http://localhost:5173
 
 In modalità mock il frontend mostra la pagina **Accesso di sviluppo**, dove si sceglie l'utente.
 
+Il profilo `local` carica anche i **dati dimostrativi** (`backend/src/main/resources/db/seed`): progetti GOL e POLIS,
+gli utenti di test, zone e tipologie di mansione segnaposto, aziende e mansioni fittizie, candidati "Demo", 7 ticket
+in stati diversi e 3 post di bacheca. Gli script sono idempotenti; per ripartire da zero:
+`docker compose -f infra/docker-compose.yml exec postgres psql -U nexus -d nexus -c 'DROP SCHEMA nexus CASCADE'`.
+
 ### Usare Keycloak reale
 
 ```bash
-cd backend && PROFILES_ACTIVE=keycloak ./mvnw spring-boot:run
+cd backend && PROFILES_ACTIVE=keycloak,seed ./mvnw spring-boot:run
 cd frontend && VITE_AUTH_MODE=keycloak pnpm dev
 ```
 
 ### Utenti di test
 
-La password è la stessa per tutti in Keycloak: `password`.
+La password è la stessa per tutti in Keycloak: `password`. Per accedere un utente deve esistere anche in NEXUS
+(tabella `app_user`, creata dal seed): gli utenti autenticati ma non censiti o disattivati ricevono 403.
 
 | Username | Ruolo |
 |---|---|
@@ -71,9 +77,9 @@ La password è la stessa per tutti in Keycloak: `password`.
 
 | `PROFILES_ACTIVE` | Composizione | Autenticazione |
 |---|---|---|
-| `local` (default) | postgresql, security-mock | header `X-USER-ID` |
-| `keycloak` | postgresql, keycloak | JWT Keycloak |
-| `test` | Testcontainers, security-mock | header `X-USER-ID` |
+| `local` (default) | postgresql, security-mock, seed | header `X-USER-ID` |
+| `keycloak` | postgresql, keycloak (in locale aggiungere `seed`) | JWT Keycloak |
+| `test` | Testcontainers, security-mock (senza seed) | header `X-USER-ID` |
 
 Variabili principali: `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `KEYCLOAK_ISSUER_URI`, `KEYCLOAK_AUDIENCE`,
 `CORS_ALLOWED_ORIGINS`, `OPENAPI_ENABLED`.

@@ -157,10 +157,18 @@ class DomainPersistenceIT {
     }
 
     @Test
+    void seedData_isNotLoaded_inTestProfile() {
+        // i dati dimostrativi (db/seed) esistono solo nel profilo local: qui il database parte vuoto
+        assertThat(users.findByUsername("admin")).isEmpty();
+        assertThat(zones.findByCode("ZONA_NORD")).isEmpty();
+        assertThat(tickets.count()).isZero();
+    }
+
+    @Test
     void toString_doesNotExposePersonalData() {
         Fixture f = fixture();
 
-        assertThat(f.candidate.toString()).doesNotContain("Mario", "Rossi").startsWith("Candidate[id=");
+        assertThat(f.candidate.toString()).doesNotContain("Mario", "Rossi").matches("Candidate\\[id=[0-9A-Z]{13}]");
         assertThat(f.tutor.toString()).doesNotContain("tutor-it@", "Nome");
     }
 

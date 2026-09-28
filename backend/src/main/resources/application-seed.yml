@@ -1,0 +1,5 @@
+# Dati dimostrativi (db/seed, script Flyway ripetibili R__seed_*): SOLO sviluppo locale.
+# Attivo nel gruppo `local`; con Keycloak reale in locale: PROFILES_ACTIVE=keycloak,seed. Mai in test o produzione.
+spring:
+  flyway:
+    locations: classpath:db/migration, classpath:db/seed

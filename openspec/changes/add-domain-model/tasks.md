@@ -31,9 +31,9 @@
 
 ## 5. Seed locale
 
-- [ ] 5.1 Sotto-profilo `seed` nel gruppo `local` (`application-seed.yml` con `classpath:db/seed`)
-- [ ] 5.2 `R__seed_*.sql` idempotenti: progetti, utenti e assegnazioni, zone e tipologie segnaposto, aziende, mansioni, candidati fittizi, ticket in più stati (anche speciale), post pubblico, riservato e bozza
-- [ ] 5.3 Verificare avvio `local` su database vuoto, riavvio senza duplicati, profilo `test` senza seed
+- [x] 5.1 Sotto-profilo `seed` nel gruppo `local` (`application-seed.yml` con `classpath:db/seed`)
+- [x] 5.2 `R__seed_*.sql` idempotenti: progetti, utenti e assegnazioni, zone e tipologie segnaposto, aziende, mansioni, candidati fittizi, ticket in più stati (anche speciale), post pubblico, riservato e bozza
+- [x] 5.3 Verificare avvio `local` su database vuoto, riavvio senza duplicati, profilo `test` senza seed
 
 ## 6. Test d'integrazione dei vincoli (Testcontainers)
 
