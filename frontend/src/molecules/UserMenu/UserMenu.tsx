@@ -25,19 +25,19 @@ export const UserMenu = ({ user }: UserMenuProps) => {
   return (
     <div className="flex items-center gap-3">
       <p className="flex items-center gap-2 text-sm">
-        <UserRound aria-hidden="true" className="size-5 shrink-0 text-muted-foreground" />
+        <UserRound aria-hidden="true" className="size-5 shrink-0 text-gold" />
         <span className="sr-only">{t('user.loggedAs')}: </span>
         <span className="flex flex-col leading-tight">
           <span className="font-medium">{fullName}</span>
           {primaryRole && (
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-gold">
               <span className="sr-only">{t('user.role')}: </span>
               {t(`roles.${primaryRole}`)}
             </span>
           )}
         </span>
       </p>
-      <Button variant="outline" size="sm" onClick={() => void handleLogout()}>
+      <Button variant="brand" size="sm" onClick={() => void handleLogout()}>
         <LogOut aria-hidden="true" />
         {AUTH_MODE === 'mock' ? t('user.switchUser') : t('user.logout')}
       </Button>

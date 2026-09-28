@@ -45,7 +45,7 @@ export const MainNav = ({ roles }: MainNavProps) => {
     <nav aria-label={t('a11y.mainNav')}>
       <Button
         ref={toggleRef}
-        variant="outline"
+        variant="brand"
         size="icon-lg"
         className="md:hidden"
         aria-expanded={isOpen}
@@ -58,7 +58,7 @@ export const MainNav = ({ roles }: MainNavProps) => {
       <ul
         id={listId}
         className={cn(
-          'absolute inset-x-0 top-full flex-col gap-1 border-b bg-background p-4 shadow-md md:static md:flex md:flex-row md:border-0 md:p-0 md:shadow-none',
+          'absolute inset-x-0 top-full flex-col gap-1 border-b-2 border-gold bg-brand p-4 shadow-md md:static md:flex md:flex-row md:border-0 md:bg-transparent md:p-0 md:shadow-none',
           isOpen ? 'flex' : 'hidden',
         )}
       >
@@ -69,8 +69,10 @@ export const MainNav = ({ roles }: MainNavProps) => {
               end
               className={({ isActive }) =>
                 cn(
-                  'flex min-h-11 items-center gap-2 rounded-md px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground md:min-h-9',
-                  isActive && 'bg-accent text-accent-foreground underline decoration-2 underline-offset-4',
+                  'flex min-h-11 items-center gap-2 rounded-md px-3 text-sm font-medium text-brand-foreground hover:bg-brand-foreground/10 md:min-h-9',
+                  // voce attiva: oro su Deep Emerald (4,9:1) + sottolineatura, non solo colore
+                  isActive &&
+                    'font-semibold text-gold underline decoration-gold decoration-2 underline-offset-8',
                 )
               }
             >
