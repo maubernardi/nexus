@@ -10,10 +10,12 @@ import { NAV_ITEMS } from '@/organisms/MainNav/navItems';
 
 type MainNavProps = {
   roles: readonly Role[];
+  /** Contenuto mostrato in cima al menu a tendina, solo su mobile (es. identità dell'utente). */
+  mobileHeader?: React.ReactNode;
 };
 
 /** Navigazione principale: lista orizzontale da desktop, menu a scomparsa (disclosure) su mobile. */
-export const MainNav = ({ roles }: MainNavProps) => {
+export const MainNav = ({ roles, mobileHeader }: MainNavProps) => {
   const { t } = useTranslation();
   const listId = useId();
   const location = useLocation();
@@ -55,33 +57,38 @@ export const MainNav = ({ roles }: MainNavProps) => {
       >
         {isOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
       </Button>
-      <ul
+      <div
         id={listId}
         className={cn(
-          'absolute inset-x-0 top-full flex-col gap-1 border-b-2 border-gold bg-brand p-4 shadow-md md:static md:flex md:flex-row md:border-0 md:bg-transparent md:p-0 md:shadow-none',
+          'absolute inset-x-0 top-full flex-col gap-3 border-b-2 border-gold bg-brand p-4 shadow-md md:static md:flex md:border-0 md:bg-transparent md:p-0 md:shadow-none',
           isOpen ? 'flex' : 'hidden',
         )}
       >
-        {items.map(({ to, labelKey, icon: Icon }) => (
-          <li key={to}>
-            <NavLink
-              to={to}
-              end
-              className={({ isActive }) =>
-                cn(
-                  'flex min-h-11 items-center gap-2 rounded-md px-3 text-sm font-medium text-brand-foreground hover:bg-brand-foreground/10 md:min-h-9',
-                  // voce attiva: oro su Deep Emerald (4,9:1) + sottolineatura, non solo colore
-                  isActive &&
-                    'font-semibold text-gold underline decoration-gold decoration-2 underline-offset-8',
-                )
-              }
-            >
-              <Icon aria-hidden="true" className="size-4" />
-              {t(labelKey)}
-            </NavLink>
-          </li>
-        ))}
-      </ul>
+        {mobileHeader && (
+          <div className="border-b border-brand-foreground/20 pb-3 md:hidden">{mobileHeader}</div>
+        )}
+        <ul className="flex flex-col gap-1 md:flex-row">
+          {items.map(({ to, labelKey, icon: Icon }) => (
+            <li key={to}>
+              <NavLink
+                to={to}
+                end
+                className={({ isActive }) =>
+                  cn(
+                    'flex min-h-11 items-center gap-2 rounded-md px-3 text-sm font-medium text-brand-foreground hover:bg-brand-foreground/10 md:min-h-9',
+                    // voce attiva: oro su Deep Emerald (4,9:1) + sottolineatura, non solo colore
+                    isActive &&
+                      'font-semibold text-gold underline decoration-gold decoration-2 underline-offset-8',
+                  )
+                }
+              >
+                <Icon aria-hidden="true" className="size-4" />
+                {t(labelKey)}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </div>
     </nav>
   );
 };
