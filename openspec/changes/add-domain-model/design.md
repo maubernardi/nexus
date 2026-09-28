@@ -130,6 +130,22 @@ La protezione è affidata al controllo degli accessi, per scelta del committente
 - in produzione, utente database con privilegi minimi (vedi D6) e backup cifrati;
 - `anonymized_at` predispone il futuro job di anonimizzazione, che svuoterà i campi identificativi e sanitari e terrà quelli statistici.
 
+## Note di implementazione
+
+Emerse durante lo sviluppo e verificate dai test.
+- **Chiavi composte.** `UserProject` e `TicketCompanyBlacklist` implementano `Persistable`: con una chiave assegnata,
+  Spring Data considererebbe ogni istanza come esistente e un duplicato diventerebbe un `merge` silenzioso.
+- **Schema sulle connessioni.** `spring.datasource.hikari.schema: nexus` vale anche per le query SQL native, non solo
+  per Hibernate.
+- **Invarianti nel codice.** `JobSlot.blockFor/release` e `Candidate.setLicenseTypes` mantengono coerenti i campi
+  legati dai vincoli (stato ⇔ ticket, patente ⇔ tipi). La logica di *quando* bloccare resta alla macchina a stati.
+- **Id nei log.** `toString()` delle entità riporta l'id in forma TSID, come nelle API, e nessun dato personale.
+- **Ruolo con più valori.** Se il token contiene più ruoli NEXUS, la copia in `app_user` prende il più alto
+  (`ADMIN` > `CALL_CENTER` > `TUTOR`).
+- **Seed.** Gli script usano chiavi naturali (codice, username, P.IVA) per le FK verso i dati di riferimento e TSID
+  letterali solo dove non esiste una chiave naturale. `ON CONFLICT DO NOTHING` non sovrascrive: per applicare una
+  modifica al seed su un database locale esistente serve un reset.
+
 ## Risks / Trade-offs
 
 - [Dati di categoria particolare in chiaro nel database] → controllo degli accessi e misure D9. Scelta documentata: se il

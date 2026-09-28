@@ -21,6 +21,14 @@ Le regole sono imposte anche tecnicamente da `.claude/hooks/guard-git.sh` (PreTo
 - Sviluppo spec-driven con OpenSpec: ogni nuova funzionalità passa da una change (`/opsx:propose` → `/opsx:apply` → `/opsx:archive`).
 - Backend: seguire la skill `java-backend` (package base `it.nexus`, niente SDK `com.btinkeeng.sdk`: gli equivalenti
   sono in `it.nexus.config` e `it.nexus.web.errors`). Ogni endpoint con `@PreAuthorize("hasRole(@requestsAuthorizer.X)")`.
+- Modello dati (`it.nexus.domain`):
+  - le entità estendono `AbstractTsidEntity` (id TSID + audit), `AbstractReferenceEntity` per le tabelle con codice
+    oppure `AbstractCreationAuditingEntity` per le righe non modificabili;
+  - le entità con chiave composta implementano `Persistable`, altrimenti un duplicato diventa un update silenzioso;
+  - nei DTO l'id è `String` (`TSID.from(id).toString()`), mai un numero;
+  - ogni vincolo va messo anche nel database (`CHECK`/`UNIQUE`/FK con nome esplicito) e testato per nome come in
+    `DomainConstraintsIT`;
+  - `toString()` e log senza dati personali.
 - Frontend: seguire la skill `react-frontend`. Ogni testo passa da `t()` (`src/languages/it.ts`).
 - Accessibilità WCAG 2.2 AA obbligatoria: nuovi componenti con test `expectNoAxeViolations` (`src/tests/axe.ts`),
   un solo `h1` per pagina via `PageHeading`, titolo pagina tramite `handle.titleKey` della route.

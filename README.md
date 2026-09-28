@@ -73,6 +73,27 @@ La password è la stessa per tutti in Keycloak: `password`. Per accedere un uten
 | `operatore.cc` | CALL_CENTER |
 | `admin` | ADMIN |
 
+## Modello dati
+
+Schema PostgreSQL `nexus`, gestito solo da migrazioni Flyway (`backend/src/main/resources/db/migration`).
+Diagramma ER, tabelle e motivazioni: [`openspec/changes/add-domain-model/design.md`](openspec/changes/add-domain-model/design.md);
+requisiti in `openspec/specs/domain-model`.
+
+| Area | Tabelle |
+|---|---|
+| Riferimento | `project`, `zone`, `job_category`, `stored_file` |
+| Utenti | `app_user` (censiti da NEXUS, ruolo in copia da Keycloak), `user_project` |
+| Candidati | `candidate`, `candidate_language` |
+| Aziende | `company`, `job_slot`, `company_audit_event` (in sola aggiunta, imposto da trigger) |
+| Segnalazioni | `ticket`, `ticket_status_history`, `ticket_company_blacklist`, `board_post` |
+
+- **Identificativi**: chiave primaria TSID (64 bit), esposta nelle API come stringa di 13 caratteri; ticket e post hanno
+  anche un numero progressivo leggibile.
+- **Integrità nel database**: vincoli `CHECK`, unicità, chiavi esterne e trigger, verificati da `DomainConstraintsIT`.
+- **Audit e concorrenza**: `created/updated at/by` su tutte le tabelle; blocco ottimistico su ticket, mansioni e post.
+- **GDPR**: i candidati contengono dati di categoria particolare. Accesso controllato, nessun dato personale nei log,
+  `anonymized_at` predisposto per l'anonimizzazione.
+
 ## Profili backend
 
 | `PROFILES_ACTIVE` | Composizione | Autenticazione |
