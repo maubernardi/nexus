@@ -145,6 +145,12 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
 | Build + test | `./mvnw verify` | `pnpm build` · `pnpm test --run` |
 | Lint | — | `pnpm lint` · `pnpm format:check` |
 
+## Gestione del progetto (Agile)
+
+Sprint di una settimana, con documenti versionati in [`docs/agile/`](docs/agile/README.md):
+[Product Backlog](docs/agile/product-backlog.md) (epiche, storie, criteri di accettazione, domande aperte),
+[Roadmap](docs/agile/roadmap.md) (release R1–R4) e un file per [sprint](docs/agile/sprints/).
+
 ## Workflow OpenSpec
 
 Ogni funzionalità parte da una change proposal:
