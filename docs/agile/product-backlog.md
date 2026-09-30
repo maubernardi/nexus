@@ -73,7 +73,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-304](#us-304) | E3 | Ticket dei miei progetti | Should | 3 | R1 | 📋 Backlog |
 | [US-305](#us-305) | E3 | Dettaglio e cronologia del ticket | Must | 3 | R1 | 📋 Backlog |
 | [US-306](#us-306) | E3 | Segnalazione speciale dalla bacheca | Must | 3 | R2 | 📋 Backlog |
-| [US-401](#us-401) | E4 | Coda FIFO | Must | 5 | R1 | 🔨 In corso (Sprint 1) |
+| [US-401](#us-401) | E4 | Coda FIFO | Must | 5 | R1 | 👀 In review (Sprint 1) |
 | [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | 📋 Backlog |
 | [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | 📋 Backlog |
 | [US-404](#us-404) | E4 | Rifiuto fast-track | Must | 3 | R2 | 📋 Backlog |
@@ -301,7 +301,7 @@ Dipendenze: US-901
 _Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali._
 
 #### US-401
-**Coda FIFO** · Must · 5 punti · R1 · 🔨 In corso (Sprint 1)
+**Coda FIFO** · Must · 5 punti · R1 · 👀 In review (Sprint 1)
 
 Come **operatore Call Center** voglio vedere la coda delle segnalazioni da lavorare, prima le speciali poi in ordine di arrivo per lavorare in modo equo e rapido.
 

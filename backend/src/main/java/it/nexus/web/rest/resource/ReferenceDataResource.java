@@ -30,6 +30,13 @@ public class ReferenceDataResource {
         return ResponseEntity.ok(referenceDataService.activeZones());
     }
 
+    @GetMapping("/projects")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Progetti attivi (per i filtri del Call Center)")
+    public ResponseEntity<List<ReferenceItemDTO>> projects() {
+        return ResponseEntity.ok(referenceDataService.activeProjects());
+    }
+
     @GetMapping("/job-categories")
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
     @Operation(summary = "Tipologie di mansione attive")

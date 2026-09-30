@@ -36,6 +36,11 @@ public class ReferenceDataServiceImpl implements ReferenceDataService {
     }
 
     @Override
+    public List<ReferenceItemDTO> activeProjects() {
+        return projectRepository.findByActiveTrueOrderByNameAsc().stream().map(mapper::toDto).toList();
+    }
+
+    @Override
     public List<ReferenceItemDTO> myActiveProjects() {
         Long userId = currentAppUserService.getCurrentAppUser().getId();
         return projectRepository.findActiveAssignedTo(userId).stream().map(mapper::toDto).toList();

@@ -1,4 +1,4 @@
-import { FilePlus2, UserPlus } from 'lucide-react';
+import { FilePlus2, ListOrdered, UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
@@ -35,6 +35,16 @@ export const HomePage = () => {
               <Link to="/segnalazioni/nuova">
                 <FilePlus2 aria-hidden="true" />
                 {t('nav.newTicket')}
+              </Link>
+            </Button>
+          </div>
+        )}
+        {(user?.roles.includes('CALL_CENTER') || user?.roles.includes('ADMIN')) && (
+          <div aria-label={t('pages.home.actions')} role="group" className="flex flex-wrap gap-3 pt-2">
+            <Button asChild size="lg">
+              <Link to="/coda">
+                <ListOrdered aria-hidden="true" />
+                {t('nav.queue')}
               </Link>
             </Button>
           </div>

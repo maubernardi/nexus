@@ -7,6 +7,7 @@ import { CandidateNewPage } from '@/pages/CandidateNewPage/CandidateNewPage';
 import { DevLoginPage } from '@/pages/DevLoginPage/DevLoginPage';
 import { HomePage } from '@/pages/HomePage/HomePage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
+import { QueuePage } from '@/pages/QueuePage/QueuePage';
 import { TicketNewPage } from '@/pages/TicketNewPage/TicketNewPage';
 
 export const routes: RouteObject[] = [
@@ -37,6 +38,15 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.ticketNew.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'coda',
+        element: (
+          <RoleRoute roles={['CALL_CENTER', 'ADMIN']}>
+            <QueuePage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.queue.title' } satisfies RouteHandle,
       },
       {
         path: '*',

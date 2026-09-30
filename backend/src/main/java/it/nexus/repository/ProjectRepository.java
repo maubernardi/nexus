@@ -15,6 +15,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     Optional<Project> findByCode(String code);
 
+    List<Project> findByActiveTrueOrderByNameAsc();
+
     /** Progetti attivi a cui l'utente è assegnato, ordinati per nome. */
     @Query("""
             select up.project from UserProject up
