@@ -54,25 +54,25 @@ Bloccano la *Definition of Ready* delle storie indicate.
 
 | ID | Epica | Storia | Priorità | Punti | Release | Stato |
 |---|---|---|---|---|---|---|
-| [EN-1](#en-1) | E3 | Motore delle transizioni del ticket | Must | 5 | R1 | 📋 Backlog |
-| [US-101](#us-101) | E1 | Messaggio "utente non abilitato" | Should | 1 | R1 | 📋 Backlog |
+| [EN-1](#en-1) | E3 | Motore delle transizioni del ticket | Must | 5 | R1 | 🔨 In corso (Sprint 1) |
+| [US-101](#us-101) | E1 | Messaggio "utente non abilitato" | Should | 1 | R1 | 🔨 In corso (Sprint 1) |
 | [US-102](#us-102) | E1 | Gestione progetti | Must | 3 | R4 | 📋 Backlog |
 | [US-103](#us-103) | E1 | Creazione utente | Must | 8 | R4 | 📋 Backlog |
 | [US-104](#us-104) | E1 | Assegnazione utenti ai progetti | Must | 3 | R4 | 📋 Backlog |
 | [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | 📋 Backlog |
 | [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Should | 3 | R4 | 📋 Backlog |
-| [US-201](#us-201) | E2 | Inserimento candidato | Must | 5 | R1 | 📋 Backlog |
+| [US-201](#us-201) | E2 | Inserimento candidato | Must | 5 | R1 | 🔨 In corso (Sprint 1) |
 | [US-202](#us-202) | E2 | I miei candidati | Must | 3 | R1 | 📋 Backlog |
 | [US-203](#us-203) | E2 | Modifica candidato | Must | 2 | R1 | 📋 Backlog |
 | [US-204](#us-204) | E2 | Visibilità minimizzata dei candidati | Must | 3 | R1 | 📋 Backlog |
 | [US-205](#us-205) | E2 | Curriculum del candidato | Could | 5 | R3 | 📋 Backlog |
-| [US-301](#us-301) | E3 | Nuova segnalazione | Must | 5 | R1 | 📋 Backlog |
+| [US-301](#us-301) | E3 | Nuova segnalazione | Must | 5 | R1 | 🔨 In corso (Sprint 1) |
 | [US-302](#us-302) | E3 | Mansione a testo libero e approvazione | Should | 5 | R2 | 📋 Backlog |
 | [US-303](#us-303) | E3 | I miei ticket | Must | 3 | R1 | 📋 Backlog |
 | [US-304](#us-304) | E3 | Ticket dei miei progetti | Should | 3 | R1 | 📋 Backlog |
 | [US-305](#us-305) | E3 | Dettaglio e cronologia del ticket | Must | 3 | R1 | 📋 Backlog |
 | [US-306](#us-306) | E3 | Segnalazione speciale dalla bacheca | Must | 3 | R2 | 📋 Backlog |
-| [US-401](#us-401) | E4 | Coda FIFO | Must | 5 | R1 | 📋 Backlog |
+| [US-401](#us-401) | E4 | Coda FIFO | Must | 5 | R1 | 🔨 In corso (Sprint 1) |
 | [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | 📋 Backlog |
 | [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | 📋 Backlog |
 | [US-404](#us-404) | E4 | Rifiuto fast-track | Must | 3 | R2 | 📋 Backlog |
@@ -119,7 +119,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 _L'ADMIN gestisce utenti, ruoli, progetti e cataloghi senza passare dalla console di Keycloak._
 
 #### US-101
-**Messaggio "utente non abilitato"** · Should · 1 punti · R1 · 📋 Backlog
+**Messaggio "utente non abilitato"** · Should · 1 punti · R1 · 🔨 In corso (Sprint 1)
 
 Come **utente autenticato ma non censito o disattivato** voglio vedere un messaggio chiaro invece di un errore generico per capire che devo rivolgermi all'amministratore.
 
@@ -179,7 +179,7 @@ Domande aperte: Q10
 _Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR._
 
 #### US-201
-**Inserimento candidato** · Must · 5 punti · R1 · 📋 Backlog
+**Inserimento candidato** · Must · 5 punti · R1 · 🔨 In corso (Sprint 1)
 
 Come **Tutor** voglio registrare un candidato con i dati previsti (anagrafica minima, patente, mezzi, L. 68/99, titolo di studio, vincoli, lingue) per poterlo segnalare per un tirocinio.
 
@@ -229,7 +229,7 @@ Criteri di accettazione:
 _Il Tutor segnala un candidato per un percorso di tirocinio e ne segue lo stato._
 
 #### EN-1
-**Motore delle transizioni del ticket** · Must · 5 punti · R1 · 📋 Backlog
+**Motore delle transizioni del ticket** · Must · 5 punti · R1 · 🔨 In corso (Sprint 1)
 
 Come **team di sviluppo** voglio un servizio unico che applica le transizioni di stato ammesse per ruolo, registra lo storico e rifiuta le transizioni non valide per ogni storia delle fasi 1–7 aggiunga solo le proprie transizioni senza duplicare regole.
 
@@ -239,7 +239,7 @@ Criteri di accettazione:
 - Quando due richieste concorrenti modificano lo stesso ticket, allora la seconda riceve 409 (blocco ottimistico).
 
 #### US-301
-**Nuova segnalazione** · Must · 5 punti · R1 · 📋 Backlog
+**Nuova segnalazione** · Must · 5 punti · R1 · 🔨 In corso (Sprint 1)
 
 Come **Tutor** voglio segnalare un mio candidato per un progetto indicando la mansione desiderata dal catalogo per avviare il percorso di tirocinio.
 
@@ -300,7 +300,7 @@ Dipendenze: US-901
 _Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali._
 
 #### US-401
-**Coda FIFO** · Must · 5 punti · R1 · 📋 Backlog
+**Coda FIFO** · Must · 5 punti · R1 · 🔨 In corso (Sprint 1)
 
 Come **operatore Call Center** voglio vedere la coda delle segnalazioni da lavorare, prima le speciali poi in ordine di arrivo per lavorare in modo equo e rapido.
 
