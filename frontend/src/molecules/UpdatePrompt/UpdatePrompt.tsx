@@ -18,15 +18,22 @@ export const UpdatePrompt = () => {
   };
 
   return (
-    <div role="status" aria-live="polite" className="fixed inset-x-4 bottom-4 z-40 sm:left-auto sm:max-w-sm">
+    // striscia nel flusso della pagina (non sovrapposta): non copre mai contenuti o elementi con il focus (WCAG 2.4.11)
+    <div role="status" aria-live="polite">
       {(needRefresh || offlineReady) && (
-        <div className="rounded-lg border border-input bg-card p-4 text-card-foreground shadow-lg">
-          <p className="text-sm">{needRefresh ? t('pwa.updateAvailable') : t('pwa.offlineReady')}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {needRefresh && <Button onClick={() => void updateServiceWorker(true)}>{t('pwa.update')}</Button>}
-            <Button variant="outline" onClick={handleClose}>
-              {needRefresh ? t('pwa.later') : t('pwa.close')}
-            </Button>
+        <div className="border-b border-border bg-accent text-accent-foreground">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
+            <p className="text-sm font-medium">
+              {needRefresh ? t('pwa.updateAvailable') : t('pwa.offlineReady')}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {needRefresh && (
+                <Button onClick={() => void updateServiceWorker(true)}>{t('pwa.update')}</Button>
+              )}
+              <Button variant="outline" onClick={handleClose}>
+                {needRefresh ? t('pwa.later') : t('pwa.close')}
+              </Button>
+            </div>
           </div>
         </div>
       )}

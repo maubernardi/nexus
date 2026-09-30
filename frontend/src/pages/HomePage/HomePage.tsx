@@ -1,6 +1,9 @@
+import { UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
+import { Button } from '@/components/ui/button';
 import { useCurrentUser } from '@/config/hooks/useCurrentUser';
 
 export const HomePage = () => {
@@ -20,6 +23,16 @@ export const HomePage = () => {
           </p>
         )}
         {primaryRole && <p>{t(`pages.home.intro.${primaryRole}`)}</p>}
+        {user?.roles.includes('TUTOR') && (
+          <div aria-label={t('pages.home.actions')} role="group" className="flex flex-wrap gap-3 pt-2">
+            <Button asChild size="lg">
+              <Link to="/candidati/nuovo">
+                <UserPlus aria-hidden="true" />
+                {t('nav.newCandidate')}
+              </Link>
+            </Button>
+          </div>
+        )}
       </div>
       <p className="text-muted-foreground">{t('pages.home.comingSoon')}</p>
     </section>

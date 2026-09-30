@@ -10,7 +10,7 @@
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-201 | Inserimento candidato | 5 | 🔨 In corso | `add-candidate-registration` | — |
+| US-201 | Inserimento candidato | 5 | 👀 In review | `add-candidate-registration` | — |
 | EN-1 | Motore delle transizioni del ticket | 5 | 🔨 In corso | `add-ticket-submission` | — |
 | US-301 | Nuova segnalazione | 5 | 🔨 In corso | `add-ticket-submission` | — |
 | US-401 | Coda FIFO | 5 | 🔨 In corso | `add-cc-queue` | — |

@@ -61,7 +61,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-104](#us-104) | E1 | Assegnazione utenti ai progetti | Must | 3 | R4 | 📋 Backlog |
 | [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | 📋 Backlog |
 | [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Should | 3 | R4 | 📋 Backlog |
-| [US-201](#us-201) | E2 | Inserimento candidato | Must | 5 | R1 | 🔨 In corso (Sprint 1) |
+| [US-201](#us-201) | E2 | Inserimento candidato | Must | 5 | R1 | 👀 In review (Sprint 1) |
 | [US-202](#us-202) | E2 | I miei candidati | Must | 3 | R1 | 📋 Backlog |
 | [US-203](#us-203) | E2 | Modifica candidato | Must | 2 | R1 | 📋 Backlog |
 | [US-204](#us-204) | E2 | Visibilità minimizzata dei candidati | Must | 3 | R1 | 📋 Backlog |
