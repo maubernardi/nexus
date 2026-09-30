@@ -12,6 +12,11 @@ Le regole sono imposte anche tecnicamente da `.claude/hooks/guard-git.sh` (PreTo
 
 ## Linee guida
 
+- **Processo Agile** (documenti in `docs/agile/`): sprint di 1 settimana, storie in `product-backlog.md` stimate in story
+  point Fibonacci, Definition of Ready/Done in `docs/agile/README.md`. Ogni storia (o piccolo gruppo coeso) → una change
+  OpenSpec → una PR; i criteri di accettazione diventano scenari delle spec. Aggiornare lo stato delle storie nel backlog e
+  il file dello sprint corrente; non iniziare storie che non soddisfano la Definition of Ready (domande aperte irrisolte).
+
 - **Versioni congelate** (matrice in `openspec/changes/archive/2026-09-27-upgrade-latest-versions/design.md`): stack fissato il 2026-09-27
   alle ultime versioni stabili, LTS per i runtime (Java 25, Node 24.21.0). Prevalgono sulle versioni indicate dalle skill.
   NON aggiornare nulla senza una richiesta esplicita; una nuova dipendenza si aggiunge all'ultima versione stabile

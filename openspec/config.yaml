@@ -29,6 +29,9 @@ context: |
   - Generazione documenti Word: libreria Java (poi-tl / Apache POI) al posto di docxtemplater.
   - CI: GitHub Actions. Repository: https://github.com/maubernardi/nexus
 
+  Processo: Agile con documenti in docs/agile/ (backlog, roadmap, sprint). Ogni change OpenSpec realizza una o più
+  storie del backlog (citarne gli ID, es. US-301, nel proposal); i criteri di accettazione diventano scenari.
+
   Lingua: il dominio usa i termini del brief (Ticket, Candidate, BoardPost, JobSlot, stati in italiano).
   Documentazione e artefatti OpenSpec in italiano. Conventional commits.
 
