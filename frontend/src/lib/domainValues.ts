@@ -40,3 +40,19 @@ export type LicenseType = (typeof LICENSE_TYPES)[number];
 
 export const LANGUAGE_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'MADRELINGUA'] as const;
 export type LanguageLevel = (typeof LANGUAGE_LEVELS)[number];
+
+export const TICKET_STATUSES = [
+  'NUOVA',
+  'IN_ATTESA_APPROVAZIONE_ADMIN',
+  'IN_LAVORAZIONE',
+  'PROPOSTA_AZIENDA',
+  'PROPOSTA_ACCOLTA',
+  'APPUNTAMENTO',
+  'IN_TIROCINIO',
+  'FORM_RESTITUZIONE',
+  'RIAPERTO',
+] as const;
+export type TicketStatus = (typeof TICKET_STATUSES)[number];
+
+export const TICKET_TYPES = ['NORMAL', 'SPECIAL'] as const;
+export type TicketType = (typeof TICKET_TYPES)[number];

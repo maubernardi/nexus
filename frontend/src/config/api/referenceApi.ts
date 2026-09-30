@@ -8,6 +8,12 @@ export const fetchZones = async (): Promise<ReferenceItem[]> => {
   return data;
 };
 
+/** Progetti attivi a cui è assegnato l'utente corrente. */
+export const fetchMyProjects = async (): Promise<ReferenceItem[]> => {
+  const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.myProjects);
+  return data;
+};
+
 export const fetchJobCategories = async (): Promise<ReferenceItem[]> => {
   const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.jobCategories);
   return data;

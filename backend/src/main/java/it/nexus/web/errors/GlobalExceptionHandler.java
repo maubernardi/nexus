@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -35,6 +36,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AbstractDomainException.class)
     ResponseEntity<ApiErrorResponseDTO> handleDomain(AbstractDomainException ex, HttpServletRequest request) {
         return build(ex.getStatus(), ex.getMessage(), request);
+    }
+
+    /** Due utenti hanno modificato lo stesso record partendo dalla stessa versione: vince il primo. */
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    ResponseEntity<ApiErrorResponseDTO> handleOptimisticLock(ObjectOptimisticLockingFailureException ex,
+            HttpServletRequest request) {
+        return build(HttpStatus.CONFLICT, "Il dato è stato modificato nel frattempo: ricarica la pagina e riprova", request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

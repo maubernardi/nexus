@@ -1,0 +1,77 @@
+package it.nexus.services.impl;
+
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import it.nexus.domain.AppUser;
+import it.nexus.domain.Candidate;
+import it.nexus.domain.JobCategory;
+import it.nexus.domain.Project;
+import it.nexus.domain.Ticket;
+import it.nexus.domain.UserProject;
+import it.nexus.domain.dto.TicketCreateDTO;
+import it.nexus.domain.dto.TicketDTO;
+import it.nexus.domain.enumeration.TicketType;
+import it.nexus.domain.workflow.TicketTransitions;
+import it.nexus.mapper.TicketMapper;
+import it.nexus.mapper.TsidMapper;
+import it.nexus.repository.CandidateRepository;
+import it.nexus.repository.JobCategoryRepository;
+import it.nexus.repository.ProjectRepository;
+import it.nexus.repository.UserProjectRepository;
+import it.nexus.services.CurrentAppUserService;
+import it.nexus.services.TicketService;
+import it.nexus.services.TicketStateMachine;
+import it.nexus.web.errors.FieldValidationException;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class TicketServiceImpl implements TicketService {
+
+    private final CandidateRepository candidateRepository;
+    private final ProjectRepository projectRepository;
+    private final UserProjectRepository userProjectRepository;
+    private final JobCategoryRepository jobCategoryRepository;
+    private final CurrentAppUserService currentAppUserService;
+    private final TicketStateMachine stateMachine;
+    private final TicketMapper mapper;
+
+    @Override
+    public TicketDTO submit(TicketCreateDTO dto) {
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        Candidate candidate = ownCandidate(dto.candidateId(), me);
+        Project project = assignedProject(dto.projectId(), me);
+        JobCategory category = activeJobCategory(dto.jobCategoryId());
+
+        Ticket ticket = new Ticket(me, project, candidate, TicketType.NORMAL);
+        ticket.setRequestedJobCategory(category);
+        return mapper.toDto(stateMachine.create(ticket, TicketTransitions.SUBMIT, null));
+    }
+
+    // inesistente e altrui danno lo stesso errore: non si rivela l'esistenza dei candidati degli altri tutor
+    private Candidate ownCandidate(String candidateId, AppUser me) {
+        return Optional.ofNullable(TsidMapper.toInternal(candidateId))
+                .flatMap(candidateRepository::findById)
+                .filter(c -> c.getOwnerTutor().getId().equals(me.getId()))
+                .orElseThrow(() -> new FieldValidationException("candidateId", "Candidato non valido"));
+    }
+
+    private Project assignedProject(String projectId, AppUser me) {
+        return Optional.ofNullable(TsidMapper.toInternal(projectId))
+                .filter(id -> userProjectRepository.existsById(new UserProject.Id(me.getId(), id)))
+                .flatMap(projectRepository::findById)
+                .filter(Project::isActive)
+                .orElseThrow(() -> new FieldValidationException("projectId", "Progetto non valido o non assegnato"));
+    }
+
+    private JobCategory activeJobCategory(String jobCategoryId) {
+        return Optional.ofNullable(TsidMapper.toInternal(jobCategoryId))
+                .flatMap(jobCategoryRepository::findById)
+                .filter(JobCategory::isActive)
+                .orElseThrow(() -> new FieldValidationException("jobCategoryId", "Mansione non valida"));
+    }
+}

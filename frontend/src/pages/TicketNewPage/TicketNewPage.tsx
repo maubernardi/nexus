@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 import { CircleCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
-import type { Candidate } from '@/config/api/candidateApi';
-import { CandidateForm } from '@/organisms/CandidateForm/CandidateForm';
-import { CANDIDATE_PARAM } from '@/pages/TicketNewPage/TicketNewPage';
+import type { Ticket } from '@/config/api/ticketApi';
+import { TicketForm } from '@/organisms/TicketForm/TicketForm';
 
-export const CandidateNewPage = () => {
+/** Parametro con cui altre pagine preselezionano il candidato (es. dopo la registrazione). */
+export const CANDIDATE_PARAM = 'candidato';
+
+export const TicketNewPage = () => {
   const { t } = useTranslation();
-  const [created, setCreated] = useState<Candidate | null>(null);
+  const [searchParams] = useSearchParams();
+  const [created, setCreated] = useState<Ticket | null>(null);
   const [formKey, setFormKey] = useState(0);
   const successRef = useRef<HTMLHeadingElement>(null);
 
@@ -24,47 +27,51 @@ export const CandidateNewPage = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeading>{t('pages.candidateNew.heading')}</PageHeading>
+      <PageHeading>{t('pages.ticketNew.heading')}</PageHeading>
       {created ? (
         <section
-          aria-labelledby="candidate-success"
+          aria-labelledby="ticket-success"
           className="space-y-4 rounded-xl border border-l-4 border-border border-l-primary bg-card p-6"
         >
           <h2
-            id="candidate-success"
+            id="ticket-success"
             ref={successRef}
             tabIndex={-1}
             className="flex items-center gap-2 text-xl font-semibold text-primary"
           >
             <CircleCheck aria-hidden="true" className="size-6" />
-            {t('candidate.success.heading')}
+            {t('ticket.success.heading', { number: created.number })}
           </h2>
-          <p>{t('candidate.success.text', { name: `${created.firstName} ${created.lastName}` })}</p>
+          <p>
+            {t('ticket.success.text', {
+              name: `${created.candidate.firstName} ${created.candidate.lastName}`,
+              status: t(`enums.ticketStatus.${created.status}`),
+            })}
+          </p>
           <div className="flex flex-wrap gap-3">
-            <Button asChild size="lg">
-              <Link to={`/segnalazioni/nuova?${CANDIDATE_PARAM}=${encodeURIComponent(created.id)}`}>
-                {t('candidate.success.report')}
-              </Link>
-            </Button>
             <Button
               size="lg"
-              variant="outline"
               onClick={() => {
                 setCreated(null);
                 setFormKey((k) => k + 1);
               }}
             >
-              {t('candidate.success.another')}
+              {t('ticket.success.another')}
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link to="/">{t('candidate.success.home')}</Link>
+              <Link to="/">{t('ticket.success.home')}</Link>
             </Button>
           </div>
         </section>
       ) : (
         <>
-          <p className="text-muted-foreground">{t('pages.candidateNew.intro')}</p>
-          <CandidateForm key={formKey} onSuccess={setCreated} />
+          <p className="text-muted-foreground">{t('pages.ticketNew.intro')}</p>
+          <TicketForm
+            key={formKey}
+            // dopo "Invia un'altra segnalazione" il candidato non va ripreso dall'indirizzo
+            initialCandidateId={formKey === 0 ? searchParams.get(CANDIDATE_PARAM) : null}
+            onSuccess={setCreated}
+          />
         </>
       )}
     </div>

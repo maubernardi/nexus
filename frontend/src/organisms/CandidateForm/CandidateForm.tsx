@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { Controller, useFieldArray, useForm, type FieldErrors, type FieldPath } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +12,7 @@ import type { Candidate, CandidateCreate } from '@/config/api/candidateApi';
 import { apiError, toFormPath } from '@/config/api/errors';
 import { useCreateCandidate } from '@/config/hooks/useCandidates';
 import { useZones } from '@/config/hooks/useReferenceData';
+import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import {
   EDUCATION_LEVELS,
   GENDERS,
@@ -91,11 +92,6 @@ export const CandidateForm = ({ onSuccess }: CandidateFormProps) => {
   const { t } = useTranslation();
   const zones = useZones();
   const createCandidate = useCreateCandidate();
-  const summaryRef = useRef<HTMLDivElement>(null);
-  // richiesta di focus sul riepilogo, evasa appena il riepilogo è nel DOM: react-hook-form invoca il callback degli
-  // errori prima di aggiornare submitCount, quindi al primo render il riepilogo può non esserci ancora
-  const [pendingSummaryFocus, setPendingSummaryFocus] = useState(false);
-  const requestSummaryFocus = (): void => setPendingSummaryFocus(true);
   const [genericError, setGenericError] = useState(false);
   const countries = useMemo(() => countryOptions(), []);
   const languages = useMemo(() => languageOptions(), []);
@@ -111,18 +107,12 @@ export const CandidateForm = ({ onSuccess }: CandidateFormProps) => {
     defaultValues: EMPTY,
     mode: 'onSubmit',
     reValidateMode: 'onChange',
-    // il focus va al riepilogo degli errori (non al primo campo): lo gestisce pendingSummaryFocus
+    // il focus va al riepilogo degli errori (non al primo campo): lo gestisce useErrorSummaryFocus
     shouldFocusError: false,
   });
   const languageRows = useFieldArray({ control, name: 'languages' });
 
-  useEffect(() => {
-    if (pendingSummaryFocus && summaryRef.current) {
-      summaryRef.current.focus();
-      setPendingSummaryFocus(false);
-    }
-    // submitCount ed errors: il riepilogo compare solo dopo che react-hook-form li ha aggiornati
-  }, [pendingSummaryFocus, submitCount, errors]);
+  const { summaryRef, requestSummaryFocus } = useErrorSummaryFocus(submitCount, errors);
 
   const required = { value: true, message: t('form.errors.required') };
   const notBlank = (value: string): true | string => value.trim() !== '' || t('form.errors.required');
