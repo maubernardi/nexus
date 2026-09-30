@@ -2,9 +2,11 @@ import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 
 import { Button } from '@/components/ui/button';
+import { isUserNotEnabled } from '@/config/api/errors';
 import { AUTH_MODE } from '@/config/auth/authConfig';
 import { useCurrentUser } from '@/config/hooks/useCurrentUser';
 import { useSessionStore } from '@/config/stores/sessionStore';
+import { NotEnabledPage } from '@/pages/NotEnabledPage/NotEnabledPage';
 import { AppLayout } from '@/templates/AppLayout/AppLayout';
 
 export const DEV_LOGIN_PATH = '/accesso-sviluppo';
@@ -13,7 +15,7 @@ export const DEV_LOGIN_PATH = '/accesso-sviluppo';
 export const ProtectedPage = () => {
   const { t } = useTranslation();
   const mockUserId = useSessionStore((state) => state.mockUserId);
-  const { data: user, isPending, isError, refetch } = useCurrentUser();
+  const { data: user, isPending, isError, error, refetch } = useCurrentUser();
 
   if (AUTH_MODE === 'mock' && !mockUserId) {
     return <Navigate to={DEV_LOGIN_PATH} replace />;
@@ -25,6 +27,10 @@ export const ProtectedPage = () => {
         <p role="status">{t('user.loading')}</p>
       </main>
     );
+  }
+
+  if (isError && isUserNotEnabled(error)) {
+    return <NotEnabledPage />;
   }
 
   if (isError) {

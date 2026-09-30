@@ -17,6 +17,8 @@ public record ApiErrorResponseDTO(
         String error,
         String message,
         String path,
+        /** Codice stabile per i casi che il client gestisce in modo dedicato (es. {@code USER_NOT_ENABLED}). */
+        String code,
         List<FieldErrorDTO> fieldErrors) {
 
     public record FieldErrorDTO(String field, String message) {
@@ -27,6 +29,12 @@ public record ApiErrorResponseDTO(
     }
 
     public static ApiErrorResponseDTO of(HttpStatus status, String message, String path, List<FieldErrorDTO> fieldErrors) {
-        return new ApiErrorResponseDTO(Instant.now(), status.value(), status.getReasonPhrase(), message, path, fieldErrors);
+        return new ApiErrorResponseDTO(Instant.now(), status.value(), status.getReasonPhrase(), message, path, null,
+                fieldErrors);
+    }
+
+    public static ApiErrorResponseDTO withCode(HttpStatus status, String code, String message, String path) {
+        return new ApiErrorResponseDTO(Instant.now(), status.value(), status.getReasonPhrase(), message, path, code,
+                List.of());
     }
 }

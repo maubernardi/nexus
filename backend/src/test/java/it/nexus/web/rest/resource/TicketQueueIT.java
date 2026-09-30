@@ -161,7 +161,10 @@ class TicketQueueIT {
     @Test
     void adminVedeLaCoda_tutorNo() throws Exception {
         mockMvc.perform(get(QUEUE).header(USER, "admin")).andExpect(status().isOk());
-        mockMvc.perform(get(QUEUE).header(USER, "tutor1")).andExpect(status().isForbidden());
+        // un 403 di ruolo non è "utente non abilitato": niente codice dedicato
+        mockMvc.perform(get(QUEUE).header(USER, "tutor1"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").doesNotExist());
     }
 
     @Test

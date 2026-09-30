@@ -230,6 +230,13 @@ export const it = {
       intro:
         'Le segnalazioni da prendere in carico. Le fast-track arrivano dalla bacheca e hanno la precedenza.',
     },
+    notEnabled: {
+      title: 'Account non abilitato',
+      heading: 'Account non abilitato',
+      description:
+        'Hai effettuato l’accesso, ma il tuo account non è abilitato a NEXUS oppure è stato disattivato.',
+      action: 'Per essere abilitato contatta l’amministratore di NEXUS della cooperativa.',
+    },
     forbidden: {
       title: 'Accesso non consentito',
       heading: 'Accesso non consentito',

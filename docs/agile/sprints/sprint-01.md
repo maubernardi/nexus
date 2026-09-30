@@ -14,7 +14,7 @@
 | EN-1 | Motore delle transizioni del ticket | 5 | 👀 In review | `add-ticket-submission` | #13 |
 | US-301 | Nuova segnalazione | 5 | 👀 In review | `add-ticket-submission` | #13 |
 | US-401 | Coda FIFO | 5 | 👀 In review | `add-cc-queue` | #14 |
-| US-101 | Messaggio "utente non abilitato" | 1 | 🔨 In corso | `add-not-enabled-page` | — |
+| US-101 | Messaggio "utente non abilitato" | 1 | 👀 In review | `add-not-enabled-page` | #15 |
 
 Le PR sono in cascata (ognuna costruita sulla precedente) e vanno unite nell'ordine della tabella.
 Per il PO, fuori dallo sviluppo: US-1301 (verifica PWA su smartphone) e le domande aperte Q1–Q4, Q8, Q9, Q12.

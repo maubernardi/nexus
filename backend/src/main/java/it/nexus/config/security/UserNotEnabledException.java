@@ -12,6 +12,9 @@ public class UserNotEnabledException extends AccessDeniedException {
 
     public static final String MESSAGE = "Utente non abilitato a NEXUS";
 
+    /** Codice dell'errore: il client mostra una pagina dedicata invece di un errore generico (US-101). */
+    public static final String CODE = "USER_NOT_ENABLED";
+
     public UserNotEnabledException() {
         super(MESSAGE);
     }
