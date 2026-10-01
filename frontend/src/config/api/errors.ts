@@ -10,3 +10,8 @@ export const apiError = (error: unknown): ApiError | null =>
 
 /** Converte i nomi di campo del backend (es. `languages[0].level`) nei percorsi di react-hook-form (`languages.0.level`). */
 export const toFormPath = (field: string): string => field.replace(/\[(\d+)\]/g, '.$1');
+
+export const USER_NOT_ENABLED = 'USER_NOT_ENABLED';
+
+/** Utente autenticato ma non censito in NEXUS o disattivato (403 con codice dedicato). */
+export const isUserNotEnabled = (error: unknown): boolean => apiError(error)?.code === USER_NOT_ENABLED;

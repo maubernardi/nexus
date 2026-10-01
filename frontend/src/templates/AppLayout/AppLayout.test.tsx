@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { AxiosError, AxiosHeaders } from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { fetchCurrentUser } from '@/config/api/userApi';
@@ -68,5 +69,41 @@ describe('App shell', () => {
     await userEvent.click(await screen.findByRole('button', { name: /Entra come Operatore Call Center/ }));
     expect(await screen.findByRole('heading', { level: 1, name: 'Benvenuto in NEXUS' })).toBeInTheDocument();
     expect(useSessionStore.getState().mockUserId).toBe('operatore.cc');
+  });
+
+  it('utente non abilitato: pagina dedicata con Esci e senza Riprova', async () => {
+    useSessionStore.setState({ mockUserId: 'tutor2' });
+    vi.mocked(fetchCurrentUser).mockRejectedValue(
+      new AxiosError('Forbidden', '403', undefined, undefined, {
+        status: 403,
+        statusText: 'Forbidden',
+        headers: {},
+        config: { headers: new AxiosHeaders() },
+        data: { status: 403, message: 'Utente non abilitato a NEXUS', code: 'USER_NOT_ENABLED' },
+      }),
+    );
+    renderRoutes({ routes });
+
+    const heading = await screen.findByRole('heading', { level: 1, name: 'Account non abilitato' });
+    await waitFor(() => expect(heading).toHaveFocus());
+    expect(document.title).toBe('Account non abilitato · NEXUS');
+    expect(screen.getByText(/contatta l’amministratore di NEXUS/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Riprova' })).not.toBeInTheDocument();
+    // una sola chiamata: il "non abilitato" non si riprova
+    expect(fetchCurrentUser).toHaveBeenCalledTimes(1);
+    await expectNoAxeViolations();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Esci' }));
+    expect(useSessionStore.getState().mockUserId).toBeNull();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Accesso di sviluppo' })).toBeInTheDocument();
+  });
+
+  it('altri errori del profilo: messaggio generico con Riprova', async () => {
+    useSessionStore.setState({ mockUserId: 'operatore.cc' });
+    vi.mocked(fetchCurrentUser).mockRejectedValue(new AxiosError('Network Error', 'ERR_NETWORK'));
+    renderRoutes({ routes });
+
+    expect(await screen.findByRole('button', { name: 'Riprova' }, { timeout: 4000 })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Account non abilitato' })).not.toBeInTheDocument();
   });
 });

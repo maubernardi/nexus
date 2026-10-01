@@ -17,6 +17,7 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import it.nexus.config.security.UserNotEnabledException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
@@ -67,6 +68,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     ResponseEntity<ApiErrorResponseDTO> handleAuthentication(AuthenticationException ex, HttpServletRequest request) {
         return build(HttpStatus.UNAUTHORIZED, "Autenticazione richiesta", request);
+    }
+
+    /** Utente autenticato ma non censito o disattivato, rilevato dentro un service: stessa risposta del filtro. */
+    @ExceptionHandler(UserNotEnabledException.class)
+    ResponseEntity<ApiErrorResponseDTO> handleUserNotEnabled(UserNotEnabledException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiErrorResponseDTO.withCode(HttpStatus.FORBIDDEN,
+                UserNotEnabledException.CODE, UserNotEnabledException.MESSAGE, request.getRequestURI()));
     }
 
     @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})

@@ -56,7 +56,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | ID | Epica | Storia | Priorità | Punti | Release | Stato |
 |---|---|---|---|---|---|---|
 | [EN-1](#en-1) | E3 | Motore delle transizioni del ticket | Must | 5 | R1 | 👀 In review (Sprint 1) |
-| [US-101](#us-101) | E1 | Messaggio "utente non abilitato" | Should | 1 | R1 | 🔨 In corso (Sprint 1) |
+| [US-101](#us-101) | E1 | Messaggio "utente non abilitato" | Should | 1 | R1 | 👀 In review (Sprint 1) |
 | [US-102](#us-102) | E1 | Gestione progetti | Must | 3 | R4 | 📋 Backlog |
 | [US-103](#us-103) | E1 | Creazione utente | Must | 8 | R4 | 📋 Backlog |
 | [US-104](#us-104) | E1 | Assegnazione utenti ai progetti | Must | 3 | R4 | 📋 Backlog |
@@ -120,7 +120,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 _L'ADMIN gestisce utenti, ruoli, progetti e cataloghi senza passare dalla console di Keycloak._
 
 #### US-101
-**Messaggio "utente non abilitato"** · Should · 1 punti · R1 · 🔨 In corso (Sprint 1)
+**Messaggio "utente non abilitato"** · Should · 1 punti · R1 · 👀 In review (Sprint 1)
 
 Come **utente autenticato ma non censito o disattivato** voglio vedere un messaggio chiaro invece di un errore generico per capire che devo rivolgermi all'amministratore.
 

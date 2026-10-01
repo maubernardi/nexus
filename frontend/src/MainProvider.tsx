@@ -1,12 +1,8 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { ToastContainer } from 'react-toastify/unstyled';
 import 'react-toastify/dist/ReactToastify.css';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { retry: 1, refetchOnWindowFocus: false },
-  },
-});
+import { queryClient } from '@/config/api/queryClient';
 
 type MainProviderProps = {
   children: React.ReactNode;

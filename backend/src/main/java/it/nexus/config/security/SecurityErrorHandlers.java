@@ -24,19 +24,22 @@ public class SecurityErrorHandlers {
     private final JsonMapper jsonMapper;
 
     public AuthenticationEntryPoint authenticationEntryPoint() {
-        return (request, response, ex) -> write(request, response, HttpStatus.UNAUTHORIZED, "Autenticazione richiesta");
+        return (request, response, ex) -> write(request, response,
+                ApiErrorResponseDTO.of(HttpStatus.UNAUTHORIZED, "Autenticazione richiesta", request.getRequestURI()));
     }
 
     public AccessDeniedHandler accessDeniedHandler() {
-        return (request, response, ex) -> write(request, response, HttpStatus.FORBIDDEN,
-                ex instanceof UserNotEnabledException ? UserNotEnabledException.MESSAGE : "Accesso negato");
+        return (request, response, ex) -> write(request, response, ex instanceof UserNotEnabledException
+                ? ApiErrorResponseDTO.withCode(HttpStatus.FORBIDDEN, UserNotEnabledException.CODE,
+                        UserNotEnabledException.MESSAGE, request.getRequestURI())
+                : ApiErrorResponseDTO.of(HttpStatus.FORBIDDEN, "Accesso negato", request.getRequestURI()));
     }
 
-    private void write(HttpServletRequest request, HttpServletResponse response, HttpStatus status, String message)
+    private void write(HttpServletRequest request, HttpServletResponse response, ApiErrorResponseDTO body)
             throws IOException {
-        response.setStatus(status.value());
+        response.setStatus(body.status());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        jsonMapper.writeValue(response.getOutputStream(), ApiErrorResponseDTO.of(status, message, request.getRequestURI()));
+        jsonMapper.writeValue(response.getOutputStream(), body);
     }
 }

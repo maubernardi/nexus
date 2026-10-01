@@ -118,7 +118,8 @@ class CurrentUserResourceIT {
         mockMvc.perform(get("/api/v1/me").header(USER_HEADER, "tutor2"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.status").value(403))
-                .andExpect(jsonPath("$.message").value(UserNotEnabledException.MESSAGE));
+                .andExpect(jsonPath("$.message").value(UserNotEnabledException.MESSAGE))
+                .andExpect(jsonPath("$.code").value(UserNotEnabledException.CODE));
     }
 
     @Test
@@ -129,7 +130,8 @@ class CurrentUserResourceIT {
 
         mockMvc.perform(get("/api/v1/me").header(USER_HEADER, "tutor2"))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.message").value(UserNotEnabledException.MESSAGE));
+                .andExpect(jsonPath("$.message").value(UserNotEnabledException.MESSAGE))
+                .andExpect(jsonPath("$.code").value(UserNotEnabledException.CODE));
     }
 
     @Test

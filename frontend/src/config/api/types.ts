@@ -5,5 +5,7 @@ export type ApiError = {
   error: string;
   message: string;
   path: string;
+  /** Codice stabile per i casi gestiti in modo dedicato (es. `USER_NOT_ENABLED`). */
+  code?: string;
   fieldErrors?: { field: string; message: string }[];
 };
