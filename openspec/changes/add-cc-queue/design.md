@@ -12,8 +12,8 @@ ASC` (il numero rende l'ordine stabile a parità di istante).
 
 ### D2 — API
 `GET /api/v1/tickets/queue?projectId=&zoneId=` → `List<QueueItemDTO>` (id, numero, tipo, stato, fast-track, versione,
-candidato in sintesi, progetto, zona, mansione richiesta, tutor, istante di arrivo). Id di filtro non validi → `400`.
-JPQL con fetch join (nessun N+1) e filtri facoltativi. La zona è quella di residenza del candidato: la zona della
+beneficiario in sintesi, progetto, zona, mansione richiesta, tutor, istante di arrivo). Id di filtro non validi → `400`.
+JPQL con fetch join (nessun N+1) e filtri facoltativi. La zona è quella di residenza del beneficiario: la zona della
 mansione esiste solo dopo l'abbinamento (fase 4). Il Call Center ha visibilità globale (brief, RBAC): vede i nomi.
 
 ### D3 — Tabella accessibile

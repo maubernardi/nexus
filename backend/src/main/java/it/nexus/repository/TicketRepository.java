@@ -17,13 +17,18 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     Optional<Ticket> findByNumber(Long number);
 
+    /** Segnalazioni non concluse dei beneficiari indicati (al più una per beneficiario). */
+    List<Ticket> findByBeneficiaryIdInAndStatusNot(Collection<Long> beneficiaryIds, TicketStatus closed);
+
+    Optional<Ticket> findFirstByBeneficiaryIdAndStatusNot(Long beneficiaryId, TicketStatus closed);
+
     /**
      * Coda del Call Center: ticket non assegnati negli stati indicati, prima i fast-track e poi per arrivo. Filtri
-     * facoltativi (null = nessun filtro) per progetto e zona di residenza del candidato.
+     * facoltativi (null = nessun filtro) per progetto e zona di residenza del beneficiario.
      */
     @Query("""
             select t from Ticket t
-            join fetch t.candidate c
+            join fetch t.beneficiary c
             join fetch c.residenceZone z
             join fetch t.project p
             join fetch t.tutor

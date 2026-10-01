@@ -1,7 +1,7 @@
 # domain-model Specification
 
 ## Purpose
-Definisce le entità del dominio NEXUS (progetti, utenti, candidati, segnalazioni, aziende, mansioni, bacheca), i loro
+Definisce le entità del dominio NEXUS (progetti, utenti, beneficiari, segnalazioni, aziende, mansioni, bacheca), i loro
 identificativi e i vincoli di integrità che il sistema garantisce indipendentemente dalla logica applicativa.
 ## Requirements
 ### Requirement: Identificativi delle entità
@@ -47,15 +47,15 @@ quando esistono dati collegati.
 - **WHEN** si tenta di cancellare un utente che è tutor di almeno un ticket
 - **THEN** l'operazione viene rifiutata e l'utente può solo essere disattivato
 
-### Requirement: Dati del candidato
-Ogni candidato SHALL avere un tutor proprietario. Genere, nazionalità e cittadinanza (codici ISO 3166-1 alpha-2), titolo
+### Requirement: Dati del beneficiario
+Ogni beneficiario SHALL avere un tutor proprietario. Genere, nazionalità e cittadinanza (codici ISO 3166-1 alpha-2), titolo
 di studio, mezzo di trasporto, tipi di patente e livello delle lingue (A1–C2 o madrelingua) MUST assumere solo valori
 ammessi. Il possesso della patente MUST essere coerente con la presenza di almeno un tipo di patente. Ogni lingua
-compare al massimo una volta per candidato. Il candidato SHALL poter riferire un file di CV e registrare la data di
+compare al massimo una volta per beneficiario. Il beneficiario SHALL poter riferire un file di CV e registrare la data di
 un'eventuale anonimizzazione.
 
 #### Scenario: Patente incoerente
-- **WHEN** si salva un candidato che dichiara la patente senza indicarne alcun tipo
+- **WHEN** si salva un beneficiario che dichiara la patente senza indicarne alcun tipo
 - **THEN** l'operazione viene rifiutata
 
 #### Scenario: Livello linguistico non valido
@@ -63,7 +63,7 @@ un'eventuale anonimizzazione.
 - **THEN** l'operazione viene rifiutata
 
 ### Requirement: Segnalazione (Ticket)
-Ogni ticket SHALL riferire tutor, progetto e candidato, avere tipo `NORMAL` o `SPECIAL` e uno stato tra `NUOVA`,
+Ogni ticket SHALL riferire tutor, progetto e beneficiario, avere tipo `NORMAL` o `SPECIAL` e uno stato tra `NUOVA`,
 `IN_ATTESA_APPROVAZIONE_ADMIN`, `IN_LAVORAZIONE`, `PROPOSTA_AZIENDA`, `PROPOSTA_ACCOLTA`, `APPUNTAMENTO`, `IN_TIROCINIO`,
 `FORM_RESTITUZIONE`, `RIAPERTO`. La mansione richiesta MUST essere indicata da una tipologia del catalogo oppure da un
 testo libero, mai entrambi e mai nessuno dei due. Un ticket `SPECIAL` MUST riferire il post di bacheca da cui è nato;
@@ -124,7 +124,7 @@ essere positive. Il sistema SHALL registrare quando un post riservato è stato r
 
 ### Requirement: Tabelle di riferimento
 Zone e tipologie di mansione SHALL essere tabelle con codice unico, nome e stato attivo/disattivo, condivise da
-candidati, mansioni e segnalazioni.
+beneficiari, mansioni e segnalazioni.
 
 #### Scenario: Zona duplicata
 - **WHEN** si crea una zona con un codice già esistente

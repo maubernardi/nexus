@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.domain.AppUser;
-import it.nexus.domain.Candidate;
+import it.nexus.domain.Beneficiary;
 import it.nexus.domain.JobCategory;
 import it.nexus.domain.Project;
 import it.nexus.domain.Ticket;
@@ -22,7 +22,7 @@ import it.nexus.domain.enumeration.TicketType;
 import it.nexus.domain.workflow.TicketTransitions;
 import it.nexus.mapper.TicketMapper;
 import it.nexus.mapper.TsidMapper;
-import it.nexus.repository.CandidateRepository;
+import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.ProjectRepository;
 import it.nexus.repository.TicketRepository;
@@ -43,7 +43,7 @@ public class TicketServiceImpl implements TicketService {
     private static final Set<TicketStatus> QUEUE_STATUSES = EnumSet.of(TicketStatus.NUOVA, TicketStatus.IN_LAVORAZIONE);
 
     private final TicketRepository ticketRepository;
-    private final CandidateRepository candidateRepository;
+    private final BeneficiaryRepository beneficiaryRepository;
     private final ProjectRepository projectRepository;
     private final UserProjectRepository userProjectRepository;
     private final JobCategoryRepository jobCategoryRepository;
@@ -54,11 +54,15 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketDTO submit(TicketCreateDTO dto) {
         AppUser me = currentAppUserService.getCurrentAppUser();
-        Candidate candidate = ownCandidate(dto.candidateId(), me);
+        Beneficiary beneficiary = ownBeneficiary(dto.beneficiaryId(), me);
+        ticketRepository.findFirstByBeneficiaryIdAndStatusNot(beneficiary.getId(), TicketStatus.CLOSED).ifPresent(open -> {
+            throw new FieldValidationException("beneficiaryId",
+                    "Il beneficiario ha già una segnalazione aperta (n. %d)".formatted(open.getNumber()));
+        });
         Project project = assignedProject(dto.projectId(), me);
         JobCategory category = activeJobCategory(dto.jobCategoryId());
 
-        Ticket ticket = new Ticket(me, project, candidate, TicketType.NORMAL);
+        Ticket ticket = new Ticket(me, project, beneficiary, TicketType.NORMAL);
         ticket.setRequestedJobCategory(category);
         return mapper.toDto(stateMachine.create(ticket, TicketTransitions.SUBMIT, null));
     }
@@ -83,12 +87,12 @@ public class TicketServiceImpl implements TicketService {
         return id;
     }
 
-    // inesistente e altrui danno lo stesso errore: non si rivela l'esistenza dei candidati degli altri tutor
-    private Candidate ownCandidate(String candidateId, AppUser me) {
-        return Optional.ofNullable(TsidMapper.toInternal(candidateId))
-                .flatMap(candidateRepository::findById)
+    // inesistente e altrui danno lo stesso errore: non si rivela l'esistenza dei beneficiari degli altri tutor
+    private Beneficiary ownBeneficiary(String beneficiaryId, AppUser me) {
+        return Optional.ofNullable(TsidMapper.toInternal(beneficiaryId))
+                .flatMap(beneficiaryRepository::findById)
                 .filter(c -> c.getOwnerTutor().getId().equals(me.getId()))
-                .orElseThrow(() -> new FieldValidationException("candidateId", "Candidato non valido"));
+                .orElseThrow(() -> new FieldValidationException("beneficiaryId", "Beneficiario non valido"));
     }
 
     private Project assignedProject(String projectId, AppUser me) {

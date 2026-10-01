@@ -51,7 +51,7 @@ cd frontend && pnpm install && pnpm dev # http://localhost:5173
 In modalità mock il frontend mostra la pagina **Accesso di sviluppo**, dove si sceglie l'utente.
 
 Il profilo `local` carica anche i **dati dimostrativi** (`backend/src/main/resources/db/seed`): progetti GOL e POLIS,
-gli utenti di test, zone e tipologie di mansione segnaposto, aziende e mansioni fittizie, candidati "Demo", 7 ticket
+gli utenti di test, zone e tipologie di mansione segnaposto, aziende e mansioni fittizie, beneficiari "Demo", 7 ticket
 in stati diversi e 3 post di bacheca. Gli script sono idempotenti; per ripartire da zero:
 `docker compose -f infra/docker-compose.yml exec postgres psql -U nexus -d nexus -c 'DROP SCHEMA nexus CASCADE'`.
 
@@ -83,7 +83,7 @@ requisiti in `openspec/specs/domain-model`.
 |---|---|
 | Riferimento | `project`, `zone`, `job_category`, `stored_file` |
 | Utenti | `app_user` (censiti da NEXUS, ruolo in copia da Keycloak), `user_project` |
-| Candidati | `candidate`, `candidate_language` |
+| Beneficiari | `beneficiary`, `beneficiary_language` |
 | Aziende | `company`, `job_slot`, `company_audit_event` (in sola aggiunta, imposto da trigger) |
 | Segnalazioni | `ticket`, `ticket_status_history`, `ticket_company_blacklist`, `board_post` |
 
@@ -91,7 +91,7 @@ requisiti in `openspec/specs/domain-model`.
   anche un numero progressivo leggibile.
 - **Integrità nel database**: vincoli `CHECK`, unicità, chiavi esterne e trigger, verificati da `DomainConstraintsIT`.
 - **Audit e concorrenza**: `created/updated at/by` su tutte le tabelle; blocco ottimistico su ticket, mansioni e post.
-- **GDPR**: i candidati contengono dati di categoria particolare. Accesso controllato, nessun dato personale nei log,
+- **GDPR**: i beneficiari contengono dati di categoria particolare. Accesso controllato, nessun dato personale nei log,
   `anonymized_at` predisposto per l'anonimizzazione.
 
 ## Profili backend

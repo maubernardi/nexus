@@ -2,6 +2,7 @@ package it.nexus.web.errors;
 
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -44,6 +45,13 @@ public class GlobalExceptionHandler {
     ResponseEntity<ApiErrorResponseDTO> handleOptimisticLock(ObjectOptimisticLockingFailureException ex,
             HttpServletRequest request) {
         return build(HttpStatus.CONFLICT, "Il dato è stato modificato nel frattempo: ricarica la pagina e riprova", request);
+    }
+
+    /** Vincolo del database violato da richieste concorrenti (es. due segnalazioni aperte per lo stesso beneficiario). */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    ResponseEntity<ApiErrorResponseDTO> handleIntegrity(DataIntegrityViolationException ex, HttpServletRequest request) {
+        log.warn("Vincolo violato su {}: {}", request.getRequestURI(), ex.getMostSpecificCause().getClass().getSimpleName());
+        return build(HttpStatus.CONFLICT, "I dati sono cambiati nel frattempo: ricarica la pagina e riprova", request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

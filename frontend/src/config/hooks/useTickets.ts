@@ -7,6 +7,7 @@ import {
   type UseQueryResult,
 } from '@tanstack/react-query';
 
+import { MY_BENEFICIARIES_KEY } from '@/config/hooks/useBeneficiaries';
 import {
   fetchQueue,
   submitTicket,
@@ -22,7 +23,12 @@ export const useSubmitTicket = (): UseMutationResult<Ticket, unknown, TicketCrea
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: submitTicket,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+    // anche i beneficiari: quello appena segnalato ora ha una segnalazione aperta
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+        queryClient.invalidateQueries({ queryKey: MY_BENEFICIARIES_KEY }),
+      ]),
   });
 };
 

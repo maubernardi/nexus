@@ -26,9 +26,9 @@ export const HomePage = () => {
         {user?.roles.includes('TUTOR') && (
           <div aria-label={t('pages.home.actions')} role="group" className="flex flex-wrap gap-3 pt-2">
             <Button asChild size="lg">
-              <Link to="/candidati/nuovo">
+              <Link to="/beneficiari/nuovo">
                 <UserPlus aria-hidden="true" />
-                {t('nav.newCandidate')}
+                {t('nav.newBeneficiary')}
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">

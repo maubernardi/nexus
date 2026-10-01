@@ -23,7 +23,7 @@ const item = (number: number, overrides: Partial<QueueItem> = {}): QueueItem => 
   status: 'NUOVA',
   fastTrack: false,
   version: 0,
-  candidate: {
+  beneficiary: {
     id: `C${number}`,
     firstName: 'Mario',
     lastName: `Rossi${number}`,

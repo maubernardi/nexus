@@ -41,7 +41,7 @@ export const QueueTable = ({ items }: QueueTableProps) => {
               {t('queue.columns.priority')}
             </th>
             <th scope="col" className={th}>
-              {t('queue.columns.candidate')}
+              {t('queue.columns.beneficiary')}
             </th>
             <th scope="col" className={th}>
               {t('queue.columns.zone')}
@@ -80,9 +80,9 @@ export const QueueTable = ({ items }: QueueTableProps) => {
                 )}
               </td>
               <td className={td}>
-                {item.candidate.lastName} {item.candidate.firstName}
+                {item.beneficiary.lastName} {item.beneficiary.firstName}
               </td>
-              <td className={`${td} whitespace-nowrap`}>{item.candidate.residenceZoneName}</td>
+              <td className={`${td} whitespace-nowrap`}>{item.beneficiary.residenceZoneName}</td>
               <td className={td}>{item.project.name}</td>
               <td className={td}>{item.requestedJobCategory?.name ?? '—'}</td>
               <td className={`${td} whitespace-nowrap`}>{item.tutorName}</td>

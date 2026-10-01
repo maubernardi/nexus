@@ -3,7 +3,7 @@ export type RouteHandle = {
     | 'pages.home.title'
     | 'pages.notFound.title'
     | 'pages.devLogin.title'
-    | 'pages.candidateNew.title'
+    | 'pages.beneficiaryNew.title'
     | 'pages.ticketNew.title'
     | 'pages.queue.title'
     | 'pages.forbidden.title';

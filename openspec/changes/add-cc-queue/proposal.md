@@ -7,7 +7,7 @@ segnalazione inviata dal Tutor (US-301) compare nella coda.
 ## What Changes
 
 - API `GET /api/v1/tickets/queue` (Call Center, ADMIN): ticket in `NUOVA` o `IN_LAVORAZIONE` non ancora assegnati a un
-  operatore, prima i fast-track e poi dal più vecchio; filtri facoltativi per progetto e zona di residenza del candidato.
+  operatore, prima i fast-track e poi dal più vecchio; filtri facoltativi per progetto e zona di residenza del beneficiario.
 - API `GET /api/v1/reference/projects`: progetti attivi (il Call Center non è assegnato a progetti, ma deve filtrarli).
 - Pagina **Coda segnalazioni** per Call Center e ADMIN: tabella dati accessibile ottimizzata per desktop e usabile a
   320 px, badge testuale "Fast-track", filtri che aggiornano l'elenco e ne annunciano il numero, filtri nell'indirizzo
@@ -19,7 +19,7 @@ segnalazione inviata dal Tutor (US-301) compare nella coda.
 - `cc-queue`: coda di lavoro del Call Center.
 
 ### Modified Capabilities
-<!-- nessuna: l'elenco dei progetti si aggiunge ai dati di riferimento quando questa change e add-candidate-registration
+<!-- nessuna: l'elenco dei progetti si aggiunge ai dati di riferimento quando questa change e add-beneficiary-registration
      sono archiviate; qui è descritto come requisito della coda -->
 
 ## Non-goals

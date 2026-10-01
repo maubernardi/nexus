@@ -8,6 +8,7 @@
 --  t2 tutor1/GOL   IN_ATTESA_APPROVAZIONE_ADMIN   t6 tutor2/POLIS PROPOSTA_ACCOLTA, timer avviato, blocca s_vendite
 --  t3 tutor2/POLIS IN_LAVORAZIONE                 t7 tutor1/GOL   RIAPERTO dopo appuntamento fallito (blacklist + audit)
 --  t4 tutor2/GOL   PROPOSTA_AZIENDA, blocca s_mag_nord
+-- Ogni beneficiario ha al più una segnalazione aperta (vincolo uq_ticket_open_per_beneficiary): t6 → k7, t7 → k6.
 -- I numeri progressivi (#post, n. ticket) li assegna il database nell'ordine di inserimento.
 
 INSERT INTO board_post (id, job_slot_id, title, project_id, status, age_min, age_max, weekly_hours, duration_months, notes, published_at, created_at, created_by, updated_at, updated_by) VALUES
@@ -15,7 +16,7 @@ INSERT INTO board_post (id, job_slot_id, title, project_id, status, age_min, age
     (892398395572130087, 892398395572130064, 'Tirocinio cameriere di sala', (SELECT id FROM project WHERE code = 'GOL'), 'PUBLISHED', 18, 29, 30, 6, 'Requisito di età del programma (esempio).', now() - interval '2 days', now(), 'seed', now(), 'seed')  -- b_riservato
 ON CONFLICT DO NOTHING;
 
-INSERT INTO ticket (id, tutor_id, project_id, candidate_id, type, status, is_fast_track, requested_job_category_id, requested_job_free_text,
+INSERT INTO ticket (id, tutor_id, project_id, beneficiary_id, type, status, is_fast_track, requested_job_category_id, requested_job_free_text,
                     board_post_id, assigned_cc_operator_id, job_slot_id, timer_started_at, timer_deadline_at,
                     created_at, created_by, updated_at, updated_by) VALUES
     -- t1
@@ -39,11 +40,11 @@ INSERT INTO ticket (id, tutor_id, project_id, candidate_id, type, status, is_fas
      892398395572130086, (SELECT id FROM app_user WHERE username = 'operatore.cc'), NULL, NULL, NULL,
      now() - interval '12 days', 'seed', now() - interval '12 days', 'seed'),
     -- t6
-    (892398395572130094, (SELECT id FROM app_user WHERE username = 'tutor2'), (SELECT id FROM project WHERE code = 'POLIS'), 892398395572130074, 'NORMAL', 'PROPOSTA_ACCOLTA', false, (SELECT id FROM job_category WHERE code = 'ADDETTO_VENDITE'), NULL,
+    (892398395572130094, (SELECT id FROM app_user WHERE username = 'tutor2'), (SELECT id FROM project WHERE code = 'POLIS'), 892398395576324401, 'NORMAL', 'PROPOSTA_ACCOLTA', false, (SELECT id FROM job_category WHERE code = 'ADDETTO_VENDITE'), NULL,
      NULL, (SELECT id FROM app_user WHERE username = 'operatore.cc'), 892398395572130066, now() - interval '2 days', now() + interval '7 days',
      now() - interval '10 days', 'seed', now() - interval '10 days', 'seed'),
     -- t7
-    (892398395576324284, (SELECT id FROM app_user WHERE username = 'tutor1'), (SELECT id FROM project WHERE code = 'GOL'), 892398395572130071, 'NORMAL', 'RIAPERTO', false, (SELECT id FROM job_category WHERE code = 'MAGAZZINIERE'), NULL,
+    (892398395576324284, (SELECT id FROM app_user WHERE username = 'tutor1'), (SELECT id FROM project WHERE code = 'GOL'), 892398395576324400, 'NORMAL', 'RIAPERTO', false, (SELECT id FROM job_category WHERE code = 'MAGAZZINIERE'), NULL,
      NULL, (SELECT id FROM app_user WHERE username = 'operatore.cc'), NULL, NULL, NULL,
      now() - interval '8 days', 'seed', now() - interval '8 days', 'seed')
 ON CONFLICT DO NOTHING;

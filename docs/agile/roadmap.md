@@ -7,7 +7,7 @@ Con sprint di una settimana, la durata delle release si stimerà dalla velocity 
 | Release | Obiettivo | Epiche principali | Punti | Esito atteso |
 |---|---|---|---|---|
 | **R0** ✅ | Fondamenta | infrastruttura, modello dati, deploy, restyle | — | demo online con login e shell (Sprint 0, completato) |
-| **R1** | Flusso base: dalla segnalazione alla proposta | E2, E3, E4 (coda), E5, E6 | 57 | il tutor registra e segnala un candidato; il Call Center lo prende in carico e lo abbina a una mansione (PROPOSTA_AZIENDA) |
+| **R1** | Flusso base: dalla segnalazione alla proposta | E2, E3, E4 (coda), E5, E6 | 57 | il tutor registra e segnala un beneficiario; il Call Center lo prende in carico e lo abbina a una mansione (PROPOSTA_AZIENDA) |
 | **R2** | Proposta, timer, appuntamenti, bacheca, fast-track | E7, E8, E9, E4 (fast-track), E12 (in app) | 60 | ciclo completo fino all'appuntamento, con timer, rilancio in bacheca e segnalazioni speciali |
 | **R3** | Tirocinio e chiusura | E10, E11, E12 (email) | 38 | Convenzione e Progetto Formativo in Word, report di restituzione, audit trail |
 | **R4** | Produzione | E1, E13 | 53 | gestione utenti, backup, GDPR, UX, sicurezza; go-live con dati reali |

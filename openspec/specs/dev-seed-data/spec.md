@@ -10,7 +10,7 @@ automatici inclusi, MUST NOT caricarli.
 
 #### Scenario: Avvio locale
 - **WHEN** il backend si avvia con il profilo `local` su un database vuoto
-- **THEN** sono presenti progetti, utenti, zone, tipologie di mansione, aziende, mansioni, candidati, ticket e post dimostrativi
+- **THEN** sono presenti progetti, utenti, zone, tipologie di mansione, aziende, mansioni, beneficiari, ticket e post dimostrativi
 
 #### Scenario: Avvio in altri profili
 - **WHEN** il backend si avvia con un profilo diverso da `local`
@@ -24,7 +24,7 @@ I dati dimostrativi SHALL comprendere:
 - ticket in più stati, tra cui almeno una segnalazione speciale;
 - un post pubblico, uno riservato a un progetto e uno in bozza.
 
-I candidati MUST avere dati palesemente fittizi.
+I beneficiari MUST avere dati palesemente fittizi.
 
 #### Scenario: Visibilità incrociata provabile
 - **WHEN** si consultano i dati dimostrativi

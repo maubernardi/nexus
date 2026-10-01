@@ -1,6 +1,6 @@
 package it.nexus.domain;
 
-import static it.nexus.domain.TestEntities.candidate;
+import static it.nexus.domain.TestEntities.beneficiary;
 import static it.nexus.domain.TestEntities.company;
 import static it.nexus.domain.TestEntities.jobCategory;
 import static it.nexus.domain.TestEntities.jobSlot;
@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.TestComponent;
 
 import it.nexus.domain.enumeration.Role;
 import it.nexus.repository.AppUserRepository;
-import it.nexus.repository.CandidateRepository;
+import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.JobSlotRepository;
@@ -38,11 +38,11 @@ public class DomainFixtures {
     private final AppUserRepository users;
     private final CompanyRepository companies;
     private final JobSlotRepository jobSlots;
-    private final CandidateRepository candidates;
+    private final BeneficiaryRepository beneficiaries;
     private final TicketRepository tickets;
 
     public record Graph(Project project, Zone zone, JobCategory category, AppUser tutor, Company company, JobSlot slot,
-            Candidate candidate) {
+            Beneficiary beneficiary) {
     }
 
     public static String code(String prefix) {
@@ -53,7 +53,7 @@ public class DomainFixtures {
         return String.format("%011d", 10_000_000_000L + SEQ.incrementAndGet());
     }
 
-    /** Progetto, zona, tipologia, tutor, azienda con una mansione libera e un candidato, già salvati. */
+    /** Progetto, zona, tipologia, tutor, azienda con una mansione libera e un beneficiario, già salvati. */
     public Graph graph() {
         Project project = projects.save(project(code("P")));
         Zone zone = zones.save(zone(code("Z")));
@@ -61,17 +61,21 @@ public class DomainFixtures {
         AppUser tutor = users.save(user(code("tutor").toLowerCase(), Role.TUTOR));
         Company company = companies.save(company(vatCode()));
         JobSlot slot = jobSlots.save(jobSlot(company, category, zone));
-        Candidate candidate = candidates.save(candidate(tutor, zone));
+        Beneficiary beneficiary = beneficiaries.save(beneficiary(tutor, zone));
         em.flush();
-        return new Graph(project, zone, category, tutor, company, slot, candidate);
+        return new Graph(project, zone, category, tutor, company, slot, beneficiary);
     }
 
     public JobSlot slot(Graph g) {
         return jobSlots.saveAndFlush(jobSlot(g.company(), g.category(), g.zone()));
     }
 
-    /** Ticket NORMAL in stato NUOVA con mansione richiesta dal catalogo, già salvato. */
+    /**
+     * Ticket NORMAL in stato NUOVA con mansione richiesta dal catalogo, già salvato. Ogni ticket ha un beneficiario
+     * proprio: un beneficiario può avere una sola segnalazione aperta (uq_ticket_open_per_beneficiary).
+     */
     public Ticket ticket(Graph g) {
-        return tickets.saveAndFlush(TestEntities.ticket(g.tutor(), g.project(), g.candidate(), g.category()));
+        Beneficiary beneficiary = beneficiaries.save(beneficiary(g.tutor(), g.zone()));
+        return tickets.saveAndFlush(TestEntities.ticket(g.tutor(), g.project(), beneficiary, g.category()));
     }
 }

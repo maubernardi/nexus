@@ -10,5 +10,8 @@ public enum TicketStatus {
     APPUNTAMENTO,
     IN_TIROCINIO,
     FORM_RESTITUZIONE,
-    RIAPERTO
+    RIAPERTO;
+
+    /** Unico stato conclusivo: in ogni altro stato la segnalazione è aperta (una sola per beneficiario). */
+    public static final TicketStatus CLOSED = FORM_RESTITUZIONE;
 }

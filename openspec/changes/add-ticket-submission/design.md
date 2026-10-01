@@ -1,8 +1,8 @@
 ## Context
 
 Motivazione: proposal.md (EN-1, US-301). Tabelle `ticket` (con `version`, numero da sequenza) e
-`ticket_status_history` esistono già (change `add-domain-model`). Dipende da `add-candidate-registration` (US-201:
-candidati, `CurrentAppUserService`, `TsidMapper`, form accessibili).
+`ticket_status_history` esistono già (change `add-domain-model`). Dipende da `add-beneficiary-registration` (US-201:
+beneficiari, `CurrentAppUserService`, `TsidMapper`, form accessibili).
 
 ## Decisions
 
@@ -26,10 +26,10 @@ transazioni. `ObjectOptimisticLockingFailureException` è tradotta dal gestore g
 a ricaricare. Nessun lock pessimistico: i conflitti sono rari e l'esito corretto è far rileggere all'utente.
 
 ### D4 — API di invio
-`POST /api/v1/tickets` con `TicketCreateDTO(candidateId, projectId, jobCategoryId)` → `201` + `TicketDTO` (id, numero,
-tipo, stato, fast-track, candidato in sintesi, progetto, mansione richiesta, creazione). Nessun header `Location`: il
-dettaglio del ticket arriva con US-305. Controlli nel service, come `400` sul campo: candidato inesistente o di un altro
-tutor (`candidateId`), progetto non assegnato o disattivato (`projectId`), tipologia inesistente o disattivata
+`POST /api/v1/tickets` con `TicketCreateDTO(beneficiaryId, projectId, jobCategoryId)` → `201` + `TicketDTO` (id, numero,
+tipo, stato, fast-track, beneficiario in sintesi, progetto, mansione richiesta, creazione). Nessun header `Location`: il
+dettaglio del ticket arriva con US-305. Controlli nel service, come `400` sul campo: beneficiario inesistente o di un altro
+tutor (`beneficiaryId`), progetto non assegnato o disattivato (`projectId`), tipologia inesistente o disattivata
 (`jobCategoryId`). Il messaggio non distingue "inesistente" da "non tuo".
 
 ### D5 — Progetti dell'utente
@@ -38,7 +38,7 @@ tutor (`candidateId`), progetto non assegnato o disattivato (`projectId`), tipol
 
 ### D6 — Frontend
 Pagina `/segnalazioni/nuova` (solo TUTOR) con gli stessi componenti di form accessibili di US-201 (`FormField`,
-`NativeSelect`, `ErrorSummary` con focus). Parametro `?candidato=<id>` per preselezionare il candidato. Senza candidati o
+`NativeSelect`, `ErrorSummary` con focus). Parametro `?beneficiario=<id>` per preselezionare il beneficiario. Senza beneficiari o
 senza progetti la pagina lo spiega e offre il collegamento utile invece di un modulo inutilizzabile. Alla conferma il
 focus va al titolo "Segnalazione n. N inviata", con lo stato in testo.
 

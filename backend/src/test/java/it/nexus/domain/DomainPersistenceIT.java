@@ -1,7 +1,7 @@
 package it.nexus.domain;
 
 import static it.nexus.domain.TestEntities.boardPost;
-import static it.nexus.domain.TestEntities.candidate;
+import static it.nexus.domain.TestEntities.beneficiary;
 import static it.nexus.domain.TestEntities.company;
 import static it.nexus.domain.TestEntities.jobCategory;
 import static it.nexus.domain.TestEntities.jobSlot;
@@ -34,7 +34,7 @@ import it.nexus.domain.enumeration.LicenseType;
 import it.nexus.domain.enumeration.Role;
 import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.BoardPostRepository;
-import it.nexus.repository.CandidateRepository;
+import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.JobCategoryRepository;
@@ -60,7 +60,7 @@ class DomainPersistenceIT {
     @Autowired UserProjectRepository userProjects;
     @Autowired CompanyRepository companies;
     @Autowired JobSlotRepository jobSlots;
-    @Autowired CandidateRepository candidates;
+    @Autowired BeneficiaryRepository beneficiaries;
     @Autowired TicketRepository tickets;
     @Autowired BoardPostRepository boardPosts;
     @Autowired CompanyAuditEventRepository auditEvents;
@@ -102,8 +102,10 @@ class DomainPersistenceIT {
     void ticketAndBoardPost_receiveProgressiveNumbersFromDatabase() {
         Fixture f = fixture();
 
-        Ticket first = tickets.saveAndFlush(ticket(f.tutor, f.project, f.candidate, f.category));
-        Ticket second = tickets.saveAndFlush(ticket(f.tutor, f.project, f.candidate, f.category));
+        Ticket first = tickets.saveAndFlush(ticket(f.tutor, f.project, f.beneficiary, f.category));
+        // un altro beneficiario: ognuno ha al più una segnalazione aperta
+        Ticket second = tickets.saveAndFlush(ticket(f.tutor, f.project, beneficiaries.save(beneficiary(f.tutor, f.zone)),
+                f.category));
         BoardPost post = boardPosts.saveAndFlush(boardPost(f.slot));
 
         assertThat(first.getNumber()).isNotNull();
@@ -113,26 +115,26 @@ class DomainPersistenceIT {
     }
 
     @Test
-    void candidate_roundTripsLicenseArrayAndLanguages() {
+    void beneficiary_roundTripsLicenseArrayAndLanguages() {
         Fixture f = fixture();
-        Candidate candidate = candidate(f.tutor, f.zone);
-        candidate.setLicenseTypes(LicenseType.B, LicenseType.CQC);
-        candidate.addLanguage(new CandidateLanguage("it", LanguageLevel.MADRELINGUA));
-        candidate.addLanguage(new CandidateLanguage("en", LanguageLevel.B1));
-        Long id = candidates.saveAndFlush(candidate).getId();
+        Beneficiary beneficiary = beneficiary(f.tutor, f.zone);
+        beneficiary.setLicenseTypes(LicenseType.B, LicenseType.CQC);
+        beneficiary.addLanguage(new BeneficiaryLanguage("it", LanguageLevel.MADRELINGUA));
+        beneficiary.addLanguage(new BeneficiaryLanguage("en", LanguageLevel.B1));
+        Long id = beneficiaries.saveAndFlush(beneficiary).getId();
         em.clear();
 
-        Candidate reloaded = candidates.findById(id).orElseThrow();
+        Beneficiary reloaded = beneficiaries.findById(id).orElseThrow();
 
         assertThat(reloaded.getLicenseTypes()).containsExactly(LicenseType.B, LicenseType.CQC);
         assertThat(reloaded.isHasDrivingLicense()).isTrue();
-        assertThat(reloaded.getLanguages()).extracting(CandidateLanguage::getLanguage).containsExactlyInAnyOrder("it", "en");
+        assertThat(reloaded.getLanguages()).extracting(BeneficiaryLanguage::getLanguage).containsExactlyInAnyOrder("it", "en");
     }
 
     @Test
     void jobSlot_blockAndRelease_incrementVersion() {
         Fixture f = fixture();
-        Ticket ticket = tickets.saveAndFlush(ticket(f.tutor, f.project, f.candidate, f.category));
+        Ticket ticket = tickets.saveAndFlush(ticket(f.tutor, f.project, f.beneficiary, f.category));
         long initialVersion = f.slot.getVersion();
 
         f.slot.blockFor(ticket);
@@ -168,7 +170,7 @@ class DomainPersistenceIT {
     void toString_doesNotExposePersonalData() {
         Fixture f = fixture();
 
-        assertThat(f.candidate.toString()).doesNotContain("Mario", "Rossi").matches("Candidate\\[id=[0-9A-Z]{13}]");
+        assertThat(f.beneficiary.toString()).doesNotContain("Mario", "Rossi").matches("Beneficiary\\[id=[0-9A-Z]{13}]");
         assertThat(f.tutor.toString()).doesNotContain("tutor-it@", "Nome");
     }
 
@@ -180,7 +182,7 @@ class DomainPersistenceIT {
         f.tutor = users.save(user("tutor-it-" + System.nanoTime(), Role.TUTOR));
         f.company = companies.save(company(String.format("%011d", System.nanoTime() % 100_000_000_000L)));
         f.slot = jobSlots.save(jobSlot(f.company, f.category, f.zone));
-        f.candidate = candidates.save(candidate(f.tutor, f.zone));
+        f.beneficiary = beneficiaries.save(beneficiary(f.tutor, f.zone));
         em.flush();
         return f;
     }
@@ -192,6 +194,6 @@ class DomainPersistenceIT {
         AppUser tutor;
         Company company;
         JobSlot slot;
-        Candidate candidate;
+        Beneficiary beneficiary;
     }
 }

@@ -2,14 +2,14 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fetchMyCandidates } from '@/config/api/candidateApi';
+import { fetchMyBeneficiaries } from '@/config/api/beneficiaryApi';
 import { fetchJobCategories, fetchMyProjects } from '@/config/api/referenceApi';
 import { submitTicket, type Ticket } from '@/config/api/ticketApi';
 import { TicketNewPage } from '@/pages/TicketNewPage/TicketNewPage';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderRoutes } from '@/tests/renderWithProviders';
 
-vi.mock('@/config/api/candidateApi', () => ({ createCandidate: vi.fn(), fetchMyCandidates: vi.fn() }));
+vi.mock('@/config/api/beneficiaryApi', () => ({ createBeneficiary: vi.fn(), fetchMyBeneficiaries: vi.fn() }));
 vi.mock('@/config/api/referenceApi', () => ({
   fetchZones: vi.fn(),
   fetchJobCategories: vi.fn(),
@@ -21,7 +21,7 @@ const MARIO = { id: 'C1', firstName: 'Mario', lastName: 'Rossi', birthYear: 1998
 
 describe('<TicketNewPage>', () => {
   beforeEach(() => {
-    vi.mocked(fetchMyCandidates).mockResolvedValue([MARIO, { ...MARIO, id: 'C2', firstName: 'Luca' }]);
+    vi.mocked(fetchMyBeneficiaries).mockResolvedValue([MARIO, { ...MARIO, id: 'C2', firstName: 'Luca' }]);
     vi.mocked(fetchMyProjects).mockResolvedValue([{ id: 'P1', code: 'GOL', name: 'GOL' }]);
     vi.mocked(fetchJobCategories).mockResolvedValue([
       { id: 'J1', code: 'MAGAZZINIERE', name: 'Magazziniere' },
@@ -30,11 +30,11 @@ describe('<TicketNewPage>', () => {
       id: 'T1',
       number: 42,
       status: 'NUOVA',
-      candidate: MARIO,
+      beneficiary: MARIO,
     } as Ticket);
   });
 
-  it('preseleziona il candidato dall’indirizzo e alla conferma sposta il focus su numero e stato', async () => {
+  it('preseleziona il beneficiario dall’indirizzo e alla conferma sposta il focus su numero e stato', async () => {
     const user = userEvent.setup();
     renderRoutes({
       routes: [
@@ -47,10 +47,10 @@ describe('<TicketNewPage>', () => {
           ),
         },
       ],
-      initialPath: '/segnalazioni/nuova?candidato=C1',
+      initialPath: '/segnalazioni/nuova?beneficiario=C1',
     });
 
-    expect(await screen.findByLabelText(/^Candidato/)).toHaveValue('C1');
+    expect(await screen.findByLabelText(/^Beneficiario/)).toHaveValue('C1');
     await user.selectOptions(screen.getByLabelText(/^Mansione richiesta/), 'J1');
     await user.click(screen.getByRole('button', { name: 'Invia segnalazione' }));
 
@@ -59,8 +59,8 @@ describe('<TicketNewPage>', () => {
     expect(screen.getByText(/in stato «Nuova» ed è entrata nella coda del Call Center/)).toBeInTheDocument();
     await expectNoAxeViolations();
 
-    // una nuova segnalazione riparte da zero, senza riprendere il candidato dall'indirizzo
+    // una nuova segnalazione riparte da zero, senza riprendere il beneficiario dall'indirizzo
     await user.click(screen.getByRole('button', { name: 'Invia un’altra segnalazione' }));
-    expect(await screen.findByLabelText(/^Candidato/)).toHaveValue('');
+    expect(await screen.findByLabelText(/^Beneficiario/)).toHaveValue('');
   });
 });

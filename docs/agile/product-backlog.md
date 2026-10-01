@@ -10,11 +10,11 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | Epica | Titolo | Obiettivo | Storie | Punti |
 |---|---|---|---|---|
 | E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti e cataloghi senza passare dalla console di Keycloak. | 6 | 21 |
-| E2 | Anagrafica candidati | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 5 | 18 |
-| E3 | Segnalazioni (fase 1) | Il Tutor segnala un candidato per un percorso di tirocinio e ne segue lo stato. | 7 | 27 |
+| E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 5 | 18 |
+| E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 7 | 27 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 4 | 15 |
 | E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 3 | 8 |
-| E6 | Abbinamento (fase 4) | Il Call Center abbina il candidato a una mansione libera e la blocca. | 3 | 12 |
+| E6 | Abbinamento (fase 4) | Il Call Center abbina il beneficiario a una mansione libera e la blocca. | 3 | 12 |
 | E7 | Proposta e timer (fase 5) | Il Tutor valuta la proposta; i tempi di risposta sono presidiati da un timer di 7 giorni lavorativi. | 5 | 15 |
 | E8 | Appuntamento e rilancio (fase 6) | Il Tutor registra l'esito dell'appuntamento; se fallisce, la mansione può essere rilanciata in bacheca. | 3 | 9 |
 | E9 | Bacheca opportunità | Le mansioni disponibili sono visibili ai Tutor in forma anonima e gestite dal Call Center. | 4 | 13 |
@@ -44,12 +44,12 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | Q4 | Festività da escludere: solo nazionali o anche il patrono locale? Chiusure della cooperativa? | US-703 | — |
 | Q5 | Campi della scheda amministrativa e template Word reali di Convenzione e Progetto Formativo. | US-1001..1005 | — |
 | Q6 | Voci esatte dei gradimenti 1–5 del report di restituzione. | US-1101 | — |
-| Q7 | Durata di conservazione dei dati dei candidati (decisione della cooperativa/DPO). | US-1303 | — |
+| Q7 | Durata di conservazione dei dati dei beneficiari (decisione della cooperativa/DPO). | US-1303 | — |
 | Q8 | Chi approva la mansione a testo libero (ADMIN?) e se, approvata, entra nel catalogo. | US-302 | — |
 | Q9 | Canali delle notifiche per evento (solo app, app + email) e destinatari. | US-1201, US-1202 | — |
 | Q10 | Elenco reale di zone e tipologie di mansione. | US-106 | — |
-| Q11 | Cosa vedono gli altri tutor dello stesso progetto del candidato (oltre al divieto su nome e cognome). | US-204 | — |
-| Q12 | Un candidato può avere più segnalazioni aperte insieme (es. su progetti o mansioni diverse)? Oggi è consentito. | US-301 | — |
+| Q11 | Cosa vedono gli altri tutor dello stesso progetto del beneficiario (oltre al divieto su nome e cognome). | US-204 | — |
+| Q12 | Un beneficiario può avere più segnalazioni aperte insieme (es. su progetti o mansioni diverse)? | US-301 | **No**: una sola segnalazione aperta alla volta (PO, 01/10). Aperta = qualunque stato tranne FORM_RESTITUZIONE. |
 
 ## Elenco delle storie
 
@@ -62,11 +62,11 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-104](#us-104) | E1 | Assegnazione utenti ai progetti | Must | 3 | R4 | 📋 Backlog |
 | [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | 📋 Backlog |
 | [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Should | 3 | R4 | 📋 Backlog |
-| [US-201](#us-201) | E2 | Inserimento candidato | Must | 5 | R1 | 👀 In review (Sprint 1) |
-| [US-202](#us-202) | E2 | I miei candidati | Must | 3 | R1 | 📋 Backlog |
-| [US-203](#us-203) | E2 | Modifica candidato | Must | 2 | R1 | 📋 Backlog |
-| [US-204](#us-204) | E2 | Visibilità minimizzata dei candidati | Must | 3 | R1 | 📋 Backlog |
-| [US-205](#us-205) | E2 | Curriculum del candidato | Could | 5 | R3 | 📋 Backlog |
+| [US-201](#us-201) | E2 | Inserimento beneficiario | Must | 5 | R1 | 👀 In review (Sprint 1) |
+| [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | 📋 Backlog |
+| [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 📋 Backlog |
+| [US-204](#us-204) | E2 | Visibilità minimizzata dei beneficiari | Must | 3 | R1 | 📋 Backlog |
+| [US-205](#us-205) | E2 | Curriculum del beneficiario | Could | 5 | R3 | 📋 Backlog |
 | [US-301](#us-301) | E3 | Nuova segnalazione | Must | 5 | R1 | 👀 In review (Sprint 1) |
 | [US-302](#us-302) | E3 | Mansione a testo libero e approvazione | Should | 5 | R2 | 📋 Backlog |
 | [US-303](#us-303) | E3 | I miei ticket | Must | 3 | R1 | 📋 Backlog |
@@ -175,59 +175,59 @@ Criteri di accettazione:
 
 Domande aperte: Q10
 
-### E2 — Anagrafica candidati
+### E2 — Anagrafica beneficiari
 
 _Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR._
 
 #### US-201
-**Inserimento candidato** · Must · 5 punti · R1 · 👀 In review (Sprint 1)
+**Inserimento beneficiario** · Must · 5 punti · R1 · 👀 In review (Sprint 1)
 
-Come **Tutor** voglio registrare un candidato con i dati previsti (anagrafica minima, patente, mezzi, L. 68/99, titolo di studio, vincoli, lingue) per poterlo segnalare per un tirocinio.
+Come **Tutor** voglio registrare un beneficiario con i dati previsti (anagrafica minima, patente, mezzi, L. 68/99, titolo di studio, vincoli, lingue) per poterlo segnalare per un tirocinio.
 
 Criteri di accettazione:
-- Quando compilo il modulo con dati validi, allora il candidato è salvato e ne sono il tutor proprietario.
+- Quando compilo il modulo con dati validi, allora il beneficiario è salvato e ne sono il tutor proprietario.
 - Quando un campo non è valido (es. anno di nascita futuro, livello linguistico non ammesso), allora vedo l'errore accanto al campo, annunciato agli screen reader.
 - Il modulo è utilizzabile solo da tastiera e su smartphone a 320 px.
 
 #### US-202
-**I miei candidati** · Must · 3 punti · R1 · 📋 Backlog
+**I miei beneficiari** · Must · 3 punti · R1 · 📋 Backlog
 
-Come **Tutor** voglio vedere l'elenco e il dettaglio dei candidati che ho inserito per ritrovarli rapidamente.
+Come **Tutor** voglio vedere l'elenco e il dettaglio dei beneficiari che ho inserito per ritrovarli rapidamente.
 
 Criteri di accettazione:
-- Vedo solo i candidati di cui sono proprietario, con ricerca per nome.
+- Vedo solo i beneficiari di cui sono proprietario, con ricerca per nome.
 
 #### US-203
-**Modifica candidato** · Must · 2 punti · R1 · 📋 Backlog
+**Modifica beneficiario** · Must · 2 punti · R1 · 📋 Backlog
 
-Come **Tutor** voglio correggere i dati di un mio candidato per tenerli aggiornati.
+Come **Tutor** voglio correggere i dati di un mio beneficiario per tenerli aggiornati.
 
 Criteri di accettazione:
-- Posso modificare solo i miei candidati; le modifiche sono tracciate (autore e data).
+- Posso modificare solo i miei beneficiari; le modifiche sono tracciate (autore e data).
 
 #### US-204
-**Visibilità minimizzata dei candidati** · Must · 3 punti · R1 · 📋 Backlog
+**Visibilità minimizzata dei beneficiari** · Must · 3 punti · R1 · 📋 Backlog
 
-Come **responsabile della privacy** voglio che nome e cognome del candidato siano visibili solo al tutor proprietario, al Call Center e all'ADMIN per rispettare la minimizzazione GDPR.
+Come **responsabile della privacy** voglio che nome e cognome del beneficiario siano visibili solo al tutor proprietario, al Call Center e all'ADMIN per rispettare la minimizzazione GDPR.
 
 Criteri di accettazione:
-- Dato un ticket di un progetto condiviso, quando lo apre un altro tutor, allora vede i dati del percorso ma non nome e cognome del candidato.
+- Dato un ticket di un progetto condiviso, quando lo apre un altro tutor, allora vede i dati del percorso ma non nome e cognome del beneficiario.
 - Le API non restituiscono mai i campi nascosti (verifica lato server, non solo nell'interfaccia).
 
 Domande aperte: Q11
 
 #### US-205
-**Curriculum del candidato** · Could · 5 punti · R3 · 📋 Backlog
+**Curriculum del beneficiario** · Could · 5 punti · R3 · 📋 Backlog
 
-Come **Tutor** voglio allegare il CV (PDF) al candidato per metterlo a disposizione del Call Center per l'abbinamento.
+Come **Tutor** voglio allegare il CV (PDF) al beneficiario per metterlo a disposizione del Call Center per l'abbinamento.
 
 Criteri di accettazione:
 - Accetta solo PDF fino a 5 MB; il file non è accessibile senza autorizzazione.
-- Il CV si scarica solo da utenti autorizzati a vedere il candidato.
+- Il CV si scarica solo da utenti autorizzati a vedere il beneficiario.
 
 ### E3 — Segnalazioni (fase 1)
 
-_Il Tutor segnala un candidato per un percorso di tirocinio e ne segue lo stato._
+_Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato._
 
 #### EN-1
 **Motore delle transizioni del ticket** · Must · 5 punti · R1 · 👀 In review (Sprint 1)
@@ -242,11 +242,12 @@ Criteri di accettazione:
 #### US-301
 **Nuova segnalazione** · Must · 5 punti · R1 · 👀 In review (Sprint 1)
 
-Come **Tutor** voglio segnalare un mio candidato per un progetto indicando la mansione desiderata dal catalogo per avviare il percorso di tirocinio.
+Come **Tutor** voglio segnalare un mio beneficiario per un progetto indicando la mansione desiderata dal catalogo per avviare il percorso di tirocinio.
 
 Criteri di accettazione:
 - Quando invio la segnalazione, allora il ticket nasce in stato NUOVA con un numero progressivo ed entra nella coda del Call Center.
 - Posso scegliere solo tra i progetti a cui sono assegnato.
+- Un beneficiario ha al più una segnalazione aperta: se ne ha già una, non posso inviarne un'altra (Q12).
 
 Dipendenze: EN-1, US-201
 
@@ -264,7 +265,7 @@ Domande aperte: Q8
 #### US-303
 **I miei ticket** · Must · 3 punti · R1 · 📋 Backlog
 
-Come **Tutor** voglio vedere l'elenco dei miei ticket con numero, candidato, stato e data per seguire i percorsi in corso.
+Come **Tutor** voglio vedere l'elenco dei miei ticket con numero, beneficiario, stato e data per seguire i percorsi in corso.
 
 Criteri di accettazione:
 - L'elenco si filtra per stato e progetto; lo stato è indicato con testo, non solo colore.
@@ -276,7 +277,7 @@ Come **Tutor** voglio consultare in sola lettura i ticket degli altri tutor dei 
 
 Criteri di accettazione:
 - Non vedo ticket di progetti a cui non sono assegnato.
-- Sui ticket altrui non ho azioni di modifica e non vedo nome e cognome del candidato (US-204).
+- Sui ticket altrui non ho azioni di modifica e non vedo nome e cognome del beneficiario (US-204).
 
 #### US-305
 **Dettaglio e cronologia del ticket** · Must · 3 punti · R1 · 📋 Backlog
@@ -289,7 +290,7 @@ Criteri di accettazione:
 #### US-306
 **Segnalazione speciale dalla bacheca** · Must · 3 punti · R2 · 📋 Backlog
 
-Come **Tutor** voglio candidare un mio candidato direttamente a un post #N della bacheca per ottenere una corsia prioritaria (fast-track).
+Come **Tutor** voglio candidare un mio beneficiario direttamente a un post #N della bacheca per ottenere una corsia prioritaria (fast-track).
 
 Criteri di accettazione:
 - Il ticket nasce SPECIAL, fast-track, in IN_LAVORAZIONE, collegato al post, con badge prioritario per il Call Center.
@@ -369,12 +370,12 @@ Criteri di accettazione:
 
 ### E6 — Abbinamento (fase 4)
 
-_Il Call Center abbina il candidato a una mansione libera e la blocca._
+_Il Call Center abbina il beneficiario a una mansione libera e la blocca._
 
 #### US-601
 **Ricerca mansioni compatibili** · Must · 5 punti · R1 · 📋 Backlog
 
-Come **operatore Call Center** voglio trovare le mansioni libere compatibili con il candidato (zona, tipologia) escludendo le aziende in blacklist per abbinare velocemente.
+Come **operatore Call Center** voglio trovare le mansioni libere compatibili con il beneficiario (zona, tipologia) escludendo le aziende in blacklist per abbinare velocemente.
 
 Criteri di accettazione:
 - Sono proposte solo mansioni LIBERE di aziende attive e non escluse per quel ticket.
@@ -384,7 +385,7 @@ Dipendenze: US-502
 #### US-602
 **Abbinamento e proposta** · Must · 5 punti · R1 · 📋 Backlog
 
-Come **operatore Call Center** voglio assegnare una mansione al ticket per proporre il candidato all'azienda.
+Come **operatore Call Center** voglio assegnare una mansione al ticket per proporre il beneficiario all'azienda.
 
 Criteri di accettazione:
 - La mansione diventa BLOCCATA dal ticket e il ticket passa in PROPOSTA_AZIENDA.
@@ -395,7 +396,7 @@ Dipendenze: EN-1, US-601
 #### US-603
 **Esclusione di un'azienda** · Should · 2 punti · R2 · 📋 Backlog
 
-Come **operatore Call Center** voglio escludere un'azienda per un ticket, con motivo per non riproporla allo stesso candidato.
+Come **operatore Call Center** voglio escludere un'azienda per un ticket, con motivo per non riproporla allo stesso beneficiario.
 
 Criteri di accettazione:
 - Un'azienda esclusa non compare più nella ricerca per quel ticket.
@@ -407,7 +408,7 @@ _Il Tutor valuta la proposta; i tempi di risposta sono presidiati da un timer di
 #### US-701
 **Accettazione della proposta** · Must · 3 punti · R2 · 📋 Backlog
 
-Come **Tutor** voglio accettare la proposta per il mio candidato per far partire il contatto con l'azienda.
+Come **Tutor** voglio accettare la proposta per il mio beneficiario per far partire il contatto con l'azienda.
 
 Criteri di accettazione:
 - Il ticket passa in PROPOSTA_ACCOLTA e parte il timer di 7 giorni lavorativi, con scadenza visibile.
@@ -477,7 +478,7 @@ Criteri di accettazione:
 #### US-803
 **Rilancio in bacheca** · Must · 5 punti · R2 · 📋 Backlog
 
-Come **Tutor** voglio chiedere il rilancio della mansione in bacheca dopo un appuntamento fallito per offrirla ad altri candidati.
+Come **Tutor** voglio chiedere il rilancio della mansione in bacheca dopo un appuntamento fallito per offrirla ad altri beneficiari.
 
 Criteri di accettazione:
 - Si crea una bozza di post precompilata dalla mansione, riservata al progetto del ticket, collegata al ticket.
@@ -492,7 +493,7 @@ _Le mansioni disponibili sono visibili ai Tutor in forma anonima e gestite dal C
 #### US-901
 **Bacheca per il Tutor** · Must · 3 punti · R2 · 📋 Backlog
 
-Come **Tutor** voglio consultare gli annunci pubblici e quelli dei miei progetti, senza il nome dell'azienda per proporre candidati adatti.
+Come **Tutor** voglio consultare gli annunci pubblici e quelli dei miei progetti, senza il nome dell'azienda per proporre beneficiari adatti.
 
 Criteri di accettazione:
 - Il nome dell'azienda non arriva mai al browser del tutor (filtrato dall'API).
@@ -645,7 +646,7 @@ Criteri di accettazione:
 #### US-1303
 **Anonimizzazione a scadenza** · Must · 5 punti · R4 · 📋 Backlog
 
-Come **responsabile della privacy** voglio che i dati identificativi dei candidati siano anonimizzati alla scadenza della conservazione per rispettare il GDPR.
+Come **responsabile della privacy** voglio che i dati identificativi dei beneficiari siano anonimizzati alla scadenza della conservazione per rispettare il GDPR.
 
 Criteri di accettazione:
 - Restano solo i dati statistici; l'operazione è registrata.

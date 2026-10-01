@@ -19,7 +19,7 @@ import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.AppUser;
 import it.nexus.domain.BoardPost;
-import it.nexus.domain.Candidate;
+import it.nexus.domain.Beneficiary;
 import it.nexus.domain.Company;
 import it.nexus.domain.JobCategory;
 import it.nexus.domain.JobSlot;
@@ -33,7 +33,7 @@ import it.nexus.domain.enumeration.TicketType;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.BoardPostRepository;
-import it.nexus.repository.CandidateRepository;
+import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.JobSlotRepository;
@@ -58,7 +58,7 @@ class TicketQueueIT {
     @Autowired ProjectRepository projects;
     @Autowired ZoneRepository zones;
     @Autowired JobCategoryRepository categories;
-    @Autowired CandidateRepository candidates;
+    @Autowired BeneficiaryRepository beneficiaries;
     @Autowired CompanyRepository companies;
     @Autowired JobSlotRepository jobSlots;
     @Autowired BoardPostRepository boardPosts;
@@ -83,14 +83,18 @@ class TicketQueueIT {
         Zone north = zones.save(TestEntities.zone("QNORD"));
         Zone south = zones.save(TestEntities.zone("QSUD"));
         JobCategory category = categories.save(TestEntities.jobCategory("QMAG"));
-        Candidate inNorth = candidates.save(TestEntities.candidate(tutor, north));
-        Candidate inSouth = candidates.save(TestEntities.candidate(tutor, south));
+        Beneficiary inNorth = beneficiaries.save(TestEntities.beneficiary(tutor, north));
+        Beneficiary inSouth = beneficiaries.save(TestEntities.beneficiary(tutor, south));
+        // un beneficiario per ticket: ognuno può averne al più uno aperto
+        Beneficiary inSouth2 = beneficiaries.save(TestEntities.beneficiary(tutor, south));
+        Beneficiary inNorth2 = beneficiaries.save(TestEntities.beneficiary(tutor, north));
+        Beneficiary inNorth3 = beneficiaries.save(TestEntities.beneficiary(tutor, north));
         Company company = companies.save(TestEntities.company("99900000001"));
         JobSlot slot = jobSlots.save(TestEntities.jobSlot(company, category, north));
         BoardPost post = boardPosts.save(TestEntities.boardPost(slot));
 
         normaleNord = arrivedHoursAgo(tickets.save(TestEntities.ticket(tutor, gol, inNorth, category)), 3);
-        normaleSud = arrivedHoursAgo(tickets.save(TestEntities.ticket(tutor, polis, inSouth, category)), 2);
+        normaleSud = arrivedHoursAgo(tickets.save(TestEntities.ticket(tutor, polis, inSouth2, category)), 2);
         Ticket special = TestEntities.ticket(tutor, gol, inSouth, category);
         special.setType(TicketType.SPECIAL);
         special.setFastTrack(true);
@@ -99,10 +103,10 @@ class TicketQueueIT {
         fastTrack = arrivedHoursAgo(tickets.save(special), 1);
 
         // fuori coda: già assegnato a un operatore, oppure in una fase successiva
-        Ticket assigned = TestEntities.ticket(tutor, gol, inNorth, category);
+        Ticket assigned = TestEntities.ticket(tutor, gol, inNorth2, category);
         assigned.setAssignedCcOperator(operator);
         arrivedHoursAgo(tickets.save(assigned), 5);
-        Ticket advanced = TestEntities.ticket(tutor, gol, inNorth, category);
+        Ticket advanced = TestEntities.ticket(tutor, gol, inNorth3, category);
         advanced.setStatus(TicketStatus.PROPOSTA_AZIENDA);
         arrivedHoursAgo(tickets.save(advanced), 6);
 
@@ -130,7 +134,7 @@ class TicketQueueIT {
                 .andExpect(jsonPath("$[*].number", contains((int) fastTrack, (int) normaleNord, (int) normaleSud)))
                 .andExpect(jsonPath("$[0].fastTrack").value(true))
                 .andExpect(jsonPath("$[0].type").value("SPECIAL"))
-                .andExpect(jsonPath("$[1].candidate.residenceZoneName").value("Zona QNORD"))
+                .andExpect(jsonPath("$[1].beneficiary.residenceZoneName").value("Zona QNORD"))
                 .andExpect(jsonPath("$[1].project.code").value("QGOL"))
                 .andExpect(jsonPath("$[1].requestedJobCategory.code").value("QMAG"))
                 .andExpect(jsonPath("$[1].tutorName").value("Nome Cognome"))
