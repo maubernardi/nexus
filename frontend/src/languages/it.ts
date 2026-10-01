@@ -16,6 +16,7 @@ export const it = {
     newBeneficiary: 'Nuovo beneficiario',
     newTicket: 'Nuova segnalazione',
     queue: 'Coda segnalazioni',
+    myWork: 'Le mie lavorazioni',
   },
   form: {
     required: 'obbligatorio',
@@ -179,7 +180,21 @@ export const it = {
       tutor: 'Tutor',
       status: 'Stato',
       arrivedAt: 'Arrivo',
+      actions: 'Azioni',
     },
+    takeCharge: 'Prendi in carico',
+    takeChargeTarget: 'la segnalazione n. {{number}}',
+    takenTitle: 'Segnalazione n. {{number}} presa in carico.',
+    takenLink: 'Vai alle mie lavorazioni',
+    conflict:
+      'Non è stato possibile prendere in carico la segnalazione n. {{number}}: un collega l’ha appena presa o è cambiata. La coda è stata aggiornata.',
+    takeError: 'Presa in carico non riuscita. Controlla la connessione e riprova.',
+    myWorkCaption: 'Segnalazioni aperte assegnate a te, dalla più vecchia',
+    myWorkEmpty: 'Non hai segnalazioni in carico. Prendine una dalla coda.',
+    myWorkCount_zero: 'Nessuna segnalazione in carico',
+    myWorkCount_one: '1 segnalazione in carico',
+    myWorkCount_other: '{{count}} segnalazioni in carico',
+    goToQueue: 'Vai alla coda',
     fastTrack: 'Fast-track',
     normal: 'Normale',
   },
@@ -241,6 +256,11 @@ export const it = {
       description:
         'Hai effettuato l’accesso, ma il tuo account non è abilitato a NEXUS oppure è stato disattivato.',
       action: 'Per essere abilitato contatta l’amministratore di NEXUS della cooperativa.',
+    },
+    myWork: {
+      title: 'Le mie lavorazioni',
+      heading: 'Le mie lavorazioni',
+      intro: 'Le segnalazioni che hai preso in carico e che non sono ancora concluse.',
     },
     forbidden: {
       title: 'Accesso non consentito',

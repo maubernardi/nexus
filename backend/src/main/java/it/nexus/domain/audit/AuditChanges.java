@@ -42,6 +42,14 @@ public final class AuditChanges {
         return this;
     }
 
+    /** Aggiunge le modifiche di {@code other} (a parità di campo prevale {@code other}). */
+    public AuditChanges merge(AuditChanges other) {
+        if (other != null) {
+            fields.putAll(other.fields);
+        }
+        return this;
+    }
+
     public Map<String, Object> asMap() {
         return Collections.unmodifiableMap(fields);
     }

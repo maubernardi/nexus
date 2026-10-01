@@ -13,4 +13,10 @@ public interface TicketService {
 
     /** Coda del Call Center, con filtri facoltativi (id esterni; null = nessun filtro). */
     List<QueueItemDTO> queue(String projectId, String zoneId);
+
+    /** Presa in carico da parte dell'operatore corrente (US-402); 409 se un collega l'ha già presa. */
+    QueueItemDTO takeCharge(String ticketId, long expectedVersion);
+
+    /** Segnalazioni aperte assegnate all'operatore corrente. */
+    List<QueueItemDTO> assignedToMe();
 }

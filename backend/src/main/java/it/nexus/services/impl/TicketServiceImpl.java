@@ -14,6 +14,7 @@ import it.nexus.domain.JobCategory;
 import it.nexus.domain.Project;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.UserProject;
+import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.QueueItemDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
@@ -31,7 +32,9 @@ import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.TicketService;
 import it.nexus.services.TicketStateMachine;
 import it.nexus.web.errors.BadRequestException;
+import it.nexus.web.errors.ConflictException;
 import it.nexus.web.errors.FieldValidationException;
+import it.nexus.web.errors.NotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -74,6 +77,30 @@ public class TicketServiceImpl implements TicketService {
                 .stream()
                 .map(mapper::toQueueItem)
                 .toList();
+    }
+
+    @Override
+    public QueueItemDTO takeCharge(String ticketId, long expectedVersion) {
+        Ticket ticket = Optional.ofNullable(TsidMapper.toInternal(ticketId))
+                .flatMap(ticketRepository::findById)
+                .orElseThrow(() -> new NotFoundException("Segnalazione non trovata"));
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        Ticket saved = stateMachine.apply(ticket, TicketTransitions.TAKE_CHARGE, expectedVersion, null, t -> {
+            // una speciale in lavorazione può essere già assegnata: la coda mostra solo quelle libere
+            if (t.getAssignedCcOperator() != null) {
+                throw new ConflictException("La segnalazione n. %d è già stata presa in carico", t.getNumber());
+            }
+            t.setAssignedCcOperator(me);
+            return AuditChanges.of().value("assignedCcOperatorId", null, TsidMapper.toExternal(me.getId()));
+        });
+        return mapper.toQueueItem(saved);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<QueueItemDTO> assignedToMe() {
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        return ticketRepository.findAssignedTo(me.getId(), TicketStatus.CLOSED).stream().map(mapper::toQueueItem).toList();
     }
 
     private static Long filterId(String externalId, String what) {
