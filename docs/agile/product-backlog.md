@@ -3,13 +3,13 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 59 elementi, 216 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md).
+**Totale: 60 elementi, 218 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-02](sprints/sprint-02.md).
 
 ## Epiche
 
 | Epica | Titolo | Obiettivo | Storie | Punti |
 |---|---|---|---|---|
-| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, servizi e cataloghi senza passare dalla console di Keycloak. | 7 | 24 |
+| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti (con il loro calendario) e cataloghi senza passare dalla console di Keycloak. | 8 | 26 |
 | E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 5 | 18 |
 | E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 7 | 27 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 4 | 15 |
@@ -27,10 +27,10 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 
 | Release | Obiettivo | Storie | Punti |
 |---|---|---|---|
-| R1 | Flusso base: dalla segnalazione alla proposta | 18 | 62 |
-| R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 19 | 63 |
+| R1 | Flusso base: dalla segnalazione alla proposta | 19 | 64 |
+| R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 20 | 66 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 10 | 38 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 12 | 53 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 11 | 50 |
 
 ## Domande aperte per il Product Owner
 
@@ -41,34 +41,35 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | Q1 | Rifiuto della segnalazione speciale: il tipo diventa NORMAL o resta SPECIAL senza fast-track? | US-404 | Resta **SPECIAL senza fast-track** (traccia dell'origine dalla bacheca) (PO, 01/10). |
 | Q2 | Scadenza del timer: il ticket torna in IN_LAVORAZIONE o in RIAPERTO? | US-705 | **RIAPERTO** (PO, 01/10). |
 | Q3 | Il Tutor può rifiutare una proposta? Con quali effetti (es. azienda esclusa automaticamente)? | US-702 | **Sì, con motivo obbligatorio**: ticket al Call Center (RIAPERTO), mansione LIBERA, azienda esclusa per quel ticket (PO, 01/10). |
-| Q4 | Festività da escludere: solo nazionali o anche il patrono locale? Chiusure della cooperativa? | US-703, US-107 | Festività nazionali + **patrono configurabile per servizio** (24 giugno per l'attuale) + chiusure; vale il calendario del servizio dell'operatore (PO, 01/10). |
-| Q5 | Campi della scheda amministrativa e template Word reali di Convenzione e Progetto Formativo. | US-1001..1005 | — |
-| Q6 | Voci esatte dei gradimenti 1–5 del report di restituzione. | US-1101 | — |
-| Q7 | Durata di conservazione dei dati dei beneficiari (decisione della cooperativa/DPO). | US-1303 | — |
+| Q4 | Festività da escludere: solo nazionali o anche il patrono locale? Chiusure della cooperativa? | US-703, US-107 | Festività nazionali + **patrono configurabile per progetto** (24 giugno per l'attuale) + chiusure; vale il calendario del progetto del ticket (PO, 01/10). |
+| Q5 | Campi della scheda amministrativa e template Word reali di Convenzione e Progetto Formativo. | US-1001..1005 | Per ora **segnaposto**; i documenti reali arriveranno più avanti. I modelli dovranno essere modificabili (modalità da definire: il PO ci sta pensando) (PO, 01/10). |
+| Q6 | Voci esatte dei gradimenti 1–5 del report di restituzione. | US-1101 | Soddisfazione dell'azienda (1–5), soddisfazione del beneficiario (1–5), obiettivi raggiunti (testo), difficoltà riscontrate (testo); assunto sì → formula (menu), no → motivo (menu). Voci dei menu provvisorie, definitive più avanti (PO, 01/10). |
+| Q7 | Durata di conservazione dei dati dei beneficiari (decisione della cooperativa/DPO). | US-1303 | **Parametrica**, per ora 2 anni (PO, 01/10). |
 | Q8 | Chi approva la mansione a testo libero (ADMIN?) e se, approvata, entra nel catalogo. | US-302 | **ADMIN**; non entra da sola nel catalogo, l'ADMIN può aggiungerla con un clic; se respinta il Tutor vede il motivo (PO, 01/10). |
 | Q9 | Canali delle notifiche per evento (solo app, app + email) e destinatari. | US-1201, US-1202 | **In app e via email**, alla controparte del passaggio (Tutor ↔ operatore, già definiti per ogni fase) (PO, 01/10). |
-| Q10 | Elenco reale di zone e tipologie di mansione. | US-106 | — |
-| Q11 | Cosa vedono gli altri tutor dello stesso progetto del beneficiario (oltre al divieto su nome e cognome). | US-204 | — |
+| Q10 | Elenco reale di zone e tipologie di mansione. | US-106 | Maschere di inserimento per l'ADMIN (US-106). Intanto: zone = quartieri di Firenze e comuni dell'hinterland (EN-3); tipologie ancora segnaposto (PO, 01/10). |
+| Q11 | Cosa vedono gli altri tutor dello stesso progetto del beneficiario (oltre al divieto su nome e cognome). | US-204 | Ogni tutor gestisce le proprie segnalazioni e vede **complete** (nome e cognome compresi) quelle del proprio progetto: dentro il progetto le informazioni sono condivise (PO, 01/10). |
 | Q12 | Un beneficiario può avere più segnalazioni aperte insieme (es. su progetti o mansioni diverse)? | US-301 | **No**: una sola segnalazione aperta alla volta (PO, 01/10). Aperta = qualunque stato tranne FORM_RESTITUZIONE. |
-| Q13 | Che cos'è un **servizio** (sede/ufficio territoriale?): chi vi appartiene (operatori, tutor, progetti?) e quale calendario vale per il timer di un ticket. | US-107, US-703 | — |
+| Q13 | Che cos'è un "servizio", a cui legare il calendario (patrono, chiusure)? | US-107, US-703 | Il "servizio" non esiste: era il **progetto** del Tutor. Il calendario (patrono, chiusure) è del progetto (PO, 01/10). |
 
 ## Elenco delle storie
 
 | ID | Epica | Storia | Priorità | Punti | Release | Stato |
 |---|---|---|---|---|---|---|
 | [EN-1](#en-1) | E3 | Motore delle transizioni del ticket | Must | 5 | R1 | 🎉 Done (Sprint 1) |
-| [EN-2](#en-2) | E13 | Audit di ogni cambio di stato e scelta | Must | 5 | R1 | 📋 Backlog |
+| [EN-2](#en-2) | E13 | Audit di ogni cambio di stato e scelta | Must | 5 | R1 | 🔨 In corso (Sprint 2) |
 | [US-101](#us-101) | E1 | Messaggio "utente non abilitato" | Should | 1 | R1 | 🎉 Done (Sprint 1) |
 | [US-102](#us-102) | E1 | Gestione progetti | Must | 3 | R4 | 📋 Backlog |
 | [US-103](#us-103) | E1 | Creazione utente | Must | 8 | R4 | 📋 Backlog |
 | [US-104](#us-104) | E1 | Assegnazione utenti ai progetti | Must | 3 | R4 | 📋 Backlog |
 | [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | 📋 Backlog |
-| [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Should | 3 | R4 | 📋 Backlog |
-| [US-107](#us-107) | E1 | Servizi e calendario del servizio | Must | 3 | R2 | 📋 Backlog |
+| [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | 📋 Backlog |
+| [US-107](#us-107) | E1 | Calendario del progetto | Must | 3 | R2 | 📋 Backlog |
+| [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | ✅ Ready (Sprint 2) |
 | [US-201](#us-201) | E2 | Inserimento beneficiario | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | 📋 Backlog |
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 📋 Backlog |
-| [US-204](#us-204) | E2 | Visibilità minimizzata dei beneficiari | Must | 3 | R1 | 📋 Backlog |
+| [US-204](#us-204) | E2 | Visibilità dei beneficiari per progetto | Must | 3 | R1 | 📋 Backlog |
 | [US-205](#us-205) | E2 | Curriculum del beneficiario | Could | 5 | R3 | 📋 Backlog |
 | [US-301](#us-301) | E3 | Nuova segnalazione | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-302](#us-302) | E3 | Mansione a testo libero e approvazione | Should | 5 | R2 | 📋 Backlog |
@@ -77,14 +78,14 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-305](#us-305) | E3 | Dettaglio e cronologia del ticket | Must | 3 | R1 | 📋 Backlog |
 | [US-306](#us-306) | E3 | Segnalazione speciale dalla bacheca | Must | 3 | R2 | 📋 Backlog |
 | [US-401](#us-401) | E4 | Coda FIFO | Must | 5 | R1 | 🎉 Done (Sprint 1) |
-| [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | 📋 Backlog |
+| [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | ✅ Ready (Sprint 2) |
 | [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | 📋 Backlog |
 | [US-404](#us-404) | E4 | Rifiuto fast-track | Must | 3 | R2 | 📋 Backlog |
-| [US-501](#us-501) | E5 | Anagrafica aziende | Must | 3 | R1 | 📋 Backlog |
-| [US-502](#us-502) | E5 | Mansioni dell'azienda | Must | 3 | R1 | 📋 Backlog |
+| [US-501](#us-501) | E5 | Anagrafica aziende | Must | 3 | R1 | ✅ Ready (Sprint 2) |
+| [US-502](#us-502) | E5 | Mansioni dell'azienda | Must | 3 | R1 | ✅ Ready (Sprint 2) |
 | [US-503](#us-503) | E5 | Audit trail dell'azienda | Should | 2 | R3 | 📋 Backlog |
-| [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 📋 Backlog |
-| [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 📋 Backlog |
+| [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | ✅ Ready (Sprint 2) |
+| [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | ✅ Ready (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 📋 Backlog |
 | [US-701](#us-701) | E7 | Accettazione della proposta | Must | 3 | R2 | 📋 Backlog |
 | [US-702](#us-702) | E7 | Rifiuto della proposta | Should | 3 | R2 | 📋 Backlog |
@@ -169,26 +170,32 @@ Criteri di accettazione:
 - Quando cambio il ruolo, allora il nuovo ruolo vale dal login successivo.
 
 #### US-106
-**Cataloghi di zone e tipologie di mansione** · Should · 3 punti · R4 · 📋 Backlog
+**Cataloghi di zone e tipologie di mansione** · Must · 3 punti · R2 · 📋 Backlog
 
-Come **ADMIN** voglio gestire le zone e le tipologie di mansione per sostituire i valori segnaposto con quelli reali della cooperativa.
+Come **ADMIN** voglio inserire, modificare e disattivare zone e tipologie di mansione da maschere dedicate per usare i valori reali della cooperativa senza rilasci.
 
 Criteri di accettazione:
 - Quando disattivo una voce, allora non è più selezionabile ma resta sui dati esistenti.
+- Ogni modifica è registrata nell'audit (EN-2).
 
-Domande aperte: Q10
 
+#### EN-3
+**Zone iniziali: Firenze e hinterland** · Must · 2 punti · R1 · ✅ Ready (Sprint 2)
 
-#### US-107
-**Servizi e calendario del servizio** · Must · 3 punti · R2 · 📋 Backlog
-
-Come **ADMIN** voglio gestire i servizi della cooperativa con il loro calendario (patrono, chiusure) per calcolare le scadenze secondo i giorni lavorativi di chi segue il ticket.
+Come **PO** voglio che le zone disponibili siano i quartieri di Firenze e i comuni dell'hinterland per lavorare subito con dati realistici, in attesa delle maschere dell'ADMIN (US-106).
 
 Criteri di accettazione:
-- Ogni servizio ha il proprio patrono (per l'attuale il 24 giugno) e le proprie chiusure, modificabili dall'ADMIN e registrate nell'audit.
-- Ogni operatore appartiene a un servizio; il timer usa il calendario del servizio dell'operatore.
+- Zone come dati iniziali (anche in produzione): Novoli, Isolotto, Legnaia, Rifredi, Campo di Marte, Santa Croce, Oltrarno, Galluzzo, Le Piagge, Rovezzano, Le Cure, Trespiano, Sorgane, Casellina, Soffiano, Serpiolle, Castello, San Niccolò, Varlungo, Santo Spirito, Due Strade, Porta al Prato, San Giovanni, Statuto, Europa, Gavinana, San Lorenzo, San Frediano, San Miniato, San Marco; Scandicci, Sesto Fiorentino, Campi Bisenzio, Borgo San Lorenzo, Scarperia e San Piero, Vicchio, Dicomano, Bagno a Ripoli, Impruneta, Fiesole.
+- Le zone segnaposto della demo vengono disattivate e i dati demo spostati sulle nuove zone.
 
-Domande aperte: Q13
+#### US-107
+**Calendario del progetto** · Must · 3 punti · R2 · 📋 Backlog
+
+Come **ADMIN** voglio impostare per ogni progetto il patrono e le chiusure per calcolare le scadenze sui giorni lavorativi effettivi.
+
+Criteri di accettazione:
+- Ogni progetto ha il proprio patrono (per l'attuale il 24 giugno) e le proprie chiusure, modificabili dall'ADMIN e registrate nell'audit.
+- Il timer di un ticket usa il calendario del progetto del ticket.
 ### E2 — Anagrafica beneficiari
 
 _Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR._
@@ -220,15 +227,13 @@ Criteri di accettazione:
 - Posso modificare solo i miei beneficiari; le modifiche sono tracciate (autore e data).
 
 #### US-204
-**Visibilità minimizzata dei beneficiari** · Must · 3 punti · R1 · 📋 Backlog
+**Visibilità dei beneficiari per progetto** · Must · 3 punti · R1 · 📋 Backlog
 
-Come **responsabile della privacy** voglio che nome e cognome del beneficiario siano visibili solo al tutor proprietario, al Call Center e all'ADMIN per rispettare la minimizzazione GDPR.
+Come **responsabile della privacy** voglio che i dati di un beneficiario siano visibili solo a chi ne ha diritto: il tutor proprietario, i tutor dei progetti in cui il beneficiario ha segnalazioni, il Call Center e l'ADMIN.
 
 Criteri di accettazione:
-- Dato un ticket di un progetto condiviso, quando lo apre un altro tutor, allora vede i dati del percorso ma non nome e cognome del beneficiario.
-- Le API non restituiscono mai i campi nascosti (verifica lato server, non solo nell'interfaccia).
-
-Domande aperte: Q11
+- Un tutor dello stesso progetto vede i dati completi (nome e cognome compresi): nel progetto le informazioni sono condivise (Q11).
+- Un tutor di altri progetti non vede né il beneficiario né le sue segnalazioni; il controllo è nelle API, non solo nell'interfaccia.
 
 #### US-205
 **Curriculum del beneficiario** · Could · 5 punti · R3 · 📋 Backlog
@@ -290,7 +295,7 @@ Come **Tutor** voglio consultare in sola lettura i ticket degli altri tutor dei 
 
 Criteri di accettazione:
 - Non vedo ticket di progetti a cui non sono assegnato.
-- Sui ticket altrui non ho azioni di modifica e non vedo nome e cognome del beneficiario (US-204).
+- Vedo i ticket dei colleghi completi (nome e cognome compresi), in sola lettura: le azioni restano al tutor proprietario (US-204).
 
 #### US-305
 **Dettaglio e cronologia del ticket** · Must · 3 punti · R1 · 📋 Backlog
@@ -324,7 +329,7 @@ Criteri di accettazione:
 - Filtri per progetto e zona; vista ottimizzata per desktop.
 
 #### US-402
-**Presa in carico** · Must · 2 punti · R1 · 📋 Backlog
+**Presa in carico** · Must · 2 punti · R1 · ✅ Ready (Sprint 2)
 
 Come **operatore Call Center** voglio prendere in carico un ticket per evitare che due operatori lavorino lo stesso caso.
 
@@ -357,7 +362,7 @@ Criteri di accettazione:
 _Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte._
 
 #### US-501
-**Anagrafica aziende** · Must · 3 punti · R1 · 📋 Backlog
+**Anagrafica aziende** · Must · 3 punti · R1 · ✅ Ready (Sprint 2)
 
 Come **operatore Call Center** voglio creare, modificare e disattivare aziende (ragione sociale, P.IVA, sede, referente, contatti) per avere un database affidabile per il matching.
 
@@ -365,7 +370,7 @@ Criteri di accettazione:
 - La P.IVA è validata (11 cifre) e univoca; un'azienda con storico si disattiva, non si cancella.
 
 #### US-502
-**Mansioni dell'azienda** · Must · 3 punti · R1 · 📋 Backlog
+**Mansioni dell'azienda** · Must · 3 punti · R1 · ✅ Ready (Sprint 2)
 
 Come **operatore Call Center** voglio gestire le mansioni di un'azienda (titolo, descrizione, tipologia, zona) per sapere quali posizioni sono disponibili.
 
@@ -385,7 +390,7 @@ Criteri di accettazione:
 _Il Call Center abbina il beneficiario a una mansione libera e la blocca._
 
 #### US-601
-**Ricerca mansioni compatibili** · Must · 5 punti · R1 · 📋 Backlog
+**Ricerca mansioni compatibili** · Must · 5 punti · R1 · ✅ Ready (Sprint 2)
 
 Come **operatore Call Center** voglio trovare le mansioni libere compatibili con il beneficiario (zona, tipologia) escludendo le aziende in blacklist per abbinare velocemente.
 
@@ -395,7 +400,7 @@ Criteri di accettazione:
 Dipendenze: US-502
 
 #### US-602
-**Abbinamento e proposta** · Must · 5 punti · R1 · 📋 Backlog
+**Abbinamento e proposta** · Must · 5 punti · R1 · ✅ Ready (Sprint 2)
 
 Come **operatore Call Center** voglio assegnare una mansione al ticket per proporre il beneficiario all'azienda.
 
@@ -442,9 +447,9 @@ Criteri di accettazione:
 Come **team di sviluppo** voglio calcolare le scadenze escludendo sabati, domeniche e festività per avere timer corretti.
 
 Criteri di accettazione:
-- La scadenza di 7 giorni lavorativi salta weekend, festività nazionali (es. 25 aprile, Pasquetta), il patrono e le chiusure del servizio dell'operatore (US-107).
+- La scadenza di 7 giorni lavorativi salta weekend, festività nazionali (es. 25 aprile, Pasquetta), il patrono e le chiusure del progetto del ticket (US-107).
 
-Dipendenze: US-107 · Domande aperte: Q13
+Dipendenze: US-107
 
 #### US-704
 **Promemoria al 4° giorno** · Must · 3 punti · R2 · 📋 Backlog
@@ -571,6 +576,7 @@ Come **Tutor / Call Center** voglio generare e scaricare la Convenzione compilat
 
 Criteri di accettazione:
 - I segnaposto del template (es. {NOME_TIROCINANTE}, {MONTE_ORE_TOTALE}, {GRIGLIA_ORARIA}) sono sostituiti; il file si apre in Word senza errori.
+- Per ora modelli segnaposto; i modelli dovranno essere modificabili (modalità da definire con il PO).
 
 Domande aperte: Q5
 
@@ -594,9 +600,9 @@ _Il percorso si chiude con un report e la traccia immodificabile nell'audit trai
 Come **Tutor** voglio compilare il report finale (gradimenti 1–5, assunzione sì/no, mansione ancora disponibile sì/no) per chiudere il percorso.
 
 Criteri di accettazione:
+- Campi: soddisfazione dell'azienda (1–5), soddisfazione del beneficiario (1–5), obiettivi raggiunti (testo), difficoltà riscontrate (testo), mansione ancora disponibile sì/no.
+- Assunto sì → formula da menu (tempo determinato 3/6/12 mesi, tempo indeterminato, contratto a chiamata, prestazione occasionale); no → motivo da menu (l'azienda non ha risorse; giudica il tirocinante non idoneo; non aveva mai espresso l'intenzione di assumere). Le voci dei menu sono provvisorie: devono poter cambiare senza rilascio.
 - Il ticket passa in FORM_RESTITUZIONE; il report non è più modificabile dopo l'invio.
-
-Domande aperte: Q6
 
 #### US-1102
 **Esito sulla mansione e audit trail** · Must · 2 punti · R3 · 📋 Backlog
@@ -635,7 +641,7 @@ Criteri di accettazione:
 _Qualità, sicurezza, GDPR e passaggio dalla demo alla produzione._
 
 #### EN-2
-**Audit di ogni cambio di stato e scelta** · Must · 5 punti · R1 · 📋 Backlog
+**Audit di ogni cambio di stato e scelta** · Must · 5 punti · R1 · 🔨 In corso (Sprint 2)
 
 Come **PO / ADMIN** voglio che ogni cambio di stato e ogni scelta (presa in carico, abbinamento, approvazioni, rifiuti e
 motivi, configurazioni) sia registrato in modo immodificabile per poter ricostruire chi ha fatto cosa e quando.
@@ -667,9 +673,8 @@ Criteri di accettazione:
 Come **responsabile della privacy** voglio che i dati identificativi dei beneficiari siano anonimizzati alla scadenza della conservazione per rispettare il GDPR.
 
 Criteri di accettazione:
+- La durata di conservazione è un parametro (per ora 2 anni dalla conclusione del percorso).
 - Restano solo i dati statistici; l'operazione è registrata.
-
-Domande aperte: Q7
 
 #### US-1304
 **Tema di Keycloak** · Should · 3 punti · R4 · 📋 Backlog
