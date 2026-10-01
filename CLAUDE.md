@@ -29,6 +29,8 @@ Le regole sono imposte anche tecnicamente da `.claude/hooks/guard-git.sh` (PreTo
 - **Terminologia**: il soggetto della segnalazione è il **beneficiario** (`Beneficiary` nel codice, `beneficiary` nel
   database e nelle API, "beneficiario" nei testi), mai "candidato". Un beneficiario ha **una sola segnalazione aperta**
   alla volta (aperta = ogni stato tranne `FORM_RESTITUZIONE`).
+- **Audit** (decisione del PO): ogni cambio di stato e ogni scelta (presa in carico, abbinamento, approvazioni, rifiuti
+  con motivo, configurazioni) va registrato in modo immodificabile: autore, istante, prima/dopo, motivo (EN-2).
 - Modello dati (`it.nexus.domain`):
   - le entità estendono `AbstractTsidEntity` (id TSID + audit), `AbstractReferenceEntity` per le tabelle con codice
     oppure `AbstractCreationAuditingEntity` per le righe non modificabili;
