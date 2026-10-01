@@ -10,11 +10,11 @@
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-201 | Inserimento beneficiario | 5 | 👀 In review | `add-beneficiary-registration` | #12 |
-| EN-1 | Motore delle transizioni del ticket | 5 | 👀 In review | `add-ticket-submission` | #13 |
-| US-301 | Nuova segnalazione | 5 | 👀 In review | `add-ticket-submission` | #13 |
-| US-401 | Coda FIFO | 5 | 👀 In review | `add-cc-queue` | #14 |
-| US-101 | Messaggio "utente non abilitato" | 1 | 👀 In review | `add-not-enabled-page` | #15 |
+| US-201 | Inserimento beneficiario | 5 | 🎉 Done | `add-beneficiary-registration` | #12 |
+| EN-1 | Motore delle transizioni del ticket | 5 | 🎉 Done | `add-ticket-submission` | #13 |
+| US-301 | Nuova segnalazione | 5 | 🎉 Done | `add-ticket-submission` | #13 |
+| US-401 | Coda FIFO | 5 | 🎉 Done | `add-cc-queue` | #14 |
+| US-101 | Messaggio "utente non abilitato" | 1 | 🎉 Done | `add-not-enabled-page` | #15 |
 
 **Correzione del PO (01/10)**: "beneficiario" al posto di "candidato" ovunque e una sola segnalazione aperta per beneficiario (Q12) → change `adopt-beneficiary-single-open-ticket`, PR #16, in coda alle altre.
 
@@ -26,7 +26,7 @@ Per il PO, fuori dallo sviluppo: US-1301 (verifica PWA su smartphone) e le doman
 | Momento | Punti residui |
 |---|---|
 | Inizio (30/09) | 21 |
-| Metà sprint | — |
+| 01/10 (merge e deploy di #12–#16) | 0 |
 | Fine sprint | — |
 
 ## Sprint Review
