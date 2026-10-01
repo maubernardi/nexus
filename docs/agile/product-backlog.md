@@ -49,12 +49,13 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | Q9 | Canali delle notifiche per evento (solo app, app + email) e destinatari. | US-1201, US-1202 | — |
 | Q10 | Elenco reale di zone e tipologie di mansione. | US-106 | — |
 | Q11 | Cosa vedono gli altri tutor dello stesso progetto del candidato (oltre al divieto su nome e cognome). | US-204 | — |
+| Q12 | Un candidato può avere più segnalazioni aperte insieme (es. su progetti o mansioni diverse)? Oggi è consentito. | US-301 | — |
 
 ## Elenco delle storie
 
 | ID | Epica | Storia | Priorità | Punti | Release | Stato |
 |---|---|---|---|---|---|---|
-| [EN-1](#en-1) | E3 | Motore delle transizioni del ticket | Must | 5 | R1 | 🔨 In corso (Sprint 1) |
+| [EN-1](#en-1) | E3 | Motore delle transizioni del ticket | Must | 5 | R1 | 👀 In review (Sprint 1) |
 | [US-101](#us-101) | E1 | Messaggio "utente non abilitato" | Should | 1 | R1 | 🔨 In corso (Sprint 1) |
 | [US-102](#us-102) | E1 | Gestione progetti | Must | 3 | R4 | 📋 Backlog |
 | [US-103](#us-103) | E1 | Creazione utente | Must | 8 | R4 | 📋 Backlog |
@@ -66,7 +67,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-203](#us-203) | E2 | Modifica candidato | Must | 2 | R1 | 📋 Backlog |
 | [US-204](#us-204) | E2 | Visibilità minimizzata dei candidati | Must | 3 | R1 | 📋 Backlog |
 | [US-205](#us-205) | E2 | Curriculum del candidato | Could | 5 | R3 | 📋 Backlog |
-| [US-301](#us-301) | E3 | Nuova segnalazione | Must | 5 | R1 | 🔨 In corso (Sprint 1) |
+| [US-301](#us-301) | E3 | Nuova segnalazione | Must | 5 | R1 | 👀 In review (Sprint 1) |
 | [US-302](#us-302) | E3 | Mansione a testo libero e approvazione | Should | 5 | R2 | 📋 Backlog |
 | [US-303](#us-303) | E3 | I miei ticket | Must | 3 | R1 | 📋 Backlog |
 | [US-304](#us-304) | E3 | Ticket dei miei progetti | Should | 3 | R1 | 📋 Backlog |
@@ -179,7 +180,7 @@ Domande aperte: Q10
 _Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR._
 
 #### US-201
-**Inserimento candidato** · Must · 5 punti · R1 · 🔨 In corso (Sprint 1)
+**Inserimento candidato** · Must · 5 punti · R1 · 👀 In review (Sprint 1)
 
 Come **Tutor** voglio registrare un candidato con i dati previsti (anagrafica minima, patente, mezzi, L. 68/99, titolo di studio, vincoli, lingue) per poterlo segnalare per un tirocinio.
 
@@ -229,7 +230,7 @@ Criteri di accettazione:
 _Il Tutor segnala un candidato per un percorso di tirocinio e ne segue lo stato._
 
 #### EN-1
-**Motore delle transizioni del ticket** · Must · 5 punti · R1 · 🔨 In corso (Sprint 1)
+**Motore delle transizioni del ticket** · Must · 5 punti · R1 · 👀 In review (Sprint 1)
 
 Come **team di sviluppo** voglio un servizio unico che applica le transizioni di stato ammesse per ruolo, registra lo storico e rifiuta le transizioni non valide per ogni storia delle fasi 1–7 aggiunga solo le proprie transizioni senza duplicare regole.
 
@@ -239,7 +240,7 @@ Criteri di accettazione:
 - Quando due richieste concorrenti modificano lo stesso ticket, allora la seconda riceve 409 (blocco ottimistico).
 
 #### US-301
-**Nuova segnalazione** · Must · 5 punti · R1 · 🔨 In corso (Sprint 1)
+**Nuova segnalazione** · Must · 5 punti · R1 · 👀 In review (Sprint 1)
 
 Come **Tutor** voglio segnalare un mio candidato per un progetto indicando la mansione desiderata dal catalogo per avviare il percorso di tirocinio.
 

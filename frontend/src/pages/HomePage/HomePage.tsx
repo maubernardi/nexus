@@ -1,4 +1,4 @@
-import { UserPlus } from 'lucide-react';
+import { FilePlus2, UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
@@ -29,6 +29,12 @@ export const HomePage = () => {
               <Link to="/candidati/nuovo">
                 <UserPlus aria-hidden="true" />
                 {t('nav.newCandidate')}
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link to="/segnalazioni/nuova">
+                <FilePlus2 aria-hidden="true" />
+                {t('nav.newTicket')}
               </Link>
             </Button>
           </div>

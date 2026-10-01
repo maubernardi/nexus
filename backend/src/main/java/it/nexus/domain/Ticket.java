@@ -24,7 +24,7 @@ import lombok.Setter;
 /**
  * Segnalazione / percorso di tirocinio. {@code number} è il progressivo leggibile assegnato dal database.
  * La mansione richiesta è una tipologia del catalogo oppure un testo libero (mai entrambi); azienda e zona della
- * proposta si ricavano da {@code jobSlot}. Le transizioni di stato sono responsabilità della macchina a stati.
+ * proposta si ricavano da {@code jobSlot}. Lo stato si cambia solo tramite {@link it.nexus.services.TicketStateMachine}.
  */
 @Getter
 @Setter
@@ -98,6 +98,14 @@ public class Ticket extends AbstractTsidEntity {
     @Column(name = "version", nullable = false)
     @Setter(AccessLevel.NONE)
     private long version;
+
+    /** Nuova segnalazione: lo stato iniziale lo imposta la macchina a stati alla creazione. */
+    public Ticket(AppUser tutor, Project project, Candidate candidate, TicketType type) {
+        this.tutor = tutor;
+        this.project = project;
+        this.candidate = candidate;
+        this.type = type;
+    }
 
     @Override
     public String toString() {

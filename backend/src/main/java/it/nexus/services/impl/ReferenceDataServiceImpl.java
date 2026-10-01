@@ -8,7 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import it.nexus.domain.dto.ReferenceItemDTO;
 import it.nexus.mapper.ReferenceMapper;
 import it.nexus.repository.JobCategoryRepository;
+import it.nexus.repository.ProjectRepository;
 import it.nexus.repository.ZoneRepository;
+import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.ReferenceDataService;
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +21,8 @@ public class ReferenceDataServiceImpl implements ReferenceDataService {
 
     private final ZoneRepository zoneRepository;
     private final JobCategoryRepository jobCategoryRepository;
+    private final ProjectRepository projectRepository;
+    private final CurrentAppUserService currentAppUserService;
     private final ReferenceMapper mapper;
 
     @Override
@@ -29,5 +33,11 @@ public class ReferenceDataServiceImpl implements ReferenceDataService {
     @Override
     public List<ReferenceItemDTO> activeJobCategories() {
         return jobCategoryRepository.findByActiveTrueOrderByNameAsc().stream().map(mapper::toDto).toList();
+    }
+
+    @Override
+    public List<ReferenceItemDTO> myActiveProjects() {
+        Long userId = currentAppUserService.getCurrentAppUser().getId();
+        return projectRepository.findActiveAssignedTo(userId).stream().map(mapper::toDto).toList();
     }
 }

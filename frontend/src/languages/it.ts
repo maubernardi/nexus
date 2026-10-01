@@ -14,6 +14,7 @@ export const it = {
   nav: {
     home: 'Home',
     newCandidate: 'Nuovo candidato',
+    newTicket: 'Nuova segnalazione',
   },
   form: {
     required: 'obbligatorio',
@@ -27,6 +28,7 @@ export const it = {
       duplicateLanguage: 'Hai indicato più volte la stessa lingua',
       languageLevel: 'Indica il livello',
       generic: 'Salvataggio non riuscito. Controlla la connessione e riprova.',
+      conflict: 'I dati sono stati modificati nel frattempo. Ricarica la pagina e riprova.',
     },
   },
   enums: {
@@ -48,6 +50,17 @@ export const it = {
       BICICLETTA: 'Bicicletta',
       A_PIEDI: 'A piedi',
       ALTRO: 'Altro',
+    },
+    ticketStatus: {
+      NUOVA: 'Nuova',
+      IN_ATTESA_APPROVAZIONE_ADMIN: 'In attesa di approvazione',
+      IN_LAVORAZIONE: 'In lavorazione',
+      PROPOSTA_AZIENDA: 'Proposta all’azienda',
+      PROPOSTA_ACCOLTA: 'Proposta accolta',
+      APPUNTAMENTO: 'Appuntamento',
+      IN_TIROCINIO: 'In tirocinio',
+      FORM_RESTITUZIONE: 'Report di restituzione',
+      RIAPERTO: 'Riaperto',
     },
     languageLevel: {
       A1: 'A1 – Base',
@@ -99,6 +112,39 @@ export const it = {
       text: '{{name}} è stato registrato ed è pronto per essere segnalato.',
       another: 'Registra un altro candidato',
       home: 'Torna alla Home',
+      report: 'Segnala questo candidato',
+    },
+  },
+  ticket: {
+    fields: {
+      candidate: 'Candidato',
+      project: 'Progetto',
+      jobCategory: 'Mansione richiesta',
+    },
+    hints: {
+      candidate: 'Solo i candidati che hai registrato.',
+      project: 'Solo i progetti a cui sei assegnato.',
+      jobCategory: 'Il tipo di lavoro che il candidato desidera svolgere.',
+    },
+    candidateOption: '{{lastName}} {{firstName}} ({{birthYear}})',
+    submit: 'Invia segnalazione',
+    submitting: 'Invio in corso…',
+    loading: 'Caricamento dei dati del modulo…',
+    loadError: 'Impossibile caricare i dati del modulo. Controlla la connessione e riprova.',
+    retry: 'Riprova',
+    empty: {
+      candidatesHeading: 'Nessun candidato da segnalare',
+      candidatesText: 'Per inviare una segnalazione registra prima il candidato.',
+      candidatesAction: 'Registra un candidato',
+      projectsHeading: 'Nessun progetto assegnato',
+      projectsText:
+        'Non sei assegnato a nessun progetto attivo. Chiedi all’amministratore di assegnartene uno.',
+    },
+    success: {
+      heading: 'Segnalazione n. {{number}} inviata',
+      text: 'La segnalazione per {{name}} è in stato «{{status}}» ed è entrata nella coda del Call Center.',
+      another: 'Invia un’altra segnalazione',
+      home: 'Torna alla Home',
     },
   },
   roles: {
@@ -141,6 +187,11 @@ export const it = {
       title: 'Nuovo candidato',
       heading: 'Nuovo candidato',
       intro: 'Registra i dati del tirocinante. Potrai segnalarlo subito dopo.',
+    },
+    ticketNew: {
+      title: 'Nuova segnalazione',
+      heading: 'Nuova segnalazione',
+      intro: 'Segnala un tuo candidato al Call Center per avviare il percorso di tirocinio.',
     },
     forbidden: {
       title: 'Accesso non consentito',
