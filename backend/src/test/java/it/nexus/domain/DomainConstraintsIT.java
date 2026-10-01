@@ -493,6 +493,19 @@ class DomainConstraintsIT {
     }
 
     @Nested
+    class MansioneRitirata {
+
+        @Test
+        void mansioneBloccataNonPuoEssereRitirata() {
+            Graph g = fixtures.graph();
+            JobSlot slot = g.slot();
+            slot.blockFor(fixtures.ticket(g));
+            slot.setActive(false);
+            assertViolates("ck_job_slot_active_free", () -> jobSlots.saveAndFlush(slot));
+        }
+    }
+
+    @Nested
     class AuditLog {
 
         private Long registerEvent() {

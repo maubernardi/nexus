@@ -62,10 +62,22 @@ public class JobSlot extends AbstractTsidEntity {
     @JoinColumn(name = "blocked_by_ticket_id", unique = true)
     private Ticket blockedByTicket;
 
+    /** Falso = ritirata: l'azienda non la offre più (resta nello storico). */
+    @Column(name = "active", nullable = false)
+    private boolean active = true;
+
     @Version
     @Column(name = "version", nullable = false)
     @Setter(AccessLevel.NONE)
     private long version;
+
+    /** Nuova mansione libera di un'azienda (US-502). */
+    public JobSlot(Company company, JobCategory jobCategory, Zone zone, String title) {
+        this.company = company;
+        this.jobCategory = jobCategory;
+        this.zone = zone;
+        this.title = title;
+    }
 
     /** Blocca la mansione per il ticket indicato. */
     public void blockFor(Ticket ticket) {
