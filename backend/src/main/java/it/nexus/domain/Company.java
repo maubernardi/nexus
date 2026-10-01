@@ -8,6 +8,7 @@ import org.hibernate.type.SqlTypes;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,4 +47,15 @@ public class Company extends AbstractTsidEntity {
 
     @Column(name = "active", nullable = false)
     private boolean active = true;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    @Setter(AccessLevel.NONE)
+    private long version;
+
+    /** Nuova azienda (US-501); gli altri dati si impostano con i setter. */
+    public Company(String name, String vatCode) {
+        this.name = name;
+        this.vatCode = vatCode;
+    }
 }

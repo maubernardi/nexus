@@ -7,6 +7,9 @@ import { BeneficiaryNewPage } from '@/pages/BeneficiaryNewPage/BeneficiaryNewPag
 import { DevLoginPage } from '@/pages/DevLoginPage/DevLoginPage';
 import { HomePage } from '@/pages/HomePage/HomePage';
 import { MyWorkPage } from '@/pages/MyWorkPage/MyWorkPage';
+import { CompaniesPage } from '@/pages/CompaniesPage/CompaniesPage';
+import { CompanyEditPage } from '@/pages/CompanyEditPage/CompanyEditPage';
+import { CompanyNewPage } from '@/pages/CompanyNewPage/CompanyNewPage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 import { QueuePage } from '@/pages/QueuePage/QueuePage';
 import { TicketNewPage } from '@/pages/TicketNewPage/TicketNewPage';
@@ -57,6 +60,33 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.myWork.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'aziende',
+        element: (
+          <RoleRoute roles={['CALL_CENTER', 'ADMIN']}>
+            <CompaniesPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.companies.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'aziende/nuova',
+        element: (
+          <RoleRoute roles={['CALL_CENTER', 'ADMIN']}>
+            <CompanyNewPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.companyNew.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'aziende/:id',
+        element: (
+          <RoleRoute roles={['CALL_CENTER', 'ADMIN']}>
+            <CompanyEditPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.companyEdit.title' } satisfies RouteHandle,
       },
       {
         path: '*',

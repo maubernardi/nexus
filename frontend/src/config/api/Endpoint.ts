@@ -7,6 +7,7 @@ export const ENDPOINTS = {
   ticketQueue: '/tickets/queue',
   ticketsAssignedToMe: '/tickets/assigned-to-me',
   projects: '/reference/projects',
+  companies: '/companies',
   beneficiaries: '/beneficiaries',
   zones: '/reference/zones',
   jobCategories: '/reference/job-categories',
