@@ -81,7 +81,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | 👀 In review (Sprint 2) |
 | [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | 📋 Backlog |
 | [US-404](#us-404) | E4 | Rifiuto fast-track | Must | 3 | R2 | 📋 Backlog |
-| [US-501](#us-501) | E5 | Anagrafica aziende | Must | 3 | R1 | ✅ Ready (Sprint 2) |
+| [US-501](#us-501) | E5 | Anagrafica aziende | Must | 3 | R1 | 👀 In review (Sprint 2) |
 | [US-502](#us-502) | E5 | Mansioni dell'azienda | Must | 3 | R1 | ✅ Ready (Sprint 2) |
 | [US-503](#us-503) | E5 | Audit trail dell'azienda | Should | 2 | R3 | 📋 Backlog |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | ✅ Ready (Sprint 2) |
@@ -362,7 +362,7 @@ Criteri di accettazione:
 _Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte._
 
 #### US-501
-**Anagrafica aziende** · Must · 3 punti · R1 · ✅ Ready (Sprint 2)
+**Anagrafica aziende** · Must · 3 punti · R1 · 👀 In review (Sprint 2)
 
 Come **operatore Call Center** voglio creare, modificare e disattivare aziende (ragione sociale, P.IVA, sede, referente, contatti) per avere un database affidabile per il matching.
 
