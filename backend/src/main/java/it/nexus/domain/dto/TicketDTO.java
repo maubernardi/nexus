@@ -13,7 +13,7 @@ public record TicketDTO(
         TicketStatus status,
         boolean fastTrack,
         long version,
-        CandidateSummaryDTO candidate,
+        BeneficiarySummaryDTO beneficiary,
         ReferenceItemDTO project,
         ReferenceItemDTO requestedJobCategory,
         Instant createdAt) {

@@ -26,7 +26,7 @@ coda.
 - **THEN** la risposta è `403` e l'interfaccia mostra "Accesso non consentito"
 
 ### Requirement: Filtri della coda
-La coda SHALL essere filtrabile per progetto e per zona di residenza del candidato, tra i progetti e le zone attivi. I
+La coda SHALL essere filtrabile per progetto e per zona di residenza del beneficiario, tra i progetti e le zone attivi. I
 filtri SHALL essere riportati nell'indirizzo della pagina e il numero di risultati SHALL essere annunciato alle
 tecnologie assistive.
 

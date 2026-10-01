@@ -11,11 +11,11 @@ transizioni. La prima a usarlo è l'invio della segnalazione da parte del Tutor.
   servizio che le applica verificando stato, ruolo e versione attesa del ticket, e scrive una riga di
   `ticket_status_history` per ogni cambio (autore e nota). Transizione non ammessa o versione superata → `409`, ruolo non
   autorizzato → `403`; modifiche concorrenti rilevate dal blocco ottimistico → `409`.
-- API `POST /api/v1/tickets` (solo Tutor): segnalazione NORMAL di un proprio candidato, per un progetto a cui il Tutor è
+- API `POST /api/v1/tickets` (solo Tutor): segnalazione NORMAL di un proprio beneficiario, per un progetto a cui il Tutor è
   assegnato, con una tipologia di mansione attiva del catalogo. Il ticket nasce in `NUOVA` con numero progressivo.
 - API `GET /api/v1/me/projects`: progetti attivi assegnati all'utente corrente.
-- Pagina **Nuova segnalazione** per il Tutor (candidato, progetto, mansione), raggiungibile dal menu, dalla Home e dalla
-  conferma di registrazione del candidato (candidato preselezionato).
+- Pagina **Nuova segnalazione** per il Tutor (beneficiario, progetto, mansione), raggiungibile dal menu, dalla Home e dalla
+  conferma di registrazione del beneficiario (beneficiario preselezionato).
 
 ## Capabilities
 
@@ -31,4 +31,4 @@ transizioni. La prima a usarlo è l'invio della segnalazione da parte del Tutor.
 - Mansione a testo libero e approvazione ADMIN (US-302), segnalazione speciale dalla bacheca (US-306).
 - Elenco, dettaglio e cronologia dei ticket nell'interfaccia (US-303, US-305); coda del Call Center (US-401, change
   `add-cc-queue`); presa in carico (US-402).
-- Regola "un solo ticket aperto per candidato": non prevista dal brief, registrata come domanda aperta Q12.
+- Regola "un solo ticket aperto per beneficiario": non prevista dal brief, registrata come domanda aperta Q12.

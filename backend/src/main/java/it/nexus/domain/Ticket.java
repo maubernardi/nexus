@@ -50,8 +50,8 @@ public class Ticket extends AbstractTsidEntity {
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "candidate_id", nullable = false)
-    private Candidate candidate;
+    @JoinColumn(name = "beneficiary_id", nullable = false)
+    private Beneficiary beneficiary;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 10)
@@ -100,10 +100,10 @@ public class Ticket extends AbstractTsidEntity {
     private long version;
 
     /** Nuova segnalazione: lo stato iniziale lo imposta la macchina a stati alla creazione. */
-    public Ticket(AppUser tutor, Project project, Candidate candidate, TicketType type) {
+    public Ticket(AppUser tutor, Project project, Beneficiary beneficiary, TicketType type) {
         this.tutor = tutor;
         this.project = project;
-        this.candidate = candidate;
+        this.beneficiary = beneficiary;
         this.type = type;
     }
 

@@ -1,6 +1,6 @@
 package it.nexus.domain.enumeration;
 
-/** Genere del candidato. */
+/** Genere del beneficiario. */
 public enum Gender {
     M,
     F,

@@ -4,20 +4,22 @@
 
 ## Obiettivo
 
-> Il Tutor registra un candidato e lo segnala; la segnalazione compare nella coda del Call Center.
+> Il Tutor registra un beneficiario e lo segnala; la segnalazione compare nella coda del Call Center.
 
 ## Impegno (21 punti)
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-201 | Inserimento candidato | 5 | 👀 In review | `add-candidate-registration` | #12 |
+| US-201 | Inserimento beneficiario | 5 | 👀 In review | `add-beneficiary-registration` | #12 |
 | EN-1 | Motore delle transizioni del ticket | 5 | 👀 In review | `add-ticket-submission` | #13 |
 | US-301 | Nuova segnalazione | 5 | 👀 In review | `add-ticket-submission` | #13 |
 | US-401 | Coda FIFO | 5 | 👀 In review | `add-cc-queue` | #14 |
 | US-101 | Messaggio "utente non abilitato" | 1 | 👀 In review | `add-not-enabled-page` | #15 |
 
+**Correzione del PO (01/10)**: "beneficiario" al posto di "candidato" ovunque e una sola segnalazione aperta per beneficiario (Q12) → change `adopt-beneficiary-single-open-ticket`, PR #16, in coda alle altre.
+
 Le PR sono in cascata (ognuna costruita sulla precedente) e vanno unite nell'ordine della tabella.
-Per il PO, fuori dallo sviluppo: US-1301 (verifica PWA su smartphone) e le domande aperte Q1–Q4, Q8, Q9, Q12.
+Per il PO, fuori dallo sviluppo: US-1301 (verifica PWA su smartphone) e le domande aperte Q1–Q4, Q8, Q9 (Q12 risolta il 01/10).
 
 ## Burndown
 

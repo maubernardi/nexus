@@ -7,7 +7,7 @@ import it.nexus.domain.Ticket;
 import it.nexus.domain.dto.QueueItemDTO;
 import it.nexus.domain.dto.TicketDTO;
 
-@Mapper(uses = {ReferenceMapper.class, CandidateMapper.class}, imports = TsidMapper.class)
+@Mapper(uses = {ReferenceMapper.class, BeneficiaryMapper.class}, imports = TsidMapper.class)
 public interface TicketMapper {
 
     @Mapping(target = "id", expression = "java(TsidMapper.toExternal(ticket.getId()))")

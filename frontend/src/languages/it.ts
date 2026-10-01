@@ -13,7 +13,7 @@ export const it = {
   },
   nav: {
     home: 'Home',
-    newCandidate: 'Nuovo candidato',
+    newBeneficiary: 'Nuovo beneficiario',
     newTicket: 'Nuova segnalazione',
     queue: 'Coda segnalazioni',
   },
@@ -73,7 +73,7 @@ export const it = {
       MADRELINGUA: 'Madrelingua',
     },
   },
-  candidate: {
+  beneficiary: {
     sections: {
       personal: 'Dati anagrafici',
       mobility: 'Mobilità',
@@ -106,37 +106,42 @@ export const it = {
       constraints: 'Vincoli ed esigenze',
       constraintsHint: 'Barriere, allergie o altre esigenze rilevanti per il tirocinio.',
     },
-    submit: 'Registra candidato',
+    submit: 'Registra beneficiario',
     submitting: 'Registrazione in corso…',
     success: {
-      heading: 'Candidato registrato',
+      heading: 'Beneficiario registrato',
       text: '{{name}} è stato registrato ed è pronto per essere segnalato.',
-      another: 'Registra un altro candidato',
+      another: 'Registra un altro beneficiario',
       home: 'Torna alla Home',
-      report: 'Segnala questo candidato',
+      report: 'Segnala questo beneficiario',
     },
   },
   ticket: {
     fields: {
-      candidate: 'Candidato',
+      beneficiary: 'Beneficiario',
       project: 'Progetto',
       jobCategory: 'Mansione richiesta',
     },
     hints: {
-      candidate: 'Solo i candidati che hai registrato.',
+      beneficiary:
+        'Solo i beneficiari che hai registrato. Chi ha già una segnalazione aperta non è selezionabile: ne è ammessa una alla volta.',
       project: 'Solo i progetti a cui sei assegnato.',
-      jobCategory: 'Il tipo di lavoro che il candidato desidera svolgere.',
+      jobCategory: 'Il tipo di lavoro che il beneficiario desidera svolgere.',
     },
-    candidateOption: '{{lastName}} {{firstName}} ({{birthYear}})',
+    beneficiaryOption: '{{lastName}} {{firstName}} ({{birthYear}})',
+    beneficiaryOptionOpen: '{{lastName}} {{firstName}} ({{birthYear}}) – segnalazione n. {{number}} aperta',
     submit: 'Invia segnalazione',
     submitting: 'Invio in corso…',
     loading: 'Caricamento dei dati del modulo…',
     loadError: 'Impossibile caricare i dati del modulo. Controlla la connessione e riprova.',
     retry: 'Riprova',
     empty: {
-      candidatesHeading: 'Nessun candidato da segnalare',
-      candidatesText: 'Per inviare una segnalazione registra prima il candidato.',
-      candidatesAction: 'Registra un candidato',
+      beneficiariesHeading: 'Nessun beneficiario da segnalare',
+      beneficiariesText: 'Per inviare una segnalazione registra prima il beneficiario.',
+      beneficiariesAction: 'Registra un beneficiario',
+      allOpenHeading: 'Tutti i tuoi beneficiari hanno già una segnalazione aperta',
+      allOpenText:
+        'Un beneficiario può avere una sola segnalazione aperta alla volta. Puoi registrare un nuovo beneficiario oppure attendere la conclusione dei percorsi in corso.',
       projectsHeading: 'Nessun progetto assegnato',
       projectsText:
         'Non sei assegnato a nessun progetto attivo. Chiedi all’amministratore di assegnartene uno.',
@@ -151,7 +156,7 @@ export const it = {
   queue: {
     filters: 'Filtri',
     project: 'Progetto',
-    zone: 'Zona di residenza del candidato',
+    zone: 'Zona di residenza del beneficiario',
     allProjects: 'Tutti i progetti',
     allZones: 'Tutte le zone',
     reset: 'Azzera filtri',
@@ -167,7 +172,7 @@ export const it = {
     columns: {
       number: 'N.',
       priority: 'Priorità',
-      candidate: 'Candidato',
+      beneficiary: 'Beneficiario',
       zone: 'Zona',
       project: 'Progetto',
       jobCategory: 'Mansione richiesta',
@@ -214,15 +219,15 @@ export const it = {
       comingSoon: 'Le funzionalità operative saranno disponibili nei prossimi rilasci.',
       actions: 'Azioni rapide',
     },
-    candidateNew: {
-      title: 'Nuovo candidato',
-      heading: 'Nuovo candidato',
+    beneficiaryNew: {
+      title: 'Nuovo beneficiario',
+      heading: 'Nuovo beneficiario',
       intro: 'Registra i dati del tirocinante. Potrai segnalarlo subito dopo.',
     },
     ticketNew: {
       title: 'Nuova segnalazione',
       heading: 'Nuova segnalazione',
-      intro: 'Segnala un tuo candidato al Call Center per avviare il percorso di tirocinio.',
+      intro: 'Segnala un tuo beneficiario al Call Center per avviare il percorso di tirocinio.',
     },
     queue: {
       title: 'Coda segnalazioni',

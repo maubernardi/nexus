@@ -32,7 +32,8 @@ context: |
   Processo: Agile con documenti in docs/agile/ (backlog, roadmap, sprint). Ogni change OpenSpec realizza una o più
   storie del backlog (citarne gli ID, es. US-301, nel proposal); i criteri di accettazione diventano scenari.
 
-  Lingua: il dominio usa i termini del brief (Ticket, Candidate, BoardPost, JobSlot, stati in italiano).
+  Lingua: il dominio usa i termini del brief (Ticket, BoardPost, JobSlot, stati in italiano). Il soggetto della
+  segnalazione è il BENEFICIARIO (Beneficiary nel codice), mai "candidato" (correzione del PO, 01/10/2026).
   Documentazione e artefatti OpenSpec in italiano. Conventional commits.
 
 rules:

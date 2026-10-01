@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button';
 import type { Ticket } from '@/config/api/ticketApi';
 import { TicketForm } from '@/organisms/TicketForm/TicketForm';
 
-/** Parametro con cui altre pagine preselezionano il candidato (es. dopo la registrazione). */
-export const CANDIDATE_PARAM = 'candidato';
+/** Parametro con cui altre pagine preselezionano il beneficiario (es. dopo la registrazione). */
+export const BENEFICIARY_PARAM = 'beneficiario';
 
 export const TicketNewPage = () => {
   const { t } = useTranslation();
@@ -44,7 +44,7 @@ export const TicketNewPage = () => {
           </h2>
           <p>
             {t('ticket.success.text', {
-              name: `${created.candidate.firstName} ${created.candidate.lastName}`,
+              name: `${created.beneficiary.firstName} ${created.beneficiary.lastName}`,
               status: t(`enums.ticketStatus.${created.status}`),
             })}
           </p>
@@ -68,8 +68,8 @@ export const TicketNewPage = () => {
           <p className="text-muted-foreground">{t('pages.ticketNew.intro')}</p>
           <TicketForm
             key={formKey}
-            // dopo "Invia un'altra segnalazione" il candidato non va ripreso dall'indirizzo
-            initialCandidateId={formKey === 0 ? searchParams.get(CANDIDATE_PARAM) : null}
+            // dopo "Invia un'altra segnalazione" il beneficiario non va ripreso dall'indirizzo
+            initialBeneficiaryId={formKey === 0 ? searchParams.get(BENEFICIARY_PARAM) : null}
             onSuccess={setCreated}
           />
         </>

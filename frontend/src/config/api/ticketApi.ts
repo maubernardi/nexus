@@ -1,11 +1,11 @@
 import { axiosInstance } from '@/config/api/axiosInstance';
-import type { CandidateSummary } from '@/config/api/candidateApi';
+import type { BeneficiarySummary } from '@/config/api/beneficiaryApi';
 import { ENDPOINTS } from '@/config/api/Endpoint';
 import type { ReferenceItem } from '@/config/api/referenceApi';
 import type { TicketStatus, TicketType } from '@/lib/domainValues';
 
 export type TicketCreate = {
-  candidateId: string;
+  beneficiaryId: string;
   projectId: string;
   jobCategoryId: string;
 };
@@ -18,7 +18,7 @@ export type Ticket = {
   fastTrack: boolean;
   /** Da rimandare nelle richieste di cambio di stato (blocco ottimistico). */
   version: number;
-  candidate: CandidateSummary;
+  beneficiary: BeneficiarySummary;
   project: ReferenceItem;
   requestedJobCategory: ReferenceItem | null;
   createdAt: string;

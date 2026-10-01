@@ -34,13 +34,14 @@ import it.nexus.domain.enumeration.Role;
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.AppUserRepository;
-import it.nexus.repository.CandidateRepository;
+import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.ProjectRepository;
 import it.nexus.repository.TicketRepository;
 import it.nexus.repository.TicketStatusHistoryRepository;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.repository.ZoneRepository;
+import jakarta.persistence.EntityManager;
 
 @SpringBootTest
 @Transactional
@@ -57,12 +58,14 @@ class TicketResourceIT {
     @Autowired UserProjectRepository userProjects;
     @Autowired ZoneRepository zones;
     @Autowired JobCategoryRepository categories;
-    @Autowired CandidateRepository candidates;
+    @Autowired BeneficiaryRepository beneficiaries;
     @Autowired TicketRepository tickets;
     @Autowired TicketStatusHistoryRepository history;
+    @Autowired EntityManager em;
 
-    private String candidateId;
-    private String otherTutorCandidateId;
+    private String beneficiaryId;
+    private String secondBeneficiaryId;
+    private String otherTutorBeneficiaryId;
     private String projectId;
     private String inactiveProjectId;
     private String unassignedProjectId;
@@ -93,8 +96,9 @@ class TicketResourceIT {
         inactiveCategory.setActive(false);
         inactiveCategory = categories.save(inactiveCategory);
 
-        candidateId = TsidMapper.toExternal(candidates.save(TestEntities.candidate(tutor1, zone)).getId());
-        otherTutorCandidateId = TsidMapper.toExternal(candidates.save(TestEntities.candidate(tutor2, zone)).getId());
+        beneficiaryId = TsidMapper.toExternal(beneficiaries.save(TestEntities.beneficiary(tutor1, zone)).getId());
+        secondBeneficiaryId = TsidMapper.toExternal(beneficiaries.save(TestEntities.beneficiary(tutor1, zone)).getId());
+        otherTutorBeneficiaryId = TsidMapper.toExternal(beneficiaries.save(TestEntities.beneficiary(tutor2, zone)).getId());
         projectId = TsidMapper.toExternal(gol.getId());
         inactiveProjectId = TsidMapper.toExternal(closed.getId());
         unassignedProjectId = TsidMapper.toExternal(unassigned.getId());
@@ -103,22 +107,22 @@ class TicketResourceIT {
         userProjects.flush();
     }
 
-    private ResultActions submit(String user, String candidate, String project, String category) throws Exception {
+    private ResultActions submit(String user, String beneficiary, String project, String category) throws Exception {
         String json = """
-                {"candidateId": "%s", "projectId": "%s", "jobCategoryId": "%s"}
-                """.formatted(candidate, project, category);
+                {"beneficiaryId": "%s", "projectId": "%s", "jobCategoryId": "%s"}
+                """.formatted(beneficiary, project, category);
         return mockMvc.perform(post("/api/v1/tickets").header(USER, user).contentType(MediaType.APPLICATION_JSON).content(json));
     }
 
     @Test
     void segnalazioneRiuscita_nuovaConNumeroECronologia() throws Exception {
-        String response = submit("tutor1", candidateId, projectId, categoryId)
+        String response = submit("tutor1", beneficiaryId, projectId, categoryId)
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("NUOVA"))
                 .andExpect(jsonPath("$.type").value("NORMAL"))
                 .andExpect(jsonPath("$.fastTrack").value(false))
                 .andExpect(jsonPath("$.number").isNumber())
-                .andExpect(jsonPath("$.candidate.id").value(candidateId))
+                .andExpect(jsonPath("$.beneficiary.id").value(beneficiaryId))
                 .andExpect(jsonPath("$.project.code").value("TGOL"))
                 .andExpect(jsonPath("$.requestedJobCategory.code").value("TMAG"))
                 .andExpect(jsonPath("$.createdAt").isNotEmpty())
@@ -138,16 +142,52 @@ class TicketResourceIT {
 
     @Test
     void numeriProgressivi() throws Exception {
-        Number first = JsonPath.read(submit("tutor1", candidateId, projectId, categoryId)
+        Number first = JsonPath.read(submit("tutor1", beneficiaryId, projectId, categoryId)
                 .andReturn().getResponse().getContentAsString(), "$.number");
-        Number second = JsonPath.read(submit("tutor1", candidateId, projectId, categoryId)
+        Number second = JsonPath.read(submit("tutor1", secondBeneficiaryId, projectId, categoryId)
                 .andReturn().getResponse().getContentAsString(), "$.number");
         assertThat(second.longValue()).isGreaterThan(first.longValue());
     }
 
     @Test
+    void beneficiarioConSegnalazioneAperta_400ConNumero() throws Exception {
+        Number first = JsonPath.read(submit("tutor1", beneficiaryId, projectId, categoryId)
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString(), "$.number");
+
+        submit("tutor1", beneficiaryId, projectId, categoryId)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("beneficiaryId"))
+                .andExpect(jsonPath("$.fieldErrors[0].message")
+                        .value("Il beneficiario ha già una segnalazione aperta (n. %d)".formatted(first.longValue())));
+        assertThat(tickets.count()).isEqualTo(1);
+    }
+
+    @Test
+    void segnalazioneConclusa_neConsenteUnaNuova() throws Exception {
+        Long id = TsidMapper.toInternal(JsonPath.read(submit("tutor1", beneficiaryId, projectId, categoryId)
+                .andReturn().getResponse().getContentAsString(), "$.id"));
+        em.createNativeQuery("UPDATE ticket SET status = 'FORM_RESTITUZIONE' WHERE id = :id").setParameter("id", id)
+                .executeUpdate();
+        em.clear();
+
+        submit("tutor1", beneficiaryId, projectId, categoryId).andExpect(status().isCreated());
+    }
+
+    @Test
+    void elencoBeneficiari_riportaLaSegnalazioneAperta() throws Exception {
+        Number number = JsonPath.read(submit("tutor1", beneficiaryId, projectId, categoryId)
+                .andReturn().getResponse().getContentAsString(), "$.number");
+
+        mockMvc.perform(get("/api/v1/beneficiaries").header(USER, "tutor1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == '%s')].openTicketNumber".formatted(beneficiaryId)).value(number.intValue()))
+                .andExpect(jsonPath("$[?(@.id == '%s')].openTicketNumber".formatted(secondBeneficiaryId)).isEmpty());
+    }
+
+    @Test
     void progettoNonAssegnato_400SulCampo() throws Exception {
-        submit("tutor1", candidateId, unassignedProjectId, categoryId)
+        submit("tutor1", beneficiaryId, unassignedProjectId, categoryId)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldErrors[0].field").value("projectId"));
         assertThat(tickets.count()).isZero();
@@ -155,16 +195,16 @@ class TicketResourceIT {
 
     @Test
     void progettoDisattivato_400SulCampo() throws Exception {
-        submit("tutor1", candidateId, inactiveProjectId, categoryId)
+        submit("tutor1", beneficiaryId, inactiveProjectId, categoryId)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldErrors[0].field").value("projectId"));
     }
 
     @Test
-    void candidatoDiUnAltroTutor_400SulCampoComeSeNonEsistesse() throws Exception {
-        String altrui = submit("tutor1", otherTutorCandidateId, projectId, categoryId)
+    void beneficiarioDiUnAltroTutor_400SulCampoComeSeNonEsistesse() throws Exception {
+        String altrui = submit("tutor1", otherTutorBeneficiaryId, projectId, categoryId)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.fieldErrors[0].field").value("candidateId"))
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("beneficiaryId"))
                 .andReturn().getResponse().getContentAsString();
         String inesistente = submit("tutor1", "0000000000000", projectId, categoryId)
                 .andExpect(status().isBadRequest())
@@ -175,7 +215,7 @@ class TicketResourceIT {
 
     @Test
     void mansioneDisattivata_400SulCampo() throws Exception {
-        submit("tutor1", candidateId, projectId, inactiveCategoryId)
+        submit("tutor1", beneficiaryId, projectId, inactiveCategoryId)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldErrors[0].field").value("jobCategoryId"));
     }
@@ -189,8 +229,8 @@ class TicketResourceIT {
 
     @Test
     void callCenterEAdmin_403() throws Exception {
-        submit("operatore.cc", candidateId, projectId, categoryId).andExpect(status().isForbidden());
-        submit("admin", candidateId, projectId, categoryId).andExpect(status().isForbidden());
+        submit("operatore.cc", beneficiaryId, projectId, categoryId).andExpect(status().isForbidden());
+        submit("admin", beneficiaryId, projectId, categoryId).andExpect(status().isForbidden());
         assertThat(tickets.count()).isZero();
     }
 

@@ -3,3 +3,6 @@
 spring:
   flyway:
     locations: classpath:db/migration, classpath:db/seed
+    # gli script demo ripetibili possono essere rinominati (es. R__seed_04_candidates → R__seed_04_beneficiaries):
+    # la vecchia voce nella cronologia non deve bloccare l'avvio. Solo per i ripetibili e solo nel profilo seed.
+    ignore-migration-patterns: "repeatable:missing"

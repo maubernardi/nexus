@@ -26,6 +26,9 @@ Le regole sono imposte anche tecnicamente da `.claude/hooks/guard-git.sh` (PreTo
 - Sviluppo spec-driven con OpenSpec: ogni nuova funzionalità passa da una change (`/opsx:propose` → `/opsx:apply` → `/opsx:archive`).
 - Backend: seguire la skill `java-backend` (package base `it.nexus`, niente SDK `com.btinkeeng.sdk`: gli equivalenti
   sono in `it.nexus.config` e `it.nexus.web.errors`). Ogni endpoint con `@PreAuthorize("hasRole(@requestsAuthorizer.X)")`.
+- **Terminologia**: il soggetto della segnalazione è il **beneficiario** (`Beneficiary` nel codice, `beneficiary` nel
+  database e nelle API, "beneficiario" nei testi), mai "candidato". Un beneficiario ha **una sola segnalazione aperta**
+  alla volta (aperta = ogni stato tranne `FORM_RESTITUZIONE`).
 - Modello dati (`it.nexus.domain`):
   - le entità estendono `AbstractTsidEntity` (id TSID + audit), `AbstractReferenceEntity` per le tabelle con codice
     oppure `AbstractCreationAuditingEntity` per le righe non modificabili;

@@ -7,14 +7,14 @@
 ## 2. Invio della segnalazione (US-301)
 
 - [x] 2.1 `GET /me/projects` (progetti attivi assegnati)
-- [x] 2.2 `TicketCreateDTO`, `TicketDTO`, `TicketMapper`, `TicketService.submit` con i controlli su candidato, progetto e tipologia
+- [x] 2.2 `TicketCreateDTO`, `TicketDTO`, `TicketMapper`, `TicketService.submit` con i controlli su beneficiario, progetto e tipologia
 - [x] 2.3 `TicketResource` `POST /tickets` (TUTOR)
-- [x] 2.4 IT: 201 in NUOVA con numero e cronologia, 400 per progetto/candidato/tipologia, 403 per ruolo
+- [x] 2.4 IT: 201 in NUOVA con numero e cronologia, 400 per progetto/beneficiario/tipologia, 403 per ruolo
 
 ## 3. Frontend
 
 - [x] 3.1 API e hook (progetti, invio segnalazione)
-- [x] 3.2 Pagina "Nuova segnalazione" (stati vuoti, preselezione da `?candidato=`, conferma), rotta TUTOR, menu, Home, collegamento dalla conferma del candidato
+- [x] 3.2 Pagina "Nuova segnalazione" (stati vuoti, preselezione da `?beneficiario=`, conferma), rotta TUTOR, menu, Home, collegamento dalla conferma del beneficiario
 - [x] 3.3 Test: invio con payload corretto, errori, stati vuoti, preselezione, axe
 
 ## 4. Verifica e consegna

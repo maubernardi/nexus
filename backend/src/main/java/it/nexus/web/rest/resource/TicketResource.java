@@ -41,7 +41,7 @@ public class TicketResource {
     // nessun Location: il dettaglio del ticket arriva con US-305
     @PostMapping
     @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
-    @Operation(summary = "Invia una segnalazione normale per un candidato del Tutor corrente")
+    @Operation(summary = "Invia una segnalazione normale per un beneficiario del Tutor corrente")
     public ResponseEntity<TicketDTO> submit(@RequestBody @Valid TicketCreateDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ticketService.submit(dto));
     }

@@ -63,22 +63,22 @@ public final class TestEntities {
         return slot;
     }
 
-    public static Candidate candidate(AppUser tutor, Zone zone) {
-        Candidate candidate = new Candidate();
-        candidate.setOwnerTutor(tutor);
-        candidate.setFirstName("Mario");
-        candidate.setLastName("Rossi");
-        candidate.setBirthYear(1995);
-        candidate.setGender(Gender.M);
-        candidate.setResidenceZone(zone);
-        return candidate;
+    public static Beneficiary beneficiary(AppUser tutor, Zone zone) {
+        Beneficiary beneficiary = new Beneficiary();
+        beneficiary.setOwnerTutor(tutor);
+        beneficiary.setFirstName("Mario");
+        beneficiary.setLastName("Rossi");
+        beneficiary.setBirthYear(1995);
+        beneficiary.setGender(Gender.M);
+        beneficiary.setResidenceZone(zone);
+        return beneficiary;
     }
 
-    public static Ticket ticket(AppUser tutor, Project project, Candidate candidate, JobCategory requested) {
+    public static Ticket ticket(AppUser tutor, Project project, Beneficiary beneficiary, JobCategory requested) {
         Ticket ticket = new Ticket();
         ticket.setTutor(tutor);
         ticket.setProject(project);
-        ticket.setCandidate(candidate);
+        ticket.setBeneficiary(beneficiary);
         ticket.setType(TicketType.NORMAL);
         ticket.setStatus(TicketStatus.NUOVA);
         ticket.setRequestedJobCategory(requested);

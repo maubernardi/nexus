@@ -31,10 +31,11 @@ import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.domain.enumeration.LanguageLevel;
 import it.nexus.domain.enumeration.LicenseType;
 import it.nexus.domain.enumeration.Role;
+import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.domain.enumeration.TicketType;
 import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.BoardPostRepository;
-import it.nexus.repository.CandidateRepository;
+import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.JobSlotRepository;
@@ -65,7 +66,7 @@ class DomainConstraintsIT {
     @Autowired UserProjectRepository userProjects;
     @Autowired CompanyRepository companies;
     @Autowired JobSlotRepository jobSlots;
-    @Autowired CandidateRepository candidates;
+    @Autowired BeneficiaryRepository beneficiaries;
     @Autowired TicketRepository tickets;
     @Autowired TicketCompanyBlacklistRepository blacklist;
     @Autowired BoardPostRepository boardPosts;
@@ -162,9 +163,28 @@ class DomainConstraintsIT {
     class TicketVincoli {
 
         @Test
+        void unaSolaSegnalazioneApertaPerBeneficiario() {
+            Graph g = fixtures.graph();
+            tickets.saveAndFlush(ticket(g.tutor(), g.project(), g.beneficiary(), g.category()));
+            assertViolates("uq_ticket_open_per_beneficiary",
+                    () -> tickets.saveAndFlush(ticket(g.tutor(), g.project(), g.beneficiary(), g.category())));
+        }
+
+        @Test
+        void segnalazioneConclusaNonBloccaLaSuccessiva() {
+            Graph g = fixtures.graph();
+            Ticket closed = ticket(g.tutor(), g.project(), g.beneficiary(), g.category());
+            closed.setStatus(TicketStatus.FORM_RESTITUZIONE);
+            tickets.saveAndFlush(closed);
+
+            assertThat(tickets.saveAndFlush(ticket(g.tutor(), g.project(), g.beneficiary(), g.category())).getId())
+                    .isNotNull();
+        }
+
+        @Test
         void mansioneRichiestaDoppia() {
             Graph g = fixtures.graph();
-            Ticket t = ticket(g.tutor(), g.project(), g.candidate(), g.category());
+            Ticket t = ticket(g.tutor(), g.project(), g.beneficiary(), g.category());
             t.setRequestedJobFreeText("Anche testo libero");
             assertViolates("ck_ticket_requested_job", () -> tickets.saveAndFlush(t));
         }
@@ -172,14 +192,14 @@ class DomainConstraintsIT {
         @Test
         void mansioneRichiestaAssente() {
             Graph g = fixtures.graph();
-            Ticket t = ticket(g.tutor(), g.project(), g.candidate(), null);
+            Ticket t = ticket(g.tutor(), g.project(), g.beneficiary(), null);
             assertViolates("ck_ticket_requested_job", () -> tickets.saveAndFlush(t));
         }
 
         @Test
         void testoLiberoVuoto() {
             Graph g = fixtures.graph();
-            Ticket t = ticket(g.tutor(), g.project(), g.candidate(), null);
+            Ticket t = ticket(g.tutor(), g.project(), g.beneficiary(), null);
             t.setRequestedJobFreeText("   ");
             assertViolates("ck_ticket_requested_job_text", () -> tickets.saveAndFlush(t));
         }
@@ -187,7 +207,7 @@ class DomainConstraintsIT {
         @Test
         void segnalazioneSpecialeSenzaPost() {
             Graph g = fixtures.graph();
-            Ticket t = ticket(g.tutor(), g.project(), g.candidate(), g.category());
+            Ticket t = ticket(g.tutor(), g.project(), g.beneficiary(), g.category());
             t.setType(TicketType.SPECIAL);
             assertViolates("ck_ticket_special_board_post", () -> tickets.saveAndFlush(t));
         }
@@ -196,7 +216,7 @@ class DomainConstraintsIT {
         void segnalazioneSpecialeConPostEAmmessa() {
             Graph g = fixtures.graph();
             BoardPost post = boardPosts.saveAndFlush(boardPost(g.slot()));
-            Ticket t = ticket(g.tutor(), g.project(), g.candidate(), g.category());
+            Ticket t = ticket(g.tutor(), g.project(), g.beneficiary(), g.category());
             t.setType(TicketType.SPECIAL);
             t.setFastTrack(true);
             t.setBoardPost(post);
@@ -206,7 +226,7 @@ class DomainConstraintsIT {
         @Test
         void fastTrackSoloPerSpeciali() {
             Graph g = fixtures.graph();
-            Ticket t = ticket(g.tutor(), g.project(), g.candidate(), g.category());
+            Ticket t = ticket(g.tutor(), g.project(), g.beneficiary(), g.category());
             t.setFastTrack(true);
             assertViolates("ck_ticket_fast_track", () -> tickets.saveAndFlush(t));
         }
@@ -361,70 +381,70 @@ class DomainConstraintsIT {
     }
 
     @Nested
-    class Candidato {
+    class Beneficiario {
 
         @Test
         void patenteDichiarataSenzaTipi() {
             Graph g = fixtures.graph();
-            g.candidate().setHasDrivingLicense(true);
-            assertViolates("ck_candidate_driving_license", () -> candidates.saveAndFlush(g.candidate()));
+            g.beneficiary().setHasDrivingLicense(true);
+            assertViolates("ck_beneficiary_driving_license", () -> beneficiaries.saveAndFlush(g.beneficiary()));
         }
 
         @Test
         void tipiDiPatenteCoerenti() {
             Graph g = fixtures.graph();
-            g.candidate().setLicenseTypes(LicenseType.B, LicenseType.CQC);
-            candidates.saveAndFlush(g.candidate());
-            assertThat(g.candidate().isHasDrivingLicense()).isTrue();
+            g.beneficiary().setLicenseTypes(LicenseType.B, LicenseType.CQC);
+            beneficiaries.saveAndFlush(g.beneficiary());
+            assertThat(g.beneficiary().isHasDrivingLicense()).isTrue();
         }
 
         @Test
         void tipoDiPatenteEstraneo() {
             Graph g = fixtures.graph();
-            assertViolates("ck_candidate_license_types", () -> jdbc.update(
-                    "UPDATE candidate SET license_types = '{B,Z9}', has_driving_license = true WHERE id = ?",
-                    g.candidate().getId()));
+            assertViolates("ck_beneficiary_license_types", () -> jdbc.update(
+                    "UPDATE beneficiary SET license_types = '{B,Z9}', has_driving_license = true WHERE id = ?",
+                    g.beneficiary().getId()));
         }
 
         @Test
         void nazionalitaNonIso() {
             Graph g = fixtures.graph();
-            g.candidate().setNationality("it");
-            assertViolates("ck_candidate_nationality", () -> candidates.saveAndFlush(g.candidate()));
+            g.beneficiary().setNationality("it");
+            assertViolates("ck_beneficiary_nationality", () -> beneficiaries.saveAndFlush(g.beneficiary()));
         }
 
         @Test
         void nomeObbligatorioSeNonAnonimizzato() {
             Graph g = fixtures.graph();
-            g.candidate().setFirstName(null);
-            assertViolates("ck_candidate_name", () -> candidates.saveAndFlush(g.candidate()));
+            g.beneficiary().setFirstName(null);
+            assertViolates("ck_beneficiary_name", () -> beneficiaries.saveAndFlush(g.beneficiary()));
         }
 
         @Test
         void anonimizzatoSenzaNomeEAmmesso() {
             Graph g = fixtures.graph();
-            g.candidate().setFirstName(null);
-            g.candidate().setLastName(null);
-            g.candidate().setAnonymizedAt(Instant.now());
-            candidates.saveAndFlush(g.candidate());
-            assertThat(g.candidate().getAnonymizedAt()).isNotNull();
+            g.beneficiary().setFirstName(null);
+            g.beneficiary().setLastName(null);
+            g.beneficiary().setAnonymizedAt(Instant.now());
+            beneficiaries.saveAndFlush(g.beneficiary());
+            assertThat(g.beneficiary().getAnonymizedAt()).isNotNull();
         }
 
         @Test
         void livelloLinguisticoNonValido() {
             Graph g = fixtures.graph();
-            assertViolates("ck_candidate_language_level", () -> jdbc.update(
-                    "INSERT INTO candidate_language (id, candidate_id, language, level, created_at, created_by, updated_at, updated_by)"
+            assertViolates("ck_beneficiary_language_level", () -> jdbc.update(
+                    "INSERT INTO beneficiary_language (id, beneficiary_id, language, level, created_at, created_by, updated_at, updated_by)"
                             + " VALUES (1, ?, 'it', 'B3', now(), 't', now(), 't')",
-                    g.candidate().getId()));
+                    g.beneficiary().getId()));
         }
 
         @Test
         void linguaDuplicata() {
             Graph g = fixtures.graph();
-            g.candidate().addLanguage(new CandidateLanguage("it", LanguageLevel.C2));
-            g.candidate().addLanguage(new CandidateLanguage("it", LanguageLevel.B1));
-            assertViolates("uq_candidate_language", () -> candidates.saveAndFlush(g.candidate()));
+            g.beneficiary().addLanguage(new BeneficiaryLanguage("it", LanguageLevel.C2));
+            g.beneficiary().addLanguage(new BeneficiaryLanguage("it", LanguageLevel.B1));
+            assertViolates("uq_beneficiary_language", () -> beneficiaries.saveAndFlush(g.beneficiary()));
         }
     }
 

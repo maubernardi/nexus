@@ -6,7 +6,7 @@ export const ENDPOINTS = {
   tickets: '/tickets',
   ticketQueue: '/tickets/queue',
   projects: '/reference/projects',
-  candidates: '/candidates',
+  beneficiaries: '/beneficiaries',
   zones: '/reference/zones',
   jobCategories: '/reference/job-categories',
 } as const;
