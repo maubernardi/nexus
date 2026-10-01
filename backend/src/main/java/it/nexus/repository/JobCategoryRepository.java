@@ -1,5 +1,6 @@
 package it.nexus.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,4 +12,6 @@ import it.nexus.domain.JobCategory;
 public interface JobCategoryRepository extends JpaRepository<JobCategory, Long> {
 
     Optional<JobCategory> findByCode(String code);
+
+    List<JobCategory> findByActiveTrueOrderByNameAsc();
 }

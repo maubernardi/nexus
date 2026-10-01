@@ -26,6 +26,12 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(FieldValidationException.class)
+    ResponseEntity<ApiErrorResponseDTO> handleFieldValidation(FieldValidationException ex, HttpServletRequest request) {
+        return ResponseEntity.badRequest().body(ApiErrorResponseDTO.of(HttpStatus.BAD_REQUEST, "Dati non validi",
+                request.getRequestURI(), List.of(new ApiErrorResponseDTO.FieldErrorDTO(ex.getField(), ex.getMessage()))));
+    }
+
     @ExceptionHandler(AbstractDomainException.class)
     ResponseEntity<ApiErrorResponseDTO> handleDomain(AbstractDomainException ex, HttpServletRequest request) {
         return build(ex.getStatus(), ex.getMessage(), request);

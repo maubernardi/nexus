@@ -1,7 +1,9 @@
 import { type RouteObject } from 'react-router';
 
 import { DEV_LOGIN_PATH, ProtectedPage } from '@/config/routing/ProtectedPage';
+import { RoleRoute } from '@/config/routing/RoleRoute';
 import type { RouteHandle } from '@/config/routing/types';
+import { CandidateNewPage } from '@/pages/CandidateNewPage/CandidateNewPage';
 import { DevLoginPage } from '@/pages/DevLoginPage/DevLoginPage';
 import { HomePage } from '@/pages/HomePage/HomePage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
@@ -17,6 +19,15 @@ export const routes: RouteObject[] = [
     element: <ProtectedPage />,
     children: [
       { index: true, element: <HomePage />, handle: { titleKey: 'pages.home.title' } satisfies RouteHandle },
+      {
+        path: 'candidati/nuovo',
+        element: (
+          <RoleRoute roles={['TUTOR']}>
+            <CandidateNewPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.candidateNew.title' } satisfies RouteHandle,
+      },
       {
         path: '*',
         element: <NotFoundPage />,

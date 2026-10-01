@@ -21,13 +21,13 @@ export const AppLayout = ({ user }: AppLayoutProps) => {
       <RouteAnnouncer />
       <AppHeader user={user} />
       <OfflineBanner />
+      <UpdatePrompt />
       <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:py-8">
         <Outlet />
       </main>
       <footer className="border-t-2 border-gold bg-muted px-4 py-4 text-center text-sm text-muted-foreground">
         {t('app.footer')}
       </footer>
-      <UpdatePrompt />
     </div>
   );
 };

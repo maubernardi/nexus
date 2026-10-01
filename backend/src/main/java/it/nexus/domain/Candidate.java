@@ -121,6 +121,11 @@ public class Candidate extends AbstractTsidEntity {
         return licenseTypes.clone();
     }
 
+    /** Nuovo candidato del Tutor indicato (proprietario). */
+    public Candidate(AppUser ownerTutor) {
+        this.ownerTutor = ownerTutor;
+    }
+
     public void addLanguage(CandidateLanguage language) {
         language.setCandidate(this);
         languages.add(language);
