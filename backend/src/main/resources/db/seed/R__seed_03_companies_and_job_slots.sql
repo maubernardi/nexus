@@ -12,15 +12,15 @@ ON CONFLICT DO NOTHING;
 
 INSERT INTO job_slot (id, company_id, job_category_id, zone_id, title, description, status, created_at, created_by, updated_at, updated_by) VALUES
     -- s_mag_nord
-    (892398395572130061, (SELECT id FROM company WHERE vat_code = '99000000001'), (SELECT id FROM job_category WHERE code = 'MAGAZZINIERE'), (SELECT id FROM zone WHERE code = 'ZONA_NORD'), 'Magazziniere reparto spedizioni', 'Mansione dimostrativa.', 'LIBERA', now(), 'seed', now(), 'seed'),
+    (892398395572130061, (SELECT id FROM company WHERE vat_code = '99000000001'), (SELECT id FROM job_category WHERE code = 'MAGAZZINIERE'), (SELECT id FROM zone WHERE code = 'RIFREDI'), 'Magazziniere reparto spedizioni', 'Mansione dimostrativa.', 'LIBERA', now(), 'seed', now(), 'seed'),
     -- s_mag_est
-    (892398395572130062, (SELECT id FROM company WHERE vat_code = '99000000001'), (SELECT id FROM job_category WHERE code = 'MAGAZZINIERE'), (SELECT id FROM zone WHERE code = 'ZONA_EST'), 'Magazziniere carico e scarico', 'Mansione dimostrativa.', 'LIBERA', now(), 'seed', now(), 'seed'),
+    (892398395572130062, (SELECT id FROM company WHERE vat_code = '99000000001'), (SELECT id FROM job_category WHERE code = 'MAGAZZINIERE'), (SELECT id FROM zone WHERE code = 'CAMPO_DI_MARTE'), 'Magazziniere carico e scarico', 'Mansione dimostrativa.', 'LIBERA', now(), 'seed', now(), 'seed'),
     -- s_cuoco
-    (892398395572130063, (SELECT id FROM company WHERE vat_code = '99000000002'), (SELECT id FROM job_category WHERE code = 'AIUTO_CUOCO'), (SELECT id FROM zone WHERE code = 'CENTRO'), 'Aiuto cuoco cucina tradizionale', 'Mansione dimostrativa.', 'LIBERA', now(), 'seed', now(), 'seed'),
+    (892398395572130063, (SELECT id FROM company WHERE vat_code = '99000000002'), (SELECT id FROM job_category WHERE code = 'AIUTO_CUOCO'), (SELECT id FROM zone WHERE code = 'SAN_LORENZO'), 'Aiuto cuoco cucina tradizionale', 'Mansione dimostrativa.', 'LIBERA', now(), 'seed', now(), 'seed'),
     -- s_sala
-    (892398395572130064, (SELECT id FROM company WHERE vat_code = '99000000002'), (SELECT id FROM job_category WHERE code = 'CAMERIERE'), (SELECT id FROM zone WHERE code = 'CENTRO'), 'Cameriere di sala pranzo', 'Mansione dimostrativa.', 'LIBERA', now(), 'seed', now(), 'seed'),
+    (892398395572130064, (SELECT id FROM company WHERE vat_code = '99000000002'), (SELECT id FROM job_category WHERE code = 'CAMERIERE'), (SELECT id FROM zone WHERE code = 'SAN_LORENZO'), 'Cameriere di sala pranzo', 'Mansione dimostrativa.', 'LIBERA', now(), 'seed', now(), 'seed'),
     -- s_pulizie
-    (892398395572130065, (SELECT id FROM company WHERE vat_code = '99000000003'), (SELECT id FROM job_category WHERE code = 'ADDETTO_PULIZIE'), (SELECT id FROM zone WHERE code = 'ZONA_SUD'), 'Addetto pulizie uffici', 'Mansione dimostrativa.', 'LIBERA', now(), 'seed', now(), 'seed'),
+    (892398395572130065, (SELECT id FROM company WHERE vat_code = '99000000003'), (SELECT id FROM job_category WHERE code = 'ADDETTO_PULIZIE'), (SELECT id FROM zone WHERE code = 'GALLUZZO'), 'Addetto pulizie uffici', 'Mansione dimostrativa.', 'LIBERA', now(), 'seed', now(), 'seed'),
     -- s_vendite
-    (892398395572130066, (SELECT id FROM company WHERE vat_code = '99000000004'), (SELECT id FROM job_category WHERE code = 'ADDETTO_VENDITE'), (SELECT id FROM zone WHERE code = 'ZONA_OVEST'), 'Addetto vendite e scaffalatura', 'Mansione dimostrativa.', 'LIBERA', now(), 'seed', now(), 'seed')
+    (892398395572130066, (SELECT id FROM company WHERE vat_code = '99000000004'), (SELECT id FROM job_category WHERE code = 'ADDETTO_VENDITE'), (SELECT id FROM zone WHERE code = 'ISOLOTTO'), 'Addetto vendite e scaffalatura', 'Mansione dimostrativa.', 'LIBERA', now(), 'seed', now(), 'seed')
 ON CONFLICT DO NOTHING;

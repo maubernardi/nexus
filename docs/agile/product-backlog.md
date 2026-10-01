@@ -57,7 +57,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | ID | Epica | Storia | Priorità | Punti | Release | Stato |
 |---|---|---|---|---|---|---|
 | [EN-1](#en-1) | E3 | Motore delle transizioni del ticket | Must | 5 | R1 | 🎉 Done (Sprint 1) |
-| [EN-2](#en-2) | E13 | Audit di ogni cambio di stato e scelta | Must | 5 | R1 | 🔨 In corso (Sprint 2) |
+| [EN-2](#en-2) | E13 | Audit di ogni cambio di stato e scelta | Must | 5 | R1 | 👀 In review (Sprint 2) |
 | [US-101](#us-101) | E1 | Messaggio "utente non abilitato" | Should | 1 | R1 | 🎉 Done (Sprint 1) |
 | [US-102](#us-102) | E1 | Gestione progetti | Must | 3 | R4 | 📋 Backlog |
 | [US-103](#us-103) | E1 | Creazione utente | Must | 8 | R4 | 📋 Backlog |
@@ -65,7 +65,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | 📋 Backlog |
 | [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | 📋 Backlog |
 | [US-107](#us-107) | E1 | Calendario del progetto | Must | 3 | R2 | 📋 Backlog |
-| [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | ✅ Ready (Sprint 2) |
+| [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 👀 In review (Sprint 2) |
 | [US-201](#us-201) | E2 | Inserimento beneficiario | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | 📋 Backlog |
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 📋 Backlog |
@@ -180,7 +180,7 @@ Criteri di accettazione:
 
 
 #### EN-3
-**Zone iniziali: Firenze e hinterland** · Must · 2 punti · R1 · ✅ Ready (Sprint 2)
+**Zone iniziali: Firenze e hinterland** · Must · 2 punti · R1 · 👀 In review (Sprint 2)
 
 Come **PO** voglio che le zone disponibili siano i quartieri di Firenze e i comuni dell'hinterland per lavorare subito con dati realistici, in attesa delle maschere dell'ADMIN (US-106).
 
@@ -641,7 +641,7 @@ Criteri di accettazione:
 _Qualità, sicurezza, GDPR e passaggio dalla demo alla produzione._
 
 #### EN-2
-**Audit di ogni cambio di stato e scelta** · Must · 5 punti · R1 · 🔨 In corso (Sprint 2)
+**Audit di ogni cambio di stato e scelta** · Must · 5 punti · R1 · 👀 In review (Sprint 2)
 
 Come **PO / ADMIN** voglio che ogni cambio di stato e ogni scelta (presa in carico, abbinamento, approvazioni, rifiuti e
 motivi, configurazioni) sia registrato in modo immodificabile per poter ricostruire chi ha fatto cosa e quando.

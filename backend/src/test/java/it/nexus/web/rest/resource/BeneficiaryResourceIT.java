@@ -2,7 +2,10 @@ package it.nexus.web.rest.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -163,7 +166,9 @@ class BeneficiaryResourceIT {
     void zoneDiRiferimento_soloAttive() throws Exception {
         mockMvc.perform(get("/api/v1/reference/zones").header(USER, "tutor1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[*].code").value(containsInAnyOrder("ZNORD")));
+                // le zone iniziali (V11) più quella attiva del test; mai quella disattivata
+                .andExpect(jsonPath("$[*].code").value(hasItems("ZNORD", "NOVOLI", "FIESOLE")))
+                .andExpect(jsonPath("$[*].code").value(not(hasItem("ZCHIUSA"))));
     }
 
     @Test
