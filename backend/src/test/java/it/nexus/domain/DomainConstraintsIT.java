@@ -30,12 +30,14 @@ import it.nexus.domain.enumeration.BoardPostStatus;
 import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.domain.enumeration.LanguageLevel;
 import it.nexus.domain.enumeration.LicenseType;
+import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.Role;
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.domain.enumeration.TicketType;
 import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.BeneficiaryRepository;
+import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.JobSlotRepository;
@@ -71,6 +73,7 @@ class DomainConstraintsIT {
     @Autowired TicketCompanyBlacklistRepository blacklist;
     @Autowired BoardPostRepository boardPosts;
     @Autowired CompanyAuditEventRepository auditEvents;
+    @Autowired AuditEventRepository auditLog;
 
     /** L'operazione deve fallire per il vincolo indicato (nome del vincolo o testo dell'errore del database). */
     static void assertViolates(String constraint, ThrowingCallable operation) {
@@ -486,6 +489,48 @@ class DomainConstraintsIT {
             registerEvent();
             assertViolates("company_audit_event è in sola aggiunta",
                     () -> jdbc.execute("TRUNCATE company_audit_event"));
+        }
+    }
+
+    @Nested
+    class AuditLog {
+
+        private Long registerEvent() {
+            AuditEvent event = auditLog.save(new AuditEvent(AuditEntityType.TICKET, 42L, "SUBMIT",
+                    Map.of("status", Map.of("after", "NUOVA")), "nota"));
+            em.flush();
+            return event.getId();
+        }
+
+        @Test
+        void tipoEAzioneInMaiuscolo() {
+            assertViolates("ck_audit_event_action", () -> auditLog.saveAndFlush(
+                    new AuditEvent(AuditEntityType.TICKET, 42L, "submit", Map.of(), null)));
+        }
+
+        @Test
+        void motivoVuotoRifiutato() {
+            assertViolates("ck_audit_event_reason", () -> auditLog.saveAndFlush(
+                    new AuditEvent(AuditEntityType.TICKET, 42L, "SUBMIT", Map.of(), "  ")));
+        }
+
+        @Test
+        void modificaRifiutata() {
+            Long id = registerEvent();
+            assertViolates("audit_event è in sola aggiunta",
+                    () -> jdbc.update("UPDATE audit_event SET action = 'MANOMESSO' WHERE id = ?", id));
+        }
+
+        @Test
+        void cancellazioneRifiutata() {
+            Long id = registerEvent();
+            assertViolates("audit_event è in sola aggiunta", () -> jdbc.update("DELETE FROM audit_event WHERE id = ?", id));
+        }
+
+        @Test
+        void svuotamentoRifiutato() {
+            registerEvent();
+            assertViolates("audit_event è in sola aggiunta", () -> jdbc.execute("TRUNCATE audit_event"));
         }
     }
 }

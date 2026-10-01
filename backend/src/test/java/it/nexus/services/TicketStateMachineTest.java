@@ -41,6 +41,7 @@ class TicketStateMachineTest {
 
     @Mock TicketRepository tickets;
     @Mock TicketStatusHistoryRepository history;
+    @Mock AuditService audit;
     @InjectMocks TicketStateMachineImpl stateMachine;
 
     @AfterEach
@@ -75,7 +76,7 @@ class TicketStateMachineTest {
 
         assertThatThrownBy(() -> stateMachine.create(ticketIn(null), TicketTransitions.SUBMIT, null))
                 .isInstanceOf(AccessDeniedException.class);
-        verifyNoInteractions(tickets, history);
+        verifyNoInteractions(tickets, history, audit);
     }
 
     @Test
@@ -87,7 +88,7 @@ class TicketStateMachineTest {
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("modificato nel frattempo");
         assertThat(ticket.getStatus()).isEqualTo(NUOVA);
-        verifyNoInteractions(tickets, history);
+        verifyNoInteractions(tickets, history, audit);
     }
 
     @Test
@@ -99,7 +100,7 @@ class TicketStateMachineTest {
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("IN_LAVORAZIONE");
         assertThat(ticket.getStatus()).isEqualTo(IN_LAVORAZIONE);
-        verifyNoInteractions(tickets, history);
+        verifyNoInteractions(tickets, history, audit);
     }
 
     @Test

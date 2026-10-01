@@ -15,10 +15,12 @@ import it.nexus.domain.Beneficiary;
 import it.nexus.domain.BeneficiaryLanguage;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.Zone;
+import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.BeneficiaryCreateDTO;
 import it.nexus.domain.dto.BeneficiaryDTO;
 import it.nexus.domain.dto.BeneficiaryLanguageDTO;
 import it.nexus.domain.dto.BeneficiarySummaryDTO;
+import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.LicenseType;
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.mapper.BeneficiaryMapper;
@@ -26,6 +28,7 @@ import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.TicketRepository;
 import it.nexus.repository.ZoneRepository;
+import it.nexus.services.AuditService;
 import it.nexus.services.BeneficiaryService;
 import it.nexus.services.CurrentAppUserService;
 import it.nexus.web.errors.FieldValidationException;
@@ -39,6 +42,7 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
 
     private final BeneficiaryRepository beneficiaryRepository;
     private final TicketRepository ticketRepository;
+    private final AuditService auditService;
     private final ZoneRepository zoneRepository;
     private final CurrentAppUserService currentAppUserService;
     private final BeneficiaryMapper mapper;
@@ -69,7 +73,10 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
         beneficiary.setConstraints(blankToNull(dto.constraints()));
         dto.languages().forEach(l -> beneficiary.addLanguage(new BeneficiaryLanguage(l.language(), l.level())));
 
-        return mapper.toDto(beneficiaryRepository.save(beneficiary));
+        Beneficiary saved = beneficiaryRepository.save(beneficiary);
+        // dati personali: nell'audit solo l'azione, mai i valori (GDPR)
+        auditService.record(AuditEntityType.BENEFICIARY, saved.getId(), "CREATE", AuditChanges.none(), null);
+        return mapper.toDto(saved);
     }
 
     @Override

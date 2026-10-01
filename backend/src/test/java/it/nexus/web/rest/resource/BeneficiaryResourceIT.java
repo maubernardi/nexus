@@ -1,5 +1,6 @@
 package it.nexus.web.rest.resource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
@@ -18,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -29,9 +31,11 @@ import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.TestEntities;
 import it.nexus.domain.Zone;
+import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.Role;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.AppUserRepository;
+import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.ZoneRepository;
 
 @SpringBootTest
@@ -46,6 +50,8 @@ class BeneficiaryResourceIT {
     @Autowired MockMvc mockMvc;
     @Autowired AppUserRepository users;
     @Autowired ZoneRepository zones;
+    @Autowired AuditEventRepository audit;
+    @Autowired JdbcTemplate jdbc;
 
     private String zoneId;
     private String inactiveZoneId;
@@ -158,5 +164,23 @@ class BeneficiaryResourceIT {
         mockMvc.perform(get("/api/v1/reference/zones").header(USER, "tutor1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[*].code").value(containsInAnyOrder("ZNORD")));
+    }
+
+    @Test
+    void registrazione_auditSenzaDatiPersonali() throws Exception {
+        String id = JsonPath.read(register("tutor1", body("")).andReturn().getResponse().getContentAsString(), "$.id");
+
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.BENEFICIARY,
+                TsidMapper.toInternal(id)))
+                .singleElement()
+                .satisfies(event -> {
+                    assertThat(event.getAction()).isEqualTo("CREATE");
+                    assertThat(event.getCreatedBy()).isEqualTo("tutor1");
+                    assertThat(event.getChanges()).isEmpty();
+                    assertThat(event.getReason()).isNull();
+                });
+        // nessuna traccia dei valori personali nel registro
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM audit_event WHERE changes::text LIKE '%Rossi%'", Long.class))
+                .isZero();
     }
 }
