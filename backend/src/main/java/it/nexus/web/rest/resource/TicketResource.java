@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import it.nexus.domain.dto.QueueItemDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
+import it.nexus.domain.dto.TicketVersionDTO;
 import it.nexus.services.TicketService;
 import it.nexus.web.rest.PathAPI;
 import jakarta.validation.Valid;
@@ -36,6 +38,20 @@ public class TicketResource {
     public ResponseEntity<List<QueueItemDTO>> queue(@RequestParam(required = false) String projectId,
             @RequestParam(required = false) String zoneId) {
         return ResponseEntity.ok(ticketService.queue(projectId, zoneId));
+    }
+
+    @PostMapping("/{id}/take-charge")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Prende in carico una segnalazione dalla coda (409 se già presa o modificata)")
+    public ResponseEntity<QueueItemDTO> takeCharge(@PathVariable String id, @RequestBody @Valid TicketVersionDTO body) {
+        return ResponseEntity.ok(ticketService.takeCharge(id, body.version()));
+    }
+
+    @GetMapping("/assigned-to-me")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Segnalazioni aperte assegnate all'operatore corrente")
+    public ResponseEntity<List<QueueItemDTO>> assignedToMe() {
+        return ResponseEntity.ok(ticketService.assignedToMe());
     }
 
     // nessun Location: il dettaglio del ticket arriva con US-305

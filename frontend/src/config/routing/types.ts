@@ -6,5 +6,6 @@ export type RouteHandle = {
     | 'pages.beneficiaryNew.title'
     | 'pages.ticketNew.title'
     | 'pages.queue.title'
+    | 'pages.myWork.title'
     | 'pages.forbidden.title';
 };

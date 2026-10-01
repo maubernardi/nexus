@@ -22,14 +22,27 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     Optional<Ticket> findFirstByBeneficiaryIdAndStatusNot(Long beneficiaryId, TicketStatus closed);
 
+    /** Segnalazioni aperte assegnate a un operatore, dalla più vecchia. */
+    @Query("""
+            select t from Ticket t
+            join fetch t.beneficiary b
+            join fetch b.residenceZone
+            join fetch t.project
+            join fetch t.tutor
+            left join fetch t.requestedJobCategory
+            where t.assignedCcOperator.id = :operatorId and t.status <> :closed
+            order by t.createdAt asc, t.number asc
+            """)
+    List<Ticket> findAssignedTo(@Param("operatorId") Long operatorId, @Param("closed") TicketStatus closed);
+
     /**
      * Coda del Call Center: ticket non assegnati negli stati indicati, prima i fast-track e poi per arrivo. Filtri
      * facoltativi (null = nessun filtro) per progetto e zona di residenza del beneficiario.
      */
     @Query("""
             select t from Ticket t
-            join fetch t.beneficiary c
-            join fetch c.residenceZone z
+            join fetch t.beneficiary b
+            join fetch b.residenceZone z
             join fetch t.project p
             join fetch t.tutor
             left join fetch t.requestedJobCategory

@@ -78,7 +78,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-305](#us-305) | E3 | Dettaglio e cronologia del ticket | Must | 3 | R1 | 📋 Backlog |
 | [US-306](#us-306) | E3 | Segnalazione speciale dalla bacheca | Must | 3 | R2 | 📋 Backlog |
 | [US-401](#us-401) | E4 | Coda FIFO | Must | 5 | R1 | 🎉 Done (Sprint 1) |
-| [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | ✅ Ready (Sprint 2) |
+| [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | 👀 In review (Sprint 2) |
 | [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | 📋 Backlog |
 | [US-404](#us-404) | E4 | Rifiuto fast-track | Must | 3 | R2 | 📋 Backlog |
 | [US-501](#us-501) | E5 | Anagrafica aziende | Must | 3 | R1 | ✅ Ready (Sprint 2) |
@@ -329,7 +329,7 @@ Criteri di accettazione:
 - Filtri per progetto e zona; vista ottimizzata per desktop.
 
 #### US-402
-**Presa in carico** · Must · 2 punti · R1 · ✅ Ready (Sprint 2)
+**Presa in carico** · Must · 2 punti · R1 · 👀 In review (Sprint 2)
 
 Come **operatore Call Center** voglio prendere in carico un ticket per evitare che due operatori lavorino lo stesso caso.
 

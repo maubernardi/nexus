@@ -1,11 +1,14 @@
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
 import { NativeSelect } from '@/components/ui/native-select';
 import { useProjects, useZones } from '@/config/hooks/useReferenceData';
-import { useQueue } from '@/config/hooks/useTickets';
+import { apiError } from '@/config/api/errors';
+import type { QueueItem } from '@/config/api/ticketApi';
+import { useQueue, useTakeCharge } from '@/config/hooks/useTickets';
 import { QueueTable } from '@/organisms/QueueTable/QueueTable';
 
 // parametri dell'indirizzo: link condivisibili e tasto Indietro coerenti con i filtri
@@ -21,6 +24,28 @@ export const QueuePage = () => {
   const zones = useZones();
   const queue = useQueue({ projectId: projectId || undefined, zoneId: zoneId || undefined });
   const filtered = projectId !== '' || zoneId !== '';
+  const takeCharge = useTakeCharge();
+  // esito dell'ultima presa in carico: la riga sparisce dalla coda, quindi il focus va al messaggio
+  const [outcome, setOutcome] = useState<{ kind: 'taken' | 'conflict' | 'error'; number: number } | null>(
+    null,
+  );
+  const outcomeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (outcome) outcomeRef.current?.focus();
+  }, [outcome]);
+
+  const onTakeCharge = (item: QueueItem): void => {
+    setOutcome(null);
+    takeCharge.mutate(
+      { id: item.id, version: item.version },
+      {
+        onSuccess: () => setOutcome({ kind: 'taken', number: item.number }),
+        onError: (error) =>
+          setOutcome({ kind: apiError(error)?.status === 409 ? 'conflict' : 'error', number: item.number }),
+      },
+    );
+  };
 
   const setFilter = (param: string, value: string): void => {
     const next = new URLSearchParams(searchParams);
@@ -86,6 +111,33 @@ export const QueuePage = () => {
         {queue.data ? t('queue.count', { count: queue.data.length }) : ''}
       </p>
 
+      {outcome && (
+        <div
+          ref={outcomeRef}
+          tabIndex={-1}
+          className={
+            outcome.kind === 'taken'
+              ? 'space-y-2 rounded-md border-l-4 border-primary bg-card p-4'
+              : 'rounded-md border-2 border-destructive bg-card p-4 font-medium text-destructive'
+          }
+        >
+          {outcome.kind === 'taken' ? (
+            <>
+              <p className="font-medium">{t('queue.takenTitle', { number: outcome.number })}</p>
+              <Link to="/lavorazioni" className="font-medium text-primary underline underline-offset-4">
+                {t('queue.takenLink')}
+              </Link>
+            </>
+          ) : (
+            <p>
+              {t(outcome.kind === 'conflict' ? 'queue.conflict' : 'queue.takeError', {
+                number: outcome.number,
+              })}
+            </p>
+          )}
+        </div>
+      )}
+
       {queue.isError && !queue.data ? (
         <div role="alert" className="space-y-3 rounded-md border-2 border-destructive bg-card p-4">
           <p className="font-medium text-destructive">{t('queue.loadError')}</p>
@@ -100,7 +152,12 @@ export const QueuePage = () => {
           {filtered ? t('queue.emptyFiltered') : t('queue.empty')}
         </p>
       ) : (
-        <QueueTable items={queue.data} />
+        <QueueTable
+          items={queue.data}
+          caption={t('queue.caption')}
+          onTakeCharge={onTakeCharge}
+          pendingId={takeCharge.isPending ? (takeCharge.variables?.id ?? null) : null}
+        />
       )}
     </div>
   );

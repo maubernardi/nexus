@@ -1,4 +1,4 @@
-import { FilePlus2, ListOrdered, UserPlus } from 'lucide-react';
+import { ClipboardList, FilePlus2, ListOrdered, UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
@@ -45,6 +45,12 @@ export const HomePage = () => {
               <Link to="/coda">
                 <ListOrdered aria-hidden="true" />
                 {t('nav.queue')}
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link to="/lavorazioni">
+                <ClipboardList aria-hidden="true" />
+                {t('nav.myWork')}
               </Link>
             </Button>
           </div>

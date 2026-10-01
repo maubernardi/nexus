@@ -1,6 +1,7 @@
 package it.nexus.services.impl;
 
 import java.util.Set;
+import java.util.function.Function;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -56,6 +57,12 @@ public class TicketStateMachineImpl implements TicketStateMachine {
 
     @Override
     public Ticket apply(Ticket ticket, TicketTransition transition, long expectedVersion, String note) {
+        return apply(ticket, transition, expectedVersion, note, t -> AuditChanges.none());
+    }
+
+    @Override
+    public Ticket apply(Ticket ticket, TicketTransition transition, long expectedVersion, String note,
+            Function<Ticket, AuditChanges> effects) {
         if (transition.isCreation()) {
             throw new IllegalArgumentException("La transizione " + transition.name() + " è di creazione");
         }
@@ -67,12 +74,13 @@ public class TicketStateMachineImpl implements TicketStateMachine {
         if (!transition.allowedFrom(from)) {
             throw new ConflictException("Operazione non ammessa per un ticket in stato %s", from);
         }
+        AuditChanges changes = AuditChanges.of().value("status", from.name(), transition.to().name())
+                .merge(effects.apply(ticket));
         ticket.setStatus(transition.to());
         // flush immediato: un conflitto di versione emerge qui (409) e non al commit
         Ticket saved = ticketRepository.saveAndFlush(ticket);
         historyRepository.save(new TicketStatusHistory(saved, from, transition.to(), blankToNull(note)));
-        auditService.record(AuditEntityType.TICKET, saved.getId(), transition.name(),
-                AuditChanges.of().value("status", from.name(), transition.to().name()), note);
+        auditService.record(AuditEntityType.TICKET, saved.getId(), transition.name(), changes, note);
         return saved;
     }
 

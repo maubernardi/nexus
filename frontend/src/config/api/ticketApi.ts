@@ -37,3 +37,13 @@ export const fetchQueue = async (filters: QueueFilters): Promise<QueueItem[]> =>
   const { data } = await axiosInstance.get<QueueItem[]>(ENDPOINTS.ticketQueue, { params: filters });
   return data;
 };
+
+export const takeCharge = async ({ id, version }: { id: string; version: number }): Promise<QueueItem> => {
+  const { data } = await axiosInstance.post<QueueItem>(`${ENDPOINTS.tickets}/${id}/take-charge`, { version });
+  return data;
+};
+
+export const fetchAssignedToMe = async (): Promise<QueueItem[]> => {
+  const { data } = await axiosInstance.get<QueueItem[]>(ENDPOINTS.ticketsAssignedToMe);
+  return data;
+};

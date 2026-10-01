@@ -9,8 +9,10 @@ import {
 
 import { MY_BENEFICIARIES_KEY } from '@/config/hooks/useBeneficiaries';
 import {
+  fetchAssignedToMe,
   fetchQueue,
   submitTicket,
+  takeCharge,
   type QueueFilters,
   type QueueItem,
   type Ticket,
@@ -41,4 +43,20 @@ export const useQueue = (filters: QueueFilters): UseQueryResult<QueueItem[]> =>
     refetchOnWindowFocus: true,
     // cambiando filtro la tabella resta visibile finché arrivano i nuovi dati
     placeholderData: keepPreviousData,
+  });
+
+/** Presa in carico: in ogni caso (riuscita o conflitto) coda e lavorazioni vanno riallineate. */
+export const useTakeCharge = (): UseMutationResult<QueueItem, unknown, { id: string; version: number }> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: takeCharge,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+  });
+};
+
+export const useAssignedToMe = (): UseQueryResult<QueueItem[]> =>
+  useQuery({
+    queryKey: [...TICKETS_KEY, 'assigned-to-me'],
+    queryFn: fetchAssignedToMe,
+    refetchOnWindowFocus: true,
   });

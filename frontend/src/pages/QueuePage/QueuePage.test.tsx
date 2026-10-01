@@ -1,9 +1,10 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { AxiosError, AxiosHeaders } from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { fetchProjects, fetchZones } from '@/config/api/referenceApi';
-import { fetchQueue, type QueueItem } from '@/config/api/ticketApi';
+import { fetchQueue, takeCharge, type QueueItem } from '@/config/api/ticketApi';
 import { QueuePage } from '@/pages/QueuePage/QueuePage';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderRoutes } from '@/tests/renderWithProviders';
@@ -14,7 +15,12 @@ vi.mock('@/config/api/referenceApi', () => ({
   fetchMyProjects: vi.fn(),
   fetchProjects: vi.fn(),
 }));
-vi.mock('@/config/api/ticketApi', () => ({ submitTicket: vi.fn(), fetchQueue: vi.fn() }));
+vi.mock('@/config/api/ticketApi', () => ({
+  submitTicket: vi.fn(),
+  fetchQueue: vi.fn(),
+  takeCharge: vi.fn(),
+  fetchAssignedToMe: vi.fn(),
+}));
 
 const item = (number: number, overrides: Partial<QueueItem> = {}): QueueItem => ({
   id: `T${number}`,
@@ -120,5 +126,44 @@ describe('<QueuePage>', () => {
     renderPage('/coda?progetto=P2');
 
     expect(await screen.findByText('Nessuna segnalazione corrisponde ai filtri scelti.')).toBeInTheDocument();
+  });
+
+  it('prende in carico una segnalazione e sposta il focus sull’esito', async () => {
+    const user = userEvent.setup();
+    vi.mocked(takeCharge).mockResolvedValue(item(3, { status: 'IN_LAVORAZIONE', version: 1 }));
+    renderPage();
+
+    await user.click(await screen.findByRole('button', { name: 'Prendi in carico la segnalazione n. 3' }));
+
+    expect(takeCharge).toHaveBeenCalledWith({ id: 'T3', version: 0 }, expect.anything());
+    const message = await screen.findByText('Segnalazione n. 3 presa in carico.');
+    await waitFor(() => expect(message.parentElement).toHaveFocus());
+    expect(screen.getByRole('link', { name: 'Vai alle mie lavorazioni' })).toHaveAttribute(
+      'href',
+      '/lavorazioni',
+    );
+    await expectNoAxeViolations();
+  });
+
+  it('se un collega l’ha presa un istante prima lo spiega e riaggiorna la coda', async () => {
+    const user = userEvent.setup();
+    vi.mocked(takeCharge).mockRejectedValue(
+      new AxiosError('Conflict', '409', undefined, undefined, {
+        status: 409,
+        statusText: 'Conflict',
+        headers: {},
+        config: { headers: new AxiosHeaders() },
+        data: { status: 409, message: 'già presa' },
+      }),
+    );
+    renderPage();
+    await screen.findByRole('table');
+    const calls = vi.mocked(fetchQueue).mock.calls.length;
+
+    await user.click(screen.getByRole('button', { name: 'Prendi in carico la segnalazione n. 7' }));
+
+    const message = await screen.findByText(/un collega l’ha appena presa o è cambiata/);
+    await waitFor(() => expect(message.parentElement).toHaveFocus());
+    await waitFor(() => expect(vi.mocked(fetchQueue).mock.calls.length).toBeGreaterThan(calls));
   });
 });
