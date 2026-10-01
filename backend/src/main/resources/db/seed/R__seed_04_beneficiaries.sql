@@ -6,31 +6,31 @@ INSERT INTO beneficiary (id, owner_tutor_id, first_name, last_name, birth_year, 
                        has_driving_license, license_types, has_vehicle, transport_mode, has_law68, education_level, constraints,
                        created_at, created_by, updated_at, updated_by) VALUES
     -- k1
-    (892398395572130071, (SELECT id FROM app_user WHERE username = 'tutor1'), 'Beneficiario', 'Demo Uno', 1998, 'M', 'IT', 'IT', (SELECT id FROM zone WHERE code = 'ZONA_NORD'),
+    (892398395572130071, (SELECT id FROM app_user WHERE username = 'tutor1'), 'Beneficiario', 'Demo Uno', 1998, 'M', 'IT', 'IT', (SELECT id FROM zone WHERE code = 'RIFREDI'),
      true, '{B}', true, 'AUTO_PROPRIA', false, 'DIPLOMA', NULL,
      now(), 'seed', now(), 'seed'),
     -- k2
-    (892398395572130072, (SELECT id FROM app_user WHERE username = 'tutor1'), 'Beneficiaria', 'Demo Due', 2001, 'F', 'IT', 'IT', (SELECT id FROM zone WHERE code = 'CENTRO'),
+    (892398395572130072, (SELECT id FROM app_user WHERE username = 'tutor1'), 'Beneficiaria', 'Demo Due', 2001, 'F', 'IT', 'IT', (SELECT id FROM zone WHERE code = 'SAN_LORENZO'),
      false, '{}', false, 'MEZZI_PUBBLICI', true, 'LICENZA_MEDIA', 'Dato fittizio: necessita di postazione senza barriere architettoniche.',
      now(), 'seed', now(), 'seed'),
     -- k3
-    (892398395572130073, (SELECT id FROM app_user WHERE username = 'tutor1'), 'Beneficiario', 'Demo Tre', 1990, 'ALTRO', 'MA', 'IT', (SELECT id FROM zone WHERE code = 'ZONA_EST'),
+    (892398395572130073, (SELECT id FROM app_user WHERE username = 'tutor1'), 'Beneficiario', 'Demo Tre', 1990, 'ALTRO', 'MA', 'IT', (SELECT id FROM zone WHERE code = 'CAMPO_DI_MARTE'),
      true, '{AM,B}', false, 'BICICLETTA', false, 'QUALIFICA_PROFESSIONALE', NULL,
      now(), 'seed', now(), 'seed'),
     -- k4
-    (892398395572130074, (SELECT id FROM app_user WHERE username = 'tutor2'), 'Beneficiaria', 'Demo Quattro', 1985, 'F', 'RO', 'RO', (SELECT id FROM zone WHERE code = 'ZONA_SUD'),
+    (892398395572130074, (SELECT id FROM app_user WHERE username = 'tutor2'), 'Beneficiaria', 'Demo Quattro', 1985, 'F', 'RO', 'RO', (SELECT id FROM zone WHERE code = 'GALLUZZO'),
      false, '{}', false, 'A_PIEDI', false, 'DIPLOMA', NULL,
      now(), 'seed', now(), 'seed'),
     -- k5
-    (892398395572130075, (SELECT id FROM app_user WHERE username = 'tutor2'), 'Beneficiario', 'Demo Cinque', 2003, 'NON_DICHIARATO', 'IT', 'IT', (SELECT id FROM zone WHERE code = 'ZONA_OVEST'),
+    (892398395572130075, (SELECT id FROM app_user WHERE username = 'tutor2'), 'Beneficiario', 'Demo Cinque', 2003, 'NON_DICHIARATO', 'IT', 'IT', (SELECT id FROM zone WHERE code = 'ISOLOTTO'),
      true, '{B,C}', true, 'AUTO_PROPRIA', false, 'ITS', 'Dato fittizio: allergia alle polveri.',
      now(), 'seed', now(), 'seed'),
     -- k6 (creato anche da V9 sui database con i dati demo precedenti: stessi valori)
-    (892398395576324400, (SELECT id FROM app_user WHERE username = 'tutor1'), 'Beneficiaria', 'Demo Sei', 1994, 'F', 'IT', 'IT', (SELECT id FROM zone WHERE code = 'CENTRO'),
+    (892398395576324400, (SELECT id FROM app_user WHERE username = 'tutor1'), 'Beneficiaria', 'Demo Sei', 1994, 'F', 'IT', 'IT', (SELECT id FROM zone WHERE code = 'SAN_LORENZO'),
      true, '{B}', false, 'MEZZI_PUBBLICI', false, 'DIPLOMA', NULL,
      now(), 'seed', now(), 'seed'),
     -- k7 (come k6)
-    (892398395576324401, (SELECT id FROM app_user WHERE username = 'tutor2'), 'Beneficiario', 'Demo Sette', 1988, 'M', 'IT', 'IT', (SELECT id FROM zone WHERE code = 'ZONA_OVEST'),
+    (892398395576324401, (SELECT id FROM app_user WHERE username = 'tutor2'), 'Beneficiario', 'Demo Sette', 1988, 'M', 'IT', 'IT', (SELECT id FROM zone WHERE code = 'ISOLOTTO'),
      false, '{}', false, 'BICICLETTA', false, 'LICENZA_MEDIA', NULL,
      now(), 'seed', now(), 'seed')
 ON CONFLICT DO NOTHING;
