@@ -7,4 +7,4 @@
 
 ## 2. Consegna
 
-- [ ] 2.1 Backlog e sprint aggiornati (dopo il merge della PR #20); PR con CI verde
+- [x] 2.1 Backlog e sprint aggiornati; PR con CI verde
