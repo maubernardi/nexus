@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 60 elementi, 218 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md).
+**Totale: 60 elementi, 218 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-02](sprints/sprint-02.md).
 
 ## Epiche
 
@@ -57,7 +57,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | ID | Epica | Storia | Priorità | Punti | Release | Stato |
 |---|---|---|---|---|---|---|
 | [EN-1](#en-1) | E3 | Motore delle transizioni del ticket | Must | 5 | R1 | 🎉 Done (Sprint 1) |
-| [EN-2](#en-2) | E13 | Audit di ogni cambio di stato e scelta | Must | 5 | R1 | 📋 Backlog |
+| [EN-2](#en-2) | E13 | Audit di ogni cambio di stato e scelta | Must | 5 | R1 | 🔨 In corso (Sprint 2) |
 | [US-101](#us-101) | E1 | Messaggio "utente non abilitato" | Should | 1 | R1 | 🎉 Done (Sprint 1) |
 | [US-102](#us-102) | E1 | Gestione progetti | Must | 3 | R4 | 📋 Backlog |
 | [US-103](#us-103) | E1 | Creazione utente | Must | 8 | R4 | 📋 Backlog |
@@ -65,7 +65,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | 📋 Backlog |
 | [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | 📋 Backlog |
 | [US-107](#us-107) | E1 | Calendario del progetto | Must | 3 | R2 | 📋 Backlog |
-| [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 📋 Backlog |
+| [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | ✅ Ready (Sprint 2) |
 | [US-201](#us-201) | E2 | Inserimento beneficiario | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | 📋 Backlog |
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 📋 Backlog |
@@ -78,14 +78,14 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-305](#us-305) | E3 | Dettaglio e cronologia del ticket | Must | 3 | R1 | 📋 Backlog |
 | [US-306](#us-306) | E3 | Segnalazione speciale dalla bacheca | Must | 3 | R2 | 📋 Backlog |
 | [US-401](#us-401) | E4 | Coda FIFO | Must | 5 | R1 | 🎉 Done (Sprint 1) |
-| [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | 📋 Backlog |
+| [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | ✅ Ready (Sprint 2) |
 | [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | 📋 Backlog |
 | [US-404](#us-404) | E4 | Rifiuto fast-track | Must | 3 | R2 | 📋 Backlog |
-| [US-501](#us-501) | E5 | Anagrafica aziende | Must | 3 | R1 | 📋 Backlog |
-| [US-502](#us-502) | E5 | Mansioni dell'azienda | Must | 3 | R1 | 📋 Backlog |
+| [US-501](#us-501) | E5 | Anagrafica aziende | Must | 3 | R1 | ✅ Ready (Sprint 2) |
+| [US-502](#us-502) | E5 | Mansioni dell'azienda | Must | 3 | R1 | ✅ Ready (Sprint 2) |
 | [US-503](#us-503) | E5 | Audit trail dell'azienda | Should | 2 | R3 | 📋 Backlog |
-| [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 📋 Backlog |
-| [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 📋 Backlog |
+| [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | ✅ Ready (Sprint 2) |
+| [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | ✅ Ready (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 📋 Backlog |
 | [US-701](#us-701) | E7 | Accettazione della proposta | Must | 3 | R2 | 📋 Backlog |
 | [US-702](#us-702) | E7 | Rifiuto della proposta | Should | 3 | R2 | 📋 Backlog |
@@ -180,7 +180,7 @@ Criteri di accettazione:
 
 
 #### EN-3
-**Zone iniziali: Firenze e hinterland** · Must · 2 punti · R1 · 📋 Backlog
+**Zone iniziali: Firenze e hinterland** · Must · 2 punti · R1 · ✅ Ready (Sprint 2)
 
 Come **PO** voglio che le zone disponibili siano i quartieri di Firenze e i comuni dell'hinterland per lavorare subito con dati realistici, in attesa delle maschere dell'ADMIN (US-106).
 
@@ -329,7 +329,7 @@ Criteri di accettazione:
 - Filtri per progetto e zona; vista ottimizzata per desktop.
 
 #### US-402
-**Presa in carico** · Must · 2 punti · R1 · 📋 Backlog
+**Presa in carico** · Must · 2 punti · R1 · ✅ Ready (Sprint 2)
 
 Come **operatore Call Center** voglio prendere in carico un ticket per evitare che due operatori lavorino lo stesso caso.
 
@@ -362,7 +362,7 @@ Criteri di accettazione:
 _Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte._
 
 #### US-501
-**Anagrafica aziende** · Must · 3 punti · R1 · 📋 Backlog
+**Anagrafica aziende** · Must · 3 punti · R1 · ✅ Ready (Sprint 2)
 
 Come **operatore Call Center** voglio creare, modificare e disattivare aziende (ragione sociale, P.IVA, sede, referente, contatti) per avere un database affidabile per il matching.
 
@@ -370,7 +370,7 @@ Criteri di accettazione:
 - La P.IVA è validata (11 cifre) e univoca; un'azienda con storico si disattiva, non si cancella.
 
 #### US-502
-**Mansioni dell'azienda** · Must · 3 punti · R1 · 📋 Backlog
+**Mansioni dell'azienda** · Must · 3 punti · R1 · ✅ Ready (Sprint 2)
 
 Come **operatore Call Center** voglio gestire le mansioni di un'azienda (titolo, descrizione, tipologia, zona) per sapere quali posizioni sono disponibili.
 
@@ -390,7 +390,7 @@ Criteri di accettazione:
 _Il Call Center abbina il beneficiario a una mansione libera e la blocca._
 
 #### US-601
-**Ricerca mansioni compatibili** · Must · 5 punti · R1 · 📋 Backlog
+**Ricerca mansioni compatibili** · Must · 5 punti · R1 · ✅ Ready (Sprint 2)
 
 Come **operatore Call Center** voglio trovare le mansioni libere compatibili con il beneficiario (zona, tipologia) escludendo le aziende in blacklist per abbinare velocemente.
 
@@ -400,7 +400,7 @@ Criteri di accettazione:
 Dipendenze: US-502
 
 #### US-602
-**Abbinamento e proposta** · Must · 5 punti · R1 · 📋 Backlog
+**Abbinamento e proposta** · Must · 5 punti · R1 · ✅ Ready (Sprint 2)
 
 Come **operatore Call Center** voglio assegnare una mansione al ticket per proporre il beneficiario all'azienda.
 
@@ -641,7 +641,7 @@ Criteri di accettazione:
 _Qualità, sicurezza, GDPR e passaggio dalla demo alla produzione._
 
 #### EN-2
-**Audit di ogni cambio di stato e scelta** · Must · 5 punti · R1 · 📋 Backlog
+**Audit di ogni cambio di stato e scelta** · Must · 5 punti · R1 · 🔨 In corso (Sprint 2)
 
 Come **PO / ADMIN** voglio che ogni cambio di stato e ogni scelta (presa in carico, abbinamento, approvazioni, rifiuti e
 motivi, configurazioni) sia registrato in modo immodificabile per poter ricostruire chi ha fatto cosa e quando.
