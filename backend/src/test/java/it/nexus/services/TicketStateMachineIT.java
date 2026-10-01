@@ -20,8 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import it.nexus.TestcontainersConfiguration;
 import it.nexus.domain.DomainFixtures;
 import it.nexus.domain.Ticket;
+import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.Role;
 import it.nexus.domain.workflow.TicketTransition;
+import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.TicketRepository;
 import it.nexus.repository.TicketStatusHistoryRepository;
 import it.nexus.support.TestSecurity;
@@ -43,6 +45,7 @@ class TicketStateMachineIT {
     @Autowired TicketStatusHistoryRepository history;
     @Autowired DomainFixtures fixtures;
     @Autowired EntityManager em;
+    @Autowired AuditEventRepository audit;
 
     private Ticket ticket;
 
@@ -72,6 +75,15 @@ class TicketStateMachineIT {
                     assertThat(row.getNote()).isEqualTo("Presa in carico");
                     assertThat(row.getCreatedBy()).isEqualTo("operatore.cc");
                     assertThat(row.getCreatedAt()).isNotNull();
+                });
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.TICKET, ticket.getId()))
+                .singleElement()
+                .satisfies(event -> {
+                    assertThat(event.getAction()).isEqualTo("TEST_TAKE");
+                    assertThat(event.getChanges())
+                            .containsEntry("status", java.util.Map.of("before", "NUOVA", "after", "IN_LAVORAZIONE"));
+                    assertThat(event.getReason()).isEqualTo("Presa in carico");
+                    assertThat(event.getCreatedBy()).isEqualTo("operatore.cc");
                 });
     }
 

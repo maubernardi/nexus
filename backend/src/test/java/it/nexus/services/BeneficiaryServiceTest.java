@@ -43,6 +43,7 @@ class BeneficiaryServiceTest {
     @Mock BeneficiaryRepository beneficiaries;
     @Mock ZoneRepository zones;
     @Mock TicketRepository tickets;
+    @Mock AuditService audit;
     @Mock CurrentAppUserService currentUser;
     @Mock BeneficiaryMapper mapper;
     @InjectMocks BeneficiaryServiceImpl service;

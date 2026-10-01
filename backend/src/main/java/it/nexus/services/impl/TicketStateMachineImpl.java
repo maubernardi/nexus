@@ -9,13 +9,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.config.security.AuthenticatedUser;
 import it.nexus.config.security.SecurityUtils;
+import it.nexus.domain.AbstractTsidEntity;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.TicketStatusHistory;
+import it.nexus.domain.audit.AuditChanges;
+import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.Role;
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.domain.workflow.TicketTransition;
+import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.TicketRepository;
 import it.nexus.repository.TicketStatusHistoryRepository;
+import it.nexus.services.AuditService;
 import it.nexus.services.TicketStateMachine;
 import it.nexus.web.errors.ConflictException;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +32,7 @@ public class TicketStateMachineImpl implements TicketStateMachine {
 
     private final TicketRepository ticketRepository;
     private final TicketStatusHistoryRepository historyRepository;
+    private final AuditService auditService;
 
     @Override
     public Ticket create(Ticket ticket, TicketTransition transition, String note) {
@@ -37,6 +43,14 @@ public class TicketStateMachineImpl implements TicketStateMachine {
         ticket.setStatus(transition.to());
         Ticket saved = ticketRepository.saveAndFlush(ticket);
         historyRepository.save(new TicketStatusHistory(saved, null, transition.to(), blankToNull(note)));
+        // alla creazione si registrano anche le scelte fatte
+        auditService.record(AuditEntityType.TICKET, saved.getId(), transition.name(), AuditChanges.of()
+                .value("status", null, transition.to().name())
+                .value("type", null, saved.getType().name())
+                .value("beneficiaryId", null, external(saved.getBeneficiary()))
+                .value("projectId", null, external(saved.getProject()))
+                .value("requestedJobCategoryId", null, external(saved.getRequestedJobCategory()))
+                .value("requestedJobFreeText", null, saved.getRequestedJobFreeText()), note);
         return saved;
     }
 
@@ -57,7 +71,13 @@ public class TicketStateMachineImpl implements TicketStateMachine {
         // flush immediato: un conflitto di versione emerge qui (409) e non al commit
         Ticket saved = ticketRepository.saveAndFlush(ticket);
         historyRepository.save(new TicketStatusHistory(saved, from, transition.to(), blankToNull(note)));
+        auditService.record(AuditEntityType.TICKET, saved.getId(), transition.name(),
+                AuditChanges.of().value("status", from.name(), transition.to().name()), note);
         return saved;
+    }
+
+    private static String external(AbstractTsidEntity entity) {
+        return entity == null ? null : TsidMapper.toExternal(entity.getId());
     }
 
     private static void requireRole(TicketTransition transition) {

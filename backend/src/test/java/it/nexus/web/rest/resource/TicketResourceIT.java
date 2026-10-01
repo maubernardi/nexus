@@ -30,10 +30,12 @@ import it.nexus.domain.Project;
 import it.nexus.domain.TestEntities;
 import it.nexus.domain.UserProject;
 import it.nexus.domain.Zone;
+import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.Role;
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.AppUserRepository;
+import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.ProjectRepository;
@@ -62,6 +64,7 @@ class TicketResourceIT {
     @Autowired TicketRepository tickets;
     @Autowired TicketStatusHistoryRepository history;
     @Autowired EntityManager em;
+    @Autowired AuditEventRepository audit;
 
     private String beneficiaryId;
     private String secondBeneficiaryId;
@@ -242,5 +245,31 @@ class TicketResourceIT {
         mockMvc.perform(get("/api/v1/me/projects").header(USER, "operatore.cc"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    void invio_registraNellAuditLeSceltePerAutore() throws Exception {
+        Long id = TsidMapper.toInternal(JsonPath.read(submit("tutor1", beneficiaryId, projectId, categoryId)
+                .andReturn().getResponse().getContentAsString(), "$.id"));
+
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.TICKET, id))
+                .singleElement()
+                .satisfies(event -> {
+                    assertThat(event.getAction()).isEqualTo("SUBMIT");
+                    assertThat(event.getCreatedBy()).isEqualTo("tutor1");
+                    assertThat(event.getChanges())
+                            .containsKeys("status", "beneficiaryId", "projectId", "requestedJobCategoryId", "type");
+                    @SuppressWarnings("unchecked")
+                    java.util.Map<String, Object> statusChange = (java.util.Map<String, Object>) event.getChanges().get("status");
+                    assertThat(statusChange).containsEntry("before", null).containsEntry("after", "NUOVA");
+                    assertThat(event.getChanges().get("beneficiaryId").toString()).contains(beneficiaryId);
+                });
+    }
+
+    @Test
+    void invioRifiutato_nessunEventoDiAudit() throws Exception {
+        long before = audit.count();
+        submit("tutor1", beneficiaryId, unassignedProjectId, categoryId).andExpect(status().isBadRequest());
+        assertThat(audit.count()).isEqualTo(before);
     }
 }
