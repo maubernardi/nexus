@@ -3,7 +3,9 @@
 ## Purpose
 Definisce le entità del dominio NEXUS (progetti, utenti, beneficiari, segnalazioni, aziende, mansioni, bacheca), i loro
 identificativi e i vincoli di integrità che il sistema garantisce indipendentemente dalla logica applicativa.
+
 ## Requirements
+
 ### Requirement: Identificativi delle entità
 Ogni entità SHALL avere un identificativo tecnico TSID (intero a 64 bit ordinato nel tempo). Verso l'esterno
 l'identificativo MUST essere rappresentato come stringa di 13 caratteri, mai come numero. Ticket e BoardPost SHALL
@@ -130,3 +132,14 @@ beneficiari, mansioni e segnalazioni.
 - **WHEN** si crea una zona con un codice già esistente
 - **THEN** l'operazione viene rifiutata
 
+### Requirement: Vincolo sulla segnalazione aperta
+Il database SHALL garantire con l'indice unico parziale `uq_ticket_open_per_beneficiary` che ogni beneficiario abbia al
+più un ticket in stato diverso da `FORM_RESTITUZIONE`.
+
+#### Scenario: Secondo ticket aperto
+- **WHEN** si inserisce un secondo ticket non concluso per lo stesso beneficiario
+- **THEN** l'inserimento fallisce violando `uq_ticket_open_per_beneficiary`
+
+#### Scenario: Ticket concluso
+- **WHEN** il beneficiario ha solo ticket in `FORM_RESTITUZIONE`
+- **THEN** l'inserimento di un nuovo ticket riesce
