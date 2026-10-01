@@ -3,13 +3,13 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 57 elementi, 208 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md).
+**Totale: 59 elementi, 216 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md).
 
 ## Epiche
 
 | Epica | Titolo | Obiettivo | Storie | Punti |
 |---|---|---|---|---|
-| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti e cataloghi senza passare dalla console di Keycloak. | 6 | 21 |
+| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, servizi e cataloghi senza passare dalla console di Keycloak. | 7 | 24 |
 | E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 5 | 18 |
 | E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 7 | 27 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 4 | 15 |
@@ -21,14 +21,14 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione e Progetto Formativo in Word. | 5 | 19 |
 | E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 2 | 7 |
 | E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 2 | 10 |
-| E13 | Trasversali e produzione | Qualità, sicurezza, GDPR e passaggio dalla demo alla produzione. | 8 | 34 |
+| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 9 | 39 |
 
 ## Release
 
 | Release | Obiettivo | Storie | Punti |
 |---|---|---|---|
-| R1 | Flusso base: dalla segnalazione alla proposta | 17 | 57 |
-| R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 18 | 60 |
+| R1 | Flusso base: dalla segnalazione alla proposta | 18 | 62 |
+| R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 19 | 63 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 10 | 38 |
 | R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 12 | 53 |
 
@@ -38,30 +38,33 @@ Bloccano la *Definition of Ready* delle storie indicate.
 
 | # | Domanda | Storie | Risposta |
 |---|---|---|---|
-| Q1 | Rifiuto della segnalazione speciale: il tipo diventa NORMAL o resta SPECIAL senza fast-track? | US-404 | — |
-| Q2 | Scadenza del timer: il ticket torna in IN_LAVORAZIONE o in RIAPERTO? | US-705 | — |
-| Q3 | Il Tutor può rifiutare una proposta? Con quali effetti (es. azienda esclusa automaticamente)? | US-702 | — |
-| Q4 | Festività da escludere: solo nazionali o anche il patrono locale? Chiusure della cooperativa? | US-703 | — |
+| Q1 | Rifiuto della segnalazione speciale: il tipo diventa NORMAL o resta SPECIAL senza fast-track? | US-404 | Resta **SPECIAL senza fast-track** (traccia dell'origine dalla bacheca) (PO, 01/10). |
+| Q2 | Scadenza del timer: il ticket torna in IN_LAVORAZIONE o in RIAPERTO? | US-705 | **RIAPERTO** (PO, 01/10). |
+| Q3 | Il Tutor può rifiutare una proposta? Con quali effetti (es. azienda esclusa automaticamente)? | US-702 | **Sì, con motivo obbligatorio**: ticket al Call Center (RIAPERTO), mansione LIBERA, azienda esclusa per quel ticket (PO, 01/10). |
+| Q4 | Festività da escludere: solo nazionali o anche il patrono locale? Chiusure della cooperativa? | US-703, US-107 | Festività nazionali + **patrono configurabile per servizio** (24 giugno per l'attuale) + chiusure; vale il calendario del servizio dell'operatore (PO, 01/10). |
 | Q5 | Campi della scheda amministrativa e template Word reali di Convenzione e Progetto Formativo. | US-1001..1005 | — |
 | Q6 | Voci esatte dei gradimenti 1–5 del report di restituzione. | US-1101 | — |
 | Q7 | Durata di conservazione dei dati dei beneficiari (decisione della cooperativa/DPO). | US-1303 | — |
-| Q8 | Chi approva la mansione a testo libero (ADMIN?) e se, approvata, entra nel catalogo. | US-302 | — |
-| Q9 | Canali delle notifiche per evento (solo app, app + email) e destinatari. | US-1201, US-1202 | — |
+| Q8 | Chi approva la mansione a testo libero (ADMIN?) e se, approvata, entra nel catalogo. | US-302 | **ADMIN**; non entra da sola nel catalogo, l'ADMIN può aggiungerla con un clic; se respinta il Tutor vede il motivo (PO, 01/10). |
+| Q9 | Canali delle notifiche per evento (solo app, app + email) e destinatari. | US-1201, US-1202 | **In app e via email**, alla controparte del passaggio (Tutor ↔ operatore, già definiti per ogni fase) (PO, 01/10). |
 | Q10 | Elenco reale di zone e tipologie di mansione. | US-106 | — |
 | Q11 | Cosa vedono gli altri tutor dello stesso progetto del beneficiario (oltre al divieto su nome e cognome). | US-204 | — |
 | Q12 | Un beneficiario può avere più segnalazioni aperte insieme (es. su progetti o mansioni diverse)? | US-301 | **No**: una sola segnalazione aperta alla volta (PO, 01/10). Aperta = qualunque stato tranne FORM_RESTITUZIONE. |
+| Q13 | Che cos'è un **servizio** (sede/ufficio territoriale?): chi vi appartiene (operatori, tutor, progetti?) e quale calendario vale per il timer di un ticket. | US-107, US-703 | — |
 
 ## Elenco delle storie
 
 | ID | Epica | Storia | Priorità | Punti | Release | Stato |
 |---|---|---|---|---|---|---|
 | [EN-1](#en-1) | E3 | Motore delle transizioni del ticket | Must | 5 | R1 | 🎉 Done (Sprint 1) |
+| [EN-2](#en-2) | E13 | Audit di ogni cambio di stato e scelta | Must | 5 | R1 | 📋 Backlog |
 | [US-101](#us-101) | E1 | Messaggio "utente non abilitato" | Should | 1 | R1 | 🎉 Done (Sprint 1) |
 | [US-102](#us-102) | E1 | Gestione progetti | Must | 3 | R4 | 📋 Backlog |
 | [US-103](#us-103) | E1 | Creazione utente | Must | 8 | R4 | 📋 Backlog |
 | [US-104](#us-104) | E1 | Assegnazione utenti ai progetti | Must | 3 | R4 | 📋 Backlog |
 | [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | 📋 Backlog |
 | [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Should | 3 | R4 | 📋 Backlog |
+| [US-107](#us-107) | E1 | Servizi e calendario del servizio | Must | 3 | R2 | 📋 Backlog |
 | [US-201](#us-201) | E2 | Inserimento beneficiario | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | 📋 Backlog |
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 📋 Backlog |
@@ -103,7 +106,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1101](#us-1101) | E11 | Report di restituzione | Must | 5 | R3 | 📋 Backlog |
 | [US-1102](#us-1102) | E11 | Esito sulla mansione e audit trail | Must | 2 | R3 | 📋 Backlog |
 | [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | 📋 Backlog |
-| [US-1202](#us-1202) | E12 | Email transazionali | Should | 5 | R3 | 📋 Backlog |
+| [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 📋 Backlog |
 | [US-1301](#us-1301) | E13 | Verifica della PWA online | Must | 1 | R1 | 📋 Backlog |
 | [US-1302](#us-1302) | E13 | Backup del database | Must | 5 | R4 | 📋 Backlog |
 | [US-1303](#us-1303) | E13 | Anonimizzazione a scadenza | Must | 5 | R4 | 📋 Backlog |
@@ -175,6 +178,17 @@ Criteri di accettazione:
 
 Domande aperte: Q10
 
+
+#### US-107
+**Servizi e calendario del servizio** · Must · 3 punti · R2 · 📋 Backlog
+
+Come **ADMIN** voglio gestire i servizi della cooperativa con il loro calendario (patrono, chiusure) per calcolare le scadenze secondo i giorni lavorativi di chi segue il ticket.
+
+Criteri di accettazione:
+- Ogni servizio ha il proprio patrono (per l'attuale il 24 giugno) e le proprie chiusure, modificabili dall'ADMIN e registrate nell'audit.
+- Ogni operatore appartiene a un servizio; il timer usa il calendario del servizio dell'operatore.
+
+Domande aperte: Q13
 ### E2 — Anagrafica beneficiari
 
 _Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR._
@@ -258,9 +272,8 @@ Come **Tutor / ADMIN** voglio indicare una mansione non presente nel catalogo, c
 
 Criteri di accettazione:
 - Con mansione a testo libero il ticket nasce in IN_ATTESA_APPROVAZIONE_ADMIN.
-- Se l'ADMIN approva, il ticket passa in NUOVA (ed entra in coda); se respinge, il tutor vede la motivazione.
-
-Domande aperte: Q8
+- Approva l'ADMIN: il ticket passa in NUOVA (ed entra in coda); se respinge, il Tutor vede la motivazione.
+- La mansione approvata non entra da sola nel catalogo: l'ADMIN può aggiungerla con un clic.
 
 #### US-303
 **I miei ticket** · Must · 3 punti · R1 · 📋 Backlog
@@ -336,9 +349,8 @@ Dipendenze: US-306
 Come **operatore Call Center** voglio rifiutare una segnalazione speciale per declassarla a lavorazione normale.
 
 Criteri di accettazione:
-- Al rifiuto: fast-track disattivato, ticket in IN_LAVORAZIONE normale, post ancora PUBLISHED.
-
-Domande aperte: Q1
+- Al rifiuto: fast-track disattivato, il tipo resta SPECIAL (traccia dell'origine), ticket in IN_LAVORAZIONE, post ancora PUBLISHED.
+- Il rifiuto richiede un motivo ed è registrato nell'audit (EN-2).
 
 ### E5 — Aziende e mansioni
 
@@ -421,9 +433,8 @@ Dipendenze: US-703
 Come **Tutor** voglio rifiutare la proposta con motivo per tornare alla ricerca di un'altra mansione.
 
 Criteri di accettazione:
-- La mansione torna LIBERA e il ticket torna in lavorazione.
-
-Domande aperte: Q3
+- Il motivo è obbligatorio; la mansione torna LIBERA, il ticket torna al Call Center in RIAPERTO e l'azienda è esclusa per quel ticket.
+- L'operatore riceve la notifica (in app e via email).
 
 #### US-703
 **Calendario dei giorni lavorativi** · Must · 3 punti · R2 · 📋 Backlog
@@ -431,9 +442,9 @@ Domande aperte: Q3
 Come **team di sviluppo** voglio calcolare le scadenze escludendo sabati, domeniche e festività per avere timer corretti.
 
 Criteri di accettazione:
-- La scadenza di 7 giorni lavorativi salta weekend e festività nazionali (es. 25 aprile, Pasquetta).
+- La scadenza di 7 giorni lavorativi salta weekend, festività nazionali (es. 25 aprile, Pasquetta), il patrono e le chiusure del servizio dell'operatore (US-107).
 
-Domande aperte: Q4
+Dipendenze: US-107 · Domande aperte: Q13
 
 #### US-704
 **Promemoria al 4° giorno** · Must · 3 punti · R2 · 📋 Backlog
@@ -451,9 +462,7 @@ Dipendenze: US-1201
 Come **Call Center** voglio che allo scadere del 7° giorno lavorativo la mansione torni libera per non tenere bloccate posizioni inattive.
 
 Criteri di accettazione:
-- Allo scadere: mansione LIBERA, ticket rimesso in lavorazione, evento nello storico.
-
-Domande aperte: Q2
+- Allo scadere: mansione LIBERA, ticket in RIAPERTO, evento nello storico e nell'audit; notifica al Tutor e all'operatore.
 
 ### E8 — Appuntamento e rilancio (fase 6)
 
@@ -610,22 +619,31 @@ Come **Tutor / Call Center** voglio vedere le notifiche che mi riguardano (prome
 
 Criteri di accettazione:
 - Contatore di non lette nell'intestazione, annunciato agli screen reader; segna come letta.
-
-Domande aperte: Q9
+- Ogni evento è notificato alla controparte del passaggio (Tutor ↔ operatore).
 
 #### US-1202
-**Email transazionali** · Should · 5 punti · R3 · 📋 Backlog
+**Email transazionali** · Must · 5 punti · R3 · 📋 Backlog
 
 Come **Tutor / Call Center** voglio ricevere per email le notifiche importanti per essere avvisato anche fuori dall'app.
 
 Criteri di accettazione:
+- Ogni notifica in app arriva anche via email alla stessa controparte.
 - Invio tramite SMTP IONOS da un indirizzo del dominio; nessun dato personale sensibile nel testo dell'email.
-
-Domande aperte: Q9
 
 ### E13 — Trasversali e produzione
 
 _Qualità, sicurezza, GDPR e passaggio dalla demo alla produzione._
+
+#### EN-2
+**Audit di ogni cambio di stato e scelta** · Must · 5 punti · R1 · 📋 Backlog
+
+Come **PO / ADMIN** voglio che ogni cambio di stato e ogni scelta (presa in carico, abbinamento, approvazioni, rifiuti e
+motivi, configurazioni) sia registrato in modo immodificabile per poter ricostruire chi ha fatto cosa e quando.
+
+Criteri di accettazione:
+- Per ogni evento: autore, istante, entità, azione, valori prima/dopo e motivo; il registro accetta solo aggiunte.
+- Le storie che cambiano stati o registrano scelte scrivono nell'audit (regola della Definition of Done).
+- L'ADMIN consulta l'audit filtrando per entità, autore e periodo.
 
 #### US-1301
 **Verifica della PWA online** · Must · 1 punti · R1 · 📋 Backlog

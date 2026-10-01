@@ -57,7 +57,8 @@ Una storia è *Done* quando:
 3. le nuove schermate passano un audit **WCAG 2.2 AA** in browser reale (axe con contrasto, tema chiaro e scuro, mobile);
 4. la CI è verde e la PR è **unita dal PO** (regole Git inviolabili: nessun merge né push su `main` da parte del team);
 5. la demo è **deployata e verificata online**;
-6. backlog, README e `CLAUDE.md` sono aggiornati se serve.
+6. ogni cambio di stato e ogni scelta introdotti dalla storia sono registrati nell'audit (EN-2, decisione del PO del 01/10);
+7. backlog, README e `CLAUDE.md` sono aggiornati se serve.
 
 ## Metriche
 
