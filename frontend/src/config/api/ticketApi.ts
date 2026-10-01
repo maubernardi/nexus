@@ -28,3 +28,12 @@ export const submitTicket = async (payload: TicketCreate): Promise<Ticket> => {
   const { data } = await axiosInstance.post<Ticket>(ENDPOINTS.tickets, payload);
   return data;
 };
+
+export type QueueItem = Ticket & { tutorName: string };
+
+export type QueueFilters = { projectId?: string; zoneId?: string };
+
+export const fetchQueue = async (filters: QueueFilters): Promise<QueueItem[]> => {
+  const { data } = await axiosInstance.get<QueueItem[]>(ENDPOINTS.ticketQueue, { params: filters });
+  return data;
+};

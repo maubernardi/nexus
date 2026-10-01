@@ -1,6 +1,9 @@
 package it.nexus.services.impl;
 
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,8 +14,10 @@ import it.nexus.domain.JobCategory;
 import it.nexus.domain.Project;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.UserProject;
+import it.nexus.domain.dto.QueueItemDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
+import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.domain.enumeration.TicketType;
 import it.nexus.domain.workflow.TicketTransitions;
 import it.nexus.mapper.TicketMapper;
@@ -20,10 +25,12 @@ import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.CandidateRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.ProjectRepository;
+import it.nexus.repository.TicketRepository;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.TicketService;
 import it.nexus.services.TicketStateMachine;
+import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.FieldValidationException;
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +39,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TicketServiceImpl implements TicketService {
 
+    /** Stati da lavorare: nuove segnalazioni e speciali non ancora prese in carico. */
+    private static final Set<TicketStatus> QUEUE_STATUSES = EnumSet.of(TicketStatus.NUOVA, TicketStatus.IN_LAVORAZIONE);
+
+    private final TicketRepository ticketRepository;
     private final CandidateRepository candidateRepository;
     private final ProjectRepository projectRepository;
     private final UserProjectRepository userProjectRepository;
@@ -50,6 +61,26 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = new Ticket(me, project, candidate, TicketType.NORMAL);
         ticket.setRequestedJobCategory(category);
         return mapper.toDto(stateMachine.create(ticket, TicketTransitions.SUBMIT, null));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<QueueItemDTO> queue(String projectId, String zoneId) {
+        return ticketRepository.findQueue(QUEUE_STATUSES, filterId(projectId, "progetto"), filterId(zoneId, "zona"))
+                .stream()
+                .map(mapper::toQueueItem)
+                .toList();
+    }
+
+    private static Long filterId(String externalId, String what) {
+        if (externalId == null || externalId.isBlank()) {
+            return null;
+        }
+        Long id = TsidMapper.toInternal(externalId);
+        if (id == null) {
+            throw new BadRequestException("Filtro %s non valido", what);
+        }
+        return id;
     }
 
     // inesistente e altrui danno lo stesso errore: non si rivela l'esistenza dei candidati degli altri tutor

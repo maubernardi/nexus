@@ -8,6 +8,12 @@ export const fetchZones = async (): Promise<ReferenceItem[]> => {
   return data;
 };
 
+/** Tutti i progetti attivi (filtri del Call Center e dell'ADMIN). */
+export const fetchProjects = async (): Promise<ReferenceItem[]> => {
+  const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.projects);
+  return data;
+};
+
 /** Progetti attivi a cui è assegnato l'utente corrente. */
 export const fetchMyProjects = async (): Promise<ReferenceItem[]> => {
   const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.myProjects);

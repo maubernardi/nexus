@@ -3,6 +3,7 @@ import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import {
   fetchJobCategories,
   fetchMyProjects,
+  fetchProjects,
   fetchZones,
   type ReferenceItem,
 } from '@/config/api/referenceApi';
@@ -15,6 +16,9 @@ export const useZones = (): UseQueryResult<ReferenceItem[]> =>
 
 export const useJobCategories = (): UseQueryResult<ReferenceItem[]> =>
   useQuery({ queryKey: ['reference', 'jobCategories'], queryFn: fetchJobCategories, staleTime: STALE });
+
+export const useProjects = (): UseQueryResult<ReferenceItem[]> =>
+  useQuery({ queryKey: ['reference', 'projects'], queryFn: fetchProjects, staleTime: STALE });
 
 // le assegnazioni ai progetti le cambia l'ADMIN: niente cache lunga
 export const useMyProjects = (): UseQueryResult<ReferenceItem[]> =>

@@ -10,6 +10,8 @@ public interface ReferenceDataService {
 
     List<ReferenceItemDTO> activeJobCategories();
 
+    List<ReferenceItemDTO> activeProjects();
+
     /** Progetti attivi a cui è assegnato l'utente corrente. */
     List<ReferenceItemDTO> myActiveProjects();
 }
