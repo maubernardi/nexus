@@ -82,10 +82,10 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | 📋 Backlog |
 | [US-404](#us-404) | E4 | Rifiuto fast-track | Must | 3 | R2 | 📋 Backlog |
 | [US-501](#us-501) | E5 | Anagrafica aziende | Must | 3 | R1 | 🎉 Done (Sprint 2) |
-| [US-502](#us-502) | E5 | Mansioni dell'azienda | Must | 3 | R1 | 👀 In review (Sprint 2) |
+| [US-502](#us-502) | E5 | Mansioni dell'azienda | Must | 3 | R1 | 🎉 Done (Sprint 2) |
 | [US-503](#us-503) | E5 | Audit trail dell'azienda | Should | 2 | R3 | 📋 Backlog |
-| [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | ✅ Ready (Sprint 2) |
-| [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | ✅ Ready (Sprint 2) |
+| [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 👀 In review (Sprint 2) |
+| [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 👀 In review (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 📋 Backlog |
 | [US-701](#us-701) | E7 | Accettazione della proposta | Must | 3 | R2 | 📋 Backlog |
 | [US-702](#us-702) | E7 | Rifiuto della proposta | Should | 3 | R2 | 📋 Backlog |
@@ -370,7 +370,7 @@ Criteri di accettazione:
 - La P.IVA è validata (11 cifre) e univoca; un'azienda con storico si disattiva, non si cancella.
 
 #### US-502
-**Mansioni dell'azienda** · Must · 3 punti · R1 · 👀 In review (Sprint 2)
+**Mansioni dell'azienda** · Must · 3 punti · R1 · 🎉 Done (Sprint 2)
 
 Come **operatore Call Center** voglio gestire le mansioni di un'azienda (titolo, descrizione, tipologia, zona) per sapere quali posizioni sono disponibili.
 
@@ -390,7 +390,7 @@ Criteri di accettazione:
 _Il Call Center abbina il beneficiario a una mansione libera e la blocca._
 
 #### US-601
-**Ricerca mansioni compatibili** · Must · 5 punti · R1 · ✅ Ready (Sprint 2)
+**Ricerca mansioni compatibili** · Must · 5 punti · R1 · 👀 In review (Sprint 2)
 
 Come **operatore Call Center** voglio trovare le mansioni libere compatibili con il beneficiario (zona, tipologia) escludendo le aziende in blacklist per abbinare velocemente.
 
@@ -400,7 +400,7 @@ Criteri di accettazione:
 Dipendenze: US-502
 
 #### US-602
-**Abbinamento e proposta** · Must · 5 punti · R1 · ✅ Ready (Sprint 2)
+**Abbinamento e proposta** · Must · 5 punti · R1 · 👀 In review (Sprint 2)
 
 Come **operatore Call Center** voglio assegnare una mansione al ticket per proporre il beneficiario all'azienda.
 

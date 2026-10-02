@@ -138,9 +138,9 @@ describe('<QueuePage>', () => {
     expect(takeCharge).toHaveBeenCalledWith({ id: 'T3', version: 0 }, expect.anything());
     const message = await screen.findByText('Segnalazione n. 3 presa in carico.');
     await waitFor(() => expect(message.parentElement).toHaveFocus());
-    expect(screen.getByRole('link', { name: 'Vai alle mie lavorazioni' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Lavora la segnalazione n. 3' })).toHaveAttribute(
       'href',
-      '/lavorazioni',
+      '/lavorazioni/T3',
     );
     await expectNoAxeViolations();
   });

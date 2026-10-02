@@ -10,13 +10,19 @@ import {
 import { MY_BENEFICIARIES_KEY } from '@/config/hooks/useBeneficiaries';
 import {
   fetchAssignedToMe,
+  fetchCompatibleJobSlots,
   fetchQueue,
+  fetchTicketWork,
+  matchTicket,
   submitTicket,
   takeCharge,
+  type CompatibleFilters,
+  type JobSlotMatch,
   type QueueFilters,
   type QueueItem,
   type Ticket,
   type TicketCreate,
+  type TicketDetail,
 } from '@/config/api/ticketApi';
 
 export const TICKETS_KEY = ['tickets'] as const;
@@ -60,3 +66,31 @@ export const useAssignedToMe = (): UseQueryResult<QueueItem[]> =>
     queryFn: fetchAssignedToMe,
     refetchOnWindowFocus: true,
   });
+
+export const useTicketWork = (id: string): UseQueryResult<TicketDetail> =>
+  useQuery({ queryKey: [...TICKETS_KEY, 'work', id], queryFn: () => fetchTicketWork(id) });
+
+export const useCompatibleJobSlots = (
+  id: string,
+  filters: CompatibleFilters,
+  enabled: boolean,
+): UseQueryResult<JobSlotMatch[]> =>
+  useQuery({
+    queryKey: [...TICKETS_KEY, 'compatible', id, filters],
+    queryFn: () => fetchCompatibleJobSlots(id, filters),
+    enabled,
+    placeholderData: keepPreviousData,
+  });
+
+/** Abbinamento: in ogni caso (riuscita o conflitto) segnalazione, compatibili e liste vanno riallineate. */
+export const useMatchTicket = (): UseMutationResult<
+  TicketDetail,
+  unknown,
+  { id: string; jobSlotId: string; ticketVersion: number; jobSlotVersion: number }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: matchTicket,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+  });
+};

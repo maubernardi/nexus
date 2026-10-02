@@ -7,6 +7,7 @@ export type RouteHandle = {
     | 'pages.ticketNew.title'
     | 'pages.queue.title'
     | 'pages.myWork.title'
+    | 'pages.ticketWork.title'
     | 'pages.companies.title'
     | 'pages.companyNew.title'
     | 'pages.companyEdit.title'

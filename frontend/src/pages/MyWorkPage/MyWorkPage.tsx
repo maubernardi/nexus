@@ -37,7 +37,11 @@ export const MyWorkPage = () => {
           </Button>
         </div>
       ) : (
-        <QueueTable items={mine.data} caption={t('queue.myWorkCaption')} />
+        <QueueTable
+          items={mine.data}
+          caption={t('queue.myWorkCaption')}
+          rowLink={(item) => `/lavorazioni/${item.id}`}
+        />
       )}
     </div>
   );

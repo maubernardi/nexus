@@ -49,6 +49,10 @@ describe('<MyWorkPage>', () => {
 
     const table = await screen.findByRole('table', { name: /assegnate a te/ });
     expect(within(table).getByText('Bianchi Anna')).toBeInTheDocument();
+    expect(within(table).getByRole('link', { name: 'Apri la segnalazione n. 5' })).toHaveAttribute(
+      'href',
+      '/lavorazioni/T5',
+    );
     expect(within(table).getByText('In lavorazione')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Prendi in carico/ })).not.toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveTextContent('1 segnalazione in carico');

@@ -2,6 +2,7 @@ package it.nexus.domain.workflow;
 
 import static it.nexus.domain.enumeration.TicketStatus.IN_LAVORAZIONE;
 import static it.nexus.domain.enumeration.TicketStatus.NUOVA;
+import static it.nexus.domain.enumeration.TicketStatus.PROPOSTA_AZIENDA;
 
 import java.util.Set;
 
@@ -22,6 +23,10 @@ public final class TicketTransitions {
      */
     public static final TicketTransition TAKE_CHARGE = new TicketTransition("TAKE_CHARGE", Set.of(NUOVA, IN_LAVORAZIONE),
             IN_LAVORAZIONE, Set.of(Role.CALL_CENTER, Role.ADMIN));
+
+    /** Fase 4 — abbinamento a una mansione libera e proposta all'azienda (US-602). */
+    public static final TicketTransition MATCH = new TicketTransition("MATCH", Set.of(IN_LAVORAZIONE), PROPOSTA_AZIENDA,
+            Set.of(Role.CALL_CENTER, Role.ADMIN));
 
     private TicketTransitions() {
     }
