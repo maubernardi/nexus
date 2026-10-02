@@ -11,11 +11,11 @@
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| EN-2 | Audit di ogni cambio di stato e scelta | 5 | 👀 Unita, da deployare | `add-audit-log` | [#21](https://github.com/maubernardi/nexus/pull/21) |
-| EN-3 | Zone iniziali: Firenze e hinterland | 2 | 👀 In review | `add-florence-zones` | [#22](https://github.com/maubernardi/nexus/pull/22) |
-| US-402 | Presa in carico | 2 | ✅ Ready | `add-ticket-take-charge` | — |
-| US-501 | Anagrafica aziende | 3 | ✅ Ready | `add-company-registry` | — |
-| US-502 | Mansioni dell'azienda | 3 | ✅ Ready | `add-company-job-slots` | — |
+| EN-2 | Audit di ogni cambio di stato e scelta | 5 | 🎉 Done | `add-audit-log` | [#21](https://github.com/maubernardi/nexus/pull/21) |
+| EN-3 | Zone iniziali: Firenze e hinterland | 2 | 🎉 Done | `add-florence-zones` | [#22](https://github.com/maubernardi/nexus/pull/22) |
+| US-402 | Presa in carico | 2 | 🎉 Done | `add-ticket-take-charge` | [#23](https://github.com/maubernardi/nexus/pull/23) |
+| US-501 | Anagrafica aziende | 3 | 🎉 Done | `add-company-registry` | [#24](https://github.com/maubernardi/nexus/pull/24) |
+| US-502 | Mansioni dell'azienda | 3 | 👀 In review | `add-company-job-slots` | [#25](https://github.com/maubernardi/nexus/pull/25) |
 | US-601 | Ricerca mansioni compatibili | 5 | ✅ Ready | `add-job-matching` | — |
 | US-602 | Abbinamento e proposta | 5 | ✅ Ready | `add-job-matching` | — |
 
@@ -35,7 +35,7 @@
 | Momento | Punti residui |
 |---|---|
 | Inizio (02/10) | 25 |
-| Metà sprint | — |
+| 02/10 (deploy di #21–#24) | 13 |
 | Fine sprint | — |
 
 ## Sprint Review

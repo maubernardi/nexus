@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import it.nexus.domain.dto.QueueItemDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
-import it.nexus.domain.dto.TicketVersionDTO;
+import it.nexus.domain.dto.VersionDTO;
 import it.nexus.services.TicketService;
 import it.nexus.web.rest.PathAPI;
 import jakarta.validation.Valid;
@@ -43,7 +43,7 @@ public class TicketResource {
     @PostMapping("/{id}/take-charge")
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
     @Operation(summary = "Prende in carico una segnalazione dalla coda (409 se già presa o modificata)")
-    public ResponseEntity<QueueItemDTO> takeCharge(@PathVariable String id, @RequestBody @Valid TicketVersionDTO body) {
+    public ResponseEntity<QueueItemDTO> takeCharge(@PathVariable String id, @RequestBody @Valid VersionDTO body) {
         return ResponseEntity.ok(ticketService.takeCharge(id, body.version()));
     }
 

@@ -87,6 +87,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/tests/setup.ts',
     css: false,
+    // i controlli axe sui moduli grandi, con più file in parallelo, superano i 5 s predefiniti
+    testTimeout: 15_000,
     alias: {
       'virtual:pwa-register/react': fileURLToPath(
         new URL('./src/tests/mocks/pwaRegister.ts', import.meta.url),

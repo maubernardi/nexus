@@ -8,6 +8,18 @@ import { CompanyEditPage } from '@/pages/CompanyEditPage/CompanyEditPage';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderRoutes } from '@/tests/renderWithProviders';
 
+vi.mock('@/config/api/jobSlotApi', () => ({
+  fetchJobSlots: vi.fn().mockResolvedValue([]),
+  createJobSlot: vi.fn(),
+  updateJobSlot: vi.fn(),
+  setJobSlotActive: vi.fn(),
+}));
+vi.mock('@/config/api/referenceApi', () => ({
+  fetchZones: vi.fn().mockResolvedValue([]),
+  fetchJobCategories: vi.fn().mockResolvedValue([]),
+  fetchMyProjects: vi.fn(),
+  fetchProjects: vi.fn(),
+}));
 vi.mock('@/config/api/companyApi', () => ({
   searchCompanies: vi.fn(),
   fetchCompany: vi.fn(),
