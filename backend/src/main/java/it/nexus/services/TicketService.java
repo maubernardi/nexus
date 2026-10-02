@@ -2,9 +2,12 @@ package it.nexus.services;
 
 import java.util.List;
 
+import it.nexus.domain.dto.JobSlotMatchDTO;
+import it.nexus.domain.dto.MatchRequestDTO;
 import it.nexus.domain.dto.QueueItemDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
+import it.nexus.domain.dto.TicketDetailDTO;
 
 public interface TicketService {
 
@@ -19,4 +22,17 @@ public interface TicketService {
 
     /** Segnalazioni aperte assegnate all'operatore corrente. */
     List<QueueItemDTO> assignedToMe();
+
+    /** Dettaglio per la lavorazione del Call Center (US-601/602). */
+    TicketDetailDTO getForWork(String ticketId);
+
+    /** Mansioni proponibili per la segnalazione; filtri facoltativi (id esterni, null = tutte). */
+    List<JobSlotMatchDTO> compatibleJobSlots(String ticketId, String zoneId, String jobCategoryId);
+
+    /**
+     * Abbina la mansione e propone il beneficiario all'azienda: ticket in PROPOSTA_AZIENDA, mansione BLOCCATA.
+     *
+     * @throws it.nexus.web.errors.ConflictException se ticket o mansione sono cambiati o la mansione non è più proponibile
+     */
+    TicketDetailDTO match(String ticketId, MatchRequestDTO request);
 }

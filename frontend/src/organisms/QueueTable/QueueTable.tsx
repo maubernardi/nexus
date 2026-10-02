@@ -1,5 +1,6 @@
 import { Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
 
 import { Button } from '@/components/ui/button';
 import type { QueueItem } from '@/config/api/ticketApi';
@@ -14,13 +15,15 @@ type QueueTableProps = {
   onTakeCharge?: (item: QueueItem) => void;
   /** Riga la cui presa in carico è in corso (pulsante disabilitato). */
   pendingId?: string | null;
+  /** Se presente, il numero della segnalazione è un link alla sua lavorazione. */
+  rowLink?: (item: QueueItem) => string;
 };
 
 /**
  * Tabella dati della coda (US-401). Scorre orizzontalmente dentro il proprio contenitore, focalizzabile da tastiera,
  * così la pagina non scorre mai di lato (WCAG 1.4.10 ammette lo scorrimento bidimensionale per le tabelle dati).
  */
-export const QueueTable = ({ items, caption, onTakeCharge, pendingId = null }: QueueTableProps) => {
+export const QueueTable = ({ items, caption, onTakeCharge, pendingId = null, rowLink }: QueueTableProps) => {
   const { t } = useTranslation();
   const th = 'px-3 py-2 text-left text-sm font-semibold whitespace-nowrap';
   const td = 'px-3 py-2 align-top';
@@ -80,7 +83,14 @@ export const QueueTable = ({ items, caption, onTakeCharge, pendingId = null }: Q
           {items.map((item) => (
             <tr key={item.id} className="border-b border-border last:border-b-0">
               <th scope="row" className={`${td} text-left font-semibold tabular-nums`}>
-                {item.number}
+                {rowLink ? (
+                  <Link to={rowLink(item)} className="text-primary underline underline-offset-4">
+                    {/* nome accessibile "Apri la segnalazione n. 12" */}
+                    <span className="sr-only">{t('queue.openTicket')}</span> {item.number}
+                  </Link>
+                ) : (
+                  item.number
+                )}
               </th>
               <td className={td}>
                 {item.fastTrack ? (

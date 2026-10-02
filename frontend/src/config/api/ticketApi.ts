@@ -47,3 +47,72 @@ export const fetchAssignedToMe = async (): Promise<QueueItem[]> => {
   const { data } = await axiosInstance.get<QueueItem[]>(ENDPOINTS.ticketsAssignedToMe);
   return data;
 };
+
+export type JobSlotMatch = {
+  id: string;
+  title: string;
+  description: string | null;
+  companyId: string;
+  companyName: string;
+  jobCategory: ReferenceItem;
+  zone: ReferenceItem;
+  version: number;
+};
+
+export type TicketDetail = {
+  id: string;
+  number: number;
+  type: TicketType;
+  status: TicketStatus;
+  fastTrack: boolean;
+  version: number;
+  beneficiary: BeneficiarySummary;
+  beneficiaryZone: ReferenceItem;
+  project: ReferenceItem;
+  requestedJobCategory: ReferenceItem | null;
+  requestedJobFreeText: string | null;
+  tutorName: string;
+  assignedOperatorName: string | null;
+  assignedToMe: boolean;
+  proposal: JobSlotMatch | null;
+  createdAt: string;
+};
+
+export type CompatibleFilters = { zoneId?: string; jobCategoryId?: string };
+
+export const fetchTicketWork = async (id: string): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.get<TicketDetail>(`${ENDPOINTS.tickets}/${id}/work`);
+  return data;
+};
+
+export const fetchCompatibleJobSlots = async (
+  id: string,
+  filters: CompatibleFilters,
+): Promise<JobSlotMatch[]> => {
+  const { data } = await axiosInstance.get<JobSlotMatch[]>(
+    `${ENDPOINTS.tickets}/${id}/compatible-job-slots`,
+    {
+      params: filters,
+    },
+  );
+  return data;
+};
+
+export const matchTicket = async ({
+  id,
+  jobSlotId,
+  ticketVersion,
+  jobSlotVersion,
+}: {
+  id: string;
+  jobSlotId: string;
+  ticketVersion: number;
+  jobSlotVersion: number;
+}): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/match`, {
+    jobSlotId,
+    ticketVersion,
+    jobSlotVersion,
+  });
+  return data;
+};

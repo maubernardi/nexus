@@ -15,9 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import it.nexus.domain.dto.JobSlotMatchDTO;
+import it.nexus.domain.dto.MatchRequestDTO;
 import it.nexus.domain.dto.QueueItemDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
+import it.nexus.domain.dto.TicketDetailDTO;
 import it.nexus.domain.dto.VersionDTO;
 import it.nexus.services.TicketService;
 import it.nexus.web.rest.PathAPI;
@@ -52,6 +55,28 @@ public class TicketResource {
     @Operation(summary = "Segnalazioni aperte assegnate all'operatore corrente")
     public ResponseEntity<List<QueueItemDTO>> assignedToMe() {
         return ResponseEntity.ok(ticketService.assignedToMe());
+    }
+
+    @GetMapping("/{id}/work")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Dettaglio della segnalazione per la lavorazione del Call Center")
+    public ResponseEntity<TicketDetailDTO> getForWork(@PathVariable String id) {
+        return ResponseEntity.ok(ticketService.getForWork(id));
+    }
+
+    @GetMapping("/{id}/compatible-job-slots")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Mansioni libere proponibili per la segnalazione, con filtri per zona e tipologia")
+    public ResponseEntity<List<JobSlotMatchDTO>> compatibleJobSlots(@PathVariable String id,
+            @RequestParam(required = false) String zoneId, @RequestParam(required = false) String jobCategoryId) {
+        return ResponseEntity.ok(ticketService.compatibleJobSlots(id, zoneId, jobCategoryId));
+    }
+
+    @PostMapping("/{id}/match")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Abbina una mansione e propone il beneficiario all'azienda (409 se la mansione non è più libera)")
+    public ResponseEntity<TicketDetailDTO> match(@PathVariable String id, @RequestBody @Valid MatchRequestDTO body) {
+        return ResponseEntity.ok(ticketService.match(id, body));
     }
 
     // nessun Location: il dettaglio del ticket arriva con US-305

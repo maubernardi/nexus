@@ -26,9 +26,11 @@ export const QueuePage = () => {
   const filtered = projectId !== '' || zoneId !== '';
   const takeCharge = useTakeCharge();
   // esito dell'ultima presa in carico: la riga sparisce dalla coda, quindi il focus va al messaggio
-  const [outcome, setOutcome] = useState<{ kind: 'taken' | 'conflict' | 'error'; number: number } | null>(
-    null,
-  );
+  const [outcome, setOutcome] = useState<{
+    kind: 'taken' | 'conflict' | 'error';
+    number: number;
+    id: string;
+  } | null>(null);
   const outcomeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -40,9 +42,13 @@ export const QueuePage = () => {
     takeCharge.mutate(
       { id: item.id, version: item.version },
       {
-        onSuccess: () => setOutcome({ kind: 'taken', number: item.number }),
+        onSuccess: () => setOutcome({ kind: 'taken', number: item.number, id: item.id }),
         onError: (error) =>
-          setOutcome({ kind: apiError(error)?.status === 409 ? 'conflict' : 'error', number: item.number }),
+          setOutcome({
+            kind: apiError(error)?.status === 409 ? 'conflict' : 'error',
+            number: item.number,
+            id: item.id,
+          }),
       },
     );
   };
@@ -124,8 +130,11 @@ export const QueuePage = () => {
           {outcome.kind === 'taken' ? (
             <>
               <p className="font-medium">{t('queue.takenTitle', { number: outcome.number })}</p>
-              <Link to="/lavorazioni" className="font-medium text-primary underline underline-offset-4">
-                {t('queue.takenLink')}
+              <Link
+                to={`/lavorazioni/${outcome.id}`}
+                className="font-medium text-primary underline underline-offset-4"
+              >
+                {t('queue.takenLink', { number: outcome.number })}
               </Link>
             </>
           ) : (

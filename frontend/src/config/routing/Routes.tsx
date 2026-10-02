@@ -11,6 +11,7 @@ import { CompaniesPage } from '@/pages/CompaniesPage/CompaniesPage';
 import { CompanyEditPage } from '@/pages/CompanyEditPage/CompanyEditPage';
 import { CompanyNewPage } from '@/pages/CompanyNewPage/CompanyNewPage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
+import { TicketWorkPage } from '@/pages/TicketWorkPage/TicketWorkPage';
 import { QueuePage } from '@/pages/QueuePage/QueuePage';
 import { TicketNewPage } from '@/pages/TicketNewPage/TicketNewPage';
 
@@ -60,6 +61,15 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.myWork.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'lavorazioni/:id',
+        element: (
+          <RoleRoute roles={['CALL_CENTER', 'ADMIN']}>
+            <TicketWorkPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.ticketWork.title' } satisfies RouteHandle,
       },
       {
         path: 'aziende',

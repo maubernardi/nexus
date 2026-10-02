@@ -15,9 +15,9 @@
 | EN-3 | Zone iniziali: Firenze e hinterland | 2 | 🎉 Done | `add-florence-zones` | [#22](https://github.com/maubernardi/nexus/pull/22) |
 | US-402 | Presa in carico | 2 | 🎉 Done | `add-ticket-take-charge` | [#23](https://github.com/maubernardi/nexus/pull/23) |
 | US-501 | Anagrafica aziende | 3 | 🎉 Done | `add-company-registry` | [#24](https://github.com/maubernardi/nexus/pull/24) |
-| US-502 | Mansioni dell'azienda | 3 | 👀 In review | `add-company-job-slots` | [#25](https://github.com/maubernardi/nexus/pull/25) |
-| US-601 | Ricerca mansioni compatibili | 5 | ✅ Ready | `add-job-matching` | — |
-| US-602 | Abbinamento e proposta | 5 | ✅ Ready | `add-job-matching` | — |
+| US-502 | Mansioni dell'azienda | 3 | 🎉 Done | `add-company-job-slots` | [#25](https://github.com/maubernardi/nexus/pull/25) |
+| US-601 | Ricerca mansioni compatibili | 5 | 👀 In review | `add-job-matching` | [#26](https://github.com/maubernardi/nexus/pull/26) |
+| US-602 | Abbinamento e proposta | 5 | 👀 In review | `add-job-matching` | [#26](https://github.com/maubernardi/nexus/pull/26) |
 
 **Extra, se avanza tempo**: US-305 Dettaglio e cronologia del ticket (3), US-303 I miei ticket (3).
 
@@ -36,6 +36,7 @@
 |---|---|
 | Inizio (02/10) | 25 |
 | 02/10 (deploy di #21–#24) | 13 |
+| 02/10 (deploy di #25) | 10 |
 | Fine sprint | — |
 
 ## Sprint Review
