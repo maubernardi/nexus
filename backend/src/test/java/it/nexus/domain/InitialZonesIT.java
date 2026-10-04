@@ -26,7 +26,11 @@ class InitialZonesIT {
                 .hasSize(40)
                 .allMatch(Zone::isActive)
                 .extracting(Zone::getName)
-                .contains("Novoli", "San Niccolò", "Porta al Prato", "Casellina", "Scarperia e San Piero", "Fiesole");
-        assertThat(zones.findByCode("CAMPO_DI_MARTE")).get().extracting(Zone::getName).isEqualTo("Campo di Marte");
+                // quartieri con il prefisso "Firenze " (V14), comuni dell'hinterland senza
+                .contains("Firenze Novoli", "Firenze San Niccolò", "Firenze Porta al Prato", "Firenze Casellina",
+                        "Scarperia e San Piero", "Fiesole")
+                .doesNotContain("Novoli", "Firenze Fiesole");
+        assertThat(zones.findByCode("CAMPO_DI_MARTE")).get().extracting(Zone::getName).isEqualTo("Firenze Campo di Marte");
+        assertThat(zones.findByCode("SESTO_FIORENTINO")).get().extracting(Zone::getName).isEqualTo("Sesto Fiorentino");
     }
 }
