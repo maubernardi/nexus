@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 60 elementi, 218 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-02](sprints/sprint-02.md).
+**Totale: 61 elementi, 219 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-02](sprints/sprint-02.md).
 
 ## Epiche
 
@@ -21,13 +21,13 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione e Progetto Formativo in Word. | 5 | 19 |
 | E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 2 | 7 |
 | E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 2 | 10 |
-| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 9 | 39 |
+| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 10 | 40 |
 
 ## Release
 
 | Release | Obiettivo | Storie | Punti |
 |---|---|---|---|
-| R1 | Flusso base: dalla segnalazione alla proposta | 19 | 64 |
+| R1 | Flusso base: dalla segnalazione alla proposta | 20 | 65 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 20 | 66 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 10 | 38 |
 | R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 11 | 50 |
@@ -66,6 +66,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | 📋 Backlog |
 | [US-107](#us-107) | E1 | Calendario del progetto | Must | 3 | R2 | 📋 Backlog |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
+| [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 📋 Backlog |
 | [US-201](#us-201) | E2 | Inserimento beneficiario | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | 📋 Backlog |
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 📋 Backlog |
@@ -650,6 +651,16 @@ Criteri di accettazione:
 - Per ogni evento: autore, istante, entità, azione, valori prima/dopo e motivo; il registro accetta solo aggiunte.
 - Le storie che cambiano stati o registrano scelte scrivono nell'audit (regola della Definition of Done).
 - L'ADMIN consulta l'audit filtrando per entità, autore e periodo.
+
+#### EN-4
+**Contatti dei referenti aziendali nell'audit senza valori** · Must · 1 punti · R1 · 📋 Backlog
+
+Come **responsabile della privacy** voglio che nome, telefono ed email del referente di un'azienda non finiscano nell'audit
+(che non si può cancellare) per rispettare la minimizzazione GDPR. Decisione del PO nella review dello Sprint 2 (04/10).
+
+Criteri di accettazione:
+- Creando o modificando un'azienda, l'audit registra per referente, telefono ed email solo che il campo è stato
+  impostato o modificato, mai il valore; gli altri campi restano con prima/dopo.
 
 #### US-1301
 **Verifica della PWA online** · Must · 1 punti · R1 · 📋 Backlog
