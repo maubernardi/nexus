@@ -1,6 +1,6 @@
 # Sprint 3 — 24 – 26 ottobre 2026
 
-**Stato:** ✅ impegno completato il 24/10 (21/21 punti); sprint prolungato su richiesta del PO, in attesa della review.
+**Stato:** 🏁 chiuso il 24/10 con la [review](sprint-03-review.md) (21/21 punti, velocity 21).
 **Planning:** 24/10, a chiusura della review dello Sprint 2; proposta del team confermata dal
 Product Owner ("teniamo tutto"). Primo sprint corto (3 giorni di calendario).
 
@@ -41,7 +41,7 @@ Discusse il 24/10: decisioni in [sprint-03-note-operative.md](sprint-03-note-ope
 | Inizio (24/10) | 22 |
 | 24/10 (note operative: US-303 a 5 punti, US-304 assorbita) | 21 |
 | 24/10 sera (#29–#37 unite) | 0 |
-| Fine sprint | — |
+| Fine sprint (24/10, chiuso in review) | 0 |
 
 ## Obiettivo e rilascio R1
 
@@ -52,4 +52,4 @@ Discusse il 24/10: decisioni in [sprint-03-note-operative.md](sprint-03-note-ope
 
 ## Review, retrospettiva e planning successivo
 
-In un unico documento asincrono a fine sprint (metodo dal 05/10).
+[sprint-03-review.md](sprint-03-review.md) (documento unico asincrono, metodo dal 05/10).

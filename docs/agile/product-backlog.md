@@ -9,7 +9,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 
 | Epica | Titolo | Obiettivo | Storie | Punti |
 |---|---|---|---|---|
-| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti (con il loro calendario) e cataloghi senza passare dalla console di Keycloak. | 8 | 26 |
+| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, il calendario e i cataloghi senza passare dalla console di Keycloak. | 8 | 26 |
 | E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 5 | 18 |
 | E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 6 | 26 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 5 | 17 |
@@ -41,7 +41,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | Q1 | Rifiuto della segnalazione speciale: il tipo diventa NORMAL o resta SPECIAL senza fast-track? | US-404 | Resta **SPECIAL senza fast-track** (traccia dell'origine dalla bacheca) (PO, 01/10). |
 | Q2 | Scadenza del timer: il ticket torna in IN_LAVORAZIONE o in RIAPERTO? | US-705 | **RIAPERTO** (PO, 01/10). |
 | Q3 | Il Tutor può rifiutare una proposta? Con quali effetti (es. azienda esclusa automaticamente)? | US-702 | **Sì, con motivo obbligatorio**: ticket al Call Center (RIAPERTO), mansione LIBERA, azienda esclusa per quel ticket (PO, 01/10). |
-| Q4 | Festività da escludere: solo nazionali o anche il patrono locale? Chiusure della cooperativa? | US-703, US-107 | Festività nazionali + **patrono configurabile per progetto** (24 giugno per l'attuale) + chiusure; vale il calendario del progetto del ticket (PO, 01/10). |
+| Q4 | Festività da escludere: solo nazionali o anche il patrono locale? Chiusure della cooperativa? | US-703, US-107 | Festività nazionali + **patrono configurabile per progetto** (24 giugno per l'attuale) + chiusure; vale il calendario del progetto del ticket (PO, 01/10). **Aggiornata il 24/10 (review dello Sprint 3):** il calendario è **unico per tutti** i progetti: festività nazionali (senza il 4 ottobre), patrono del 24 giugno e chiusure, impostati dall'ADMIN. |
 | Q5 | Campi della scheda amministrativa e template Word reali di Convenzione e Progetto Formativo. | US-1001..1005 | Per ora **segnaposto**; i documenti reali arriveranno più avanti. I modelli dovranno essere modificabili (modalità da definire: il PO ci sta pensando) (PO, 01/10). |
 | Q6 | Voci esatte dei gradimenti 1–5 del report di restituzione. | US-1101 | Soddisfazione dell'azienda (1–5), soddisfazione del beneficiario (1–5), obiettivi raggiunti (testo), difficoltà riscontrate (testo); assunto sì → formula (menu), no → motivo (menu). Voci dei menu provvisorie, definitive più avanti (PO, 01/10). |
 | Q7 | Durata di conservazione dei dati dei beneficiari (decisione della cooperativa/DPO). | US-1303 | **Parametrica**, per ora 2 anni (PO, 01/10). |
@@ -50,7 +50,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | Q10 | Elenco reale di zone e tipologie di mansione. | US-106 | Maschere di inserimento per l'ADMIN (US-106). Intanto: zone = quartieri di Firenze e comuni dell'hinterland (EN-3); tipologie ancora segnaposto (PO, 01/10). |
 | Q11 | Cosa vedono gli altri tutor dello stesso progetto del beneficiario (oltre al divieto su nome e cognome). | US-204 | Ogni tutor gestisce le proprie segnalazioni e vede **complete** (nome e cognome compresi) quelle del proprio progetto: dentro il progetto le informazioni sono condivise (PO, 01/10). |
 | Q12 | Un beneficiario può avere più segnalazioni aperte insieme (es. su progetti o mansioni diverse)? | US-301 | **No**: una sola segnalazione aperta alla volta (PO, 01/10). Aperta = qualunque stato tranne FORM_RESTITUZIONE. |
-| Q13 | Che cos'è un "servizio", a cui legare il calendario (patrono, chiusure)? | US-107, US-703 | Il "servizio" non esiste: era il **progetto** del Tutor. Il calendario (patrono, chiusure) è del progetto (PO, 01/10). |
+| Q13 | Che cos'è un "servizio", a cui legare il calendario (patrono, chiusure)? | US-107, US-703 | Il "servizio" non esiste: era il **progetto** del Tutor. Il calendario (patrono, chiusure) è del progetto (PO, 01/10). **Aggiornata il 24/10 (review dello Sprint 3):** il calendario è **unico per tutti** i progetti: festività nazionali (senza il 4 ottobre), patrono del 24 giugno e chiusure, impostati dall'ADMIN. |
 
 ## Elenco delle storie
 
@@ -64,7 +64,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-104](#us-104) | E1 | Assegnazione utenti ai progetti | Must | 3 | R4 | 📋 Backlog |
 | [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | 📋 Backlog |
 | [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | 📋 Backlog |
-| [US-107](#us-107) | E1 | Calendario del progetto | Must | 3 | R2 | 📋 Backlog |
+| [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | ✅ Ready (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [EN-5](#en-5) | E13 | Controllo della numerazione delle migrazioni nella CI | Must | 1 | R1 | 🎉 Done (Sprint 3) |
@@ -86,16 +86,16 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-405](#us-405) | E4 | Lavorazione condivisa tra operatori | Must | 2 | R1 | 🎉 Done (Sprint 3) |
 | [US-501](#us-501) | E5 | Anagrafica aziende | Must | 3 | R1 | 🎉 Done (Sprint 2) |
 | [US-502](#us-502) | E5 | Mansioni dell'azienda | Must | 3 | R1 | 🎉 Done (Sprint 2) |
-| [US-503](#us-503) | E5 | Storico e pregressi dell'azienda | Must | 3 | R1 | 📋 Backlog |
+| [US-503](#us-503) | E5 | Storico e pregressi dell'azienda | Must | 3 | R1 | ✅ Ready (Sprint 4) |
 | [US-504](#us-504) | E5 | Disattivazione impedita con mansioni bloccate | Must | 1 | R1 | 🎉 Done (Sprint 3) |
-| [US-505](#us-505) | E5 | Diario delle note dell'azienda | Must | 2 | R1 | 📋 Backlog |
+| [US-505](#us-505) | E5 | Diario delle note dell'azienda | Must | 2 | R1 | ✅ Ready (Sprint 4) |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 📋 Backlog |
-| [US-604](#us-604) | E6 | Dettagli di azienda e mansione durante l'abbinamento | Must | 5 | R1 | 📋 Backlog |
-| [US-701](#us-701) | E7 | Accettazione della proposta | Must | 3 | R2 | 📋 Backlog |
+| [US-604](#us-604) | E6 | Dettagli di azienda e mansione durante l'abbinamento | Must | 5 | R1 | ✅ Ready (Sprint 4) |
+| [US-701](#us-701) | E7 | Accettazione della proposta | Must | 3 | R2 | ✅ Ready (Sprint 4) |
 | [US-702](#us-702) | E7 | Rifiuto della proposta | Should | 3 | R2 | 📋 Backlog |
-| [US-703](#us-703) | E7 | Calendario dei giorni lavorativi | Must | 3 | R2 | 📋 Backlog |
+| [US-703](#us-703) | E7 | Calendario dei giorni lavorativi | Must | 3 | R2 | ✅ Ready (Sprint 4) |
 | [US-704](#us-704) | E7 | Promemoria al 4° giorno | Must | 3 | R2 | 📋 Backlog |
 | [US-705](#us-705) | E7 | Scadenza del timer | Must | 3 | R2 | 📋 Backlog |
 | [US-801](#us-801) | E8 | Appuntamento preso | Must | 2 | R2 | 📋 Backlog |
@@ -195,13 +195,15 @@ Criteri di accettazione:
 - Le zone segnaposto della demo vengono disattivate e i dati demo spostati sulle nuove zone.
 
 #### US-107
-**Calendario del progetto** · Must · 3 punti · R2 · 📋 Backlog
+**Calendario unico (patrono e chiusure)** · Must · 3 punti · R2 · ✅ Ready (Sprint 4)
 
-Come **ADMIN** voglio impostare per ogni progetto il patrono e le chiusure per calcolare le scadenze sui giorni lavorativi effettivi.
+Come **ADMIN** voglio impostare il patrono e le chiusure della cooperativa per calcolare le scadenze sui giorni lavorativi
+effettivi. Aggiornata nella review dello Sprint 3 (24/10): il calendario è **unico per tutti** i progetti.
 
 Criteri di accettazione:
-- Ogni progetto ha il proprio patrono (per l'attuale il 24 giugno) e le proprie chiusure, modificabili dall'ADMIN e registrate nell'audit.
-- Il timer di un ticket usa il calendario del progetto del ticket.
+- Pagina "Calendario" per l'ADMIN: patrono (24 giugno) e chiusure, come date singole o periodi, con descrizione;
+  modifiche registrate nell'audit.
+- Un solo calendario, valido per tutti i progetti e per tutte le segnalazioni.
 ### E2 — Anagrafica beneficiari
 
 _Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR._
@@ -290,6 +292,9 @@ Criteri di accettazione:
   passa in NUOVA (entra in coda); evento di audit.
 - Se l'operatore respinge la proposta, **sceglie lui una tipologia corretta del catalogo** e indica il motivo; la
   segnalazione entra in coda con quella tipologia e il Tutor riceve una **notifica** con il motivo (PO, 24/10).
+  Finché non ci sono le notifiche (US-1201): evento "Tipologia cambiata dal Call Center" nella cronologia (proposta →
+  scelta, motivo) ed evidenza testuale "Tipologia cambiata" nella Home del Tutor finché non apre la segnalazione
+  (review dello Sprint 3, §8.2).
 - Lo stato `IN_ATTESA_APPROVAZIONE_ADMIN` diventa `IN_ATTESA_APPROVAZIONE` (non è più solo dell'ADMIN).
 
 #### US-303
@@ -408,7 +413,7 @@ Criteri di accettazione:
 - Lo stato LIBERA/BLOCCATA è visibile e non si modifica a mano: lo governano abbinamenti e chiusure.
 
 #### US-503
-**Storico e pregressi dell'azienda** · Must · 3 punti · R1 · 📋 Backlog
+**Storico e pregressi dell'azienda** · Must · 3 punti · R1 · ✅ Ready (Sprint 4)
 
 Come **operatore Call Center / ADMIN** voglio vedere nella scheda dell'azienda lo storico immodificabile e i pregressi
 (segnalazioni passate ed esiti) per valutare l'azienda prima di proporle un beneficiario. Aggiornata con la nota operativa
@@ -418,6 +423,8 @@ Criteri di accettazione:
 - Riepilogo in testo: proposte, accettate, appuntamenti falliti, tirocini, assunzioni, esiti negativi.
 - Elenco cronologico in sola lettura: segnalazione collegata, evento ed esito, autore, data; esclusioni con motivo.
 - Visibile solo a Call Center e ADMIN.
+- Le voci del riepilogo compaiono sempre, a zero finché i relativi eventi non esistono (arriveranno con R2 e R3), così la
+  scheda non cambia forma (review dello Sprint 3, 24/10).
 
 #### US-504
 **Disattivazione impedita con mansioni bloccate** · Must · 1 punti · R1 · 🎉 Done (Sprint 3)
@@ -431,7 +438,7 @@ Criteri di accettazione:
   segnalazione (es. "la mansione «Magazziniere» è bloccata dalla segnalazione n. 30").
 
 #### US-505
-**Diario delle note dell'azienda** · Must · 2 punti · R1 · 📋 Backlog
+**Diario delle note dell'azienda** · Must · 2 punti · R1 · ✅ Ready (Sprint 4)
 
 Come **operatore Call Center** voglio annotare informazioni utili sull'azienda in un diario di note datate per
 condividerle con i colleghi e ritrovarle negli abbinamenti futuri. Nota operativa del PO, decisa il 24/10.
@@ -476,7 +483,7 @@ Criteri di accettazione:
 - Un'azienda esclusa non compare più nella ricerca per quel ticket.
 
 #### US-604
-**Dettagli di azienda e mansione durante l'abbinamento** · Must · 5 punti · R1 · 📋 Backlog
+**Dettagli di azienda e mansione durante l'abbinamento** · Must · 5 punti · R1 · ✅ Ready (Sprint 4)
 
 Come **operatore Call Center** voglio aprire, dalla ricerca delle mansioni compatibili, una finestra con la scheda
 dell'azienda, la scheda della mansione, le note e i pregressi dell'azienda per scegliere la proposta con tutte le
@@ -496,7 +503,7 @@ Dipendenze: US-503, US-505
 _Il Tutor valuta la proposta; i tempi di risposta sono presidiati da un timer di 7 giorni lavorativi._
 
 #### US-701
-**Accettazione della proposta** · Must · 3 punti · R2 · 📋 Backlog
+**Accettazione della proposta** · Must · 3 punti · R2 · ✅ Ready (Sprint 4)
 
 Come **Tutor** voglio accettare la proposta per il mio beneficiario per far partire il contatto con l'azienda.
 
@@ -515,12 +522,15 @@ Criteri di accettazione:
 - L'operatore riceve la notifica (in app e via email).
 
 #### US-703
-**Calendario dei giorni lavorativi** · Must · 3 punti · R2 · 📋 Backlog
+**Calendario dei giorni lavorativi** · Must · 3 punti · R2 · ✅ Ready (Sprint 4)
 
 Come **team di sviluppo** voglio calcolare le scadenze escludendo sabati, domeniche e festività per avere timer corretti.
 
 Criteri di accettazione:
-- La scadenza di 7 giorni lavorativi salta weekend, festività nazionali (es. 25 aprile, Pasquetta), il patrono e le chiusure del progetto del ticket (US-107).
+- La scadenza di 7 giorni lavorativi salta sabati, domeniche, festività nazionali, il patrono e le chiusure del calendario
+  unico (US-107).
+- Festività nazionali calcolate nel codice: 1/1, 6/1, 25/4, 1/5, 2/6, 15/8, 1/11, 8/12, 25/12, 26/12, Pasqua e
+  Pasquetta. Il 4 ottobre **non** è considerato festivo (PO, 24/10).
 
 Dipendenze: US-107
 
