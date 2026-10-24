@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react';
 import { AxiosError, AxiosHeaders } from 'axios';
+import type { InitialEntry } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { fetchBeneficiary, type Beneficiary } from '@/config/api/beneficiaryApi';
@@ -31,7 +32,7 @@ const mario: Beneficiary = {
   editable: true,
 };
 
-const renderPage = () =>
+const renderPage = (initialPath: InitialEntry = '/beneficiari/B1') =>
   renderRoutes({
     routes: [
       {
@@ -43,7 +44,7 @@ const renderPage = () =>
         ),
       },
     ],
-    initialPath: '/beneficiari/B1',
+    initialPath,
   });
 
 describe('<BeneficiaryPage>', () => {
@@ -73,6 +74,16 @@ describe('<BeneficiaryPage>', () => {
     await screen.findByRole('heading', { level: 1, name: 'Mario Rossi' });
     expect(screen.queryByRole('link', { name: 'Modifica' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Torna alla Home' })).toBeInTheDocument();
+  });
+
+  it('arrivando da una segnalazione, il ritorno riporta alla segnalazione', async () => {
+    vi.mocked(fetchBeneficiary).mockResolvedValue({ ...mario, editable: false });
+    renderPage({ pathname: '/beneficiari/B1', state: { fromTicket: { id: 'T9', number: 24 } } });
+
+    expect(await screen.findByRole('link', { name: 'Torna alla segnalazione n. 24' })).toHaveAttribute(
+      'href',
+      '/segnalazioni/T9',
+    );
   });
 
   it('beneficiario non visibile: stesso messaggio di inesistente', async () => {

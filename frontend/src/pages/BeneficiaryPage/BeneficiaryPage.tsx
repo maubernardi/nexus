@@ -11,6 +11,9 @@ import { isoName } from '@/lib/isoNames';
 
 type Row = { label: string; value: ReactNode };
 
+/** Stato della navigazione verso la scheda: arrivando da una segnalazione, il link di ritorno riporta lì. */
+export type BeneficiaryLinkState = { fromTicket?: { id: string; number: number } };
+
 const Section = ({ id, title, rows }: { id: string; title: string; rows: Row[] }) => (
   <section aria-labelledby={id} className="space-y-3 rounded-xl border border-border bg-card p-4">
     <h2 id={id} className="text-lg font-semibold text-primary">
@@ -36,7 +39,9 @@ export const BeneficiaryPage = () => {
   const { id = '' } = useParams();
   const location = useLocation();
   const beneficiary = useBeneficiary(id);
-  const saved = (location.state as { saved?: boolean } | null)?.saved === true;
+  const state = location.state as ({ saved?: boolean } & BeneficiaryLinkState) | null;
+  const saved = state?.saved === true;
+  const fromTicket = state?.fromTicket;
   const outcomeRef = useRef<HTMLParagraphElement>(null);
 
   // esito del salvataggio annunciato portandovi il focus
@@ -149,12 +154,21 @@ export const BeneficiaryPage = () => {
         ]}
       />
 
-      <Link
-        to={b.editable ? '/beneficiari' : '/'}
-        className="inline-block font-medium text-primary underline underline-offset-4"
-      >
-        {t(b.editable ? 'beneficiary.backToList' : 'beneficiary.backToHome')}
-      </Link>
+      {fromTicket ? (
+        <Link
+          to={`/segnalazioni/${fromTicket.id}`}
+          className="inline-block font-medium text-primary underline underline-offset-4"
+        >
+          {t('beneficiary.backToTicket', { number: fromTicket.number })}
+        </Link>
+      ) : (
+        <Link
+          to={b.editable ? '/beneficiari' : '/'}
+          className="inline-block font-medium text-primary underline underline-offset-4"
+        >
+          {t(b.editable ? 'beneficiary.backToList' : 'beneficiary.backToHome')}
+        </Link>
+      )}
     </div>
   );
 };

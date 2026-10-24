@@ -107,7 +107,7 @@ export const TicketsPage = () => {
           <Button asChild size="lg">
             <Link to="/segnalazioni/nuova">
               <FilePlus2 aria-hidden="true" />
-              {t('nav.newTicket')}
+              {t('tickets.new')}
             </Link>
           </Button>
         )}
