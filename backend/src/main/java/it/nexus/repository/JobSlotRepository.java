@@ -15,6 +15,14 @@ public interface JobSlotRepository extends JpaRepository<JobSlot, Long> {
 
     Optional<JobSlot> findByBlockedByTicketId(Long ticketId);
 
+    /** Mansioni bloccate da una proposta in corso, con la segnalazione che le blocca (US-504). */
+    @Query("""
+            select j from JobSlot j join fetch j.blockedByTicket t
+            where j.company.id = :companyId and j.status = it.nexus.domain.enumeration.JobSlotStatus.BLOCCATA
+            order by t.number
+            """)
+    List<JobSlot> findBlockedByCompany(@Param("companyId") Long companyId);
+
     /** Mansioni di un'azienda: prima le attive, poi per titolo. */
     @Query("""
             select j from JobSlot j

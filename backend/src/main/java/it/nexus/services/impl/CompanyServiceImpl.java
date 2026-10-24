@@ -2,11 +2,13 @@ package it.nexus.services.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.domain.Company;
+import it.nexus.domain.JobSlot;
 import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.CompanyDTO;
 import it.nexus.domain.dto.CompanyFormDTO;
@@ -14,6 +16,7 @@ import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.mapper.CompanyMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.CompanyRepository;
+import it.nexus.repository.JobSlotRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.CompanyService;
 import it.nexus.web.errors.BadRequestException;
@@ -30,6 +33,7 @@ public class CompanyServiceImpl implements CompanyService {
     private static final String DUPLICATE_VAT = "Esiste già un'azienda con questa partita IVA";
 
     private final CompanyRepository repository;
+    private final JobSlotRepository jobSlotRepository;
     private final AuditService auditService;
     private final CompanyMapper mapper;
 
@@ -101,6 +105,16 @@ public class CompanyServiceImpl implements CompanyService {
         requireVersion(company, expectedVersion);
         if (company.isActive() == active) {
             return mapper.toDto(company);
+        }
+        if (!active) {
+            // un'azienda con proposte in corso non deve sparire dalle ricerche (US-504)
+            List<JobSlot> blocked = jobSlotRepository.findBlockedByCompany(company.getId());
+            if (!blocked.isEmpty()) {
+                throw new ConflictException("Non si può disattivare l'azienda: %s", blocked.stream()
+                        .map(j -> "la mansione «%s» è bloccata dalla segnalazione n. %d"
+                                .formatted(j.getTitle(), j.getBlockedByTicket().getNumber()))
+                        .collect(Collectors.joining("; ")));
+            }
         }
         company.setActive(active);
         Company saved = repository.saveAndFlush(company);

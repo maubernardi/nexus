@@ -28,12 +28,26 @@ import com.jayway.jsonpath.JsonPath;
 
 import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
+import it.nexus.domain.AppUser;
+import it.nexus.domain.Company;
+import it.nexus.domain.JobCategory;
+import it.nexus.domain.JobSlot;
 import it.nexus.domain.TestEntities;
+import it.nexus.domain.Ticket;
+import it.nexus.domain.Zone;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.Role;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.AuditEventRepository;
+import it.nexus.repository.BeneficiaryRepository;
+import it.nexus.repository.CompanyRepository;
+import it.nexus.repository.JobCategoryRepository;
+import it.nexus.repository.JobSlotRepository;
+import it.nexus.repository.ProjectRepository;
+import it.nexus.repository.TicketRepository;
+import it.nexus.repository.ZoneRepository;
+import jakarta.persistence.EntityManager;
 
 @SpringBootTest
 @Transactional
@@ -48,6 +62,14 @@ class CompanyResourceIT {
     @Autowired MockMvc mockMvc;
     @Autowired AppUserRepository users;
     @Autowired AuditEventRepository audit;
+    @Autowired CompanyRepository companies;
+    @Autowired ZoneRepository zones;
+    @Autowired JobCategoryRepository categories;
+    @Autowired ProjectRepository projects;
+    @Autowired BeneficiaryRepository beneficiaries;
+    @Autowired TicketRepository tickets;
+    @Autowired JobSlotRepository jobSlots;
+    @Autowired EntityManager em;
 
     @BeforeEach
     void setUp() {
@@ -170,6 +192,29 @@ class CompanyResourceIT {
                         .content(body("Seconda", "11111111111", ", \"version\": 0")))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldErrors[0].field").value("vatCode"));
+    }
+
+    @Test
+    void conMansioneBloccata_nonSiDisattiva_eIlMessaggioDiceQuale() throws Exception {
+        String id = createdId("Officina Rossi", "12345678901");
+        Company company = companies.findById(TsidMapper.toInternal(id)).orElseThrow();
+        AppUser tutor = users.findByExternalId("00000000-0000-4000-8000-000000000001").orElseThrow();
+        Zone zone = zones.save(TestEntities.zone("ZBLOCCO"));
+        JobCategory category = categories.save(TestEntities.jobCategory("CBLOCCO"));
+        Ticket ticket = tickets.save(TestEntities.ticket(tutor, projects.save(TestEntities.project("PBLOCCO")),
+                beneficiaries.save(TestEntities.beneficiary(tutor, zone)), category));
+        JobSlot slot = TestEntities.jobSlot(company, category, zone);
+        slot.setTitle("Magazziniere");
+        slot.blockFor(ticket);
+        jobSlots.saveAndFlush(slot);
+        em.refresh(ticket);
+
+        mockMvc.perform(post(API + "/" + id + "/deactivate").header(USER, "operatore.cc")
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"version\": " + company.getVersion() + "}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Non si può disattivare l'azienda: la mansione «Magazziniere» è bloccata "
+                        + "dalla segnalazione n. " + ticket.getNumber()));
+        assertThat(companies.findById(company.getId()).orElseThrow().isActive()).isTrue();
     }
 
     @Test
