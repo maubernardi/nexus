@@ -1,0 +1,11 @@
+# Note operative del PO — decisioni (24/10/2026)
+
+Osservazioni del Product Owner sull'uso della demo, discusse una per una durante lo Sprint 3.
+
+| # | Nota del PO | Decisione | Backlog |
+|---|---|---|---|
+| 1 | "Sia per tutor che per operatori, la landing page deve essere l'elenco delle segnalazioni" | Pagina unica **"Segnalazioni"** come Home per tutti. Tutor: "Le mie segnalazioni" (predefinita) e "Del mio progetto". Call Center/ADMIN: "Da prendere in carico" (predefinita, la coda FIFO), "In carico a me", "Tutte". Filtri per stato e progetto; ogni numero apre dettaglio e cronologia. Spariscono dal menu "Coda" e "Le mie lavorazioni". | US-303 riscritta (3 → 5 punti); US-304 assorbita |
+| 2 | "La scheda dell'azienda deve avere un campo note" | **Diario di note datate** con autore, che si aggiungono e non si sovrascrivono; solo Call Center/ADMIN; nell'audit "nota aggiunta" senza testo. | US-505 (2 punti) |
+| 3 | "Il Tutor deve poter inserire una nuova mansione in fase di nuova segnalazione. Questa mansione però dovrà essere approvata da un operatore" | Si tratta di una nuova **tipologia** (non di una posizione presso un'azienda). Approva un **operatore** (o l'ADMIN), potendo correggere il nome; la tipologia approvata **entra nel catalogo**. Se **respinge**, l'operatore sceglie una tipologia corretta del catalogo e indica il motivo; la segnalazione entra in coda e il Tutor riceve una notifica. Stato rinominato `IN_ATTESA_APPROVAZIONE`. | US-302 riscritta; risposta a Q8 aggiornata |
+| 4 | "Non ha senso il filtro per Zona dell'operatore. Invece, per stato" | Nell'elenco delle segnalazioni (ex coda) **niente filtro per zona**, filtri per **stato** e progetto (vedi nota 1). La zona resta invece come filtro predefinito nella **ricerca delle mansioni compatibili** (serve all'abbinamento). | US-303 |
+| 5 | "Nella fase di assegnazione della mansione da parte dell'operatore, è necessario che si possa vedere - in un popup - la scheda dell'azienda, della mansione e eventuali pregressi dell'azienda" | Pulsante **"Dettagli"** nella ricerca delle compatibili: dialogo modale accessibile con scheda azienda, scheda mansione, note e **pregressi** (segnalazioni passate ed esiti, esclusioni, riepilogo); si può proporre da lì. Lo storico completo compare anche nella **scheda azienda**. | US-604 (5 punti); US-503 riscritta e anticipata a R1 (3 punti) |

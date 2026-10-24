@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 64 elementi, 223 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-03](sprints/sprint-03.md).
+**Totale: 65 elementi, 230 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-03](sprints/sprint-03.md).
 
 ## Epiche
 
@@ -11,10 +11,10 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 |---|---|---|---|---|
 | E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti (con il loro calendario) e cataloghi senza passare dalla console di Keycloak. | 8 | 26 |
 | E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 5 | 18 |
-| E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 7 | 27 |
+| E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 6 | 26 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 5 | 17 |
-| E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 4 | 9 |
-| E6 | Abbinamento (fase 4) | Il Call Center abbina il beneficiario a una mansione libera e la blocca. | 3 | 12 |
+| E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 5 | 12 |
+| E6 | Abbinamento (fase 4) | Il Call Center abbina il beneficiario a una mansione libera e la blocca. | 4 | 17 |
 | E7 | Proposta e timer (fase 5) | Il Tutor valuta la proposta; i tempi di risposta sono presidiati da un timer di 7 giorni lavorativi. | 5 | 15 |
 | E8 | Appuntamento e rilancio (fase 6) | Il Tutor registra l'esito dell'appuntamento; se fallisce, la mansione può essere rilanciata in bacheca. | 3 | 9 |
 | E9 | Bacheca opportunità | Le mansioni disponibili sono visibili ai Tutor in forma anonima e gestite dal Call Center. | 4 | 13 |
@@ -27,9 +27,9 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 
 | Release | Obiettivo | Storie | Punti |
 |---|---|---|---|
-| R1 | Flusso base: dalla segnalazione alla proposta | 23 | 69 |
+| R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 20 | 66 |
-| R3 | Tirocinio, documenti Word, chiusura, email | 10 | 38 |
+| R3 | Tirocinio, documenti Word, chiusura, email | 9 | 36 |
 | R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 11 | 50 |
 
 ## Domande aperte per il Product Owner
@@ -45,7 +45,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | Q5 | Campi della scheda amministrativa e template Word reali di Convenzione e Progetto Formativo. | US-1001..1005 | Per ora **segnaposto**; i documenti reali arriveranno più avanti. I modelli dovranno essere modificabili (modalità da definire: il PO ci sta pensando) (PO, 01/10). |
 | Q6 | Voci esatte dei gradimenti 1–5 del report di restituzione. | US-1101 | Soddisfazione dell'azienda (1–5), soddisfazione del beneficiario (1–5), obiettivi raggiunti (testo), difficoltà riscontrate (testo); assunto sì → formula (menu), no → motivo (menu). Voci dei menu provvisorie, definitive più avanti (PO, 01/10). |
 | Q7 | Durata di conservazione dei dati dei beneficiari (decisione della cooperativa/DPO). | US-1303 | **Parametrica**, per ora 2 anni (PO, 01/10). |
-| Q8 | Chi approva la mansione a testo libero (ADMIN?) e se, approvata, entra nel catalogo. | US-302 | **ADMIN**; non entra da sola nel catalogo, l'ADMIN può aggiungerla con un clic; se respinta il Tutor vede il motivo (PO, 01/10). |
+| Q8 | Chi approva la mansione a testo libero (ADMIN?) e se, approvata, entra nel catalogo. | US-302 | **ADMIN**; non entra da sola nel catalogo, l'ADMIN può aggiungerla con un clic; se respinta il Tutor vede il motivo (PO, 01/10). **Aggiornata il 24/10:** approva un **operatore** del Call Center (o l'ADMIN) e la tipologia approvata **entra nel catalogo**; se respinta, l'operatore sceglie la tipologia corretta e il Tutor riceve una notifica. |
 | Q9 | Canali delle notifiche per evento (solo app, app + email) e destinatari. | US-1201, US-1202 | **In app e via email**, alla controparte del passaggio (Tutor ↔ operatore, già definiti per ogni fase) (PO, 01/10). |
 | Q10 | Elenco reale di zone e tipologie di mansione. | US-106 | Maschere di inserimento per l'ADMIN (US-106). Intanto: zone = quartieri di Firenze e comuni dell'hinterland (EN-3); tipologie ancora segnaposto (PO, 01/10). |
 | Q11 | Cosa vedono gli altri tutor dello stesso progetto del beneficiario (oltre al divieto su nome e cognome). | US-204 | Ogni tutor gestisce le proprie segnalazioni e vede **complete** (nome e cognome compresi) quelle del proprio progetto: dentro il progetto le informazioni sono condivise (PO, 01/10). |
@@ -74,9 +74,9 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-204](#us-204) | E2 | Visibilità dei beneficiari per progetto | Must | 3 | R1 | ✅ Ready (Sprint 3) |
 | [US-205](#us-205) | E2 | Curriculum del beneficiario | Could | 5 | R3 | 📋 Backlog |
 | [US-301](#us-301) | E3 | Nuova segnalazione | Must | 5 | R1 | 🎉 Done (Sprint 1) |
-| [US-302](#us-302) | E3 | Mansione a testo libero e approvazione | Should | 5 | R2 | 📋 Backlog |
-| [US-303](#us-303) | E3 | I miei ticket | Must | 3 | R1 | ✅ Ready (Sprint 3) |
-| [US-304](#us-304) | E3 | Ticket dei miei progetti | Should | 3 | R1 | ✅ Ready (Sprint 3) |
+| [US-302](#us-302) | E3 | Nuova tipologia di mansione dal Tutor, approvata dal Call Center | Should | 5 | R2 | 📋 Backlog |
+| [US-303](#us-303) | E3 | Elenco delle segnalazioni (Home) | Must | 5 | R1 | ✅ Ready (Sprint 3) |
+| [US-304](#us-304) | E3 | Ticket dei miei progetti | Should | 0 | R1 | ↪️ Assorbita in US-303 |
 | [US-305](#us-305) | E3 | Dettaglio e cronologia del ticket | Must | 3 | R1 | ✅ Ready (Sprint 3) |
 | [US-306](#us-306) | E3 | Segnalazione speciale dalla bacheca | Must | 3 | R2 | 📋 Backlog |
 | [US-401](#us-401) | E4 | Coda FIFO | Must | 5 | R1 | 🎉 Done (Sprint 1) |
@@ -86,11 +86,13 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-405](#us-405) | E4 | Lavorazione condivisa tra operatori | Must | 2 | R1 | ✅ Ready (Sprint 3) |
 | [US-501](#us-501) | E5 | Anagrafica aziende | Must | 3 | R1 | 🎉 Done (Sprint 2) |
 | [US-502](#us-502) | E5 | Mansioni dell'azienda | Must | 3 | R1 | 🎉 Done (Sprint 2) |
-| [US-503](#us-503) | E5 | Audit trail dell'azienda | Should | 2 | R3 | 📋 Backlog |
+| [US-503](#us-503) | E5 | Storico e pregressi dell'azienda | Must | 3 | R1 | 📋 Backlog |
 | [US-504](#us-504) | E5 | Disattivazione impedita con mansioni bloccate | Must | 1 | R1 | ✅ Ready (Sprint 3) |
+| [US-505](#us-505) | E5 | Diario delle note dell'azienda | Must | 2 | R1 | 📋 Backlog |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 📋 Backlog |
+| [US-604](#us-604) | E6 | Dettagli di azienda e mansione durante l'abbinamento | Must | 5 | R1 | 📋 Backlog |
 | [US-701](#us-701) | E7 | Accettazione della proposta | Must | 3 | R2 | 📋 Backlog |
 | [US-702](#us-702) | E7 | Rifiuto della proposta | Should | 3 | R2 | 📋 Backlog |
 | [US-703](#us-703) | E7 | Calendario dei giorni lavorativi | Must | 3 | R2 | 📋 Backlog |
@@ -275,31 +277,42 @@ Criteri di accettazione:
 Dipendenze: EN-1, US-201
 
 #### US-302
-**Mansione a testo libero e approvazione** · Should · 5 punti · R2 · 📋 Backlog
+**Nuova tipologia di mansione dal Tutor, approvata dal Call Center** · Should · 5 punti · R2 · 📋 Backlog
 
-Come **Tutor / ADMIN** voglio indicare una mansione non presente nel catalogo, che l'ADMIN approva o respinge per non bloccare segnalazioni atipiche.
+Come **Tutor** voglio indicare nella segnalazione una tipologia di mansione che non trovo nel catalogo, che un operatore
+del Call Center approva, per non bloccare segnalazioni atipiche. Aggiornata con la nota operativa del PO (24/10): approva
+l'**operatore**, non l'ADMIN.
 
 Criteri di accettazione:
-- Con mansione a testo libero il ticket nasce in IN_ATTESA_APPROVAZIONE_ADMIN.
-- Approva l'ADMIN: il ticket passa in NUOVA (ed entra in coda); se respinge, il Tutor vede la motivazione.
-- La mansione approvata non entra da sola nel catalogo: l'ADMIN può aggiungerla con un clic.
+- Se la mansione non è nell'elenco, il Tutor la scrive; la segnalazione nasce in attesa di approvazione e compare al
+  Call Center come "da approvare".
+- Un operatore (o l'ADMIN) approva, potendo correggerne il nome: la tipologia **entra nel catalogo** e la segnalazione
+  passa in NUOVA (entra in coda); evento di audit.
+- Se l'operatore respinge la proposta, **sceglie lui una tipologia corretta del catalogo** e indica il motivo; la
+  segnalazione entra in coda con quella tipologia e il Tutor riceve una **notifica** con il motivo (PO, 24/10).
+- Lo stato `IN_ATTESA_APPROVAZIONE_ADMIN` diventa `IN_ATTESA_APPROVAZIONE` (non è più solo dell'ADMIN).
 
 #### US-303
-**I miei ticket** · Must · 3 punti · R1 · ✅ Ready (Sprint 3)
+**Elenco delle segnalazioni (Home)** · Must · 5 punti · R1 · ✅ Ready (Sprint 3)
 
-Come **Tutor** voglio vedere l'elenco dei miei ticket con numero, beneficiario, stato e data per seguire i percorsi in corso.
+Come **Tutor, operatore Call Center o ADMIN** voglio che la pagina iniziale sia l'elenco delle segnalazioni che mi
+riguardano per partire subito dal lavoro. Nota operativa del PO, decisa il 24/10: sostituisce "I miei ticket" e assorbe
+US-304 e gli elenchi di US-401/US-402.
 
 Criteri di accettazione:
-- L'elenco si filtra per stato e progetto; lo stato è indicato con testo, non solo colore.
+- La Home di tutti i ruoli è la pagina "Segnalazioni"; numero, beneficiario, progetto, mansione, stato in testo e data;
+  ogni numero apre il dettaglio con la cronologia (US-305).
+- Tutor: vista predefinita "Le mie segnalazioni" e vista "Del mio progetto" (segnalazioni dei colleghi complete, in sola
+  lettura; nessuna di altri progetti); pulsante "Nuova segnalazione".
+- Call Center e ADMIN: viste "Da prendere in carico" (predefinita: la coda FIFO con le fast-track in cima, con il
+  pulsante "Prendi in carico"), "In carico a me" e "Tutte"; le pagine "Coda" e "Le mie lavorazioni" spariscono dal menu.
+- Filtri per stato e progetto in ogni vista, **nessun filtro per zona** (nota 4 del PO); vista e filtri nell'indirizzo;
+  numero di risultati annunciato.
 
 #### US-304
-**Ticket dei miei progetti** · Should · 3 punti · R1 · ✅ Ready (Sprint 3)
+**Ticket dei miei progetti** · Should · 0 punti · R1 · ↪️ Assorbita in US-303 (24/10)
 
-Come **Tutor** voglio consultare in sola lettura i ticket degli altri tutor dei progetti a cui sono assegnato per coordinarmi con i colleghi.
-
-Criteri di accettazione:
-- Non vedo ticket di progetti a cui non sono assegnato.
-- Vedo i ticket dei colleghi completi (nome e cognome compresi), in sola lettura: le azioni restano al tutor proprietario (US-204).
+Confluita nella vista "Del mio progetto" della Home (US-303).
 
 #### US-305
 **Dettaglio e cronologia del ticket** · Must · 3 punti · R1 · ✅ Ready (Sprint 3)
@@ -395,12 +408,16 @@ Criteri di accettazione:
 - Lo stato LIBERA/BLOCCATA è visibile e non si modifica a mano: lo governano abbinamenti e chiusure.
 
 #### US-503
-**Audit trail dell'azienda** · Should · 2 punti · R3 · 📋 Backlog
+**Storico e pregressi dell'azienda** · Must · 3 punti · R1 · 📋 Backlog
 
-Come **operatore Call Center / ADMIN** voglio consultare lo storico immodificabile degli eventi di un'azienda per avere trasparenza verso aziende ed enti.
+Come **operatore Call Center / ADMIN** voglio vedere nella scheda dell'azienda lo storico immodificabile e i pregressi
+(segnalazioni passate ed esiti) per valutare l'azienda prima di proporle un beneficiario. Aggiornata con la nota operativa
+del PO (24/10): anticipata a R1 e mostrata anche durante l'abbinamento (US-604).
 
 Criteri di accettazione:
-- Lo storico è in sola lettura, in ordine cronologico, con autore e ticket collegato.
+- Riepilogo in testo: proposte, accettate, appuntamenti falliti, tirocini, assunzioni, esiti negativi.
+- Elenco cronologico in sola lettura: segnalazione collegata, evento ed esito, autore, data; esclusioni con motivo.
+- Visibile solo a Call Center e ADMIN.
 
 #### US-504
 **Disattivazione impedita con mansioni bloccate** · Must · 1 punti · R1 · ✅ Ready (Sprint 3)
@@ -412,6 +429,18 @@ dello Sprint 2 (05/10).
 Criteri di accettazione:
 - La disattivazione è rifiutata (409) finché l'azienda ha mansioni bloccate; il messaggio indica mansione e numero della
   segnalazione (es. "la mansione «Magazziniere» è bloccata dalla segnalazione n. 30").
+
+#### US-505
+**Diario delle note dell'azienda** · Must · 2 punti · R1 · 📋 Backlog
+
+Come **operatore Call Center** voglio annotare informazioni utili sull'azienda in un diario di note datate per
+condividerle con i colleghi e ritrovarle negli abbinamenti futuri. Nota operativa del PO, decisa il 24/10.
+
+Criteri di accettazione:
+- Nella scheda azienda, sezione "Note": elenco dal più recente con data, ora e autore; "Aggiungi nota" (testo
+  obbligatorio, fino a 2000 caratteri). Le note si aggiungono, non si sovrascrivono né si cancellano.
+- Visibili solo a Call Center e ADMIN.
+- Audit: evento "nota aggiunta" sull'azienda, **senza il testo** (può contenere dati personali, come EN-4).
 
 ### E6 — Abbinamento (fase 4)
 
@@ -445,6 +474,22 @@ Come **operatore Call Center** voglio escludere un'azienda per un ticket, con mo
 
 Criteri di accettazione:
 - Un'azienda esclusa non compare più nella ricerca per quel ticket.
+
+#### US-604
+**Dettagli di azienda e mansione durante l'abbinamento** · Must · 5 punti · R1 · 📋 Backlog
+
+Come **operatore Call Center** voglio aprire, dalla ricerca delle mansioni compatibili, una finestra con la scheda
+dell'azienda, la scheda della mansione, le note e i pregressi dell'azienda per scegliere la proposta con tutte le
+informazioni. Nota operativa del PO, decisa il 24/10.
+
+Criteri di accettazione:
+- Pulsante "Dettagli" accanto a "Proponi" per ogni mansione compatibile; la finestra mostra: scheda azienda (ragione
+  sociale, sede, referente e contatti, stato), scheda mansione (titolo, tipologia, zona, descrizione), note più recenti
+  (US-505) e pregressi con riepilogo (US-503); da qui si può proporre con la stessa conferma.
+- Dialogo modale accessibile: focus nella finestra e intrappolato finché è aperta, chiusura con Esc o "Chiudi", ritorno
+  del focus sul pulsante di partenza; a schermo intero sui dispositivi piccoli.
+
+Dipendenze: US-503, US-505
 
 ### E7 — Proposta e timer (fase 5)
 
