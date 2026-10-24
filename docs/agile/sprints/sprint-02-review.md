@@ -3,8 +3,7 @@
 **Sprint:** 2–8 ottobre 2026 (planning 01/10) · **Review:** 04/10/2026 · **Partecipanti:** Mauro Bernardi (Product Owner),
 team di sviluppo (Claude Code) · **Demo:** https://portalenexus.it, versione `8b12b2f` (deploy riuscito il 02/10 e il 04/10).
 
-> Documento di lavoro per la discussione con il PO. Le sezioni **«Da decidere»** contengono le domande aperte, con una
-> proposta del team per ciascuna.
+> Discusso con il PO dal 04/10 al 24/10: tutte le decisioni del §7 sono state prese (vedi i riquadri ✅).
 
 ---
 
@@ -113,7 +112,7 @@ Già in vigore, da confermare o correggere in review:
 | D4 | Pagina **"Le mie lavorazioni"** (non prevista dalla storia): senza, l'operatore non ritrova le segnalazioni prese | Team | US-402 |
 | D5 | Le aziende e le mansioni si **disattivano/ritirano**, mai si cancellano; una mansione bloccata non si ritira | Team (dal criterio di US-501) | US-501, US-502 |
 | D6 | **Conferma esplicita** prima della proposta all'azienda (blocca una posizione reale) | Team | US-602 |
-| D7 | Abbina solo l'operatore che ha in carico la segnalazione; l'**ADMIN** può sempre | Team | US-602 |
+| D7 | ~~Abbina solo l'operatore che ha in carico la segnalazione; l'ADMIN può sempre~~ → **superata in review** (§7.2): ogni operatore può lavorare ogni segnalazione | Team → PO | US-602, US-405 |
 | D8 | La proposta registra l'evento `PROPOSTA_INVIATA` nello **storico dell'azienda** (oltre all'audit) | Team (dal brief) | US-602 |
 | D9 | P.IVA validata solo come **11 cifre** (nessun controllo della cifra di controllo) | Team (dal criterio) | US-501 |
 
@@ -154,11 +153,24 @@ Se l'operatore che ha preso in carico una segnalazione è assente, oggi solo l'A
 un modo per "restituirla" alla coda o passarla a un collega.
 *Proposta:* nuova storia (2 punti): "Rilascia" (torna in coda) e "Assegna a…" (solo ADMIN), entrambi con motivo e audit.
 
+> ✅ **Deciso (PO, 05/10): regola più semplice.** "Non è così fiscale: se manca un operatore, l'altro può operare anche
+> sulle sue segnalazioni." Quindi:
+> - ogni operatore del Call Center (e l'ADMIN) può lavorare ogni segnalazione presa in carico, anche di un collega;
+>   l'abbinamento non è più riservato a chi l'ha in carico (D7 superata);
+> - l'**assegnazione resta al collega**: audit e cronologia dicono chi ha fatto cosa; un pulsante facoltativo
+>   "Prendila in carico tu" la sposta esplicitamente nelle proprie lavorazioni (con audit);
+> - per ritrovare le segnalazioni di un collega assente, "Le mie lavorazioni" offre anche la vista **"Tutte le
+>   lavorazioni"** del Call Center, con l'operatore indicato.
+>
+> Niente "Rilascia" né "Assegna a…". Nuova voce **US-405** (2 punti, R1).
+
 ### 7.3 Disattivazione di un'azienda con mansioni bloccate
 Oggi un'azienda si può disattivare anche se ha una mansione bloccata da una proposta in corso; la proposta resta
 valida, ma l'azienda sparisce dalla ricerca.
 *Proposta:* impedirla finché ha mansioni bloccate (messaggio con il numero della segnalazione), come per il ritiro
 della mansione.
+
+> ✅ **Deciso (PO, 05/10): proposta accettata.** Nuova voce **US-504** (1 punto, R1).
 
 ### 7.4 Cadenza degli sprint
 Entrambi gli sprint si sono chiusi nei primi 1–2 giorni: il vincolo reale non è lo sviluppo ma il tempo di revisione,
@@ -167,15 +179,28 @@ merge e prova del PO.
 a ~35 punti** con extra espliciti, e unire le PR a blocchi (es. due momenti al giorno). In alternativa, sprint più
 brevi (3 giorni) con impegni da ~20 punti.
 
+> ✅ **Deciso (PO, 05/10): sprint corti di 3 giorni, ~20 punti.** Vincolo: il PO lavora al progetto nel tempo libero e si
+> confronta con il committente quando può, quindi il ritmo deve restare sostenibile. Cerimonie leggere e asincrone: un
+> unico documento (review + retrospettiva + planning) discusso quando il PO è disponibile. Metodo aggiornato in
+> `docs/agile/README.md` e in `CLAUDE.md`.
+
 ### 7.5 Migrazioni in PR parallele
 *Proposta:* il team verifica il numero della migrazione dopo ogni merge e, se una PR aperta ne ha una "superata",
 rinomina il file prima del merge; nella descrizione di ogni PR con migrazioni compare il numero.
+
+> ✅ **Deciso (PO, 24/10): proposta accettata, con la verifica automatica nella CI.** Il team indica il numero della
+> migrazione in ogni PR e rinumera dopo ogni merge; un controllo della CI fallisce se una PR porta una migrazione con
+> numero non superiore all'ultima già su `main`. Nuova voce **EN-5** (1 punto, R1); regola in `docs/agile/README.md` e
+> in `CLAUDE.md`.
 
 ### 7.6 Chiusura dello Sprint 2
 Il lavoro è completo dal 02/10; formalmente lo sprint termina l'08/10.
 *Proposta:* chiudere oggi lo Sprint 2 (come per lo Sprint 1) e pianificare lo Sprint 3 dal 05/10.
 
-## 8. Proposta per lo Sprint 3 (da discutere in planning)
+> ✅ **Deciso (PO, 24/10):** Sprint 2 chiuso con questa review; Sprint 3 dal 24/10 (3 giorni) con **tutte** le voci
+> proposte, 22 punti — chiude il rilascio R1. Vedi [sprint-03.md](sprint-03.md).
+
+## 8. Sprint 3 (approvato il 24/10)
 
 **Obiettivo proposto:** *il Tutor segue le proprie segnalazioni e i propri beneficiari, con la cronologia completa;
 R1 chiuso.*
@@ -188,9 +213,11 @@ R1 chiuso.*
 | US-203 | Modifica beneficiario (con audit "solo campi") | 2 |
 | US-204 | Visibilità dei beneficiari per progetto | 3 |
 | US-304 | Ticket dei miei progetti | 3 |
-| *nuova* | Rilascio/riassegnazione della presa in carico (§7.2), se approvata | 2 |
-| *nuova* | Blocco della disattivazione di aziende con mansioni bloccate (§7.3), se approvata | 1 |
-| | **Totale** | **17–20** |
+| US-405 | Lavorazione condivisa tra operatori (§7.2, deciso) | 2 |
+| EN-4 | Contatti dei referenti aziendali nell'audit senza valori (§7.1, deciso) | 1 |
+| US-504 | Disattivazione impedita con mansioni bloccate (§7.3, deciso) | 1 |
+| EN-5 | Controllo della numerazione delle migrazioni nella CI (§7.5, deciso) | 1 |
+| | **Totale** | **22** |
 
 Con l'impegno a ~35 punti (§7.4), si possono anticipare le prime storie di **R2**: US-107 *Calendario del progetto* (3),
 US-703 *Calendario dei giorni lavorativi* (3), US-701 *Accettazione della proposta* (3), così che il ciclo

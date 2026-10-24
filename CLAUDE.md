@@ -12,10 +12,11 @@ Le regole sono imposte anche tecnicamente da `.claude/hooks/guard-git.sh` (PreTo
 
 ## Linee guida
 
-- **Processo Agile** (documenti in `docs/agile/`): sprint di 1 settimana, storie in `product-backlog.md` stimate in story
-  point Fibonacci, Definition of Ready/Done in `docs/agile/README.md`. Ogni storia (o piccolo gruppo coeso) → una change
-  OpenSpec → una PR; i criteri di accettazione diventano scenari delle spec. Aggiornare lo stato delle storie nel backlog e
-  il file dello sprint corrente; non iniziare storie che non soddisfano la Definition of Ready (domande aperte irrisolte).
+- **Processo Agile** (documenti in `docs/agile/`): sprint corti di 3 giorni (~20 punti; il PO lavora al progetto nel
+  tempo libero), storie in `product-backlog.md` stimate in story point Fibonacci, Definition of Ready/Done in
+  `docs/agile/README.md`. Ogni storia (o piccolo gruppo coeso) → una change OpenSpec → una PR; i criteri di accettazione
+  diventano scenari delle spec. Aggiornare lo stato delle storie nel backlog e il file dello sprint corrente; non
+  iniziare storie che non soddisfano la Definition of Ready (domande aperte irrisolte).
 
 - **Versioni congelate** (matrice in `openspec/changes/archive/2026-09-27-upgrade-latest-versions/design.md`): stack fissato il 2026-09-27
   alle ultime versioni stabili, LTS per i runtime (Java 25, Node 24.21.0). Prevalgono sulle versioni indicate dalle skill.
@@ -39,6 +40,8 @@ Le regole sono imposte anche tecnicamente da `.claude/hooks/guard-git.sh` (PreTo
   - ogni vincolo va messo anche nel database (`CHECK`/`UNIQUE`/FK con nome esplicito) e testato per nome come in
     `DomainConstraintsIT`;
   - `toString()` e log senza dati personali.
+- **Migrazioni Flyway**: indicare il numero (`V<n>`) nella descrizione della PR; dopo ogni merge del PO ricontrollare le PR
+  aperte e rinumerare quelle con un numero superato (la CI lo verifica, EN-5). Mai modificare una migrazione già su `main`.
 - Frontend: seguire la skill `react-frontend`. Ogni testo passa da `t()` (`src/languages/it.ts`).
 - Accessibilità WCAG 2.2 AA obbligatoria: nuovi componenti con test `expectNoAxeViolations` (`src/tests/axe.ts`),
   un solo `h1` per pagina via `PageHeading`, titolo pagina tramite `handle.titleKey` della route.
