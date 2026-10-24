@@ -9,11 +9,13 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.Year;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,13 +34,23 @@ import com.jayway.jsonpath.JsonPath;
 
 import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
+import it.nexus.domain.AppUser;
+import it.nexus.domain.Beneficiary;
+import it.nexus.domain.JobCategory;
+import it.nexus.domain.Project;
 import it.nexus.domain.TestEntities;
+import it.nexus.domain.UserProject;
 import it.nexus.domain.Zone;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.Role;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.AuditEventRepository;
+import it.nexus.repository.BeneficiaryRepository;
+import it.nexus.repository.JobCategoryRepository;
+import it.nexus.repository.ProjectRepository;
+import it.nexus.repository.TicketRepository;
+import it.nexus.repository.UserProjectRepository;
 import it.nexus.repository.ZoneRepository;
 
 @SpringBootTest
@@ -55,6 +67,11 @@ class BeneficiaryResourceIT {
     @Autowired ZoneRepository zones;
     @Autowired AuditEventRepository audit;
     @Autowired JdbcTemplate jdbc;
+    @Autowired ProjectRepository projects;
+    @Autowired UserProjectRepository userProjects;
+    @Autowired JobCategoryRepository categories;
+    @Autowired BeneficiaryRepository beneficiaries;
+    @Autowired TicketRepository tickets;
 
     private String zoneId;
     private String inactiveZoneId;
@@ -187,5 +204,103 @@ class BeneficiaryResourceIT {
         // nessuna traccia dei valori personali nel registro
         assertThat(jdbc.queryForObject("SELECT count(*) FROM audit_event WHERE changes::text LIKE '%Rossi%'", Long.class))
                 .isZero();
+    }
+
+    private ResultActions update(String user, String id, String json) throws Exception {
+        return mockMvc.perform(put("/api/v1/beneficiaries/" + id).header(USER, user).contentType(MediaType.APPLICATION_JSON).content(json));
+    }
+
+    private String registered(String user) throws Exception {
+        return JsonPath.read(register(user, body("")).andReturn().getResponse().getContentAsString(), "$.id");
+    }
+
+    @Test
+    void modificaDelProprietario_campiELingueAggiornati() throws Exception {
+        String id = registered("tutor1");
+        String changed = body("").replace("Mario", "Luigi").replace("[\"B\", \"CQC\"]", "[]")
+                .replace("{\"language\": \"en\", \"level\": \"B1\"}", "{\"language\": \"fr\", \"level\": \"A2\"}")
+                .replace("\"MADRELINGUA\"", "\"C2\"");
+
+        update("tutor1", id, changed)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName").value("Luigi"))
+                .andExpect(jsonPath("$.hasDrivingLicense").value(false))
+                .andExpect(jsonPath("$.languages[*].language").value(containsInAnyOrder("it", "fr")))
+                .andExpect(jsonPath("$.languages[?(@.language == 'it')].level").value(hasItem("C2")))
+                .andExpect(jsonPath("$.editable").value(true));
+    }
+
+    @Test
+    void modifica_auditConISoliNomiDeiCampi() throws Exception {
+        String id = registered("tutor1");
+        update("tutor1", id, body("").replace("Mario", "Luigi").replace("\"hasLaw68\": false", "\"hasLaw68\": true"))
+                .andExpect(status().isOk());
+        // nessuna modifica: nessun nuovo evento
+        update("tutor1", id, body("").replace("Mario", "Luigi").replace("\"hasLaw68\": false", "\"hasLaw68\": true"))
+                .andExpect(status().isOk());
+
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.BENEFICIARY,
+                TsidMapper.toInternal(id)))
+                .extracting(e -> e.getAction())
+                .containsExactly("CREATE", "UPDATE");
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.BENEFICIARY,
+                TsidMapper.toInternal(id)).get(1).getChanges())
+                .containsOnlyKeys("firstName", "hasLaw68")
+                .containsEntry("firstName", Map.of("redacted", true));
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM audit_event WHERE changes::text LIKE '%Luigi%'", Long.class))
+                .isZero();
+    }
+
+    @Test
+    void modifica_soloIlProprietario() throws Exception {
+        String id = registered("tutor1");
+        update("tutor2", id, body("")).andExpect(status().isNotFound());
+        shareProject("tutor1", "tutor2", id);
+
+        update("tutor2", id, body("")).andExpect(status().isForbidden());
+        update("operatore.cc", id, body("")).andExpect(status().isForbidden());
+    }
+
+    @Test
+    void modifica_zonaGiaAssegnataAncheSeDisattivata() throws Exception {
+        String id = registered("tutor1");
+        zones.findById(TsidMapper.toInternal(zoneId)).orElseThrow().setActive(false);
+
+        update("tutor1", id, body("").replace("Mario", "Luigi")).andExpect(status().isOk());
+        update("tutor1", id, body("").replace(zoneId, inactiveZoneId))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("residenceZoneId"));
+    }
+
+    @Test
+    void visibilita_tutorDelProgettoVedeIDatiCompletiInSolaLettura() throws Exception {
+        String id = registered("tutor1");
+        // un Tutor di un altro progetto non lo vede
+        Project other = projects.save(TestEntities.project("QALTRO"));
+        userProjects.save(new UserProject(users.findByUsername("tutor2").orElseThrow(), other));
+        mockMvc.perform(get("/api/v1/beneficiaries/" + id).header(USER, "tutor2")).andExpect(status().isNotFound());
+
+        shareProject("tutor1", "tutor2", id);
+        mockMvc.perform(get("/api/v1/beneficiaries/" + id).header(USER, "tutor2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName").value("Mario"))
+                .andExpect(jsonPath("$.lastName").value("Rossi"))
+                .andExpect(jsonPath("$.editable").value(false));
+        mockMvc.perform(get("/api/v1/beneficiaries/" + id).header(USER, "tutor1"))
+                .andExpect(jsonPath("$.editable").value(true))
+                .andExpect(jsonPath("$.ownerTutorName").isString());
+        // "I miei beneficiari" resta solo del proprietario
+        mockMvc.perform(get("/api/v1/beneficiaries").header(USER, "tutor2")).andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    /** Segnalazione del beneficiario nel progetto QSHARE, a cui sono assegnati il proprietario e il collega. */
+    private void shareProject(String owner, String colleague, String beneficiaryId) {
+        AppUser ownerUser = users.findByUsername(owner).orElseThrow();
+        Project project = projects.save(TestEntities.project("QSHARE"));
+        userProjects.save(new UserProject(ownerUser, project));
+        userProjects.save(new UserProject(users.findByUsername(colleague).orElseThrow(), project));
+        JobCategory category = categories.save(TestEntities.jobCategory("QCAT"));
+        Beneficiary beneficiary = beneficiaries.findById(TsidMapper.toInternal(beneficiaryId)).orElseThrow();
+        tickets.saveAndFlush(TestEntities.ticket(ownerUser, project, beneficiary, category));
     }
 }

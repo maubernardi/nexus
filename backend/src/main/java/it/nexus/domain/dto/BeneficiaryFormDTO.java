@@ -14,8 +14,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-/** Dati per registrare un beneficiario. Il possesso della patente è dedotto da {@code licenseTypes}. */
-public record BeneficiaryCreateDTO(
+/**
+ * Dati del beneficiario inviati dal modulo, in registrazione e in modifica. Il possesso della patente è dedotto da
+ * {@code licenseTypes}.
+ */
+public record BeneficiaryFormDTO(
         @NotBlank @Size(max = 100) String firstName,
         @NotBlank @Size(max = 100) String lastName,
         @NotNull @BirthYear Integer birthYear,
@@ -31,7 +34,7 @@ public record BeneficiaryCreateDTO(
         @Size(max = 2000) String constraints,
         @Valid @Size(max = 12) List<BeneficiaryLanguageDTO> languages) {
 
-    public BeneficiaryCreateDTO {
+    public BeneficiaryFormDTO {
         licenseTypes = licenseTypes == null ? Set.of() : Set.copyOf(licenseTypes);
         languages = languages == null ? List.of() : List.copyOf(languages);
     }

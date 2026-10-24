@@ -83,15 +83,54 @@ const toPayload = (v: BeneficiaryFormValues): BeneficiaryCreate => ({
   languages: v.languages.map((l) => ({ language: l.language, level: l.level as LanguageLevel })),
 });
 
+const toValues = (b: Beneficiary): BeneficiaryFormValues => ({
+  firstName: b.firstName,
+  lastName: b.lastName,
+  birthYear: String(b.birthYear),
+  gender: b.gender,
+  nationality: b.nationality ?? '',
+  citizenship: b.citizenship ?? '',
+  residenceZoneId: b.residenceZone.id,
+  licenseTypes: b.licenseTypes,
+  hasVehicle: b.hasVehicle,
+  transportMode: b.transportMode ?? '',
+  educationLevel: b.educationLevel ?? '',
+  hasLaw68: b.hasLaw68,
+  constraints: b.constraints ?? '',
+  languages: b.languages.map((l) => ({ language: l.language, level: l.level })),
+});
+
 type BeneficiaryFormProps = {
+  /** In modifica (US-203): dati di partenza; assente in registrazione. */
+  beneficiary?: Beneficiary;
+  submitLabel?: string;
+  submittingLabel?: string;
+  /** Salvataggio; per default registra un nuovo beneficiario. */
+  onSubmit?: (payload: BeneficiaryCreate) => Promise<Beneficiary>;
   onSuccess: (beneficiary: Beneficiary) => void;
 };
 
-/** Registrazione di un beneficiario (US-201): quattro sezioni, errori sui campi e riepilogo focalizzato all'invio. */
-export const BeneficiaryForm = ({ onSuccess }: BeneficiaryFormProps) => {
+/**
+ * Registrazione (US-201) e modifica (US-203) di un beneficiario: quattro sezioni, errori sui campi e riepilogo
+ * focalizzato all'invio.
+ */
+export const BeneficiaryForm = ({
+  beneficiary,
+  submitLabel,
+  submittingLabel,
+  onSubmit,
+  onSuccess,
+}: BeneficiaryFormProps) => {
   const { t } = useTranslation();
   const zones = useZones();
   const createBeneficiary = useCreateBeneficiary();
+  const save = onSubmit ?? createBeneficiary.mutateAsync;
+  // in modifica la zona attuale è sempre tra le opzioni: anche prima del caricamento e se nel frattempo è disattivata
+  const zoneOptions = useMemo(() => {
+    const active = zones.data ?? [];
+    const current = beneficiary?.residenceZone;
+    return current && !active.some((z) => z.id === current.id) ? [current, ...active] : active;
+  }, [zones.data, beneficiary]);
   const [genericError, setGenericError] = useState(false);
   const countries = useMemo(() => countryOptions(), []);
   const languages = useMemo(() => languageOptions(), []);
@@ -104,7 +143,7 @@ export const BeneficiaryForm = ({ onSuccess }: BeneficiaryFormProps) => {
     setError,
     formState: { errors, isSubmitting, submitCount },
   } = useForm<BeneficiaryFormValues>({
-    defaultValues: EMPTY,
+    defaultValues: beneficiary ? toValues(beneficiary) : EMPTY,
     mode: 'onSubmit',
     reValidateMode: 'onChange',
     // il focus va al riepilogo degli errori (non al primo campo): lo gestisce useErrorSummaryFocus
@@ -171,7 +210,7 @@ export const BeneficiaryForm = ({ onSuccess }: BeneficiaryFormProps) => {
       return;
     }
     try {
-      onSuccess(await createBeneficiary.mutateAsync(toPayload(values)));
+      onSuccess(await save(toPayload(values)));
     } catch (error) {
       const fieldErrors = apiError(error)?.fieldErrors ?? [];
       if (fieldErrors.length > 0) {
@@ -304,7 +343,7 @@ export const BeneficiaryForm = ({ onSuccess }: BeneficiaryFormProps) => {
             {(p) => (
               <NativeSelect {...p} disabled={zones.isPending} {...register('residenceZoneId', { required })}>
                 <option value="">{t('form.select')}</option>
-                {(zones.data ?? []).map((z) => (
+                {zoneOptions.map((z) => (
                   <option key={z.id} value={z.id}>
                     {z.name}
                   </option>
@@ -490,7 +529,9 @@ export const BeneficiaryForm = ({ onSuccess }: BeneficiaryFormProps) => {
       </section>
 
       <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={isSubmitting}>
-        {isSubmitting ? t('beneficiary.submitting') : t('beneficiary.submit')}
+        {isSubmitting
+          ? (submittingLabel ?? t('beneficiary.submitting'))
+          : (submitLabel ?? t('beneficiary.submit'))}
       </Button>
     </form>
   );

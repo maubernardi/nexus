@@ -17,10 +17,12 @@ import it.nexus.domain.enumeration.LicenseType;
 public interface BeneficiaryMapper {
 
     @Mapping(target = "id", expression = "java(TsidMapper.toExternal(beneficiary.getId()))")
-    @Mapping(target = "hasDrivingLicense", source = "hasDrivingLicense")
-    @Mapping(target = "hasVehicle", source = "hasVehicle")
-    @Mapping(target = "hasLaw68", source = "hasLaw68")
-    BeneficiaryDTO toDto(Beneficiary beneficiary);
+    @Mapping(target = "hasDrivingLicense", source = "beneficiary.hasDrivingLicense")
+    @Mapping(target = "hasVehicle", source = "beneficiary.hasVehicle")
+    @Mapping(target = "hasLaw68", source = "beneficiary.hasLaw68")
+    @Mapping(target = "ownerTutorName",
+            expression = "java(beneficiary.getOwnerTutor().getFirstName() + \" \" + beneficiary.getOwnerTutor().getLastName())")
+    BeneficiaryDTO toDto(Beneficiary beneficiary, boolean editable);
 
     @Mapping(target = "id", expression = "java(TsidMapper.toExternal(beneficiary.getId()))")
     @Mapping(target = "residenceZoneName", source = "residenceZone.name")

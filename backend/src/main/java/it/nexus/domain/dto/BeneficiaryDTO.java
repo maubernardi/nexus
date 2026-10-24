@@ -8,6 +8,9 @@ import it.nexus.domain.enumeration.Gender;
 import it.nexus.domain.enumeration.LicenseType;
 import it.nexus.domain.enumeration.TransportMode;
 
+/**
+ * Scheda del beneficiario. {@code editable}: l'utente corrente può modificarlo (solo il Tutor proprietario, US-203).
+ */
 public record BeneficiaryDTO(
         String id,
         String firstName,
@@ -25,5 +28,7 @@ public record BeneficiaryDTO(
         EducationLevel educationLevel,
         String constraints,
         List<BeneficiaryLanguageDTO> languages,
-        Instant createdAt) {
+        Instant createdAt,
+        String ownerTutorName,
+        boolean editable) {
 }

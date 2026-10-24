@@ -72,7 +72,8 @@ export const MainNav = ({ roles, mobileHeader }: MainNavProps) => {
             <li key={to}>
               <NavLink
                 to={to}
-                end
+                // la voce resta attiva anche nelle pagine interne della sezione (es. scheda di un beneficiario)
+                end={to === '/'}
                 className={({ isActive }) =>
                   cn(
                     'flex min-h-11 items-center gap-2 rounded-md px-3 text-sm font-medium text-brand-foreground hover:bg-brand-foreground/10 md:min-h-9',
