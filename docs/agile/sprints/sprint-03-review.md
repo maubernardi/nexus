@@ -212,7 +212,7 @@ accetta la proposta e parte il timer sui giorni lavorativi del progetto.*
 | US-505 | Diario delle note dell'azienda | 2 | R1 |
 | US-503 | Storico e pregressi dell'azienda | 3 | R1 |
 | US-604 | Dettagli di azienda e mansione durante l'abbinamento | 5 | R1 |
-| US-107 | Calendario del progetto (patrono, chiusure) | 3 | R2 |
+| US-107 | Calendario unico (patrono, chiusure) | 3 | R2 |
 | US-703 | Calendario dei giorni lavorativi | 3 | R2 |
 | US-701 | Accettazione della proposta (timer di 7 giorni lavorativi) | 3 | R2 |
 | | **Totale** | **19** | |
@@ -223,6 +223,14 @@ Tutor* (5), dopo la decisione §8.2. Per il PO: US-1301 e il deploy della demo (
 
 *Alternativa:* al posto della catena del calendario, US-302 (5) e US-701 senza timer; sconsigliata, perché US-701 senza
 calendario andrebbe rifatta.
+
+> ✅ **Deciso (PO, 24/10): piano confermato** (19 punti, extra US-302), con queste scelte:
+> - **US-503**: le voci del riepilogo compaiono sempre, a zero finché i relativi eventi non esistono;
+> - **US-107**: il calendario è **unico per tutti** i progetti (non per progetto, come detto in Q4 e Q13): pagina
+>   "Calendario" per l'ADMIN con patrono (24 giugno) e chiusure, con audit;
+> - **US-703**: festività nazionali calcolate nel codice, Pasqua e Pasquetta comprese; il **4 ottobre è escluso**.
+>
+> Q4, Q13, US-107, US-703 e la roadmap aggiornati di conseguenza. Sprint 4: [sprint-04.md](sprint-04.md).
 
 ## 10. Azioni a carico del PO
 
