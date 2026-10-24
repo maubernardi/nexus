@@ -23,6 +23,15 @@ jobs:
         working-directory: backend
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # storia completa: il controllo delle migrazioni confronta la PR con il branch di destinazione
+          fetch-depth: 0
+      - name: Migrazioni Flyway (numerazione e immutabilità, EN-5)
+        if: github.event_name == 'pull_request'
+        working-directory: .
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: .github/scripts/check-migrations.sh "origin/$BASE_REF"
       - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: temurin
