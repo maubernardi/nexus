@@ -16,7 +16,13 @@ strumento esterno). Il *cosa* e il *perché* stanno nel backlog; il *come* nelle
 | **Product Owner** | Mauro Bernardi | ordina il backlog, sceglie l'obiettivo dello sprint, chiarisce i requisiti, **accetta** le storie, esegue merge e deploy |
 | **Team di sviluppo** | Claude Code | raffina e stima le storie, le implementa (OpenSpec → codice → test → PR), prepara la demo, propone miglioramenti |
 
-## Cadenza (sprint di 1 settimana)
+## Cadenza (sprint corti di 3 giorni)
+
+Dal 05/10/2026 (decisione del PO nella review dello Sprint 2): sprint di **3 giorni di calendario** con impegno di circa
+**20 punti**. Il PO segue il progetto nel tempo libero e si confronta con il committente quando può: le cerimonie sono
+leggere e **asincrone** — review, retrospettiva e planning stanno in un unico documento Markdown preparato dal team e
+discusso quando il PO è disponibile. Se lo sprint finisce prima, il team prepara il documento e aspetta; il lavoro non
+unito resta nelle PR.
 
 | Momento | Quando | Cosa produce |
 |---|---|---|
@@ -25,6 +31,13 @@ strumento esterno). Il *cosa* e il *perché* stanno nel backlog; il *come* nelle
 | **Sprint Review** | fine sprint | demo **online** su https://portalenexus.it; il PO accetta o rifiuta ogni storia |
 | **Retrospettiva** | fine sprint | cosa ha funzionato, cosa migliorare, azioni (nel file dello sprint) |
 | **Raffinamento del backlog** | continuo | storie chiarite, stimate, spezzate; domande aperte risolte con il PO |
+
+## Migrazioni del database in PR parallele
+
+Decisione del PO (24/10): ogni PR che aggiunge una migrazione Flyway ne indica il numero nella descrizione. Dopo ogni
+merge il team controlla le PR ancora aperte e, se una ha una migrazione con numero ormai superato, la rinumera prima
+del merge. La CI rifiuta una migrazione con numero non superiore all'ultima già su `main` (EN-5). Il PO unisce le PR in
+qualunque ordine.
 
 ## Flusso di una storia
 
@@ -62,5 +75,5 @@ Una storia è *Done* quando:
 
 ## Metriche
 
-- **Velocity**: somma dei punti delle storie *Done* per sprint; dalla terza settimana guida la capacità del planning.
+- **Velocity**: somma dei punti delle storie *Done* per sprint; con sprint da 3 giorni guida la capacità del planning dal terzo sprint corto.
 - **Burndown**: nel file dello sprint, punti residui a metà e a fine sprint.
