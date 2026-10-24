@@ -19,4 +19,15 @@ class AuditChangesTest {
         assertThat(changes).containsOnlyKeys("status", "lastName");
         assertThat(changes.get("lastName")).isEqualTo(Map.of("redacted", true));
     }
+
+    @Test
+    void datoPersonaleRegistratoSoloSeCambiato() {
+        Map<String, Object> changes = AuditChanges.of()
+                .redactedIfChanged("email", "a@x.it", "a@x.it")
+                .redactedIfChanged("phone", null, "055 1")
+                .asMap();
+
+        assertThat(changes).containsOnlyKeys("phone");
+        assertThat(changes.get("phone")).isEqualTo(Map.of("redacted", true));
+    }
 }

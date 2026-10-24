@@ -59,9 +59,10 @@ public class CompanyServiceImpl implements CompanyService {
                 .value("name", null, saved.getName())
                 .value("vatCode", null, saved.getVatCode())
                 .value("legalAddress", null, saved.getLegalAddress())
-                .value("contactPerson", null, saved.getContactPerson())
-                .value("phone", null, saved.getPhone())
-                .value("email", null, saved.getEmail()), null);
+                // contatti del referente: dati personali, nell'audit senza valori (EN-4)
+                .redactedIfChanged("contactPerson", null, saved.getContactPerson())
+                .redactedIfChanged("phone", null, saved.getPhone())
+                .redactedIfChanged("email", null, saved.getEmail()), null);
         return mapper.toDto(saved);
     }
 
@@ -81,9 +82,9 @@ public class CompanyServiceImpl implements CompanyService {
                 .value("name", company.getName(), dto.name().strip())
                 .value("vatCode", company.getVatCode(), vatCode)
                 .value("legalAddress", company.getLegalAddress(), blankToNull(dto.legalAddress()))
-                .value("contactPerson", company.getContactPerson(), blankToNull(dto.contactPerson()))
-                .value("phone", company.getPhone(), blankToNull(dto.phone()))
-                .value("email", company.getEmail(), blankToNull(dto.email()));
+                .redactedIfChanged("contactPerson", company.getContactPerson(), blankToNull(dto.contactPerson()))
+                .redactedIfChanged("phone", company.getPhone(), blankToNull(dto.phone()))
+                .redactedIfChanged("email", company.getEmail(), blankToNull(dto.email()));
         company.setName(dto.name().strip());
         company.setVatCode(vatCode);
         apply(company, dto);

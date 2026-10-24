@@ -66,8 +66,8 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | 📋 Backlog |
 | [US-107](#us-107) | E1 | Calendario del progetto | Must | 3 | R2 | 📋 Backlog |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
-| [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | ✅ Ready (Sprint 3) |
-| [EN-5](#en-5) | E13 | Controllo della numerazione delle migrazioni nella CI | Must | 1 | R1 | 👀 In review (Sprint 3) |
+| [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 👀 In review (Sprint 3) |
+| [EN-5](#en-5) | E13 | Controllo della numerazione delle migrazioni nella CI | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [US-201](#us-201) | E2 | Inserimento beneficiario | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | ✅ Ready (Sprint 3) |
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | ✅ Ready (Sprint 3) |
@@ -680,7 +680,7 @@ Criteri di accettazione:
 - L'ADMIN consulta l'audit filtrando per entità, autore e periodo.
 
 #### EN-4
-**Contatti dei referenti aziendali nell'audit senza valori** · Must · 1 punti · R1 · ✅ Ready (Sprint 3)
+**Contatti dei referenti aziendali nell'audit senza valori** · Must · 1 punti · R1 · 👀 In review (Sprint 3)
 
 Come **responsabile della privacy** voglio che nome, telefono ed email del referente di un'azienda non finiscano nell'audit
 (che non si può cancellare) per rispettare la minimizzazione GDPR. Decisione del PO nella review dello Sprint 2 (04/10).
@@ -690,7 +690,7 @@ Criteri di accettazione:
   impostato o modificato, mai il valore; gli altri campi restano con prima/dopo.
 
 #### EN-5
-**Controllo della numerazione delle migrazioni nella CI** · Must · 1 punti · R1 · 👀 In review (Sprint 3)
+**Controllo della numerazione delle migrazioni nella CI** · Must · 1 punti · R1 · 🎉 Done (Sprint 3)
 
 Come **PO** voglio che una PR con una migrazione numerata male venga segnalata dalla CI per non scoprirlo durante un
 deploy (caso V11/V12 dello Sprint 2). Decisione del PO nella review dello Sprint 2 (24/10).
