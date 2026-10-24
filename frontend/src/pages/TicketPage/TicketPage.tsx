@@ -1,15 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
 import { Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router';
+import { Link, Navigate, useParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
 import { NativeSelect } from '@/components/ui/native-select';
 import { apiError } from '@/config/api/errors';
-import type { JobSlotMatch, TicketDetail } from '@/config/api/ticketApi';
+import type { JobSlotMatch, TicketDetail, TicketEvent } from '@/config/api/ticketApi';
+import { useCurrentUser } from '@/config/hooks/useCurrentUser';
 import { useJobCategories, useZones } from '@/config/hooks/useReferenceData';
-import { useCompatibleJobSlots, useMatchTicket, useTakeOver, useTicketWork } from '@/config/hooks/useTickets';
+import {
+  useCompatibleJobSlots,
+  useMatchTicket,
+  useTakeOver,
+  useTicket,
+  useTicketHistory,
+} from '@/config/hooks/useTickets';
+import { TICKET_STATUSES } from '@/lib/domainValues';
 
 const dateTime = new Intl.DateTimeFormat('it-IT', { dateStyle: 'short', timeStyle: 'short' });
 
@@ -22,11 +30,22 @@ type Outcome =
   | { kind: 'conflict'; reason: string }
   | { kind: 'error' };
 
-/** Lavorazione di una segnalazione da parte del Call Center: compatibili e abbinamento (US-601, US-602). */
-export const TicketWorkPage = () => {
+/** Vecchio indirizzo della lavorazione (`/lavorazioni/:id`): porta al dettaglio unico. */
+export const LegacyWorkRedirect = () => {
+  const { id = '' } = useParams();
+  return <Navigate to={`/segnalazioni/${id}`} replace />;
+};
+
+/**
+ * Dettaglio della segnalazione per tutti i ruoli (US-305): dati, proposta e cronologia; per Call Center e ADMIN anche
+ * la lavorazione (presa in carico da un collega, mansioni compatibili e abbinamento, US-405/601/602).
+ */
+export const TicketPage = () => {
   const { t } = useTranslation();
   const { id = '' } = useParams();
-  const ticket = useTicketWork(id);
+  const ticket = useTicket(id);
+  const { data: user } = useCurrentUser();
+  const isCallCenter = user?.roles.some((r) => r === 'CALL_CENTER' || r === 'ADMIN') ?? false;
   const outcomeRef = useRef<HTMLDivElement>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const takeOver = useTakeOver();
@@ -41,8 +60,8 @@ export const TicketWorkPage = () => {
         <PageHeading>
           {t(apiError(ticket.error)?.status === 404 ? 'work.notFound' : 'common.loadError')}
         </PageHeading>
-        <Link to="/lavorazioni" className="font-medium text-primary underline underline-offset-4">
-          {t('work.backToMyWork')}
+        <Link to="/" className="font-medium text-primary underline underline-offset-4">
+          {t('work.backToList')}
         </Link>
       </div>
     );
@@ -52,8 +71,8 @@ export const TicketWorkPage = () => {
   }
   const d = ticket.data;
   // dopo la presa in carico chiunque del Call Center (o l'ADMIN) può lavorarla, anche se è di un collega (US-405)
-  const canMatch = d.status === 'IN_LAVORAZIONE' && d.assignedOperatorName !== null;
-  const ofColleague = d.assignedOperatorName !== null && !d.assignedToMe;
+  const canMatch = isCallCenter && d.status === 'IN_LAVORAZIONE' && d.assignedOperatorName !== null;
+  const ofColleague = isCallCenter && d.assignedOperatorName !== null && !d.assignedToMe;
   const onTakeOver = (): void => {
     takeOver.mutate(
       { id: d.id, version: d.version },
@@ -74,7 +93,7 @@ export const TicketWorkPage = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeading>{t('pages.ticketWork.heading', { number: d.number })}</PageHeading>
+      <PageHeading>{t('pages.ticket.heading', { number: d.number })}</PageHeading>
       <p className="font-medium">
         {t('work.status', { status: t(`enums.ticketStatus.${d.status}`) })} · {assignment}
       </p>
@@ -129,15 +148,77 @@ export const TicketWorkPage = () => {
           </dl>
         </section>
       )}
-      {d.status === 'IN_LAVORAZIONE' && !canMatch && (
+      {isCallCenter && d.status === 'IN_LAVORAZIONE' && !canMatch && (
         <p className="rounded-xl border border-border bg-card p-4">{t('work.notTaken')}</p>
       )}
       {canMatch && <CompatibleSection ticket={d} onOutcome={setOutcome} />}
 
-      <Link to="/lavorazioni" className="inline-block font-medium text-primary underline underline-offset-4">
-        {t('work.backToMyWork')}
+      <TicketHistory ticketId={d.id} />
+
+      <Link to="/" className="inline-block font-medium text-primary underline underline-offset-4">
+        {t('work.backToList')}
       </Link>
     </div>
+  );
+};
+
+const KNOWN_ACTIONS = ['SUBMIT', 'TAKE_CHARGE', 'TAKE_OVER', 'MATCH', 'STATUS'] as const;
+
+/** Cronologia della segnalazione (US-305): lista ordinata dalla più vecchia, con data, autore, azione, stato e nota. */
+const TicketHistory = ({ ticketId }: { ticketId: string }) => {
+  const { t } = useTranslation();
+  const history = useTicketHistory(ticketId);
+  // dallo storico degli stati, un evento senza stato di partenza è la creazione: "Segnalazione inviata"
+  const actionLabel = (e: TicketEvent): string => {
+    const action = e.action === 'STATUS' && e.fromStatus === null ? 'SUBMIT' : e.action;
+    return (KNOWN_ACTIONS as readonly string[]).includes(action)
+      ? t(`work.actions.${action as (typeof KNOWN_ACTIONS)[number]}`)
+      : action;
+  };
+  const statusLabel = (s: TicketEvent['toStatus']): string =>
+    s && (TICKET_STATUSES as readonly string[]).includes(s) ? t(`enums.ticketStatus.${s}`) : '';
+
+  return (
+    <section aria-labelledby="work-history" className="space-y-3 rounded-xl border border-border bg-card p-4">
+      <h2 id="work-history" className="text-lg font-semibold text-primary">
+        {t('work.sections.history')}
+      </h2>
+      {history.isError ? (
+        <p role="alert" className="font-medium text-destructive">
+          {t('common.loadError')}
+        </p>
+      ) : !history.data ? (
+        <p>{t('common.loading')}</p>
+      ) : history.data.length === 0 ? (
+        <p>{t('work.historyEmpty')}</p>
+      ) : (
+        <ol className="space-y-3">
+          {history.data.map((e, i) => (
+            <li key={`${e.at}-${i}`} className="border-l-4 border-primary/40 pl-3">
+              <p className="font-medium">
+                {actionLabel(e)}
+                {e.toStatus && (
+                  <>
+                    {' – '}
+                    {e.fromStatus
+                      ? t('work.statusChange', {
+                          from: statusLabel(e.fromStatus),
+                          to: statusLabel(e.toStatus),
+                        })
+                      : t('work.statusSet', { to: statusLabel(e.toStatus) })}
+                  </>
+                )}
+              </p>
+              {e.detail && <p>{e.detail}</p>}
+              {e.note && <p className="italic">{t('work.note', { note: e.note })}</p>}
+              <p className="text-sm text-muted-foreground">
+                <time dateTime={e.at}>{dateTime.format(new Date(e.at))}</time> · {e.authorName}
+              </p>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
   );
 };
 

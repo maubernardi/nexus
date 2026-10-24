@@ -21,6 +21,7 @@ import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
+import it.nexus.domain.dto.TicketEventDTO;
 import it.nexus.domain.dto.VersionDTO;
 import it.nexus.domain.enumeration.TicketListView;
 import it.nexus.domain.enumeration.TicketStatus;
@@ -52,11 +53,18 @@ public class TicketResource {
         return ResponseEntity.ok(ticketService.takeCharge(id, body.version()));
     }
 
-    @GetMapping("/{id}/work")
-    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
-    @Operation(summary = "Dettaglio della segnalazione per la lavorazione del Call Center")
-    public ResponseEntity<TicketDetailDTO> getForWork(@PathVariable String id) {
-        return ResponseEntity.ok(ticketService.getForWork(id));
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Dettaglio della segnalazione (Tutor: le proprie e dei suoi progetti)")
+    public ResponseEntity<TicketDetailDTO> getDetail(@PathVariable String id) {
+        return ResponseEntity.ok(ticketService.getDetail(id));
+    }
+
+    @GetMapping("/{id}/history")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Cronologia della segnalazione: data, autore, azione, stato e nota")
+    public ResponseEntity<List<TicketEventDTO>> history(@PathVariable String id) {
+        return ResponseEntity.ok(ticketService.history(id));
     }
 
     @GetMapping("/{id}/compatible-job-slots")

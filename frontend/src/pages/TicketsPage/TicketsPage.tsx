@@ -209,7 +209,7 @@ export const TicketsPage = () => {
             <>
               <p className="font-medium">{t('tickets.taken', { number: outcome.number })}</p>
               <Link
-                to={`/lavorazioni/${outcome.id}`}
+                to={`/segnalazioni/${outcome.id}`}
                 className="font-medium text-primary underline underline-offset-4"
               >
                 {t('tickets.workIt', { number: outcome.number })}
@@ -243,8 +243,7 @@ export const TicketsPage = () => {
           items={list.data}
           caption={t(`tickets.caption.${view}`)}
           columns={COLUMNS[view]}
-          // il Call Center apre la lavorazione; il dettaglio per il Tutor arriva con US-305
-          rowLink={isTutor ? undefined : (item) => `/lavorazioni/${item.id}`}
+          rowLink={(item) => `/segnalazioni/${item.id}`}
           onTakeCharge={view === 'TO_TAKE' ? onTakeCharge : undefined}
           pendingId={takeCharge.isPending ? (takeCharge.variables?.id ?? null) : null}
         />

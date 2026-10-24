@@ -1,10 +1,15 @@
 package it.nexus.services.impl;
 
+import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import it.nexus.config.security.AuthenticatedUser;
 import it.nexus.config.security.SecurityUtils;
 import it.nexus.domain.AppUser;
+import it.nexus.domain.AuditEvent;
 import it.nexus.domain.Beneficiary;
 import it.nexus.domain.Company;
 import it.nexus.domain.CompanyAuditEvent;
@@ -22,6 +28,7 @@ import it.nexus.domain.JobSlot;
 import it.nexus.domain.Project;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.TicketCompanyBlacklist;
+import it.nexus.domain.TicketStatusHistory;
 import it.nexus.domain.UserProject;
 import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.JobSlotMatchDTO;
@@ -29,6 +36,7 @@ import it.nexus.domain.dto.MatchRequestDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
+import it.nexus.domain.dto.TicketEventDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.JobSlotStatus;
@@ -42,6 +50,8 @@ import it.nexus.mapper.JobSlotMapper;
 import it.nexus.mapper.ReferenceMapper;
 import it.nexus.mapper.TicketMapper;
 import it.nexus.mapper.TsidMapper;
+import it.nexus.repository.AppUserRepository;
+import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.JobCategoryRepository;
@@ -50,6 +60,7 @@ import it.nexus.repository.ProjectRepository;
 import it.nexus.repository.TicketCompanyBlacklistRepository;
 import it.nexus.repository.TicketRepository;
 import it.nexus.repository.TicketSpecifications;
+import it.nexus.repository.TicketStatusHistoryRepository;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.CurrentAppUserService;
@@ -77,6 +88,9 @@ public class TicketServiceImpl implements TicketService {
     private final CurrentAppUserService currentAppUserService;
     private final TicketStateMachine stateMachine;
     private final TicketMapper mapper;
+    private final AuditEventRepository auditEventRepository;
+    private final TicketStatusHistoryRepository historyRepository;
+    private final AppUserRepository appUserRepository;
     private final JobSlotRepository jobSlotRepository;
     private final TicketCompanyBlacklistRepository blacklistRepository;
     private final CompanyAuditEventRepository companyAuditEvents;
@@ -166,8 +180,83 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     @Transactional(readOnly = true)
-    public TicketDetailDTO getForWork(String ticketId) {
-        return detail(findTicket(ticketId), currentAppUserService.getCurrentAppUser());
+    public TicketDetailDTO getDetail(String ticketId) {
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        return detail(visibleTicket(ticketId, me), me);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TicketEventDTO> history(String ticketId) {
+        Ticket ticket = visibleTicket(ticketId, currentAppUserService.getCurrentAppUser());
+        List<AuditEvent> events = auditEventRepository.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(
+                AuditEntityType.TICKET, ticket.getId());
+        // segnalazioni nate prima dell'audit (EN-2): i cambi di stato che l'audit non registra vengono dallo storico
+        Set<String> inAudit = events.stream()
+                .map(e -> status(e, "before") + ">" + status(e, "after"))
+                .collect(Collectors.toSet());
+        List<TicketStatusHistory> earlier = historyRepository.findByTicketIdOrderByCreatedAtAsc(ticket.getId()).stream()
+                .filter(r -> !inAudit.contains(r.getFromStatus() + ">" + r.getToStatus()))
+                .toList();
+        Map<String, String> names = displayNames(Stream.concat(
+                earlier.stream().map(TicketStatusHistory::getCreatedBy),
+                events.stream().map(AuditEvent::getCreatedBy)).toList());
+        return Stream.concat(
+                earlier.stream().map(r -> new TicketEventDTO(r.getCreatedAt(), names.get(r.getCreatedBy()), "STATUS",
+                        r.getFromStatus(), r.getToStatus(), null, r.getNote())),
+                events.stream().map(e -> new TicketEventDTO(e.getCreatedAt(), names.get(e.getCreatedBy()), e.getAction(),
+                        status(e, "before"), status(e, "after"), describe(e), e.getReason())))
+                .toList();
+    }
+
+    /** Dettaglio leggibile di un evento: chi ha preso in carico, a chi è passata, quale proposta. */
+    private String describe(AuditEvent event) {
+        return switch (event.getAction()) {
+            case "TAKE_CHARGE" -> userName(changed(event, "assignedCcOperatorId", "after"));
+            case "TAKE_OVER" -> "%s → %s".formatted(userName(changed(event, "assignedCcOperatorId", "before")),
+                    userName(changed(event, "assignedCcOperatorId", "after")));
+            case "MATCH" -> Optional.ofNullable(TsidMapper.toInternal(changed(event, "jobSlotId", "after")))
+                    .flatMap(jobSlotRepository::findById)
+                    .map(slot -> "«%s» presso %s".formatted(slot.getTitle(), slot.getCompany().getName()))
+                    .orElse(null);
+            default -> null;
+        };
+    }
+
+    private String userName(String externalId) {
+        return Optional.ofNullable(TsidMapper.toInternal(externalId))
+                .flatMap(appUserRepository::findById)
+                .map(u -> u.getFirstName() + " " + u.getLastName())
+                .orElse(null);
+    }
+
+    private static String changed(AuditEvent event, String field, String side) {
+        Object change = event.getChanges().get(field);
+        return change instanceof Map<?, ?> map && map.get(side) != null ? map.get(side).toString() : null;
+    }
+
+    private static TicketStatus status(AuditEvent event, String side) {
+        String value = changed(event, "status", side);
+        return value == null ? null : TicketStatus.valueOf(value);
+    }
+
+    /** Nome e cognome degli autori (gli username dell'audit); le operazioni automatiche risultano dal "Sistema". */
+    private Map<String, String> displayNames(Collection<String> usernames) {
+        Map<String, String> names = new HashMap<>();
+        appUserRepository.findByUsernameIn(new HashSet<>(usernames))
+                .forEach(u -> names.put(u.getUsername(), u.getFirstName() + " " + u.getLastName()));
+        usernames.forEach(u -> names.putIfAbsent(u, "Sistema"));
+        return names;
+    }
+
+    /** Ticket visibile all'utente; altrimenti 404, come per un ticket inesistente. */
+    private Ticket visibleTicket(String ticketId, AppUser me) {
+        Ticket ticket = findTicket(ticketId);
+        if (currentAppUserService.hasGlobalVisibility() || ticket.getTutor().getId().equals(me.getId())
+                || userProjectRepository.existsById(new UserProject.Id(me.getId(), ticket.getProject().getId()))) {
+            return ticket;
+        }
+        throw new NotFoundException("Segnalazione non trovata");
     }
 
     @Override

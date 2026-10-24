@@ -15,7 +15,8 @@ vi.mock('@/config/api/ticketApi', () => ({
   fetchTickets: vi.fn(),
   submitTicket: vi.fn(),
   takeCharge: vi.fn(),
-  fetchTicketWork: vi.fn(),
+  fetchTicket: vi.fn(),
+  fetchTicketHistory: vi.fn(),
   fetchCompatibleJobSlots: vi.fn(),
   matchTicket: vi.fn(),
   takeOverTicket: vi.fn(),
@@ -103,7 +104,7 @@ describe('<TicketsPage>', () => {
     expect(within(first).getByText('Fast-track')).toBeInTheDocument();
     expect(within(first).getByRole('link', { name: 'Apri la segnalazione n. 7' })).toHaveAttribute(
       'href',
-      '/lavorazioni/T7',
+      '/segnalazioni/T7',
     );
     expect(
       within(first).getByRole('button', { name: 'Prendi in carico la segnalazione n. 7' }),
@@ -174,7 +175,7 @@ describe('<TicketsPage>', () => {
     await waitFor(() => expect(ok.parentElement).toHaveFocus());
     expect(screen.getByRole('link', { name: 'Lavora la segnalazione n. 3' })).toHaveAttribute(
       'href',
-      '/lavorazioni/T3',
+      '/segnalazioni/T3',
     );
 
     await user.click(screen.getByRole('button', { name: 'Prendi in carico la segnalazione n. 7' }));

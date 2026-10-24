@@ -8,6 +8,7 @@ import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
+import it.nexus.domain.dto.TicketEventDTO;
 import it.nexus.domain.enumeration.TicketListView;
 import it.nexus.domain.enumeration.TicketStatus;
 
@@ -21,8 +22,14 @@ public interface TicketService {
     TicketListItemDTO takeCharge(String ticketId, long expectedVersion);
 
 
-    /** Dettaglio per la lavorazione del Call Center (US-601/602). */
-    TicketDetailDTO getForWork(String ticketId);
+    /**
+     * Dettaglio della segnalazione (US-305): Call Center e ADMIN vedono tutte le segnalazioni, il Tutor le proprie e
+     * quelle dei suoi progetti; altrimenti 404 (non si rivela l'esistenza).
+     */
+    TicketDetailDTO getDetail(String ticketId);
+
+    /** Cronologia della segnalazione, dalla più vecchia, con le stesse regole di visibilità del dettaglio. */
+    List<TicketEventDTO> history(String ticketId);
 
     /**
      * Elenco delle segnalazioni della Home (US-303) nella vista indicata (null = predefinita per il ruolo), con filtri

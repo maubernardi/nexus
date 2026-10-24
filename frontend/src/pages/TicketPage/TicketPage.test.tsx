@@ -6,14 +6,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fetchJobCategories, fetchZones } from '@/config/api/referenceApi';
 import {
   fetchCompatibleJobSlots,
-  fetchTicketWork,
+  fetchTicket,
+  fetchTicketHistory,
   matchTicket,
   takeOverTicket,
   type JobSlotMatch,
   type TicketDetail,
 } from '@/config/api/ticketApi';
 import { fetchCurrentUser } from '@/config/api/userApi';
-import { TicketWorkPage } from '@/pages/TicketWorkPage/TicketWorkPage';
+import { TicketPage } from '@/pages/TicketPage/TicketPage';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderRoutes } from '@/tests/renderWithProviders';
 
@@ -21,7 +22,8 @@ vi.mock('@/config/api/ticketApi', () => ({
   submitTicket: vi.fn(),
   fetchTickets: vi.fn(),
   takeCharge: vi.fn(),
-  fetchTicketWork: vi.fn(),
+  fetchTicket: vi.fn(),
+  fetchTicketHistory: vi.fn(),
   fetchCompatibleJobSlots: vi.fn(),
   matchTicket: vi.fn(),
   takeOverTicket: vi.fn(),
@@ -78,18 +80,18 @@ const renderPage = () =>
   renderRoutes({
     routes: [
       {
-        path: '/lavorazioni/:id',
+        path: '/segnalazioni/:id',
         element: (
           <main>
-            <TicketWorkPage />
+            <TicketPage />
           </main>
         ),
       },
     ],
-    initialPath: '/lavorazioni/T9',
+    initialPath: '/segnalazioni/T9',
   });
 
-describe('<TicketWorkPage>', () => {
+describe('<TicketPage>', () => {
   beforeEach(() => {
     vi.mocked(fetchCurrentUser).mockResolvedValue({
       id: 'operatore.cc',
@@ -98,7 +100,27 @@ describe('<TicketWorkPage>', () => {
       lastName: 'Call Center',
       roles: ['CALL_CENTER'],
     });
-    vi.mocked(fetchTicketWork).mockResolvedValue(detail());
+    vi.mocked(fetchTicket).mockResolvedValue(detail());
+    vi.mocked(fetchTicketHistory).mockResolvedValue([
+      {
+        at: '2026-10-01T08:00:00Z',
+        authorName: 'Tutor Uno',
+        action: 'SUBMIT',
+        fromStatus: null,
+        toStatus: 'NUOVA',
+        detail: null,
+        note: null,
+      },
+      {
+        at: '2026-10-01T09:00:00Z',
+        authorName: 'Operatore Call Center',
+        action: 'TAKE_CHARGE',
+        fromStatus: 'NUOVA',
+        toStatus: 'IN_LAVORAZIONE',
+        detail: 'Operatore Call Center',
+        note: 'Chiamato il tutor',
+      },
+    ]);
     vi.mocked(fetchZones).mockResolvedValue([NOVOLI, { id: 'Z2', code: 'FIESOLE', name: 'Fiesole' }]);
     vi.mocked(fetchJobCategories).mockResolvedValue([MAG]);
     vi.mocked(fetchCompatibleJobSlots).mockReset();
@@ -172,7 +194,7 @@ describe('<TicketWorkPage>', () => {
 
   it('in carico a un collega: si può lavorare e prendere in carico, l’assegnazione resta', async () => {
     const user = userEvent.setup();
-    vi.mocked(fetchTicketWork).mockResolvedValue(
+    vi.mocked(fetchTicket).mockResolvedValue(
       detail({ assignedToMe: false, assignedOperatorName: 'Collega Due' }),
     );
     vi.mocked(takeOverTicket).mockResolvedValue(detail({ assignedToMe: true, version: 3 }));
@@ -190,7 +212,7 @@ describe('<TicketWorkPage>', () => {
   });
 
   it('non ancora presa in carico: niente ricerca, rimanda alla coda', async () => {
-    vi.mocked(fetchTicketWork).mockResolvedValue(detail({ assignedToMe: false, assignedOperatorName: null }));
+    vi.mocked(fetchTicket).mockResolvedValue(detail({ assignedToMe: false, assignedOperatorName: null }));
     renderPage();
 
     expect(
@@ -201,12 +223,46 @@ describe('<TicketWorkPage>', () => {
   });
 
   it('dopo l’abbinamento mostra la proposta e non la ricerca', async () => {
-    vi.mocked(fetchTicketWork).mockResolvedValue(detail({ status: 'PROPOSTA_AZIENDA', proposal: alfa }));
+    vi.mocked(fetchTicket).mockResolvedValue(detail({ status: 'PROPOSTA_AZIENDA', proposal: alfa }));
     renderPage();
 
     const proposal = await screen.findByRole('region', { name: 'Proposta all’azienda' });
     expect(within(proposal).getByText('Alfa Logistica')).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Mansioni compatibili' })).not.toBeInTheDocument();
     await expectNoAxeViolations();
+  });
+
+  it('cronologia: azioni, cambi di stato, autori, dettagli e note in una lista ordinata', async () => {
+    renderPage();
+
+    const history = await screen.findByRole('region', { name: 'Cronologia' });
+    const items = await within(history).findAllByRole('listitem');
+    expect(items).toHaveLength(2);
+    expect(items[0]).toHaveTextContent('Segnalazione inviata – stato «Nuova»');
+    expect(items[0]).toHaveTextContent('Tutor Uno');
+    expect(items[1]).toHaveTextContent('Presa in carico – da «Nuova» a «In lavorazione»');
+    expect(items[1]).toHaveTextContent('Nota: Chiamato il tutor');
+    await expectNoAxeViolations();
+  });
+
+  it('Tutor: dettaglio e cronologia in sola lettura, senza ricerca né presa in carico', async () => {
+    vi.mocked(fetchCurrentUser).mockResolvedValue({
+      id: 'tutor1',
+      username: 'tutor1',
+      firstName: 'Tutor',
+      lastName: 'Uno',
+      roles: ['TUTOR'],
+    });
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({ assignedToMe: false, assignedOperatorName: 'Operatore Call Center' }),
+    );
+    renderPage();
+
+    expect(await screen.findByRole('region', { name: 'Cronologia' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Dati della segnalazione' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Mansioni compatibili' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Prendila in carico tu' })).not.toBeInTheDocument();
+    expect(fetchCompatibleJobSlots).not.toHaveBeenCalled();
+    expect(screen.getByRole('link', { name: 'Torna alle segnalazioni' })).toHaveAttribute('href', '/');
   });
 });

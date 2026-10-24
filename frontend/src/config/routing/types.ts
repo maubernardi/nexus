@@ -5,7 +5,7 @@ export type RouteHandle = {
     | 'pages.devLogin.title'
     | 'pages.beneficiaryNew.title'
     | 'pages.ticketNew.title'
-    | 'pages.ticketWork.title'
+    | 'pages.ticket.title'
     | 'pages.companies.title'
     | 'pages.companyNew.title'
     | 'pages.companyEdit.title'

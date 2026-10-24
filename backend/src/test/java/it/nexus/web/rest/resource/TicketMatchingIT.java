@@ -169,7 +169,7 @@ class TicketMatchingIT {
 
     @Test
     void dettaglioPerLaLavorazione() throws Exception {
-        mockMvc.perform(get("/api/v1/tickets/" + id(ticket) + "/work").header(USER, "operatore.cc"))
+        mockMvc.perform(get("/api/v1/tickets/" + id(ticket) + "").header(USER, "operatore.cc"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("IN_LAVORAZIONE"))
                 .andExpect(jsonPath("$.assignedToMe").value(true))

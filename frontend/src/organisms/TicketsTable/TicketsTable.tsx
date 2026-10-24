@@ -110,9 +110,14 @@ export const TicketsTable = ({
             <tr key={item.id} className="border-b border-border last:border-b-0">
               <th scope="row" className={`${td} text-left font-semibold tabular-nums`}>
                 {rowLink ? (
-                  <Link to={rowLink(item)} className="text-primary underline underline-offset-4">
-                    {/* nome accessibile "Apri la segnalazione n. 12" */}
-                    <span className="sr-only">{t('tickets.open')}</span> {item.number}
+                  // aria-label invece di un testo nascosto: un elemento sr-only spostava l'area cliccabile del link;
+                  // il nome contiene il numero visibile (WCAG 2.5.3)
+                  <Link
+                    to={rowLink(item)}
+                    aria-label={t('tickets.openNumber', { number: item.number })}
+                    className="text-primary underline underline-offset-4"
+                  >
+                    {item.number}
                   </Link>
                 ) : (
                   item.number
