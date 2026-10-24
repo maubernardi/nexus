@@ -14,6 +14,10 @@ vi.mock('@/config/api/jobSlotApi', () => ({
   updateJobSlot: vi.fn(),
   setJobSlotActive: vi.fn(),
 }));
+vi.mock('@/config/api/companyNoteApi', () => ({
+  fetchCompanyNotes: vi.fn().mockResolvedValue([]),
+  addCompanyNote: vi.fn(),
+}));
 vi.mock('@/config/api/referenceApi', () => ({
   fetchZones: vi.fn().mockResolvedValue([]),
   fetchJobCategories: vi.fn().mockResolvedValue([]),

@@ -7,11 +7,12 @@ import { Button } from '@/components/ui/button';
 import { apiError } from '@/config/api/errors';
 import { useCompany, useSetCompanyActive, useUpdateCompany } from '@/config/hooks/useCompanies';
 import { CompanyForm } from '@/organisms/CompanyForm/CompanyForm';
+import { CompanyNotesSection } from '@/organisms/CompanyNotesSection/CompanyNotesSection';
 import { JobSlotsSection } from '@/organisms/JobSlotsSection/JobSlotsSection';
 
 type Outcome = 'created' | 'saved' | 'activated' | 'deactivated' | 'conflict' | 'error';
 
-/** Scheda dell'azienda: dati e attivazione (US-501), mansioni (US-502). */
+/** Scheda dell'azienda: dati e attivazione (US-501), mansioni (US-502), note (US-505). */
 export const CompanyEditPage = () => {
   const { t } = useTranslation();
   const { id = '' } = useParams();
@@ -99,6 +100,8 @@ export const CompanyEditPage = () => {
       </section>
 
       <JobSlotsSection companyId={c.id} companyActive={c.active} />
+
+      <CompanyNotesSection companyId={c.id} />
 
       <section
         aria-labelledby="company-status"

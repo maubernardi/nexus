@@ -39,6 +39,7 @@ import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
+import it.nexus.repository.CompanyNoteRepository;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ProjectRepository;
@@ -73,6 +74,7 @@ class DomainConstraintsIT {
     @Autowired TicketCompanyBlacklistRepository blacklist;
     @Autowired BoardPostRepository boardPosts;
     @Autowired CompanyAuditEventRepository auditEvents;
+    @Autowired CompanyNoteRepository companyNotes;
     @Autowired AuditEventRepository auditLog;
 
     /** L'operazione deve fallire per il vincolo indicato (nome del vincolo o testo dell'errore del database). */
@@ -489,6 +491,43 @@ class DomainConstraintsIT {
             registerEvent();
             assertViolates("company_audit_event è in sola aggiunta",
                     () -> jdbc.execute("TRUNCATE company_audit_event"));
+        }
+    }
+
+    @Nested
+    class DiarioNote {
+
+        private Long addNote() {
+            CompanyNote note = companyNotes.save(new CompanyNote(fixtures.graph().company(), "Nota di prova"));
+            em.flush();
+            return note.getId();
+        }
+
+        @Test
+        void testoVuoto() {
+            Long companyId = fixtures.graph().company().getId();
+            assertViolates("ck_company_note_text", () -> jdbc.update(
+                    "INSERT INTO company_note (id, company_id, text, created_at, created_by) VALUES (1, ?, '   ', now(), 'test')",
+                    companyId));
+        }
+
+        @Test
+        void modificaRifiutata() {
+            Long id = addNote();
+            assertViolates("company_note è in sola aggiunta",
+                    () -> jdbc.update("UPDATE company_note SET text = 'manomessa' WHERE id = ?", id));
+        }
+
+        @Test
+        void cancellazioneRifiutata() {
+            Long id = addNote();
+            assertViolates("company_note è in sola aggiunta", () -> jdbc.update("DELETE FROM company_note WHERE id = ?", id));
+        }
+
+        @Test
+        void svuotamentoRifiutato() {
+            addNote();
+            assertViolates("company_note è in sola aggiunta", () -> jdbc.execute("TRUNCATE company_note"));
         }
     }
 
