@@ -3,6 +3,7 @@ import { CircleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils';
+import { InfoTip } from '@/molecules/InfoTip/InfoTip';
 
 export type FieldControlProps = {
   id: string;
@@ -39,18 +40,18 @@ export const FormField = ({
 
   return (
     <div className={cn('space-y-1.5', className)}>
-      <label htmlFor={id} className="block text-sm font-medium">
-        {label}
-        {/* spazio come nodo di testo a sé: dentro lo span verrebbe normalizzato e il nome accessibile
-            diventerebbe "Cognome(obbligatorio)" */}
-        {required && ' '}
-        {required && <span className="font-normal text-muted-foreground">({t('form.required')})</span>}
-      </label>
-      {hint && (
-        <p id={hintId} className="text-sm text-muted-foreground">
-          {hint}
-        </p>
-      )}
+      {/* il suggerimento sta in un'icona accanto all'etichetta: un testo sotto abbasserebbe il campo e lo
+          disallineerebbe da quelli vicini (richiesta del PO, 25/10) */}
+      <div className="relative flex min-h-6 items-center gap-1">
+        <label htmlFor={id} className="text-sm font-medium">
+          {label}
+          {/* spazio come nodo di testo a sé: dentro lo span verrebbe normalizzato e il nome accessibile
+              diventerebbe "Cognome(obbligatorio)" */}
+          {required && ' '}
+          {required && <span className="font-normal text-muted-foreground">({t('form.required')})</span>}
+        </label>
+        {hint && hintId && <InfoTip id={hintId} label={label} text={hint} />}
+      </div>
       {children({
         id,
         'aria-invalid': Boolean(error),
