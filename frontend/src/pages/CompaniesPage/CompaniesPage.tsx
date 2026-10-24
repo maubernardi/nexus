@@ -92,11 +92,11 @@ export const CompaniesPage = () => {
         <div role="alert" className="space-y-3 rounded-md border-2 border-destructive bg-card p-4">
           <p className="font-medium text-destructive">{t('company.loadError')}</p>
           <Button variant="outline" onClick={() => void companies.refetch()}>
-            {t('queue.retry')}
+            {t('common.retry')}
           </Button>
         </div>
       ) : !companies.data ? (
-        <p>{t('queue.loading')}</p>
+        <p>{t('common.loading')}</p>
       ) : companies.data.length === 0 ? (
         <p className="rounded-xl border border-border bg-card p-6">{t('company.empty')}</p>
       ) : (

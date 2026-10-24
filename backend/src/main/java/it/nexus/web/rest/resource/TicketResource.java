@@ -17,11 +17,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
-import it.nexus.domain.dto.QueueItemDTO;
+import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
 import it.nexus.domain.dto.VersionDTO;
+import it.nexus.domain.enumeration.TicketListView;
+import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.services.TicketService;
 import it.nexus.web.rest.PathAPI;
 import jakarta.validation.Valid;
@@ -35,26 +37,19 @@ public class TicketResource {
 
     private final TicketService ticketService;
 
-    @GetMapping("/queue")
-    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
-    @Operation(summary = "Coda del Call Center: prima i fast-track, poi in ordine di arrivo")
-    public ResponseEntity<List<QueueItemDTO>> queue(@RequestParam(required = false) String projectId,
-            @RequestParam(required = false) String zoneId) {
-        return ResponseEntity.ok(ticketService.queue(projectId, zoneId));
+    @GetMapping
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Elenco delle segnalazioni della Home: vista per ruolo, filtri per stato e progetto")
+    public ResponseEntity<List<TicketListItemDTO>> list(@RequestParam(required = false) TicketListView view,
+            @RequestParam(required = false) TicketStatus status, @RequestParam(required = false) String projectId) {
+        return ResponseEntity.ok(ticketService.list(view, status, projectId));
     }
 
     @PostMapping("/{id}/take-charge")
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
     @Operation(summary = "Prende in carico una segnalazione dalla coda (409 se già presa o modificata)")
-    public ResponseEntity<QueueItemDTO> takeCharge(@PathVariable String id, @RequestBody @Valid VersionDTO body) {
+    public ResponseEntity<TicketListItemDTO> takeCharge(@PathVariable String id, @RequestBody @Valid VersionDTO body) {
         return ResponseEntity.ok(ticketService.takeCharge(id, body.version()));
-    }
-
-    @GetMapping("/assigned-to-me")
-    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
-    @Operation(summary = "Segnalazioni aperte assegnate all'operatore corrente")
-    public ResponseEntity<List<QueueItemDTO>> assignedToMe() {
-        return ResponseEntity.ok(ticketService.assignedToMe());
     }
 
     @GetMapping("/{id}/work")

@@ -19,9 +19,8 @@ import { renderRoutes } from '@/tests/renderWithProviders';
 
 vi.mock('@/config/api/ticketApi', () => ({
   submitTicket: vi.fn(),
-  fetchQueue: vi.fn(),
+  fetchTickets: vi.fn(),
   takeCharge: vi.fn(),
-  fetchAssignedToMe: vi.fn(),
   fetchTicketWork: vi.fn(),
   fetchCompatibleJobSlots: vi.fn(),
   matchTicket: vi.fn(),

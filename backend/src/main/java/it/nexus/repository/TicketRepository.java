@@ -5,15 +5,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import it.nexus.domain.Ticket;
 import it.nexus.domain.enumeration.TicketStatus;
 
 @Repository
-public interface TicketRepository extends JpaRepository<Ticket, Long> {
+public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecificationExecutor<Ticket> {
 
     Optional<Ticket> findByNumber(Long number);
 
@@ -21,37 +20,4 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findByBeneficiaryIdInAndStatusNot(Collection<Long> beneficiaryIds, TicketStatus closed);
 
     Optional<Ticket> findFirstByBeneficiaryIdAndStatusNot(Long beneficiaryId, TicketStatus closed);
-
-    /** Segnalazioni aperte assegnate a un operatore, dalla più vecchia. */
-    @Query("""
-            select t from Ticket t
-            join fetch t.beneficiary b
-            join fetch b.residenceZone
-            join fetch t.project
-            join fetch t.tutor
-            left join fetch t.requestedJobCategory
-            where t.assignedCcOperator.id = :operatorId and t.status <> :closed
-            order by t.createdAt asc, t.number asc
-            """)
-    List<Ticket> findAssignedTo(@Param("operatorId") Long operatorId, @Param("closed") TicketStatus closed);
-
-    /**
-     * Coda del Call Center: ticket non assegnati negli stati indicati, prima i fast-track e poi per arrivo. Filtri
-     * facoltativi (null = nessun filtro) per progetto e zona di residenza del beneficiario.
-     */
-    @Query("""
-            select t from Ticket t
-            join fetch t.beneficiary b
-            join fetch b.residenceZone z
-            join fetch t.project p
-            join fetch t.tutor
-            left join fetch t.requestedJobCategory
-            where t.status in :statuses
-              and t.assignedCcOperator is null
-              and (:projectId is null or p.id = :projectId)
-              and (:zoneId is null or z.id = :zoneId)
-            order by t.fastTrack desc, t.createdAt asc, t.number asc
-            """)
-    List<Ticket> findQueue(@Param("statuses") Collection<TicketStatus> statuses, @Param("projectId") Long projectId,
-            @Param("zoneId") Long zoneId);
 }

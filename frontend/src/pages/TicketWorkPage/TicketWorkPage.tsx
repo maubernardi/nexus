@@ -39,7 +39,7 @@ export const TicketWorkPage = () => {
     return (
       <div className="space-y-4">
         <PageHeading>
-          {t(apiError(ticket.error)?.status === 404 ? 'work.notFound' : 'queue.loadError')}
+          {t(apiError(ticket.error)?.status === 404 ? 'work.notFound' : 'common.loadError')}
         </PageHeading>
         <Link to="/lavorazioni" className="font-medium text-primary underline underline-offset-4">
           {t('work.backToMyWork')}
@@ -48,7 +48,7 @@ export const TicketWorkPage = () => {
     );
   }
   if (!ticket.data) {
-    return <p role="status">{t('queue.loading')}</p>;
+    return <p role="status">{t('common.loading')}</p>;
   }
   const d = ticket.data;
   // dopo la presa in carico chiunque del Call Center (o l'ADMIN) può lavorarla, anche se è di un collega (US-405)
@@ -174,7 +174,7 @@ const TicketData = ({ ticket: d }: { ticket: TicketDetail }) => {
           {d.fastTrack ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-gold px-2 py-0.5 text-xs font-semibold text-brand">
               <Zap aria-hidden="true" className="size-3.5" />
-              {t('queue.fastTrack')}
+              {t('tickets.fastTrack')}
             </span>
           ) : (
             t('work.normal')
@@ -298,10 +298,10 @@ const CompatibleSection = ({ ticket: d, onOutcome }: CompatibleSectionProps) => 
           role="alert"
           className="rounded-md border-2 border-destructive bg-card p-4 font-medium text-destructive"
         >
-          {t('queue.loadError')}
+          {t('common.loadError')}
         </p>
       ) : !compatible.data ? (
-        <p>{t('queue.loading')}</p>
+        <p>{t('common.loading')}</p>
       ) : compatible.data.length === 0 ? (
         <p className="rounded-xl border border-border bg-card p-6">{t('work.empty')}</p>
       ) : (
@@ -331,7 +331,7 @@ const CompatibleSection = ({ ticket: d, onOutcome }: CompatibleSectionProps) => 
                   {t('work.fields.zone')}
                 </th>
                 <th scope="col" className={th}>
-                  {t('queue.columns.actions')}
+                  {t('tickets.columns.actions')}
                 </th>
               </tr>
             </thead>

@@ -10,6 +10,22 @@ import { expectNoAxeViolations } from '@/tests/axe';
 import { renderRoutes } from '@/tests/renderWithProviders';
 
 vi.mock('@/config/api/userApi', () => ({ fetchCurrentUser: vi.fn() }));
+// la Home è l'elenco delle segnalazioni (US-303): niente chiamate di rete nei test della shell
+vi.mock('@/config/api/ticketApi', () => ({
+  fetchTickets: vi.fn().mockResolvedValue([]),
+  submitTicket: vi.fn(),
+  takeCharge: vi.fn(),
+  fetchTicketWork: vi.fn(),
+  fetchCompatibleJobSlots: vi.fn(),
+  matchTicket: vi.fn(),
+  takeOverTicket: vi.fn(),
+}));
+vi.mock('@/config/api/referenceApi', () => ({
+  fetchZones: vi.fn().mockResolvedValue([]),
+  fetchJobCategories: vi.fn().mockResolvedValue([]),
+  fetchMyProjects: vi.fn().mockResolvedValue([]),
+  fetchProjects: vi.fn().mockResolvedValue([]),
+}));
 
 describe('App shell', () => {
   beforeEach(() => {
@@ -34,12 +50,12 @@ describe('App shell', () => {
     useSessionStore.setState({ mockUserId: 'operatore.cc' });
     renderRoutes({ routes });
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'Benvenuto in NEXUS' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Segnalazioni' })).toBeInTheDocument();
     expect(screen.getByRole('banner')).toHaveTextContent('Operatore Call Center');
     expect(screen.getByRole('main')).toBeInTheDocument();
     expect(screen.getByRole('contentinfo')).toBeInTheDocument();
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    expect(document.title).toBe('Home · NEXUS');
+    expect(document.title).toBe('Segnalazioni · NEXUS');
     await expectNoAxeViolations();
   });
 
@@ -55,7 +71,7 @@ describe('App shell', () => {
   it("al cambio pagina aggiorna il titolo e porta il focus sull'h1", async () => {
     useSessionStore.setState({ mockUserId: 'operatore.cc' });
     const { router } = renderRoutes({ routes });
-    await screen.findByRole('heading', { level: 1, name: 'Benvenuto in NEXUS' });
+    await screen.findByRole('heading', { level: 1, name: 'Segnalazioni' });
 
     await router.navigate('/pagina-inesistente');
 
@@ -67,7 +83,7 @@ describe('App shell', () => {
   it('dalla pagina di accesso entra con l’utente scelto', async () => {
     renderRoutes({ routes });
     await userEvent.click(await screen.findByRole('button', { name: /Entra come Operatore Call Center/ }));
-    expect(await screen.findByRole('heading', { level: 1, name: 'Benvenuto in NEXUS' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Segnalazioni' })).toBeInTheDocument();
     expect(useSessionStore.getState().mockUserId).toBe('operatore.cc');
   });
 

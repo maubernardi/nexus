@@ -9,9 +9,8 @@ import {
 
 import { MY_BENEFICIARIES_KEY } from '@/config/hooks/useBeneficiaries';
 import {
-  fetchAssignedToMe,
   fetchCompatibleJobSlots,
-  fetchQueue,
+  fetchTickets,
   fetchTicketWork,
   matchTicket,
   submitTicket,
@@ -19,11 +18,11 @@ import {
   takeOverTicket,
   type CompatibleFilters,
   type JobSlotMatch,
-  type QueueFilters,
-  type QueueItem,
   type Ticket,
   type TicketCreate,
   type TicketDetail,
+  type TicketListItem,
+  type TicketListQuery,
 } from '@/config/api/ticketApi';
 
 export const TICKETS_KEY = ['tickets'] as const;
@@ -41,32 +40,30 @@ export const useSubmitTicket = (): UseMutationResult<Ticket, unknown, TicketCrea
   });
 };
 
-/** Coda del Call Center: si aggiorna da sola mentre l'operatore lavora. */
-export const useQueue = (filters: QueueFilters): UseQueryResult<QueueItem[]> =>
+/** Elenco delle segnalazioni della Home (US-303): si aggiorna da solo mentre si lavora. */
+export const useTicketList = (query: TicketListQuery, enabled = true): UseQueryResult<TicketListItem[]> =>
   useQuery({
-    queryKey: [...TICKETS_KEY, 'queue', filters],
-    queryFn: () => fetchQueue(filters),
+    enabled,
+    queryKey: [...TICKETS_KEY, 'list', query],
+    queryFn: () => fetchTickets(query),
     refetchInterval: 60_000,
     refetchOnWindowFocus: true,
-    // cambiando filtro la tabella resta visibile finché arrivano i nuovi dati
+    // cambiando vista o filtro la tabella resta visibile finché arrivano i nuovi dati
     placeholderData: keepPreviousData,
   });
 
 /** Presa in carico: in ogni caso (riuscita o conflitto) coda e lavorazioni vanno riallineate. */
-export const useTakeCharge = (): UseMutationResult<QueueItem, unknown, { id: string; version: number }> => {
+export const useTakeCharge = (): UseMutationResult<
+  TicketListItem,
+  unknown,
+  { id: string; version: number }
+> => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: takeCharge,
     onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
   });
 };
-
-export const useAssignedToMe = (): UseQueryResult<QueueItem[]> =>
-  useQuery({
-    queryKey: [...TICKETS_KEY, 'assigned-to-me'],
-    queryFn: fetchAssignedToMe,
-    refetchOnWindowFocus: true,
-  });
 
 export const useTicketWork = (id: string): UseQueryResult<TicketDetail> =>
   useQuery({ queryKey: [...TICKETS_KEY, 'work', id], queryFn: () => fetchTicketWork(id) });

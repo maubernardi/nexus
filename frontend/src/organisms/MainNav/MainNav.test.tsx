@@ -10,7 +10,7 @@ describe('<MainNav>', () => {
   it('espone un landmark nav etichettato con la pagina corrente marcata', async () => {
     renderWithProviders(<MainNav roles={['TUTOR']} />);
     expect(screen.getByRole('navigation', { name: 'Navigazione principale' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Segnalazioni' })).toHaveAttribute('aria-current', 'page');
     await expectNoAxeViolations();
   });
 

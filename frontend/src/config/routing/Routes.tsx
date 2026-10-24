@@ -1,19 +1,17 @@
-import { type RouteObject } from 'react-router';
+import { Navigate, type RouteObject } from 'react-router';
 
 import { DEV_LOGIN_PATH, ProtectedPage } from '@/config/routing/ProtectedPage';
 import { RoleRoute } from '@/config/routing/RoleRoute';
 import type { RouteHandle } from '@/config/routing/types';
 import { BeneficiaryNewPage } from '@/pages/BeneficiaryNewPage/BeneficiaryNewPage';
 import { DevLoginPage } from '@/pages/DevLoginPage/DevLoginPage';
-import { HomePage } from '@/pages/HomePage/HomePage';
-import { MyWorkPage } from '@/pages/MyWorkPage/MyWorkPage';
 import { CompaniesPage } from '@/pages/CompaniesPage/CompaniesPage';
 import { CompanyEditPage } from '@/pages/CompanyEditPage/CompanyEditPage';
 import { CompanyNewPage } from '@/pages/CompanyNewPage/CompanyNewPage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 import { TicketWorkPage } from '@/pages/TicketWorkPage/TicketWorkPage';
-import { QueuePage } from '@/pages/QueuePage/QueuePage';
 import { TicketNewPage } from '@/pages/TicketNewPage/TicketNewPage';
+import { TicketsPage } from '@/pages/TicketsPage/TicketsPage';
 
 export const routes: RouteObject[] = [
   {
@@ -25,7 +23,11 @@ export const routes: RouteObject[] = [
     path: '/',
     element: <ProtectedPage />,
     children: [
-      { index: true, element: <HomePage />, handle: { titleKey: 'pages.home.title' } satisfies RouteHandle },
+      {
+        index: true,
+        element: <TicketsPage />,
+        handle: { titleKey: 'pages.tickets.title' } satisfies RouteHandle,
+      },
       {
         path: 'beneficiari/nuovo',
         element: (
@@ -44,24 +46,9 @@ export const routes: RouteObject[] = [
         ),
         handle: { titleKey: 'pages.ticketNew.title' } satisfies RouteHandle,
       },
-      {
-        path: 'coda',
-        element: (
-          <RoleRoute roles={['CALL_CENTER', 'ADMIN']}>
-            <QueuePage />
-          </RoleRoute>
-        ),
-        handle: { titleKey: 'pages.queue.title' } satisfies RouteHandle,
-      },
-      {
-        path: 'lavorazioni',
-        element: (
-          <RoleRoute roles={['CALL_CENTER', 'ADMIN']}>
-            <MyWorkPage />
-          </RoleRoute>
-        ),
-        handle: { titleKey: 'pages.myWork.title' } satisfies RouteHandle,
-      },
+      // indirizzi delle pagine sostituite dalla Home (US-303): restano validi segnalibri e link già condivisi
+      { path: 'coda', element: <Navigate to="/?vista=da-prendere" replace /> },
+      { path: 'lavorazioni', element: <Navigate to="/?vista=in-carico" replace /> },
       {
         path: 'lavorazioni/:id',
         element: (

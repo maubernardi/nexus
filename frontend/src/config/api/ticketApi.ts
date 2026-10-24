@@ -29,22 +29,29 @@ export const submitTicket = async (payload: TicketCreate): Promise<Ticket> => {
   return data;
 };
 
-export type QueueItem = Ticket & { tutorName: string };
+/** Riga dell'elenco delle segnalazioni (Home, US-303). */
+export type TicketListItem = Ticket & { tutorName: string; assignedOperatorName: string | null };
 
-export type QueueFilters = { projectId?: string; zoneId?: string };
+/** Viste dell'elenco: MINE e PROJECT per il Tutor, le altre per Call Center e ADMIN. */
+export type TicketListView = 'MINE' | 'PROJECT' | 'TO_TAKE' | 'ASSIGNED_TO_ME' | 'ALL';
 
-export const fetchQueue = async (filters: QueueFilters): Promise<QueueItem[]> => {
-  const { data } = await axiosInstance.get<QueueItem[]>(ENDPOINTS.ticketQueue, { params: filters });
+export type TicketListQuery = { view: TicketListView; status?: TicketStatus; projectId?: string };
+
+export const fetchTickets = async (query: TicketListQuery): Promise<TicketListItem[]> => {
+  const { data } = await axiosInstance.get<TicketListItem[]>(ENDPOINTS.tickets, { params: query });
   return data;
 };
 
-export const takeCharge = async ({ id, version }: { id: string; version: number }): Promise<QueueItem> => {
-  const { data } = await axiosInstance.post<QueueItem>(`${ENDPOINTS.tickets}/${id}/take-charge`, { version });
-  return data;
-};
-
-export const fetchAssignedToMe = async (): Promise<QueueItem[]> => {
-  const { data } = await axiosInstance.get<QueueItem[]>(ENDPOINTS.ticketsAssignedToMe);
+export const takeCharge = async ({
+  id,
+  version,
+}: {
+  id: string;
+  version: number;
+}): Promise<TicketListItem> => {
+  const { data } = await axiosInstance.post<TicketListItem>(`${ENDPOINTS.tickets}/${id}/take-charge`, {
+    version,
+  });
   return data;
 };
 

@@ -6,9 +6,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import it.nexus.config.security.AuthenticatedUser;
+import it.nexus.config.security.SecurityUtils;
 import it.nexus.domain.AppUser;
 import it.nexus.domain.Beneficiary;
 import it.nexus.domain.Company;
@@ -22,12 +26,14 @@ import it.nexus.domain.UserProject;
 import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
-import it.nexus.domain.dto.QueueItemDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
+import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.JobSlotStatus;
+import it.nexus.domain.enumeration.Role;
+import it.nexus.domain.enumeration.TicketListView;
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.domain.enumeration.TicketType;
 import it.nexus.domain.workflow.TicketTransitions;
@@ -43,6 +49,7 @@ import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ProjectRepository;
 import it.nexus.repository.TicketCompanyBlacklistRepository;
 import it.nexus.repository.TicketRepository;
+import it.nexus.repository.TicketSpecifications;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.CurrentAppUserService;
@@ -59,7 +66,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TicketServiceImpl implements TicketService {
 
-    /** Stati da lavorare: nuove segnalazioni e speciali non ancora prese in carico. */
+    /** Stati della coda: nuove segnalazioni e speciali non ancora prese in carico. */
     private static final Set<TicketStatus> QUEUE_STATUSES = EnumSet.of(TicketStatus.NUOVA, TicketStatus.IN_LAVORAZIONE);
 
     private final TicketRepository ticketRepository;
@@ -95,16 +102,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<QueueItemDTO> queue(String projectId, String zoneId) {
-        return ticketRepository.findQueue(QUEUE_STATUSES, filterId(projectId, "progetto"), filterId(zoneId, "zona"))
-                .stream()
-                .map(mapper::toQueueItem)
-                .toList();
-    }
-
-    @Override
-    public QueueItemDTO takeCharge(String ticketId, long expectedVersion) {
+    public TicketListItemDTO takeCharge(String ticketId, long expectedVersion) {
         Ticket ticket = Optional.ofNullable(TsidMapper.toInternal(ticketId))
                 .flatMap(ticketRepository::findById)
                 .orElseThrow(() -> new NotFoundException("Segnalazione non trovata"));
@@ -117,14 +115,53 @@ public class TicketServiceImpl implements TicketService {
             t.setAssignedCcOperator(me);
             return AuditChanges.of().value("assignedCcOperatorId", null, TsidMapper.toExternal(me.getId()));
         });
-        return mapper.toQueueItem(saved);
+        return mapper.toListItem(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<QueueItemDTO> assignedToMe() {
+    public List<TicketListItemDTO> list(TicketListView requested, TicketStatus status, String projectId) {
         AppUser me = currentAppUserService.getCurrentAppUser();
-        return ticketRepository.findAssignedTo(me.getId(), TicketStatus.CLOSED).stream().map(mapper::toQueueItem).toList();
+        Set<Role> roles = SecurityUtils.getCurrentUser().map(AuthenticatedUser::roles).orElse(Set.of());
+        TicketListView view = requested != null ? requested
+                : roles.contains(Role.TUTOR) && !currentAppUserService.hasGlobalVisibility() ? TicketListView.MINE
+                : TicketListView.TO_TAKE;
+        if (!view.allowedFor(roles)) {
+            throw new BadRequestException("Vista non disponibile per il ruolo");
+        }
+        Long project = filterId(projectId, "progetto");
+
+        Specification<Ticket> spec = TicketSpecifications.fetchListData()
+                .and(TicketSpecifications.status(status))
+                .and(TicketSpecifications.project(project));
+        Sort newestFirst = Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("number"));
+        Sort oldestFirst = Sort.by(Sort.Order.asc("createdAt"), Sort.Order.asc("number"));
+        Sort sort = switch (view) {
+            case MINE -> {
+                spec = spec.and(TicketSpecifications.tutor(me.getId()));
+                yield newestFirst;
+            }
+            case PROJECT -> {
+                // solo i progetti a cui il Tutor è assegnato: mai segnalazioni di altri progetti
+                List<Long> mine = userProjectRepository.findByIdUserId(me.getId()).stream()
+                        .map(up -> up.getId().getProjectId()).toList();
+                spec = spec.and(TicketSpecifications.projectIn(mine));
+                yield newestFirst;
+            }
+            case TO_TAKE -> {
+                spec = spec.and(TicketSpecifications.statusIn(QUEUE_STATUSES)).and(TicketSpecifications.unassigned());
+                yield Sort.by(Sort.Order.desc("fastTrack"), Sort.Order.asc("createdAt"), Sort.Order.asc("number"));
+            }
+            case ASSIGNED_TO_ME -> {
+                spec = spec.and(TicketSpecifications.assignedTo(me.getId()));
+                if (status == null) {
+                    spec = spec.and(TicketSpecifications.open());
+                }
+                yield oldestFirst;
+            }
+            case ALL -> newestFirst;
+        };
+        return ticketRepository.findAll(spec, sort).stream().map(mapper::toListItem).toList();
     }
 
     @Override
