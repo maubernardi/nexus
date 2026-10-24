@@ -27,6 +27,9 @@ export type Beneficiary = Omit<BeneficiaryCreate, 'residenceZoneId'> & {
   residenceZone: ReferenceItem;
   hasDrivingLicense: boolean;
   createdAt: string;
+  ownerTutorName: string;
+  /** L'utente corrente può modificarlo: solo il Tutor proprietario (US-203). */
+  editable: boolean;
 };
 
 export type BeneficiarySummary = {
@@ -46,5 +49,26 @@ export const createBeneficiary = async (payload: BeneficiaryCreate): Promise<Ben
 
 export const fetchMyBeneficiaries = async (): Promise<BeneficiarySummary[]> => {
   const { data } = await axiosInstance.get<BeneficiarySummary[]>(ENDPOINTS.beneficiaries);
+  return data;
+};
+
+export const fetchBeneficiary = async (id: string): Promise<Beneficiary> => {
+  const { data } = await axiosInstance.get<Beneficiary>(
+    `${ENDPOINTS.beneficiaries}/${encodeURIComponent(id)}`,
+  );
+  return data;
+};
+
+export const updateBeneficiary = async ({
+  id,
+  payload,
+}: {
+  id: string;
+  payload: BeneficiaryCreate;
+}): Promise<Beneficiary> => {
+  const { data } = await axiosInstance.put<Beneficiary>(
+    `${ENDPOINTS.beneficiaries}/${encodeURIComponent(id)}`,
+    payload,
+  );
   return data;
 };

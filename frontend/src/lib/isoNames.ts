@@ -25,3 +25,7 @@ export const countryOptions = (): Option[] => buildOptions(COUNTRY_CODES, 'regio
 
 export const languageOptions = (): Option[] =>
   buildOptions(LANGUAGE_CODES, 'language', ['it', 'en', 'fr', 'es', 'ar']);
+
+/** Nome in italiano di un paese (ISO 3166-1) o di una lingua (ISO 639-1); il codice se sconosciuto. */
+export const isoName = (code: string, type: 'region' | 'language'): string =>
+  new Intl.DisplayNames(['it'], { type, fallback: 'code' }).of(code) ?? code;

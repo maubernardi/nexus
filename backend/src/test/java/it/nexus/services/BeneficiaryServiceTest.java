@@ -22,7 +22,7 @@ import it.nexus.domain.AppUser;
 import it.nexus.domain.Beneficiary;
 import it.nexus.domain.TestEntities;
 import it.nexus.domain.Zone;
-import it.nexus.domain.dto.BeneficiaryCreateDTO;
+import it.nexus.domain.dto.BeneficiaryFormDTO;
 import it.nexus.domain.dto.BeneficiaryLanguageDTO;
 import it.nexus.domain.enumeration.Gender;
 import it.nexus.domain.enumeration.LanguageLevel;
@@ -32,6 +32,7 @@ import it.nexus.mapper.BeneficiaryMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.TicketRepository;
+import it.nexus.repository.UserProjectRepository;
 import it.nexus.repository.ZoneRepository;
 import it.nexus.services.impl.BeneficiaryServiceImpl;
 import it.nexus.web.errors.FieldValidationException;
@@ -43,6 +44,7 @@ class BeneficiaryServiceTest {
     @Mock BeneficiaryRepository beneficiaries;
     @Mock ZoneRepository zones;
     @Mock TicketRepository tickets;
+    @Mock UserProjectRepository userProjects;
     @Mock AuditService audit;
     @Mock CurrentAppUserService currentUser;
     @Mock BeneficiaryMapper mapper;
@@ -50,8 +52,8 @@ class BeneficiaryServiceTest {
 
     private static final String ZONE_ID = TsidMapper.toExternal(123L);
 
-    private static BeneficiaryCreateDTO dto(List<BeneficiaryLanguageDTO> languages) {
-        return new BeneficiaryCreateDTO(" Mario ", "Rossi", 1998, Gender.M, "IT", "IT", ZONE_ID,
+    private static BeneficiaryFormDTO dto(List<BeneficiaryLanguageDTO> languages) {
+        return new BeneficiaryFormDTO(" Mario ", "Rossi", 1998, Gender.M, "IT", "IT", ZONE_ID,
                 Set.of(LicenseType.CQC, LicenseType.B), false, null, false, null, "", languages);
     }
 

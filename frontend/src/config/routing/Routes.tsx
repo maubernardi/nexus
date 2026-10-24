@@ -3,7 +3,10 @@ import { Navigate, type RouteObject } from 'react-router';
 import { DEV_LOGIN_PATH, ProtectedPage } from '@/config/routing/ProtectedPage';
 import { RoleRoute } from '@/config/routing/RoleRoute';
 import type { RouteHandle } from '@/config/routing/types';
+import { BeneficiariesPage } from '@/pages/BeneficiariesPage/BeneficiariesPage';
+import { BeneficiaryEditPage } from '@/pages/BeneficiaryEditPage/BeneficiaryEditPage';
 import { BeneficiaryNewPage } from '@/pages/BeneficiaryNewPage/BeneficiaryNewPage';
+import { BeneficiaryPage } from '@/pages/BeneficiaryPage/BeneficiaryPage';
 import { DevLoginPage } from '@/pages/DevLoginPage/DevLoginPage';
 import { CompaniesPage } from '@/pages/CompaniesPage/CompaniesPage';
 import { CompanyEditPage } from '@/pages/CompanyEditPage/CompanyEditPage';
@@ -29,6 +32,15 @@ export const routes: RouteObject[] = [
         handle: { titleKey: 'pages.tickets.title' } satisfies RouteHandle,
       },
       {
+        path: 'beneficiari',
+        element: (
+          <RoleRoute roles={['TUTOR']}>
+            <BeneficiariesPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.beneficiaries.title' } satisfies RouteHandle,
+      },
+      {
         path: 'beneficiari/nuovo',
         element: (
           <RoleRoute roles={['TUTOR']}>
@@ -36,6 +48,21 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.beneficiaryNew.title' } satisfies RouteHandle,
+      },
+      {
+        // US-204: la visibilità del singolo beneficiario la decide l'API
+        path: 'beneficiari/:id',
+        element: <BeneficiaryPage />,
+        handle: { titleKey: 'pages.beneficiary.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'beneficiari/:id/modifica',
+        element: (
+          <RoleRoute roles={['TUTOR']}>
+            <BeneficiaryEditPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.beneficiaryEdit.title' } satisfies RouteHandle,
       },
       {
         path: 'segnalazioni/nuova',

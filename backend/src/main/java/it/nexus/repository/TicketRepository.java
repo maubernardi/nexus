@@ -19,5 +19,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecif
     /** Segnalazioni non concluse dei beneficiari indicati (al più una per beneficiario). */
     List<Ticket> findByBeneficiaryIdInAndStatusNot(Collection<Long> beneficiaryIds, TicketStatus closed);
 
+    /** Vero se il beneficiario ha almeno una segnalazione (anche conclusa) in uno dei progetti indicati (US-204). */
+    boolean existsByBeneficiaryIdAndProjectIdIn(Long beneficiaryId, Collection<Long> projectIds);
+
     Optional<Ticket> findFirstByBeneficiaryIdAndStatusNot(Long beneficiaryId, TicketStatus closed);
 }

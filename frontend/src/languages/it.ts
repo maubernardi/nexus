@@ -13,7 +13,7 @@ export const it = {
   },
   nav: {
     home: 'Segnalazioni',
-    newBeneficiary: 'Nuovo beneficiario',
+    beneficiaries: 'Beneficiari',
     newTicket: 'Nuova segnalazione',
     companies: 'Aziende',
   },
@@ -87,7 +87,7 @@ export const it = {
       confidential: 'Informazioni riservate',
     },
     confidentialNote:
-      'Dati riservati: li vedono solo tu, il Call Center e l’amministrazione. Inserisci solo quanto necessario al tirocinio.',
+      'Dati riservati: li vedono solo tu, i tutor dei progetti in cui lo segnali, il Call Center e l’amministrazione. Inserisci solo quanto necessario al tirocinio.',
     fields: {
       firstName: 'Nome',
       lastName: 'Cognome',
@@ -121,6 +121,33 @@ export const it = {
       home: 'Torna alla Home',
       report: 'Segnala questo beneficiario',
     },
+    new: 'Nuovo beneficiario',
+    search: 'Cerca per nome o cognome',
+    searchSubmit: 'Cerca',
+    count_one: '1 beneficiario',
+    count_other: '{{count}} beneficiari',
+    caption: 'I miei beneficiari',
+    empty: 'Non hai ancora registrato beneficiari.',
+    noMatch: 'Nessun beneficiario corrisponde alla ricerca.',
+    name: 'Beneficiario',
+    openTicket: 'Segnalazione aperta',
+    ticketNumber: 'n. {{number}}',
+    noTicket: 'Nessuna',
+    owner: 'Inserito da {{name}}',
+    edit: 'Modifica',
+    save: 'Salva modifiche',
+    saving: 'Salvataggio in corso…',
+    saved: 'Modifiche salvate.',
+    notEditable: 'Solo il Tutor che ha inserito il beneficiario può modificarlo.',
+    notFound: 'Beneficiario non trovato',
+    loadError: 'Impossibile caricare il beneficiario. Controlla la connessione e riprova.',
+    backToList: 'Torna ai miei beneficiari',
+    backToDetail: 'Torna alla scheda',
+    backToHome: 'Torna alla Home',
+    yes: 'Sì',
+    no: 'No',
+    none: 'Nessuna',
+    notSpecified: 'Non indicato',
   },
   ticket: {
     fields: {
@@ -402,6 +429,18 @@ export const it = {
     tickets: {
       title: 'Segnalazioni',
       heading: 'Segnalazioni',
+    },
+    beneficiaries: {
+      title: 'I miei beneficiari',
+      heading: 'I miei beneficiari',
+      intro: 'I beneficiari che hai registrato. Apri una scheda per vederne i dati o modificarli.',
+    },
+    beneficiary: {
+      title: 'Beneficiario',
+    },
+    beneficiaryEdit: {
+      title: 'Modifica beneficiario',
+      heading: 'Modifica di {{name}}',
     },
     beneficiaryNew: {
       title: 'Nuovo beneficiario',
