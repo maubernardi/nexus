@@ -252,6 +252,7 @@ export const it = {
       data: 'Dati della segnalazione',
       proposal: 'Proposta all’azienda',
       compatible: 'Mansioni compatibili',
+      history: 'Cronologia',
     },
     fields: {
       beneficiary: 'Beneficiario',
@@ -294,7 +295,18 @@ export const it = {
     takeOver: 'Prendila in carico tu',
     takenOver: 'Ora la segnalazione è in carico a te e compare nelle tue lavorazioni.',
     notTaken: 'Prendi in carico la segnalazione dalla coda per poterla abbinare.',
-    backToMyWork: 'Torna alle mie lavorazioni',
+    backToList: 'Torna alle segnalazioni',
+    historyEmpty: 'Nessun evento registrato.',
+    actions: {
+      SUBMIT: 'Segnalazione inviata',
+      TAKE_CHARGE: 'Presa in carico',
+      TAKE_OVER: 'Passata a un altro operatore',
+      MATCH: 'Proposta all’azienda',
+      STATUS: 'Cambio di stato',
+    },
+    statusChange: 'da «{{from}}» a «{{to}}»',
+    statusSet: 'stato «{{to}}»',
+    note: 'Nota: {{note}}',
     notFound: 'Segnalazione non trovata',
   },
   tickets: {
@@ -353,7 +365,7 @@ export const it = {
       createdAt: 'Arrivo',
       actions: 'Azioni',
     },
-    open: 'Apri la segnalazione n.',
+    openNumber: 'Apri la segnalazione n. {{number}}',
     fastTrack: 'Fast-track',
     normal: 'Normale',
     nobody: 'Nessuno',
@@ -421,8 +433,8 @@ export const it = {
     companyEdit: {
       title: 'Scheda azienda',
     },
-    ticketWork: {
-      title: 'Lavorazione segnalazione',
+    ticket: {
+      title: 'Segnalazione',
       heading: 'Segnalazione n. {{number}}',
     },
     forbidden: {

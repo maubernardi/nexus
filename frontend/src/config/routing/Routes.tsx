@@ -9,7 +9,7 @@ import { CompaniesPage } from '@/pages/CompaniesPage/CompaniesPage';
 import { CompanyEditPage } from '@/pages/CompanyEditPage/CompanyEditPage';
 import { CompanyNewPage } from '@/pages/CompanyNewPage/CompanyNewPage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
-import { TicketWorkPage } from '@/pages/TicketWorkPage/TicketWorkPage';
+import { LegacyWorkRedirect, TicketPage } from '@/pages/TicketPage/TicketPage';
 import { TicketNewPage } from '@/pages/TicketNewPage/TicketNewPage';
 import { TicketsPage } from '@/pages/TicketsPage/TicketsPage';
 
@@ -50,14 +50,12 @@ export const routes: RouteObject[] = [
       { path: 'coda', element: <Navigate to="/?vista=da-prendere" replace /> },
       { path: 'lavorazioni', element: <Navigate to="/?vista=in-carico" replace /> },
       {
-        path: 'lavorazioni/:id',
-        element: (
-          <RoleRoute roles={['CALL_CENTER', 'ADMIN']}>
-            <TicketWorkPage />
-          </RoleRoute>
-        ),
-        handle: { titleKey: 'pages.ticketWork.title' } satisfies RouteHandle,
+        path: 'segnalazioni/:id',
+        element: <TicketPage />,
+        handle: { titleKey: 'pages.ticket.title' } satisfies RouteHandle,
       },
+      // indirizzo della vecchia pagina di lavorazione: porta al dettaglio unico
+      { path: 'lavorazioni/:id', element: <LegacyWorkRedirect /> },
       {
         path: 'aziende',
         element: (

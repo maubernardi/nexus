@@ -87,8 +87,24 @@ export type TicketDetail = {
 
 export type CompatibleFilters = { zoneId?: string; jobCategoryId?: string };
 
-export const fetchTicketWork = async (id: string): Promise<TicketDetail> => {
-  const { data } = await axiosInstance.get<TicketDetail>(`${ENDPOINTS.tickets}/${id}/work`);
+export const fetchTicket = async (id: string): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.get<TicketDetail>(`${ENDPOINTS.tickets}/${id}`);
+  return data;
+};
+
+/** Voce della cronologia (US-305); `action` è il nome della transizione o dell'azione registrata nell'audit. */
+export type TicketEvent = {
+  at: string;
+  authorName: string;
+  action: string;
+  fromStatus: TicketStatus | null;
+  toStatus: TicketStatus | null;
+  detail: string | null;
+  note: string | null;
+};
+
+export const fetchTicketHistory = async (id: string): Promise<TicketEvent[]> => {
+  const { data } = await axiosInstance.get<TicketEvent[]>(`${ENDPOINTS.tickets}/${id}/history`);
   return data;
 };
 

@@ -11,7 +11,8 @@ import { MY_BENEFICIARIES_KEY } from '@/config/hooks/useBeneficiaries';
 import {
   fetchCompatibleJobSlots,
   fetchTickets,
-  fetchTicketWork,
+  fetchTicket,
+  fetchTicketHistory,
   matchTicket,
   submitTicket,
   takeCharge,
@@ -21,6 +22,7 @@ import {
   type Ticket,
   type TicketCreate,
   type TicketDetail,
+  type TicketEvent,
   type TicketListItem,
   type TicketListQuery,
 } from '@/config/api/ticketApi';
@@ -65,8 +67,12 @@ export const useTakeCharge = (): UseMutationResult<
   });
 };
 
-export const useTicketWork = (id: string): UseQueryResult<TicketDetail> =>
-  useQuery({ queryKey: [...TICKETS_KEY, 'work', id], queryFn: () => fetchTicketWork(id) });
+export const useTicket = (id: string): UseQueryResult<TicketDetail> =>
+  useQuery({ queryKey: [...TICKETS_KEY, 'detail', id], queryFn: () => fetchTicket(id) });
+
+/** Cronologia: sotto la stessa chiave dei ticket, così si aggiorna dopo ogni azione. */
+export const useTicketHistory = (id: string): UseQueryResult<TicketEvent[]> =>
+  useQuery({ queryKey: [...TICKETS_KEY, 'history', id], queryFn: () => fetchTicketHistory(id) });
 
 export const useCompatibleJobSlots = (
   id: string,
