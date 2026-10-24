@@ -18,6 +18,7 @@ import {
   useTicketHistory,
 } from '@/config/hooks/useTickets';
 import { TICKET_STATUSES } from '@/lib/domainValues';
+import type { BeneficiaryLinkState } from '@/pages/BeneficiaryPage/BeneficiaryPage';
 
 const dateTime = new Intl.DateTimeFormat('it-IT', { dateStyle: 'short', timeStyle: 'short' });
 
@@ -224,6 +225,11 @@ const TicketHistory = ({ ticketId }: { ticketId: string }) => {
 
 const TicketData = ({ ticket: d }: { ticket: TicketDetail }) => {
   const { t } = useTranslation();
+  const beneficiaryLine = t('work.beneficiaryLine', {
+    lastName: d.beneficiary.lastName,
+    firstName: d.beneficiary.firstName,
+    birthYear: d.beneficiary.birthYear,
+  });
   return (
     <section aria-labelledby="work-data" className="space-y-3 rounded-xl border border-border bg-card p-4">
       <h2 id="work-data" className="text-lg font-semibold text-primary">
@@ -232,11 +238,15 @@ const TicketData = ({ ticket: d }: { ticket: TicketDetail }) => {
       <dl className="grid gap-x-6 gap-y-2 sm:grid-cols-[max-content_1fr]">
         <dt className="font-medium">{t('work.fields.beneficiary')}</dt>
         <dd>
-          {t('work.beneficiaryLine', {
-            lastName: d.beneficiary.lastName,
-            firstName: d.beneficiary.firstName,
-            birthYear: d.beneficiary.birthYear,
-          })}
+          {/* la scheda si apre con le stesse regole di visibilità della segnalazione (US-204) */}
+          <Link
+            to={`/beneficiari/${d.beneficiary.id}`}
+            state={{ fromTicket: { id: d.id, number: d.number } } satisfies BeneficiaryLinkState}
+            aria-label={t('work.openBeneficiary', { line: beneficiaryLine })}
+            className="font-medium text-primary underline underline-offset-4"
+          >
+            {beneficiaryLine}
+          </Link>
         </dd>
         <dt className="font-medium">{t('work.fields.zone')}</dt>
         <dd>{d.beneficiaryZone.name}</dd>

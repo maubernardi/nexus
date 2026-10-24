@@ -14,7 +14,6 @@ export const it = {
   nav: {
     home: 'Segnalazioni',
     beneficiaries: 'Beneficiari',
-    newTicket: 'Nuova segnalazione',
     companies: 'Aziende',
   },
   common: {
@@ -143,6 +142,7 @@ export const it = {
     loadError: 'Impossibile caricare il beneficiario. Controlla la connessione e riprova.',
     backToList: 'Torna ai miei beneficiari',
     backToDetail: 'Torna alla scheda',
+    backToTicket: 'Torna alla segnalazione n. {{number}}',
     backToHome: 'Torna alla Home',
     yes: 'Sì',
     no: 'No',
@@ -295,6 +295,8 @@ export const it = {
     },
     normal: 'Normale',
     beneficiaryLine: '{{lastName}} {{firstName}} ({{birthYear}})',
+    // il nome accessibile comincia con il testo visibile (WCAG 2.5.3)
+    openBeneficiary: '{{line}}, apri la scheda del beneficiario',
     filters: 'Filtri di compatibilità',
     zone: 'Zona',
     jobCategory: 'Tipologia',
@@ -337,6 +339,7 @@ export const it = {
     notFound: 'Segnalazione non trovata',
   },
   tickets: {
+    new: 'Nuova segnalazione',
     views: 'Viste delle segnalazioni',
     view: {
       MINE: 'Le mie segnalazioni',

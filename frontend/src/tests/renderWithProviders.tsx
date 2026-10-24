@@ -1,10 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, type RenderResult } from '@testing-library/react';
-import { createMemoryRouter, RouterProvider, type RouteObject } from 'react-router';
+import { createMemoryRouter, RouterProvider, type InitialEntry, type RouteObject } from 'react-router';
 
 type RenderRoutesOptions = {
   routes: RouteObject[];
-  initialPath?: string;
+  /** Indirizzo iniziale; un oggetto per passare anche lo stato della navigazione. */
+  initialPath?: InitialEntry;
 };
 
 export const createTestQueryClient = (): QueryClient =>
