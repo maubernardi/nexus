@@ -198,6 +198,10 @@ garantita dalle stesse regole.
 ### 8.4 Chiusura dello Sprint 3
 *Proposta:* chiudere lo Sprint 3 con questa review e avviare lo Sprint 4 alla conferma del planning (§9).
 
+> ✅ **Deciso (PO, 24/10): proposta accettata.** Sprint 3 chiuso il 24/10 con velocity 21. Lo Sprint 4 parte alla
+> conferma del planning, per 3 giorni. Prima dello Sprint 4: una PR senza punti con §8.1 e §8.3, e il deploy della demo
+> (A1).
+
 ## 9. Proposta per lo Sprint 4 (3 giorni, ~20 punti)
 
 **Obiettivo proposto:** *l'operatore sceglie la proposta con lo storico e le note dell'azienda (R1 chiuso); il Tutor
