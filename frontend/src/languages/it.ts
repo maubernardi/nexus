@@ -21,6 +21,7 @@ export const it = {
   },
   form: {
     required: 'obbligatorio',
+    hintFor: 'Informazioni su {{label}}',
     select: 'Seleziona…',
     errorSummary_one: 'Correggi 1 errore prima di continuare',
     errorSummary_other: 'Correggi {{count}} errori prima di continuare',
