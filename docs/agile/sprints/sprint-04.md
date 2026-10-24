@@ -1,6 +1,6 @@
 # Sprint 4 — 25 – 27 ottobre 2026
 
-**Stato:** 📋 pianificato. **Planning:** 24/10, nella [review dello Sprint 3](sprint-03-review.md) (§9); proposta del
+**Stato:** 🔨 in corso. **Planning:** 24/10, nella [review dello Sprint 3](sprint-03-review.md) (§9); proposta del
 team confermata dal Product Owner, con il calendario unico per tutti i progetti.
 
 ## Obiettivo
@@ -14,11 +14,14 @@ team confermata dal Product Owner, con il calendario unico per tutti i progetti.
   menu (§8.1); nome del beneficiario come link alla scheda nel dettaglio della segnalazione (§8.3).
 - Deploy della demo con il lavoro dello Sprint 3 (PO, azione A1).
 
+Fatto il 25/10: decisioni §8.1 e §8.3 in [#40](https://github.com/maubernardi/nexus/pull/40) (change
+`review-sprint-03-navigation`); demo aggiornata a `0323f2e` e poi a `54ebf99` (Sprint 3, #40, US-505).
+
 ## Impegno (24 punti)
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-505 | Diario delle note dell'azienda | 2 | ✅ Ready | — | — |
+| US-505 | Diario delle note dell'azienda | 2 | 🎉 Done | `add-company-notes` | [#42](https://github.com/maubernardi/nexus/pull/42) |
 | US-503 | Storico e pregressi dell'azienda | 3 | ✅ Ready | — | — |
 | US-604 | Dettagli di azienda e mansione durante l'abbinamento | 5 | ✅ Ready | — | — |
 | US-107 | Calendario unico (patrono e chiusure) | 3 | ✅ Ready | — | — |
@@ -39,6 +42,7 @@ coeso); gli stati del backlog si aggiornano nella PR di documentazione dopo i me
 |---|---|
 | Planning (24/10) | 19 |
 | 25/10 (US-302 aggiunta dal PO) | 24 |
+| 25/10 (US-505 unita, #42) | 22 |
 | Fine sprint | — |
 
 ## Review, retrospettiva e planning successivo
