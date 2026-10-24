@@ -290,6 +290,9 @@ Criteri di accettazione:
   passa in NUOVA (entra in coda); evento di audit.
 - Se l'operatore respinge la proposta, **sceglie lui una tipologia corretta del catalogo** e indica il motivo; la
   segnalazione entra in coda con quella tipologia e il Tutor riceve una **notifica** con il motivo (PO, 24/10).
+  Finché non ci sono le notifiche (US-1201): evento "Tipologia cambiata dal Call Center" nella cronologia (proposta →
+  scelta, motivo) ed evidenza testuale "Tipologia cambiata" nella Home del Tutor finché non apre la segnalazione
+  (review dello Sprint 3, §8.2).
 - Lo stato `IN_ATTESA_APPROVAZIONE_ADMIN` diventa `IN_ATTESA_APPROVAZIONE` (non è più solo dell'ADMIN).
 
 #### US-303
