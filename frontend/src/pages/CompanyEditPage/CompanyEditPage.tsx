@@ -21,6 +21,8 @@ export const CompanyEditPage = () => {
   const setActive = useSetCompanyActive();
   const initial = (location.state as { outcome?: Outcome } | null)?.outcome ?? null;
   const [outcome, setOutcome] = useState<Outcome | null>(initial);
+  // motivo del rifiuto spiegato dal server (es. mansioni bloccate, US-504)
+  const [reason, setReason] = useState<string | null>(null);
   const outcomeRef = useRef<HTMLDivElement>(null);
 
   // esito annunciato portandovi il focus (anche all'arrivo dalla creazione)
@@ -50,7 +52,11 @@ export const CompanyEditPage = () => {
       { id: c.id, version: c.version, active: !c.active },
       {
         onSuccess: (updated) => setOutcome(updated.active ? 'activated' : 'deactivated'),
-        onError: (error) => setOutcome(apiError(error)?.status === 409 ? 'conflict' : 'error'),
+        onError: (error) => {
+          const body = apiError(error);
+          setReason(body?.status === 409 ? body.message : null);
+          setOutcome(body?.status === 409 ? 'conflict' : 'error');
+        },
       },
     );
   };
@@ -74,7 +80,7 @@ export const CompanyEditPage = () => {
               : 'rounded-md border-l-4 border-primary bg-card p-4 font-medium'
           }
         >
-          {t(`company.outcome.${outcome}`)}
+          {outcome === 'conflict' && reason ? reason : t(`company.outcome.${outcome}`)}
         </div>
       )}
 
