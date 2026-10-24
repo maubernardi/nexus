@@ -74,7 +74,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-204](#us-204) | E2 | Visibilità dei beneficiari per progetto | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-205](#us-205) | E2 | Curriculum del beneficiario | Could | 5 | R3 | 📋 Backlog |
 | [US-301](#us-301) | E3 | Nuova segnalazione | Must | 5 | R1 | 🎉 Done (Sprint 1) |
-| [US-302](#us-302) | E3 | Nuova tipologia di mansione dal Tutor, approvata dal Call Center | Should | 5 | R2 | 📋 Backlog |
+| [US-302](#us-302) | E3 | Nuova tipologia di mansione dal Tutor, approvata dal Call Center | Should | 5 | R2 | ✅ Ready (Sprint 4) |
 | [US-303](#us-303) | E3 | Elenco delle segnalazioni (Home) | Must | 5 | R1 | 🎉 Done (Sprint 3) |
 | [US-304](#us-304) | E3 | Ticket dei miei progetti | Should | 0 | R1 | ↪️ Assorbita in US-303 |
 | [US-305](#us-305) | E3 | Dettaglio e cronologia del ticket | Must | 3 | R1 | 🎉 Done (Sprint 3) |
@@ -279,7 +279,7 @@ Criteri di accettazione:
 Dipendenze: EN-1, US-201
 
 #### US-302
-**Nuova tipologia di mansione dal Tutor, approvata dal Call Center** · Should · 5 punti · R2 · 📋 Backlog
+**Nuova tipologia di mansione dal Tutor, approvata dal Call Center** · Should · 5 punti · R2 · ✅ Ready (Sprint 4)
 
 Come **Tutor** voglio indicare nella segnalazione una tipologia di mansione che non trovo nel catalogo, che un operatore
 del Call Center approva, per non bloccare segnalazioni atipiche. Aggiornata con la nota operativa del PO (24/10): approva

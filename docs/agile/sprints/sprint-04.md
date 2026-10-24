@@ -14,7 +14,7 @@ team confermata dal Product Owner, con il calendario unico per tutti i progetti.
   menu (§8.1); nome del beneficiario come link alla scheda nel dettaglio della segnalazione (§8.3).
 - Deploy della demo con il lavoro dello Sprint 3 (PO, azione A1).
 
-## Impegno (19 punti)
+## Impegno (24 punti)
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
@@ -24,18 +24,21 @@ team confermata dal Product Owner, con il calendario unico per tutti i progetti.
 | US-107 | Calendario unico (patrono e chiusure) | 3 | ✅ Ready | — | — |
 | US-703 | Calendario dei giorni lavorativi | 3 | ✅ Ready | — | — |
 | US-701 | Accettazione della proposta | 3 | ✅ Ready | — | — |
+| US-302 | Nuova tipologia di mansione dal Tutor, approvata dal Call Center | 5 | ✅ Ready | — | — |
 
-**Extra** (se avanza tempo): US-302 *Nuova tipologia di mansione dal Tutor* (5), con la soluzione provvisoria per la
-notifica decisa in review (§8.2). Per il PO: US-1301 (PWA su smartphone).
+US-302 aggiunta all'impegno il 25/10 su richiesta del PO (nota operativa 3), senza togliere altre storie: impegno sopra i
+~20 punti abituali. Notifica al Tutor con la soluzione provvisoria decisa in review (§8.2). Per il PO: US-1301 (PWA su
+smartphone).
 
-Ordine: US-505 → US-503 → US-604 (chiude R1), poi US-107 → US-703 → US-701. Una PR per storia (o piccolo gruppo
+Ordine: US-505 → US-503 → US-604 (chiude R1), poi US-107 → US-703 → US-701, infine US-302. Una PR per storia (o piccolo gruppo
 coeso); gli stati del backlog si aggiornano nella PR di documentazione dopo i merge.
 
 ## Burndown
 
 | Momento | Punti residui |
 |---|---|
-| Inizio (25/10) | 19 |
+| Planning (24/10) | 19 |
+| 25/10 (US-302 aggiunta dal PO) | 24 |
 | Fine sprint | — |
 
 ## Review, retrospettiva e planning successivo
