@@ -83,7 +83,7 @@ describe('<CompanyEditPage>', () => {
     await expectNoAxeViolations();
   });
 
-  it('disattiva e, se un collega l’ha cambiata, lo spiega', async () => {
+  it('disattiva e, se il server rifiuta, mostra il motivo', async () => {
     const user = userEvent.setup();
     vi.mocked(setCompanyActive)
       .mockResolvedValueOnce({ ...rossi, active: false, version: 4 })
@@ -93,7 +93,11 @@ describe('<CompanyEditPage>', () => {
           statusText: 'Conflict',
           headers: {},
           config: { headers: new AxiosHeaders() },
-          data: { status: 409, message: 'conflitto' },
+          data: {
+            status: 409,
+            message:
+              'Non si può disattivare l’azienda: la mansione «Magazziniere» è bloccata dalla segnalazione n. 30',
+          },
         }),
       );
     renderPage();
@@ -103,6 +107,7 @@ describe('<CompanyEditPage>', () => {
     expect(setCompanyActive).toHaveBeenCalledWith({ id: 'C1', version: 3, active: false }, expect.anything());
 
     await user.click(await screen.findByRole('button', { name: 'Riattiva azienda' }));
-    expect(await screen.findByText(/modificata da un collega/)).toHaveFocus();
+    // il motivo del rifiuto arriva dal server (US-504)
+    expect(await screen.findByText(/bloccata dalla segnalazione n\. 30/)).toHaveFocus();
   });
 });
