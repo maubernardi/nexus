@@ -147,7 +147,7 @@ export const JobSlotsSection = ({ companyId, companyActive }: JobSlotsSectionPro
           {t('jobSlot.loadError')}
         </p>
       ) : !slots.data ? (
-        <p>{t('queue.loading')}</p>
+        <p>{t('common.loading')}</p>
       ) : slots.data.length === 0 ? (
         <p className="rounded-xl border border-border bg-card p-6">{t('jobSlot.empty')}</p>
       ) : (
@@ -180,7 +180,7 @@ export const JobSlotsSection = ({ companyId, companyActive }: JobSlotsSectionPro
                   {t('jobSlot.availability')}
                 </th>
                 <th scope="col" className={th}>
-                  {t('queue.columns.actions')}
+                  {t('tickets.columns.actions')}
                 </th>
               </tr>
             </thead>

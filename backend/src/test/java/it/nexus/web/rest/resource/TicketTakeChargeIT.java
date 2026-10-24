@@ -114,11 +114,11 @@ class TicketTakeChargeIT {
                 .andExpect(jsonPath("$.status").value("IN_LAVORAZIONE"))
                 .andExpect(jsonPath("$.version").value(vista + 1));
 
-        mockMvc.perform(get("/api/v1/tickets/queue").header(USER, "operatore.cc"))
+        mockMvc.perform(get("/api/v1/tickets").param("view", "TO_TAKE").header(USER, "operatore.cc"))
                 .andExpect(jsonPath("$[*].id", not(hasItem(id))));
-        mockMvc.perform(get("/api/v1/tickets/assigned-to-me").header(USER, "operatore.cc"))
+        mockMvc.perform(get("/api/v1/tickets").param("view", "ASSIGNED_TO_ME").header(USER, "operatore.cc"))
                 .andExpect(jsonPath("$[*].id", hasItem(id)));
-        mockMvc.perform(get("/api/v1/tickets/assigned-to-me").header(USER, "admin"))
+        mockMvc.perform(get("/api/v1/tickets").param("view", "ASSIGNED_TO_ME").header(USER, "admin"))
                 .andExpect(jsonPath("$[*].id", not(hasItem(id))));
 
         em.flush();

@@ -4,8 +4,6 @@ export const ENDPOINTS = {
   currentUser: '/me',
   myProjects: '/me/projects',
   tickets: '/tickets',
-  ticketQueue: '/tickets/queue',
-  ticketsAssignedToMe: '/tickets/assigned-to-me',
   projects: '/reference/projects',
   companies: '/companies',
   jobSlots: '/job-slots',

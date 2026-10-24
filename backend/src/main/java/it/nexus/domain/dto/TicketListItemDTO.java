@@ -5,8 +5,8 @@ import java.time.Instant;
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.domain.enumeration.TicketType;
 
-/** Voce della coda del Call Center; {@code version} serve alla presa in carico (US-402). */
-public record QueueItemDTO(
+/** Riga dell'elenco delle segnalazioni (Home, US-303); {@code version} serve alle azioni (presa in carico). */
+public record TicketListItemDTO(
         String id,
         Long number,
         TicketType type,
@@ -17,5 +17,7 @@ public record QueueItemDTO(
         ReferenceItemDTO project,
         ReferenceItemDTO requestedJobCategory,
         String tutorName,
+        /** Operatore che ha in carico la segnalazione (null se nessuno). */
+        String assignedOperatorName,
         Instant createdAt) {
 }

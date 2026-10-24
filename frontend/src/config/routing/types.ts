@@ -1,12 +1,10 @@
 export type RouteHandle = {
   titleKey:
-    | 'pages.home.title'
+    | 'pages.tickets.title'
     | 'pages.notFound.title'
     | 'pages.devLogin.title'
     | 'pages.beneficiaryNew.title'
     | 'pages.ticketNew.title'
-    | 'pages.queue.title'
-    | 'pages.myWork.title'
     | 'pages.ticketWork.title'
     | 'pages.companies.title'
     | 'pages.companyNew.title'

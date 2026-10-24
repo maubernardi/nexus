@@ -42,7 +42,7 @@ export const CompanyEditPage = () => {
     );
   }
   if (!company.data) {
-    return <p role="status">{t('queue.loading')}</p>;
+    return <p role="status">{t('common.loading')}</p>;
   }
   const c = company.data;
 

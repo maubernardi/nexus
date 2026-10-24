@@ -44,7 +44,7 @@ describe('interceptor di risposta', () => {
 
   it('un 403 di ruolo non tocca il profilo', async () => {
     const invalidate = vi.spyOn(queryClient, 'invalidateQueries').mockResolvedValue();
-    await expect(axiosInstance.get(ENDPOINTS.ticketQueue, { adapter: reply403() })).rejects.toBeTruthy();
+    await expect(axiosInstance.get(ENDPOINTS.tickets, { adapter: reply403() })).rejects.toBeTruthy();
     expect(invalidate).not.toHaveBeenCalled();
   });
 });
