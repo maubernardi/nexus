@@ -117,7 +117,7 @@ Nessun difetto noto sul codice unito; la verifica sul campo attende il deploy.
 | D3 | Cronologia letta dall'audit; per le segnalazioni precedenti all'audit si integra lo storico degli stati | Team | US-305 |
 | D4 | Un Tutor vede un beneficiario altrui se questo ha una segnalazione (anche conclusa) in un suo progetto | Team (da Q11) | US-204 |
 | D5 | "I miei beneficiari" resta solo del proprietario; quelli dei colleghi si raggiungono dalle segnalazioni | Team | US-202 |
-| D6 | Nel menu del Tutor "Beneficiari" sostituisce "Nuovo beneficiario" (diventa un pulsante dell'elenco) | Team | US-202 — **da confermare** (§8.1) |
+| D6 | Nel menu del Tutor "Beneficiari" sostituisce "Nuovo beneficiario" (diventa un pulsante dell'elenco) | Team → PO | US-202 — ✅ confermata (§8.1) |
 | D7 | Voce del menu attiva anche nelle pagine interne della sezione | Team | navigazione |
 | D8 | Nessun blocco ottimistico sul beneficiario (lo modifica solo il suo Tutor) | Team | US-203 |
 | D9 | In modifica la zona già assegnata resta valida anche se disattivata | Team | US-203 |
@@ -167,6 +167,9 @@ Oggi il menu del Tutor ha *Segnalazioni*, *Beneficiari*, *Nuova segnalazione*; "
 cima all'elenco dei beneficiari.
 *Proposta:* tenerlo così (menu corto, anche su smartphone). Alternativa: rimettere "Nuovo beneficiario" nel menu
 (4 voci).
+
+> ✅ **Deciso (PO, 24/10): proposta accettata.** Il menu del Tutor resta *Segnalazioni*, *Beneficiari*, *Nuova
+> segnalazione*; "Nuovo beneficiario" è il pulsante in cima all'elenco dei beneficiari. Nessuna modifica al codice.
 
 ### 8.2 Notifica al Tutor quando l'operatore respinge la nuova tipologia (US-302)
 La storia chiede una notifica, ma le notifiche (US-1201, in app ed email) arrivano più avanti.
