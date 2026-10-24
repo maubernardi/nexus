@@ -16,6 +16,7 @@ import {
   matchTicket,
   submitTicket,
   takeCharge,
+  takeOverTicket,
   type CompatibleFilters,
   type JobSlotMatch,
   type QueueFilters,
@@ -91,6 +92,15 @@ export const useMatchTicket = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: matchTicket,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+  });
+};
+
+/** "Prendila in carico tu" (US-405): la segnalazione di un collega passa all'operatore corrente. */
+export const useTakeOver = (): UseMutationResult<TicketDetail, unknown, { id: string; version: number }> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: takeOverTicket,
     onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
   });
 };

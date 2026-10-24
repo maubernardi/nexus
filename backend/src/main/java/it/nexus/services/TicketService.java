@@ -35,4 +35,7 @@ public interface TicketService {
      * @throws it.nexus.web.errors.ConflictException se ticket o mansione sono cambiati o la mansione non è più proponibile
      */
     TicketDetailDTO match(String ticketId, MatchRequestDTO request);
+
+    /** "Prendila in carico tu": la segnalazione in carico a un collega passa all'operatore corrente (US-405). */
+    TicketDetailDTO takeOver(String ticketId, long expectedVersion);
 }

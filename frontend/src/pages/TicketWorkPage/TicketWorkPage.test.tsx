@@ -8,6 +8,7 @@ import {
   fetchCompatibleJobSlots,
   fetchTicketWork,
   matchTicket,
+  takeOverTicket,
   type JobSlotMatch,
   type TicketDetail,
 } from '@/config/api/ticketApi';
@@ -24,6 +25,7 @@ vi.mock('@/config/api/ticketApi', () => ({
   fetchTicketWork: vi.fn(),
   fetchCompatibleJobSlots: vi.fn(),
   matchTicket: vi.fn(),
+  takeOverTicket: vi.fn(),
 }));
 vi.mock('@/config/api/referenceApi', () => ({
   fetchZones: vi.fn(),
@@ -169,14 +171,31 @@ describe('<TicketWorkPage>', () => {
     ).toHaveFocus();
   });
 
-  it('in carico a un collega: niente ricerca, spiegazione', async () => {
+  it('in carico a un collega: si può lavorare e prendere in carico, l’assegnazione resta', async () => {
+    const user = userEvent.setup();
     vi.mocked(fetchTicketWork).mockResolvedValue(
       detail({ assignedToMe: false, assignedOperatorName: 'Collega Due' }),
     );
+    vi.mocked(takeOverTicket).mockResolvedValue(detail({ assignedToMe: true, version: 3 }));
+    renderPage();
+
+    expect(await screen.findByText(/in carico a Collega Due/)).toBeInTheDocument();
+    expect(screen.getByText('Puoi lavorarla anche tu: l’assegnazione resta al collega.')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Mansioni compatibili' })).toBeInTheDocument();
+    await screen.findByRole('button', { name: /^Proponi Magazziniere/ });
+    await expectNoAxeViolations();
+
+    await user.click(screen.getByRole('button', { name: 'Prendila in carico tu' }));
+    expect(await screen.findByText(/Ora la segnalazione è in carico a te/)).toHaveFocus();
+    expect(takeOverTicket).toHaveBeenCalledWith({ id: 'T9', version: 2 }, expect.anything());
+  });
+
+  it('non ancora presa in carico: niente ricerca, rimanda alla coda', async () => {
+    vi.mocked(fetchTicketWork).mockResolvedValue(detail({ assignedToMe: false, assignedOperatorName: null }));
     renderPage();
 
     expect(
-      await screen.findByText(/in carico a Collega Due: solo chi l’ha in carico può abbinarla/),
+      await screen.findByText('Prendi in carico la segnalazione dalla coda per poterla abbinare.'),
     ).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Mansioni compatibili' })).not.toBeInTheDocument();
     expect(fetchCompatibleJobSlots).not.toHaveBeenCalled();

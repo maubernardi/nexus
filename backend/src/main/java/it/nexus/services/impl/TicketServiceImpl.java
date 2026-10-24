@@ -28,7 +28,6 @@ import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.JobSlotStatus;
-import it.nexus.domain.enumeration.Role;
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.domain.enumeration.TicketType;
 import it.nexus.domain.workflow.TicketTransitions;
@@ -154,7 +153,7 @@ public class TicketServiceImpl implements TicketService {
         Company company = slot.getCompany();
 
         Ticket saved = stateMachine.apply(ticket, TicketTransitions.MATCH, request.ticketVersion(), null, t -> {
-            requireWorkingOperator(t, me);
+            requireTakenInCharge(t);
             if (slot.getVersion() != request.jobSlotVersion() || slot.getStatus() != JobSlotStatus.LIBERA
                     || !slot.isActive() || !company.isActive()) {
                 throw new ConflictException(
@@ -183,23 +182,42 @@ public class TicketServiceImpl implements TicketService {
         return detail(saved, me);
     }
 
+    @Override
+    public TicketDetailDTO takeOver(String ticketId, long expectedVersion) {
+        Ticket ticket = findTicket(ticketId);
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        if (ticket.getVersion() != expectedVersion) {
+            throw new ConflictException("La segnalazione è stata modificata nel frattempo: ricarica la pagina e riprova");
+        }
+        AppUser previous = ticket.getAssignedCcOperator();
+        if (ticket.getStatus() == TicketStatus.CLOSED || previous == null) {
+            throw new ConflictException("La segnalazione n. %d non è in carico a nessuno: prendila dalla coda",
+                    ticket.getNumber());
+        }
+        if (previous.getId().equals(me.getId())) {
+            return detail(ticket, me);
+        }
+        ticket.setAssignedCcOperator(me);
+        Ticket saved = ticketRepository.saveAndFlush(ticket);
+        auditService.record(AuditEntityType.TICKET, saved.getId(), "TAKE_OVER", AuditChanges.of()
+                .value("assignedCcOperatorId", TsidMapper.toExternal(previous.getId()), TsidMapper.toExternal(me.getId())),
+                null);
+        return detail(saved, me);
+    }
+
     private Ticket findTicket(String ticketId) {
         return Optional.ofNullable(TsidMapper.toInternal(ticketId))
                 .flatMap(ticketRepository::findById)
                 .orElseThrow(() -> new NotFoundException("Segnalazione non trovata"));
     }
 
-    /** Lavora la segnalazione solo l'operatore che l'ha in carico; l'ADMIN può intervenire sempre. */
-    private static void requireWorkingOperator(Ticket ticket, AppUser me) {
-        if (me.getRole() == Role.ADMIN) {
-            return;
-        }
-        AppUser assigned = ticket.getAssignedCcOperator();
-        if (assigned == null) {
+    /**
+     * Una segnalazione si lavora dopo la presa in carico, da parte di qualunque operatore o dell'ADMIN, anche se è in
+     * carico a un collega (US-405, decisione del PO del 05/10): l'assegnazione non cambia e l'audit registra chi agisce.
+     */
+    private static void requireTakenInCharge(Ticket ticket) {
+        if (ticket.getAssignedCcOperator() == null) {
             throw new ConflictException("Prendi in carico la segnalazione n. %d prima di abbinarla", ticket.getNumber());
-        }
-        if (!assigned.getId().equals(me.getId())) {
-            throw new ConflictException("La segnalazione n. %d è in carico a un collega", ticket.getNumber());
         }
     }
 
