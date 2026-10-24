@@ -8,9 +8,8 @@ import { Button } from '@/components/ui/button';
 import { NativeSelect } from '@/components/ui/native-select';
 import { apiError } from '@/config/api/errors';
 import type { JobSlotMatch, TicketDetail } from '@/config/api/ticketApi';
-import { useCurrentUser } from '@/config/hooks/useCurrentUser';
 import { useJobCategories, useZones } from '@/config/hooks/useReferenceData';
-import { useCompatibleJobSlots, useMatchTicket, useTicketWork } from '@/config/hooks/useTickets';
+import { useCompatibleJobSlots, useMatchTicket, useTakeOver, useTicketWork } from '@/config/hooks/useTickets';
 
 const dateTime = new Intl.DateTimeFormat('it-IT', { dateStyle: 'short', timeStyle: 'short' });
 
@@ -19,6 +18,7 @@ const ALL = '';
 
 type Outcome =
   | { kind: 'proposed'; title: string; company: string }
+  | { kind: 'takenOver' }
   | { kind: 'conflict'; reason: string }
   | { kind: 'error' };
 
@@ -27,9 +27,9 @@ export const TicketWorkPage = () => {
   const { t } = useTranslation();
   const { id = '' } = useParams();
   const ticket = useTicketWork(id);
-  const { data: user } = useCurrentUser();
   const outcomeRef = useRef<HTMLDivElement>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
+  const takeOver = useTakeOver();
 
   useEffect(() => {
     if (outcome) outcomeRef.current?.focus();
@@ -51,8 +51,21 @@ export const TicketWorkPage = () => {
     return <p role="status">{t('queue.loading')}</p>;
   }
   const d = ticket.data;
-  const isAdmin = user?.roles.includes('ADMIN') ?? false;
-  const canMatch = d.status === 'IN_LAVORAZIONE' && (d.assignedToMe || isAdmin);
+  // dopo la presa in carico chiunque del Call Center (o l'ADMIN) può lavorarla, anche se è di un collega (US-405)
+  const canMatch = d.status === 'IN_LAVORAZIONE' && d.assignedOperatorName !== null;
+  const ofColleague = d.assignedOperatorName !== null && !d.assignedToMe;
+  const onTakeOver = (): void => {
+    takeOver.mutate(
+      { id: d.id, version: d.version },
+      {
+        onSuccess: () => setOutcome({ kind: 'takenOver' }),
+        onError: (error) => {
+          const body = apiError(error);
+          setOutcome(body?.status === 409 ? { kind: 'conflict', reason: body.message } : { kind: 'error' });
+        },
+      },
+    );
+  };
   const assignment = d.assignedToMe
     ? t('work.assignedToYou')
     : d.assignedOperatorName
@@ -65,22 +78,32 @@ export const TicketWorkPage = () => {
       <p className="font-medium">
         {t('work.status', { status: t(`enums.ticketStatus.${d.status}`) })} · {assignment}
       </p>
+      {ofColleague && (
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-muted-foreground">{t('work.sharedHint')}</p>
+          <Button variant="outline" onClick={onTakeOver} disabled={takeOver.isPending}>
+            {t('work.takeOver')}
+          </Button>
+        </div>
+      )}
 
       {outcome && (
         <div
           ref={outcomeRef}
           tabIndex={-1}
           className={
-            outcome.kind === 'proposed'
+            outcome.kind === 'proposed' || outcome.kind === 'takenOver'
               ? 'rounded-md border-l-4 border-primary bg-card p-4 font-medium'
               : 'rounded-md border-2 border-destructive bg-card p-4 font-medium text-destructive'
           }
         >
-          {outcome.kind === 'proposed'
-            ? t('work.proposed', { title: outcome.title, company: outcome.company })
-            : outcome.kind === 'conflict'
-              ? t('work.conflict', { reason: outcome.reason })
-              : t('work.error')}
+          {outcome.kind === 'takenOver'
+            ? t('work.takenOver')
+            : outcome.kind === 'proposed'
+              ? t('work.proposed', { title: outcome.title, company: outcome.company })
+              : outcome.kind === 'conflict'
+                ? t('work.conflict', { reason: outcome.reason })
+                : t('work.error')}
         </div>
       )}
 
@@ -106,11 +129,8 @@ export const TicketWorkPage = () => {
           </dl>
         </section>
       )}
-
       {d.status === 'IN_LAVORAZIONE' && !canMatch && (
-        <p className="rounded-xl border border-border bg-card p-4">
-          {d.assignedOperatorName ? t('work.notMine', { name: d.assignedOperatorName }) : t('work.notTaken')}
-        </p>
+        <p className="rounded-xl border border-border bg-card p-4">{t('work.notTaken')}</p>
       )}
       {canMatch && <CompatibleSection ticket={d} onOutcome={setOutcome} />}
 

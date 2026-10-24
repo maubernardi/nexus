@@ -116,3 +116,16 @@ export const matchTicket = async ({
   });
   return data;
 };
+
+export const takeOverTicket = async ({
+  id,
+  version,
+}: {
+  id: string;
+  version: number;
+}): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/take-over`, {
+    version,
+  });
+  return data;
+};

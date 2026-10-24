@@ -79,6 +79,13 @@ public class TicketResource {
         return ResponseEntity.ok(ticketService.match(id, body));
     }
 
+    @PostMapping("/{id}/take-over")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Sposta su di sé una segnalazione in carico a un collega")
+    public ResponseEntity<TicketDetailDTO> takeOver(@PathVariable String id, @RequestBody @Valid VersionDTO body) {
+        return ResponseEntity.ok(ticketService.takeOver(id, body.version()));
+    }
+
     // nessun Location: il dettaglio del ticket arriva con US-305
     @PostMapping
     @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")

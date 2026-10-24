@@ -220,12 +220,48 @@ class TicketMatchingIT {
     }
 
     @Test
-    void segnalazioneDiUnCollegaONonPresaInCarico_409_adminPuo() throws Exception {
+    void segnalazioneDiUnCollega_abbinabile_lAssegnazioneResta() throws Exception {
         Ticket ofColleague = workingTicket(colleague);
         doMatch("operatore.cc", ofColleague, match, match.getVersion())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.assignedOperatorName").value("Nome Cognome"))
+                .andExpect(jsonPath("$.assignedToMe").value(false));
+        em.flush();
+        em.clear();
+        assertThat(tickets.findById(ofColleague.getId()).orElseThrow().getAssignedCcOperator().getId())
+                .isEqualTo(colleague.getId());
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.TICKET, ofColleague.getId()))
+                .singleElement().satisfies(e -> assertThat(e.getCreatedBy()).isEqualTo("operatore.cc"));
+    }
+
+    @Test
+    void nonPresaInCarico_409() throws Exception {
+        Ticket unassigned = workingTicket(null);
+        doMatch("admin", unassigned, match, match.getVersion())
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("in carico a un collega")));
-        doMatch("admin", ofColleague, match, match.getVersion()).andExpect(status().isOk());
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Prendi in carico")));
+    }
+
+    @Test
+    void prendilaInCaricoTu_spostaLAssegnazioneConAudit() throws Exception {
+        Ticket ofColleague = workingTicket(colleague);
+        mockMvc.perform(post("/api/v1/tickets/" + id(ofColleague) + "/take-over").header(USER, "operatore.cc")
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"version\": " + ofColleague.getVersion() + "}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.assignedToMe").value(true));
+        em.flush();
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.TICKET, ofColleague.getId()))
+                .singleElement()
+                .satisfies(e -> {
+                    assertThat(e.getAction()).isEqualTo("TAKE_OVER");
+                    assertThat(e.getChanges()).containsEntry("assignedCcOperatorId", Map.of(
+                            "before", TsidMapper.toExternal(colleague.getId()),
+                            "after", TsidMapper.toExternal(operator.getId())));
+                });
+        // versione superata: 409
+        mockMvc.perform(post("/api/v1/tickets/" + id(ofColleague) + "/take-over").header(USER, "admin")
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"version\": 0}"))
+                .andExpect(status().isConflict());
     }
 
     @Test
