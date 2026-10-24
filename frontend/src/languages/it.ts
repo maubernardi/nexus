@@ -186,6 +186,17 @@ export const it = {
       home: 'Torna alla Home',
     },
   },
+  companyNote: {
+    heading: 'Note',
+    intro:
+      'Informazioni utili sull’azienda per i colleghi. Le vedono solo il Call Center e l’amministrazione; le note si aggiungono e non si modificano né si cancellano.',
+    text: 'Nuova nota',
+    add: 'Aggiungi nota',
+    adding: 'Aggiunta in corso…',
+    added: 'Nota aggiunta.',
+    empty: 'Nessuna nota.',
+    listLabel: 'Note dalla più recente',
+  },
   company: {
     fields: {
       name: 'Ragione sociale',
