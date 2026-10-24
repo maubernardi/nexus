@@ -2,9 +2,7 @@
 
 ## Purpose
 Anagrafica delle aziende ospitanti, gestita da Call Center e ADMIN, base per l'abbinamento delle mansioni.
-
 ## Requirements
-
 ### Requirement: Gestione delle aziende
 Il sistema SHALL permettere a Call Center e ADMIN di cercare, registrare, modificare, disattivare e riattivare le
 aziende, senza mai cancellarle. Il Tutor SHALL NOT accedere all'anagrafica.
@@ -58,3 +56,13 @@ stato LIBERA/BLOCCATA SHALL NOT essere modificabile a mano.
 #### Scenario: Azienda disattivata
 - **WHEN** si aggiunge una mansione a un'azienda disattivata
 - **THEN** la risposta è `409`
+
+### Requirement: Disattivazione con proposte in corso
+Il sistema SHALL rifiutare con `409` la disattivazione di un'azienda che ha mansioni BLOCCATE da segnalazioni, indicando
+per ciascuna il titolo della mansione e il numero della segnalazione; l'azienda resta attiva.
+
+#### Scenario: Mansione bloccata
+- **WHEN** un operatore disattiva un'azienda la cui mansione «Magazziniere» è bloccata dalla segnalazione n. 30
+- **THEN** la risposta è `409` con il messaggio "Non si può disattivare l'azienda: la mansione «Magazziniere» è bloccata
+  dalla segnalazione n. 30" e la scheda azienda lo mostra
+

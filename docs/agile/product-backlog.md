@@ -66,28 +66,28 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | 📋 Backlog |
 | [US-107](#us-107) | E1 | Calendario del progetto | Must | 3 | R2 | 📋 Backlog |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
-| [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 👀 In review (Sprint 3) |
+| [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [EN-5](#en-5) | E13 | Controllo della numerazione delle migrazioni nella CI | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [US-201](#us-201) | E2 | Inserimento beneficiario | Must | 5 | R1 | 🎉 Done (Sprint 1) |
-| [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | ✅ Ready (Sprint 3) |
-| [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | ✅ Ready (Sprint 3) |
-| [US-204](#us-204) | E2 | Visibilità dei beneficiari per progetto | Must | 3 | R1 | ✅ Ready (Sprint 3) |
+| [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | 🎉 Done (Sprint 3) |
+| [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 🎉 Done (Sprint 3) |
+| [US-204](#us-204) | E2 | Visibilità dei beneficiari per progetto | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-205](#us-205) | E2 | Curriculum del beneficiario | Could | 5 | R3 | 📋 Backlog |
 | [US-301](#us-301) | E3 | Nuova segnalazione | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-302](#us-302) | E3 | Nuova tipologia di mansione dal Tutor, approvata dal Call Center | Should | 5 | R2 | 📋 Backlog |
-| [US-303](#us-303) | E3 | Elenco delle segnalazioni (Home) | Must | 5 | R1 | ✅ Ready (Sprint 3) |
+| [US-303](#us-303) | E3 | Elenco delle segnalazioni (Home) | Must | 5 | R1 | 🎉 Done (Sprint 3) |
 | [US-304](#us-304) | E3 | Ticket dei miei progetti | Should | 0 | R1 | ↪️ Assorbita in US-303 |
-| [US-305](#us-305) | E3 | Dettaglio e cronologia del ticket | Must | 3 | R1 | ✅ Ready (Sprint 3) |
+| [US-305](#us-305) | E3 | Dettaglio e cronologia del ticket | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-306](#us-306) | E3 | Segnalazione speciale dalla bacheca | Must | 3 | R2 | 📋 Backlog |
 | [US-401](#us-401) | E4 | Coda FIFO | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | 📋 Backlog |
 | [US-404](#us-404) | E4 | Rifiuto fast-track | Must | 3 | R2 | 📋 Backlog |
-| [US-405](#us-405) | E4 | Lavorazione condivisa tra operatori | Must | 2 | R1 | ✅ Ready (Sprint 3) |
+| [US-405](#us-405) | E4 | Lavorazione condivisa tra operatori | Must | 2 | R1 | 🎉 Done (Sprint 3) |
 | [US-501](#us-501) | E5 | Anagrafica aziende | Must | 3 | R1 | 🎉 Done (Sprint 2) |
 | [US-502](#us-502) | E5 | Mansioni dell'azienda | Must | 3 | R1 | 🎉 Done (Sprint 2) |
 | [US-503](#us-503) | E5 | Storico e pregressi dell'azienda | Must | 3 | R1 | 📋 Backlog |
-| [US-504](#us-504) | E5 | Disattivazione impedita con mansioni bloccate | Must | 1 | R1 | ✅ Ready (Sprint 3) |
+| [US-504](#us-504) | E5 | Disattivazione impedita con mansioni bloccate | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [US-505](#us-505) | E5 | Diario delle note dell'azienda | Must | 2 | R1 | 📋 Backlog |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
@@ -217,7 +217,7 @@ Criteri di accettazione:
 - Il modulo è utilizzabile solo da tastiera e su smartphone a 320 px.
 
 #### US-202
-**I miei beneficiari** · Must · 3 punti · R1 · ✅ Ready (Sprint 3)
+**I miei beneficiari** · Must · 3 punti · R1 · 🎉 Done (Sprint 3)
 
 Come **Tutor** voglio vedere l'elenco e il dettaglio dei beneficiari che ho inserito per ritrovarli rapidamente.
 
@@ -225,7 +225,7 @@ Criteri di accettazione:
 - Vedo solo i beneficiari di cui sono proprietario, con ricerca per nome.
 
 #### US-203
-**Modifica beneficiario** · Must · 2 punti · R1 · ✅ Ready (Sprint 3)
+**Modifica beneficiario** · Must · 2 punti · R1 · 🎉 Done (Sprint 3)
 
 Come **Tutor** voglio correggere i dati di un mio beneficiario per tenerli aggiornati.
 
@@ -233,7 +233,7 @@ Criteri di accettazione:
 - Posso modificare solo i miei beneficiari; le modifiche sono tracciate (autore e data).
 
 #### US-204
-**Visibilità dei beneficiari per progetto** · Must · 3 punti · R1 · ✅ Ready (Sprint 3)
+**Visibilità dei beneficiari per progetto** · Must · 3 punti · R1 · 🎉 Done (Sprint 3)
 
 Come **responsabile della privacy** voglio che i dati di un beneficiario siano visibili solo a chi ne ha diritto: il tutor proprietario, i tutor dei progetti in cui il beneficiario ha segnalazioni, il Call Center e l'ADMIN.
 
@@ -293,7 +293,7 @@ Criteri di accettazione:
 - Lo stato `IN_ATTESA_APPROVAZIONE_ADMIN` diventa `IN_ATTESA_APPROVAZIONE` (non è più solo dell'ADMIN).
 
 #### US-303
-**Elenco delle segnalazioni (Home)** · Must · 5 punti · R1 · ✅ Ready (Sprint 3)
+**Elenco delle segnalazioni (Home)** · Must · 5 punti · R1 · 🎉 Done (Sprint 3)
 
 Come **Tutor, operatore Call Center o ADMIN** voglio che la pagina iniziale sia l'elenco delle segnalazioni che mi
 riguardano per partire subito dal lavoro. Nota operativa del PO, decisa il 24/10: sostituisce "I miei ticket" e assorbe
@@ -315,7 +315,7 @@ Criteri di accettazione:
 Confluita nella vista "Del mio progetto" della Home (US-303).
 
 #### US-305
-**Dettaglio e cronologia del ticket** · Must · 3 punti · R1 · ✅ Ready (Sprint 3)
+**Dettaglio e cronologia del ticket** · Must · 3 punti · R1 · 🎉 Done (Sprint 3)
 
 Come **Tutor / Call Center** voglio vedere il dettaglio del ticket e la cronologia degli stati per sapere cosa è successo e quando.
 
@@ -375,7 +375,7 @@ Criteri di accettazione:
 - Il rifiuto richiede un motivo ed è registrato nell'audit (EN-2).
 
 #### US-405
-**Lavorazione condivisa tra operatori** · Must · 2 punti · R1 · ✅ Ready (Sprint 3)
+**Lavorazione condivisa tra operatori** · Must · 2 punti · R1 · 🎉 Done (Sprint 3)
 
 Come **operatore Call Center** voglio poter lavorare anche le segnalazioni prese in carico da un collega per non
 bloccare il lavoro quando un collega è assente. Decisione del PO nella review dello Sprint 2 (05/10).
@@ -420,7 +420,7 @@ Criteri di accettazione:
 - Visibile solo a Call Center e ADMIN.
 
 #### US-504
-**Disattivazione impedita con mansioni bloccate** · Must · 1 punti · R1 · ✅ Ready (Sprint 3)
+**Disattivazione impedita con mansioni bloccate** · Must · 1 punti · R1 · 🎉 Done (Sprint 3)
 
 Come **operatore Call Center** voglio che non si possa disattivare un'azienda con mansioni bloccate da proposte in corso
 per non far sparire dalle ricerche un'azienda che sta ancora valutando un beneficiario. Decisione del PO nella review
@@ -725,7 +725,7 @@ Criteri di accettazione:
 - L'ADMIN consulta l'audit filtrando per entità, autore e periodo.
 
 #### EN-4
-**Contatti dei referenti aziendali nell'audit senza valori** · Must · 1 punti · R1 · 👀 In review (Sprint 3)
+**Contatti dei referenti aziendali nell'audit senza valori** · Must · 1 punti · R1 · 🎉 Done (Sprint 3)
 
 Come **responsabile della privacy** voglio che nome, telefono ed email del referente di un'azienda non finiscano nell'audit
 (che non si può cancellare) per rispettare la minimizzazione GDPR. Decisione del PO nella review dello Sprint 2 (04/10).

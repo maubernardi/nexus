@@ -20,6 +20,8 @@ con un messaggio chiaro senza modificare nulla.
 - **WHEN** un operatore abbina una segnalazione in carico a un collega
 - **THEN** l'abbinamento riesce, la segnalazione resta in carico al collega e l'audit indica l'operatore che ha agito
 
+## ADDED Requirements
+
 ### Requirement: Presa in carico di una segnalazione di un collega
 Il sistema SHALL permettere a un operatore di spostare su di sé una segnalazione in carico a un collega ("Prendila in
 carico tu"), partendo dalla versione vista, con un evento di audit che riporta l'operatore prima e dopo.
