@@ -190,6 +190,11 @@ Nel dettaglio della segnalazione il nome del beneficiario è solo testo.
 *Proposta:* renderlo un link alla scheda del beneficiario (piccola modifica, nessun punto): la visibilità è già
 garantita dalle stesse regole.
 
+> ✅ **Deciso (PO, 24/10): proposta accettata.** Il nome del beneficiario nel dettaglio della segnalazione è un link alla
+> sua scheda, con nome accessibile che indica la destinazione; arrivando dalla segnalazione, il link di ritorno della
+> scheda riporta alla segnalazione. Stesse regole di visibilità (controllo nell'API). Senza punti, nella stessa PR di
+> §8.1, prima dello Sprint 4.
+
 ### 8.4 Chiusura dello Sprint 3
 *Proposta:* chiudere lo Sprint 3 con questa review e avviare lo Sprint 4 alla conferma del planning (§9).
 
