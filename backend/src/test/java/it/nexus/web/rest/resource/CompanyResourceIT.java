@@ -86,6 +86,11 @@ class CompanyResourceIT {
                     assertThat(e.getAction()).isEqualTo("CREATE");
                     assertThat(e.getCreatedBy()).isEqualTo("operatore.cc");
                     assertThat(e.getChanges()).containsKeys("name", "vatCode", "contactPerson");
+                    // contatti del referente: solo "campo impostato", mai i valori (EN-4)
+                    assertThat(e.getChanges()).containsEntry("contactPerson", Map.of("redacted", true))
+                            .containsEntry("phone", Map.of("redacted", true))
+                            .containsEntry("email", Map.of("redacted", true));
+                    assertThat(e.getChanges().toString()).doesNotContain("Paola Neri", "055 123456", "info@azienda.test");
                 });
     }
 
@@ -137,6 +142,24 @@ class CompanyResourceIT {
         mockMvc.perform(put(API + "/" + id).header(USER, "admin").contentType(MediaType.APPLICATION_JSON)
                         .content(body("Altro nome", "12345678901", ", \"version\": 0")))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    void modificaDelReferente_auditSenzaValori() throws Exception {
+        String id = createdId("Officina Rossi", "12345678901");
+        mockMvc.perform(put(API + "/" + id).header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
+                        .content(body("Officina Rossi", "12345678901", ", \"version\": 0")
+                                .replace("Paola Neri", "Marco Gialli")))
+                .andExpect(status().isOk());
+
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.COMPANY, TsidMapper.toInternal(id)))
+                .last()
+                .satisfies(e -> {
+                    assertThat(e.getAction()).isEqualTo("UPDATE");
+                    assertThat(e.getChanges()).containsOnlyKeys("contactPerson")
+                            .containsEntry("contactPerson", Map.of("redacted", true));
+                    assertThat(e.getChanges().toString()).doesNotContain("Paola Neri", "Marco Gialli");
+                });
     }
 
     @Test

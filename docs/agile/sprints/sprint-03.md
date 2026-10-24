@@ -12,7 +12,7 @@ Product Owner ("teniamo tutto"). Primo sprint corto (3 giorni di calendario).
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| EN-5 | Controllo della numerazione delle migrazioni nella CI | 1 | ✅ Ready | — | — |
+| EN-5 | Controllo della numerazione delle migrazioni nella CI | 1 | 👀 In review | `add-migration-check` | [#29](https://github.com/maubernardi/nexus/pull/29) |
 | EN-4 | Contatti dei referenti aziendali nell'audit senza valori | 1 | ✅ Ready | — | — |
 | US-504 | Disattivazione impedita con mansioni bloccate | 1 | ✅ Ready | — | — |
 | US-405 | Lavorazione condivisa tra operatori | 2 | ✅ Ready | — | — |

@@ -36,6 +36,11 @@ public final class AuditChanges {
         return this;
     }
 
+    /** Dato personale: si registra che il campo è cambiato, senza i valori; ignorato se prima e dopo coincidono. */
+    public AuditChanges redactedIfChanged(String field, Object before, Object after) {
+        return Objects.equals(before, after) ? this : redacted(field);
+    }
+
     /** Dato personale: si registra solo che il campo è stato toccato. */
     public AuditChanges redacted(String field) {
         fields.put(field, Map.of("redacted", true));
