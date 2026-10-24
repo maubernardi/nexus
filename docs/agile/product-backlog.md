@@ -88,7 +88,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-502](#us-502) | E5 | Mansioni dell'azienda | Must | 3 | R1 | 🎉 Done (Sprint 2) |
 | [US-503](#us-503) | E5 | Storico e pregressi dell'azienda | Must | 3 | R1 | ✅ Ready (Sprint 4) |
 | [US-504](#us-504) | E5 | Disattivazione impedita con mansioni bloccate | Must | 1 | R1 | 🎉 Done (Sprint 3) |
-| [US-505](#us-505) | E5 | Diario delle note dell'azienda | Must | 2 | R1 | ✅ Ready (Sprint 4) |
+| [US-505](#us-505) | E5 | Diario delle note dell'azienda | Must | 2 | R1 | 🎉 Done (Sprint 4) |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 📋 Backlog |
@@ -438,7 +438,7 @@ Criteri di accettazione:
   segnalazione (es. "la mansione «Magazziniere» è bloccata dalla segnalazione n. 30").
 
 #### US-505
-**Diario delle note dell'azienda** · Must · 2 punti · R1 · ✅ Ready (Sprint 4)
+**Diario delle note dell'azienda** · Must · 2 punti · R1 · 🎉 Done (Sprint 4)
 
 Come **operatore Call Center** voglio annotare informazioni utili sull'azienda in un diario di note datate per
 condividerle con i colleghi e ritrovarle negli abbinamenti futuri. Nota operativa del PO, decisa il 24/10.
