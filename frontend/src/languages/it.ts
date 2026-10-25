@@ -186,6 +186,31 @@ export const it = {
       home: 'Torna alla Home',
     },
   },
+  companyHistory: {
+    heading: 'Storico e pregressi',
+    summaryLabel: 'Riepilogo dei pregressi',
+    summary: {
+      proposals: 'Proposte',
+      accepted: 'Accettate',
+      failedAppointments: 'Appuntamenti falliti',
+      internships: 'Tirocini',
+      hirings: 'Assunzioni',
+      negativeOutcomes: 'Esiti negativi',
+    },
+    listLabel: 'Eventi dalla più recente',
+    empty: 'Nessun evento registrato.',
+    ticket: 'segnalazione n. {{number}}',
+    types: {
+      PROPOSTA_INVIATA: 'Proposta inviata',
+      PROPOSTA_ACCOLTA: 'Proposta accettata',
+      PROPOSTA_RIFIUTATA: 'Proposta rifiutata',
+      APPUNTAMENTO_FISSATO: 'Appuntamento fissato',
+      APPUNTAMENTO_FALLITO: 'Appuntamento fallito',
+      TIROCINIO_AVVIATO: 'Tirocinio avviato',
+      TIROCINIO_CONCLUSO: 'Tirocinio concluso',
+      ESCLUSIONE: 'Azienda esclusa',
+    },
+  },
   companyNote: {
     heading: 'Note',
     intro:

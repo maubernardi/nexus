@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.nexus.domain.dto.CompanyDTO;
+import it.nexus.domain.dto.CompanyHistoryDTO;
 import it.nexus.domain.dto.CompanyFormDTO;
 import it.nexus.domain.dto.VersionDTO;
+import it.nexus.services.CompanyHistoryService;
 import it.nexus.services.CompanyService;
 import it.nexus.web.rest.PathAPI;
 import jakarta.validation.Valid;
@@ -31,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class CompanyResource {
 
     private final CompanyService companyService;
+    private final CompanyHistoryService companyHistoryService;
 
     @GetMapping
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
@@ -60,6 +63,13 @@ public class CompanyResource {
     @Operation(summary = "Modifica un'azienda (409 se modificata nel frattempo)")
     public ResponseEntity<CompanyDTO> update(@PathVariable String id, @RequestBody @Valid CompanyFormDTO dto) {
         return ResponseEntity.ok(companyService.update(id, dto));
+    }
+
+    @GetMapping("/{id}/history")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Storico e pregressi dell'azienda: riepilogo ed eventi dalla più recente, esclusioni comprese")
+    public ResponseEntity<CompanyHistoryDTO> history(@PathVariable String id) {
+        return ResponseEntity.ok(companyHistoryService.history(id));
     }
 
     @PostMapping("/{id}/deactivate")

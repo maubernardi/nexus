@@ -56,3 +56,15 @@ export type TicketStatus = (typeof TICKET_STATUSES)[number];
 
 export const TICKET_TYPES = ['NORMAL', 'SPECIAL'] as const;
 export type TicketType = (typeof TICKET_TYPES)[number];
+
+/** Tipi di evento noti dello storico; altri tipi futuri si mostrano con il codice. */
+export const COMPANY_EVENT_TYPES = [
+  'PROPOSTA_INVIATA',
+  'PROPOSTA_ACCOLTA',
+  'PROPOSTA_RIFIUTATA',
+  'APPUNTAMENTO_FISSATO',
+  'APPUNTAMENTO_FALLITO',
+  'TIROCINIO_AVVIATO',
+  'TIROCINIO_CONCLUSO',
+  'ESCLUSIONE',
+] as const;

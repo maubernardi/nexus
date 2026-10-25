@@ -1,9 +1,6 @@
 package it.nexus.services.impl;
 
-import java.util.Collection;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,6 +36,7 @@ import it.nexus.domain.dto.TicketDetailDTO;
 import it.nexus.domain.dto.TicketEventDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
+import it.nexus.domain.enumeration.CompanyEventType;
 import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.domain.enumeration.Role;
 import it.nexus.domain.enumeration.TicketListView;
@@ -65,6 +63,7 @@ import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.TicketService;
+import it.nexus.services.UserDisplayNameService;
 import it.nexus.services.TicketStateMachine;
 import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.ConflictException;
@@ -91,6 +90,7 @@ public class TicketServiceImpl implements TicketService {
     private final AuditEventRepository auditEventRepository;
     private final TicketStatusHistoryRepository historyRepository;
     private final AppUserRepository appUserRepository;
+    private final UserDisplayNameService userDisplayNameService;
     private final JobSlotRepository jobSlotRepository;
     private final TicketCompanyBlacklistRepository blacklistRepository;
     private final CompanyAuditEventRepository companyAuditEvents;
@@ -198,7 +198,7 @@ public class TicketServiceImpl implements TicketService {
         List<TicketStatusHistory> earlier = historyRepository.findByTicketIdOrderByCreatedAtAsc(ticket.getId()).stream()
                 .filter(r -> !inAudit.contains(r.getFromStatus() + ">" + r.getToStatus()))
                 .toList();
-        Map<String, String> names = displayNames(Stream.concat(
+        Map<String, String> names = userDisplayNameService.displayNames(Stream.concat(
                 earlier.stream().map(TicketStatusHistory::getCreatedBy),
                 events.stream().map(AuditEvent::getCreatedBy)).toList());
         return Stream.concat(
@@ -238,15 +238,6 @@ public class TicketServiceImpl implements TicketService {
     private static TicketStatus status(AuditEvent event, String side) {
         String value = changed(event, "status", side);
         return value == null ? null : TicketStatus.valueOf(value);
-    }
-
-    /** Nome e cognome degli autori (gli username dell'audit); le operazioni automatiche risultano dal "Sistema". */
-    private Map<String, String> displayNames(Collection<String> usernames) {
-        Map<String, String> names = new HashMap<>();
-        appUserRepository.findByUsernameIn(new HashSet<>(usernames))
-                .forEach(u -> names.put(u.getUsername(), u.getFirstName() + " " + u.getLastName()));
-        usernames.forEach(u -> names.putIfAbsent(u, "Sistema"));
-        return names;
     }
 
     /** Ticket visibile all'utente; altrimenti 404, come per un ticket inesistente. */
@@ -301,7 +292,7 @@ public class TicketServiceImpl implements TicketService {
                 .value("status", JobSlotStatus.LIBERA.name(), JobSlotStatus.BLOCCATA.name())
                 .value("blockedByTicketId", null, TsidMapper.toExternal(saved.getId())), null);
         // storico dell'azienda: la proposta è un evento del rapporto con l'azienda (brief, audit trail)
-        companyAuditEvents.save(new CompanyAuditEvent(company, saved, "PROPOSTA_INVIATA", Map.of(
+        companyAuditEvents.save(new CompanyAuditEvent(company, saved, CompanyEventType.PROPOSTA_INVIATA.name(), Map.of(
                 "ticketNumber", saved.getNumber(),
                 "jobSlotId", TsidMapper.toExternal(slot.getId()),
                 "jobSlotTitle", slot.getTitle())));
