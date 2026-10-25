@@ -14,6 +14,19 @@ vi.mock('@/config/api/jobSlotApi', () => ({
   updateJobSlot: vi.fn(),
   setJobSlotActive: vi.fn(),
 }));
+vi.mock('@/config/api/companyHistoryApi', () => ({
+  fetchCompanyHistory: vi.fn().mockResolvedValue({
+    summary: {
+      proposals: 0,
+      accepted: 0,
+      failedAppointments: 0,
+      internships: 0,
+      hirings: 0,
+      negativeOutcomes: 0,
+    },
+    events: [],
+  }),
+}));
 vi.mock('@/config/api/companyNoteApi', () => ({
   fetchCompanyNotes: vi.fn().mockResolvedValue([]),
   addCompanyNote: vi.fn(),

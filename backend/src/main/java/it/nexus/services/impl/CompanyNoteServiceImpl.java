@@ -1,7 +1,5 @@
 package it.nexus.services.impl;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,12 +15,12 @@ import it.nexus.domain.dto.CompanyNoteDTO;
 import it.nexus.domain.dto.CompanyNoteFormDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.mapper.TsidMapper;
-import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.CompanyNoteRepository;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.CompanyNoteService;
 import it.nexus.services.CurrentAppUserService;
+import it.nexus.services.UserDisplayNameService;
 import it.nexus.web.errors.NotFoundException;
 import lombok.RequiredArgsConstructor;
 
@@ -33,7 +31,7 @@ public class CompanyNoteServiceImpl implements CompanyNoteService {
 
     private final CompanyNoteRepository noteRepository;
     private final CompanyRepository companyRepository;
-    private final AppUserRepository appUserRepository;
+    private final UserDisplayNameService userDisplayNameService;
     private final AuditService auditService;
     private final CurrentAppUserService currentAppUserService;
 
@@ -41,12 +39,8 @@ public class CompanyNoteServiceImpl implements CompanyNoteService {
     @Transactional(readOnly = true)
     public List<CompanyNoteDTO> list(String companyId) {
         List<CompanyNote> notes = noteRepository.findByCompanyIdOrderByCreatedAtDescIdDesc(find(companyId).getId());
-        Map<String, String> names = new HashMap<>();
-        appUserRepository.findByUsernameIn(new HashSet<>(notes.stream().map(CompanyNote::getCreatedBy).toList()))
-                .forEach(u -> names.put(u.getUsername(), fullName(u)));
-        return notes.stream()
-                .map(n -> toDto(n, names.getOrDefault(n.getCreatedBy(), "Sistema")))
-                .toList();
+        Map<String, String> names = userDisplayNameService.displayNames(notes.stream().map(CompanyNote::getCreatedBy).toList());
+        return notes.stream().map(n -> toDto(n, names.get(n.getCreatedBy()))).toList();
     }
 
     @Override
