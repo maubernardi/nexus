@@ -51,4 +51,10 @@ public interface TicketService {
 
     /** "Prendila in carico tu": la segnalazione in carico a un collega passa all'operatore corrente (US-405). */
     TicketDetailDTO takeOver(String ticketId, long expectedVersion);
+
+    /**
+     * Il Tutor della segnalazione accetta la proposta (US-701): stato PROPOSTA_ACCOLTA e timer fino al 7° giorno
+     * lavorativo successivo; evento nello storico dell'azienda.
+     */
+    TicketDetailDTO accept(String ticketId, long expectedVersion);
 }

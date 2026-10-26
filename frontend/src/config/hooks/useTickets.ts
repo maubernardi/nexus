@@ -17,6 +17,7 @@ import {
   submitTicket,
   takeCharge,
   takeOverTicket,
+  acceptProposal,
   type CompatibleFilters,
   type JobSlotMatch,
   type Ticket,
@@ -104,6 +105,19 @@ export const useTakeOver = (): UseMutationResult<TicketDetail, unknown, { id: st
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: takeOverTicket,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+  });
+};
+
+/** Il Tutor accetta la proposta (US-701): la segnalazione e gli elenchi si aggiornano. */
+export const useAcceptProposal = (): UseMutationResult<
+  TicketDetail,
+  unknown,
+  { id: string; version: number }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: acceptProposal,
     onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
   });
 };

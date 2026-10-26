@@ -11,6 +11,7 @@ import type { JobSlotMatch, TicketDetail, TicketEvent } from '@/config/api/ticke
 import { useCurrentUser } from '@/config/hooks/useCurrentUser';
 import { useJobCategories, useZones } from '@/config/hooks/useReferenceData';
 import {
+  useAcceptProposal,
   useCompatibleJobSlots,
   useMatchTicket,
   useTakeOver,
@@ -29,6 +30,7 @@ const ALL = '';
 type Outcome =
   | { kind: 'proposed'; title: string; company: string }
   | { kind: 'takenOver' }
+  | { kind: 'accepted'; deadline: string }
   | { kind: 'conflict'; reason: string }
   | { kind: 'error' };
 
@@ -113,43 +115,26 @@ export const TicketPage = () => {
           ref={outcomeRef}
           tabIndex={-1}
           className={
-            outcome.kind === 'proposed' || outcome.kind === 'takenOver'
+            outcome.kind === 'proposed' || outcome.kind === 'takenOver' || outcome.kind === 'accepted'
               ? 'rounded-md border-l-4 border-primary bg-card p-4 font-medium'
               : 'rounded-md border-2 border-destructive bg-card p-4 font-medium text-destructive'
           }
         >
           {outcome.kind === 'takenOver'
             ? t('work.takenOver')
-            : outcome.kind === 'proposed'
-              ? t('work.proposed', { title: outcome.title, company: outcome.company })
-              : outcome.kind === 'conflict'
-                ? t('work.conflict', { reason: outcome.reason })
-                : t('work.error')}
+            : outcome.kind === 'accepted'
+              ? t('work.accepted', { deadline: formatDay(outcome.deadline) })
+              : outcome.kind === 'proposed'
+                ? t('work.proposed', { title: outcome.title, company: outcome.company })
+                : outcome.kind === 'conflict'
+                  ? t('work.conflict', { reason: outcome.reason })
+                  : t('work.error')}
         </div>
       )}
 
       <TicketData ticket={d} />
 
-      {d.proposal && (
-        <section
-          aria-labelledby="work-proposal"
-          className="space-y-3 rounded-xl border border-l-4 border-border border-l-primary bg-card p-4"
-        >
-          <h2 id="work-proposal" className="text-lg font-semibold text-primary">
-            {t('work.sections.proposal')}
-          </h2>
-          <dl className="grid gap-x-6 gap-y-2 sm:grid-cols-[max-content_1fr]">
-            <dt className="font-medium">{t('work.fields.company')}</dt>
-            <dd>{d.proposal.companyName}</dd>
-            <dt className="font-medium">{t('work.fields.jobSlot')}</dt>
-            <dd>{d.proposal.title}</dd>
-            <dt className="font-medium">{t('work.fields.jobCategory')}</dt>
-            <dd>{d.proposal.jobCategory.name}</dd>
-            <dt className="font-medium">{t('work.fields.zone')}</dt>
-            <dd>{d.proposal.zone.name}</dd>
-          </dl>
-        </section>
-      )}
+      {d.proposal && <ProposalSection ticket={d} onOutcome={setOutcome} />}
       {isCallCenter && d.status === 'IN_LAVORAZIONE' && !canMatch && (
         <p className="rounded-xl border border-border bg-card p-4">{t('work.notTaken')}</p>
       )}
@@ -164,7 +149,112 @@ export const TicketPage = () => {
   );
 };
 
-const KNOWN_ACTIONS = ['SUBMIT', 'TAKE_CHARGE', 'TAKE_OVER', 'MATCH', 'STATUS'] as const;
+const KNOWN_ACTIONS = ['SUBMIT', 'TAKE_CHARGE', 'TAKE_OVER', 'MATCH', 'ACCEPT', 'STATUS'] as const;
+
+const dayFormat = new Intl.DateTimeFormat('it-IT', {
+  weekday: 'long',
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+});
+
+/** Giorno ISO (aaaa-mm-gg) con il giorno della settimana, senza passare dal fuso orario. */
+const formatDay = (iso: string): string => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return dayFormat.format(new Date(y, m - 1, d));
+};
+
+/**
+ * Proposta all'azienda: mansione abbinata, scadenza del timer se accettata e, per il Tutor della segnalazione,
+ * l'accettazione con conferma (US-701).
+ */
+const ProposalSection = ({
+  ticket: d,
+  onOutcome,
+}: {
+  ticket: TicketDetail;
+  onOutcome: (o: Outcome) => void;
+}) => {
+  const { t } = useTranslation();
+  const accept = useAcceptProposal();
+  const [confirming, setConfirming] = useState(false);
+  const confirmRef = useRef<HTMLHeadingElement>(null);
+  const proposal = d.proposal;
+
+  useEffect(() => {
+    if (confirming) confirmRef.current?.focus();
+  }, [confirming]);
+
+  if (!proposal) return null;
+  const canAccept = d.myTicket && d.status === 'PROPOSTA_AZIENDA';
+
+  const onConfirm = (): void => {
+    accept.mutate(
+      { id: d.id, version: d.version },
+      {
+        onSuccess: (updated) => onOutcome({ kind: 'accepted', deadline: updated.timerDeadline ?? '' }),
+        onError: (error) => {
+          const body = apiError(error);
+          onOutcome(body?.status === 409 ? { kind: 'conflict', reason: body.message } : { kind: 'error' });
+        },
+        onSettled: () => setConfirming(false),
+      },
+    );
+  };
+
+  return (
+    <section
+      aria-labelledby="work-proposal"
+      className="space-y-3 rounded-xl border border-l-4 border-border border-l-primary bg-card p-4"
+    >
+      <h2 id="work-proposal" className="text-lg font-semibold text-primary">
+        {t('work.sections.proposal')}
+      </h2>
+      <dl className="grid gap-x-6 gap-y-2 sm:grid-cols-[max-content_1fr]">
+        <dt className="font-medium">{t('work.fields.company')}</dt>
+        <dd>{proposal.companyName}</dd>
+        <dt className="font-medium">{t('work.fields.jobSlot')}</dt>
+        <dd>{proposal.title}</dd>
+        <dt className="font-medium">{t('work.fields.jobCategory')}</dt>
+        <dd>{proposal.jobCategory.name}</dd>
+        <dt className="font-medium">{t('work.fields.zone')}</dt>
+        <dd>{proposal.zone.name}</dd>
+        {d.timerDeadline && (
+          <>
+            <dt className="font-medium">{t('work.timerDeadline')}</dt>
+            <dd>{t('work.timerDeadlineValue', { date: formatDay(d.timerDeadline) })}</dd>
+          </>
+        )}
+      </dl>
+      {canAccept && !confirming && (
+        <Button size="lg" onClick={() => setConfirming(true)}>
+          {t('work.accept')}
+        </Button>
+      )}
+      {canAccept && confirming && (
+        <div className="space-y-3 rounded-xl border-2 border-primary bg-card p-4">
+          <h3 ref={confirmRef} tabIndex={-1} className="font-semibold">
+            {t('work.acceptHeading')}
+          </h3>
+          <p>{t('work.acceptText', { title: proposal.title, company: proposal.companyName })}</p>
+          <div className="flex flex-wrap gap-3">
+            <Button size="lg" onClick={onConfirm} disabled={accept.isPending}>
+              {t('work.acceptConfirm')}
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={() => setConfirming(false)}
+              disabled={accept.isPending}
+            >
+              {t('work.cancel')}
+            </Button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+};
 
 /** Cronologia della segnalazione (US-305): lista ordinata dalla più vecchia, con data, autore, azione, stato e nota. */
 const TicketHistory = ({ ticketId }: { ticketId: string }) => {

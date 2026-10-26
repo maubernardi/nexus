@@ -1,11 +1,12 @@
 package it.nexus.domain.dto;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.domain.enumeration.TicketType;
 
-/** Segnalazione vista dal Call Center durante la lavorazione; {@code proposal} è la mansione abbinata, se c'è. */
+/** Dettaglio della segnalazione (US-305); {@code proposal} è la mansione abbinata, se c'è. */
 public record TicketDetailDTO(
         String id,
         Long number,
@@ -23,5 +24,9 @@ public record TicketDetailDTO(
         String assignedOperatorName,
         boolean assignedToMe,
         JobSlotMatchDTO proposal,
-        Instant createdAt) {
+        Instant createdAt,
+        /** L'utente corrente è il Tutor della segnalazione: può accettare la proposta (US-701). */
+        boolean myTicket,
+        /** Ultimo giorno lavorativo del timer della proposta accettata (US-701), se il timer è attivo. */
+        LocalDate timerDeadline) {
 }

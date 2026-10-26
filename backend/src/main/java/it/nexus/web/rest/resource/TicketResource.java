@@ -89,6 +89,13 @@ public class TicketResource {
         return ResponseEntity.ok(ticketService.takeOver(id, body.version()));
     }
 
+    @PostMapping("/{id}/accept")
+    @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
+    @Operation(summary = "Il Tutor della segnalazione accetta la proposta: parte il timer di 7 giorni lavorativi")
+    public ResponseEntity<TicketDetailDTO> accept(@PathVariable String id, @RequestBody @Valid VersionDTO body) {
+        return ResponseEntity.ok(ticketService.accept(id, body.version()));
+    }
+
     // nessun Location: il dettaglio del ticket arriva con US-305
     @PostMapping
     @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")

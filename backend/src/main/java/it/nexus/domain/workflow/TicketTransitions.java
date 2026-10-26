@@ -2,6 +2,7 @@ package it.nexus.domain.workflow;
 
 import static it.nexus.domain.enumeration.TicketStatus.IN_LAVORAZIONE;
 import static it.nexus.domain.enumeration.TicketStatus.NUOVA;
+import static it.nexus.domain.enumeration.TicketStatus.PROPOSTA_ACCOLTA;
 import static it.nexus.domain.enumeration.TicketStatus.PROPOSTA_AZIENDA;
 
 import java.util.Set;
@@ -27,6 +28,13 @@ public final class TicketTransitions {
     /** Fase 4 — abbinamento a una mansione libera e proposta all'azienda (US-602). */
     public static final TicketTransition MATCH = new TicketTransition("MATCH", Set.of(IN_LAVORAZIONE), PROPOSTA_AZIENDA,
             Set.of(Role.CALL_CENTER, Role.ADMIN));
+
+    /**
+     * Fase 5 — il Tutor accetta la proposta (US-701): parte il timer di 7 giorni lavorativi. Solo il Tutor della
+     * segnalazione (controllo nel servizio).
+     */
+    public static final TicketTransition ACCEPT = new TicketTransition("ACCEPT", Set.of(PROPOSTA_AZIENDA),
+            PROPOSTA_ACCOLTA, Set.of(Role.TUTOR));
 
     private TicketTransitions() {
     }

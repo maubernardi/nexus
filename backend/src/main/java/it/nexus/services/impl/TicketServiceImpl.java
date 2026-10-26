@@ -1,5 +1,9 @@
 package it.nexus.services.impl;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -10,9 +14,11 @@ import java.util.stream.Stream;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import it.nexus.config.TimeConfig;
 import it.nexus.config.security.AuthenticatedUser;
 import it.nexus.config.security.SecurityUtils;
 import it.nexus.domain.AppUser;
@@ -63,8 +69,9 @@ import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.TicketService;
-import it.nexus.services.UserDisplayNameService;
 import it.nexus.services.TicketStateMachine;
+import it.nexus.services.UserDisplayNameService;
+import it.nexus.services.WorkingDayService;
 import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.ConflictException;
 import it.nexus.web.errors.FieldValidationException;
@@ -75,6 +82,10 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 @RequiredArgsConstructor
 public class TicketServiceImpl implements TicketService {
+
+    /** Durata del timer della proposta accettata in giorni lavorativi (brief, fase 5). */
+    static final int TIMER_WORKING_DAYS = 7;
+    private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     /** Stati della coda: nuove segnalazioni e speciali non ancora prese in carico. */
     private static final Set<TicketStatus> QUEUE_STATUSES = EnumSet.of(TicketStatus.NUOVA, TicketStatus.IN_LAVORAZIONE);
@@ -91,6 +102,8 @@ public class TicketServiceImpl implements TicketService {
     private final TicketStatusHistoryRepository historyRepository;
     private final AppUserRepository appUserRepository;
     private final UserDisplayNameService userDisplayNameService;
+    private final WorkingDayService workingDayService;
+    private final Clock clock;
     private final JobSlotRepository jobSlotRepository;
     private final TicketCompanyBlacklistRepository blacklistRepository;
     private final CompanyAuditEventRepository companyAuditEvents;
@@ -219,8 +232,16 @@ public class TicketServiceImpl implements TicketService {
                     .flatMap(jobSlotRepository::findById)
                     .map(slot -> "«%s» presso %s".formatted(slot.getTitle(), slot.getCompany().getName()))
                     .orElse(null);
+            case "ACCEPT" -> Optional.ofNullable(changed(event, "timerDeadlineAt", "after"))
+                    .map(at -> "Scadenza " + DATE.format(lastDay(Instant.parse(at))))
+                    .orElse(null);
             default -> null;
         };
+    }
+
+    /** Ultimo giorno del timer: il giorno di Roma che termina alla scadenza. */
+    private static LocalDate lastDay(Instant deadline) {
+        return LocalDate.ofInstant(deadline.minusSeconds(1), TimeConfig.ZONE);
     }
 
     private String userName(String externalId) {
@@ -300,6 +321,30 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    public TicketDetailDTO accept(String ticketId, long expectedVersion) {
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        Ticket ticket = visibleTicket(ticketId, me);
+        if (!ticket.getTutor().getId().equals(me.getId())) {
+            throw new AccessDeniedException("Solo il Tutor della segnalazione può accettare la proposta");
+        }
+        Instant started = clock.instant();
+        LocalDate lastDay = workingDayService.plusWorkingDays(LocalDate.ofInstant(started, TimeConfig.ZONE),
+                TIMER_WORKING_DAYS);
+        // il timer scade alla fine del 7° giorno lavorativo (mezzanotte di Roma del giorno dopo)
+        Instant deadline = lastDay.plusDays(1).atStartOfDay(TimeConfig.ZONE).toInstant();
+        Ticket saved = stateMachine.apply(ticket, TicketTransitions.ACCEPT, expectedVersion, null, t -> {
+            t.setTimerStartedAt(started);
+            t.setTimerDeadlineAt(deadline);
+            return AuditChanges.of().value("timerDeadlineAt", null, deadline.toString());
+        });
+        JobSlot slot = saved.getJobSlot();
+        companyAuditEvents.save(new CompanyAuditEvent(slot.getCompany(), saved,
+                CompanyEventType.PROPOSTA_ACCOLTA.name(), Map.of("ticketNumber", saved.getNumber(),
+                        "jobSlotTitle", slot.getTitle(), "timerLastDay", lastDay.toString())));
+        return detail(saved, me);
+    }
+
+    @Override
     public TicketDetailDTO takeOver(String ticketId, long expectedVersion) {
         Ticket ticket = findTicket(ticketId);
         AppUser me = currentAppUserService.getCurrentAppUser();
@@ -356,7 +401,9 @@ public class TicketServiceImpl implements TicketService {
                 assigned == null ? null : fullName(assigned),
                 assigned != null && assigned.getId().equals(me.getId()),
                 t.getJobSlot() == null ? null : jobSlotMapper.toMatch(t.getJobSlot()),
-                t.getCreatedAt());
+                t.getCreatedAt(),
+                t.getTutor().getId().equals(me.getId()),
+                t.getTimerDeadlineAt() == null ? null : lastDay(t.getTimerDeadlineAt()));
     }
 
     private static String fullName(AppUser user) {

@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { fetchJobCategories, fetchZones } from '@/config/api/referenceApi';
 import {
+  acceptProposal,
   fetchCompatibleJobSlots,
   fetchTicket,
   fetchTicketHistory,
@@ -27,6 +28,7 @@ vi.mock('@/config/api/ticketApi', () => ({
   fetchCompatibleJobSlots: vi.fn(),
   matchTicket: vi.fn(),
   takeOverTicket: vi.fn(),
+  acceptProposal: vi.fn(),
 }));
 vi.mock('@/config/api/referenceApi', () => ({
   fetchZones: vi.fn(),
@@ -104,6 +106,8 @@ const detail = (overrides: Partial<TicketDetail> = {}): TicketDetail => ({
   assignedToMe: true,
   proposal: null,
   createdAt: '2026-10-01T08:00:00Z',
+  myTicket: false,
+  timerDeadline: null,
   ...overrides,
 });
 
@@ -311,6 +315,51 @@ describe('<TicketPage>', () => {
     expect(within(proposal).getByText('Alfa Logistica')).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Mansioni compatibili' })).not.toBeInTheDocument();
     await expectNoAxeViolations();
+  });
+
+  it('Tutor della segnalazione: accetta la proposta con conferma e vede la scadenza', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchCurrentUser).mockResolvedValue({
+      id: 'tutor1',
+      username: 'tutor1',
+      firstName: 'Tutor',
+      lastName: 'Uno',
+      roles: ['TUTOR'],
+    });
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({ status: 'PROPOSTA_AZIENDA', proposal: alfa, myTicket: true, assignedToMe: false }),
+    );
+    vi.mocked(acceptProposal).mockResolvedValue(
+      detail({
+        status: 'PROPOSTA_ACCOLTA',
+        proposal: alfa,
+        myTicket: true,
+        version: 3,
+        timerDeadline: '2026-11-03',
+      }),
+    );
+    renderPage();
+
+    await user.click(await screen.findByRole('button', { name: 'Accetta la proposta' }));
+    expect(screen.getByRole('heading', { name: 'Conferma l’accettazione' })).toHaveFocus();
+    expect(screen.getByText(/parte il timer di 7 giorni lavorativi/)).toBeInTheDocument();
+    await expectNoAxeViolations();
+    await user.click(screen.getByRole('button', { name: 'Conferma accettazione' }));
+
+    const outcome = await screen.findByText('Proposta accettata. Scadenza del timer: martedì 03/11/2026.');
+    await waitFor(() => expect(outcome).toHaveFocus());
+    expect(acceptProposal).toHaveBeenCalledWith({ id: 'T9', version: 2 }, expect.anything());
+  });
+
+  it('collega o Call Center: nessuna accettazione; scadenza visibile dopo l’accettazione', async () => {
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({ status: 'PROPOSTA_ACCOLTA', proposal: alfa, timerDeadline: '2026-11-03' }),
+    );
+    renderPage();
+
+    const proposal = await screen.findByRole('region', { name: 'Proposta all’azienda' });
+    expect(within(proposal).getByText('martedì 03/11/2026 (7 giorni lavorativi)')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Accetta la proposta' })).not.toBeInTheDocument();
   });
 
   it('cronologia: azioni, cambi di stato, autori, dettagli e note in una lista ordinata', async () => {
