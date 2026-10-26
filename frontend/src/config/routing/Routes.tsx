@@ -8,6 +8,7 @@ import { BeneficiaryEditPage } from '@/pages/BeneficiaryEditPage/BeneficiaryEdit
 import { BeneficiaryNewPage } from '@/pages/BeneficiaryNewPage/BeneficiaryNewPage';
 import { BeneficiaryPage } from '@/pages/BeneficiaryPage/BeneficiaryPage';
 import { DevLoginPage } from '@/pages/DevLoginPage/DevLoginPage';
+import { CalendarPage } from '@/pages/CalendarPage/CalendarPage';
 import { CompaniesPage } from '@/pages/CompaniesPage/CompaniesPage';
 import { CompanyEditPage } from '@/pages/CompanyEditPage/CompanyEditPage';
 import { CompanyNewPage } from '@/pages/CompanyNewPage/CompanyNewPage';
@@ -109,6 +110,15 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.companyEdit.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'calendario',
+        element: (
+          <RoleRoute roles={['ADMIN']}>
+            <CalendarPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.calendar.title' } satisfies RouteHandle,
       },
       {
         path: '*',

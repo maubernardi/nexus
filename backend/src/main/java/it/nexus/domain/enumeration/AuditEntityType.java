@@ -10,5 +10,6 @@ public enum AuditEntityType {
     PROJECT,
     ZONE,
     JOB_CATEGORY,
-    APP_USER
+    APP_USER,
+    CALENDAR
 }

@@ -532,6 +532,43 @@ class DomainConstraintsIT {
     }
 
     @Nested
+    class Calendario {
+
+        @Test
+        void unaSolaRiga() {
+            assertViolates("ck_work_calendar_single_row", () -> jdbc.update(
+                    "INSERT INTO work_calendar (id, patron_month, patron_day, created_at, created_by, updated_at, updated_by)"
+                            + " VALUES (2, 6, 24, now(), 'test', now(), 'test')"));
+        }
+
+        @Test
+        void meseDelPatronoFuoriIntervallo() {
+            assertViolates("ck_work_calendar_patron_month",
+                    () -> jdbc.update("UPDATE work_calendar SET patron_month = 13 WHERE id = 1"));
+        }
+
+        @Test
+        void giornoDelPatronoFuoriIntervallo() {
+            assertViolates("ck_work_calendar_patron_day",
+                    () -> jdbc.update("UPDATE work_calendar SET patron_day = 0 WHERE id = 1"));
+        }
+
+        @Test
+        void chiusuraConFinePrimaDellInizio() {
+            assertViolates("ck_calendar_closure_period", () -> jdbc.update(
+                    "INSERT INTO calendar_closure (id, start_date, end_date, description, created_at, created_by, updated_at, updated_by)"
+                            + " VALUES (1, DATE '2026-08-21', DATE '2026-08-10', 'Ferie', now(), 'test', now(), 'test')"));
+        }
+
+        @Test
+        void chiusuraSenzaDescrizione() {
+            assertViolates("ck_calendar_closure_description", () -> jdbc.update(
+                    "INSERT INTO calendar_closure (id, start_date, end_date, description, created_at, created_by, updated_at, updated_by)"
+                            + " VALUES (1, DATE '2026-08-10', DATE '2026-08-10', '  ', now(), 'test', now(), 'test')"));
+        }
+    }
+
+    @Nested
     class MansioneRitirata {
 
         @Test
