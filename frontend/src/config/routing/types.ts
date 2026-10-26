@@ -12,5 +12,6 @@ export type RouteHandle = {
     | 'pages.companies.title'
     | 'pages.companyNew.title'
     | 'pages.companyEdit.title'
+    | 'pages.calendar.title'
     | 'pages.forbidden.title';
 };
