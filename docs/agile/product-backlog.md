@@ -64,7 +64,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-104](#us-104) | E1 | Assegnazione utenti ai progetti | Must | 3 | R4 | 📋 Backlog |
 | [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | 📋 Backlog |
 | [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | 📋 Backlog |
-| [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | ✅ Ready (Sprint 4) |
+| [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [EN-5](#en-5) | E13 | Controllo della numerazione delle migrazioni nella CI | Must | 1 | R1 | 🎉 Done (Sprint 3) |
@@ -93,9 +93,9 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 📋 Backlog |
 | [US-604](#us-604) | E6 | Dettagli di azienda e mansione durante l'abbinamento | Must | 5 | R1 | 🎉 Done (Sprint 4) |
-| [US-701](#us-701) | E7 | Accettazione della proposta | Must | 3 | R2 | ✅ Ready (Sprint 4) |
+| [US-701](#us-701) | E7 | Accettazione della proposta | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [US-702](#us-702) | E7 | Rifiuto della proposta | Should | 3 | R2 | 📋 Backlog |
-| [US-703](#us-703) | E7 | Calendario dei giorni lavorativi | Must | 3 | R2 | ✅ Ready (Sprint 4) |
+| [US-703](#us-703) | E7 | Calendario dei giorni lavorativi | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [US-704](#us-704) | E7 | Promemoria al 4° giorno | Must | 3 | R2 | 📋 Backlog |
 | [US-705](#us-705) | E7 | Scadenza del timer | Must | 3 | R2 | 📋 Backlog |
 | [US-801](#us-801) | E8 | Appuntamento preso | Must | 2 | R2 | 📋 Backlog |
@@ -195,7 +195,7 @@ Criteri di accettazione:
 - Le zone segnaposto della demo vengono disattivate e i dati demo spostati sulle nuove zone.
 
 #### US-107
-**Calendario unico (patrono e chiusure)** · Must · 3 punti · R2 · ✅ Ready (Sprint 4)
+**Calendario unico (patrono e chiusure)** · Must · 3 punti · R2 · 🎉 Done (Sprint 4)
 
 Come **ADMIN** voglio impostare il patrono e le chiusure della cooperativa per calcolare le scadenze sui giorni lavorativi
 effettivi. Aggiornata nella review dello Sprint 3 (24/10): il calendario è **unico per tutti** i progetti.
@@ -503,12 +503,14 @@ Dipendenze: US-503, US-505
 _Il Tutor valuta la proposta; i tempi di risposta sono presidiati da un timer di 7 giorni lavorativi._
 
 #### US-701
-**Accettazione della proposta** · Must · 3 punti · R2 · ✅ Ready (Sprint 4)
+**Accettazione della proposta** · Must · 3 punti · R2 · 🎉 Done (Sprint 4)
 
 Come **Tutor** voglio accettare la proposta per il mio beneficiario per far partire il contatto con l'azienda.
 
 Criteri di accettazione:
 - Il ticket passa in PROPOSTA_ACCOLTA e parte il timer di 7 giorni lavorativi, con scadenza visibile.
+- Accetta solo il Tutor della segnalazione: i tutor, di norma, non sono intercambiabili come gli operatori del Call
+  Center (PO, 27/10).
 
 Dipendenze: US-703
 
@@ -522,7 +524,7 @@ Criteri di accettazione:
 - L'operatore riceve la notifica (in app e via email).
 
 #### US-703
-**Calendario dei giorni lavorativi** · Must · 3 punti · R2 · ✅ Ready (Sprint 4)
+**Calendario dei giorni lavorativi** · Must · 3 punti · R2 · 🎉 Done (Sprint 4)
 
 Come **team di sviluppo** voglio calcolare le scadenze escludendo sabati, domeniche e festività per avere timer corretti.
 

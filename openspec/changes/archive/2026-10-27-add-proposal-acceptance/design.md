@@ -2,8 +2,8 @@
 
 ### D1 — Solo il Tutor della segnalazione
 È il Tutor che segue il beneficiario a decidere se accettare: i colleghi di progetto vedono la proposta ma non la
-accettano, e nemmeno il Call Center o l'ADMIN (proposta del team, da confermare dal PO: in alternativa anche i colleghi
-di progetto, come per la lavorazione condivisa del Call Center).
+accettano, e nemmeno il Call Center o l'ADMIN. **Confermato dal PO (27/10)**: di norma i tutor non sono
+intercambiabili come gli operatori del Call Center.
 
 ### D2 — Scadenza come istante, mostrata come giorno
 `timer_deadline_at` è la mezzanotte di Roma alla fine del 7° giorno lavorativo: lo scheduler del timeout (US-705)
