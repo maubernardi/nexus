@@ -35,6 +35,48 @@ vi.mock('@/config/api/referenceApi', () => ({
   fetchProjects: vi.fn(),
 }));
 vi.mock('@/config/api/userApi', () => ({ fetchCurrentUser: vi.fn() }));
+vi.mock('@/config/api/companyApi', () => ({
+  fetchCompany: vi.fn().mockResolvedValue({
+    id: 'C1',
+    name: 'Alfa Logistica',
+    vatCode: '12345678901',
+    legalAddress: 'Via Roma 1, Firenze',
+    contactPerson: 'Paola Neri',
+    phone: null,
+    email: 'info@alfa.test',
+    active: true,
+    version: 1,
+    updatedAt: '2026-10-01T08:00:00Z',
+  }),
+  searchCompanies: vi.fn(),
+  createCompany: vi.fn(),
+  updateCompany: vi.fn(),
+  setCompanyActive: vi.fn(),
+}));
+vi.mock('@/config/api/companyNoteApi', () => ({
+  fetchCompanyNotes: vi.fn().mockResolvedValue([
+    {
+      id: 'N1',
+      text: 'Contattare al mattino',
+      createdAt: '2026-10-20T09:00:00Z',
+      authorName: 'Paolo Verdi',
+    },
+  ]),
+  addCompanyNote: vi.fn(),
+}));
+vi.mock('@/config/api/companyHistoryApi', () => ({
+  fetchCompanyHistory: vi.fn().mockResolvedValue({
+    summary: {
+      proposals: 2,
+      accepted: 1,
+      failedAppointments: 0,
+      internships: 1,
+      hirings: 1,
+      negativeOutcomes: 0,
+    },
+    events: [],
+  }),
+}));
 
 const NOVOLI = { id: 'Z1', code: 'NOVOLI', name: 'Novoli' };
 const MAG = { id: 'J1', code: 'MAG', name: 'Magazziniere' };
@@ -170,6 +212,45 @@ describe('<TicketPage>', () => {
       { id: 'T9', jobSlotId: 'S1', ticketVersion: 2, jobSlotVersion: 4 },
       expect.anything(),
     );
+  });
+
+  it('Dettagli: dialogo con azienda, mansione, note e pregressi; Esc riporta il focus', async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    const details = await screen.findByRole('button', {
+      name: 'Dettagli Magazziniere presso Alfa Logistica',
+    });
+    await user.click(details);
+
+    const dialog = await screen.findByRole('dialog', { name: '«Magazziniere» presso Alfa Logistica' });
+    expect(await within(dialog).findByText('Paola Neri')).toBeInTheDocument();
+    expect(within(dialog).getByRole('heading', { level: 3, name: 'Mansione' })).toBeInTheDocument();
+    expect(await within(dialog).findByText('Contattare al mattino')).toBeInTheDocument();
+    expect(await within(dialog).findByText('Proposte')).toBeInTheDocument();
+    expect(
+      within(dialog).getByRole('link', { name: 'Apri la scheda completa dell’azienda' }),
+    ).toHaveAttribute('href', '/aziende/C1');
+    await expectNoAxeViolations();
+
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(details).toHaveFocus());
+  });
+
+  it('Dettagli: "Proponi" dal dialogo apre la stessa conferma', async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Dettagli Magazziniere presso Alfa Logistica' }),
+    );
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', { name: 'Proponi' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Conferma la proposta' })).toHaveFocus());
+    expect(matchTicket).not.toHaveBeenCalled();
   });
 
   it('mansione appena bloccata: spiega il motivo', async () => {
