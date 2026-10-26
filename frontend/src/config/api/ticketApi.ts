@@ -83,6 +83,10 @@ export type TicketDetail = {
   assignedToMe: boolean;
   proposal: JobSlotMatch | null;
   createdAt: string;
+  /** L'utente corrente è il Tutor della segnalazione: può accettare la proposta (US-701). */
+  myTicket: boolean;
+  /** Ultimo giorno lavorativo del timer della proposta accettata (aaaa-mm-gg), se attivo. */
+  timerDeadline: string | null;
 };
 
 export type CompatibleFilters = { zoneId?: string; jobCategoryId?: string };
@@ -150,5 +154,16 @@ export const takeOverTicket = async ({
   const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/take-over`, {
     version,
   });
+  return data;
+};
+
+export const acceptProposal = async ({
+  id,
+  version,
+}: {
+  id: string;
+  version: number;
+}): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/accept`, { version });
   return data;
 };

@@ -81,10 +81,12 @@ public class CompanyHistoryServiceImpl implements CompanyHistoryService {
         return Boolean.TRUE.equals(event.getDetails().get("assunto"));
     }
 
-    /** Dettaglio leggibile dell'evento: la mansione proposta o l'esito. */
+    /** Dettaglio leggibile dell'evento: la mansione proposta o accettata, oppure l'esito. */
     private static String describe(CompanyAuditEvent event) {
         Map<String, Object> d = event.getDetails();
-        if (CompanyEventType.PROPOSTA_INVIATA.name().equals(event.getEventType()) && d.get("jobSlotTitle") != null) {
+        boolean proposal = CompanyEventType.PROPOSTA_INVIATA.name().equals(event.getEventType())
+                || CompanyEventType.PROPOSTA_ACCOLTA.name().equals(event.getEventType());
+        if (proposal && d.get("jobSlotTitle") != null) {
             return "«" + d.get("jobSlotTitle") + "»";
         }
         if (CompanyEventType.APPUNTAMENTO_FALLITO.name().equals(event.getEventType())
