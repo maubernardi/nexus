@@ -18,6 +18,7 @@ import {
   useTicketHistory,
 } from '@/config/hooks/useTickets';
 import { TICKET_STATUSES } from '@/lib/domainValues';
+import { MatchDetailsDialog } from '@/organisms/MatchDetailsDialog/MatchDetailsDialog';
 import type { BeneficiaryLinkState } from '@/pages/BeneficiaryPage/BeneficiaryPage';
 
 const dateTime = new Intl.DateTimeFormat('it-IT', { dateStyle: 'short', timeStyle: 'short' });
@@ -294,6 +295,8 @@ const CompatibleSection = ({ ticket: d, onOutcome }: CompatibleSectionProps) => 
   );
   const match = useMatchTicket();
   const [candidate, setCandidate] = useState<JobSlotMatch | null>(null);
+  const [details, setDetails] = useState<JobSlotMatch | null>(null);
+  const detailsTrigger = useRef<HTMLButtonElement | null>(null);
   const confirmRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -436,17 +439,33 @@ const CompatibleSection = ({ ticket: d, onOutcome }: CompatibleSectionProps) => 
                   <td className={td}>{s.jobCategory.name}</td>
                   <td className={td}>{s.zone.name}</td>
                   <td className={td}>
-                    <Button
-                      size="sm"
-                      onClick={() => setCandidate(s)}
-                      disabled={candidate !== null || match.isPending}
-                    >
-                      {t('work.propose')}
-                      {/* spazio come nodo a sé: nome accessibile "Proponi Magazziniere presso Alfa" */}{' '}
-                      <span className="sr-only">
-                        {t('work.proposeTarget', { title: s.title, company: s.companyName })}
-                      </span>
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={(e) => {
+                          detailsTrigger.current = e.currentTarget;
+                          setDetails(s);
+                        }}
+                      >
+                        {t('work.details')}
+                        {/* spazio come nodo a sé: nome accessibile "Dettagli Magazziniere presso Alfa" */}{' '}
+                        <span className="sr-only">
+                          {t('work.proposeTarget', { title: s.title, company: s.companyName })}
+                        </span>
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => setCandidate(s)}
+                        disabled={candidate !== null || match.isPending}
+                      >
+                        {t('work.propose')}
+                        {/* spazio come nodo a sé: nome accessibile "Proponi Magazziniere presso Alfa" */}{' '}
+                        <span className="sr-only">
+                          {t('work.proposeTarget', { title: s.title, company: s.companyName })}
+                        </span>
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -454,6 +473,17 @@ const CompatibleSection = ({ ticket: d, onOutcome }: CompatibleSectionProps) => 
           </table>
         </div>
       )}
+
+      <MatchDetailsDialog
+        slot={details}
+        onClose={() => setDetails(null)}
+        onPropose={(slot) => {
+          setDetails(null);
+          setCandidate(slot);
+        }}
+        proposeDisabled={candidate !== null || match.isPending}
+        returnFocusRef={detailsTrigger}
+      />
     </section>
   );
 };

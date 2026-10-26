@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
@@ -20,9 +21,24 @@ const SUMMARY_KEYS: readonly (keyof CompanyHistorySummary)[] = [
  * Storico e pregressi dell'azienda (US-503), in sola lettura: riepilogo sempre completo ed eventi dalla più recente,
  * con la segnalazione collegata e le esclusioni con motivo.
  */
-export const CompanyHistorySection = ({ companyId }: { companyId: string }) => {
+type CompanyHistorySectionProps = {
+  companyId: string;
+  /** Livello del titolo: 2 nella scheda azienda, 3 dentro il dialogo "Dettagli" (US-604). */
+  headingLevel?: 2 | 3;
+  /** Se indicato, mostra solo gli eventi più recenti. */
+  maxEvents?: number;
+};
+
+export const CompanyHistorySection = ({
+  companyId,
+  headingLevel = 2,
+  maxEvents,
+}: CompanyHistorySectionProps) => {
   const { t } = useTranslation();
   const history = useCompanyHistory(companyId);
+  const headingId = useId();
+  const Heading = headingLevel === 2 ? 'h2' : 'h3';
+  const events = history.data ? history.data.events.slice(0, maxEvents) : [];
 
   const typeLabel = (e: CompanyHistoryEvent): string =>
     (COMPANY_EVENT_TYPES as readonly string[]).includes(e.type)
@@ -31,12 +47,12 @@ export const CompanyHistorySection = ({ companyId }: { companyId: string }) => {
 
   return (
     <section
-      aria-labelledby="company-history"
-      className="space-y-4 rounded-xl border border-border bg-card p-4"
+      aria-labelledby={headingId}
+      className="@container space-y-4 rounded-xl border border-border bg-card p-4"
     >
-      <h2 id="company-history" className="text-lg font-semibold text-primary">
+      <Heading id={headingId} className="text-lg font-semibold text-primary">
         {t('companyHistory.heading')}
-      </h2>
+      </Heading>
       {history.isError ? (
         <p role="alert" className="font-medium text-destructive">
           {t('common.loadError')}
@@ -47,21 +63,23 @@ export const CompanyHistorySection = ({ companyId }: { companyId: string }) => {
         <>
           <dl
             aria-label={t('companyHistory.summaryLabel')}
-            className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6"
+            className="grid grid-cols-2 gap-3 @md:grid-cols-3 @4xl:grid-cols-6"
           >
             {SUMMARY_KEYS.map((key) => (
               <div key={key} className="rounded-md border border-border p-3">
-                <dt className="text-sm text-muted-foreground">{t(`companyHistory.summary.${key}`)}</dt>
+                <dt className="text-sm break-words text-muted-foreground">
+                  {t(`companyHistory.summary.${key}`)}
+                </dt>
                 <dd className="text-2xl font-semibold tabular-nums">{history.data.summary[key]}</dd>
               </div>
             ))}
           </dl>
 
-          {history.data.events.length === 0 ? (
+          {events.length === 0 ? (
             <p>{t('companyHistory.empty')}</p>
           ) : (
             <ol aria-label={t('companyHistory.listLabel')} className="space-y-3">
-              {history.data.events.map((e, i) => (
+              {events.map((e, i) => (
                 <li key={`${e.at}-${i}`} className="border-l-4 border-primary/40 pl-3">
                   <p className="font-medium">
                     {typeLabel(e)}

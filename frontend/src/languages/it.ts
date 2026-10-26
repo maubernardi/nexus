@@ -211,6 +211,17 @@ export const it = {
       ESCLUSIONE: 'Azienda esclusa',
     },
   },
+  matchDetails: {
+    title: '«{{title}}» presso {{company}}',
+    description: 'Scheda dell’azienda e della mansione, note recenti e pregressi, per scegliere la proposta.',
+    company: 'Azienda',
+    jobSlot: 'Mansione',
+    jobDescription: 'Descrizione',
+    notes: 'Note recenti',
+    openCompany: 'Apri la scheda completa dell’azienda',
+    notSpecified: 'Non indicato',
+    close: 'Chiudi',
+  },
   companyNote: {
     heading: 'Note',
     intro:
@@ -346,6 +357,7 @@ export const it = {
     caption: 'Mansioni libere proponibili, per azienda e titolo',
     propose: 'Proponi',
     proposeTarget: '{{title}} presso {{company}}',
+    details: 'Dettagli',
     confirmHeading: 'Conferma la proposta',
     confirmText:
       'Proporre {{beneficiary}} per la mansione «{{title}}» presso {{company}}? La mansione sarà bloccata per questa segnalazione.',
