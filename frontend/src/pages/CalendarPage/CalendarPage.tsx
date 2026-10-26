@@ -9,7 +9,13 @@ import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
 import type { CalendarClosure, WorkCalendar } from '@/config/api/calendarApi';
 import { apiError } from '@/config/api/errors';
-import { useAddClosure, useCalendar, useRemoveClosure, useUpdatePatron } from '@/config/hooks/useCalendar';
+import {
+  useAddClosure,
+  useCalendar,
+  useDeadlinePreview,
+  useRemoveClosure,
+  useUpdatePatron,
+} from '@/config/hooks/useCalendar';
 import { FormField } from '@/molecules/FormField/FormField';
 
 const MONTHS = Array.from({ length: 12 }, (_, i) =>
@@ -17,12 +23,20 @@ const MONTHS = Array.from({ length: 12 }, (_, i) =>
 );
 const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 const dateFormat = new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+const longDateFormat = new Intl.DateTimeFormat('it-IT', {
+  weekday: 'long',
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+});
+
+const toDate = (iso: string): Date => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d);
+};
 
 /** Data ISO (aaaa-mm-gg) in formato italiano, senza passare dal fuso orario. */
-const formatDate = (iso: string): string => {
-  const [y, m, d] = iso.split('-').map(Number);
-  return dateFormat.format(new Date(y, m - 1, d));
-};
+const formatDate = (iso: string): string => dateFormat.format(toDate(iso));
 
 type Outcome = { message: string; error?: boolean };
 type ClosureValues = { startDate: string; endDate: string; description: string };
@@ -79,6 +93,7 @@ export const CalendarPage = () => {
       <PatronSection key={calendar.data.version} calendar={calendar.data} onOutcome={setOutcome} />
       <HolidaysSection />
       <ClosuresSection closures={calendar.data.closures} onOutcome={setOutcome} />
+      <PreviewSection />
     </div>
   );
 };
@@ -313,6 +328,53 @@ const ClosuresSection = ({
           ))}
         </ul>
       )}
+    </section>
+  );
+};
+
+/** Prova del calcolo dei giorni lavorativi (US-703): promemoria e scadenza del timer della proposta. */
+const PreviewSection = () => {
+  const { t } = useTranslation();
+  const [from, setFrom] = useState('');
+  const preview = useDeadlinePreview(from);
+
+  const onSubmit = (event: FormEvent<HTMLFormElement>): void => {
+    event.preventDefault();
+    const value = new FormData(event.currentTarget).get('from');
+    setFrom(typeof value === 'string' ? value : '');
+  };
+
+  return (
+    <section
+      aria-labelledby="calendar-preview"
+      className="space-y-3 rounded-xl border border-border bg-card p-4"
+    >
+      <h2 id="calendar-preview" className="text-lg font-semibold text-primary">
+        {t('calendar.previewHeading')}
+      </h2>
+      <p className="text-sm text-muted-foreground">{t('calendar.previewHelp')}</p>
+      <form onSubmit={onSubmit} className="flex flex-wrap items-end gap-3">
+        <div className="space-y-1.5">
+          <label htmlFor="calendar-preview-from" className="block text-sm font-medium">
+            {t('calendar.previewFrom')}
+          </label>
+          <Input id="calendar-preview-from" name="from" type="date" required className="w-auto" />
+        </div>
+        <Button type="submit" size="lg" variant="outline">
+          {t('calendar.previewSubmit')}
+        </Button>
+      </form>
+      <div role="status">
+        {preview.data && (
+          <dl className="grid gap-x-6 gap-y-1 sm:grid-cols-[max-content_1fr]">
+            <dt className="font-medium">{t('calendar.reminder')}</dt>
+            <dd>{longDateFormat.format(toDate(preview.data.reminder))}</dd>
+            <dt className="font-medium">{t('calendar.deadline')}</dt>
+            <dd>{longDateFormat.format(toDate(preview.data.deadline))}</dd>
+          </dl>
+        )}
+        {preview.isError && <p className="font-medium text-destructive">{t('common.loadError')}</p>}
+      </div>
     </section>
   );
 };

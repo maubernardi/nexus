@@ -9,9 +9,11 @@ import {
 import {
   addClosure,
   fetchCalendar,
+  fetchDeadlinePreview,
   removeClosure,
   updatePatron,
   type ClosureForm,
+  type DeadlinePreview,
   type WorkCalendar,
 } from '@/config/api/calendarApi';
 
@@ -27,7 +29,11 @@ const useCalendarMutation = <V>(
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn,
-    onSuccess: (calendar) => queryClient.setQueryData(CALENDAR_KEY, calendar),
+    onSuccess: (calendar) => {
+      queryClient.setQueryData(CALENDAR_KEY, calendar);
+      // patrono e chiusure cambiano le scadenze: la prova del calcolo va rifatta
+      return queryClient.invalidateQueries({ queryKey: [...CALENDAR_KEY, 'preview'] });
+    },
   });
 };
 
@@ -42,3 +48,11 @@ export const useAddClosure = (): UseMutationResult<WorkCalendar, unknown, Closur
 
 export const useRemoveClosure = (): UseMutationResult<WorkCalendar, unknown, string> =>
   useCalendarMutation(removeClosure);
+
+/** Prova del calcolo (US-703) per la data indicata; nessuna richiesta finché la data è vuota. */
+export const useDeadlinePreview = (from: string): UseQueryResult<DeadlinePreview> =>
+  useQuery({
+    queryKey: [...CALENDAR_KEY, 'preview', from],
+    queryFn: () => fetchDeadlinePreview(from),
+    enabled: from !== '',
+  });

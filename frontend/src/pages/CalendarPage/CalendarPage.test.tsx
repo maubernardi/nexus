@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   addClosure,
   fetchCalendar,
+  fetchDeadlinePreview,
   removeClosure,
   updatePatron,
   type WorkCalendar,
@@ -15,6 +16,7 @@ import { renderWithProviders } from '@/tests/renderWithProviders';
 
 vi.mock('@/config/api/calendarApi', () => ({
   fetchCalendar: vi.fn(),
+  fetchDeadlinePreview: vi.fn(),
   updatePatron: vi.fn(),
   addClosure: vi.fn(),
   removeClosure: vi.fn(),
@@ -90,6 +92,24 @@ describe('<CalendarPage>', () => {
     await user.click(screen.getByRole('button', { name: 'Rimuovi Ferie estive' }));
     expect(await screen.findByText('Chiusura rimossa: Ferie estive.')).toBeInTheDocument();
     expect(removeClosure).toHaveBeenCalledWith('K1', expect.anything());
+  });
+
+  it('prova del calcolo: promemoria e scadenza con il giorno della settimana', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchDeadlinePreview).mockResolvedValue({
+      from: '2026-10-23',
+      reminder: '2026-10-29',
+      deadline: '2026-11-03',
+    });
+    renderPage();
+
+    await user.type(await screen.findByLabelText('Data di accettazione'), '2026-10-23');
+    await user.click(screen.getByRole('button', { name: 'Calcola' }));
+
+    expect(await screen.findByText('giovedì 29/10/2026')).toBeInTheDocument();
+    expect(screen.getByText('martedì 03/11/2026')).toBeInTheDocument();
+    expect(fetchDeadlinePreview).toHaveBeenCalledWith('2026-10-23');
+    await expectNoAxeViolations();
   });
 
   it('senza data e descrizione non invia', async () => {
