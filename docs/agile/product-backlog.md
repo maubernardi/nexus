@@ -86,13 +86,13 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-405](#us-405) | E4 | Lavorazione condivisa tra operatori | Must | 2 | R1 | 🎉 Done (Sprint 3) |
 | [US-501](#us-501) | E5 | Anagrafica aziende | Must | 3 | R1 | 🎉 Done (Sprint 2) |
 | [US-502](#us-502) | E5 | Mansioni dell'azienda | Must | 3 | R1 | 🎉 Done (Sprint 2) |
-| [US-503](#us-503) | E5 | Storico e pregressi dell'azienda | Must | 3 | R1 | ✅ Ready (Sprint 4) |
+| [US-503](#us-503) | E5 | Storico e pregressi dell'azienda | Must | 3 | R1 | 🎉 Done (Sprint 4) |
 | [US-504](#us-504) | E5 | Disattivazione impedita con mansioni bloccate | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [US-505](#us-505) | E5 | Diario delle note dell'azienda | Must | 2 | R1 | 🎉 Done (Sprint 4) |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 📋 Backlog |
-| [US-604](#us-604) | E6 | Dettagli di azienda e mansione durante l'abbinamento | Must | 5 | R1 | ✅ Ready (Sprint 4) |
+| [US-604](#us-604) | E6 | Dettagli di azienda e mansione durante l'abbinamento | Must | 5 | R1 | 🎉 Done (Sprint 4) |
 | [US-701](#us-701) | E7 | Accettazione della proposta | Must | 3 | R2 | ✅ Ready (Sprint 4) |
 | [US-702](#us-702) | E7 | Rifiuto della proposta | Should | 3 | R2 | 📋 Backlog |
 | [US-703](#us-703) | E7 | Calendario dei giorni lavorativi | Must | 3 | R2 | ✅ Ready (Sprint 4) |
@@ -413,7 +413,7 @@ Criteri di accettazione:
 - Lo stato LIBERA/BLOCCATA è visibile e non si modifica a mano: lo governano abbinamenti e chiusure.
 
 #### US-503
-**Storico e pregressi dell'azienda** · Must · 3 punti · R1 · ✅ Ready (Sprint 4)
+**Storico e pregressi dell'azienda** · Must · 3 punti · R1 · 🎉 Done (Sprint 4)
 
 Come **operatore Call Center / ADMIN** voglio vedere nella scheda dell'azienda lo storico immodificabile e i pregressi
 (segnalazioni passate ed esiti) per valutare l'azienda prima di proporle un beneficiario. Aggiornata con la nota operativa
@@ -483,7 +483,7 @@ Criteri di accettazione:
 - Un'azienda esclusa non compare più nella ricerca per quel ticket.
 
 #### US-604
-**Dettagli di azienda e mansione durante l'abbinamento** · Must · 5 punti · R1 · ✅ Ready (Sprint 4)
+**Dettagli di azienda e mansione durante l'abbinamento** · Must · 5 punti · R1 · 🎉 Done (Sprint 4)
 
 Come **operatore Call Center** voglio aprire, dalla ricerca delle mansioni compatibili, una finestra con la scheda
 dell'azienda, la scheda della mansione, le note e i pregressi dell'azienda per scegliere la proposta con tutte le
