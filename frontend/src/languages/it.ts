@@ -258,6 +258,13 @@ export const it = {
     noClosures: 'Nessuna chiusura inserita.',
     period: 'dal {{from}} al {{to}}',
     remove: 'Rimuovi',
+    previewHeading: 'Prova del calcolo',
+    previewHelp:
+      'Per una proposta accettata in questa data: promemoria al 4° e scadenza al 7° giorno lavorativo, contando solo i giorni lavorativi successivi.',
+    previewFrom: 'Data di accettazione',
+    previewSubmit: 'Calcola',
+    reminder: 'Promemoria',
+    deadline: 'Scadenza',
   },
   companyNote: {
     heading: 'Note',

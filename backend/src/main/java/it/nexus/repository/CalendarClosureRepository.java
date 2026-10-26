@@ -15,4 +15,7 @@ public interface CalendarClosureRepository extends JpaRepository<CalendarClosure
 
     /** Chiusure che toccano l'intervallo indicato (per il calcolo dei giorni lavorativi, US-703). */
     List<CalendarClosure> findByStartDateLessThanEqualAndEndDateGreaterThanEqual(LocalDate to, LocalDate from);
+
+    /** Chiusure in corso o future rispetto alla data indicata (US-703). */
+    List<CalendarClosure> findByEndDateGreaterThanEqual(LocalDate from);
 }

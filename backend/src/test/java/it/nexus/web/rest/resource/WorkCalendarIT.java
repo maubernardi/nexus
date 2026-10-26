@@ -147,6 +147,18 @@ class WorkCalendarIT {
     }
 
     @Test
+    void provaDelCalcolo_promemoriaEScadenza() throws Exception {
+        mockMvc.perform(get(API + "/deadline-preview").param("from", "2026-10-23").header(USER, "admin"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.reminder").value("2026-10-29"))
+                .andExpect(jsonPath("$.deadline").value("2026-11-03"));
+        mockMvc.perform(get(API + "/deadline-preview").param("from", "2026-10-23").header(USER, "operatore.cc"))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get(API + "/deadline-preview").param("from", "ieri").header(USER, "admin"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void soloAdmin() throws Exception {
         mockMvc.perform(get(API).header(USER, "operatore.cc")).andExpect(status().isForbidden());
         mockMvc.perform(get(API).header(USER, "tutor1")).andExpect(status().isForbidden());

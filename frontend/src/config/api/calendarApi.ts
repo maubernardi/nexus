@@ -37,3 +37,12 @@ export const removeClosure = async (id: string): Promise<WorkCalendar> => {
   );
   return data;
 };
+
+export type DeadlinePreview = { from: string; reminder: string; deadline: string };
+
+export const fetchDeadlinePreview = async (from: string): Promise<DeadlinePreview> => {
+  const { data } = await axiosInstance.get<DeadlinePreview>(`${ENDPOINTS.calendar}/deadline-preview`, {
+    params: { from },
+  });
+  return data;
+};
