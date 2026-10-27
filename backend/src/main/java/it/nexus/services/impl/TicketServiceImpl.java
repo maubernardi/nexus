@@ -332,6 +332,7 @@ public class TicketServiceImpl implements TicketService {
             case "CATEGORY_REJECT" -> "«%s» → «%s»".formatted(changed(event, "requestedJobFreeText", "before"),
                     changed(event, "requestedJobCategory", "after"));
             case "APPOINTMENT_SET" -> "Timer fermato";
+            case "TIMER_REMINDER" -> "Promemoria inviato al Tutor";
             case "PROPOSAL_REJECT" -> Optional
                     .ofNullable(TsidMapper.toInternal(changed(event, "excludedCompanyId", "after")))
                     .flatMap(companyRepository::findById)

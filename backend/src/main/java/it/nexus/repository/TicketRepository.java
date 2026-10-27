@@ -22,5 +22,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecif
     /** Vero se il beneficiario ha almeno una segnalazione (anche conclusa) in uno dei progetti indicati (US-204). */
     boolean existsByBeneficiaryIdAndProjectIdIn(Long beneficiaryId, Collection<Long> projectIds);
 
+    /** Proposte accettate con il timer attivo e il promemoria non ancora inviato (US-704). */
+    List<Ticket> findByStatusAndTimerStartedAtIsNotNullAndTimerReminderSentAtIsNull(TicketStatus status);
+
     Optional<Ticket> findFirstByBeneficiaryIdAndStatusNot(Long beneficiaryId, TicketStatus closed);
 }

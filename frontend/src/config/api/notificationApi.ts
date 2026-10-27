@@ -10,6 +10,7 @@ export const NOTIFICATION_TYPES = [
   'APPOINTMENT_SET',
   'APPOINTMENT_FAILED',
   'PROPOSAL_REJECTED',
+  'TIMER_REMINDER',
 ] as const;
 
 export type AppNotification = {
