@@ -177,14 +177,33 @@ al Call Center in **RIAPERTO**. Va deciso dove la ritrova l'operatore.
 lavora come una segnalazione in lavorazione: nuova ricerca delle compatibili, con l'azienda esclusa se il motivo lo
 richiede. Alternativa: torna in "Da prendere in carico" per chiunque.
 
+> ✅ **Deciso (PO, 27/10): proposta accettata.** La segnalazione riaperta resta **in carico allo stesso operatore**, in
+> cima a "In carico a me" con l'evidenza "Riaperta", e si lavora come una in lavorazione (un collega può sempre
+> intervenire, US-405). **Nessuna esclusione automatica** dell'azienda dopo un appuntamento fallito: decide l'operatore
+> (US-603). Resta l'esclusione automatica al rifiuto della proposta da parte del Tutor (Q3).
+>
+> Per decidere, l'operatore ha il **motivo dell'appuntamento fallito** (PO, 27/10): il Tutor indica una causa da un menu
+> ("L'azienda non ha confermato il tirocinio", "Il beneficiario ha rinunciato", "Il beneficiario non si è presentato",
+> "Altro") e una nota, obbligatoria con "Altro"; il motivo va in cronologia e nello storico dell'azienda. Voci del menu
+> provvisorie, da confermare con il committente. Criterio aggiunto a US-802 (resta 2 punti).
+
 ### 8.3 Notifiche in app (US-1201)
 Le notifiche servono a promemoria, scadenza, rifiuto e tipologia cambiata. Q9 chiede app **ed email**: l'email è una
 storia a parte (US-1202, R3).
 *Proposta:* nello Sprint 5 solo le notifiche **in app** (campanella con contatore nell'intestazione, elenco, "segna come
 letta"); l'avviso provvisorio di US-302 diventa una notifica.
 
+> ✅ **Deciso (PO, 27/10): proposta accettata.** Nello Sprint 5 solo notifiche **in app**: campanella con il numero di
+> non lette (annunciato agli screen reader), elenco dalla più recente con link alla segnalazione, segna come letta (una o
+> tutte). Destinatari: la controparte del passaggio (Tutor ↔ operatore che ha in carico la segnalazione; la scadenza del
+> timer a entrambi). L'avviso "Tipologia cambiata" di US-302 diventa una notifica. Nessun dato personale oltre al numero
+> della segnalazione. L'email resta in US-1202 (R3).
+
 ### 8.4 Chiusura dello Sprint 4
 *Proposta:* chiudere lo Sprint 4 con questa review (velocity 24) e avviare lo Sprint 5 alla conferma del planning.
+
+> ✅ **Deciso (PO, 27/10): proposta accettata.** Sprint 4 chiuso il 27/10 con velocity 24; lo Sprint 5 parte alla
+> conferma del planning, per 3 giorni.
 
 ## 9. Proposta per lo Sprint 5 (3 giorni, ~20 punti)
 
@@ -208,6 +227,11 @@ Dipendono dalle decisioni §8.2 e §8.3. Per il PO: US-1301 e le note operative 
 
 *Alternativa:* iniziare la bacheca (US-901, US-902, US-803: 13 punti) e rinviare promemoria e scadenza; sconsigliata,
 perché una proposta accettata oggi resterebbe senza scadenza effettiva.
+
+> ✅ **Deciso (PO, 27/10): piano confermato, 21 punti.** US-802 passa da 2 a **3 punti**: include la gestione delle
+> segnalazioni riaperte (§8.2) e il motivo dell'appuntamento fallito. Timer: controllo **ogni ora**; scadenza alla fine
+> del 7° giorno lavorativo (mezzanotte di Roma), con la segnalazione riaperta trovata dall'operatore in "In carico a me".
+> Sprint 5: [sprint-05.md](sprint-05.md).
 
 ## 10. Azioni a carico del PO
 

@@ -74,8 +74,7 @@ segnalazione SHALL nascere in `IN_ATTESA_APPROVAZIONE` e non entrare in coda. Un
 nome, senza distinguere maiuscole) MUST essere scelta dall'elenco. Un operatore del Call Center o l'ADMIN SHALL poter:
 approvarla, anche correggendone il nome, e allora la tipologia entra nel catalogo; oppure respingerla scegliendo una
 tipologia del catalogo con un motivo obbligatorio. In entrambi i casi la segnalazione passa in `NUOVA` (coda) e la
-decisione è registrata nell'audit e in cronologia; se respinta, il Tutor della segnalazione ne è avvisato finché non la
-apre.
+decisione è registrata nell'audit e in cronologia; il Tutor della segnalazione ne riceve una notifica in app.
 
 #### Scenario: Invio con tipologia nuova
 - **WHEN** il Tutor descrive la tipologia "Tecnico del suono" e invia
@@ -89,7 +88,7 @@ apre.
 #### Scenario: Respingimento
 - **WHEN** l'operatore sceglie "Magazziniere" dal catalogo con il motivo "Rientra nel catalogo"
 - **THEN** la segnalazione va in coda come "Magazziniere", la cronologia mostra proposta → scelta e il motivo, e il Tutor
-  vede "Tipologia cambiata" nella Home finché non apre la segnalazione
+  riceve la notifica "tipologia cambiata"
 
 #### Scenario: Tipologia già nel catalogo
 - **WHEN** il Tutor descrive una tipologia con il nome di una già presente

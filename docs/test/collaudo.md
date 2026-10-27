@@ -9,8 +9,8 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | https://portalenexus.it |
-| **Versione della demo** | `27251c8` (27/10/2026): Sprint 1–4 e Sprint 5 fino a US-702 |
-| **Ultimo aggiornamento** | 27/10/2026 |
+| **Versione della demo** | `19bd629` (27/10/2026): Sprint 1–5 completi |
+| **Ultimo aggiornamento** | 27/10/2026 (aggiunte T-5.7 e T-9.2) |
 
 ## Come prepararsi
 
@@ -205,6 +205,15 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
      **resta** tra le compatibili (nessuna esclusione automatica); nello storico dell'azienda "Appuntamento fallito" con
      la causa.
 
+- [ ] **T-5.7 Escludere un'azienda (Sprint 5)**
+  1. Come `operatore.cc` apri una segnalazione riaperta e in carico (es. quella di T-5.6) → mansioni compatibili →
+     **Dettagli** su una mansione → **Escludi questa azienda** → premi **Conferma esclusione** senza motivo.
+  2. **Atteso:** "Campo obbligatorio".
+  3. Scrivi un motivo → **Conferma esclusione**.
+  4. **Atteso:** la finestra si chiude con l'esito "… esclusa per questa segnalazione"; l'azienda non compare più tra le
+     compatibili; sotto, l'elenco **Aziende escluse** la mostra con motivo, autore e data; in cronologia "Azienda esclusa
+     dal Call Center" con il motivo; nello storico dell'azienda compare l'esclusione.
+
 ## 6. Aziende (Call Center)
 
 - [ ] **T-6.1 Ricerca e nuova azienda**
@@ -268,7 +277,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
   2. Aggiungi una chiusura in un giorno lavorativo tra oggi e la scadenza, poi ricalcola.
   3. **Atteso:** la scadenza si sposta avanti di un giorno lavorativo. Rimuovi poi la chiusura di prova.
 
-## 9. Timer: promemoria (Sprint 5, dopo il deploy della PR #57)
+## 9. Timer: promemoria e scadenza (Sprint 5)
 
 - [ ] **T-9.1 Promemoria al 4° giorno lavorativo**
   1. Accetta una proposta (T-5.3) e **non** registrare l'appuntamento.
@@ -276,6 +285,16 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
      giornata, controlla le notifiche del Tutor.
   3. **Atteso:** una sola notifica "Promemoria: per la segnalazione n. … manca la registrazione dell'appuntamento…";
      in cronologia "Promemoria del timer" con autore "Sistema". Nelle ore successive il promemoria non si ripete.
+
+- [ ] **T-9.2 Scadenza del timer**
+  1. Accetta una proposta (T-5.3) e non registrare l'appuntamento fino alla scadenza mostrata nel dettaglio (7° giorno
+     lavorativo).
+  2. Il giorno dopo la scadenza, entro un'ora dalla mezzanotte, apri la segnalazione.
+  3. **Atteso:** stato «Riaperto», la scadenza non c'è più, la mansione è di nuovo **Libera**; in cronologia "Scadenza del
+     timer" con autore "Sistema"; il Tutor e l'operatore hanno la notifica "Il timer … è scaduto…"; la segnalazione è in
+     cima a "In carico a me" dell'operatore; l'azienda resta tra le compatibili.
+  4. Scorciatoia sulla demo: la segnalazione n. 6 dei dati demo (di `tutor2`, accettata a settembre) è scaduta al primo
+     controllo dopo il deploy: verifica stato, cronologia e notifiche di `tutor2` e `operatore.cc`.
 
 ## 10. Prove trasversali
 
