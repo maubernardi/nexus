@@ -10,6 +10,7 @@ import {
   appointmentSet,
   approveCategory,
   rejectCategory,
+  rejectProposal,
   fetchCompatibleJobSlots,
   fetchTicket,
   fetchTicketHistory,
@@ -37,6 +38,7 @@ vi.mock('@/config/api/ticketApi', () => ({
   appointmentSet: vi.fn(),
   approveCategory: vi.fn(),
   rejectCategory: vi.fn(),
+  rejectProposal: vi.fn(),
 }));
 vi.mock('@/config/api/referenceApi', () => ({
   fetchZones: vi.fn(),
@@ -442,6 +444,43 @@ describe('<TicketPage>', () => {
     expect(
       await screen.findByRole('button', { name: 'Proponi Magazziniere presso Alfa Logistica' }),
     ).toBeInTheDocument();
+  });
+
+  it('Tutor della segnalazione: rifiuta la proposta con motivo obbligatorio', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchCurrentUser).mockResolvedValue({
+      id: 'tutor1',
+      username: 'tutor1',
+      firstName: 'Tutor',
+      lastName: 'Uno',
+      roles: ['TUTOR'],
+    });
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({ status: 'PROPOSTA_AZIENDA', proposal: alfa, myTicket: true, assignedToMe: false }),
+    );
+    vi.mocked(rejectProposal).mockResolvedValue(detail({ status: 'RIAPERTO', myTicket: true, version: 3 }));
+    renderPage();
+
+    await user.click(await screen.findByRole('button', { name: 'Rifiuta la proposta' }));
+    expect(screen.getByRole('heading', { name: 'Rifiuta la proposta' })).toHaveFocus();
+    expect(
+      screen.getByText(/Alfa Logistica non sarà più proposta per questa segnalazione/),
+    ).toBeInTheDocument();
+    await expectNoAxeViolations();
+    await user.click(screen.getByRole('button', { name: 'Conferma rifiuto' }));
+    expect(await screen.findByText('Campo obbligatorio')).toBeInTheDocument();
+    expect(rejectProposal).not.toHaveBeenCalled();
+
+    await user.type(screen.getByLabelText(/^Motivo/), 'Orari incompatibili');
+    vi.mocked(fetchTicket).mockResolvedValue(detail({ status: 'RIAPERTO', myTicket: true, version: 3 }));
+    await user.click(screen.getByRole('button', { name: 'Conferma rifiuto' }));
+
+    const outcome = await screen.findByText(/Proposta rifiutata: la segnalazione è tornata all’operatore/);
+    await waitFor(() => expect(outcome).toHaveFocus());
+    expect(rejectProposal).toHaveBeenCalledWith(
+      { id: 'T9', version: 2, reason: 'Orari incompatibili' },
+      expect.anything(),
+    );
   });
 
   it('collega o Call Center: nessuna accettazione; scadenza visibile dopo l’accettazione', async () => {

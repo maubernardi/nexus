@@ -7,6 +7,7 @@ import it.nexus.domain.dto.AppointmentSetDTO;
 import it.nexus.domain.dto.ApproveCategoryDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
+import it.nexus.domain.dto.ProposalRejectDTO;
 import it.nexus.domain.dto.RejectCategoryDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
@@ -70,6 +71,12 @@ public interface TicketService {
      * operatore, mansione di nuovo libera, nessuna esclusione automatica dell'azienda (US-802).
      */
     TicketDetailDTO appointmentFailed(String ticketId, AppointmentFailedDTO dto);
+
+    /**
+     * Il Tutor della segnalazione rifiuta la proposta con motivo: stato RIAPERTO in carico allo stesso operatore,
+     * mansione di nuovo libera, azienda esclusa per la segnalazione (US-702, Q3).
+     */
+    TicketDetailDTO rejectProposal(String ticketId, ProposalRejectDTO dto);
 
     /** Il Call Center approva la nuova tipologia proposta dal Tutor, che entra nel catalogo (US-302). */
     TicketDetailDTO approveCategory(String ticketId, ApproveCategoryDTO dto);

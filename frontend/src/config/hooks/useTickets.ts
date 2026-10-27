@@ -22,6 +22,7 @@ import {
   appointmentSet,
   approveCategory,
   rejectCategory,
+  rejectProposal,
   type CompatibleFilters,
   type JobSlotMatch,
   type Ticket,
@@ -173,6 +174,19 @@ export const useAppointmentFailed = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: appointmentFailed,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+  });
+};
+
+/** Il Tutor rifiuta la proposta (US-702): la segnalazione torna al Call Center. */
+export const useRejectProposal = (): UseMutationResult<
+  TicketDetail,
+  unknown,
+  { id: string; version: number; reason: string }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: rejectProposal,
     onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
   });
 };

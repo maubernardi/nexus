@@ -71,6 +71,13 @@ public final class TicketTransitions {
     public static final TicketTransition APPOINTMENT_FAILED = new TicketTransition("APPOINTMENT_FAILED",
             Set.of(APPUNTAMENTO), RIAPERTO, Set.of(Role.TUTOR));
 
+    /**
+     * Fase 5 — il Tutor rifiuta la proposta con motivo (US-702, Q3): la segnalazione torna al Call Center, la mansione
+     * torna libera e l'azienda è esclusa per la segnalazione. Solo il Tutor della segnalazione (controllo nel servizio).
+     */
+    public static final TicketTransition PROPOSAL_REJECT = new TicketTransition("PROPOSAL_REJECT",
+            Set.of(PROPOSTA_AZIENDA), RIAPERTO, Set.of(Role.TUTOR));
+
     private TicketTransitions() {
     }
 }
