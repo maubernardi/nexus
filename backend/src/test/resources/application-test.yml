@@ -1,0 +1,4 @@
+# Nei test il controllo orario del timer non parte da solo: i test chiamano direttamente il servizio.
+nexus:
+  timer:
+    cron: "-"

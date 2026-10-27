@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import it.nexus.config.security.SecurityUtils;
 import it.nexus.domain.AppUser;
 import it.nexus.domain.Notification;
 import it.nexus.domain.Ticket;
@@ -34,7 +35,10 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void notify(AppUser recipient, NotificationType type, Ticket ticket) {
-        if (recipient == null || recipient.getId().equals(currentAppUserService.getCurrentAppUser().getId())) {
+        // chi agisce non riceve la propria notifica; le attività pianificate agiscono senza utente (Sistema)
+        boolean byRecipient = SecurityUtils.getCurrentUser().isPresent()
+                && recipient != null && recipient.getId().equals(currentAppUserService.getCurrentAppUser().getId());
+        if (recipient == null || byRecipient) {
             return;
         }
         repository.save(new Notification(recipient, type, ticket));

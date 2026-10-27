@@ -18,5 +18,7 @@ public enum NotificationType {
     /** All'operatore: l'appuntamento non è andato a buon fine, la segnalazione è riaperta (US-802). */
     APPOINTMENT_FAILED,
     /** All'operatore: il Tutor ha rifiutato la proposta, la segnalazione è riaperta (US-702). */
-    PROPOSAL_REJECTED
+    PROPOSAL_REJECTED,
+    /** Al Tutor: promemoria al 4° giorno lavorativo dall'accettazione, senza appuntamento registrato (US-704). */
+    TIMER_REMINDER
 }
