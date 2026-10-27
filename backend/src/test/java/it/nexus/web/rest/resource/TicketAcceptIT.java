@@ -3,6 +3,7 @@ package it.nexus.web.rest.resource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -127,6 +128,23 @@ class TicketAcceptIT {
     private ResultActions accept(String user, long version) throws Exception {
         return mockMvc.perform(post("/api/v1/tickets/" + id() + "/accept").header(USER, user)
                 .contentType(MediaType.APPLICATION_JSON).content("{\"version\": %d}".formatted(version)));
+    }
+
+    @Test
+    void notifiche_propostaAlTutor_accettazioneAllOperatore() throws Exception {
+        mockMvc.perform(get("/api/v1/notifications").header(USER, "tutor1"))
+                .andExpect(jsonPath("$.unread").value(1))
+                .andExpect(jsonPath("$.items[0].type").value("PROPOSAL_SENT"))
+                .andExpect(jsonPath("$.items[0].ticketNumber").value(ticket.getNumber()));
+        // chi agisce non riceve la propria notifica
+        mockMvc.perform(get("/api/v1/notifications/unread-count").header(USER, "operatore.cc"))
+                .andExpect(content().string("0"));
+
+        accept("tutor1", version()).andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/notifications").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.unread").value(1))
+                .andExpect(jsonPath("$.items[0].type").value("PROPOSAL_ACCEPTED"))
+                .andExpect(jsonPath("$.items[0].ticketId").value(id()));
     }
 
     @Test

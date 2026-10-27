@@ -12,6 +12,7 @@ import { CalendarPage } from '@/pages/CalendarPage/CalendarPage';
 import { CompaniesPage } from '@/pages/CompaniesPage/CompaniesPage';
 import { CompanyEditPage } from '@/pages/CompanyEditPage/CompanyEditPage';
 import { CompanyNewPage } from '@/pages/CompanyNewPage/CompanyNewPage';
+import { NotificationsPage } from '@/pages/NotificationsPage/NotificationsPage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 import { LegacyWorkRedirect, TicketPage } from '@/pages/TicketPage/TicketPage';
 import { TicketNewPage } from '@/pages/TicketNewPage/TicketNewPage';
@@ -110,6 +111,11 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.companyEdit.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'notifiche',
+        element: <NotificationsPage />,
+        handle: { titleKey: 'pages.notifications.title' } satisfies RouteHandle,
       },
       {
         path: 'calendario',

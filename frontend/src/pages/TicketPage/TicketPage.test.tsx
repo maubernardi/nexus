@@ -7,7 +7,6 @@ import { fetchJobCategories, fetchZones } from '@/config/api/referenceApi';
 import {
   acceptProposal,
   approveCategory,
-  markCategoryChangeSeen,
   rejectCategory,
   fetchCompatibleJobSlots,
   fetchTicket,
@@ -34,7 +33,6 @@ vi.mock('@/config/api/ticketApi', () => ({
   acceptProposal: vi.fn(),
   approveCategory: vi.fn(),
   rejectCategory: vi.fn(),
-  markCategoryChangeSeen: vi.fn().mockResolvedValue(undefined),
 }));
 vi.mock('@/config/api/referenceApi', () => ({
   fetchZones: vi.fn(),
@@ -114,7 +112,6 @@ const detail = (overrides: Partial<TicketDetail> = {}): TicketDetail => ({
   createdAt: '2026-10-01T08:00:00Z',
   myTicket: false,
   timerDeadline: null,
-  categoryChanged: false,
   ...overrides,
 });
 
@@ -433,25 +430,6 @@ describe('<TicketPage>', () => {
       { id: 'T9', jobCategoryId: 'J1', reason: 'È già nel catalogo', version: 2 },
       expect.anything(),
     );
-  });
-
-  it('Tutor: avviso di tipologia cambiata, segnato come visto all’apertura', async () => {
-    vi.mocked(fetchCurrentUser).mockResolvedValue({
-      id: 'tutor1',
-      username: 'tutor1',
-      firstName: 'Tutor',
-      lastName: 'Uno',
-      roles: ['TUTOR'],
-    });
-    vi.mocked(fetchTicket).mockResolvedValue(
-      detail({ status: 'NUOVA', myTicket: true, categoryChanged: true }),
-    );
-    renderPage();
-
-    expect(await screen.findByText(/ha scelto una tipologia diversa/)).toBeInTheDocument();
-    await waitFor(() => expect(markCategoryChangeSeen).toHaveBeenCalledWith('T9', expect.anything()));
-    expect(markCategoryChangeSeen).toHaveBeenCalledTimes(1);
-    expect(screen.queryByRole('region', { name: 'Nuova tipologia da approvare' })).not.toBeInTheDocument();
   });
 
   it('cronologia: azioni, cambi di stato, autori, dettagli e note in una lista ordinata', async () => {

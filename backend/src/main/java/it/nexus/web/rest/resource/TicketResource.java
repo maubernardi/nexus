@@ -107,14 +107,6 @@ public class TicketResource {
         return ResponseEntity.ok(ticketService.rejectCategory(id, body));
     }
 
-    @PostMapping("/{id}/category-change-seen")
-    @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
-    @Operation(summary = "Il Tutor della segnalazione ha visto il cambio di tipologia")
-    public ResponseEntity<Void> categoryChangeSeen(@PathVariable String id) {
-        ticketService.markCategoryChangeSeen(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @PostMapping("/{id}/accept")
     @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
     @Operation(summary = "Il Tutor della segnalazione accetta la proposta: parte il timer di 7 giorni lavorativi")

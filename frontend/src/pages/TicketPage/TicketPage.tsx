@@ -17,7 +17,6 @@ import {
   useAcceptProposal,
   useApproveCategory,
   useCompatibleJobSlots,
-  useMarkCategoryChangeSeen,
   useMatchTicket,
   useRejectCategory,
   useTakeOver,
@@ -145,8 +144,6 @@ export const TicketPage = () => {
         </div>
       )}
 
-      {d.categoryChanged && <CategoryChangedNotice ticketId={d.id} />}
-
       <TicketData ticket={d} />
 
       {isCallCenter && d.status === 'IN_ATTESA_APPROVAZIONE' && d.requestedJobFreeText && (
@@ -178,26 +175,6 @@ const KNOWN_ACTIONS = [
   'ACCEPT',
   'STATUS',
 ] as const;
-
-/** Avviso al Tutor: la tipologia proposta è stata respinta (US-302). Aprendo la segnalazione l'avviso è visto. */
-const CategoryChangedNotice = ({ ticketId }: { ticketId: string }) => {
-  const { t } = useTranslation();
-  const markSeen = useMarkCategoryChangeSeen();
-  const sent = useRef(false);
-
-  useEffect(() => {
-    if (!sent.current) {
-      sent.current = true;
-      markSeen.mutate(ticketId);
-    }
-  }, [ticketId, markSeen]);
-
-  return (
-    <p className="rounded-md border-l-4 border-gold bg-card p-4 font-medium">
-      {t('work.category.changedNotice')}
-    </p>
-  );
-};
 
 type ApproveValues = { name: string };
 type RejectValues = { jobCategoryId: string; reason: string };

@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 
 import type { CurrentUser } from '@/config/auth/types';
 import { UserIdentity } from '@/molecules/UserIdentity/UserIdentity';
+import { NotificationsBell } from '@/molecules/NotificationsBell/NotificationsBell';
 import { UserMenu } from '@/molecules/UserMenu/UserMenu';
 import { MainNav } from '@/organisms/MainNav/MainNav';
 
@@ -29,7 +30,10 @@ export const AppHeader = ({ user }: AppHeaderProps) => {
           </Link>
           <MainNav roles={user.roles} mobileHeader={<UserIdentity user={user} />} />
         </div>
-        <UserMenu user={user} />
+        <div className="flex shrink-0 items-center gap-1 md:gap-2">
+          <NotificationsBell />
+          <UserMenu user={user} />
+        </div>
       </div>
     </header>
   );

@@ -19,7 +19,6 @@ import {
   takeOverTicket,
   acceptProposal,
   approveCategory,
-  markCategoryChangeSeen,
   rejectCategory,
   type CompatibleFilters,
   type JobSlotMatch,
@@ -147,14 +146,5 @@ export const useRejectCategory = (): UseMutationResult<
   return useMutation({
     mutationFn: rejectCategory,
     onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
-  });
-};
-
-/** Il Tutor ha visto il cambio di tipologia: l'evidenza nella Home si spegne. */
-export const useMarkCategoryChangeSeen = (): UseMutationResult<void, unknown, string> => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: markCategoryChangeSeen,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [...TICKETS_KEY, 'list'] }),
   });
 };

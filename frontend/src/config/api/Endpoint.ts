@@ -6,6 +6,7 @@ export const ENDPOINTS = {
   tickets: '/tickets',
   projects: '/reference/projects',
   calendar: '/calendar',
+  notifications: '/notifications',
   companies: '/companies',
   jobSlots: '/job-slots',
   beneficiaries: '/beneficiaries',

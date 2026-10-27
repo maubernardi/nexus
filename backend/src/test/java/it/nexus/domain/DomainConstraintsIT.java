@@ -532,6 +532,18 @@ class DomainConstraintsIT {
     }
 
     @Nested
+    class Notifiche {
+
+        @Test
+        void tipoNonValido() {
+            Long userId = fixtures.graph().tutor().getId();
+            assertViolates("ck_notification_type", () -> jdbc.update(
+                    "INSERT INTO notification (id, recipient_id, type, created_at, created_by)"
+                            + " VALUES (1, ?, 'tipo non valido', now(), 'test')", userId));
+        }
+    }
+
+    @Nested
     class Calendario {
 
         @Test
