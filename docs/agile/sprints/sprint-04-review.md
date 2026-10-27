@@ -177,6 +177,11 @@ al Call Center in **RIAPERTO**. Va deciso dove la ritrova l'operatore.
 lavora come una segnalazione in lavorazione: nuova ricerca delle compatibili, con l'azienda esclusa se il motivo lo
 richiede. Alternativa: torna in "Da prendere in carico" per chiunque.
 
+> ✅ **Deciso (PO, 27/10): proposta accettata.** La segnalazione riaperta resta **in carico allo stesso operatore**, in
+> cima a "In carico a me" con l'evidenza "Riaperta", e si lavora come una in lavorazione (un collega può sempre
+> intervenire, US-405). **Nessuna esclusione automatica** dell'azienda dopo un appuntamento fallito: decide l'operatore
+> (US-603). Resta l'esclusione automatica al rifiuto della proposta da parte del Tutor (Q3).
+
 ### 8.3 Notifiche in app (US-1201)
 Le notifiche servono a promemoria, scadenza, rifiuto e tipologia cambiata. Q9 chiede app **ed email**: l'email è una
 storia a parte (US-1202, R3).
