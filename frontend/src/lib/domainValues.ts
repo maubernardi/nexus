@@ -68,3 +68,12 @@ export const COMPANY_EVENT_TYPES = [
   'TIROCINIO_CONCLUSO',
   'ESCLUSIONE',
 ] as const;
+
+/** Cause dell'appuntamento fallito (US-802); voci provvisorie. */
+export const APPOINTMENT_FAILURE_CAUSES = [
+  'AZIENDA_NON_CONFERMA',
+  'BENEFICIARIO_RINUNCIA',
+  'BENEFICIARIO_ASSENTE',
+  'ALTRO',
+] as const;
+export type AppointmentFailureCause = (typeof APPOINTMENT_FAILURE_CAUSES)[number];

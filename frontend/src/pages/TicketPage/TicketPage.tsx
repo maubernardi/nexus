@@ -16,6 +16,7 @@ import { useJobCategories, useZones } from '@/config/hooks/useReferenceData';
 import {
   useAcceptProposal,
   useApproveCategory,
+  useAppointmentFailed,
   useAppointmentSet,
   useCompatibleJobSlots,
   useMatchTicket,
@@ -24,7 +25,11 @@ import {
   useTicket,
   useTicketHistory,
 } from '@/config/hooks/useTickets';
-import { TICKET_STATUSES } from '@/lib/domainValues';
+import {
+  APPOINTMENT_FAILURE_CAUSES,
+  TICKET_STATUSES,
+  type AppointmentFailureCause,
+} from '@/lib/domainValues';
 import { FormField } from '@/molecules/FormField/FormField';
 import { MatchDetailsDialog } from '@/organisms/MatchDetailsDialog/MatchDetailsDialog';
 import type { BeneficiaryLinkState } from '@/pages/BeneficiaryPage/BeneficiaryPage';
@@ -39,6 +44,7 @@ type Outcome =
   | { kind: 'takenOver' }
   | { kind: 'accepted'; deadline: string }
   | { kind: 'appointmentSet' }
+  | { kind: 'appointmentFailed' }
   | { kind: 'categoryApproved'; name: string }
   | { kind: 'categoryRejected'; name: string }
   | { kind: 'conflict'; reason: string }
@@ -85,7 +91,9 @@ export const TicketPage = () => {
   }
   const d = ticket.data;
   // dopo la presa in carico chiunque del Call Center (o l'ADMIN) può lavorarla, anche se è di un collega (US-405)
-  const canMatch = isCallCenter && d.status === 'IN_LAVORAZIONE' && d.assignedOperatorName !== null;
+  // anche una segnalazione riaperta (appuntamento fallito) si abbina di nuovo (US-802)
+  const workable = d.status === 'IN_LAVORAZIONE' || d.status === 'RIAPERTO';
+  const canMatch = isCallCenter && workable && d.assignedOperatorName !== null;
   const ofColleague = isCallCenter && d.assignedOperatorName !== null && !d.assignedToMe;
   const onTakeOver = (): void => {
     takeOver.mutate(
@@ -136,15 +144,17 @@ export const TicketPage = () => {
               ? t('work.category.approved', { name: outcome.name })
               : outcome.kind === 'categoryRejected'
                 ? t('work.category.rejected', { name: outcome.name })
-                : outcome.kind === 'appointmentSet'
-                  ? t('work.appointment.saved')
-                  : outcome.kind === 'accepted'
-                    ? t('work.accepted', { deadline: formatDay(outcome.deadline) })
-                    : outcome.kind === 'proposed'
-                      ? t('work.proposed', { title: outcome.title, company: outcome.company })
-                      : outcome.kind === 'conflict'
-                        ? t('work.conflict', { reason: outcome.reason })
-                        : t('work.error')}
+                : outcome.kind === 'appointmentFailed'
+                  ? t('work.appointment.failedSaved')
+                  : outcome.kind === 'appointmentSet'
+                    ? t('work.appointment.saved')
+                    : outcome.kind === 'accepted'
+                      ? t('work.accepted', { deadline: formatDay(outcome.deadline) })
+                      : outcome.kind === 'proposed'
+                        ? t('work.proposed', { title: outcome.title, company: outcome.company })
+                        : outcome.kind === 'conflict'
+                          ? t('work.conflict', { reason: outcome.reason })
+                          : t('work.error')}
         </div>
       )}
 
@@ -155,7 +165,7 @@ export const TicketPage = () => {
       )}
 
       {d.proposal && <ProposalSection ticket={d} onOutcome={setOutcome} />}
-      {isCallCenter && d.status === 'IN_LAVORAZIONE' && !canMatch && (
+      {isCallCenter && workable && !canMatch && (
         <p className="rounded-xl border border-border bg-card p-4">{t('work.notTaken')}</p>
       )}
       {canMatch && <CompatibleSection ticket={d} onOutcome={setOutcome} />}
@@ -178,6 +188,7 @@ const KNOWN_ACTIONS = [
   'MATCH',
   'ACCEPT',
   'APPOINTMENT_SET',
+  'APPOINTMENT_FAILED',
   'STATUS',
 ] as const;
 
@@ -435,6 +446,9 @@ const ProposalSection = ({
       {d.myTicket && d.status === 'PROPOSTA_ACCOLTA' && (
         <AppointmentSetAction ticket={d} company={proposal.companyName} onOutcome={onOutcome} />
       )}
+      {d.myTicket && d.status === 'APPUNTAMENTO' && (
+        <AppointmentFailedAction ticket={d} company={proposal.companyName} onOutcome={onOutcome} />
+      )}
     </section>
   );
 };
@@ -507,6 +521,123 @@ const AppointmentSetAction = ({
         </Button>
       </div>
     </div>
+  );
+};
+
+type FailedValues = { cause: AppointmentFailureCause | ''; note: string };
+
+/** Il Tutor della segnalazione registra l'appuntamento fallito, con causa e nota (US-802). */
+const AppointmentFailedAction = ({
+  ticket: d,
+  company,
+  onOutcome,
+}: {
+  ticket: TicketDetail;
+  company: string;
+  onOutcome: (o: Outcome) => void;
+}) => {
+  const { t } = useTranslation();
+  const failed = useAppointmentFailed();
+  const [confirming, setConfirming] = useState(false);
+  const confirmRef = useRef<HTMLHeadingElement>(null);
+  const form = useForm<FailedValues>({ defaultValues: { cause: '', note: '' } });
+  const { errors } = form.formState;
+
+  useEffect(() => {
+    if (confirming) confirmRef.current?.focus();
+  }, [confirming]);
+
+  // mutateAsync: l'esito arriva anche se, riaperta la segnalazione, questa sezione sparisce
+  const onConfirm = async ({ cause, note }: FailedValues): Promise<void> => {
+    try {
+      await failed.mutateAsync({
+        id: d.id,
+        version: d.version,
+        cause: cause as AppointmentFailureCause,
+        note: note.trim() || null,
+      });
+      onOutcome({ kind: 'appointmentFailed' });
+    } catch (error) {
+      const body = apiError(error);
+      const noteError = body?.fieldErrors?.find((fe) => fe.field === 'note');
+      if (noteError) {
+        form.setError('note', { type: 'server', message: noteError.message });
+        return;
+      }
+      onOutcome(body?.status === 409 ? { kind: 'conflict', reason: body.message } : { kind: 'error' });
+      setConfirming(false);
+    }
+  };
+
+  if (!confirming) {
+    return (
+      <Button size="lg" variant="outline" onClick={() => setConfirming(true)}>
+        {t('work.appointment.failed')}
+      </Button>
+    );
+  }
+  return (
+    <form
+      noValidate
+      onSubmit={form.handleSubmit(onConfirm)}
+      className="space-y-3 rounded-xl border-2 border-primary bg-card p-4"
+    >
+      <h3 ref={confirmRef} tabIndex={-1} className="font-semibold">
+        {t('work.appointment.failedHeading')}
+      </h3>
+      <p>{t('work.appointment.failedText', { company })}</p>
+      <FormField
+        id="work-appointment-cause"
+        label={t('work.appointment.cause')}
+        required
+        error={errors.cause?.message}
+      >
+        {(p) => (
+          <NativeSelect
+            {...p}
+            {...form.register('cause', { required: { value: true, message: t('form.errors.required') } })}
+          >
+            <option value="">{t('form.select')}</option>
+            {APPOINTMENT_FAILURE_CAUSES.map((c) => (
+              <option key={c} value={c}>
+                {t(`enums.appointmentFailureCause.${c}`)}
+              </option>
+            ))}
+          </NativeSelect>
+        )}
+      </FormField>
+      <FormField
+        id="work-appointment-failed-note"
+        label={t('work.appointment.failedNote')}
+        hint={t('work.appointment.failedNoteHint')}
+        error={errors.note?.message}
+      >
+        {(p) => (
+          <Textarea
+            {...p}
+            rows={2}
+            {...form.register('note', {
+              validate: (v, all) => all.cause !== 'ALTRO' || v.trim() !== '' || t('form.errors.required'),
+              maxLength: { value: 1000, message: t('form.errors.maxLength', { max: 1000 }) },
+            })}
+          />
+        )}
+      </FormField>
+      <div className="flex flex-wrap gap-3">
+        <Button type="submit" size="lg" disabled={failed.isPending}>
+          {t('work.appointment.failedConfirm')}
+        </Button>
+        <Button
+          type="button"
+          size="lg"
+          variant="outline"
+          onClick={() => setConfirming(false)}
+          disabled={failed.isPending}
+        >
+          {t('work.cancel')}
+        </Button>
+      </div>
+    </form>
   );
 };
 

@@ -15,6 +15,7 @@ import it.nexus.domain.CompanyAuditEvent;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.TicketCompanyBlacklist;
 import it.nexus.domain.dto.CompanyHistoryDTO;
+import it.nexus.domain.enumeration.AppointmentFailureCause;
 import it.nexus.domain.enumeration.CompanyEventType;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.CompanyAuditEventRepository;
@@ -90,9 +91,13 @@ public class CompanyHistoryServiceImpl implements CompanyHistoryService {
         if (proposal && d.get("jobSlotTitle") != null) {
             return "«" + d.get("jobSlotTitle") + "»";
         }
-        if (CompanyEventType.APPUNTAMENTO_FALLITO.name().equals(event.getEventType())
-                && Boolean.TRUE.equals(d.get("rilancioInBacheca"))) {
-            return "Con rilancio in bacheca";
+        if (CompanyEventType.APPUNTAMENTO_FALLITO.name().equals(event.getEventType())) {
+            if (Boolean.TRUE.equals(d.get("rilancioInBacheca"))) {
+                return "Con rilancio in bacheca";
+            }
+            if (d.get("cause") != null) {
+                return "Causa: " + AppointmentFailureCause.valueOf(d.get("cause").toString()).label();
+            }
         }
         if (isConcluded(event)) {
             return hired(event) ? "Con assunzione" : "Senza assunzione";

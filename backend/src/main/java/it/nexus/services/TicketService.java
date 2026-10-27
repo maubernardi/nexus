@@ -2,6 +2,7 @@ package it.nexus.services;
 
 import java.util.List;
 
+import it.nexus.domain.dto.AppointmentFailedDTO;
 import it.nexus.domain.dto.AppointmentSetDTO;
 import it.nexus.domain.dto.ApproveCategoryDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
@@ -63,6 +64,12 @@ public interface TicketService {
 
     /** Il Tutor della segnalazione registra l'appuntamento fissato: stato APPUNTAMENTO, il timer si ferma (US-801). */
     TicketDetailDTO appointmentSet(String ticketId, AppointmentSetDTO dto);
+
+    /**
+     * Il Tutor della segnalazione registra l'appuntamento fallito, con causa: stato RIAPERTO in carico allo stesso
+     * operatore, mansione di nuovo libera, nessuna esclusione automatica dell'azienda (US-802).
+     */
+    TicketDetailDTO appointmentFailed(String ticketId, AppointmentFailedDTO dto);
 
     /** Il Call Center approva la nuova tipologia proposta dal Tutor, che entra nel catalogo (US-302). */
     TicketDetailDTO approveCategory(String ticketId, ApproveCategoryDTO dto);

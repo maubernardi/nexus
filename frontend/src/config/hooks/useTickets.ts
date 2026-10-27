@@ -18,6 +18,7 @@ import {
   takeCharge,
   takeOverTicket,
   acceptProposal,
+  appointmentFailed,
   appointmentSet,
   approveCategory,
   rejectCategory,
@@ -159,6 +160,19 @@ export const useAppointmentSet = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: appointmentSet,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+  });
+};
+
+/** Il Tutor registra l'appuntamento fallito (US-802): la segnalazione torna al Call Center. */
+export const useAppointmentFailed = (): UseMutationResult<
+  TicketDetail,
+  unknown,
+  Parameters<typeof appointmentFailed>[0]
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: appointmentFailed,
     onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
   });
 };
