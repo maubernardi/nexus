@@ -3,10 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { apiError } from '@/config/api/errors';
 import type { JobSlotMatch } from '@/config/api/ticketApi';
 import { useCompany } from '@/config/hooks/useCompanies';
 import { useCompanyNotes } from '@/config/hooks/useCompanyNotes';
+import { FormField } from '@/molecules/FormField/FormField';
 import { CompanyHistorySection } from '@/organisms/CompanyHistorySection/CompanyHistorySection';
 
 const RECENT_NOTES = 3;
@@ -38,6 +41,8 @@ type MatchDetailsDialogProps = {
   /** "Proponi" dal dialogo: apre la stessa conferma della tabella. */
   onPropose: (slot: JobSlotMatch) => void;
   proposeDisabled?: boolean;
+  /** "Escludi questa azienda" (US-603): esclude l'azienda per la segnalazione, con il motivo. */
+  onExclude?: (slot: JobSlotMatch, reason: string) => Promise<void>;
   /** Pulsante da cui si è aperto il dialogo: alla chiusura il focus torna lì (salvo proposta). */
   returnFocusRef?: RefObject<HTMLElement | null>;
 };
@@ -51,10 +56,11 @@ export const MatchDetailsDialog = ({
   onClose,
   onPropose,
   proposeDisabled = false,
+  onExclude,
   returnFocusRef,
 }: MatchDetailsDialogProps) => {
   const { t } = useTranslation();
-  // proponendo, il focus va alla conferma e non torna sul pulsante "Dettagli"
+  // proponendo o escludendo, il focus va all'esito e non torna sul pulsante "Dettagli"
   const proposing = useRef(false);
   // il contenuto resta montato durante la chiusura: Radix può così riportare il focus sul pulsante di partenza
   const [shown, setShown] = useState(slot);
@@ -96,9 +102,92 @@ export const MatchDetailsDialog = ({
               </Button>
             </DialogClose>
           </div>
+          {onExclude && (
+            <ExcludeCompany
+              key={shown.id}
+              company={shown.companyName}
+              onExclude={async (reason) => {
+                proposing.current = true;
+                try {
+                  await onExclude(shown, reason);
+                } catch (error) {
+                  proposing.current = false;
+                  throw error;
+                }
+              }}
+            />
+          )}
         </DialogContent>
       )}
     </Dialog>
+  );
+};
+
+/** Esclusione dell'azienda dalla finestra dei dettagli, con il motivo obbligatorio (US-603). */
+const ExcludeCompany = ({
+  company,
+  onExclude,
+}: {
+  company: string;
+  onExclude: (reason: string) => Promise<void>;
+}) => {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  if (!open) {
+    return (
+      <Button variant="outline" className="self-start" onClick={() => setOpen(true)}>
+        {t('exclusion.action')}
+      </Button>
+    );
+  }
+  const submit = async (): Promise<void> => {
+    if (reason.trim() === '') {
+      setError(t('form.errors.required'));
+      return;
+    }
+    setPending(true);
+    try {
+      await onExclude(reason.trim());
+    } catch (e) {
+      setError(apiError(e)?.message ?? t('form.errors.generic'));
+      setPending(false);
+    }
+  };
+  return (
+    <div className="space-y-3 rounded-xl border-2 border-primary p-4">
+      <p>{t('exclusion.text', { company })}</p>
+      <FormField
+        id="match-exclusion-reason"
+        label={t('exclusion.reason')}
+        required
+        error={error ?? undefined}
+      >
+        {(p) => (
+          <Textarea
+            {...p}
+            rows={2}
+            maxLength={500}
+            value={reason}
+            onChange={(e) => {
+              setReason(e.target.value);
+              setError(null);
+            }}
+          />
+        )}
+      </FormField>
+      <div className="flex flex-wrap gap-3">
+        <Button onClick={() => void submit()} disabled={pending}>
+          {t('exclusion.confirm')}
+        </Button>
+        <Button variant="outline" onClick={() => setOpen(false)} disabled={pending}>
+          {t('work.cancel')}
+        </Button>
+      </div>
+    </div>
   );
 };
 

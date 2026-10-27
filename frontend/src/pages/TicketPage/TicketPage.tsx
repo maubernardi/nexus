@@ -18,6 +18,8 @@ import {
   useApproveCategory,
   useAppointmentFailed,
   useAppointmentSet,
+  useExcludeCompany,
+  useExclusions,
   useCompatibleJobSlots,
   useMatchTicket,
   useRejectCategory,
@@ -47,6 +49,7 @@ type Outcome =
   | { kind: 'appointmentSet' }
   | { kind: 'appointmentFailed' }
   | { kind: 'proposalRejected' }
+  | { kind: 'excluded'; company: string }
   | { kind: 'categoryApproved'; name: string }
   | { kind: 'categoryRejected'; name: string }
   | { kind: 'conflict'; reason: string }
@@ -146,19 +149,21 @@ export const TicketPage = () => {
               ? t('work.category.approved', { name: outcome.name })
               : outcome.kind === 'categoryRejected'
                 ? t('work.category.rejected', { name: outcome.name })
-                : outcome.kind === 'proposalRejected'
-                  ? t('work.reject.saved')
-                  : outcome.kind === 'appointmentFailed'
-                    ? t('work.appointment.failedSaved')
-                    : outcome.kind === 'appointmentSet'
-                      ? t('work.appointment.saved')
-                      : outcome.kind === 'accepted'
-                        ? t('work.accepted', { deadline: formatDay(outcome.deadline) })
-                        : outcome.kind === 'proposed'
-                          ? t('work.proposed', { title: outcome.title, company: outcome.company })
-                          : outcome.kind === 'conflict'
-                            ? t('work.conflict', { reason: outcome.reason })
-                            : t('work.error')}
+                : outcome.kind === 'excluded'
+                  ? t('exclusion.done', { company: outcome.company })
+                  : outcome.kind === 'proposalRejected'
+                    ? t('work.reject.saved')
+                    : outcome.kind === 'appointmentFailed'
+                      ? t('work.appointment.failedSaved')
+                      : outcome.kind === 'appointmentSet'
+                        ? t('work.appointment.saved')
+                        : outcome.kind === 'accepted'
+                          ? t('work.accepted', { deadline: formatDay(outcome.deadline) })
+                          : outcome.kind === 'proposed'
+                            ? t('work.proposed', { title: outcome.title, company: outcome.company })
+                            : outcome.kind === 'conflict'
+                              ? t('work.conflict', { reason: outcome.reason })
+                              : t('work.error')}
         </div>
       )}
 
@@ -196,6 +201,7 @@ const KNOWN_ACTIONS = [
   'PROPOSAL_REJECT',
   'TIMER_REMINDER',
   'TIMER_EXPIRE',
+  'COMPANY_EXCLUDE',
   'STATUS',
 ] as const;
 
@@ -866,6 +872,7 @@ const CompatibleSection = ({ ticket: d, onOutcome }: CompatibleSectionProps) => 
     true,
   );
   const match = useMatchTicket();
+  const exclude = useExcludeCompany();
   const [candidate, setCandidate] = useState<JobSlotMatch | null>(null);
   const [details, setDetails] = useState<JobSlotMatch | null>(null);
   const detailsTrigger = useRef<HTMLButtonElement | null>(null);
@@ -1054,8 +1061,47 @@ const CompatibleSection = ({ ticket: d, onOutcome }: CompatibleSectionProps) => 
           setCandidate(slot);
         }}
         proposeDisabled={candidate !== null || match.isPending}
+        onExclude={async (slot, reason) => {
+          await exclude.mutateAsync({ id: d.id, companyId: slot.companyId, reason });
+          setDetails(null);
+          onOutcome({ kind: 'excluded', company: slot.companyName });
+        }}
         returnFocusRef={detailsTrigger}
       />
+
+      <ExclusionsList ticketId={d.id} />
+    </section>
+  );
+};
+
+/** Aziende escluse per la segnalazione, con motivo, autore e data (US-603). */
+const ExclusionsList = ({ ticketId }: { ticketId: string }) => {
+  const { t } = useTranslation();
+  const exclusions = useExclusions(ticketId);
+  if (!exclusions.data) return null;
+  return (
+    <section
+      aria-labelledby="work-exclusions"
+      className="space-y-3 rounded-xl border border-border bg-card p-4"
+    >
+      <h3 id="work-exclusions" className="font-semibold text-primary">
+        {t('exclusion.heading')}
+      </h3>
+      {exclusions.data.length === 0 ? (
+        <p>{t('exclusion.empty')}</p>
+      ) : (
+        <ul className="space-y-2">
+          {exclusions.data.map((x) => (
+            <li key={x.companyId} className="border-l-4 border-primary/40 pl-3">
+              <p className="font-medium">{x.companyName}</p>
+              {x.reason && <p className="break-words">{x.reason}</p>}
+              <p className="text-sm text-muted-foreground">
+                {t('exclusion.meta', { date: dateTime.format(new Date(x.createdAt)), author: x.authorName })}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 };

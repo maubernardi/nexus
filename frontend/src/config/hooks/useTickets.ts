@@ -18,11 +18,14 @@ import {
   takeCharge,
   takeOverTicket,
   acceptProposal,
+  excludeCompany,
+  fetchExclusions,
   appointmentFailed,
   appointmentSet,
   approveCategory,
   rejectCategory,
   rejectProposal,
+  type CompanyExclusion,
   type CompatibleFilters,
   type JobSlotMatch,
   type Ticket,
@@ -187,6 +190,23 @@ export const useRejectProposal = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: rejectProposal,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+  });
+};
+
+/** Aziende escluse per la segnalazione (US-603). */
+export const useExclusions = (id: string, enabled = true): UseQueryResult<CompanyExclusion[]> =>
+  useQuery({ queryKey: [...TICKETS_KEY, 'exclusions', id], queryFn: () => fetchExclusions(id), enabled });
+
+/** Esclusione di un'azienda: si aggiornano esclusioni, compatibili e cronologia. */
+export const useExcludeCompany = (): UseMutationResult<
+  CompanyExclusion[],
+  unknown,
+  { id: string; companyId: string; reason: string }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: excludeCompany,
     onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
   });
 };

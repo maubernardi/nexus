@@ -40,6 +40,8 @@ import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.AppointmentFailedDTO;
 import it.nexus.domain.dto.AppointmentSetDTO;
 import it.nexus.domain.dto.ApproveCategoryDTO;
+import it.nexus.domain.dto.CompanyExclusionDTO;
+import it.nexus.domain.dto.CompanyExclusionFormDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
 import it.nexus.domain.dto.ProposalRejectDTO;
@@ -334,7 +336,7 @@ public class TicketServiceImpl implements TicketService {
             case "APPOINTMENT_SET" -> "Timer fermato";
             case "TIMER_REMINDER" -> "Promemoria inviato al Tutor";
             case "TIMER_EXPIRE" -> "Nessun appuntamento entro la scadenza: mansione di nuovo libera";
-            case "PROPOSAL_REJECT" -> Optional
+            case "PROPOSAL_REJECT", "COMPANY_EXCLUDE" -> Optional
                     .ofNullable(TsidMapper.toInternal(changed(event, "excludedCompanyId", "after")))
                     .flatMap(companyRepository::findById)
                     .map(c -> "%s esclusa per questa segnalazione".formatted(c.getName()))
@@ -529,6 +531,40 @@ public class TicketServiceImpl implements TicketService {
                 Map.of("ticketNumber", saved.getNumber(), "jobSlotTitle", slot.getTitle())));
         notificationService.notify(saved.getAssignedCcOperator(), NotificationType.PROPOSAL_REJECTED, saved);
         return detail(saved, me);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CompanyExclusionDTO> exclusions(String ticketId) {
+        List<TicketCompanyBlacklist> rows = blacklistRepository.findByIdTicketId(findTicket(ticketId).getId());
+        Map<String, String> names = userDisplayNameService.displayNames(
+                rows.stream().map(TicketCompanyBlacklist::getCreatedBy).toList());
+        return rows.stream()
+                .sorted(Comparator.comparing(TicketCompanyBlacklist::getCreatedAt))
+                .map(x -> new CompanyExclusionDTO(TsidMapper.toExternal(x.getCompany().getId()),
+                        x.getCompany().getName(), x.getReason(), x.getCreatedAt(), names.get(x.getCreatedBy())))
+                .toList();
+    }
+
+    @Override
+    public List<CompanyExclusionDTO> excludeCompany(String ticketId, CompanyExclusionFormDTO dto) {
+        Ticket ticket = findTicket(ticketId);
+        if (ticket.getStatus() != TicketStatus.IN_LAVORAZIONE && ticket.getStatus() != TicketStatus.RIAPERTO) {
+            throw new ConflictException("Si esclude un'azienda solo su una segnalazione in lavorazione o riaperta");
+        }
+        requireTakenInCharge(ticket);
+        Company company = Optional.ofNullable(TsidMapper.toInternal(dto.companyId()))
+                .flatMap(companyRepository::findById)
+                .orElseThrow(() -> new FieldValidationException("companyId", "Azienda non valida"));
+        if (blacklistRepository.existsById(new TicketCompanyBlacklist.Id(ticket.getId(), company.getId()))) {
+            throw new ConflictException("%s è già esclusa per la segnalazione n. %d", company.getName(),
+                    ticket.getNumber());
+        }
+        String reason = dto.reason().strip();
+        blacklistRepository.saveAndFlush(new TicketCompanyBlacklist(ticket, company, reason));
+        auditService.record(AuditEntityType.TICKET, ticket.getId(), "COMPANY_EXCLUDE",
+                AuditChanges.of().value("excludedCompanyId", null, TsidMapper.toExternal(company.getId())), reason);
+        return exclusions(ticketId);
     }
 
     /** Segnalazione visibile e del Tutor corrente: le azioni sulla proposta spettano solo a lui (PO, 27/10). */

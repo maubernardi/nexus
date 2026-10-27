@@ -262,3 +262,32 @@ export const rejectProposal = async ({
   });
   return data;
 };
+
+export type CompanyExclusion = {
+  companyId: string;
+  companyName: string;
+  reason: string | null;
+  createdAt: string;
+  authorName: string;
+};
+
+export const fetchExclusions = async (id: string): Promise<CompanyExclusion[]> => {
+  const { data } = await axiosInstance.get<CompanyExclusion[]>(`${ENDPOINTS.tickets}/${id}/exclusions`);
+  return data;
+};
+
+export const excludeCompany = async ({
+  id,
+  companyId,
+  reason,
+}: {
+  id: string;
+  companyId: string;
+  reason: string;
+}): Promise<CompanyExclusion[]> => {
+  const { data } = await axiosInstance.post<CompanyExclusion[]>(`${ENDPOINTS.tickets}/${id}/exclusions`, {
+    companyId,
+    reason,
+  });
+  return data;
+};
