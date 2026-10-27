@@ -43,10 +43,15 @@ export const TicketNewPage = () => {
             {t('ticket.success.heading', { number: created.number })}
           </h2>
           <p>
-            {t('ticket.success.text', {
-              name: `${created.beneficiary.firstName} ${created.beneficiary.lastName}`,
-              status: t(`enums.ticketStatus.${created.status}`),
-            })}
+            {t(
+              created.status === 'IN_ATTESA_APPROVAZIONE'
+                ? 'ticket.success.textAwaiting'
+                : 'ticket.success.text',
+              {
+                name: `${created.beneficiary.firstName} ${created.beneficiary.lastName}`,
+                status: t(`enums.ticketStatus.${created.status}`),
+              },
+            )}
           </p>
           <div className="flex flex-wrap gap-3">
             <Button

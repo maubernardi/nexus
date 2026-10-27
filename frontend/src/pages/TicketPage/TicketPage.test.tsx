@@ -6,6 +6,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fetchJobCategories, fetchZones } from '@/config/api/referenceApi';
 import {
   acceptProposal,
+  approveCategory,
+  markCategoryChangeSeen,
+  rejectCategory,
   fetchCompatibleJobSlots,
   fetchTicket,
   fetchTicketHistory,
@@ -29,6 +32,9 @@ vi.mock('@/config/api/ticketApi', () => ({
   matchTicket: vi.fn(),
   takeOverTicket: vi.fn(),
   acceptProposal: vi.fn(),
+  approveCategory: vi.fn(),
+  rejectCategory: vi.fn(),
+  markCategoryChangeSeen: vi.fn().mockResolvedValue(undefined),
 }));
 vi.mock('@/config/api/referenceApi', () => ({
   fetchZones: vi.fn(),
@@ -108,6 +114,7 @@ const detail = (overrides: Partial<TicketDetail> = {}): TicketDetail => ({
   createdAt: '2026-10-01T08:00:00Z',
   myTicket: false,
   timerDeadline: null,
+  categoryChanged: false,
   ...overrides,
 });
 
@@ -360,6 +367,91 @@ describe('<TicketPage>', () => {
     const proposal = await screen.findByRole('region', { name: 'Proposta all’azienda' });
     expect(within(proposal).getByText('martedì 03/11/2026 (7 giorni lavorativi)')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Accetta la proposta' })).not.toBeInTheDocument();
+  });
+
+  it('Call Center: approva la nuova tipologia con il nome corretto', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({
+        status: 'IN_ATTESA_APPROVAZIONE',
+        assignedOperatorName: null,
+        assignedToMe: false,
+        requestedJobCategory: null,
+        requestedJobFreeText: 'Tecnico del suono',
+      }),
+    );
+    vi.mocked(approveCategory).mockResolvedValue(
+      detail({
+        status: 'NUOVA',
+        requestedJobCategory: { id: 'J9', code: 'TECNICO_AUDIO', name: 'Tecnico audio' },
+      }),
+    );
+    renderPage();
+
+    const section = await screen.findByRole('region', { name: 'Nuova tipologia da approvare' });
+    expect(within(section).getByText(/proposto la tipologia «Tecnico del suono»/)).toBeInTheDocument();
+    await expectNoAxeViolations();
+    const name = within(section).getByLabelText(/^Nome della tipologia/);
+    expect(name).toHaveValue('Tecnico del suono');
+    await user.clear(name);
+    await user.type(name, 'Tecnico audio');
+    await user.click(within(section).getByRole('button', { name: 'Approva e aggiungi al catalogo' }));
+
+    const outcome = await screen.findByText(/Tipologia «Tecnico audio» approvata/);
+    await waitFor(() => expect(outcome).toHaveFocus());
+    expect(approveCategory).toHaveBeenCalledWith(
+      { id: 'T9', name: 'Tecnico audio', version: 2 },
+      expect.anything(),
+    );
+  });
+
+  it('Call Center: usa una tipologia del catalogo con il motivo (obbligatorio)', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({
+        status: 'IN_ATTESA_APPROVAZIONE',
+        assignedOperatorName: null,
+        assignedToMe: false,
+        requestedJobCategory: null,
+        requestedJobFreeText: 'Magazzino',
+      }),
+    );
+    vi.mocked(rejectCategory).mockResolvedValue(detail({ status: 'NUOVA', requestedJobCategory: MAG }));
+    renderPage();
+
+    const section = await screen.findByRole('region', { name: 'Nuova tipologia da approvare' });
+    await within(section).findByRole('option', { name: 'Magazziniere' });
+    await user.selectOptions(within(section).getByLabelText(/^Tipologia del catalogo/), 'J1');
+    await user.click(within(section).getByRole('button', { name: 'Usa questa tipologia' }));
+    expect(await within(section).findByText('Campo obbligatorio')).toBeInTheDocument();
+    expect(rejectCategory).not.toHaveBeenCalled();
+
+    await user.type(within(section).getByLabelText(/^Motivo per il Tutor/), 'È già nel catalogo');
+    await user.click(within(section).getByRole('button', { name: 'Usa questa tipologia' }));
+    expect(await screen.findByText(/Tipologia cambiata in «Magazziniere»/)).toBeInTheDocument();
+    expect(rejectCategory).toHaveBeenCalledWith(
+      { id: 'T9', jobCategoryId: 'J1', reason: 'È già nel catalogo', version: 2 },
+      expect.anything(),
+    );
+  });
+
+  it('Tutor: avviso di tipologia cambiata, segnato come visto all’apertura', async () => {
+    vi.mocked(fetchCurrentUser).mockResolvedValue({
+      id: 'tutor1',
+      username: 'tutor1',
+      firstName: 'Tutor',
+      lastName: 'Uno',
+      roles: ['TUTOR'],
+    });
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({ status: 'NUOVA', myTicket: true, categoryChanged: true }),
+    );
+    renderPage();
+
+    expect(await screen.findByText(/ha scelto una tipologia diversa/)).toBeInTheDocument();
+    await waitFor(() => expect(markCategoryChangeSeen).toHaveBeenCalledWith('T9', expect.anything()));
+    expect(markCategoryChangeSeen).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('region', { name: 'Nuova tipologia da approvare' })).not.toBeInTheDocument();
   });
 
   it('cronologia: azioni, cambi di stato, autori, dettagli e note in una lista ordinata', async () => {

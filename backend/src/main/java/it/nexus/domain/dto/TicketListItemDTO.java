@@ -16,8 +16,12 @@ public record TicketListItemDTO(
         BeneficiarySummaryDTO beneficiary,
         ReferenceItemDTO project,
         ReferenceItemDTO requestedJobCategory,
+        /** Nuova tipologia proposta dal Tutor, in attesa di approvazione (US-302). */
+        String requestedJobFreeText,
         String tutorName,
         /** Operatore che ha in carico la segnalazione (null se nessuno). */
         String assignedOperatorName,
-        Instant createdAt) {
+        Instant createdAt,
+        /** Tipologia cambiata dal Call Center e non ancora vista dal Tutor (US-302, notifica provvisoria). */
+        boolean categoryChangeUnseen) {
 }

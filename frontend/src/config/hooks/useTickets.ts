@@ -18,6 +18,9 @@ import {
   takeCharge,
   takeOverTicket,
   acceptProposal,
+  approveCategory,
+  markCategoryChangeSeen,
+  rejectCategory,
   type CompatibleFilters,
   type JobSlotMatch,
   type Ticket,
@@ -119,5 +122,39 @@ export const useAcceptProposal = (): UseMutationResult<
   return useMutation({
     mutationFn: acceptProposal,
     onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+  });
+};
+
+/** Decisione del Call Center sulla nuova tipologia (US-302): la segnalazione e gli elenchi si aggiornano. */
+export const useApproveCategory = (): UseMutationResult<
+  TicketDetail,
+  unknown,
+  { id: string; name: string; version: number }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: approveCategory,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+  });
+};
+
+export const useRejectCategory = (): UseMutationResult<
+  TicketDetail,
+  unknown,
+  { id: string; jobCategoryId: string; reason: string; version: number }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: rejectCategory,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+  });
+};
+
+/** Il Tutor ha visto il cambio di tipologia: l'evidenza nella Home si spegne. */
+export const useMarkCategoryChangeSeen = (): UseMutationResult<void, unknown, string> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: markCategoryChangeSeen,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [...TICKETS_KEY, 'list'] }),
   });
 };

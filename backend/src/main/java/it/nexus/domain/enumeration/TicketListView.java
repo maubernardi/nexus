@@ -10,6 +10,8 @@ public enum TicketListView {
     PROJECT(Set.of(Role.TUTOR)),
     /** Call Center: la coda (nuove e speciali non ancora prese in carico), fast-track in cima, poi per arrivo. */
     TO_TAKE(Set.of(Role.CALL_CENTER, Role.ADMIN)),
+    /** Call Center: segnalazioni con una nuova tipologia di mansione da approvare (US-302), dalla più vecchia. */
+    TO_APPROVE(Set.of(Role.CALL_CENTER, Role.ADMIN)),
     /** Call Center: le segnalazioni aperte in carico all'operatore corrente. */
     ASSIGNED_TO_ME(Set.of(Role.CALL_CENTER, Role.ADMIN)),
     /** Call Center: tutte le segnalazioni. */

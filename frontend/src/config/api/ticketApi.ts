@@ -4,10 +4,12 @@ import { ENDPOINTS } from '@/config/api/Endpoint';
 import type { ReferenceItem } from '@/config/api/referenceApi';
 import type { TicketStatus, TicketType } from '@/lib/domainValues';
 
+/** Tipologia del catalogo (`jobCategoryId`) oppure nuova tipologia da approvare (`jobFreeText`, US-302). */
 export type TicketCreate = {
   beneficiaryId: string;
   projectId: string;
-  jobCategoryId: string;
+  jobCategoryId: string | null;
+  jobFreeText: string | null;
 };
 
 export type Ticket = {
@@ -24,16 +26,25 @@ export type Ticket = {
   createdAt: string;
 };
 
+/** Campi dell'elenco per la nuova tipologia (US-302). */
+type NewCategoryInfo = {
+  /** Nuova tipologia proposta dal Tutor, in attesa di approvazione. */
+  requestedJobFreeText: string | null;
+  /** Tipologia cambiata dal Call Center e non ancora vista dal Tutor. */
+  categoryChangeUnseen: boolean;
+};
+
 export const submitTicket = async (payload: TicketCreate): Promise<Ticket> => {
   const { data } = await axiosInstance.post<Ticket>(ENDPOINTS.tickets, payload);
   return data;
 };
 
 /** Riga dell'elenco delle segnalazioni (Home, US-303). */
-export type TicketListItem = Ticket & { tutorName: string; assignedOperatorName: string | null };
+export type TicketListItem = Ticket &
+  NewCategoryInfo & { tutorName: string; assignedOperatorName: string | null };
 
 /** Viste dell'elenco: MINE e PROJECT per il Tutor, le altre per Call Center e ADMIN. */
-export type TicketListView = 'MINE' | 'PROJECT' | 'TO_TAKE' | 'ASSIGNED_TO_ME' | 'ALL';
+export type TicketListView = 'MINE' | 'PROJECT' | 'TO_TAKE' | 'TO_APPROVE' | 'ASSIGNED_TO_ME' | 'ALL';
 
 export type TicketListQuery = { view: TicketListView; status?: TicketStatus; projectId?: string };
 
@@ -87,6 +98,8 @@ export type TicketDetail = {
   myTicket: boolean;
   /** Ultimo giorno lavorativo del timer della proposta accettata (aaaa-mm-gg), se attivo. */
   timerDeadline: string | null;
+  /** Per il Tutor della segnalazione: tipologia cambiata dal Call Center e non ancora vista (US-302). */
+  categoryChanged: boolean;
 };
 
 export type CompatibleFilters = { zoneId?: string; jobCategoryId?: string };
@@ -166,4 +179,43 @@ export const acceptProposal = async ({
 }): Promise<TicketDetail> => {
   const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/accept`, { version });
   return data;
+};
+
+export const approveCategory = async ({
+  id,
+  name,
+  version,
+}: {
+  id: string;
+  name: string;
+  version: number;
+}): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/category/approve`, {
+    name,
+    version,
+  });
+  return data;
+};
+
+export const rejectCategory = async ({
+  id,
+  jobCategoryId,
+  reason,
+  version,
+}: {
+  id: string;
+  jobCategoryId: string;
+  reason: string;
+  version: number;
+}): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/category/reject`, {
+    jobCategoryId,
+    reason,
+    version,
+  });
+  return data;
+};
+
+export const markCategoryChangeSeen = async (id: string): Promise<void> => {
+  await axiosInstance.post(`${ENDPOINTS.tickets}/${id}/category-change-seen`);
 };
