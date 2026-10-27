@@ -1,0 +1,307 @@
+# NEXUS — Prove di collaudo
+
+Elenco delle prove manuali da eseguire sulla demo, passo per passo. Ogni prova ha una casella: segnala `[x]` quando
+l'esito è quello atteso. Se qualcosa non va, lascia la casella vuota e scrivi una nota sotto la prova
+(`> Nota: …`): la raccolgo nella review dello sprint.
+
+Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate con lo sprint in cui sono arrivate.
+
+| | |
+|---|---|
+| **Ambiente** | https://portalenexus.it |
+| **Versione della demo** | `27251c8` (27/10/2026): Sprint 1–4 e Sprint 5 fino a US-702 |
+| **Ultimo aggiornamento** | 27/10/2026 |
+
+## Come prepararsi
+
+- **Utenti demo** (password come da configurazione del server):
+
+  | Utente | Ruolo | Progetti |
+  |---|---|---|
+  | `tutor1` | Tutor | GOL |
+  | `tutor2` | Tutor | GOL e POLIS |
+  | `operatore.cc` | Call Center | — (vede tutto) |
+  | `admin` | Amministratore | — (vede tutto, è anche il "secondo operatore") |
+
+- **Più utenti insieme**: usa una finestra normale e una **finestra anonima/privata** (o due browser diversi), così
+  restano collegati due utenti contemporaneamente.
+- **Numeri delle segnalazioni**: quando una prova crea una segnalazione, annota il numero (es. n. 33): le prove
+  successive lo chiamano **«la tua segnalazione»**.
+- Le prove sono in ordine: alcune usano i dati creati da quelle precedenti.
+
+---
+
+## 1. Accesso e navigazione
+
+- [ ] **T-1.1 Accesso**
+  1. Apri https://portalenexus.it ed entra come `tutor1`.
+  2. **Atteso:** si apre la Home "Segnalazioni"; in alto il nome "Tutor Uno" (su smartphone dentro il menu) e "Esci".
+
+- [ ] **T-1.2 Menu per ruolo**
+  1. Come `tutor1`: il menu ha **Segnalazioni** e **Beneficiari**, più la campanella delle notifiche.
+  2. Esci ed entra come `operatore.cc`: il menu ha **Segnalazioni** e **Aziende**.
+  3. Esci ed entra come `admin`: il menu ha **Segnalazioni**, **Aziende** e **Calendario**.
+  4. **Atteso:** ogni ruolo vede solo le sue voci; la voce della pagina aperta è evidenziata (sottolineata in oro).
+
+- [ ] **T-1.3 Pagina non consentita**
+  1. Come `operatore.cc` apri direttamente https://portalenexus.it/calendario.
+  2. **Atteso:** "Accesso non consentito", non la pagina del calendario.
+
+- [ ] **T-1.4 Pagina inesistente**
+  1. Apri https://portalenexus.it/pagina-che-non-esiste.
+  2. **Atteso:** "Pagina non trovata", con il link per tornare alla Home.
+
+- [ ] **T-1.5 Uscita**
+  1. Premi **Esci**.
+  2. **Atteso:** torni alla pagina di accesso; per rientrare servono di nuovo utente e password.
+
+## 2. Beneficiari (Tutor)
+
+- [ ] **T-2.1 Nuovo beneficiario: campi obbligatori**
+  1. Come `tutor1`: **Beneficiari** → **Nuovo beneficiario** → premi **Registra beneficiario** senza compilare.
+  2. **Atteso:** in cima un riepilogo "Correggi 5 errori…" con il focus su di esso; ogni voce è un link al campo; i
+     campi sbagliati sono evidenziati con il messaggio sotto.
+
+- [ ] **T-2.2 Suggerimenti dei campi ("i")**
+  1. Nello stesso modulo, accanto ad "Anno di nascita" c'è l'icona **i**: passaci sopra con il mouse, poi cliccala, poi
+     raggiungila con il tasto Tab.
+  2. **Atteso:** compare il suggerimento ("Solo l'anno, per esempio 1998"); si chiude con Esc; i campi restano allineati.
+
+- [ ] **T-2.3 Nuovo beneficiario: registrazione**
+  1. Compila: nome, cognome (annotali), anno 1998, genere, zona **Firenze Novoli**, una lingua con livello.
+  2. Premi **Registra beneficiario**.
+  3. **Atteso:** "Beneficiario registrato", con i pulsanti "Segnala questo beneficiario", "Registra un altro
+     beneficiario", "Torna alla Home".
+
+- [ ] **T-2.4 I miei beneficiari: elenco e ricerca**
+  1. **Beneficiari**: c'è il beneficiario appena creato, con zona e "Segnalazione aperta: Nessuna".
+  2. Cerca scrivendo cognome e nome in ordine inverso, senza accenti → **Cerca**.
+  3. **Atteso:** compare solo quel beneficiario; il numero dei risultati è indicato sopra la tabella.
+
+- [ ] **T-2.5 Scheda e modifica**
+  1. Apri il beneficiario → **Modifica** → cambia l'anno di nascita → **Salva modifiche**.
+  2. **Atteso:** torni alla scheda con "Modifiche salvate." e il nuovo anno; la scheda indica "Inserito da Tutor Uno".
+
+- [ ] **T-2.6 Visibilità per progetto**
+  1. Come `tutor2` apri **Beneficiari**: il beneficiario di `tutor1` **non** c'è (l'elenco è solo dei propri).
+  2. Come `tutor1`, in Home, vista **Del mio progetto**: compaiono anche le segnalazioni di `tutor2` del progetto GOL.
+  3. Apri una segnalazione di `tutor2` del progetto GOL e clicca il nome del beneficiario.
+  4. **Atteso:** la scheda del beneficiario si apre completa ma **senza "Modifica"**; "Torna alla segnalazione n. …"
+     riporta indietro.
+
+## 3. Segnalazioni (Tutor)
+
+- [ ] **T-3.1 Nuova segnalazione**
+  1. Come `tutor1`: Home → **Nuova segnalazione** (pulsante in cima all'elenco).
+  2. Scegli il beneficiario di T-2.3, il progetto GOL, la mansione **Magazziniere** → **Invia segnalazione**.
+  3. **Atteso:** "Segnalazione n. … inviata", stato «Nuova». Annota il numero: è **la tua segnalazione**.
+
+- [ ] **T-3.2 Una sola segnalazione aperta per beneficiario**
+  1. Apri di nuovo **Nuova segnalazione**.
+  2. **Atteso:** lo stesso beneficiario compare come "segnalazione n. … aperta" e non è selezionabile.
+
+- [ ] **T-3.3 Nuova tipologia di mansione**
+  1. Registra un secondo beneficiario (come in T-2.3) e da **Segnala questo beneficiario** apri il modulo.
+  2. Spunta **"La mansione non è nell'elenco: la descrivo io"** e scrivi "Fonico per eventi" → **Invia segnalazione**.
+  3. **Atteso:** l'esito dice «In attesa di approvazione» e che entrerà in coda dopo la decisione del Call Center.
+     Annota il numero (**segnalazione con tipologia nuova**).
+
+- [ ] **T-3.4 Tipologia già nel catalogo**
+  1. Ripeti T-3.3 scrivendo "magazziniere" (minuscolo) come nuova tipologia.
+  2. **Atteso:** errore "La tipologia «Magazziniere» è già nell'elenco: selezionala".
+
+- [ ] **T-3.5 Home del Tutor: viste e filtri**
+  1. Home: vista **Le mie segnalazioni** (dalla più recente), poi **Del mio progetto** (con la colonna Tutor).
+  2. Filtra per stato «Nuova», poi togli il filtro.
+  3. **Atteso:** l'elenco cambia; l'indirizzo della pagina contiene la vista e il filtro (copiandolo si ritrova la
+     stessa vista).
+
+- [ ] **T-3.6 Dettaglio e cronologia**
+  1. Apri **la tua segnalazione** dalla Home (clic sul numero).
+  2. **Atteso:** dati della segnalazione (beneficiario cliccabile, zona, progetto, mansione, tutor) e la **Cronologia**
+     con "Segnalazione inviata", data e autore; nessuna azione del Call Center.
+
+## 4. Call Center: dalla coda alla proposta
+
+- [ ] **T-4.1 Home del Call Center**
+  1. Come `operatore.cc`: la Home si apre su **Da prendere in carico** (fast-track in cima, poi dalla più vecchia).
+  2. Prova le viste **Da approvare**, **In carico a me**, **Tutte** (con la colonna dell'operatore).
+  3. **Atteso:** **la tua segnalazione** è in "Da prendere in carico"; quella con tipologia nuova è in "Da approvare"
+     come "Fonico per eventi (nuova, da approvare)".
+
+- [ ] **T-4.2 Approvare una tipologia nuova**
+  1. Vista **Da approvare** → apri la segnalazione dei dati demo con «Tecnico del suono».
+  2. Nella sezione "Nuova tipologia da approvare" correggi il nome in "Tecnico audio" → **Approva e aggiungi al catalogo**.
+  3. **Atteso:** esito "Tipologia «Tecnico audio» approvata…"; stato «Nuova»; in cronologia "Nuova tipologia approvata".
+     Nel modulo di nuova segnalazione del Tutor ora compare "Tecnico audio".
+
+- [ ] **T-4.3 Respingere una tipologia nuova**
+  1. Apri la **segnalazione con tipologia nuova** (T-3.3) → "Oppure usa una tipologia del catalogo": scegli una tipologia
+     e scrivi un motivo → **Usa questa tipologia**.
+  2. **Atteso:** esito "Tipologia cambiata in «…»…"; la cronologia mostra proposta → scelta e il motivo.
+  3. Come `tutor1`: la campanella segna una notifica; aprila: "Il Call Center ha scelto una tipologia diversa…".
+
+- [ ] **T-4.4 Presa in carico**
+  1. Come `operatore.cc`, vista **Da prendere in carico** → **Prendi in carico** su **la tua segnalazione**.
+  2. **Atteso:** esito con il link alla segnalazione; la segnalazione passa in **In carico a me**, stato «In lavorazione».
+
+- [ ] **T-4.5 Lavorazione condivisa**
+  1. Come `admin` apri **la tua segnalazione**: "in carico a Operatore Call Center", con la ricerca delle compatibili
+     disponibile e il pulsante **Prendila in carico tu**.
+  2. Premi **Prendila in carico tu**; poi, come `operatore.cc`, fai lo stesso per riprenderla.
+  3. **Atteso:** l'assegnazione passa da uno all'altro; la cronologia registra ogni passaggio ("X → Y").
+
+- [ ] **T-4.6 Mansioni compatibili e filtri**
+  1. Come `operatore.cc`, nella tua segnalazione: la ricerca parte da zona del beneficiario e mansione richiesta.
+  2. Cambia **Zona** in "Tutte le zone" e **Tipologia** in "Tutte le tipologie".
+  3. **Atteso:** il numero di mansioni compatibili cambia ed è annunciato; compaiono solo mansioni libere di aziende
+     attive.
+
+- [ ] **T-4.7 Dettagli dell'azienda prima di proporre**
+  1. Su una mansione premi **Dettagli**.
+  2. **Atteso:** si apre una finestra con azienda (contatti, stato), mansione, note recenti e storico con il riepilogo;
+     con **Esc** si chiude e il cursore torna su "Dettagli"; su smartphone occupa tutto lo schermo.
+
+- [ ] **T-4.8 Proposta all'azienda**
+  1. Nella finestra "Dettagli" (o nella tabella) premi **Proponi** → **Conferma proposta**.
+  2. **Atteso:** esito "Proposta inviata: «…» presso …"; stato «Proposta all'azienda»; nella scheda dell'azienda la
+     mansione risulta **Bloccata – segnalazione n. …**; `tutor1` riceve la notifica "C'è una proposta di tirocinio…".
+
+## 5. Tutor: esito della proposta e appuntamento
+
+- [ ] **T-5.1 Rifiuto della proposta**
+  1. Come `tutor1` apri **la tua segnalazione** → **Rifiuta la proposta** → premi **Conferma rifiuto** senza motivo.
+  2. **Atteso:** "Campo obbligatorio".
+  3. Scrivi un motivo → **Conferma rifiuto**.
+  4. **Atteso:** "Proposta rifiutata: la segnalazione è tornata all'operatore…"; stato «Riaperto»; in cronologia
+     "«azienda» esclusa per questa segnalazione" con il motivo.
+  5. Come `operatore.cc`: notifica del rifiuto; in **In carico a me** la segnalazione è **in cima** con "Riaperto" in
+     evidenza; nelle compatibili **l'azienda rifiutata non compare più**.
+
+- [ ] **T-5.2 Nuova proposta dopo la riapertura**
+  1. Come `operatore.cc` proponi un'altra mansione (come T-4.8).
+  2. **Atteso:** stato «Proposta all'azienda» di nuovo.
+
+- [ ] **T-5.3 Accettazione della proposta**
+  1. Come `tutor1` → **Accetta la proposta** → **Conferma accettazione**.
+  2. **Atteso:** "Proposta accettata. Scadenza del timer: <giorno> <data>"; stato «Proposta accolta»; la scadenza è il
+     7° giorno lavorativo dopo oggi (salta sabati, domeniche, festività, patrono e chiusure). La vede anche il Call
+     Center, che riceve la notifica dell'accettazione.
+
+- [ ] **T-5.4 Solo il Tutor della segnalazione decide**
+  1. Come `tutor2` apri una segnalazione di `tutor1` del progetto GOL con una proposta in corso.
+  2. **Atteso:** la vede, ma **senza** "Accetta"/"Rifiuta"/"Appuntamento".
+
+- [ ] **T-5.5 Appuntamento fissato**
+  1. Come `tutor1` → **Appuntamento fissato** → scrivi una nota (es. data e ora) → **Conferma appuntamento**.
+  2. **Atteso:** "Appuntamento registrato: il timer è fermo."; stato «Appuntamento»; la scadenza non c'è più; in
+     cronologia "Appuntamento fissato – Timer fermato" con la nota; il Call Center riceve la notifica.
+
+- [ ] **T-5.6 Appuntamento non andato a buon fine**
+  1. → **L'appuntamento non è andato a buon fine** → causa **Altro** senza nota → **Conferma**.
+  2. **Atteso:** "Campo obbligatorio" sulla nota.
+  3. Scegli la causa "L'azienda non ha confermato il tirocinio" → **Conferma**.
+  4. **Atteso:** "Esito registrato…"; stato «Riaperto»; cronologia con la causa; la mansione torna **Libera**; l'azienda
+     **resta** tra le compatibili (nessuna esclusione automatica); nello storico dell'azienda "Appuntamento fallito" con
+     la causa.
+
+## 6. Aziende (Call Center)
+
+- [ ] **T-6.1 Ricerca e nuova azienda**
+  1. Come `operatore.cc`: **Aziende** → cerca "Demo" → **Nuova azienda**.
+  2. Prova una partita IVA di 10 cifre, poi una già usata, poi una nuova di 11 cifre.
+  3. **Atteso:** errori chiari sui primi due casi; con l'ultima l'azienda è creata e si apre la scheda.
+
+- [ ] **T-6.2 Modifica**
+  1. Nella scheda cambia referente o telefono → **Salva modifiche**.
+  2. **Atteso:** "Modifiche salvate."
+
+- [ ] **T-6.3 Mansioni**
+  1. **Aggiungi mansione** (titolo, tipologia, zona) → salva; poi modificane il titolo; poi **Ritira**.
+  2. **Atteso:** la mansione compare "Libera", si modifica, poi risulta ritirata; una mansione **Bloccata** non si può
+     ritirare.
+
+- [ ] **T-6.4 Disattivazione impedita**
+  1. Apri l'azienda con una mansione bloccata (es. quella proposta in T-5.2) → **Disattiva azienda**.
+  2. **Atteso:** rifiuto con il motivo: la mansione «…» è bloccata dalla segnalazione n. …
+
+- [ ] **T-6.5 Note dell'azienda**
+  1. Sezione **Note** → **Aggiungi nota** vuota, poi con un testo.
+  2. **Atteso:** la nota vuota è rifiutata; quella con testo compare in cima con data, ora e autore; non ci sono
+     comandi per modificarla o cancellarla.
+
+- [ ] **T-6.6 Storico e pregressi**
+  1. Sezione **Storico e pregressi** dell'azienda usata nelle prove.
+  2. **Atteso:** riepilogo (proposte, accettate, appuntamenti falliti, tirocini, assunzioni, esiti negativi) ed eventi
+     dalla più recente, con il link alla segnalazione; anche le esclusioni con il motivo.
+
+## 7. Notifiche
+
+- [ ] **T-7.1 Campanella e pagina**
+  1. Come un utente con notifiche (es. `operatore.cc` dopo la sezione 5): la campanella mostra il numero.
+  2. Aprila: elenco dalla più recente, le non lette con "Nuova:".
+  3. Apri una segnalazione dal link della notifica, poi torna alle notifiche.
+  4. **Atteso:** quella notifica risulta letta; il numero sulla campanella scende.
+
+- [ ] **T-7.2 Segna come lette**
+  1. **Segna come letta** su una notifica, poi **Segna tutte come lette**.
+  2. **Atteso:** "Tutte le notifiche sono state segnate come lette."; la campanella torna a "nessuna da leggere".
+
+- [ ] **T-7.3 Notifiche nuove senza ricaricare**
+  1. Tieni aperta la Home come `tutor1`; in un'altra finestra, come `operatore.cc`, fai una proposta a una
+     segnalazione di `tutor1`.
+  2. **Atteso:** entro un minuto il numero sulla campanella di `tutor1` sale, senza ricaricare la pagina.
+
+## 8. Calendario (ADMIN)
+
+- [ ] **T-8.1 Patrono**
+  1. Come `admin`: **Calendario** → il patrono è 24 giugno; imposta 30 febbraio → **Salva patrono**.
+  2. **Atteso:** errore (il giorno non esiste); poi rimetti 24 giugno e salva: "Patrono salvato: 24 giugno."
+
+- [ ] **T-8.2 Chiusure**
+  1. Aggiungi una chiusura di un giorno (solo "Dal") e una di un periodo ("Dal" e "Al"), con descrizione.
+  2. Prova anche un periodo con "Al" prima di "Dal".
+  3. **Atteso:** le chiusure compaiono ordinate; il periodo al contrario è rifiutato; **Rimuovi** le toglie.
+
+- [ ] **T-8.3 Prova del calcolo**
+  1. **Prova del calcolo** con la data di oggi → **Calcola**: annota promemoria e scadenza.
+  2. Aggiungi una chiusura in un giorno lavorativo tra oggi e la scadenza, poi ricalcola.
+  3. **Atteso:** la scadenza si sposta avanti di un giorno lavorativo. Rimuovi poi la chiusura di prova.
+
+## 9. Timer: promemoria (Sprint 5, dopo il deploy della PR #57)
+
+- [ ] **T-9.1 Promemoria al 4° giorno lavorativo**
+  1. Accetta una proposta (T-5.3) e **non** registrare l'appuntamento.
+  2. Il **4° giorno lavorativo** dopo l'accettazione (vedi "Prova del calcolo", T-8.3), entro un'ora dall'inizio della
+     giornata, controlla le notifiche del Tutor.
+  3. **Atteso:** una sola notifica "Promemoria: per la segnalazione n. … manca la registrazione dell'appuntamento…";
+     in cronologia "Promemoria del timer" con autore "Sistema". Nelle ore successive il promemoria non si ripete.
+
+## 10. Prove trasversali
+
+- [ ] **T-10.1 Smartphone e app (PWA, US-1301)**
+  1. Da Android (Chrome) e iPhone (Safari) apri la demo e installala ("Aggiungi a schermata Home").
+  2. Apri l'app installata; poi metti il telefono in modalità aereo e riaprila.
+  3. **Atteso:** l'app si apre a tutto schermo; offline compare l'avviso, senza dati di segnalazioni in memoria.
+
+- [ ] **T-10.2 Solo tastiera**
+  1. Su un computer, senza mouse, percorri con **Tab**, **Invio**, **Esc** una nuova segnalazione e una proposta
+     (finestra "Dettagli" compresa).
+  2. **Atteso:** ogni comando è raggiungibile, il punto in cui sei è sempre visibile (bordo evidente), nessuna
+     trappola (tranne la finestra "Dettagli", da cui si esce con Esc).
+
+- [ ] **T-10.3 Schermi piccoli e zoom**
+  1. Sul telefono in verticale, oppure sul computer con lo zoom del browser al 200%, apri Home, dettaglio di una
+     segnalazione, scheda azienda e calendario.
+  2. **Atteso:** nessuno scorrimento orizzontale della pagina (le tabelle scorrono dentro il loro riquadro); testi e
+     pulsanti leggibili.
+
+- [ ] **T-10.4 Tema scuro**
+  1. Imposta il tema scuro del sistema operativo e ricarica.
+  2. **Atteso:** la demo passa al tema scuro con testi ben leggibili.
+
+- [ ] **T-10.5 Screen reader (facoltativa)**
+  1. Con NVDA (Windows), VoiceOver (Mac/iPhone) o TalkBack (Android), ascolta la Home e invia una segnalazione con un
+     campo sbagliato.
+  2. **Atteso:** titoli e campi sono annunciati con il loro nome; gli errori e gli esiti delle azioni sono letti
+     subito.
