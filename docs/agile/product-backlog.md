@@ -573,6 +573,10 @@ Come **Tutor** voglio registrare che l'appuntamento non è andato a buon fine pe
 
 Criteri di accettazione:
 - Il ticket passa in RIAPERTO e la mansione torna LIBERA; l'evento entra nell'audit trail dell'azienda.
+- Il Tutor indica il motivo: causa da un menu ("L'azienda non ha confermato il tirocinio", "Il beneficiario ha
+  rinunciato", "Il beneficiario non si è presentato", "Altro"; voci provvisorie) e nota, obbligatoria con "Altro"; il
+  motivo va in cronologia e nello storico dell'azienda. Nessuna esclusione automatica dell'azienda: decide l'operatore
+  (review dello Sprint 4, §8.2).
 
 #### US-803
 **Rilancio in bacheca** · Must · 5 punti · R2 · 📋 Backlog
@@ -711,6 +715,9 @@ Come **Tutor / Call Center** voglio vedere le notifiche che mi riguardano (prome
 Criteri di accettazione:
 - Contatore di non lette nell'intestazione, annunciato agli screen reader; segna come letta.
 - Ogni evento è notificato alla controparte del passaggio (Tutor ↔ operatore).
+- Elenco dalla più recente con link alla segnalazione; segna come letta una o tutte; nessun dato personale oltre al
+  numero della segnalazione. Sostituisce l'avviso provvisorio di US-302. Solo in app: l'email è US-1202 (review dello
+  Sprint 4, §8.3).
 
 #### US-1202
 **Email transazionali** · Must · 5 punti · R3 · 📋 Backlog
