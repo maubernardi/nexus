@@ -1,6 +1,6 @@
 # Sprint 4 — 25 – 27 ottobre 2026
 
-**Stato:** ✅ impegno completato il 27/10 (24/24 punti), in attesa della [review](sprint-04-review.md). **Planning:** 24/10, nella [review dello Sprint 3](sprint-03-review.md) (§9); proposta del
+**Stato:** 🏁 chiuso il 27/10 con la [review](sprint-04-review.md) (24/24 punti, velocity 24). **Planning:** 24/10, nella [review dello Sprint 3](sprint-03-review.md) (§9); proposta del
 team confermata dal Product Owner, con il calendario unico per tutti i progetti.
 
 ## Obiettivo
@@ -54,7 +54,7 @@ coeso); gli stati del backlog si aggiornano nella PR di documentazione dopo i me
 | 26/10 (US-703 unita, #48) | 8 |
 | 27/10 (US-701 unita, #49) | 5 |
 | 27/10 (US-302 unita, #51) | 0 |
-| Fine sprint | — |
+| Fine sprint (27/10, chiuso in review) | 0 |
 
 ## Review, retrospettiva e planning successivo
 

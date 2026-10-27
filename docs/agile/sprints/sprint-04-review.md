@@ -202,6 +202,9 @@ letta"); l'avviso provvisorio di US-302 diventa una notifica.
 ### 8.4 Chiusura dello Sprint 4
 *Proposta:* chiudere lo Sprint 4 con questa review (velocity 24) e avviare lo Sprint 5 alla conferma del planning.
 
+> ✅ **Deciso (PO, 27/10): proposta accettata.** Sprint 4 chiuso il 27/10 con velocity 24; lo Sprint 5 parte alla
+> conferma del planning, per 3 giorni.
+
 ## 9. Proposta per lo Sprint 5 (3 giorni, ~20 punti)
 
 **Obiettivo proposto:** *dopo l'accettazione il percorso prosegue: promemoria e scadenza del timer, rifiuto della
