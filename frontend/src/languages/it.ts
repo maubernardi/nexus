@@ -297,6 +297,8 @@ export const it = {
       PROPOSAL_SENT: 'C’è una proposta di tirocinio per la segnalazione n. {{number}}: valutala e accettala.',
       PROPOSAL_ACCEPTED:
         'Il Tutor ha accettato la proposta della segnalazione n. {{number}}: è partito il timer.',
+      APPOINTMENT_SET:
+        'Il Tutor ha registrato l’appuntamento con l’azienda per la segnalazione n. {{number}}.',
     },
   },
   companyNote: {
@@ -455,6 +457,15 @@ export const it = {
     acceptConfirm: 'Conferma accettazione',
     accepted: 'Proposta accettata. Scadenza del timer: {{deadline}}.',
     timerDeadline: 'Scadenza del timer',
+    appointment: {
+      set: 'Appuntamento fissato',
+      setHeading: 'Conferma l’appuntamento',
+      setText: 'Registri che l’appuntamento con {{company}} è fissato? Il timer si ferma.',
+      note: 'Note (facoltative)',
+      noteHint: 'Per esempio data, ora e luogo dell’appuntamento.',
+      setConfirm: 'Conferma appuntamento',
+      saved: 'Appuntamento registrato: il timer è fermo.',
+    },
     category: {
       heading: 'Nuova tipologia da approvare',
       proposed: 'Il Tutor ha proposto la tipologia «{{name}}», che non è nel catalogo.',
@@ -480,6 +491,7 @@ export const it = {
       TAKE_OVER: 'Passata a un altro operatore',
       MATCH: 'Proposta all’azienda',
       ACCEPT: 'Proposta accettata',
+      APPOINTMENT_SET: 'Appuntamento fissato',
       CATEGORY_APPROVE: 'Nuova tipologia approvata',
       CATEGORY_REJECT: 'Tipologia cambiata dal Call Center',
       STATUS: 'Cambio di stato',

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import it.nexus.domain.dto.AppointmentSetDTO;
 import it.nexus.domain.dto.ApproveCategoryDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
@@ -105,6 +106,14 @@ public class TicketResource {
     public ResponseEntity<TicketDetailDTO> rejectCategory(@PathVariable String id,
             @RequestBody @Valid RejectCategoryDTO body) {
         return ResponseEntity.ok(ticketService.rejectCategory(id, body));
+    }
+
+    @PostMapping("/{id}/appointment-set")
+    @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
+    @Operation(summary = "Il Tutor della segnalazione registra l'appuntamento fissato con l'azienda: il timer si ferma")
+    public ResponseEntity<TicketDetailDTO> appointmentSet(@PathVariable String id,
+            @RequestBody @Valid AppointmentSetDTO body) {
+        return ResponseEntity.ok(ticketService.appointmentSet(id, body));
     }
 
     @PostMapping("/{id}/accept")

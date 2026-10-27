@@ -18,6 +18,7 @@ import {
   takeCharge,
   takeOverTicket,
   acceptProposal,
+  appointmentSet,
   approveCategory,
   rejectCategory,
   type CompatibleFilters,
@@ -145,6 +146,19 @@ export const useRejectCategory = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: rejectCategory,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+  });
+};
+
+/** Il Tutor registra l'appuntamento fissato (US-801): il timer si ferma. */
+export const useAppointmentSet = (): UseMutationResult<
+  TicketDetail,
+  unknown,
+  { id: string; version: number; note: string | null }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: appointmentSet,
     onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
   });
 };

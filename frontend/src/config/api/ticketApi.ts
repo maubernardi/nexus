@@ -211,3 +211,19 @@ export const rejectCategory = async ({
   });
   return data;
 };
+
+export const appointmentSet = async ({
+  id,
+  version,
+  note,
+}: {
+  id: string;
+  version: number;
+  note: string | null;
+}): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/appointment-set`, {
+    version,
+    note,
+  });
+  return data;
+};

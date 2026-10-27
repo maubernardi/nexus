@@ -85,7 +85,8 @@ public class CompanyHistoryServiceImpl implements CompanyHistoryService {
     private static String describe(CompanyAuditEvent event) {
         Map<String, Object> d = event.getDetails();
         boolean proposal = CompanyEventType.PROPOSTA_INVIATA.name().equals(event.getEventType())
-                || CompanyEventType.PROPOSTA_ACCOLTA.name().equals(event.getEventType());
+                || CompanyEventType.PROPOSTA_ACCOLTA.name().equals(event.getEventType())
+                || CompanyEventType.APPUNTAMENTO_FISSATO.name().equals(event.getEventType());
         if (proposal && d.get("jobSlotTitle") != null) {
             return "«" + d.get("jobSlotTitle") + "»";
         }

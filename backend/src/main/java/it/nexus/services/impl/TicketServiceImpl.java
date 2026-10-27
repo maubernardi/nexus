@@ -36,6 +36,7 @@ import it.nexus.domain.TicketCompanyBlacklist;
 import it.nexus.domain.TicketStatusHistory;
 import it.nexus.domain.UserProject;
 import it.nexus.domain.audit.AuditChanges;
+import it.nexus.domain.dto.AppointmentSetDTO;
 import it.nexus.domain.dto.ApproveCategoryDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
@@ -317,6 +318,7 @@ public class TicketServiceImpl implements TicketService {
                     .orElse(null);
             case "CATEGORY_REJECT" -> "«%s» → «%s»".formatted(changed(event, "requestedJobFreeText", "before"),
                     changed(event, "requestedJobCategory", "after"));
+            case "APPOINTMENT_SET" -> "Timer fermato";
             case "ACCEPT" -> Optional.ofNullable(changed(event, "timerDeadlineAt", "after"))
                     .map(at -> "Scadenza " + DATE.format(lastDay(Instant.parse(at))))
                     .orElse(null);
@@ -409,10 +411,7 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketDetailDTO accept(String ticketId, long expectedVersion) {
         AppUser me = currentAppUserService.getCurrentAppUser();
-        Ticket ticket = visibleTicket(ticketId, me);
-        if (!ticket.getTutor().getId().equals(me.getId())) {
-            throw new AccessDeniedException("Solo il Tutor della segnalazione può accettare la proposta");
-        }
+        Ticket ticket = ownTicket(ticketId, me, "accettare la proposta");
         Instant started = clock.instant();
         LocalDate lastDay = workingDayService.plusWorkingDays(LocalDate.ofInstant(started, TimeConfig.ZONE),
                 TIMER_WORKING_DAYS);
@@ -429,6 +428,43 @@ public class TicketServiceImpl implements TicketService {
                         "jobSlotTitle", slot.getTitle(), "timerLastDay", lastDay.toString())));
         notificationService.notify(saved.getAssignedCcOperator(), NotificationType.PROPOSAL_ACCEPTED, saved);
         return detail(saved, me);
+    }
+
+    @Override
+    public TicketDetailDTO appointmentSet(String ticketId, AppointmentSetDTO dto) {
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        Ticket ticket = ownTicket(ticketId, me, "registrare l'appuntamento");
+        String note = dto.note() == null || dto.note().isBlank() ? null : dto.note().strip();
+        Ticket saved = stateMachine.apply(ticket, TicketTransitions.APPOINTMENT_SET, dto.version(), note, t -> {
+            // il timer si ferma: i valori restano nell'audit
+            AuditChanges changes = AuditChanges.of()
+                    .value("timerDeadlineAt", toText(t.getTimerDeadlineAt()), null)
+                    .value("timerReminderSentAt", toText(t.getTimerReminderSentAt()), null)
+                    .value("timerStartedAt", toText(t.getTimerStartedAt()), null);
+            t.setTimerStartedAt(null);
+            t.setTimerReminderSentAt(null);
+            t.setTimerDeadlineAt(null);
+            return changes;
+        });
+        JobSlot slot = saved.getJobSlot();
+        companyAuditEvents.save(new CompanyAuditEvent(slot.getCompany(), saved,
+                CompanyEventType.APPUNTAMENTO_FISSATO.name(), Map.of("ticketNumber", saved.getNumber(),
+                        "jobSlotTitle", slot.getTitle())));
+        notificationService.notify(saved.getAssignedCcOperator(), NotificationType.APPOINTMENT_SET, saved);
+        return detail(saved, me);
+    }
+
+    /** Segnalazione visibile e del Tutor corrente: le azioni sulla proposta spettano solo a lui (PO, 27/10). */
+    private Ticket ownTicket(String ticketId, AppUser me, String action) {
+        Ticket ticket = visibleTicket(ticketId, me);
+        if (!ticket.getTutor().getId().equals(me.getId())) {
+            throw new AccessDeniedException("Solo il Tutor della segnalazione può " + action);
+        }
+        return ticket;
+    }
+
+    private static String toText(Instant instant) {
+        return instant == null ? null : instant.toString();
     }
 
     @Override

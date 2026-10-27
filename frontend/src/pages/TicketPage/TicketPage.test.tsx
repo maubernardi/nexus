@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fetchJobCategories, fetchZones } from '@/config/api/referenceApi';
 import {
   acceptProposal,
+  appointmentSet,
   approveCategory,
   rejectCategory,
   fetchCompatibleJobSlots,
@@ -31,6 +32,7 @@ vi.mock('@/config/api/ticketApi', () => ({
   matchTicket: vi.fn(),
   takeOverTicket: vi.fn(),
   acceptProposal: vi.fn(),
+  appointmentSet: vi.fn(),
   approveCategory: vi.fn(),
   rejectCategory: vi.fn(),
 }));
@@ -353,6 +355,43 @@ describe('<TicketPage>', () => {
     const outcome = await screen.findByText('Proposta accettata. Scadenza del timer: martedì 03/11/2026.');
     await waitFor(() => expect(outcome).toHaveFocus());
     expect(acceptProposal).toHaveBeenCalledWith({ id: 'T9', version: 2 }, expect.anything());
+  });
+
+  it('Tutor della segnalazione: appuntamento fissato con nota, il timer si ferma', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchCurrentUser).mockResolvedValue({
+      id: 'tutor1',
+      username: 'tutor1',
+      firstName: 'Tutor',
+      lastName: 'Uno',
+      roles: ['TUTOR'],
+    });
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({ status: 'PROPOSTA_ACCOLTA', proposal: alfa, myTicket: true, timerDeadline: '2026-11-03' }),
+    );
+    vi.mocked(appointmentSet).mockResolvedValue(
+      detail({ status: 'APPUNTAMENTO', proposal: alfa, myTicket: true, version: 4 }),
+    );
+    renderPage();
+
+    expect(screen.queryByRole('button', { name: 'Accetta la proposta' })).not.toBeInTheDocument();
+    await user.click(await screen.findByRole('button', { name: 'Appuntamento fissato' }));
+    expect(screen.getByRole('heading', { name: 'Conferma l’appuntamento' })).toHaveFocus();
+    expect(screen.getByText(/con Alfa Logistica è fissato\? Il timer si ferma/)).toBeInTheDocument();
+    await expectNoAxeViolations();
+    await user.type(screen.getByLabelText(/^Note \(facoltative\)/), 'Giovedì alle 10');
+    // come nella realtà: ricaricata, la segnalazione è già in "Appuntamento" e il pulsante sparisce
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({ status: 'APPUNTAMENTO', proposal: alfa, myTicket: true, version: 4 }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Conferma appuntamento' }));
+
+    const outcome = await screen.findByText('Appuntamento registrato: il timer è fermo.');
+    await waitFor(() => expect(outcome).toHaveFocus());
+    expect(appointmentSet).toHaveBeenCalledWith(
+      { id: 'T9', version: 2, note: 'Giovedì alle 10' },
+      expect.anything(),
+    );
   });
 
   it('collega o Call Center: nessuna accettazione; scadenza visibile dopo l’accettazione', async () => {
