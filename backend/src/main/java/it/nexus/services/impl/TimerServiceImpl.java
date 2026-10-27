@@ -8,14 +8,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.config.TimeConfig;
+import it.nexus.domain.JobSlot;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.enumeration.AuditEntityType;
+import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.domain.enumeration.NotificationType;
 import it.nexus.domain.enumeration.TicketStatus;
+import it.nexus.domain.workflow.TicketTransitions;
+import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.TicketRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.NotificationService;
+import it.nexus.services.TicketStateMachine;
 import it.nexus.services.TimerService;
 import it.nexus.services.WorkingDayService;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +37,7 @@ public class TimerServiceImpl implements TimerService {
     private final WorkingDayService workingDayService;
     private final AuditService auditService;
     private final NotificationService notificationService;
+    private final TicketStateMachine stateMachine;
 
     @Override
     public int sendDueReminders(Instant now) {
@@ -54,5 +60,35 @@ public class TimerServiceImpl implements TimerService {
             sent++;
         }
         return sent;
+    }
+
+    @Override
+    public int expireDue(Instant now) {
+        List<Ticket> expired = ticketRepository.findByStatusAndTimerDeadlineAtLessThanEqual(
+                TicketStatus.PROPOSTA_ACCOLTA, now);
+        for (Ticket ticket : expired) {
+            JobSlot slot = ticket.getJobSlot();
+            Ticket saved = stateMachine.applyBySystem(ticket, TicketTransitions.TIMER_EXPIRE, t -> {
+                AuditChanges changes = AuditChanges.of()
+                        .value("timerDeadlineAt", t.getTimerDeadlineAt().toString(), null)
+                        .value("jobSlotId", slot == null ? null : TsidMapper.toExternal(slot.getId()), null);
+                t.setTimerStartedAt(null);
+                t.setTimerReminderSentAt(null);
+                t.setTimerDeadlineAt(null);
+                if (slot != null) {
+                    slot.release();
+                    t.setJobSlot(null);
+                }
+                return changes;
+            });
+            if (slot != null) {
+                auditService.record(AuditEntityType.JOB_SLOT, slot.getId(), "RELEASE", AuditChanges.of()
+                        .value("status", JobSlotStatus.BLOCCATA.name(), JobSlotStatus.LIBERA.name())
+                        .value("blockedByTicketId", TsidMapper.toExternal(saved.getId()), null), null);
+            }
+            notificationService.notify(saved.getTutor(), NotificationType.TIMER_EXPIRED, saved);
+            notificationService.notify(saved.getAssignedCcOperator(), NotificationType.TIMER_EXPIRED, saved);
+        }
+        return expired.size();
     }
 }

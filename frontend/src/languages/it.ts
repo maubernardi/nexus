@@ -311,6 +311,8 @@ export const it = {
         'Il Tutor ha rifiutato la proposta della segnalazione n. {{number}}: l’azienda è esclusa e la segnalazione è riaperta.',
       TIMER_REMINDER:
         'Promemoria: per la segnalazione n. {{number}} manca la registrazione dell’appuntamento con l’azienda. La scadenza del timer è nel dettaglio.',
+      TIMER_EXPIRED:
+        'Il timer della segnalazione n. {{number}} è scaduto senza appuntamento: la segnalazione è riaperta e la mansione è di nuovo libera.',
     },
   },
   companyNote: {
@@ -527,6 +529,7 @@ export const it = {
       APPOINTMENT_FAILED: 'Appuntamento non andato a buon fine',
       PROPOSAL_REJECT: 'Proposta rifiutata dal Tutor',
       TIMER_REMINDER: 'Promemoria del timer',
+      TIMER_EXPIRE: 'Scadenza del timer',
       CATEGORY_APPROVE: 'Nuova tipologia approvata',
       CATEGORY_REJECT: 'Tipologia cambiata dal Call Center',
       STATUS: 'Cambio di stato',

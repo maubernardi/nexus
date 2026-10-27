@@ -20,5 +20,7 @@ public enum NotificationType {
     /** All'operatore: il Tutor ha rifiutato la proposta, la segnalazione è riaperta (US-702). */
     PROPOSAL_REJECTED,
     /** Al Tutor: promemoria al 4° giorno lavorativo dall'accettazione, senza appuntamento registrato (US-704). */
-    TIMER_REMINDER
+    TIMER_REMINDER,
+    /** Al Tutor e all'operatore: il timer è scaduto senza appuntamento, la segnalazione è riaperta (US-705). */
+    TIMER_EXPIRED
 }

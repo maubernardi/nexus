@@ -18,19 +18,24 @@ import org.springframework.transaction.annotation.Transactional;
 import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.TimeConfig;
 import it.nexus.domain.AppUser;
+import it.nexus.domain.Company;
 import it.nexus.domain.JobCategory;
+import it.nexus.domain.JobSlot;
 import it.nexus.domain.Project;
 import it.nexus.domain.TestEntities;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.Zone;
 import it.nexus.domain.enumeration.AuditEntityType;
+import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.domain.enumeration.NotificationType;
 import it.nexus.domain.enumeration.Role;
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.BeneficiaryRepository;
+import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.JobCategoryRepository;
+import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.NotificationRepository;
 import it.nexus.repository.ProjectRepository;
 import it.nexus.repository.TicketRepository;
@@ -57,6 +62,8 @@ class TimerServiceIT {
     @Autowired TicketRepository tickets;
     @Autowired NotificationRepository notifications;
     @Autowired AuditEventRepository audit;
+    @Autowired CompanyRepository companies;
+    @Autowired JobSlotRepository jobSlots;
 
     private AppUser tutor;
     private Project project;
@@ -111,6 +118,43 @@ class TimerServiceIT {
                     assertThat(e.getAction()).isEqualTo("TIMER_REMINDER");
                     assertThat(e.getCreatedBy()).isEqualTo("system");
                 });
+    }
+
+    @Test
+    void scadenza_riapertaMansioneLiberaNotificheENessunPromemoria() {
+        AppUser operator = users.save(TestEntities.user("operatore.cc", Role.CALL_CENTER));
+        Company company = companies.save(TestEntities.company("99900000301"));
+        JobSlot slot = jobSlots.save(TestEntities.jobSlot(company, category, zone));
+        Ticket ticket = accepted(TicketStatus.PROPOSTA_ACCOLTA, true);
+        ticket.setAssignedCcOperator(operator);
+        ticket.setJobSlot(slot);
+        slot.blockFor(ticket);
+        tickets.saveAndFlush(ticket);
+        Instant deadline = ticket.getTimerDeadlineAt();
+
+        assertThat(timerService.expireDue(deadline.minusSeconds(1))).isZero();
+        // il controllo orario: prima le scadenze, poi i promemoria
+        assertThat(timerService.expireDue(deadline)).isEqualTo(1);
+        assertThat(timerService.sendDueReminders(deadline)).isZero();
+        assertThat(timerService.expireDue(deadline.plusSeconds(3600))).isZero();
+
+        Ticket saved = tickets.findById(ticket.getId()).orElseThrow();
+        assertThat(saved.getStatus()).isEqualTo(TicketStatus.RIAPERTO);
+        assertThat(saved.getTimerStartedAt()).isNull();
+        assertThat(saved.getTimerDeadlineAt()).isNull();
+        assertThat(saved.getJobSlot()).isNull();
+        assertThat(saved.getAssignedCcOperator()).isEqualTo(operator);
+        assertThat(jobSlots.findById(slot.getId()).orElseThrow().getStatus()).isEqualTo(JobSlotStatus.LIBERA);
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.TICKET, ticket.getId()))
+                .singleElement()
+                .satisfies(e -> {
+                    assertThat(e.getAction()).isEqualTo("TIMER_EXPIRE");
+                    assertThat(e.getCreatedBy()).isEqualTo("system");
+                });
+        assertThat(notifications.findByRecipientIdOrderByCreatedAtDescIdDesc(tutor.getId(), PageRequest.of(0, 5)))
+                .extracting(n -> n.getType()).containsExactly(NotificationType.TIMER_EXPIRED);
+        assertThat(notifications.findByRecipientIdOrderByCreatedAtDescIdDesc(operator.getId(), PageRequest.of(0, 5)))
+                .extracting(n -> n.getType()).containsExactly(NotificationType.TIMER_EXPIRED);
     }
 
     @Test

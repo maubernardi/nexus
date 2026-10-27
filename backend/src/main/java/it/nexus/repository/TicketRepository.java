@@ -1,5 +1,6 @@
 package it.nexus.repository;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +25,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecif
 
     /** Proposte accettate con il timer attivo e il promemoria non ancora inviato (US-704). */
     List<Ticket> findByStatusAndTimerStartedAtIsNotNullAndTimerReminderSentAtIsNull(TicketStatus status);
+
+    /** Proposte accettate con il timer scaduto all'istante indicato (US-705). */
+    List<Ticket> findByStatusAndTimerDeadlineAtLessThanEqual(TicketStatus status, Instant at);
 
     Optional<Ticket> findFirstByBeneficiaryIdAndStatusNot(Long beneficiaryId, TicketStatus closed);
 }

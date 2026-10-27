@@ -29,6 +29,15 @@ public interface TicketStateMachine {
      * dell'operatore): {@code effects} è invocato solo dopo i controlli, modifica il ticket e restituisce le modifiche da
      * registrare nell'audit insieme al cambio di stato.
      */
+    /**
+     * Applica una transizione del sistema ({@link TicketTransition#bySystem()}): solo da un'attività pianificata, senza
+     * utente collegato, partendo dallo stato attuale del ticket.
+     *
+     * @throws IllegalStateException se la transizione non è del sistema o c'è un utente collegato
+     * @throws it.nexus.web.errors.ConflictException se la transizione non parte dallo stato corrente
+     */
+    Ticket applyBySystem(Ticket ticket, TicketTransition transition, Function<Ticket, AuditChanges> effects);
+
     Ticket apply(Ticket ticket, TicketTransition transition, long expectedVersion, String note,
             Function<Ticket, AuditChanges> effects);
 }
