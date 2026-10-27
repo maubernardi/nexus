@@ -228,6 +228,11 @@ Dipendono dalle decisioni §8.2 e §8.3. Per il PO: US-1301 e le note operative 
 *Alternativa:* iniziare la bacheca (US-901, US-902, US-803: 13 punti) e rinviare promemoria e scadenza; sconsigliata,
 perché una proposta accettata oggi resterebbe senza scadenza effettiva.
 
+> ✅ **Deciso (PO, 27/10): piano confermato, 21 punti.** US-802 passa da 2 a **3 punti**: include la gestione delle
+> segnalazioni riaperte (§8.2) e il motivo dell'appuntamento fallito. Timer: controllo **ogni ora**; scadenza alla fine
+> del 7° giorno lavorativo (mezzanotte di Roma), con la segnalazione riaperta trovata dall'operatore in "In carico a me".
+> Sprint 5: [sprint-05.md](sprint-05.md).
+
 ## 10. Azioni a carico del PO
 
 - [ ] Provare la demo guidata (§3) sulla versione `d08e6dc`.
