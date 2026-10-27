@@ -1,6 +1,6 @@
 # Sprint 5 — Review, retrospettiva e planning
 
-**Sprint:** 27 – 29 ottobre 2026 (planning 27/10) · **Review:** 28/10/2026 · **Partecipanti:** Mauro Bernardi (Product
+**Sprint:** 27 – 29 ottobre 2026 (planning 27/10) · **Review:** 27/10/2026 · **Partecipanti:** Mauro Bernardi (Product
 Owner), team di sviluppo (Claude Code) · **Demo:** https://portalenexus.it, versione `19bd629` (tutto lo Sprint 5) ·
 **Collaudo:** [docs/test/collaudo.md](../../test/collaudo.md).
 
