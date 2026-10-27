@@ -8,6 +8,7 @@ export const NOTIFICATION_TYPES = [
   'PROPOSAL_SENT',
   'PROPOSAL_ACCEPTED',
   'APPOINTMENT_SET',
+  'APPOINTMENT_FAILED',
 ] as const;
 
 export type AppNotification = {

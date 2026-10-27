@@ -154,7 +154,16 @@ export const TicketsTable = ({
                   {item.assignedOperatorName ?? t('tickets.nobody')}
                 </td>
               )}
-              <td className={`${td} whitespace-nowrap`}>{t(`enums.ticketStatus.${item.status}`)}</td>
+              <td className={`${td} whitespace-nowrap`}>
+                {/* una segnalazione riaperta va lavorata di nuovo: evidenza in testo, non solo colore */}
+                {item.status === 'RIAPERTO' ? (
+                  <strong className="font-semibold text-primary">
+                    {t(`enums.ticketStatus.${item.status}`)}
+                  </strong>
+                ) : (
+                  t(`enums.ticketStatus.${item.status}`)
+                )}
+              </td>
               <td className={`${td} whitespace-nowrap tabular-nums`}>
                 <time dateTime={item.createdAt}>{dateTime.format(new Date(item.createdAt))}</time>
               </td>

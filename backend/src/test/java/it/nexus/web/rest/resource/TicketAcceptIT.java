@@ -230,6 +230,63 @@ class TicketAcceptIT {
         appointmentSet("tutor1", "{\"version\": %d}".formatted(version())).andExpect(status().isOk());
     }
 
+    private ResultActions appointmentFailed(String user, String cause, String note) throws Exception {
+        String json = "{\"version\": %d, \"cause\": \"%s\"%s}".formatted(version(), cause,
+                note == null ? "" : ", \"note\": \"" + note + "\"");
+        return mockMvc.perform(post("/api/v1/tickets/" + id() + "/appointment-failed").header(USER, user)
+                .contentType(MediaType.APPLICATION_JSON).content(json));
+    }
+
+    @Test
+    void appuntamentoFallito_riapertaMansioneLiberaStoricoNotificaENuovaProposta() throws Exception {
+        accept("tutor1", version()).andExpect(status().isOk());
+        appointmentSet("tutor1", "{\"version\": %d}".formatted(version())).andExpect(status().isOk());
+
+        // con "Altro" la nota è obbligatoria
+        appointmentFailed("tutor1", "ALTRO", " ").andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("note"));
+        appointmentFailed("tutor1", "AZIENDA_NON_CONFERMA", "Hanno scelto un altro candidato")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("RIAPERTO"))
+                .andExpect(jsonPath("$.proposal").doesNotExist())
+                .andExpect(jsonPath("$.assignedToMe").value(false));
+
+        em.flush();
+        em.clear();
+        assertThat(jobSlots.findById(slot.getId()).orElseThrow().getStatus()).isEqualTo(JobSlotStatus.LIBERA);
+        mockMvc.perform(get("/api/v1/tickets/" + id() + "/history").header(USER, "tutor1"))
+                .andExpect(jsonPath("$[-1].action").value("APPOINTMENT_FAILED"))
+                .andExpect(jsonPath("$[-1].detail").value("Causa: L'azienda non ha confermato il tirocinio"))
+                .andExpect(jsonPath("$[-1].note").value("Hanno scelto un altro candidato"));
+        mockMvc.perform(get("/api/v1/companies/" + TsidMapper.toExternal(company.getId()) + "/history")
+                        .header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.summary.failedAppointments").value(1))
+                .andExpect(jsonPath("$.events[0].detail").value("Causa: L'azienda non ha confermato il tirocinio"));
+        mockMvc.perform(get("/api/v1/notifications").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.items[0].type").value("APPOINTMENT_FAILED"));
+        // resta in carico all'operatore, in cima a "In carico a me", e si propone di nuovo (anche la stessa azienda)
+        mockMvc.perform(get("/api/v1/tickets").param("view", "ASSIGNED_TO_ME").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$[0].id").value(id()))
+                .andExpect(jsonPath("$[0].status").value("RIAPERTO"));
+        mockMvc.perform(post("/api/v1/tickets/" + id() + "/match").header(USER, "operatore.cc")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"jobSlotId\": \"%s\", \"ticketVersion\": %d, \"jobSlotVersion\": %d}".formatted(
+                                TsidMapper.toExternal(slot.getId()), version(),
+                                jobSlots.findById(slot.getId()).orElseThrow().getVersion())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("PROPOSTA_AZIENDA"));
+    }
+
+    @Test
+    void appuntamentoFallito_soloDaAppuntamentoEDalTutor() throws Exception {
+        accept("tutor1", version()).andExpect(status().isOk());
+        // senza appuntamento fissato non si registra il fallimento
+        appointmentFailed("tutor1", "BENEFICIARIO_RINUNCIA", null).andExpect(status().isConflict());
+        appointmentSet("tutor1", "{\"version\": %d}".formatted(version())).andExpect(status().isOk());
+        appointmentFailed("operatore.cc", "BENEFICIARIO_RINUNCIA", null).andExpect(status().isForbidden());
+        appointmentFailed("tutor1", "BENEFICIARIO_RINUNCIA", null).andExpect(status().isOk());
+    }
+
     @Test
     void soloIlTutorDellaSegnalazione() throws Exception {
         // tutor di un altro progetto: la segnalazione non esiste per lui

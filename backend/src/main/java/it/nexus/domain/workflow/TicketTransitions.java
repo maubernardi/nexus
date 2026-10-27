@@ -6,6 +6,7 @@ import static it.nexus.domain.enumeration.TicketStatus.IN_LAVORAZIONE;
 import static it.nexus.domain.enumeration.TicketStatus.NUOVA;
 import static it.nexus.domain.enumeration.TicketStatus.PROPOSTA_ACCOLTA;
 import static it.nexus.domain.enumeration.TicketStatus.PROPOSTA_AZIENDA;
+import static it.nexus.domain.enumeration.TicketStatus.RIAPERTO;
 
 import java.util.Set;
 
@@ -45,9 +46,9 @@ public final class TicketTransitions {
     public static final TicketTransition TAKE_CHARGE = new TicketTransition("TAKE_CHARGE", Set.of(NUOVA, IN_LAVORAZIONE),
             IN_LAVORAZIONE, Set.of(Role.CALL_CENTER, Role.ADMIN));
 
-    /** Fase 4 — abbinamento a una mansione libera e proposta all'azienda (US-602). */
-    public static final TicketTransition MATCH = new TicketTransition("MATCH", Set.of(IN_LAVORAZIONE), PROPOSTA_AZIENDA,
-            Set.of(Role.CALL_CENTER, Role.ADMIN));
+    /** Fase 4 — abbinamento a una mansione libera e proposta all'azienda (US-602), anche dopo una riapertura (US-802). */
+    public static final TicketTransition MATCH = new TicketTransition("MATCH", Set.of(IN_LAVORAZIONE, RIAPERTO),
+            PROPOSTA_AZIENDA, Set.of(Role.CALL_CENTER, Role.ADMIN));
 
     /**
      * Fase 5 — il Tutor accetta la proposta (US-701): parte il timer di 7 giorni lavorativi. Solo il Tutor della
@@ -62,6 +63,13 @@ public final class TicketTransitions {
      */
     public static final TicketTransition APPOINTMENT_SET = new TicketTransition("APPOINTMENT_SET",
             Set.of(PROPOSTA_ACCOLTA), APPUNTAMENTO, Set.of(Role.TUTOR));
+
+    /**
+     * Fase 6 — appuntamento non andato a buon fine (US-802): la segnalazione torna al Call Center, in carico allo stesso
+     * operatore, e la mansione torna libera. Solo il Tutor della segnalazione (controllo nel servizio).
+     */
+    public static final TicketTransition APPOINTMENT_FAILED = new TicketTransition("APPOINTMENT_FAILED",
+            Set.of(APPUNTAMENTO), RIAPERTO, Set.of(Role.TUTOR));
 
     private TicketTransitions() {
     }

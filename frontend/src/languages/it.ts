@@ -39,6 +39,12 @@ export const it = {
     },
   },
   enums: {
+    appointmentFailureCause: {
+      AZIENDA_NON_CONFERMA: 'L’azienda non ha confermato il tirocinio',
+      BENEFICIARIO_RINUNCIA: 'Il beneficiario ha rinunciato',
+      BENEFICIARIO_ASSENTE: 'Il beneficiario non si è presentato',
+      ALTRO: 'Altro',
+    },
     gender: { M: 'Maschio', F: 'Femmina', ALTRO: 'Altro', NON_DICHIARATO: 'Preferisce non dichiarare' },
     educationLevel: {
       NESSUN_TITOLO: 'Nessun titolo',
@@ -299,6 +305,8 @@ export const it = {
         'Il Tutor ha accettato la proposta della segnalazione n. {{number}}: è partito il timer.',
       APPOINTMENT_SET:
         'Il Tutor ha registrato l’appuntamento con l’azienda per la segnalazione n. {{number}}.',
+      APPOINTMENT_FAILED:
+        'L’appuntamento della segnalazione n. {{number}} non è andato a buon fine: la segnalazione è riaperta, il motivo è nella cronologia.',
     },
   },
   companyNote: {
@@ -465,6 +473,16 @@ export const it = {
       noteHint: 'Per esempio data, ora e luogo dell’appuntamento.',
       setConfirm: 'Conferma appuntamento',
       saved: 'Appuntamento registrato: il timer è fermo.',
+      failed: 'L’appuntamento non è andato a buon fine',
+      failedHeading: 'Registra l’esito dell’appuntamento',
+      failedText:
+        'La segnalazione torna all’operatore del Call Center per una nuova ricerca e la mansione presso {{company}} torna libera.',
+      cause: 'Causa',
+      failedNote: 'Nota',
+      failedNoteHint: 'Obbligatoria se la causa è «Altro».',
+      failedConfirm: 'Conferma',
+      failedSaved:
+        'Esito registrato: la segnalazione è tornata all’operatore del Call Center per una nuova ricerca.',
     },
     category: {
       heading: 'Nuova tipologia da approvare',
@@ -492,6 +510,7 @@ export const it = {
       MATCH: 'Proposta all’azienda',
       ACCEPT: 'Proposta accettata',
       APPOINTMENT_SET: 'Appuntamento fissato',
+      APPOINTMENT_FAILED: 'Appuntamento non andato a buon fine',
       CATEGORY_APPROVE: 'Nuova tipologia approvata',
       CATEGORY_REJECT: 'Tipologia cambiata dal Call Center',
       STATUS: 'Cambio di stato',

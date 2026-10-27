@@ -2,7 +2,7 @@ import { axiosInstance } from '@/config/api/axiosInstance';
 import type { BeneficiarySummary } from '@/config/api/beneficiaryApi';
 import { ENDPOINTS } from '@/config/api/Endpoint';
 import type { ReferenceItem } from '@/config/api/referenceApi';
-import type { TicketStatus, TicketType } from '@/lib/domainValues';
+import type { AppointmentFailureCause, TicketStatus, TicketType } from '@/lib/domainValues';
 
 /** Tipologia del catalogo (`jobCategoryId`) oppure nuova tipologia da approvare (`jobFreeText`, US-302). */
 export type TicketCreate = {
@@ -223,6 +223,25 @@ export const appointmentSet = async ({
 }): Promise<TicketDetail> => {
   const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/appointment-set`, {
     version,
+    note,
+  });
+  return data;
+};
+
+export const appointmentFailed = async ({
+  id,
+  version,
+  cause,
+  note,
+}: {
+  id: string;
+  version: number;
+  cause: AppointmentFailureCause;
+  note: string | null;
+}): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/appointment-failed`, {
+    version,
+    cause,
     note,
   });
   return data;

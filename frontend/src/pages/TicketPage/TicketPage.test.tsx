@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fetchJobCategories, fetchZones } from '@/config/api/referenceApi';
 import {
   acceptProposal,
+  appointmentFailed,
   appointmentSet,
   approveCategory,
   rejectCategory,
@@ -32,6 +33,7 @@ vi.mock('@/config/api/ticketApi', () => ({
   matchTicket: vi.fn(),
   takeOverTicket: vi.fn(),
   acceptProposal: vi.fn(),
+  appointmentFailed: vi.fn(),
   appointmentSet: vi.fn(),
   approveCategory: vi.fn(),
   rejectCategory: vi.fn(),
@@ -392,6 +394,54 @@ describe('<TicketPage>', () => {
       { id: 'T9', version: 2, note: 'Giovedì alle 10' },
       expect.anything(),
     );
+  });
+
+  it('Tutor della segnalazione: appuntamento fallito con causa; con "Altro" la nota è obbligatoria', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchCurrentUser).mockResolvedValue({
+      id: 'tutor1',
+      username: 'tutor1',
+      firstName: 'Tutor',
+      lastName: 'Uno',
+      roles: ['TUTOR'],
+    });
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({ status: 'APPUNTAMENTO', proposal: alfa, myTicket: true }),
+    );
+    vi.mocked(appointmentFailed).mockResolvedValue(
+      detail({ status: 'RIAPERTO', myTicket: true, version: 5 }),
+    );
+    renderPage();
+
+    await user.click(await screen.findByRole('button', { name: 'L’appuntamento non è andato a buon fine' }));
+    expect(screen.getByRole('heading', { name: 'Registra l’esito dell’appuntamento' })).toHaveFocus();
+    await expectNoAxeViolations();
+    await user.selectOptions(screen.getByLabelText(/^Causa/), 'ALTRO');
+    await user.click(screen.getByRole('button', { name: 'Conferma' }));
+    expect(await screen.findByText('Campo obbligatorio')).toBeInTheDocument();
+    expect(appointmentFailed).not.toHaveBeenCalled();
+
+    await user.selectOptions(screen.getByLabelText(/^Causa/), 'BENEFICIARIO_RINUNCIA');
+    // come nella realtà: ricaricata, la segnalazione è già riaperta e la sezione della proposta sparisce
+    vi.mocked(fetchTicket).mockResolvedValue(detail({ status: 'RIAPERTO', myTicket: true, version: 5 }));
+    await user.click(screen.getByRole('button', { name: 'Conferma' }));
+
+    const outcome = await screen.findByText(/Esito registrato: la segnalazione è tornata all’operatore/);
+    await waitFor(() => expect(outcome).toHaveFocus());
+    expect(appointmentFailed).toHaveBeenCalledWith(
+      { id: 'T9', version: 2, cause: 'BENEFICIARIO_RINUNCIA', note: null },
+      expect.anything(),
+    );
+  });
+
+  it('Call Center: una segnalazione riaperta si abbina di nuovo', async () => {
+    vi.mocked(fetchTicket).mockResolvedValue(detail({ status: 'RIAPERTO' }));
+    renderPage();
+
+    expect(await screen.findByRole('heading', { name: 'Mansioni compatibili' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: 'Proponi Magazziniere presso Alfa Logistica' }),
+    ).toBeInTheDocument();
   });
 
   it('collega o Call Center: nessuna accettazione; scadenza visibile dopo l’accettazione', async () => {

@@ -5,6 +5,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -36,6 +37,7 @@ import it.nexus.domain.TicketCompanyBlacklist;
 import it.nexus.domain.TicketStatusHistory;
 import it.nexus.domain.UserProject;
 import it.nexus.domain.audit.AuditChanges;
+import it.nexus.domain.dto.AppointmentFailedDTO;
 import it.nexus.domain.dto.AppointmentSetDTO;
 import it.nexus.domain.dto.ApproveCategoryDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
@@ -46,6 +48,7 @@ import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
 import it.nexus.domain.dto.TicketEventDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
+import it.nexus.domain.enumeration.AppointmentFailureCause;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.CompanyEventType;
 import it.nexus.domain.enumeration.JobSlotStatus;
@@ -269,7 +272,14 @@ public class TicketServiceImpl implements TicketService {
             }
             case ALL -> newestFirst;
         };
-        return ticketRepository.findAll(spec, sort).stream().map(mapper::toListItem).toList();
+        List<Ticket> found = ticketRepository.findAll(spec, sort);
+        if (view == TicketListView.ASSIGNED_TO_ME) {
+            // le riaperte in cima: vanno lavorate di nuovo (review dello Sprint 4, §8.2); ordinamento stabile
+            found = found.stream()
+                    .sorted(Comparator.comparing((Ticket t) -> t.getStatus() != TicketStatus.RIAPERTO))
+                    .toList();
+        }
+        return found.stream().map(mapper::toListItem).toList();
     }
 
     @Override
@@ -319,6 +329,9 @@ public class TicketServiceImpl implements TicketService {
             case "CATEGORY_REJECT" -> "«%s» → «%s»".formatted(changed(event, "requestedJobFreeText", "before"),
                     changed(event, "requestedJobCategory", "after"));
             case "APPOINTMENT_SET" -> "Timer fermato";
+            case "APPOINTMENT_FAILED" -> Optional.ofNullable(changed(event, "cause", "after"))
+                    .map(cause -> "Causa: " + AppointmentFailureCause.valueOf(cause).label())
+                    .orElse(null);
             case "ACCEPT" -> Optional.ofNullable(changed(event, "timerDeadlineAt", "after"))
                     .map(at -> "Scadenza " + DATE.format(lastDay(Instant.parse(at))))
                     .orElse(null);
@@ -451,6 +464,33 @@ public class TicketServiceImpl implements TicketService {
                 CompanyEventType.APPUNTAMENTO_FISSATO.name(), Map.of("ticketNumber", saved.getNumber(),
                         "jobSlotTitle", slot.getTitle())));
         notificationService.notify(saved.getAssignedCcOperator(), NotificationType.APPOINTMENT_SET, saved);
+        return detail(saved, me);
+    }
+
+    @Override
+    public TicketDetailDTO appointmentFailed(String ticketId, AppointmentFailedDTO dto) {
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        Ticket ticket = ownTicket(ticketId, me, "registrare l'esito dell'appuntamento");
+        String note = dto.note() == null || dto.note().isBlank() ? null : dto.note().strip();
+        if (dto.cause() == AppointmentFailureCause.ALTRO && note == null) {
+            throw new FieldValidationException("note", "Descrivi il motivo");
+        }
+        JobSlot slot = ticket.getJobSlot();
+        Ticket saved = stateMachine.apply(ticket, TicketTransitions.APPOINTMENT_FAILED, dto.version(), note, t -> {
+            // la mansione torna libera; nessuna esclusione automatica dell'azienda: decide l'operatore (PO, 27/10)
+            slot.release();
+            t.setJobSlot(null);
+            return AuditChanges.of()
+                    .value("cause", null, dto.cause().name())
+                    .value("jobSlotId", TsidMapper.toExternal(slot.getId()), null);
+        });
+        auditService.record(AuditEntityType.JOB_SLOT, slot.getId(), "RELEASE", AuditChanges.of()
+                .value("status", JobSlotStatus.BLOCCATA.name(), JobSlotStatus.LIBERA.name())
+                .value("blockedByTicketId", TsidMapper.toExternal(saved.getId()), null), null);
+        companyAuditEvents.save(new CompanyAuditEvent(slot.getCompany(), saved,
+                CompanyEventType.APPUNTAMENTO_FALLITO.name(), Map.of("ticketNumber", saved.getNumber(),
+                        "jobSlotTitle", slot.getTitle(), "cause", dto.cause().name())));
+        notificationService.notify(saved.getAssignedCcOperator(), NotificationType.APPOINTMENT_FAILED, saved);
         return detail(saved, me);
     }
 
