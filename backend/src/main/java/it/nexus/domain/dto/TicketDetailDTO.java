@@ -28,5 +28,7 @@ public record TicketDetailDTO(
         /** L'utente corrente è il Tutor della segnalazione: può accettare la proposta (US-701). */
         boolean myTicket,
         /** Ultimo giorno lavorativo del timer della proposta accettata (US-701), se il timer è attivo. */
-        LocalDate timerDeadline) {
+        LocalDate timerDeadline,
+        /** Per il Tutor della segnalazione: tipologia cambiata dal Call Center e non ancora vista (US-302). */
+        boolean categoryChanged) {
 }

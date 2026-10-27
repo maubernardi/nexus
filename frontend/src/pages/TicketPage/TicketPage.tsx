@@ -1,24 +1,31 @@
 import { useEffect, useRef, useState } from 'react';
 import { Zap } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
+import { Textarea } from '@/components/ui/textarea';
 import { apiError } from '@/config/api/errors';
 import type { JobSlotMatch, TicketDetail, TicketEvent } from '@/config/api/ticketApi';
 import { useCurrentUser } from '@/config/hooks/useCurrentUser';
 import { useJobCategories, useZones } from '@/config/hooks/useReferenceData';
 import {
   useAcceptProposal,
+  useApproveCategory,
   useCompatibleJobSlots,
+  useMarkCategoryChangeSeen,
   useMatchTicket,
+  useRejectCategory,
   useTakeOver,
   useTicket,
   useTicketHistory,
 } from '@/config/hooks/useTickets';
 import { TICKET_STATUSES } from '@/lib/domainValues';
+import { FormField } from '@/molecules/FormField/FormField';
 import { MatchDetailsDialog } from '@/organisms/MatchDetailsDialog/MatchDetailsDialog';
 import type { BeneficiaryLinkState } from '@/pages/BeneficiaryPage/BeneficiaryPage';
 
@@ -31,6 +38,8 @@ type Outcome =
   | { kind: 'proposed'; title: string; company: string }
   | { kind: 'takenOver' }
   | { kind: 'accepted'; deadline: string }
+  | { kind: 'categoryApproved'; name: string }
+  | { kind: 'categoryRejected'; name: string }
   | { kind: 'conflict'; reason: string }
   | { kind: 'error' };
 
@@ -115,24 +124,34 @@ export const TicketPage = () => {
           ref={outcomeRef}
           tabIndex={-1}
           className={
-            outcome.kind === 'proposed' || outcome.kind === 'takenOver' || outcome.kind === 'accepted'
+            outcome.kind !== 'conflict' && outcome.kind !== 'error'
               ? 'rounded-md border-l-4 border-primary bg-card p-4 font-medium'
               : 'rounded-md border-2 border-destructive bg-card p-4 font-medium text-destructive'
           }
         >
           {outcome.kind === 'takenOver'
             ? t('work.takenOver')
-            : outcome.kind === 'accepted'
-              ? t('work.accepted', { deadline: formatDay(outcome.deadline) })
-              : outcome.kind === 'proposed'
-                ? t('work.proposed', { title: outcome.title, company: outcome.company })
-                : outcome.kind === 'conflict'
-                  ? t('work.conflict', { reason: outcome.reason })
-                  : t('work.error')}
+            : outcome.kind === 'categoryApproved'
+              ? t('work.category.approved', { name: outcome.name })
+              : outcome.kind === 'categoryRejected'
+                ? t('work.category.rejected', { name: outcome.name })
+                : outcome.kind === 'accepted'
+                  ? t('work.accepted', { deadline: formatDay(outcome.deadline) })
+                  : outcome.kind === 'proposed'
+                    ? t('work.proposed', { title: outcome.title, company: outcome.company })
+                    : outcome.kind === 'conflict'
+                      ? t('work.conflict', { reason: outcome.reason })
+                      : t('work.error')}
         </div>
       )}
 
+      {d.categoryChanged && <CategoryChangedNotice ticketId={d.id} />}
+
       <TicketData ticket={d} />
+
+      {isCallCenter && d.status === 'IN_ATTESA_APPROVAZIONE' && d.requestedJobFreeText && (
+        <CategoryDecisionSection ticket={d} onOutcome={setOutcome} />
+      )}
 
       {d.proposal && <ProposalSection ticket={d} onOutcome={setOutcome} />}
       {isCallCenter && d.status === 'IN_LAVORAZIONE' && !canMatch && (
@@ -149,7 +168,186 @@ export const TicketPage = () => {
   );
 };
 
-const KNOWN_ACTIONS = ['SUBMIT', 'TAKE_CHARGE', 'TAKE_OVER', 'MATCH', 'ACCEPT', 'STATUS'] as const;
+const KNOWN_ACTIONS = [
+  'SUBMIT',
+  'CATEGORY_APPROVE',
+  'CATEGORY_REJECT',
+  'TAKE_CHARGE',
+  'TAKE_OVER',
+  'MATCH',
+  'ACCEPT',
+  'STATUS',
+] as const;
+
+/** Avviso al Tutor: la tipologia proposta è stata respinta (US-302). Aprendo la segnalazione l'avviso è visto. */
+const CategoryChangedNotice = ({ ticketId }: { ticketId: string }) => {
+  const { t } = useTranslation();
+  const markSeen = useMarkCategoryChangeSeen();
+  const sent = useRef(false);
+
+  useEffect(() => {
+    if (!sent.current) {
+      sent.current = true;
+      markSeen.mutate(ticketId);
+    }
+  }, [ticketId, markSeen]);
+
+  return (
+    <p className="rounded-md border-l-4 border-gold bg-card p-4 font-medium">
+      {t('work.category.changedNotice')}
+    </p>
+  );
+};
+
+type ApproveValues = { name: string };
+type RejectValues = { jobCategoryId: string; reason: string };
+
+/**
+ * Decisione del Call Center sulla nuova tipologia proposta dal Tutor (US-302): approvarla, anche con il nome corretto,
+ * oppure usare una tipologia del catalogo spiegando il motivo.
+ */
+const CategoryDecisionSection = ({
+  ticket: d,
+  onOutcome,
+}: {
+  ticket: TicketDetail;
+  onOutcome: (o: Outcome) => void;
+}) => {
+  const { t } = useTranslation();
+  const categories = useJobCategories();
+  const approve = useApproveCategory();
+  const reject = useRejectCategory();
+  const proposed = d.requestedJobFreeText ?? '';
+  const required = { value: true, message: t('form.errors.required') };
+  const approveForm = useForm<ApproveValues>({ defaultValues: { name: proposed } });
+  const rejectForm = useForm<RejectValues>({ defaultValues: { jobCategoryId: '', reason: '' } });
+
+  const onError = (error: unknown, setField: (field: string, message: string) => void): void => {
+    const body = apiError(error);
+    const fieldError = body?.fieldErrors?.[0];
+    if (fieldError) {
+      setField(fieldError.field, fieldError.message);
+    } else {
+      onOutcome(body?.status === 409 ? { kind: 'conflict', reason: body.message } : { kind: 'error' });
+    }
+  };
+
+  const onApprove = async ({ name }: ApproveValues): Promise<void> => {
+    try {
+      const updated = await approve.mutateAsync({ id: d.id, name: name.trim(), version: d.version });
+      onOutcome({ kind: 'categoryApproved', name: updated.requestedJobCategory?.name ?? name.trim() });
+    } catch (error) {
+      onError(error, (_field, message) => approveForm.setError('name', { type: 'server', message }));
+    }
+  };
+
+  const onReject = async ({ jobCategoryId, reason }: RejectValues): Promise<void> => {
+    try {
+      const updated = await reject.mutateAsync({
+        id: d.id,
+        jobCategoryId,
+        reason: reason.trim(),
+        version: d.version,
+      });
+      onOutcome({ kind: 'categoryRejected', name: updated.requestedJobCategory?.name ?? '' });
+    } catch (error) {
+      onError(error, (field, message) =>
+        rejectForm.setError(field === 'reason' ? 'reason' : 'jobCategoryId', { type: 'server', message }),
+      );
+    }
+  };
+
+  return (
+    <section
+      aria-labelledby="work-category"
+      className="space-y-4 rounded-xl border border-l-4 border-border border-l-gold bg-card p-4"
+    >
+      <h2 id="work-category" className="text-lg font-semibold text-primary">
+        {t('work.category.heading')}
+      </h2>
+      <p>{t('work.category.proposed', { name: proposed })}</p>
+
+      <form noValidate onSubmit={approveForm.handleSubmit(onApprove)} className="space-y-3">
+        <FormField
+          id="work-category-name"
+          label={t('work.category.name')}
+          hint={t('work.category.nameHint')}
+          required
+          error={approveForm.formState.errors.name?.message}
+        >
+          {(p) => (
+            <Input
+              {...p}
+              autoComplete="off"
+              {...approveForm.register('name', {
+                validate: (v) => v.trim() !== '' || t('form.errors.required'),
+                maxLength: { value: 200, message: t('form.errors.maxLength', { max: 200 }) },
+              })}
+            />
+          )}
+        </FormField>
+        {/* testo lungo: a 320 px va a capo invece di sbordare (WCAG 1.4.10) */}
+        <Button
+          type="submit"
+          size="lg"
+          className="h-auto min-h-11 py-2 whitespace-normal"
+          disabled={approve.isPending || reject.isPending}
+        >
+          {t('work.category.approve')}
+        </Button>
+      </form>
+
+      <form
+        noValidate
+        onSubmit={rejectForm.handleSubmit(onReject)}
+        aria-labelledby="work-category-or"
+        className="space-y-3 border-t border-border pt-4"
+      >
+        <h3 id="work-category-or" className="font-semibold">
+          {t('work.category.orHeading')}
+        </h3>
+        <FormField
+          id="work-category-catalog"
+          label={t('work.category.catalog')}
+          required
+          error={rejectForm.formState.errors.jobCategoryId?.message}
+        >
+          {(p) => (
+            <NativeSelect {...p} {...rejectForm.register('jobCategoryId', { required })}>
+              <option value="">{t('form.select')}</option>
+              {(categories.data ?? []).map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </NativeSelect>
+          )}
+        </FormField>
+        <FormField
+          id="work-category-reason"
+          label={t('work.category.reason')}
+          hint={t('work.category.reasonHint')}
+          required
+          error={rejectForm.formState.errors.reason?.message}
+        >
+          {(p) => (
+            <Textarea
+              {...p}
+              rows={2}
+              {...rejectForm.register('reason', {
+                validate: (v) => v.trim() !== '' || t('form.errors.required'),
+                maxLength: { value: 500, message: t('form.errors.maxLength', { max: 500 }) },
+              })}
+            />
+          )}
+        </FormField>
+        <Button type="submit" size="lg" variant="outline" disabled={approve.isPending || reject.isPending}>
+          {t('work.category.reject')}
+        </Button>
+      </form>
+    </section>
+  );
+};
 
 const dayFormat = new Intl.DateTimeFormat('it-IT', {
   weekday: 'long',

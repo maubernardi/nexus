@@ -48,6 +48,8 @@ const item = (number: number, overrides: Partial<TicketListItem> = {}): TicketLi
   tutorName: 'Tutor Uno',
   assignedOperatorName: null,
   createdAt: '2026-10-24T08:15:00Z',
+  requestedJobFreeText: null,
+  categoryChangeUnseen: false,
   ...overrides,
 });
 
@@ -207,6 +209,35 @@ describe('<TicketsPage>', () => {
       status: undefined,
       projectId: undefined,
     });
+  });
+
+  it('nuova tipologia: "Da approvare" per il Call Center, evidenza "Tipologia cambiata" per il Tutor', async () => {
+    const user = userEvent.setup();
+    asUser('CALL_CENTER');
+    vi.mocked(fetchTickets).mockResolvedValue([
+      item(7, {
+        status: 'IN_ATTESA_APPROVAZIONE',
+        requestedJobCategory: null,
+        requestedJobFreeText: 'Fonico',
+      }),
+    ]);
+    const { unmount } = renderPage();
+
+    await user.click(await screen.findByRole('link', { name: 'Da approvare' }));
+    const table = await screen.findByRole('table', { name: /nuova tipologia da approvare/ });
+    expect(within(table).getByText('Fonico (nuova, da approvare)')).toBeInTheDocument();
+    expect(fetchTickets).toHaveBeenLastCalledWith({
+      view: 'TO_APPROVE',
+      status: undefined,
+      projectId: undefined,
+    });
+    unmount();
+
+    asUser('TUTOR');
+    vi.mocked(fetchTickets).mockResolvedValue([item(8, { categoryChangeUnseen: true })]);
+    renderPage();
+    expect(await screen.findByText('Tipologia cambiata')).toBeInTheDocument();
+    await expectNoAxeViolations();
   });
 
   it('vista vuota: messaggio al posto della tabella', async () => {

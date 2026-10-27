@@ -52,6 +52,34 @@ describe('<TicketForm>', () => {
     vi.mocked(submitTicket).mockReset();
   });
 
+  it('mansione non nell’elenco: la descrive e la invia come nuova tipologia', async () => {
+    const user = userEvent.setup();
+    vi.mocked(submitTicket).mockResolvedValue({ status: 'IN_ATTESA_APPROVAZIONE' } as Ticket);
+    renderForm();
+
+    await user.selectOptions(await screen.findByLabelText(/^Beneficiario/), 'C1');
+    await user.selectOptions(screen.getByLabelText(/^Progetto/), 'P1');
+    await user.click(screen.getByLabelText('La mansione non è nell’elenco: la descrivo io'));
+    expect(screen.queryByLabelText(/^Mansione richiesta/)).not.toBeInTheDocument();
+    await expectNoAxeViolations();
+
+    await user.click(screen.getByRole('button', { name: 'Invia segnalazione' }));
+    expect(
+      await screen.findByRole('link', { name: 'Nuova tipologia di mansione: Campo obbligatorio' }),
+    ).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText(/^Nuova tipologia di mansione/), ' Tecnico del suono ');
+    await user.click(screen.getByRole('button', { name: 'Invia segnalazione' }));
+    await waitFor(() =>
+      expect(vi.mocked(submitTicket).mock.calls[0][0]).toEqual({
+        beneficiaryId: 'C1',
+        projectId: 'P1',
+        jobCategoryId: null,
+        jobFreeText: 'Tecnico del suono',
+      }),
+    );
+  });
+
   it('senza scelte mostra il riepilogo con tre errori e vi sposta il focus', async () => {
     const user = userEvent.setup();
     renderForm();
@@ -89,6 +117,7 @@ describe('<TicketForm>', () => {
       beneficiaryId: 'C1',
       projectId: 'P1',
       jobCategoryId: 'J1',
+      jobFreeText: null,
     });
   });
 

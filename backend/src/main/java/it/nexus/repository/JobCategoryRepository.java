@@ -14,4 +14,9 @@ public interface JobCategoryRepository extends JpaRepository<JobCategory, Long> 
     Optional<JobCategory> findByCode(String code);
 
     List<JobCategory> findByActiveTrueOrderByNameAsc();
+
+    /** Tipologia attiva con lo stesso nome, senza distinguere maiuscole e minuscole (US-302). */
+    Optional<JobCategory> findFirstByNameIgnoreCaseAndActiveTrue(String name);
+
+    boolean existsByCode(String code);
 }

@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import it.nexus.domain.dto.ApproveCategoryDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
+import it.nexus.domain.dto.RejectCategoryDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
@@ -87,6 +89,30 @@ public class TicketResource {
     @Operation(summary = "Sposta su di sé una segnalazione in carico a un collega")
     public ResponseEntity<TicketDetailDTO> takeOver(@PathVariable String id, @RequestBody @Valid VersionDTO body) {
         return ResponseEntity.ok(ticketService.takeOver(id, body.version()));
+    }
+
+    @PostMapping("/{id}/category/approve")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Approva la nuova tipologia proposta dal Tutor: entra nel catalogo e la segnalazione va in coda")
+    public ResponseEntity<TicketDetailDTO> approveCategory(@PathVariable String id,
+            @RequestBody @Valid ApproveCategoryDTO body) {
+        return ResponseEntity.ok(ticketService.approveCategory(id, body));
+    }
+
+    @PostMapping("/{id}/category/reject")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Respinge la nuova tipologia: si usa quella del catalogo indicata, con il motivo per il Tutor")
+    public ResponseEntity<TicketDetailDTO> rejectCategory(@PathVariable String id,
+            @RequestBody @Valid RejectCategoryDTO body) {
+        return ResponseEntity.ok(ticketService.rejectCategory(id, body));
+    }
+
+    @PostMapping("/{id}/category-change-seen")
+    @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
+    @Operation(summary = "Il Tutor della segnalazione ha visto il cambio di tipologia")
+    public ResponseEntity<Void> categoryChangeSeen(@PathVariable String id) {
+        ticketService.markCategoryChangeSeen(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/accept")

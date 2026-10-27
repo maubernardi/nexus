@@ -2,8 +2,10 @@ package it.nexus.services;
 
 import java.util.List;
 
+import it.nexus.domain.dto.ApproveCategoryDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
+import it.nexus.domain.dto.RejectCategoryDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
@@ -57,4 +59,13 @@ public interface TicketService {
      * lavorativo successivo; evento nello storico dell'azienda.
      */
     TicketDetailDTO accept(String ticketId, long expectedVersion);
+
+    /** Il Call Center approva la nuova tipologia proposta dal Tutor, che entra nel catalogo (US-302). */
+    TicketDetailDTO approveCategory(String ticketId, ApproveCategoryDTO dto);
+
+    /** Il Call Center respinge la nuova tipologia e sceglie quella del catalogo, con il motivo (US-302). */
+    TicketDetailDTO rejectCategory(String ticketId, RejectCategoryDTO dto);
+
+    /** Il Tutor della segnalazione ha visto il cambio di tipologia: l'evidenza nella Home si spegne (US-302). */
+    void markCategoryChangeSeen(String ticketId);
 }

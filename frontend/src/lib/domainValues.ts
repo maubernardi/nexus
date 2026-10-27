@@ -43,7 +43,7 @@ export type LanguageLevel = (typeof LANGUAGE_LEVELS)[number];
 
 export const TICKET_STATUSES = [
   'NUOVA',
-  'IN_ATTESA_APPROVAZIONE_ADMIN',
+  'IN_ATTESA_APPROVAZIONE',
   'IN_LAVORAZIONE',
   'PROPOSTA_AZIENDA',
   'PROPOSTA_ACCOLTA',

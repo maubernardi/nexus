@@ -15,4 +15,10 @@ public class JobCategory extends AbstractReferenceEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    /** Nuova tipologia del catalogo, per esempio approvata dal Call Center su proposta del Tutor (US-302). */
+    public JobCategory(String code, String name) {
+        setCode(code);
+        setName(name);
+    }
 }

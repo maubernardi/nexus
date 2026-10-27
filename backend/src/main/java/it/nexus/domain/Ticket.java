@@ -85,6 +85,10 @@ public class Ticket extends AbstractTsidEntity {
     @JoinColumn(name = "job_slot_id")
     private JobSlot jobSlot;
 
+    /** La tipologia proposta dal Tutor è stata respinta e il Tutor non ha ancora visto la segnalazione (US-302). */
+    @Column(name = "category_change_unseen", nullable = false)
+    private boolean categoryChangeUnseen;
+
     @Column(name = "timer_started_at")
     private Instant timerStartedAt;
 

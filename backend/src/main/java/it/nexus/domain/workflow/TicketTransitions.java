@@ -1,5 +1,6 @@
 package it.nexus.domain.workflow;
 
+import static it.nexus.domain.enumeration.TicketStatus.IN_ATTESA_APPROVAZIONE;
 import static it.nexus.domain.enumeration.TicketStatus.IN_LAVORAZIONE;
 import static it.nexus.domain.enumeration.TicketStatus.NUOVA;
 import static it.nexus.domain.enumeration.TicketStatus.PROPOSTA_ACCOLTA;
@@ -17,6 +18,24 @@ public final class TicketTransitions {
 
     /** Fase 1 — segnalazione normale del Tutor con mansione del catalogo (US-301). */
     public static final TicketTransition SUBMIT = new TicketTransition("SUBMIT", Set.of(), NUOVA, Set.of(Role.TUTOR));
+
+    /**
+     * Fase 1 — segnalazione con una nuova tipologia di mansione scritta dal Tutor (US-302): attende l'approvazione del
+     * Call Center. Stesso nome di {@link #SUBMIT}: in cronologia è comunque "Segnalazione inviata".
+     */
+    public static final TicketTransition SUBMIT_NEW_CATEGORY = new TicketTransition("SUBMIT", Set.of(),
+            IN_ATTESA_APPROVAZIONE, Set.of(Role.TUTOR));
+
+    /** Fase 1 — un operatore approva la nuova tipologia, che entra nel catalogo; la segnalazione va in coda (US-302). */
+    public static final TicketTransition APPROVE_CATEGORY = new TicketTransition("CATEGORY_APPROVE",
+            Set.of(IN_ATTESA_APPROVAZIONE), NUOVA, Set.of(Role.CALL_CENTER, Role.ADMIN));
+
+    /**
+     * Fase 1 — un operatore respinge la nuova tipologia e sceglie quella corretta del catalogo, con il motivo; la
+     * segnalazione va in coda e il Tutor ne è avvisato (US-302).
+     */
+    public static final TicketTransition REJECT_CATEGORY = new TicketTransition("CATEGORY_REJECT",
+            Set.of(IN_ATTESA_APPROVAZIONE), NUOVA, Set.of(Role.CALL_CENTER, Role.ADMIN));
 
     /**
      * Fase 3 — presa in carico dalla coda (US-402): una segnalazione nuova, o speciale già in lavorazione ma non

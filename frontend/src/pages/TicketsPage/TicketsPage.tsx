@@ -24,16 +24,18 @@ const VIEW_SLUGS: Record<TicketListView, string> = {
   MINE: 'le-mie',
   PROJECT: 'del-progetto',
   TO_TAKE: 'da-prendere',
+  TO_APPROVE: 'da-approvare',
   ASSIGNED_TO_ME: 'in-carico',
   ALL: 'tutte',
 };
 const TUTOR_VIEWS: TicketListView[] = ['MINE', 'PROJECT'];
-const CC_VIEWS: TicketListView[] = ['TO_TAKE', 'ASSIGNED_TO_ME', 'ALL'];
+const CC_VIEWS: TicketListView[] = ['TO_TAKE', 'TO_APPROVE', 'ASSIGNED_TO_ME', 'ALL'];
 
 const COLUMNS: Record<TicketListView, TicketsTableColumns> = {
-  MINE: {},
+  MINE: { categoryNotice: true },
   PROJECT: { tutor: true },
   TO_TAKE: { priority: true, zone: true, tutor: true },
+  TO_APPROVE: { zone: true, tutor: true },
   ASSIGNED_TO_ME: { priority: true, zone: true, tutor: true },
   ALL: { priority: true, zone: true, tutor: true, operator: true },
 };

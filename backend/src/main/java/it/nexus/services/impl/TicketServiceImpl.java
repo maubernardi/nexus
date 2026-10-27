@@ -1,11 +1,13 @@
 package it.nexus.services.impl;
 
+import java.text.Normalizer;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -34,8 +36,10 @@ import it.nexus.domain.TicketCompanyBlacklist;
 import it.nexus.domain.TicketStatusHistory;
 import it.nexus.domain.UserProject;
 import it.nexus.domain.audit.AuditChanges;
+import it.nexus.domain.dto.ApproveCategoryDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
+import it.nexus.domain.dto.RejectCategoryDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
@@ -121,11 +125,90 @@ public class TicketServiceImpl implements TicketService {
                     "Il beneficiario ha già una segnalazione aperta (n. %d)".formatted(open.getNumber()));
         });
         Project project = assignedProject(dto.projectId(), me);
-        JobCategory category = activeJobCategory(dto.jobCategoryId());
-
         Ticket ticket = new Ticket(me, project, beneficiary, TicketType.NORMAL);
-        ticket.setRequestedJobCategory(category);
-        return mapper.toDto(stateMachine.create(ticket, TicketTransitions.SUBMIT, null));
+        // esattamente una delle due è garantito da @JobChoice sul DTO
+        if (!isBlank(dto.jobCategoryId())) {
+            ticket.setRequestedJobCategory(activeJobCategory(dto.jobCategoryId()));
+            return mapper.toDto(stateMachine.create(ticket, TicketTransitions.SUBMIT, null));
+        }
+        // nuova tipologia (US-302): se esiste già nel catalogo va scelta dall'elenco
+        String text = dto.jobFreeText().strip();
+        jobCategoryRepository.findFirstByNameIgnoreCaseAndActiveTrue(text).ifPresent(existing -> {
+            throw new FieldValidationException("jobFreeText",
+                    "La tipologia «%s» è già nell'elenco: selezionala".formatted(existing.getName()));
+        });
+        ticket.setRequestedJobFreeText(text);
+        return mapper.toDto(stateMachine.create(ticket, TicketTransitions.SUBMIT_NEW_CATEGORY, null));
+    }
+
+    @Override
+    public TicketDetailDTO approveCategory(String ticketId, ApproveCategoryDTO dto) {
+        Ticket ticket = findTicket(ticketId);
+        String name = dto.name().strip();
+        jobCategoryRepository.findFirstByNameIgnoreCaseAndActiveTrue(name).ifPresent(existing -> {
+            throw new FieldValidationException("name", ("La tipologia «%s» è già nel catalogo: "
+                    + "respingi la proposta scegliendo quella").formatted(existing.getName()));
+        });
+        String proposed = ticket.getRequestedJobFreeText();
+        Ticket saved = stateMachine.apply(ticket, TicketTransitions.APPROVE_CATEGORY, dto.version(), null, t -> {
+            JobCategory category = jobCategoryRepository.save(new JobCategory(newCategoryCode(name), name));
+            auditService.record(AuditEntityType.JOB_CATEGORY, category.getId(), "CREATE", AuditChanges.of()
+                    .value("code", null, category.getCode())
+                    .value("name", null, category.getName()), null);
+            t.setRequestedJobFreeText(null);
+            t.setRequestedJobCategory(category);
+            return AuditChanges.of()
+                    .value("requestedJobFreeText", proposed, null)
+                    .value("requestedJobCategory", null, category.getName());
+        });
+        return detail(saved, currentAppUserService.getCurrentAppUser());
+    }
+
+    @Override
+    public TicketDetailDTO rejectCategory(String ticketId, RejectCategoryDTO dto) {
+        Ticket ticket = findTicket(ticketId);
+        JobCategory chosen = activeJobCategory(dto.jobCategoryId());
+        String proposed = ticket.getRequestedJobFreeText();
+        Ticket saved = stateMachine.apply(ticket, TicketTransitions.REJECT_CATEGORY, dto.version(), dto.reason().strip(),
+                t -> {
+                    t.setRequestedJobFreeText(null);
+                    t.setRequestedJobCategory(chosen);
+                    // notifica provvisoria al Tutor finché non arrivano le notifiche (US-1201, review §8.2)
+                    t.setCategoryChangeUnseen(true);
+                    return AuditChanges.of()
+                            .value("requestedJobFreeText", proposed, null)
+                            .value("requestedJobCategory", null, chosen.getName());
+                });
+        return detail(saved, currentAppUserService.getCurrentAppUser());
+    }
+
+    @Override
+    public void markCategoryChangeSeen(String ticketId) {
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        Ticket ticket = visibleTicket(ticketId, me);
+        if (ticket.getTutor().getId().equals(me.getId()) && ticket.isCategoryChangeUnseen()) {
+            ticket.setCategoryChangeUnseen(false);
+            ticketRepository.save(ticket);
+        }
+    }
+
+    /** Codice del catalogo dal nome (es. "Tecnico del suono" → TECNICO_DEL_SUONO), reso univoco se serve. */
+    private String newCategoryCode(String name) {
+        String base = Normalizer.normalize(name, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toUpperCase(Locale.ROOT)
+                .replaceAll("[^A-Z0-9]+", "_")
+                .replaceAll("^_+|_+$", "");
+        base = base.isEmpty() ? "TIPOLOGIA" : base.substring(0, Math.min(base.length(), 26));
+        String code = base;
+        for (int i = 2; jobCategoryRepository.existsByCode(code); i++) {
+            code = base + "_" + i;
+        }
+        return code;
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 
     @Override
@@ -174,6 +257,10 @@ public class TicketServiceImpl implements TicketService {
                         .map(up -> up.getId().getProjectId()).toList();
                 spec = spec.and(TicketSpecifications.projectIn(mine));
                 yield newestFirst;
+            }
+            case TO_APPROVE -> {
+                spec = spec.and(TicketSpecifications.status(TicketStatus.IN_ATTESA_APPROVAZIONE));
+                yield oldestFirst;
             }
             case TO_TAKE -> {
                 spec = spec.and(TicketSpecifications.statusIn(QUEUE_STATUSES)).and(TicketSpecifications.unassigned());
@@ -232,6 +319,11 @@ public class TicketServiceImpl implements TicketService {
                     .flatMap(jobSlotRepository::findById)
                     .map(slot -> "«%s» presso %s".formatted(slot.getTitle(), slot.getCompany().getName()))
                     .orElse(null);
+            case "CATEGORY_APPROVE" -> Optional.ofNullable(changed(event, "requestedJobCategory", "after"))
+                    .map(name -> "«%s» aggiunta al catalogo".formatted(name))
+                    .orElse(null);
+            case "CATEGORY_REJECT" -> "«%s» → «%s»".formatted(changed(event, "requestedJobFreeText", "before"),
+                    changed(event, "requestedJobCategory", "after"));
             case "ACCEPT" -> Optional.ofNullable(changed(event, "timerDeadlineAt", "after"))
                     .map(at -> "Scadenza " + DATE.format(lastDay(Instant.parse(at))))
                     .orElse(null);
@@ -258,7 +350,7 @@ public class TicketServiceImpl implements TicketService {
 
     private static TicketStatus status(AuditEvent event, String side) {
         String value = changed(event, "status", side);
-        return value == null ? null : TicketStatus.valueOf(value);
+        return value == null ? null : TicketStatus.fromStored(value);
     }
 
     /** Ticket visibile all'utente; altrimenti 404, come per un ticket inesistente. */
@@ -403,7 +495,8 @@ public class TicketServiceImpl implements TicketService {
                 t.getJobSlot() == null ? null : jobSlotMapper.toMatch(t.getJobSlot()),
                 t.getCreatedAt(),
                 t.getTutor().getId().equals(me.getId()),
-                t.getTimerDeadlineAt() == null ? null : lastDay(t.getTimerDeadlineAt()));
+                t.getTimerDeadlineAt() == null ? null : lastDay(t.getTimerDeadlineAt()),
+                t.getTutor().getId().equals(me.getId()) && t.isCategoryChangeUnseen());
     }
 
     private static String fullName(AppUser user) {

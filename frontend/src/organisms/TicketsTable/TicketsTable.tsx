@@ -13,6 +13,8 @@ export type TicketsTableColumns = {
   zone?: boolean;
   tutor?: boolean;
   operator?: boolean;
+  /** Evidenza "Tipologia cambiata" accanto allo stato (vista del Tutor, US-302). */
+  categoryNotice?: boolean;
 };
 
 type TicketsTableProps = {
@@ -142,14 +144,27 @@ export const TicketsTable = ({
                 <td className={`${td} whitespace-nowrap`}>{item.beneficiary.residenceZoneName}</td>
               )}
               <td className={td}>{item.project.name}</td>
-              <td className={td}>{item.requestedJobCategory?.name ?? '—'}</td>
+              <td className={td}>
+                {item.requestedJobCategory?.name ??
+                  (item.requestedJobFreeText
+                    ? t('tickets.newCategory', { name: item.requestedJobFreeText })
+                    : '—')}
+              </td>
               {columns.tutor && <td className={`${td} whitespace-nowrap`}>{item.tutorName}</td>}
               {columns.operator && (
                 <td className={`${td} whitespace-nowrap`}>
                   {item.assignedOperatorName ?? t('tickets.nobody')}
                 </td>
               )}
-              <td className={`${td} whitespace-nowrap`}>{t(`enums.ticketStatus.${item.status}`)}</td>
+              <td className={`${td} whitespace-nowrap`}>
+                {t(`enums.ticketStatus.${item.status}`)}
+                {columns.categoryNotice && item.categoryChangeUnseen && (
+                  <>
+                    {' · '}
+                    <strong className="font-semibold text-primary">{t('tickets.categoryChanged')}</strong>
+                  </>
+                )}
+              </td>
               <td className={`${td} whitespace-nowrap tabular-nums`}>
                 <time dateTime={item.createdAt}>{dateTime.format(new Date(item.createdAt))}</time>
               </td>

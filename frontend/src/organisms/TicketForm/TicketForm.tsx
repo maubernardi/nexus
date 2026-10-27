@@ -1,9 +1,11 @@
 import { useState, type ReactNode } from 'react';
-import { useForm, type FieldPath } from 'react-hook-form';
+import { useForm, useWatch, type FieldPath } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
 import type { BeneficiarySummary } from '@/config/api/beneficiaryApi';
 import { apiError } from '@/config/api/errors';
@@ -20,9 +22,12 @@ type TicketFormValues = {
   beneficiaryId: string;
   projectId: string;
   jobCategoryId: string;
+  /** La mansione non è nell'elenco: il Tutor descrive una nuova tipologia (US-302). */
+  newCategory: boolean;
+  jobFreeText: string;
 };
 
-const FIELDS = ['beneficiaryId', 'projectId', 'jobCategoryId'] as const;
+const FIELDS = ['beneficiaryId', 'projectId', 'jobCategoryId', 'jobFreeText'] as const;
 
 const fieldId = (field: keyof TicketFormValues): string => `ticket-${field}`;
 
@@ -135,6 +140,7 @@ const TicketFormFields = ({
     register,
     handleSubmit,
     setError,
+    control,
     formState: { errors, isSubmitting, submitCount },
   } = useForm<TicketFormValues>({
     defaultValues: {
@@ -143,6 +149,8 @@ const TicketFormFields = ({
         : onlyOption(available),
       projectId: onlyOption(projects),
       jobCategoryId: '',
+      newCategory: false,
+      jobFreeText: '',
     },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
@@ -152,11 +160,13 @@ const TicketFormFields = ({
   const { summaryRef, requestSummaryFocus } = useErrorSummaryFocus(submitCount, errors);
 
   const required = { value: true, message: t('form.errors.required') };
-  const labels: Record<keyof TicketFormValues, string> = {
+  const labels: Record<(typeof FIELDS)[number], string> = {
     beneficiaryId: t('ticket.fields.beneficiary'),
     projectId: t('ticket.fields.project'),
     jobCategoryId: t('ticket.fields.jobCategory'),
+    jobFreeText: t('ticket.fields.jobFreeText'),
   };
+  const newCategory = useWatch({ control, name: 'newCategory' });
   const summary: SummaryError[] = FIELDS.flatMap((field) => {
     const message = errors[field]?.message;
     return message ? [{ fieldId: fieldId(field), message: `${labels[field]}: ${message}` }] : [];
@@ -165,7 +175,14 @@ const TicketFormFields = ({
   const onValid = async (values: TicketFormValues): Promise<void> => {
     setGenericError(false);
     try {
-      onSuccess(await submitTicket.mutateAsync(values));
+      onSuccess(
+        await submitTicket.mutateAsync({
+          beneficiaryId: values.beneficiaryId,
+          projectId: values.projectId,
+          jobCategoryId: values.newCategory ? null : values.jobCategoryId,
+          jobFreeText: values.newCategory ? values.jobFreeText.trim() : null,
+        }),
+      );
     } catch (error) {
       const fieldErrors = (apiError(error)?.fieldErrors ?? []).filter((fe) =>
         (FIELDS as readonly string[]).includes(fe.field),
@@ -235,24 +252,57 @@ const TicketFormFields = ({
             </NativeSelect>
           )}
         </FormField>
-        <FormField
-          id={fieldId('jobCategoryId')}
-          label={labels.jobCategoryId}
-          hint={t('ticket.hints.jobCategory')}
-          required
-          error={errors.jobCategoryId?.message}
-        >
-          {(p) => (
-            <NativeSelect {...p} {...register('jobCategoryId', { required })}>
-              <option value="">{t('form.select')}</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </NativeSelect>
-          )}
-        </FormField>
+        {!newCategory && (
+          <FormField
+            id={fieldId('jobCategoryId')}
+            label={labels.jobCategoryId}
+            hint={t('ticket.hints.jobCategory')}
+            required
+            error={errors.jobCategoryId?.message}
+          >
+            {(p) => (
+              <NativeSelect
+                {...p}
+                {...register('jobCategoryId', {
+                  validate: (v, all) => all.newCategory || v !== '' || t('form.errors.required'),
+                })}
+              >
+                <option value="">{t('form.select')}</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </NativeSelect>
+            )}
+          </FormField>
+        )}
+        <div className="flex min-h-11 items-center gap-3">
+          <Checkbox id={fieldId('newCategory')} {...register('newCategory')} />
+          <label htmlFor={fieldId('newCategory')} className="text-sm font-medium">
+            {t('ticket.fields.newCategory')}
+          </label>
+        </div>
+        {newCategory && (
+          <FormField
+            id={fieldId('jobFreeText')}
+            label={labels.jobFreeText}
+            hint={t('ticket.hints.jobFreeText')}
+            required
+            error={errors.jobFreeText?.message}
+          >
+            {(p) => (
+              <Input
+                {...p}
+                autoComplete="off"
+                {...register('jobFreeText', {
+                  validate: (v, all) => !all.newCategory || v.trim() !== '' || t('form.errors.required'),
+                  maxLength: { value: 200, message: t('form.errors.maxLength', { max: 200 }) },
+                })}
+              />
+            )}
+          </FormField>
+        )}
       </div>
 
       <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={isSubmitting}>

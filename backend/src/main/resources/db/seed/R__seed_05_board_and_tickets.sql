@@ -5,7 +5,7 @@
 --  b_riservato PUBLISHED, riservato a GOL da 2 giorni (mansione s_sala)
 --  b_bozza     DRAFT, rilancio dal ticket t7 (GOL)    (mansione s_mag_est)
 --  t1 tutor1/GOL   NUOVA                          t5 tutor1/GOL   SPECIAL fast-track IN_LAVORAZIONE (da b_pubblico)
---  t2 tutor1/GOL   IN_ATTESA_APPROVAZIONE_ADMIN   t6 tutor2/POLIS PROPOSTA_ACCOLTA, timer avviato, blocca s_vendite
+--  t2 tutor1/GOL   IN_ATTESA_APPROVAZIONE         t6 tutor2/POLIS PROPOSTA_ACCOLTA, timer avviato, blocca s_vendite
 --  t3 tutor2/POLIS IN_LAVORAZIONE                 t7 tutor1/GOL   RIAPERTO dopo appuntamento fallito (blacklist + audit)
 --  t4 tutor2/GOL   PROPOSTA_AZIENDA, blocca s_mag_nord
 -- Ogni beneficiario ha al più una segnalazione aperta (vincolo uq_ticket_open_per_beneficiary): t6 → k7, t7 → k6.
@@ -24,7 +24,7 @@ INSERT INTO ticket (id, tutor_id, project_id, beneficiary_id, type, status, is_f
      NULL, NULL, NULL, NULL, NULL,
      now() - interval '20 days', 'seed', now() - interval '20 days', 'seed'),
     -- t2
-    (892398395572130090, (SELECT id FROM app_user WHERE username = 'tutor1'), (SELECT id FROM project WHERE code = 'GOL'), 892398395572130072, 'NORMAL', 'IN_ATTESA_APPROVAZIONE_ADMIN', false, NULL, 'Tecnico del suono',
+    (892398395572130090, (SELECT id FROM app_user WHERE username = 'tutor1'), (SELECT id FROM project WHERE code = 'GOL'), 892398395572130072, 'NORMAL', 'IN_ATTESA_APPROVAZIONE', false, NULL, 'Tecnico del suono',
      NULL, NULL, NULL, NULL, NULL,
      now() - interval '18 days', 'seed', now() - interval '18 days', 'seed'),
     -- t3
@@ -63,7 +63,7 @@ UPDATE job_slot SET status = 'BLOCCATA', blocked_by_ticket_id = 8923983955721300
 -- Storico degli stati (creazione ed eventuali transizioni).
 INSERT INTO ticket_status_history (id, ticket_id, from_status, to_status, note, created_at, created_by, updated_at, updated_by) VALUES
     (892398395576324285, 892398395572130089, NULL, 'NUOVA', NULL, now() - interval '1 days', 'seed', now() - interval '1 days', 'seed'),
-    (892398395576324286, 892398395572130090, NULL, 'IN_ATTESA_APPROVAZIONE_ADMIN', NULL, now() - interval '1 days', 'seed', now() - interval '1 days', 'seed'),
+    (892398395576324286, 892398395572130090, NULL, 'IN_ATTESA_APPROVAZIONE', NULL, now() - interval '1 days', 'seed', now() - interval '1 days', 'seed'),
     (892398395576324287, 892398395572130091, NULL, 'NUOVA', NULL, now() - interval '2 days', 'seed', now() - interval '2 days', 'seed'),
     (892398395576324288, 892398395572130091, 'NUOVA', 'IN_LAVORAZIONE', NULL, now() - interval '1 days', 'seed', now() - interval '1 days', 'seed'),
     (892398395576324289, 892398395572130092, NULL, 'NUOVA', NULL, now() - interval '3 days', 'seed', now() - interval '3 days', 'seed'),
