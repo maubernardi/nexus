@@ -246,3 +246,19 @@ export const appointmentFailed = async ({
   });
   return data;
 };
+
+export const rejectProposal = async ({
+  id,
+  version,
+  reason,
+}: {
+  id: string;
+  version: number;
+  reason: string;
+}): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/reject`, {
+    version,
+    reason,
+  });
+  return data;
+};

@@ -307,6 +307,8 @@ export const it = {
         'Il Tutor ha registrato l’appuntamento con l’azienda per la segnalazione n. {{number}}.',
       APPOINTMENT_FAILED:
         'L’appuntamento della segnalazione n. {{number}} non è andato a buon fine: la segnalazione è riaperta, il motivo è nella cronologia.',
+      PROPOSAL_REJECTED:
+        'Il Tutor ha rifiutato la proposta della segnalazione n. {{number}}: l’azienda è esclusa e la segnalazione è riaperta.',
     },
   },
   companyNote: {
@@ -465,6 +467,16 @@ export const it = {
     acceptConfirm: 'Conferma accettazione',
     accepted: 'Proposta accettata. Scadenza del timer: {{deadline}}.',
     timerDeadline: 'Scadenza del timer',
+    reject: {
+      action: 'Rifiuta la proposta',
+      heading: 'Rifiuta la proposta',
+      text: '{{company}} non sarà più proposta per questa segnalazione, che torna all’operatore del Call Center per una nuova ricerca.',
+      reason: 'Motivo',
+      reasonHint: 'Lo vede l’operatore del Call Center nella cronologia e nello storico dell’azienda.',
+      confirm: 'Conferma rifiuto',
+      saved:
+        'Proposta rifiutata: la segnalazione è tornata all’operatore del Call Center per una nuova ricerca.',
+    },
     appointment: {
       set: 'Appuntamento fissato',
       setHeading: 'Conferma l’appuntamento',
@@ -511,6 +523,7 @@ export const it = {
       ACCEPT: 'Proposta accettata',
       APPOINTMENT_SET: 'Appuntamento fissato',
       APPOINTMENT_FAILED: 'Appuntamento non andato a buon fine',
+      PROPOSAL_REJECT: 'Proposta rifiutata dal Tutor',
       CATEGORY_APPROVE: 'Nuova tipologia approvata',
       CATEGORY_REJECT: 'Tipologia cambiata dal Call Center',
       STATUS: 'Cambio di stato',

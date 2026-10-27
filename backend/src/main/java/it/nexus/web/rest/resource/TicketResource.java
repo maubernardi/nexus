@@ -20,6 +20,7 @@ import it.nexus.domain.dto.AppointmentSetDTO;
 import it.nexus.domain.dto.ApproveCategoryDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
+import it.nexus.domain.dto.ProposalRejectDTO;
 import it.nexus.domain.dto.RejectCategoryDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
@@ -123,6 +124,14 @@ public class TicketResource {
     public ResponseEntity<TicketDetailDTO> appointmentFailed(@PathVariable String id,
             @RequestBody @Valid AppointmentFailedDTO body) {
         return ResponseEntity.ok(ticketService.appointmentFailed(id, body));
+    }
+
+    @PostMapping("/{id}/reject")
+    @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
+    @Operation(summary = "Il Tutor della segnalazione rifiuta la proposta con motivo: l'azienda è esclusa")
+    public ResponseEntity<TicketDetailDTO> rejectProposal(@PathVariable String id,
+            @RequestBody @Valid ProposalRejectDTO body) {
+        return ResponseEntity.ok(ticketService.rejectProposal(id, body));
     }
 
     @PostMapping("/{id}/accept")

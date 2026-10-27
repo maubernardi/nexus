@@ -21,6 +21,7 @@ import {
   useCompatibleJobSlots,
   useMatchTicket,
   useRejectCategory,
+  useRejectProposal,
   useTakeOver,
   useTicket,
   useTicketHistory,
@@ -45,6 +46,7 @@ type Outcome =
   | { kind: 'accepted'; deadline: string }
   | { kind: 'appointmentSet' }
   | { kind: 'appointmentFailed' }
+  | { kind: 'proposalRejected' }
   | { kind: 'categoryApproved'; name: string }
   | { kind: 'categoryRejected'; name: string }
   | { kind: 'conflict'; reason: string }
@@ -144,17 +146,19 @@ export const TicketPage = () => {
               ? t('work.category.approved', { name: outcome.name })
               : outcome.kind === 'categoryRejected'
                 ? t('work.category.rejected', { name: outcome.name })
-                : outcome.kind === 'appointmentFailed'
-                  ? t('work.appointment.failedSaved')
-                  : outcome.kind === 'appointmentSet'
-                    ? t('work.appointment.saved')
-                    : outcome.kind === 'accepted'
-                      ? t('work.accepted', { deadline: formatDay(outcome.deadline) })
-                      : outcome.kind === 'proposed'
-                        ? t('work.proposed', { title: outcome.title, company: outcome.company })
-                        : outcome.kind === 'conflict'
-                          ? t('work.conflict', { reason: outcome.reason })
-                          : t('work.error')}
+                : outcome.kind === 'proposalRejected'
+                  ? t('work.reject.saved')
+                  : outcome.kind === 'appointmentFailed'
+                    ? t('work.appointment.failedSaved')
+                    : outcome.kind === 'appointmentSet'
+                      ? t('work.appointment.saved')
+                      : outcome.kind === 'accepted'
+                        ? t('work.accepted', { deadline: formatDay(outcome.deadline) })
+                        : outcome.kind === 'proposed'
+                          ? t('work.proposed', { title: outcome.title, company: outcome.company })
+                          : outcome.kind === 'conflict'
+                            ? t('work.conflict', { reason: outcome.reason })
+                            : t('work.error')}
         </div>
       )}
 
@@ -189,6 +193,7 @@ const KNOWN_ACTIONS = [
   'ACCEPT',
   'APPOINTMENT_SET',
   'APPOINTMENT_FAILED',
+  'PROPOSAL_REJECT',
   'STATUS',
 ] as const;
 
@@ -443,6 +448,9 @@ const ProposalSection = ({
           </div>
         </div>
       )}
+      {canAccept && !confirming && (
+        <ProposalRejectAction ticket={d} company={proposal.companyName} onOutcome={onOutcome} />
+      )}
       {d.myTicket && d.status === 'PROPOSTA_ACCOLTA' && (
         <AppointmentSetAction ticket={d} company={proposal.companyName} onOutcome={onOutcome} />
       )}
@@ -521,6 +529,93 @@ const AppointmentSetAction = ({
         </Button>
       </div>
     </div>
+  );
+};
+
+type ProposalRejectValues = { reason: string };
+
+/** Il Tutor della segnalazione rifiuta la proposta con motivo: l'azienda è esclusa (US-702, Q3). */
+const ProposalRejectAction = ({
+  ticket: d,
+  company,
+  onOutcome,
+}: {
+  ticket: TicketDetail;
+  company: string;
+  onOutcome: (o: Outcome) => void;
+}) => {
+  const { t } = useTranslation();
+  const reject = useRejectProposal();
+  const [confirming, setConfirming] = useState(false);
+  const confirmRef = useRef<HTMLHeadingElement>(null);
+  const form = useForm<ProposalRejectValues>({ defaultValues: { reason: '' } });
+
+  useEffect(() => {
+    if (confirming) confirmRef.current?.focus();
+  }, [confirming]);
+
+  // mutateAsync: l'esito arriva anche se, riaperta la segnalazione, la sezione della proposta sparisce
+  const onConfirm = async ({ reason }: ProposalRejectValues): Promise<void> => {
+    try {
+      await reject.mutateAsync({ id: d.id, version: d.version, reason: reason.trim() });
+      onOutcome({ kind: 'proposalRejected' });
+    } catch (error) {
+      const body = apiError(error);
+      onOutcome(body?.status === 409 ? { kind: 'conflict', reason: body.message } : { kind: 'error' });
+      setConfirming(false);
+    }
+  };
+
+  if (!confirming) {
+    return (
+      <Button size="lg" variant="outline" onClick={() => setConfirming(true)}>
+        {t('work.reject.action')}
+      </Button>
+    );
+  }
+  return (
+    <form
+      noValidate
+      onSubmit={form.handleSubmit(onConfirm)}
+      className="space-y-3 rounded-xl border-2 border-primary bg-card p-4"
+    >
+      <h3 ref={confirmRef} tabIndex={-1} className="font-semibold">
+        {t('work.reject.heading')}
+      </h3>
+      <p>{t('work.reject.text', { company })}</p>
+      <FormField
+        id="work-reject-reason"
+        label={t('work.reject.reason')}
+        hint={t('work.reject.reasonHint')}
+        required
+        error={form.formState.errors.reason?.message}
+      >
+        {(p) => (
+          <Textarea
+            {...p}
+            rows={2}
+            {...form.register('reason', {
+              validate: (v) => v.trim() !== '' || t('form.errors.required'),
+              maxLength: { value: 500, message: t('form.errors.maxLength', { max: 500 }) },
+            })}
+          />
+        )}
+      </FormField>
+      <div className="flex flex-wrap gap-3">
+        <Button type="submit" size="lg" disabled={reject.isPending}>
+          {t('work.reject.confirm')}
+        </Button>
+        <Button
+          type="button"
+          size="lg"
+          variant="outline"
+          onClick={() => setConfirming(false)}
+          disabled={reject.isPending}
+        >
+          {t('work.cancel')}
+        </Button>
+      </div>
+    </form>
   );
 };
 

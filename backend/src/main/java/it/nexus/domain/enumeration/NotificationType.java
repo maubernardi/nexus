@@ -16,5 +16,7 @@ public enum NotificationType {
     /** All'operatore: il Tutor ha registrato l'appuntamento fissato con l'azienda (US-801). */
     APPOINTMENT_SET,
     /** All'operatore: l'appuntamento non è andato a buon fine, la segnalazione è riaperta (US-802). */
-    APPOINTMENT_FAILED
+    APPOINTMENT_FAILED,
+    /** All'operatore: il Tutor ha rifiutato la proposta, la segnalazione è riaperta (US-702). */
+    PROPOSAL_REJECTED
 }

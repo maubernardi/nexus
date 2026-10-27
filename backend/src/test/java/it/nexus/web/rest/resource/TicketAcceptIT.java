@@ -1,6 +1,8 @@
 package it.nexus.web.rest.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -285,6 +287,50 @@ class TicketAcceptIT {
         appointmentSet("tutor1", "{\"version\": %d}".formatted(version())).andExpect(status().isOk());
         appointmentFailed("operatore.cc", "BENEFICIARIO_RINUNCIA", null).andExpect(status().isForbidden());
         appointmentFailed("tutor1", "BENEFICIARIO_RINUNCIA", null).andExpect(status().isOk());
+    }
+
+    private ResultActions reject(String user, String reason) throws Exception {
+        return mockMvc.perform(post("/api/v1/tickets/" + id() + "/reject").header(USER, user)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"version\": %d, \"reason\": \"%s\"}".formatted(version(), reason)));
+    }
+
+    @Test
+    void rifiutoDellaProposta_riapertaMansioneLiberaAziendaEsclusa() throws Exception {
+        reject("tutor1", " ").andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("reason"));
+        reject("tutor1", "Orari incompatibili con la terapia")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("RIAPERTO"))
+                .andExpect(jsonPath("$.proposal").doesNotExist());
+
+        em.flush();
+        em.clear();
+        assertThat(jobSlots.findById(slot.getId()).orElseThrow().getStatus()).isEqualTo(JobSlotStatus.LIBERA);
+        mockMvc.perform(get("/api/v1/tickets/" + id() + "/history").header(USER, "tutor1"))
+                .andExpect(jsonPath("$[-1].action").value("PROPOSAL_REJECT"))
+                .andExpect(jsonPath("$[-1].detail").value("Alfa Logistica esclusa per questa segnalazione"))
+                .andExpect(jsonPath("$[-1].note").value("Orari incompatibili con la terapia"));
+        mockMvc.perform(get("/api/v1/companies/" + TsidMapper.toExternal(company.getId()) + "/history")
+                        .header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.events[*].type", hasItem("PROPOSTA_RIFIUTATA")))
+                .andExpect(jsonPath("$.events[*].type", hasItem("ESCLUSIONE")));
+        mockMvc.perform(get("/api/v1/notifications").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.items[0].type").value("PROPOSAL_REJECTED"));
+        // l'azienda esclusa non compare più tra le compatibili della segnalazione
+        mockMvc.perform(get("/api/v1/tickets/" + id() + "/compatible-job-slots").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$[*].companyId", not(hasItem(TsidMapper.toExternal(company.getId())))));
+        mockMvc.perform(get("/api/v1/tickets").param("view", "ASSIGNED_TO_ME").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$[0].id").value(id()));
+    }
+
+    @Test
+    void rifiuto_soloPrimaDellAccettazioneEDalTutor() throws Exception {
+        reject("operatore.cc", "Motivo").andExpect(status().isForbidden());
+        userProjects.save(new UserProject(colleague, project));
+        reject("tutor2", "Motivo").andExpect(status().isForbidden());
+        accept("tutor1", version()).andExpect(status().isOk());
+        reject("tutor1", "Ci ho ripensato").andExpect(status().isConflict());
     }
 
     @Test

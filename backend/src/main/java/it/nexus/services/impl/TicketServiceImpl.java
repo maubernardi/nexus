@@ -42,6 +42,7 @@ import it.nexus.domain.dto.AppointmentSetDTO;
 import it.nexus.domain.dto.ApproveCategoryDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
+import it.nexus.domain.dto.ProposalRejectDTO;
 import it.nexus.domain.dto.RejectCategoryDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
@@ -67,6 +68,7 @@ import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
+import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ProjectRepository;
@@ -117,6 +119,7 @@ public class TicketServiceImpl implements TicketService {
     private final Clock clock;
     private final JobSlotRepository jobSlotRepository;
     private final TicketCompanyBlacklistRepository blacklistRepository;
+    private final CompanyRepository companyRepository;
     private final CompanyAuditEventRepository companyAuditEvents;
     private final AuditService auditService;
     private final JobSlotMapper jobSlotMapper;
@@ -329,6 +332,11 @@ public class TicketServiceImpl implements TicketService {
             case "CATEGORY_REJECT" -> "«%s» → «%s»".formatted(changed(event, "requestedJobFreeText", "before"),
                     changed(event, "requestedJobCategory", "after"));
             case "APPOINTMENT_SET" -> "Timer fermato";
+            case "PROPOSAL_REJECT" -> Optional
+                    .ofNullable(TsidMapper.toInternal(changed(event, "excludedCompanyId", "after")))
+                    .flatMap(companyRepository::findById)
+                    .map(c -> "%s esclusa per questa segnalazione".formatted(c.getName()))
+                    .orElse(null);
             case "APPOINTMENT_FAILED" -> Optional.ofNullable(changed(event, "cause", "after"))
                     .map(cause -> "Causa: " + AppointmentFailureCause.valueOf(cause).label())
                     .orElse(null);
@@ -491,6 +499,33 @@ public class TicketServiceImpl implements TicketService {
                 CompanyEventType.APPUNTAMENTO_FALLITO.name(), Map.of("ticketNumber", saved.getNumber(),
                         "jobSlotTitle", slot.getTitle(), "cause", dto.cause().name())));
         notificationService.notify(saved.getAssignedCcOperator(), NotificationType.APPOINTMENT_FAILED, saved);
+        return detail(saved, me);
+    }
+
+    @Override
+    public TicketDetailDTO rejectProposal(String ticketId, ProposalRejectDTO dto) {
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        Ticket ticket = ownTicket(ticketId, me, "rifiutare la proposta");
+        String reason = dto.reason().strip();
+        JobSlot slot = ticket.getJobSlot();
+        Company company = slot == null ? null : slot.getCompany();
+        Ticket saved = stateMachine.apply(ticket, TicketTransitions.PROPOSAL_REJECT, dto.version(), reason, t -> {
+            slot.release();
+            t.setJobSlot(null);
+            return AuditChanges.of()
+                    .value("jobSlotId", TsidMapper.toExternal(slot.getId()), null)
+                    .value("excludedCompanyId", null, TsidMapper.toExternal(company.getId()));
+        });
+        auditService.record(AuditEntityType.JOB_SLOT, slot.getId(), "RELEASE", AuditChanges.of()
+                .value("status", JobSlotStatus.BLOCCATA.name(), JobSlotStatus.LIBERA.name())
+                .value("blockedByTicketId", TsidMapper.toExternal(saved.getId()), null), null);
+        // l'azienda non si ripropone per questa segnalazione (Q3); l'esclusione compare nello storico con il motivo
+        if (!blacklistRepository.existsById(new TicketCompanyBlacklist.Id(saved.getId(), company.getId()))) {
+            blacklistRepository.save(new TicketCompanyBlacklist(saved, company, reason));
+        }
+        companyAuditEvents.save(new CompanyAuditEvent(company, saved, CompanyEventType.PROPOSTA_RIFIUTATA.name(),
+                Map.of("ticketNumber", saved.getNumber(), "jobSlotTitle", slot.getTitle())));
+        notificationService.notify(saved.getAssignedCcOperator(), NotificationType.PROPOSAL_REJECTED, saved);
         return detail(saved, me);
     }
 
