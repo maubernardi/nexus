@@ -84,6 +84,24 @@ public class TicketStateMachineImpl implements TicketStateMachine {
         return saved;
     }
 
+    @Override
+    public Ticket applyBySystem(Ticket ticket, TicketTransition transition, Function<Ticket, AuditChanges> effects) {
+        if (!transition.bySystem() || SecurityUtils.getCurrentUser().isPresent()) {
+            throw new IllegalStateException("La transizione " + transition.name() + " la applica solo il sistema");
+        }
+        TicketStatus from = ticket.getStatus();
+        if (!transition.allowedFrom(from)) {
+            throw new ConflictException("Operazione non ammessa per un ticket in stato %s", from);
+        }
+        AuditChanges changes = AuditChanges.of().value("status", from.name(), transition.to().name())
+                .merge(effects.apply(ticket));
+        ticket.setStatus(transition.to());
+        Ticket saved = ticketRepository.saveAndFlush(ticket);
+        historyRepository.save(new TicketStatusHistory(saved, from, transition.to(), null));
+        auditService.record(AuditEntityType.TICKET, saved.getId(), transition.name(), changes, null);
+        return saved;
+    }
+
     private static String external(AbstractTsidEntity entity) {
         return entity == null ? null : TsidMapper.toExternal(entity.getId());
     }

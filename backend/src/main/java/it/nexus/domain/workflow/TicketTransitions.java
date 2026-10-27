@@ -78,6 +78,13 @@ public final class TicketTransitions {
     public static final TicketTransition PROPOSAL_REJECT = new TicketTransition("PROPOSAL_REJECT",
             Set.of(PROPOSTA_AZIENDA), RIAPERTO, Set.of(Role.TUTOR));
 
+    /**
+     * Fase 5 — scadenza del timer alla fine del 7° giorno lavorativo senza appuntamento (US-705): la segnalazione torna
+     * al Call Center, in carico allo stesso operatore, e la mansione torna libera. La applica solo il sistema.
+     */
+    public static final TicketTransition TIMER_EXPIRE = TicketTransition.bySystem("TIMER_EXPIRE",
+            Set.of(PROPOSTA_ACCOLTA), RIAPERTO);
+
     private TicketTransitions() {
     }
 }

@@ -5,6 +5,8 @@ import static it.nexus.domain.enumeration.TicketStatus.NUOVA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -21,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 
 import it.nexus.domain.Ticket;
+import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.TicketStatusHistory;
 import it.nexus.domain.TestEntities;
 import it.nexus.domain.enumeration.Role;
@@ -68,6 +71,38 @@ class TicketStateMachineTest {
         assertThat(row.getValue().getFromStatus()).isNull();
         assertThat(row.getValue().getToStatus()).isEqualTo(NUOVA);
         assertThat(row.getValue().getNote()).isNull();
+    }
+
+    @Test
+    void transizioneDelSistema_nessunUtentePuoRichiederla() {
+        TestSecurity.authenticate("admin", Role.ADMIN);
+        Ticket accepted = ticketIn(TicketStatus.PROPOSTA_ACCOLTA);
+
+        assertThatThrownBy(() -> stateMachine.apply(accepted, TicketTransitions.TIMER_EXPIRE, 0, null))
+                .isInstanceOf(AccessDeniedException.class);
+        // e con un utente collegato nemmeno la via del sistema è ammessa
+        assertThatThrownBy(() -> stateMachine.applyBySystem(accepted, TicketTransitions.TIMER_EXPIRE,
+                t -> AuditChanges.none()))
+                .isInstanceOf(IllegalStateException.class);
+        verifyNoInteractions(tickets, history, audit);
+    }
+
+    @Test
+    void transizioneDelSistema_applicataSenzaUtente() {
+        when(tickets.saveAndFlush(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Ticket expired = stateMachine.applyBySystem(ticketIn(TicketStatus.PROPOSTA_ACCOLTA),
+                TicketTransitions.TIMER_EXPIRE, t -> AuditChanges.none());
+
+        assertThat(expired.getStatus()).isEqualTo(TicketStatus.RIAPERTO);
+        verify(audit).record(any(), any(), eq("TIMER_EXPIRE"), any(), isNull());
+    }
+
+    @Test
+    void transizioneUtente_nonApplicabileDalSistema() {
+        assertThatThrownBy(() -> stateMachine.applyBySystem(ticketIn(NUOVA), TicketTransitions.TAKE_CHARGE,
+                t -> AuditChanges.none()))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
