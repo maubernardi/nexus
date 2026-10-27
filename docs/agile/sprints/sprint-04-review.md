@@ -112,7 +112,7 @@ Nessun difetto noto sul codice unito.
 | D4 | US-302 aggiunta all'impegno (24 punti) | PO (25/10) | Sprint 4 |
 | D5 | Accetta la proposta **solo il Tutor della segnalazione**: i tutor non sono intercambiabili come gli operatori | PO (27/10) | US-701 |
 | D6 | Le note dell'azienda non si modificano né si cancellano; una correzione è una nuova nota | Team (dalla storia) | US-505 |
-| D7 | "Esiti negativi" = tirocini conclusi senza assunzione | Team | US-503 — **da confermare** (§8.1) |
+| D7 | "Esiti negativi" = tirocini conclusi senza assunzione | Team → PO | US-503 — ✅ confermata (§8.1) |
 | D8 | Scadenza del timer alla fine del 7° giorno lavorativo, ora di Roma; il giorno dell'accettazione non conta | Team | US-701, US-703 |
 | D9 | "Prova del calcolo" nella pagina Calendario, per verificare US-703 prima di US-701 | Team | US-703 |
 | D10 | Una tipologia nuova con il nome di una già presente va scelta dall'elenco; il codice del catalogo si ricava dal nome | Team | US-302 |
@@ -166,6 +166,9 @@ mansione"*: **sviluppo completo**. Per chiuderlo resta **US-1301** (verifica del
 Oggi conta i **tirocini conclusi senza assunzione**. In alternativa si possono contare anche proposte rifiutate e
 appuntamenti falliti, che però hanno già voci proprie.
 *Proposta:* tenere la definizione attuale.
+
+> ✅ **Deciso (PO, 27/10): proposta accettata.** "Esiti negativi" = tirocini conclusi senza assunzione; proposte
+> rifiutate e appuntamenti falliti restano nelle loro voci.
 
 ### 8.2 Segnalazioni "riaperte"
 Con US-702 (rifiuto della proposta), US-705 (scadenza del timer) e US-802 (appuntamento fallito) la segnalazione torna

@@ -33,8 +33,7 @@ US-302 aggiunta all'impegno il 25/10 su richiesta del PO (nota operativa 3), sen
 ~20 punti abituali. Notifica al Tutor con la soluzione provvisoria decisa in review (§8.2). Per il PO: US-1301 (PWA su
 smartphone).
 
-Demo aggiornata il 26/10 a `d36f167` (US-503, US-604). Sviluppo di **R1 completo** il 26/10 con US-604; per chiudere il rilascio resta US-1301 (PO). Da confermare dal PO:
-"esiti negativi" del riepilogo = tirocini conclusi senza assunzione (#44, design D1).
+Demo aggiornata il 26/10 a `d36f167` (US-503, US-604). Sviluppo di **R1 completo** il 26/10 con US-604; per chiudere il rilascio resta US-1301 (PO). "Esiti negativi" del riepilogo = tirocini conclusi senza assunzione (#44, design D1): confermato dal PO in review.
 
 Decisione del PO (27/10, US-701): accetta la proposta **solo il Tutor della segnalazione**; i tutor, di norma, non sono
 intercambiabili come gli operatori del Call Center.
