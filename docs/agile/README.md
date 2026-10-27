@@ -71,7 +71,9 @@ Una storia è *Done* quando:
 4. la CI è verde e la PR è **unita dal PO** (regole Git inviolabili: nessun merge né push su `main` da parte del team);
 5. la demo è **deployata e verificata online**;
 6. ogni cambio di stato e ogni scelta introdotti dalla storia sono registrati nell'audit (EN-2, decisione del PO del 01/10);
-7. backlog, README e `CLAUDE.md` sono aggiornati se serve.
+7. backlog, README e `CLAUDE.md` sono aggiornati se serve;
+8. le prove manuali della storia sono in [docs/test/collaudo.md](../test/collaudo.md), passo per passo con la casella da
+   spuntare (aggiornato nella PR di documentazione dopo il merge, insieme alla versione della demo).
 
 ## Metriche
 
