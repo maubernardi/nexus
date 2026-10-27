@@ -53,3 +53,11 @@ Il Call Center e l'ADMIN SHALL avere nella Home la vista "Da approvare", con le 
 - **WHEN** un operatore apre la vista "Da approvare"
 - **THEN** vede le segnalazioni con una nuova tipologia proposta, con l'indicazione "(nuova, da approvare)"
 
+### Requirement: Riaperte in cima
+Nella vista "In carico a me" le segnalazioni `RIAPERTO` SHALL comparire per prime, con lo stato evidenziato in testo,
+seguite dalle altre dalla più vecchia.
+
+#### Scenario: Riaperta in cima
+- **WHEN** una segnalazione dell'operatore viene riaperta
+- **THEN** compare in cima a "In carico a me" con lo stato "Riaperto" evidenziato
+

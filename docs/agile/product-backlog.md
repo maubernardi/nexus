@@ -91,15 +91,15 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-505](#us-505) | E5 | Diario delle note dell'azienda | Must | 2 | R1 | 🎉 Done (Sprint 4) |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
-| [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | ✅ Ready (Sprint 5) |
+| [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 🎉 Done (Sprint 5) |
 | [US-604](#us-604) | E6 | Dettagli di azienda e mansione durante l'abbinamento | Must | 5 | R1 | 🎉 Done (Sprint 4) |
 | [US-701](#us-701) | E7 | Accettazione della proposta | Must | 3 | R2 | 🎉 Done (Sprint 4) |
-| [US-702](#us-702) | E7 | Rifiuto della proposta | Should | 3 | R2 | ✅ Ready (Sprint 5) |
+| [US-702](#us-702) | E7 | Rifiuto della proposta | Should | 3 | R2 | 🎉 Done (Sprint 5) |
 | [US-703](#us-703) | E7 | Calendario dei giorni lavorativi | Must | 3 | R2 | 🎉 Done (Sprint 4) |
-| [US-704](#us-704) | E7 | Promemoria al 4° giorno | Must | 3 | R2 | ✅ Ready (Sprint 5) |
-| [US-705](#us-705) | E7 | Scadenza del timer | Must | 3 | R2 | ✅ Ready (Sprint 5) |
-| [US-801](#us-801) | E8 | Appuntamento preso | Must | 2 | R2 | ✅ Ready (Sprint 5) |
-| [US-802](#us-802) | E8 | Appuntamento fallito | Must | 3 | R2 | ✅ Ready (Sprint 5) |
+| [US-704](#us-704) | E7 | Promemoria al 4° giorno | Must | 3 | R2 | 🎉 Done (Sprint 5) |
+| [US-705](#us-705) | E7 | Scadenza del timer | Must | 3 | R2 | 🎉 Done (Sprint 5) |
+| [US-801](#us-801) | E8 | Appuntamento preso | Must | 2 | R2 | 🎉 Done (Sprint 5) |
+| [US-802](#us-802) | E8 | Appuntamento fallito | Must | 3 | R2 | 🎉 Done (Sprint 5) |
 | [US-803](#us-803) | E8 | Rilancio in bacheca | Must | 5 | R2 | 📋 Backlog |
 | [US-901](#us-901) | E9 | Bacheca per il Tutor | Must | 3 | R2 | 📋 Backlog |
 | [US-902](#us-902) | E9 | Gestione della bacheca | Must | 5 | R2 | 📋 Backlog |
@@ -112,7 +112,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1005](#us-1005) | E10 | Progetto Formativo in Word | Must | 3 | R3 | 📋 Backlog |
 | [US-1101](#us-1101) | E11 | Report di restituzione | Must | 5 | R3 | 📋 Backlog |
 | [US-1102](#us-1102) | E11 | Esito sulla mansione e audit trail | Must | 2 | R3 | 📋 Backlog |
-| [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | ✅ Ready (Sprint 5) |
+| [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | 🎉 Done (Sprint 5) |
 | [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 📋 Backlog |
 | [US-1301](#us-1301) | E13 | Verifica della PWA online | Must | 1 | R1 | 📋 Backlog |
 | [US-1302](#us-1302) | E13 | Backup del database | Must | 5 | R4 | 📋 Backlog |
@@ -475,7 +475,7 @@ Criteri di accettazione:
 Dipendenze: EN-1, US-601
 
 #### US-603
-**Esclusione di un'azienda** · Should · 2 punti · R2 · ✅ Ready (Sprint 5)
+**Esclusione di un'azienda** · Should · 2 punti · R2 · 🎉 Done (Sprint 5)
 
 Come **operatore Call Center** voglio escludere un'azienda per un ticket, con motivo per non riproporla allo stesso beneficiario.
 
@@ -515,7 +515,7 @@ Criteri di accettazione:
 Dipendenze: US-703
 
 #### US-702
-**Rifiuto della proposta** · Should · 3 punti · R2 · ✅ Ready (Sprint 5)
+**Rifiuto della proposta** · Should · 3 punti · R2 · 🎉 Done (Sprint 5)
 
 Come **Tutor** voglio rifiutare la proposta con motivo per tornare alla ricerca di un'altra mansione.
 
@@ -537,7 +537,7 @@ Criteri di accettazione:
 Dipendenze: US-107
 
 #### US-704
-**Promemoria al 4° giorno** · Must · 3 punti · R2 · ✅ Ready (Sprint 5)
+**Promemoria al 4° giorno** · Must · 3 punti · R2 · 🎉 Done (Sprint 5)
 
 Come **Tutor** voglio ricevere un solo promemoria al 4° giorno lavorativo senza azioni per non far scadere la proposta.
 
@@ -549,7 +549,7 @@ Criteri di accettazione:
 Dipendenze: US-1201
 
 #### US-705
-**Scadenza del timer** · Must · 3 punti · R2 · ✅ Ready (Sprint 5)
+**Scadenza del timer** · Must · 3 punti · R2 · 🎉 Done (Sprint 5)
 
 Come **Call Center** voglio che allo scadere del 7° giorno lavorativo la mansione torni libera per non tenere bloccate posizioni inattive.
 
@@ -563,7 +563,7 @@ Criteri di accettazione:
 _Il Tutor registra l'esito dell'appuntamento; se fallisce, la mansione può essere rilanciata in bacheca._
 
 #### US-801
-**Appuntamento preso** · Must · 2 punti · R2 · ✅ Ready (Sprint 5)
+**Appuntamento preso** · Must · 2 punti · R2 · 🎉 Done (Sprint 5)
 
 Come **Tutor** voglio registrare che l'appuntamento con l'azienda è fissato per avanzare il percorso.
 
@@ -571,7 +571,7 @@ Criteri di accettazione:
 - Il ticket passa in APPUNTAMENTO e il timer si ferma.
 
 #### US-802
-**Appuntamento fallito** · Must · 3 punti · R2 · ✅ Ready (Sprint 5)
+**Appuntamento fallito** · Must · 3 punti · R2 · 🎉 Done (Sprint 5)
 
 Come **Tutor** voglio registrare che l'appuntamento non è andato a buon fine per riaprire la ricerca.
 
@@ -714,7 +714,7 @@ Dipendenze: US-1101
 _Le persone giuste sono avvisate al momento giusto, in app e via email._
 
 #### US-1201
-**Notifiche in app** · Must · 5 punti · R2 · ✅ Ready (Sprint 5)
+**Notifiche in app** · Must · 5 punti · R2 · 🎉 Done (Sprint 5)
 
 Come **Tutor / Call Center** voglio vedere le notifiche che mi riguardano (promemoria, rilanci, esiti) per non perdere scadenze e richieste.
 
