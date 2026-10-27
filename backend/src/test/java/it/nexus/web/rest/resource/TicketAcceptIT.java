@@ -187,6 +187,49 @@ class TicketAcceptIT {
                 .andExpect(jsonPath("$.timerDeadline").value(expected.toString()));
     }
 
+    private ResultActions appointmentSet(String user, String json) throws Exception {
+        return mockMvc.perform(post("/api/v1/tickets/" + id() + "/appointment-set").header(USER, user)
+                .contentType(MediaType.APPLICATION_JSON).content(json));
+    }
+
+    @Test
+    void appuntamentoFissato_timerFermoStoricoNotificaECronologia() throws Exception {
+        accept("tutor1", version()).andExpect(status().isOk());
+
+        appointmentSet("tutor1", "{\"version\": %d, \"note\": \" Giovedì alle 10 \"}".formatted(version()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("APPUNTAMENTO"))
+                .andExpect(jsonPath("$.timerDeadline").doesNotExist());
+
+        em.flush();
+        em.clear();
+        Ticket saved = tickets.findById(ticket.getId()).orElseThrow();
+        assertThat(saved.getTimerStartedAt()).isNull();
+        assertThat(saved.getTimerDeadlineAt()).isNull();
+        assertThat(jobSlots.findById(slot.getId()).orElseThrow().getStatus()).isEqualTo(JobSlotStatus.BLOCCATA);
+        assertThat(companyAudit.findByCompanyIdOrderByCreatedAtAsc(company.getId()))
+                .extracting(e -> e.getEventType())
+                .containsExactly("PROPOSTA_INVIATA", "PROPOSTA_ACCOLTA", "APPUNTAMENTO_FISSATO");
+        mockMvc.perform(get("/api/v1/tickets/" + id() + "/history").header(USER, "tutor1"))
+                .andExpect(jsonPath("$[-1].action").value("APPOINTMENT_SET"))
+                .andExpect(jsonPath("$[-1].detail").value("Timer fermato"))
+                .andExpect(jsonPath("$[-1].note").value("Giovedì alle 10"))
+                .andExpect(jsonPath("$[-1].toStatus").value("APPUNTAMENTO"));
+        mockMvc.perform(get("/api/v1/notifications").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.items[0].type").value("APPOINTMENT_SET"));
+    }
+
+    @Test
+    void appuntamentoFissato_soloDopoLAccettazioneEDalTutor() throws Exception {
+        // prima dell'accettazione non si può
+        appointmentSet("tutor1", "{\"version\": %d}".formatted(version())).andExpect(status().isConflict());
+        accept("tutor1", version()).andExpect(status().isOk());
+        userProjects.save(new UserProject(colleague, project));
+        appointmentSet("tutor2", "{\"version\": %d}".formatted(version())).andExpect(status().isForbidden());
+        appointmentSet("operatore.cc", "{\"version\": %d}".formatted(version())).andExpect(status().isForbidden());
+        appointmentSet("tutor1", "{\"version\": %d}".formatted(version())).andExpect(status().isOk());
+    }
+
     @Test
     void soloIlTutorDellaSegnalazione() throws Exception {
         // tutor di un altro progetto: la segnalazione non esiste per lui

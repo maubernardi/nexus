@@ -16,6 +16,7 @@ import { useJobCategories, useZones } from '@/config/hooks/useReferenceData';
 import {
   useAcceptProposal,
   useApproveCategory,
+  useAppointmentSet,
   useCompatibleJobSlots,
   useMatchTicket,
   useRejectCategory,
@@ -37,6 +38,7 @@ type Outcome =
   | { kind: 'proposed'; title: string; company: string }
   | { kind: 'takenOver' }
   | { kind: 'accepted'; deadline: string }
+  | { kind: 'appointmentSet' }
   | { kind: 'categoryApproved'; name: string }
   | { kind: 'categoryRejected'; name: string }
   | { kind: 'conflict'; reason: string }
@@ -134,13 +136,15 @@ export const TicketPage = () => {
               ? t('work.category.approved', { name: outcome.name })
               : outcome.kind === 'categoryRejected'
                 ? t('work.category.rejected', { name: outcome.name })
-                : outcome.kind === 'accepted'
-                  ? t('work.accepted', { deadline: formatDay(outcome.deadline) })
-                  : outcome.kind === 'proposed'
-                    ? t('work.proposed', { title: outcome.title, company: outcome.company })
-                    : outcome.kind === 'conflict'
-                      ? t('work.conflict', { reason: outcome.reason })
-                      : t('work.error')}
+                : outcome.kind === 'appointmentSet'
+                  ? t('work.appointment.saved')
+                  : outcome.kind === 'accepted'
+                    ? t('work.accepted', { deadline: formatDay(outcome.deadline) })
+                    : outcome.kind === 'proposed'
+                      ? t('work.proposed', { title: outcome.title, company: outcome.company })
+                      : outcome.kind === 'conflict'
+                        ? t('work.conflict', { reason: outcome.reason })
+                        : t('work.error')}
         </div>
       )}
 
@@ -173,6 +177,7 @@ const KNOWN_ACTIONS = [
   'TAKE_OVER',
   'MATCH',
   'ACCEPT',
+  'APPOINTMENT_SET',
   'STATUS',
 ] as const;
 
@@ -427,7 +432,81 @@ const ProposalSection = ({
           </div>
         </div>
       )}
+      {d.myTicket && d.status === 'PROPOSTA_ACCOLTA' && (
+        <AppointmentSetAction ticket={d} company={proposal.companyName} onOutcome={onOutcome} />
+      )}
     </section>
+  );
+};
+
+/** Il Tutor della segnalazione registra l'appuntamento fissato, con conferma e nota facoltativa (US-801). */
+const AppointmentSetAction = ({
+  ticket: d,
+  company,
+  onOutcome,
+}: {
+  ticket: TicketDetail;
+  company: string;
+  onOutcome: (o: Outcome) => void;
+}) => {
+  const { t } = useTranslation();
+  const appointment = useAppointmentSet();
+  const [confirming, setConfirming] = useState(false);
+  const [note, setNote] = useState('');
+  const confirmRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (confirming) confirmRef.current?.focus();
+  }, [confirming]);
+
+  // mutateAsync: l'esito arriva anche se, ricaricata la segnalazione in "Appuntamento", questo pulsante sparisce
+  const onConfirm = async (): Promise<void> => {
+    try {
+      await appointment.mutateAsync({ id: d.id, version: d.version, note: note.trim() || null });
+      onOutcome({ kind: 'appointmentSet' });
+    } catch (error) {
+      const body = apiError(error);
+      onOutcome(body?.status === 409 ? { kind: 'conflict', reason: body.message } : { kind: 'error' });
+      setConfirming(false);
+    }
+  };
+
+  if (!confirming) {
+    return (
+      <Button size="lg" onClick={() => setConfirming(true)}>
+        {t('work.appointment.set')}
+      </Button>
+    );
+  }
+  return (
+    <div className="space-y-3 rounded-xl border-2 border-primary bg-card p-4">
+      <h3 ref={confirmRef} tabIndex={-1} className="font-semibold">
+        {t('work.appointment.setHeading')}
+      </h3>
+      <p>{t('work.appointment.setText', { company })}</p>
+      <FormField
+        id="work-appointment-note"
+        label={t('work.appointment.note')}
+        hint={t('work.appointment.noteHint')}
+      >
+        {(p) => (
+          <Textarea {...p} rows={2} maxLength={1000} value={note} onChange={(e) => setNote(e.target.value)} />
+        )}
+      </FormField>
+      <div className="flex flex-wrap gap-3">
+        <Button size="lg" onClick={() => void onConfirm()} disabled={appointment.isPending}>
+          {t('work.appointment.setConfirm')}
+        </Button>
+        <Button
+          size="lg"
+          variant="outline"
+          onClick={() => setConfirming(false)}
+          disabled={appointment.isPending}
+        >
+          {t('work.cancel')}
+        </Button>
+      </div>
+    </div>
   );
 };
 

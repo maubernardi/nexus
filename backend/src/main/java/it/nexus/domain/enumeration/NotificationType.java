@@ -12,5 +12,7 @@ public enum NotificationType {
     /** Al Tutor: c'è una proposta per il suo beneficiario (US-602). */
     PROPOSAL_SENT,
     /** All'operatore: il Tutor ha accettato la proposta (US-701). */
-    PROPOSAL_ACCEPTED
+    PROPOSAL_ACCEPTED,
+    /** All'operatore: il Tutor ha registrato l'appuntamento fissato con l'azienda (US-801). */
+    APPOINTMENT_SET
 }

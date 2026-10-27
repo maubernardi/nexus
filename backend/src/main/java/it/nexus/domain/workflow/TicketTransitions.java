@@ -1,5 +1,6 @@
 package it.nexus.domain.workflow;
 
+import static it.nexus.domain.enumeration.TicketStatus.APPUNTAMENTO;
 import static it.nexus.domain.enumeration.TicketStatus.IN_ATTESA_APPROVAZIONE;
 import static it.nexus.domain.enumeration.TicketStatus.IN_LAVORAZIONE;
 import static it.nexus.domain.enumeration.TicketStatus.NUOVA;
@@ -54,6 +55,13 @@ public final class TicketTransitions {
      */
     public static final TicketTransition ACCEPT = new TicketTransition("ACCEPT", Set.of(PROPOSTA_AZIENDA),
             PROPOSTA_ACCOLTA, Set.of(Role.TUTOR));
+
+    /**
+     * Fase 6 — il Tutor registra che l'appuntamento con l'azienda è fissato (US-801): il timer si ferma. Solo il Tutor
+     * della segnalazione (controllo nel servizio).
+     */
+    public static final TicketTransition APPOINTMENT_SET = new TicketTransition("APPOINTMENT_SET",
+            Set.of(PROPOSTA_ACCOLTA), APPUNTAMENTO, Set.of(Role.TUTOR));
 
     private TicketTransitions() {
     }
