@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fetchJobCategories, fetchZones } from '@/config/api/referenceApi';
 import {
   acceptProposal,
+  excludeCompany,
   appointmentFailed,
   appointmentSet,
   approveCategory,
@@ -34,6 +35,8 @@ vi.mock('@/config/api/ticketApi', () => ({
   matchTicket: vi.fn(),
   takeOverTicket: vi.fn(),
   acceptProposal: vi.fn(),
+  excludeCompany: vi.fn(),
+  fetchExclusions: vi.fn().mockResolvedValue([]),
   appointmentFailed: vi.fn(),
   appointmentSet: vi.fn(),
   approveCategory: vi.fn(),
@@ -250,6 +253,42 @@ describe('<TicketPage>', () => {
     await user.keyboard('{Escape}');
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     await waitFor(() => expect(details).toHaveFocus());
+  });
+
+  it('Dettagli: esclusione dell’azienda con motivo, esito ed elenco delle escluse', async () => {
+    const user = userEvent.setup();
+    vi.mocked(excludeCompany).mockResolvedValue([
+      {
+        companyId: 'C1',
+        companyName: 'Alfa Logistica',
+        reason: 'Non assume d’estate',
+        createdAt: '2026-10-27T10:00:00Z',
+        authorName: 'Operatore Call Center',
+      },
+    ]);
+    renderPage();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Dettagli Magazziniere presso Alfa Logistica' }),
+    );
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', { name: 'Escludi questa azienda' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Conferma esclusione' }));
+    expect(await within(dialog).findByText('Campo obbligatorio')).toBeInTheDocument();
+    expect(excludeCompany).not.toHaveBeenCalled();
+    await expectNoAxeViolations();
+
+    await user.type(within(dialog).getByLabelText(/^Motivo dell’esclusione/), 'Non assume d’estate');
+    await user.click(within(dialog).getByRole('button', { name: 'Conferma esclusione' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    const outcome = await screen.findByText(/Alfa Logistica esclusa per questa segnalazione/);
+    await waitFor(() => expect(outcome).toHaveFocus());
+    expect(excludeCompany).toHaveBeenCalledWith(
+      { id: 'T9', companyId: 'C1', reason: 'Non assume d’estate' },
+      expect.anything(),
+    );
+    expect(screen.getByRole('heading', { name: 'Aziende escluse' })).toBeInTheDocument();
   });
 
   it('Dettagli: "Proponi" dal dialogo apre la stessa conferma', async () => {

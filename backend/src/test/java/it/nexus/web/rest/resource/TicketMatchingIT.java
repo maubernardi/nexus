@@ -2,6 +2,9 @@ package it.nexus.web.rest.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -261,6 +264,47 @@ class TicketMatchingIT {
         // versione superata: 409
         mockMvc.perform(post("/api/v1/tickets/" + id(ofColleague) + "/take-over").header(USER, "admin")
                         .contentType(MediaType.APPLICATION_JSON).content("{\"version\": 0}"))
+                .andExpect(status().isConflict());
+    }
+
+    private ResultActions exclude(String user, Ticket t, Company c, String reason) throws Exception {
+        return mockMvc.perform(post("/api/v1/tickets/" + id(t) + "/exclusions").header(USER, user)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"companyId\": \"%s\", \"reason\": \"%s\"}".formatted(TsidMapper.toExternal(c.getId()),
+                        reason)));
+    }
+
+    @Test
+    void esclusione_aziendaNonPiuTraLeCompatibili_conMotivoInCronologia() throws Exception {
+        Company alfa = match.getCompany();
+        exclude("operatore.cc", ticket, alfa, " ").andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("reason"));
+
+        exclude("operatore.cc", ticket, alfa, "Non assume nel periodo estivo")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].companyName", hasItems("Esclusa S.p.A.", "Alfa Logistica")))
+                .andExpect(jsonPath("$[1].reason").value("Non assume nel periodo estivo"))
+                .andExpect(jsonPath("$[1].authorName").isString());
+
+        mockMvc.perform(get("/api/v1/tickets/" + id(ticket) + "/compatible-job-slots").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$[*].companyName", not(hasItem("Alfa Logistica"))));
+        mockMvc.perform(get("/api/v1/tickets/" + id(ticket) + "/history").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$[-1].action").value("COMPANY_EXCLUDE"))
+                .andExpect(jsonPath("$[-1].detail").value("Alfa Logistica esclusa per questa segnalazione"))
+                .andExpect(jsonPath("$[-1].note").value("Non assume nel periodo estivo"));
+        mockMvc.perform(get("/api/v1/companies/" + TsidMapper.toExternal(alfa.getId()) + "/history")
+                        .header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.events[0].type").value("ESCLUSIONE"));
+        // una seconda volta no
+        exclude("operatore.cc", ticket, alfa, "Ancora").andExpect(status().isConflict());
+    }
+
+    @Test
+    void esclusione_soloCallCenterESuSegnalazioneInLavorazione() throws Exception {
+        exclude("tutor1", ticket, match.getCompany(), "Motivo").andExpect(status().isForbidden());
+        Ticket notTaken = TestEntities.ticket(tutor, project, beneficiaries.save(TestEntities.beneficiary(tutor, near)),
+                wanted);
+        exclude("operatore.cc", tickets.saveAndFlush(notTaken), match.getCompany(), "Motivo")
                 .andExpect(status().isConflict());
     }
 

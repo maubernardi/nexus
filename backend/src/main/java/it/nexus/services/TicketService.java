@@ -5,6 +5,8 @@ import java.util.List;
 import it.nexus.domain.dto.AppointmentFailedDTO;
 import it.nexus.domain.dto.AppointmentSetDTO;
 import it.nexus.domain.dto.ApproveCategoryDTO;
+import it.nexus.domain.dto.CompanyExclusionDTO;
+import it.nexus.domain.dto.CompanyExclusionFormDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
 import it.nexus.domain.dto.ProposalRejectDTO;
@@ -77,6 +79,15 @@ public interface TicketService {
      * mansione di nuovo libera, azienda esclusa per la segnalazione (US-702, Q3).
      */
     TicketDetailDTO rejectProposal(String ticketId, ProposalRejectDTO dto);
+
+    /** Aziende escluse per la segnalazione, dalla prima (US-603). */
+    List<CompanyExclusionDTO> exclusions(String ticketId);
+
+    /**
+     * Il Call Center esclude un'azienda per la segnalazione, con motivo: non compare più tra le compatibili (US-603).
+     * Solo su segnalazioni prese in carico e senza una proposta in corso.
+     */
+    List<CompanyExclusionDTO> excludeCompany(String ticketId, CompanyExclusionFormDTO dto);
 
     /** Il Call Center approva la nuova tipologia proposta dal Tutor, che entra nel catalogo (US-302). */
     TicketDetailDTO approveCategory(String ticketId, ApproveCategoryDTO dto);

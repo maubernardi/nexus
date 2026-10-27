@@ -18,6 +18,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import it.nexus.domain.dto.AppointmentFailedDTO;
 import it.nexus.domain.dto.AppointmentSetDTO;
 import it.nexus.domain.dto.ApproveCategoryDTO;
+import it.nexus.domain.dto.CompanyExclusionDTO;
+import it.nexus.domain.dto.CompanyExclusionFormDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
 import it.nexus.domain.dto.ProposalRejectDTO;
@@ -70,6 +72,21 @@ public class TicketResource {
     @Operation(summary = "Cronologia della segnalazione: data, autore, azione, stato e nota")
     public ResponseEntity<List<TicketEventDTO>> history(@PathVariable String id) {
         return ResponseEntity.ok(ticketService.history(id));
+    }
+
+    @GetMapping("/{id}/exclusions")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Aziende escluse per la segnalazione, con motivo")
+    public ResponseEntity<List<CompanyExclusionDTO>> exclusions(@PathVariable String id) {
+        return ResponseEntity.ok(ticketService.exclusions(id));
+    }
+
+    @PostMapping("/{id}/exclusions")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Esclude un'azienda per la segnalazione, con motivo: non compare più tra le compatibili")
+    public ResponseEntity<List<CompanyExclusionDTO>> excludeCompany(@PathVariable String id,
+            @RequestBody @Valid CompanyExclusionFormDTO body) {
+        return ResponseEntity.ok(ticketService.excludeCompany(id, body));
     }
 
     @GetMapping("/{id}/compatible-job-slots")
