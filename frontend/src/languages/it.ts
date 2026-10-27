@@ -272,6 +272,33 @@ export const it = {
     reminder: 'Promemoria',
     deadline: 'Scadenza',
   },
+  notifications: {
+    bell_zero: 'Notifiche, nessuna da leggere',
+    bell_one: 'Notifiche, 1 da leggere',
+    bell_other: 'Notifiche, {{count}} da leggere',
+    arrived_one: 'Hai 1 notifica da leggere',
+    arrived_other: 'Hai {{count}} notifiche da leggere',
+    unread_zero: 'Nessuna notifica da leggere.',
+    unread_one: '1 notifica da leggere.',
+    unread_other: '{{count}} notifiche da leggere.',
+    markAll: 'Segna tutte come lette',
+    allRead: 'Tutte le notifiche sono state segnate come lette.',
+    markRead: 'Segna come letta',
+    new: 'Nuova:',
+    open: 'Apri la segnalazione n. {{number}}',
+    empty: 'Non hai notifiche.',
+    listLabel: 'Notifiche dalla più recente',
+    generic: 'Aggiornamento sulla segnalazione n. {{number}}.',
+    types: {
+      CATEGORY_CHANGED:
+        'Il Call Center ha scelto una tipologia diversa da quella che avevi proposto per la segnalazione n. {{number}}: il motivo è nella cronologia.',
+      CATEGORY_APPROVED:
+        'La nuova tipologia che avevi proposto per la segnalazione n. {{number}} è stata approvata.',
+      PROPOSAL_SENT: 'C’è una proposta di tirocinio per la segnalazione n. {{number}}: valutala e accettala.',
+      PROPOSAL_ACCEPTED:
+        'Il Tutor ha accettato la proposta della segnalazione n. {{number}}: è partito il timer.',
+    },
+  },
   companyNote: {
     heading: 'Note',
     intro:
@@ -442,8 +469,6 @@ export const it = {
       approved: 'Tipologia «{{name}}» approvata e aggiunta al catalogo: la segnalazione è entrata in coda.',
       rejected:
         'Tipologia cambiata in «{{name}}»: la segnalazione è entrata in coda e il Tutor ne è avvisato.',
-      changedNotice:
-        'Il Call Center ha scelto una tipologia diversa da quella che avevi proposto. Trovi il motivo nella cronologia.',
     },
     timerDeadlineValue: '{{date}} (7 giorni lavorativi)',
     notTaken: 'Prendi in carico la segnalazione dalla coda per poterla abbinare.',
@@ -502,7 +527,6 @@ export const it = {
     },
     emptyFiltered: 'Nessuna segnalazione corrisponde ai filtri scelti.',
     newCategory: '{{name}} (nuova, da approvare)',
-    categoryChanged: 'Tipologia cambiata',
     filters: 'Filtri',
     status: 'Stato',
     allStatuses: 'Tutti gli stati',
@@ -565,6 +589,10 @@ export const it = {
     tickets: {
       title: 'Segnalazioni',
       heading: 'Segnalazioni',
+    },
+    notifications: {
+      title: 'Notifiche',
+      heading: 'Notifiche',
     },
     calendar: {
       title: 'Calendario',

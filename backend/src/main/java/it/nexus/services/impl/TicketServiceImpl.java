@@ -48,6 +48,7 @@ import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.CompanyEventType;
 import it.nexus.domain.enumeration.JobSlotStatus;
+import it.nexus.domain.enumeration.NotificationType;
 import it.nexus.domain.enumeration.Role;
 import it.nexus.domain.enumeration.TicketListView;
 import it.nexus.domain.enumeration.TicketStatus;
@@ -72,6 +73,7 @@ import it.nexus.repository.TicketStatusHistoryRepository;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.CurrentAppUserService;
+import it.nexus.services.NotificationService;
 import it.nexus.services.TicketService;
 import it.nexus.services.TicketStateMachine;
 import it.nexus.services.UserDisplayNameService;
@@ -107,6 +109,7 @@ public class TicketServiceImpl implements TicketService {
     private final AppUserRepository appUserRepository;
     private final UserDisplayNameService userDisplayNameService;
     private final WorkingDayService workingDayService;
+    private final NotificationService notificationService;
     private final Clock clock;
     private final JobSlotRepository jobSlotRepository;
     private final TicketCompanyBlacklistRepository blacklistRepository;
@@ -161,6 +164,7 @@ public class TicketServiceImpl implements TicketService {
                     .value("requestedJobFreeText", proposed, null)
                     .value("requestedJobCategory", null, category.getName());
         });
+        notificationService.notify(saved.getTutor(), NotificationType.CATEGORY_APPROVED, saved);
         return detail(saved, currentAppUserService.getCurrentAppUser());
     }
 
@@ -173,23 +177,12 @@ public class TicketServiceImpl implements TicketService {
                 t -> {
                     t.setRequestedJobFreeText(null);
                     t.setRequestedJobCategory(chosen);
-                    // notifica provvisoria al Tutor finché non arrivano le notifiche (US-1201, review §8.2)
-                    t.setCategoryChangeUnseen(true);
                     return AuditChanges.of()
                             .value("requestedJobFreeText", proposed, null)
                             .value("requestedJobCategory", null, chosen.getName());
                 });
+        notificationService.notify(saved.getTutor(), NotificationType.CATEGORY_CHANGED, saved);
         return detail(saved, currentAppUserService.getCurrentAppUser());
-    }
-
-    @Override
-    public void markCategoryChangeSeen(String ticketId) {
-        AppUser me = currentAppUserService.getCurrentAppUser();
-        Ticket ticket = visibleTicket(ticketId, me);
-        if (ticket.getTutor().getId().equals(me.getId()) && ticket.isCategoryChangeUnseen()) {
-            ticket.setCategoryChangeUnseen(false);
-            ticketRepository.save(ticket);
-        }
     }
 
     /** Codice del catalogo dal nome (es. "Tecnico del suono" → TECNICO_DEL_SUONO), reso univoco se serve. */
@@ -409,6 +402,7 @@ public class TicketServiceImpl implements TicketService {
                 "ticketNumber", saved.getNumber(),
                 "jobSlotId", TsidMapper.toExternal(slot.getId()),
                 "jobSlotTitle", slot.getTitle())));
+        notificationService.notify(saved.getTutor(), NotificationType.PROPOSAL_SENT, saved);
         return detail(saved, me);
     }
 
@@ -433,6 +427,7 @@ public class TicketServiceImpl implements TicketService {
         companyAuditEvents.save(new CompanyAuditEvent(slot.getCompany(), saved,
                 CompanyEventType.PROPOSTA_ACCOLTA.name(), Map.of("ticketNumber", saved.getNumber(),
                         "jobSlotTitle", slot.getTitle(), "timerLastDay", lastDay.toString())));
+        notificationService.notify(saved.getAssignedCcOperator(), NotificationType.PROPOSAL_ACCEPTED, saved);
         return detail(saved, me);
     }
 
@@ -495,8 +490,7 @@ public class TicketServiceImpl implements TicketService {
                 t.getJobSlot() == null ? null : jobSlotMapper.toMatch(t.getJobSlot()),
                 t.getCreatedAt(),
                 t.getTutor().getId().equals(me.getId()),
-                t.getTimerDeadlineAt() == null ? null : lastDay(t.getTimerDeadlineAt()),
-                t.getTutor().getId().equals(me.getId()) && t.isCategoryChangeUnseen());
+                t.getTimerDeadlineAt() == null ? null : lastDay(t.getTimerDeadlineAt()));
     }
 
     private static String fullName(AppUser user) {

@@ -30,8 +30,6 @@ export type Ticket = {
 type NewCategoryInfo = {
   /** Nuova tipologia proposta dal Tutor, in attesa di approvazione. */
   requestedJobFreeText: string | null;
-  /** Tipologia cambiata dal Call Center e non ancora vista dal Tutor. */
-  categoryChangeUnseen: boolean;
 };
 
 export const submitTicket = async (payload: TicketCreate): Promise<Ticket> => {
@@ -98,8 +96,6 @@ export type TicketDetail = {
   myTicket: boolean;
   /** Ultimo giorno lavorativo del timer della proposta accettata (aaaa-mm-gg), se attivo. */
   timerDeadline: string | null;
-  /** Per il Tutor della segnalazione: tipologia cambiata dal Call Center e non ancora vista (US-302). */
-  categoryChanged: boolean;
 };
 
 export type CompatibleFilters = { zoneId?: string; jobCategoryId?: string };
@@ -214,8 +210,4 @@ export const rejectCategory = async ({
     version,
   });
   return data;
-};
-
-export const markCategoryChangeSeen = async (id: string): Promise<void> => {
-  await axiosInstance.post(`${ENDPOINTS.tickets}/${id}/category-change-seen`);
 };

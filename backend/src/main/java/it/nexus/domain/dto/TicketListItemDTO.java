@@ -21,7 +21,5 @@ public record TicketListItemDTO(
         String tutorName,
         /** Operatore che ha in carico la segnalazione (null se nessuno). */
         String assignedOperatorName,
-        Instant createdAt,
-        /** Tipologia cambiata dal Call Center e non ancora vista dal Tutor (US-302, notifica provvisoria). */
-        boolean categoryChangeUnseen) {
+        Instant createdAt) {
 }

@@ -49,7 +49,6 @@ const item = (number: number, overrides: Partial<TicketListItem> = {}): TicketLi
   assignedOperatorName: null,
   createdAt: '2026-10-24T08:15:00Z',
   requestedJobFreeText: null,
-  categoryChangeUnseen: false,
   ...overrides,
 });
 
@@ -211,7 +210,7 @@ describe('<TicketsPage>', () => {
     });
   });
 
-  it('nuova tipologia: "Da approvare" per il Call Center, evidenza "Tipologia cambiata" per il Tutor', async () => {
+  it('nuova tipologia: vista "Da approvare" per il Call Center', async () => {
     const user = userEvent.setup();
     asUser('CALL_CENTER');
     vi.mocked(fetchTickets).mockResolvedValue([
@@ -221,7 +220,7 @@ describe('<TicketsPage>', () => {
         requestedJobFreeText: 'Fonico',
       }),
     ]);
-    const { unmount } = renderPage();
+    renderPage();
 
     await user.click(await screen.findByRole('link', { name: 'Da approvare' }));
     const table = await screen.findByRole('table', { name: /nuova tipologia da approvare/ });
@@ -231,12 +230,6 @@ describe('<TicketsPage>', () => {
       status: undefined,
       projectId: undefined,
     });
-    unmount();
-
-    asUser('TUTOR');
-    vi.mocked(fetchTickets).mockResolvedValue([item(8, { categoryChangeUnseen: true })]);
-    renderPage();
-    expect(await screen.findByText('Tipologia cambiata')).toBeInTheDocument();
     await expectNoAxeViolations();
   });
 

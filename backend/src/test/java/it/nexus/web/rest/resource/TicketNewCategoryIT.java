@@ -155,6 +155,8 @@ class TicketNewCategoryIT {
                 created.getId())).singleElement().satisfies(e -> assertThat(e.getAction()).isEqualTo("CREATE"));
         mockMvc.perform(get("/api/v1/tickets").param("view", "TO_TAKE").header(USER, "operatore.cc"))
                 .andExpect(jsonPath("$[*].id", hasItem(id)));
+        mockMvc.perform(get("/api/v1/notifications").header(USER, "tutor1"))
+                .andExpect(jsonPath("$.items[0].type").value("CATEGORY_APPROVED"));
         mockMvc.perform(get("/api/v1/tickets/" + id + "/history").header(USER, "tutor1"))
                 .andExpect(jsonPath("$[-1].action").value("CATEGORY_APPROVE"))
                 .andExpect(jsonPath("$[-1].detail").value("«Tecnico audio» aggiunta al catalogo"))
@@ -181,22 +183,17 @@ class TicketNewCategoryIT {
                         .formatted(catalogId, "Rientra nel catalogo", version(id)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("NUOVA"))
-                .andExpect(jsonPath("$.requestedJobCategory.name").value("Magazziniere QA"))
-                .andExpect(jsonPath("$.categoryChanged").value(false));
+                .andExpect(jsonPath("$.requestedJobCategory.name").value("Magazziniere QA"));
 
         mockMvc.perform(get("/api/v1/tickets/" + id + "/history").header(USER, "tutor1"))
                 .andExpect(jsonPath("$[-1].action").value("CATEGORY_REJECT"))
                 .andExpect(jsonPath("$[-1].detail").value("«Tecnico del suono» → «Magazziniere QA»"))
                 .andExpect(jsonPath("$[-1].note").value("Rientra nel catalogo"));
-        // evidenza per il Tutor finché non apre la segnalazione
-        mockMvc.perform(get("/api/v1/tickets").param("view", "MINE").header(USER, "tutor1"))
-                .andExpect(jsonPath("$[0].categoryChangeUnseen").value(true));
-        mockMvc.perform(get("/api/v1/tickets/" + id).header(USER, "tutor1"))
-                .andExpect(jsonPath("$.categoryChanged").value(true));
-        mockMvc.perform(post("/api/v1/tickets/" + id + "/category-change-seen").header(USER, "tutor1"))
-                .andExpect(status().isNoContent());
-        mockMvc.perform(get("/api/v1/tickets").param("view", "MINE").header(USER, "tutor1"))
-                .andExpect(jsonPath("$[0].categoryChangeUnseen").value(false));
+        // il Tutor ne è avvisato con una notifica (US-1201)
+        mockMvc.perform(get("/api/v1/notifications").header(USER, "tutor1"))
+                .andExpect(jsonPath("$.unread").value(1))
+                .andExpect(jsonPath("$.items[0].type").value("CATEGORY_CHANGED"))
+                .andExpect(jsonPath("$.items[0].ticketId").value(id));
     }
 
     @Test

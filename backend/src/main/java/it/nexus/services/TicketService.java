@@ -65,7 +65,4 @@ public interface TicketService {
 
     /** Il Call Center respinge la nuova tipologia e sceglie quella del catalogo, con il motivo (US-302). */
     TicketDetailDTO rejectCategory(String ticketId, RejectCategoryDTO dto);
-
-    /** Il Tutor della segnalazione ha visto il cambio di tipologia: l'evidenza nella Home si spegne (US-302). */
-    void markCategoryChangeSeen(String ticketId);
 }

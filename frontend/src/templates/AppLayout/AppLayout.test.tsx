@@ -10,6 +10,13 @@ import { expectNoAxeViolations } from '@/tests/axe';
 import { renderRoutes } from '@/tests/renderWithProviders';
 
 vi.mock('@/config/api/userApi', () => ({ fetchCurrentUser: vi.fn() }));
+vi.mock('@/config/api/notificationApi', () => ({
+  NOTIFICATION_TYPES: [],
+  fetchUnreadCount: vi.fn().mockResolvedValue(0),
+  fetchNotifications: vi.fn().mockResolvedValue({ unread: 0, items: [] }),
+  markNotificationRead: vi.fn(),
+  markAllNotificationsRead: vi.fn(),
+}));
 // la Home è l'elenco delle segnalazioni (US-303): niente chiamate di rete nei test della shell
 vi.mock('@/config/api/ticketApi', () => ({
   fetchTickets: vi.fn().mockResolvedValue([]),
