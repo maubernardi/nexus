@@ -1,6 +1,6 @@
 # Sprint 4 — 25 – 27 ottobre 2026
 
-**Stato:** 🔨 in corso. **Planning:** 24/10, nella [review dello Sprint 3](sprint-03-review.md) (§9); proposta del
+**Stato:** ✅ impegno completato il 27/10 (24/24 punti), in attesa della [review](sprint-04-review.md). **Planning:** 24/10, nella [review dello Sprint 3](sprint-03-review.md) (§9); proposta del
 team confermata dal Product Owner, con il calendario unico per tutti i progetti.
 
 ## Obiettivo
@@ -27,7 +27,7 @@ Fatto il 25/10: decisioni §8.1 e §8.3 in [#40](https://github.com/maubernardi/
 | US-107 | Calendario unico (patrono e chiusure) | 3 | 🎉 Done | `add-work-calendar` | [#47](https://github.com/maubernardi/nexus/pull/47) |
 | US-703 | Calendario dei giorni lavorativi | 3 | 🎉 Done | `add-working-days` | [#48](https://github.com/maubernardi/nexus/pull/48) |
 | US-701 | Accettazione della proposta | 3 | 🎉 Done | `add-proposal-acceptance` | [#49](https://github.com/maubernardi/nexus/pull/49) |
-| US-302 | Nuova tipologia di mansione dal Tutor, approvata dal Call Center | 5 | ✅ Ready | — | — |
+| US-302 | Nuova tipologia di mansione dal Tutor, approvata dal Call Center | 5 | 🎉 Done | `add-new-job-category` | [#51](https://github.com/maubernardi/nexus/pull/51) |
 
 US-302 aggiunta all'impegno il 25/10 su richiesta del PO (nota operativa 3), senza togliere altre storie: impegno sopra i
 ~20 punti abituali. Notifica al Tutor con la soluzione provvisoria decisa in review (§8.2). Per il PO: US-1301 (PWA su
@@ -54,8 +54,9 @@ coeso); gli stati del backlog si aggiornano nella PR di documentazione dopo i me
 | 26/10 (US-107 unita, #47) | 11 |
 | 26/10 (US-703 unita, #48) | 8 |
 | 27/10 (US-701 unita, #49) | 5 |
+| 27/10 (US-302 unita, #51) | 0 |
 | Fine sprint | — |
 
 ## Review, retrospettiva e planning successivo
 
-In un unico documento asincrono a fine sprint.
+[sprint-04-review.md](sprint-04-review.md) (documento unico asincrono).
