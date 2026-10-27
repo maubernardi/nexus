@@ -3,9 +3,7 @@
 ## Purpose
 Definisce le entità del dominio NEXUS (progetti, utenti, beneficiari, segnalazioni, aziende, mansioni, bacheca), i loro
 identificativi e i vincoli di integrità che il sistema garantisce indipendentemente dalla logica applicativa.
-
 ## Requirements
-
 ### Requirement: Identificativi delle entità
 Ogni entità SHALL avere un identificativo tecnico TSID (intero a 64 bit ordinato nel tempo). Verso l'esterno
 l'identificativo MUST essere rappresentato come stringa di 13 caratteri, mai come numero. Ticket e BoardPost SHALL
@@ -66,7 +64,7 @@ un'eventuale anonimizzazione.
 
 ### Requirement: Segnalazione (Ticket)
 Ogni ticket SHALL riferire tutor, progetto e beneficiario, avere tipo `NORMAL` o `SPECIAL` e uno stato tra `NUOVA`,
-`IN_ATTESA_APPROVAZIONE_ADMIN`, `IN_LAVORAZIONE`, `PROPOSTA_AZIENDA`, `PROPOSTA_ACCOLTA`, `APPUNTAMENTO`, `IN_TIROCINIO`,
+`IN_ATTESA_APPROVAZIONE`, `IN_LAVORAZIONE`, `PROPOSTA_AZIENDA`, `PROPOSTA_ACCOLTA`, `APPUNTAMENTO`, `IN_TIROCINIO`,
 `FORM_RESTITUZIONE`, `RIAPERTO`. La mansione richiesta MUST essere indicata da una tipologia del catalogo oppure da un
 testo libero, mai entrambi e mai nessuno dei due. Un ticket `SPECIAL` MUST riferire il post di bacheca da cui è nato;
 un ticket fast-track MUST essere di tipo `SPECIAL`. Il timer SHALL registrare avvio, invio del promemoria e scadenza;
@@ -143,3 +141,4 @@ più un ticket in stato diverso da `FORM_RESTITUZIONE`.
 #### Scenario: Ticket concluso
 - **WHEN** il beneficiario ha solo ticket in `FORM_RESTITUZIONE`
 - **THEN** l'inserimento di un nuovo ticket riesce
+

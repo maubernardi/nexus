@@ -2,9 +2,7 @@
 
 ## Purpose
 Permette al Tutor di segnalare un proprio beneficiario per un progetto a cui è assegnato, avviando il percorso di tirocinio.
-
 ## Requirements
-
 ### Requirement: Invio della segnalazione
 Il sistema SHALL permettere al solo Tutor di inviare una segnalazione normale indicando un proprio beneficiario, un progetto
 a cui è assegnato e una tipologia di mansione attiva del catalogo. Il ticket SHALL nascere di tipo `NORMAL`, senza
@@ -69,3 +67,35 @@ selezionabili, indicandone il numero.
 - **WHEN** il Tutor apre il modulo e un suo beneficiario ha la segnalazione n. N aperta
 - **THEN** quel beneficiario compare come non selezionabile con il testo "segnalazione n. N aperta"; se tutti i suoi
   beneficiari sono in questa situazione, la pagina lo spiega al posto del modulo
+
+### Requirement: Nuova tipologia di mansione dal Tutor
+Il Tutor SHALL poter descrivere una tipologia di mansione che non è nel catalogo al posto di sceglierne una; la
+segnalazione SHALL nascere in `IN_ATTESA_APPROVAZIONE` e non entrare in coda. Una tipologia già nel catalogo (stesso
+nome, senza distinguere maiuscole) MUST essere scelta dall'elenco. Un operatore del Call Center o l'ADMIN SHALL poter:
+approvarla, anche correggendone il nome, e allora la tipologia entra nel catalogo; oppure respingerla scegliendo una
+tipologia del catalogo con un motivo obbligatorio. In entrambi i casi la segnalazione passa in `NUOVA` (coda) e la
+decisione è registrata nell'audit e in cronologia; se respinta, il Tutor della segnalazione ne è avvisato finché non la
+apre.
+
+#### Scenario: Invio con tipologia nuova
+- **WHEN** il Tutor descrive la tipologia "Tecnico del suono" e invia
+- **THEN** la segnalazione è "In attesa di approvazione" e il Call Center la trova in "Da approvare", non in coda
+
+#### Scenario: Approvazione con nome corretto
+- **WHEN** l'operatore approva la tipologia con il nome "Tecnico audio"
+- **THEN** "Tecnico audio" entra nel catalogo, la segnalazione va in coda con quella tipologia e la cronologia mostra
+  "Nuova tipologia approvata"
+
+#### Scenario: Respingimento
+- **WHEN** l'operatore sceglie "Magazziniere" dal catalogo con il motivo "Rientra nel catalogo"
+- **THEN** la segnalazione va in coda come "Magazziniere", la cronologia mostra proposta → scelta e il motivo, e il Tutor
+  vede "Tipologia cambiata" nella Home finché non apre la segnalazione
+
+#### Scenario: Tipologia già nel catalogo
+- **WHEN** il Tutor descrive una tipologia con il nome di una già presente
+- **THEN** il sistema chiede di sceglierla dall'elenco
+
+#### Scenario: Altri ruoli
+- **WHEN** un Tutor prova ad approvare o respingere una tipologia
+- **THEN** la risposta è `403`
+
