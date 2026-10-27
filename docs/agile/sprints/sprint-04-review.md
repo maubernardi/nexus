@@ -181,12 +181,23 @@ richiede. Alternativa: torna in "Da prendere in carico" per chiunque.
 > cima a "In carico a me" con l'evidenza "Riaperta", e si lavora come una in lavorazione (un collega può sempre
 > intervenire, US-405). **Nessuna esclusione automatica** dell'azienda dopo un appuntamento fallito: decide l'operatore
 > (US-603). Resta l'esclusione automatica al rifiuto della proposta da parte del Tutor (Q3).
+>
+> Per decidere, l'operatore ha il **motivo dell'appuntamento fallito** (PO, 27/10): il Tutor indica una causa da un menu
+> ("L'azienda non ha confermato il tirocinio", "Il beneficiario ha rinunciato", "Il beneficiario non si è presentato",
+> "Altro") e una nota, obbligatoria con "Altro"; il motivo va in cronologia e nello storico dell'azienda. Voci del menu
+> provvisorie, da confermare con il committente. Criterio aggiunto a US-802 (resta 2 punti).
 
 ### 8.3 Notifiche in app (US-1201)
 Le notifiche servono a promemoria, scadenza, rifiuto e tipologia cambiata. Q9 chiede app **ed email**: l'email è una
 storia a parte (US-1202, R3).
 *Proposta:* nello Sprint 5 solo le notifiche **in app** (campanella con contatore nell'intestazione, elenco, "segna come
 letta"); l'avviso provvisorio di US-302 diventa una notifica.
+
+> ✅ **Deciso (PO, 27/10): proposta accettata.** Nello Sprint 5 solo notifiche **in app**: campanella con il numero di
+> non lette (annunciato agli screen reader), elenco dalla più recente con link alla segnalazione, segna come letta (una o
+> tutte). Destinatari: la controparte del passaggio (Tutor ↔ operatore che ha in carico la segnalazione; la scadenza del
+> timer a entrambi). L'avviso "Tipologia cambiata" di US-302 diventa una notifica. Nessun dato personale oltre al numero
+> della segnalazione. L'email resta in US-1202 (R3).
 
 ### 8.4 Chiusura dello Sprint 4
 *Proposta:* chiudere lo Sprint 4 con questa review (velocity 24) e avviare lo Sprint 5 alla conferma del planning.
