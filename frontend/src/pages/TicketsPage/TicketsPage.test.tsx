@@ -49,6 +49,8 @@ const item = (number: number, overrides: Partial<TicketListItem> = {}): TicketLi
   assignedOperatorName: null,
   createdAt: '2026-10-24T08:15:00Z',
   requestedJobFreeText: null,
+  timerDeadline: null,
+  timerDueSoon: false,
   ...overrides,
 });
 
@@ -208,6 +210,37 @@ describe('<TicketsPage>', () => {
       status: undefined,
       projectId: undefined,
     });
+  });
+
+  it('Tutor: colonna "Scadenza", con "in scadenza" in testo dopo il promemoria', async () => {
+    asUser('TUTOR');
+    vi.mocked(fetchTickets).mockResolvedValue([
+      item(5, { status: 'PROPOSTA_ACCOLTA', timerDeadline: '2026-11-04', timerDueSoon: true }),
+      item(6, { status: 'PROPOSTA_ACCOLTA', timerDeadline: '2026-11-06' }),
+      item(7),
+    ]);
+    renderPage();
+
+    const table = await screen.findByRole('table', { name: /Le mie segnalazioni/ });
+    expect(within(table).getByRole('columnheader', { name: 'Scadenza' })).toBeInTheDocument();
+    const [dueSoon, later, none] = within(table).getAllByRole('row').slice(1);
+    expect(within(dueSoon).getByText('in scadenza, entro mer 04/11')).toHaveAttribute(
+      'datetime',
+      '2026-11-04',
+    );
+    expect(within(later).getByText('entro ven 06/11')).toBeInTheDocument();
+    expect(within(later).queryByText(/in scadenza/)).not.toBeInTheDocument();
+    expect(within(none).getByText('Nessuna scadenza')).toBeInTheDocument();
+    await expectNoAxeViolations();
+  });
+
+  it('Call Center: nessuna colonna "Scadenza"', async () => {
+    asUser('CALL_CENTER');
+    vi.mocked(fetchTickets).mockResolvedValue([item(7)]);
+    renderPage();
+
+    const table = await screen.findByRole('table', { name: /Segnalazioni da prendere in carico/ });
+    expect(within(table).queryByRole('columnheader', { name: 'Scadenza' })).not.toBeInTheDocument();
   });
 
   it('nuova tipologia: vista "Da approvare" per il Call Center', async () => {

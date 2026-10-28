@@ -283,6 +283,12 @@ public class TicketServiceImpl implements TicketService {
             found = found.stream()
                     .sorted(Comparator.comparing((Ticket t) -> t.getStatus() != TicketStatus.RIAPERTO))
                     .toList();
+        } else if (view == TicketListView.MINE || view == TicketListView.PROJECT) {
+            // prima la scadenza più vicina (US-307); le altre restano dalla più recente: ordinamento stabile
+            found = found.stream()
+                    .sorted(Comparator.comparing(Ticket::getTimerDeadlineAt,
+                            Comparator.nullsLast(Comparator.naturalOrder())))
+                    .toList();
         }
         return found.stream().map(mapper::toListItem).toList();
     }
@@ -345,15 +351,10 @@ public class TicketServiceImpl implements TicketService {
                     .map(cause -> "Causa: " + AppointmentFailureCause.valueOf(cause).label())
                     .orElse(null);
             case "ACCEPT" -> Optional.ofNullable(changed(event, "timerDeadlineAt", "after"))
-                    .map(at -> "Scadenza " + DATE.format(lastDay(Instant.parse(at))))
+                    .map(at -> "Scadenza " + DATE.format(TimeConfig.lastDay(Instant.parse(at))))
                     .orElse(null);
             default -> null;
         };
-    }
-
-    /** Ultimo giorno del timer: il giorno di Roma che termina alla scadenza. */
-    private static LocalDate lastDay(Instant deadline) {
-        return LocalDate.ofInstant(deadline.minusSeconds(1), TimeConfig.ZONE);
     }
 
     private String userName(String externalId) {
@@ -639,7 +640,7 @@ public class TicketServiceImpl implements TicketService {
                 t.getJobSlot() == null ? null : jobSlotMapper.toMatch(t.getJobSlot()),
                 t.getCreatedAt(),
                 t.getTutor().getId().equals(me.getId()),
-                t.getTimerDeadlineAt() == null ? null : lastDay(t.getTimerDeadlineAt()));
+                t.getTimerDeadlineAt() == null ? null : TimeConfig.lastDay(t.getTimerDeadlineAt()));
     }
 
     private static String fullName(AppUser user) {

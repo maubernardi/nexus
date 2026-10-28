@@ -4,8 +4,16 @@ import { Link } from 'react-router';
 
 import { Button } from '@/components/ui/button';
 import type { TicketListItem } from '@/config/api/ticketApi';
+import { cn } from '@/lib/utils';
 
 const dateTime = new Intl.DateTimeFormat('it-IT', { dateStyle: 'short', timeStyle: 'short' });
+const dayFormat = new Intl.DateTimeFormat('it-IT', { weekday: 'short', day: '2-digit', month: '2-digit' });
+
+/** Giorno ISO (aaaa-mm-gg) come "mar 04/11", senza passare dal fuso orario. */
+const formatDay = (iso: string): string => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return dayFormat.format(new Date(y, m - 1, d));
+};
 
 /** Colonne facoltative: dipendono dal ruolo e dalla vista. */
 export type TicketsTableColumns = {
@@ -13,6 +21,8 @@ export type TicketsTableColumns = {
   zone?: boolean;
   tutor?: boolean;
   operator?: boolean;
+  /** Scadenza del timer (viste del Tutor, US-307). */
+  deadline?: boolean;
 };
 
 type TicketsTableProps = {
@@ -95,6 +105,11 @@ export const TicketsTable = ({
             <th scope="col" className={th}>
               {t('tickets.columns.status')}
             </th>
+            {columns.deadline && (
+              <th scope="col" className={th}>
+                {t('tickets.columns.deadline')}
+              </th>
+            )}
             <th scope="col" className={th}>
               {t('tickets.columns.createdAt')}
             </th>
@@ -164,6 +179,25 @@ export const TicketsTable = ({
                   t(`enums.ticketStatus.${item.status}`)
                 )}
               </td>
+              {columns.deadline && (
+                <td className={`${td} whitespace-nowrap tabular-nums`}>
+                  {item.timerDeadline === null ? (
+                    <>
+                      <span aria-hidden="true">—</span>
+                      <span className="sr-only">{t('tickets.noDeadline')}</span>
+                    </>
+                  ) : (
+                    // dopo il promemoria la scadenza è vicina: evidenza in testo ("in scadenza"), non solo colore
+                    <time
+                      dateTime={item.timerDeadline}
+                      className={cn(item.timerDueSoon && 'font-semibold text-primary')}
+                    >
+                      {item.timerDueSoon && `${t('tickets.dueSoon')}, `}
+                      {t('tickets.deadline', { date: formatDay(item.timerDeadline) })}
+                    </time>
+                  )}
+                </td>
+              )}
               <td className={`${td} whitespace-nowrap tabular-nums`}>
                 <time dateTime={item.createdAt}>{dateTime.format(new Date(item.createdAt))}</time>
               </td>
