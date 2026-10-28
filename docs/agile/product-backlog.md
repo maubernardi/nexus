@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 65 elementi, 231 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-05](sprints/sprint-05.md).
+**Totale: 65 elementi, 231 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-06](sprints/sprint-06.md).
 
 ## Epiche
 
@@ -100,11 +100,11 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-705](#us-705) | E7 | Scadenza del timer | Must | 3 | R2 | 🎉 Done (Sprint 5) |
 | [US-801](#us-801) | E8 | Appuntamento preso | Must | 2 | R2 | 🎉 Done (Sprint 5) |
 | [US-802](#us-802) | E8 | Appuntamento fallito | Must | 3 | R2 | 🎉 Done (Sprint 5) |
-| [US-803](#us-803) | E8 | Rilancio in bacheca | Must | 5 | R2 | 📋 Backlog |
-| [US-901](#us-901) | E9 | Bacheca per il Tutor | Must | 3 | R2 | 📋 Backlog |
-| [US-902](#us-902) | E9 | Gestione della bacheca | Must | 5 | R2 | 📋 Backlog |
-| [US-903](#us-903) | E9 | Sblocco a tutti dopo 7 giorni | Must | 2 | R2 | 📋 Backlog |
-| [US-904](#us-904) | E9 | Annuncio da una mansione libera | Should | 3 | R2 | 📋 Backlog |
+| [US-803](#us-803) | E8 | Rilancio in bacheca | Must | 5 | R2 | ✅ Ready (Sprint 6) |
+| [US-901](#us-901) | E9 | Bacheca per il Tutor | Must | 3 | R2 | ✅ Ready (Sprint 6) |
+| [US-902](#us-902) | E9 | Gestione della bacheca | Must | 5 | R2 | ✅ Ready (Sprint 6) |
+| [US-903](#us-903) | E9 | Sblocco a tutti dopo 7 giorni | Must | 2 | R2 | ✅ Ready (Sprint 6) |
+| [US-904](#us-904) | E9 | Annuncio da una mansione libera | Should | 3 | R2 | ✅ Ready (Sprint 6) |
 | [US-1001](#us-1001) | E10 | Scheda amministrativa del tirocinio | Must | 5 | R3 | 📋 Backlog |
 | [US-1002](#us-1002) | E10 | Griglia oraria e sospensioni | Must | 5 | R3 | 📋 Backlog |
 | [US-1003](#us-1003) | E10 | Avvio del tirocinio | Must | 1 | R3 | 📋 Backlog |
@@ -585,12 +585,14 @@ Criteri di accettazione:
   e si può abbinare di nuovo (review dello Sprint 4, §8.2). Stima portata da 2 a 3 punti nel planning dello Sprint 5.
 
 #### US-803
-**Rilancio in bacheca** · Must · 5 punti · R2 · 📋 Backlog
+**Rilancio in bacheca** · Must · 5 punti · R2 · ✅ Ready (Sprint 6)
 
 Come **Tutor** voglio chiedere il rilancio della mansione in bacheca dopo un appuntamento fallito per offrirla ad altri beneficiari.
 
 Criteri di accettazione:
+- Nel modulo dell'appuntamento fallito (US-802) il Tutor trova la casella "Chiedi il rilancio in bacheca" (review Sprint 5, §8.1).
 - Si crea una bozza di post precompilata dalla mansione, riservata al progetto del ticket, collegata al ticket.
+- La bozza non è visibile ai Tutor finché il Call Center non la pubblica (US-902).
 - Il Call Center riceve una notifica.
 
 Dipendenze: US-802, US-1201
@@ -600,16 +602,17 @@ Dipendenze: US-802, US-1201
 _Le mansioni disponibili sono visibili ai Tutor in forma anonima e gestite dal Call Center._
 
 #### US-901
-**Bacheca per il Tutor** · Must · 3 punti · R2 · 📋 Backlog
+**Bacheca per il Tutor** · Must · 3 punti · R2 · ✅ Ready (Sprint 6)
 
 Come **Tutor** voglio consultare gli annunci pubblici e quelli dei miei progetti, senza il nome dell'azienda per proporre beneficiari adatti.
 
 Criteri di accettazione:
 - Il nome dell'azienda non arriva mai al browser del tutor (filtrato dall'API).
+- Il Tutor non vede né il titolo né le note dell'annuncio (possono contenere il nome dell'azienda): solo numero (#N), tipologia, zona, fascia d'età, orario, durata e l'indicazione "solo per il tuo progetto" per i post riservati (review Sprint 5, §8.2).
 - Annunci filtrabili per zona e tipologia; consultabili da smartphone.
 
 #### US-902
-**Gestione della bacheca** · Must · 5 punti · R2 · 📋 Backlog
+**Gestione della bacheca** · Must · 5 punti · R2 · ✅ Ready (Sprint 6)
 
 Come **operatore Call Center** voglio vedere le bozze, modificarle, pubblicarle e archiviarle per controllare cosa è visibile ai tutor.
 
@@ -617,7 +620,7 @@ Criteri di accettazione:
 - Solo Call Center e ADMIN modificano i post; la pubblicazione registra la data.
 
 #### US-903
-**Sblocco a tutti dopo 7 giorni** · Must · 2 punti · R2 · 📋 Backlog
+**Sblocco a tutti dopo 7 giorni** · Must · 2 punti · R2 · ✅ Ready (Sprint 6)
 
 Come **operatore Call Center** voglio rendere pubblico un post riservato a un progetto per allargare la platea se nessuno risponde.
 
@@ -625,7 +628,7 @@ Criteri di accettazione:
 - Il comando è disponibile solo dopo 7 giorni solari dalla pubblicazione; registra la data dello sblocco.
 
 #### US-904
-**Annuncio da una mansione libera** · Should · 3 punti · R2 · 📋 Backlog
+**Annuncio da una mansione libera** · Should · 3 punti · R2 · ✅ Ready (Sprint 6)
 
 Come **operatore Call Center** voglio creare un annuncio partendo da una mansione libera per promuovere le posizioni aperte.
 
