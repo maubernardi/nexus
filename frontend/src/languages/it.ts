@@ -324,6 +324,10 @@ export const it = {
         'Promemoria: per la segnalazione n. {{number}} manca la registrazione dell’appuntamento con l’azienda. La scadenza del timer è nel dettaglio.',
       TIMER_EXPIRED:
         'Il timer della segnalazione n. {{number}} è scaduto senza appuntamento: la segnalazione è riaperta e la mansione è di nuovo libera.',
+      FAST_TRACK_REJECTED:
+        'Il Call Center non ha approvato la corsia veloce della segnalazione n. {{number}}: continua in lavorazione normale, il motivo è nella cronologia.',
+      FAST_TRACK_DROPPED:
+        'L’annuncio della segnalazione n. {{number}} non è più in bacheca: la corsia veloce è decaduta e la segnalazione continua in lavorazione normale.',
       BOARD_RELAUNCH_REQUESTED:
         'Il Tutor chiede di rilanciare in bacheca la mansione della segnalazione n. {{number}}: c’è una bozza di annuncio da controllare e pubblicare.',
     },
@@ -499,6 +503,15 @@ export const it = {
         'Proposta a {{company}} per «{{title}}»: la mansione si blocca, l’annuncio #{{post}} viene archiviato e il Tutor riceve la notifica.',
       confirm: 'Sì, approva e proponi',
       approved: 'Corsia veloce approvata: proposta inviata a {{company}} per «{{title}}».',
+      reject: 'Rifiuta la corsia veloce',
+      rejectHeading: 'Rifiutare la corsia veloce della segnalazione n. {{number}}?',
+      rejectText:
+        'La segnalazione resta in lavorazione, senza corsia veloce: cerchi la mansione tra le compatibili come per le altre. L’annuncio #{{post}} torna candidabile e il Tutor riceve la notifica.',
+      reason: 'Motivo',
+      reasonHint: 'Il Tutor lo legge nella cronologia della segnalazione.',
+      rejectConfirm: 'Sì, rifiuta',
+      rejected:
+        'Corsia veloce rifiutata: la segnalazione continua in lavorazione normale e l’annuncio #{{post}} torna candidabile.',
     },
     timerDeadline: 'Scadenza del timer',
     reject: {
@@ -566,6 +579,8 @@ export const it = {
       TAKE_OVER: 'Passata a un altro operatore',
       MATCH: 'Proposta all’azienda',
       FAST_TRACK_APPROVE: 'Corsia veloce approvata: proposta all’azienda',
+      FAST_TRACK_REJECT: 'Corsia veloce rifiutata',
+      FAST_TRACK_DROP: 'Corsia veloce decaduta: annuncio fuori dalla bacheca',
       ACCEPT: 'Proposta accettata',
       APPOINTMENT_SET: 'Appuntamento fissato',
       APPOINTMENT_FAILED: 'Appuntamento non andato a buon fine',
@@ -824,6 +839,8 @@ export const it = {
       action: 'Archivia',
       heading: 'Archiviare l’annuncio #{{number}}?',
       text: 'Non sarà più visibile ai Tutor e resterà in sola lettura.',
+      candidature:
+        'La segnalazione n. {{number}}, candidata a questo annuncio, perde la corsia veloce e continua in lavorazione normale; il Tutor riceve la notifica.',
       confirm: 'Sì, archivia',
     },
     cancel: 'Annulla',

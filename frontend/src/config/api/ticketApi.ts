@@ -219,6 +219,23 @@ export const approveFastTrack = async ({
   return data;
 };
 
+/** Il Call Center rifiuta la corsia veloce con il motivo (US-404): resta in lavorazione normale. */
+export const rejectFastTrack = async ({
+  id,
+  version,
+  reason,
+}: {
+  id: string;
+  version: number;
+  reason: string;
+}): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/fast-track/reject`, {
+    version,
+    reason,
+  });
+  return data;
+};
+
 export const approveCategory = async ({
   id,
   name,

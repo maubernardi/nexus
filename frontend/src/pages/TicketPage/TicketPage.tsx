@@ -20,6 +20,7 @@ import {
   useAcceptProposal,
   useApproveCategory,
   useApproveFastTrack,
+  useRejectFastTrack,
   useAppointmentFailed,
   useAppointmentSet,
   useExcludeCompany,
@@ -49,6 +50,7 @@ const ALL = '';
 type Outcome =
   | { kind: 'proposed'; title: string; company: string }
   | { kind: 'fastTrackApproved'; title: string; company: string }
+  | { kind: 'fastTrackRejected'; post: number }
   | { kind: 'takenOver' }
   | { kind: 'accepted'; deadline: string }
   | { kind: 'appointmentSet' }
@@ -179,9 +181,11 @@ export const TicketPage = () => {
                                   title: outcome.title,
                                   company: outcome.company,
                                 })
-                              : outcome.kind === 'conflict'
-                                ? t('work.conflict', { reason: outcome.reason })
-                                : t('work.error')}
+                              : outcome.kind === 'fastTrackRejected'
+                                ? t('work.fastTrack.rejected', { post: outcome.post })
+                                : outcome.kind === 'conflict'
+                                  ? t('work.conflict', { reason: outcome.reason })
+                                  : t('work.error')}
         </div>
       )}
 
@@ -236,21 +240,27 @@ const FastTrackSection = ({
   const { t } = useTranslation();
   const post = useBoardPost(postId);
   const approve = useApproveFastTrack();
-  const [confirming, setConfirming] = useState(false);
+  const reject = useRejectFastTrack();
+  const [mode, setMode] = useState<'approve' | 'reject' | null>(null);
   const confirmRef = useRef<HTMLHeadingElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const wasConfirming = useRef(false);
+  const approveRef = useRef<HTMLButtonElement>(null);
+  const rejectRef = useRef<HTMLButtonElement>(null);
+  const lastMode = useRef<'approve' | 'reject' | null>(null);
+  const form = useForm<FastTrackRejectValues>({ defaultValues: { reason: '' } });
 
+  // il focus va alla domanda; annullando torna al pulsante che l'ha aperta
   useEffect(() => {
-    if (confirming) confirmRef.current?.focus();
-    else if (wasConfirming.current) buttonRef.current?.focus();
-    wasConfirming.current = confirming;
-  }, [confirming]);
+    if (mode) confirmRef.current?.focus();
+    else if (lastMode.current === 'approve') approveRef.current?.focus();
+    else if (lastMode.current === 'reject') rejectRef.current?.focus();
+    lastMode.current = mode;
+  }, [mode]);
 
   const slot = post.data?.jobSlot;
+  const pending = approve.isPending || reject.isPending;
 
-  // mutateAsync: l'esito arriva anche se, diventata proposta, questa sezione sparisce
-  const onConfirm = async (): Promise<void> => {
+  // mutateAsync: l'esito arriva anche se, decisa la corsia veloce, questa sezione sparisce
+  const onApprove = async (): Promise<void> => {
     if (!slot) return;
     try {
       await approve.mutateAsync({ id: d.id, version: d.version });
@@ -258,7 +268,23 @@ const FastTrackSection = ({
     } catch (error) {
       const body = apiError(error);
       onOutcome(body?.status === 409 ? { kind: 'conflict', reason: body.message } : { kind: 'error' });
-      setConfirming(false);
+      setMode(null);
+    }
+  };
+
+  const onReject = async ({ reason }: FastTrackRejectValues): Promise<void> => {
+    try {
+      await reject.mutateAsync({ id: d.id, version: d.version, reason: reason.trim() });
+      onOutcome({ kind: 'fastTrackRejected', post: d.boardPostNumber ?? 0 });
+    } catch (error) {
+      const body = apiError(error);
+      const reasonError = body?.fieldErrors?.find((fe) => fe.field === 'reason');
+      if (reasonError) {
+        form.setError('reason', { type: 'server', message: reasonError.message });
+        return;
+      }
+      onOutcome(body?.status === 409 ? { kind: 'conflict', reason: body.message } : { kind: 'error' });
+      setMode(null);
     }
   };
 
@@ -289,39 +315,82 @@ const FastTrackSection = ({
           <dd>{slot.zone.name}</dd>
         </dl>
       )}
-      {canDecide &&
-        slot &&
-        (confirming ? (
-          <div className="space-y-3 rounded-xl border-2 border-primary bg-card p-4">
-            <h3 ref={confirmRef} tabIndex={-1} className="font-semibold">
-              {t('work.fastTrack.confirmHeading', { number: d.number })}
-            </h3>
-            <p>
-              {t('work.fastTrack.confirmText', {
-                title: slot.title,
-                company: slot.companyName,
-                post: d.boardPostNumber,
-              })}
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Button size="lg" onClick={() => void onConfirm()} disabled={approve.isPending}>
-                {t('work.fastTrack.confirm')}
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => setConfirming(false)}
-                disabled={approve.isPending}
-              >
-                {t('work.cancel')}
-              </Button>
-            </div>
+      {canDecide && slot && mode === 'approve' && (
+        <div className="space-y-3 rounded-xl border-2 border-primary bg-card p-4">
+          <h3 ref={confirmRef} tabIndex={-1} className="font-semibold">
+            {t('work.fastTrack.confirmHeading', { number: d.number })}
+          </h3>
+          <p>
+            {t('work.fastTrack.confirmText', {
+              title: slot.title,
+              company: slot.companyName,
+              post: d.boardPostNumber,
+            })}
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Button size="lg" onClick={() => void onApprove()} disabled={pending}>
+              {t('work.fastTrack.confirm')}
+            </Button>
+            <Button size="lg" variant="outline" onClick={() => setMode(null)} disabled={pending}>
+              {t('work.cancel')}
+            </Button>
           </div>
-        ) : (
-          <Button ref={buttonRef} size="lg" onClick={() => setConfirming(true)}>
+        </div>
+      )}
+      {canDecide && slot && mode === 'reject' && (
+        <form
+          noValidate
+          onSubmit={form.handleSubmit(onReject)}
+          className="space-y-3 rounded-xl border-2 border-primary bg-card p-4"
+        >
+          <h3 ref={confirmRef} tabIndex={-1} className="font-semibold">
+            {t('work.fastTrack.rejectHeading', { number: d.number })}
+          </h3>
+          <p>{t('work.fastTrack.rejectText', { post: d.boardPostNumber })}</p>
+          <FormField
+            id="work-fast-track-reason"
+            label={t('work.fastTrack.reason')}
+            hint={t('work.fastTrack.reasonHint')}
+            required
+            error={form.formState.errors.reason?.message}
+          >
+            {(p) => (
+              <Textarea
+                {...p}
+                rows={2}
+                {...form.register('reason', {
+                  validate: (v) => v.trim() !== '' || t('form.errors.required'),
+                  maxLength: { value: 500, message: t('form.errors.maxLength', { max: 500 }) },
+                })}
+              />
+            )}
+          </FormField>
+          <div className="flex flex-wrap gap-3">
+            <Button type="submit" size="lg" disabled={pending}>
+              {t('work.fastTrack.rejectConfirm')}
+            </Button>
+            <Button
+              type="button"
+              size="lg"
+              variant="outline"
+              onClick={() => setMode(null)}
+              disabled={pending}
+            >
+              {t('work.cancel')}
+            </Button>
+          </div>
+        </form>
+      )}
+      {canDecide && slot && mode === null && (
+        <div className="flex flex-wrap gap-3">
+          <Button ref={approveRef} size="lg" onClick={() => setMode('approve')}>
             {t('work.fastTrack.approve')}
           </Button>
-        ))}
+          <Button ref={rejectRef} size="lg" variant="outline" onClick={() => setMode('reject')}>
+            {t('work.fastTrack.reject')}
+          </Button>
+        </div>
+      )}
     </section>
   );
 };
@@ -374,6 +443,8 @@ const KNOWN_ACTIONS = [
   'TAKE_OVER',
   'MATCH',
   'FAST_TRACK_APPROVE',
+  'FAST_TRACK_REJECT',
+  'FAST_TRACK_DROP',
   'ACCEPT',
   'APPOINTMENT_SET',
   'APPOINTMENT_FAILED',
@@ -385,6 +456,7 @@ const KNOWN_ACTIONS = [
 ] as const;
 
 type ApproveValues = { name: string };
+type FastTrackRejectValues = { reason: string };
 type RejectValues = { jobCategoryId: string; reason: string };
 
 /**

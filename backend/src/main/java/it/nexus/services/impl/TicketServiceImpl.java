@@ -47,6 +47,7 @@ import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
 import it.nexus.domain.dto.ProposalRejectDTO;
 import it.nexus.domain.dto.RejectCategoryDTO;
+import it.nexus.domain.dto.FastTrackRejectDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketSpecialCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
@@ -85,6 +86,7 @@ import it.nexus.repository.TicketStatusHistoryRepository;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BoardPostService;
+import it.nexus.services.FastTrackService;
 import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.NotificationService;
 import it.nexus.services.TicketService;
@@ -130,6 +132,7 @@ public class TicketServiceImpl implements TicketService {
     private final CompanyAuditEventRepository companyAuditEvents;
     private final AuditService auditService;
     private final BoardPostService boardPostService;
+    private final FastTrackService fastTrackService;
     private final BoardPostRepository boardPostRepository;
     private final JobSlotMapper jobSlotMapper;
     private final BeneficiaryMapper beneficiaryMapper;
@@ -480,6 +483,17 @@ public class TicketServiceImpl implements TicketService {
         });
         afterProposal(saved, slot, "Corsia veloce approvata: segnalazione n. %d".formatted(saved.getNumber()));
         return detail(saved, me);
+    }
+
+    @Override
+    public TicketDetailDTO rejectFastTrack(String ticketId, FastTrackRejectDTO dto) {
+        Ticket ticket = findTicket(ticketId);
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        if (!ticket.isFastTrack() || ticket.getBoardPost() == null) {
+            throw new ConflictException("La segnalazione n. %d non ha una corsia veloce in attesa", ticket.getNumber());
+        }
+        requireTakenInCharge(ticket, "decidere sulla corsia veloce");
+        return detail(fastTrackService.reject(ticket, dto.version(), dto.reason().strip()), me);
     }
 
     /**

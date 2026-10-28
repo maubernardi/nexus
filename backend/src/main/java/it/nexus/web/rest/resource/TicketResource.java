@@ -25,6 +25,7 @@ import it.nexus.domain.dto.MatchRequestDTO;
 import it.nexus.domain.dto.ProposalRejectDTO;
 import it.nexus.domain.dto.RejectCategoryDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
+import it.nexus.domain.dto.FastTrackRejectDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketSpecialCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
@@ -110,6 +111,14 @@ public class TicketResource {
     @Operation(summary = "Approva la corsia veloce: proposta all'azienda con la mansione dell'annuncio, annuncio archiviato")
     public ResponseEntity<TicketDetailDTO> approveFastTrack(@PathVariable String id, @RequestBody @Valid VersionDTO body) {
         return ResponseEntity.ok(ticketService.approveFastTrack(id, body.version()));
+    }
+
+    @PostMapping("/{id}/fast-track/reject")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Rifiuta la corsia veloce con il motivo: resta in lavorazione normale, l'annuncio torna candidabile")
+    public ResponseEntity<TicketDetailDTO> rejectFastTrack(@PathVariable String id,
+            @RequestBody @Valid FastTrackRejectDTO body) {
+        return ResponseEntity.ok(ticketService.rejectFastTrack(id, body));
     }
 
     @PostMapping("/{id}/take-over")

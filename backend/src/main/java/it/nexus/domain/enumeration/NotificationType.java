@@ -24,5 +24,9 @@ public enum NotificationType {
     /** Al Tutor e all'operatore: il timer è scaduto senza appuntamento, la segnalazione è riaperta (US-705). */
     TIMER_EXPIRED,
     /** All'operatore: il Tutor chiede il rilancio in bacheca, c'è una bozza da controllare (US-803). */
-    BOARD_RELAUNCH_REQUESTED
+    BOARD_RELAUNCH_REQUESTED,
+    /** Al Tutor: il Call Center ha rifiutato la corsia veloce, la segnalazione continua normale (US-404). */
+    FAST_TRACK_REJECTED,
+    /** Al Tutor: l'annuncio è uscito dalla bacheca mentre la candidatura aspettava, la corsia veloce è decaduta. */
+    FAST_TRACK_DROPPED
 }

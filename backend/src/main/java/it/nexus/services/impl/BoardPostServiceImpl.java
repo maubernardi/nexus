@@ -37,6 +37,7 @@ import it.nexus.repository.ProjectRepository;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BoardPostService;
+import it.nexus.services.FastTrackService;
 import it.nexus.services.CurrentAppUserService;
 import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.ConflictException;
@@ -56,6 +57,7 @@ public class BoardPostServiceImpl implements BoardPostService {
     private final ProjectRepository projectRepository;
     private final JobSlotRepository jobSlotRepository;
     private final TicketRepository ticketRepository;
+    private final FastTrackService fastTrackService;
     private final UserProjectRepository userProjectRepository;
     private final CurrentAppUserService currentAppUserService;
     private final ReferenceMapper referenceMapper;
@@ -184,6 +186,7 @@ public class BoardPostServiceImpl implements BoardPostService {
         BoardPost saved = repository.saveAndFlush(post);
         auditService.record(AuditEntityType.BOARD_POST, saved.getId(), "ARCHIVE", AuditChanges.of()
                 .value("status", before.name(), BoardPostStatus.ARCHIVED.name()), null);
+        fastTrackService.dropPending(saved, "Annuncio #%d archiviato dal Call Center".formatted(saved.getNumber()));
         return dto(saved);
     }
 
@@ -258,6 +261,9 @@ public class BoardPostServiceImpl implements BoardPostService {
                     BoardPost saved = repository.saveAndFlush(post);
                     auditService.record(AuditEntityType.BOARD_POST, saved.getId(), "ARCHIVE", AuditChanges.of()
                             .value("status", before.name(), BoardPostStatus.ARCHIVED.name()), reason);
+                    // candidatura in attesa su un annuncio che non c'è più: la corsia veloce decade (Sprint 6, §8.1)
+                    fastTrackService.dropPending(saved,
+                            "Annuncio #%d archiviato: %s".formatted(saved.getNumber(), reason));
                     return saved.getNumber();
                 })
                 .toList();
