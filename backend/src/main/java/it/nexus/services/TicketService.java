@@ -13,6 +13,7 @@ import it.nexus.domain.dto.ProposalRejectDTO;
 import it.nexus.domain.dto.RejectCategoryDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
+import it.nexus.domain.dto.TicketSpecialCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
 import it.nexus.domain.dto.TicketEventDTO;
@@ -23,6 +24,12 @@ public interface TicketService {
 
     /** Segnalazione normale del Tutor corrente: nasce in {@code NUOVA} ed entra nella coda del Call Center. */
     TicketDTO submit(TicketCreateDTO dto);
+
+    /**
+     * Segnalazione speciale dalla bacheca (US-306): beneficiario del Tutor senza segnalazioni aperte, annuncio pubblicato
+     * e visibile al Tutor, non già bloccato da un'altra candidatura (409).
+     */
+    TicketDTO submitSpecial(TicketSpecialCreateDTO dto);
 
 
     /** Presa in carico da parte dell'operatore corrente (US-402); 409 se un collega l'ha già presa. */

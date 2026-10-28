@@ -17,5 +17,7 @@ public record TutorBoardPostDTO(
         Integer weeklyHours,
         Integer durationMonths,
         ReferenceItemDTO project,
-        Instant publishedAt) {
+        Instant publishedAt,
+        /** Un altro beneficiario è già candidato e il Call Center deve decidere: niente candidature (US-306, §8.1). */
+        boolean candidatureInProgress) {
 }

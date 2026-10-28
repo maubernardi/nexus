@@ -27,5 +27,14 @@ public record BoardPostDTO(
         Instant createdAt,
         long version,
         /** Da quando l'annuncio riservato si può rendere visibile a tutti (7 giorni dalla pubblicazione, US-903). */
-        Instant makePublicFrom) {
+        Instant makePublicFrom,
+        /** Segnalazione speciale candidata all'annuncio e in attesa della decisione del Call Center (US-306). */
+        String candidatureTicketId,
+        Long candidatureTicketNumber) {
+
+    public BoardPostDTO withCandidature(String ticketId, Long ticketNumber) {
+        return new BoardPostDTO(id, number, title, status, jobSlot, project, ageMin, ageMax, weeklyHours, durationMonths,
+                notes, publishedAt, madePublicAt, createdFromTicketId, createdFromTicketNumber, createdAt, version,
+                makePublicFrom, ticketId, ticketNumber);
+    }
 }

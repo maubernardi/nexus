@@ -5,6 +5,7 @@ import { RoleRoute } from '@/config/routing/RoleRoute';
 import type { RouteHandle } from '@/config/routing/types';
 import { BeneficiariesPage } from '@/pages/BeneficiariesPage/BeneficiariesPage';
 import { BoardRoute } from '@/pages/BoardPage/BoardRoute';
+import { CandidaturePage } from '@/pages/CandidaturePage/CandidaturePage';
 import { BoardPostPage } from '@/pages/BoardPostPage/BoardPostPage';
 import { BeneficiaryEditPage } from '@/pages/BeneficiaryEditPage/BeneficiaryEditPage';
 import { BeneficiaryNewPage } from '@/pages/BeneficiaryNewPage/BeneficiaryNewPage';
@@ -122,6 +123,15 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.board.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'bacheca/:id/candidatura',
+        element: (
+          <RoleRoute roles={['TUTOR']}>
+            <CandidaturePage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.candidature.title' } satisfies RouteHandle,
       },
       {
         path: 'bacheca/:id',

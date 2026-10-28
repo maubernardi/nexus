@@ -12,6 +12,7 @@ import {
   fetchBoardPost,
   fetchBoardPosts,
   fetchTutorBoard,
+  fetchTutorBoardPost,
   makePublicBoardPost,
   publishBoardPost,
   updateBoardPost,
@@ -32,6 +33,9 @@ export const useBoardPost = (id: string): UseQueryResult<BoardPost> =>
 
 export const useTutorBoard = (filters: TutorBoardFilters): UseQueryResult<TutorBoardPost[]> =>
   useQuery({ queryKey: [...BOARD_KEY, 'tutor', filters], queryFn: () => fetchTutorBoard(filters) });
+
+export const useTutorBoardPost = (id: string): UseQueryResult<TutorBoardPost> =>
+  useQuery({ queryKey: [...BOARD_KEY, 'tutor', 'detail', id], queryFn: () => fetchTutorBoardPost(id) });
 
 const useBoardPostMutation = <V>(
   mutationFn: (vars: V) => Promise<BoardPost>,

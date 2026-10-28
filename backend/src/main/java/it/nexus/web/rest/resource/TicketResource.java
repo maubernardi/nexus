@@ -26,6 +26,7 @@ import it.nexus.domain.dto.ProposalRejectDTO;
 import it.nexus.domain.dto.RejectCategoryDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
+import it.nexus.domain.dto.TicketSpecialCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
 import it.nexus.domain.dto.TicketEventDTO;
@@ -156,6 +157,13 @@ public class TicketResource {
     @Operation(summary = "Il Tutor della segnalazione accetta la proposta: parte il timer di 7 giorni lavorativi")
     public ResponseEntity<TicketDetailDTO> accept(@PathVariable String id, @RequestBody @Valid VersionDTO body) {
         return ResponseEntity.ok(ticketService.accept(id, body.version()));
+    }
+
+    @PostMapping("/special")
+    @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
+    @Operation(summary = "Candida un beneficiario del Tutor a un annuncio della bacheca: segnalazione speciale (US-306)")
+    public ResponseEntity<TicketDTO> submitSpecial(@RequestBody @Valid TicketSpecialCreateDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ticketService.submitSpecial(dto));
     }
 
     // nessun Location: il dettaglio del ticket arriva con US-305

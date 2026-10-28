@@ -82,6 +82,19 @@ export const BoardPostPage = () => {
         )}
       </p>
 
+      {p.candidatureTicketId && p.candidatureTicketNumber && (
+        // la candidatura blocca l'annuncio finché non si decide sulla corsia veloce (US-306)
+        <p className="rounded-md border-l-4 border-gold bg-card p-4">
+          {t('board.candidature')}{' '}
+          <Link
+            to={`/segnalazioni/${p.candidatureTicketId}`}
+            className="font-medium text-primary underline underline-offset-4"
+          >
+            {t('board.candidatureTicket', { number: p.candidatureTicketNumber })}
+          </Link>
+        </p>
+      )}
+
       {outcome && (
         <div
           ref={outcomeRef}

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,5 +30,12 @@ public class BoardResource {
     public ResponseEntity<List<TutorBoardPostDTO>> list(@RequestParam(required = false) String zoneId,
             @RequestParam(required = false) String jobCategoryId) {
         return ResponseEntity.ok(boardPostService.listForTutor(zoneId, jobCategoryId));
+    }
+
+    @GetMapping(PathAPI.BASE_PATH_V1 + "/board/{id}")
+    @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
+    @Operation(summary = "Un annuncio della bacheca del Tutor, per candidare un beneficiario (US-306)")
+    public ResponseEntity<TutorBoardPostDTO> get(@PathVariable String id) {
+        return ResponseEntity.ok(boardPostService.getForTutor(id));
     }
 }

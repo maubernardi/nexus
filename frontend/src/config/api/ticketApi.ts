@@ -33,6 +33,19 @@ type NewCategoryInfo = {
   requestedJobFreeText: string | null;
 };
 
+/** Candidatura di un beneficiario del Tutor a un annuncio della bacheca (US-306): nasce una segnalazione speciale. */
+export type TicketSpecialCreate = {
+  boardPostId: string;
+  beneficiaryId: string;
+  /** Solo per un annuncio aperto a tutti: per uno riservato vale il progetto dell'annuncio. */
+  projectId: string | null;
+};
+
+export const submitSpecialTicket = async (payload: TicketSpecialCreate): Promise<Ticket> => {
+  const { data } = await axiosInstance.post<Ticket>(`${ENDPOINTS.tickets}/special`, payload);
+  return data;
+};
+
 export const submitTicket = async (payload: TicketCreate): Promise<Ticket> => {
   const { data } = await axiosInstance.post<Ticket>(ENDPOINTS.tickets, payload);
   return data;
@@ -108,6 +121,9 @@ export type TicketDetail = {
   relaunchPostId?: string | null;
   relaunchPostNumber?: number | null;
   relaunchPostStatus?: BoardPostStatus | null;
+  /** Annuncio della bacheca a cui è candidata la segnalazione speciale (US-306). */
+  boardPostId?: string | null;
+  boardPostNumber?: number | null;
 };
 
 export type CompatibleFilters = { zoneId?: string; jobCategoryId?: string };

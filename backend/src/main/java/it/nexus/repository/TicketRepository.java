@@ -30,4 +30,10 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecif
     List<Ticket> findByStatusAndTimerDeadlineAtLessThanEqual(TicketStatus status, Instant at);
 
     Optional<Ticket> findFirstByBeneficiaryIdAndStatusNot(Long beneficiaryId, TicketStatus closed);
+
+    /** Candidatura in valutazione sull'annuncio: al più una ({@code uq_ticket_fast_track_board_post}, US-306). */
+    Optional<Ticket> findFirstByBoardPostIdAndFastTrackTrue(Long boardPostId);
+
+    /** Candidature in valutazione sugli annunci indicati (US-306). */
+    List<Ticket> findByBoardPostIdInAndFastTrackTrue(Collection<Long> boardPostIds);
 }

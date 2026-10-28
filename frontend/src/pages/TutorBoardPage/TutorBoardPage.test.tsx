@@ -22,6 +22,7 @@ const post = (number: number, overrides: Partial<TutorBoardPost> = {}): TutorBoa
   jobCategory: { id: 'J1', code: 'MAG', name: 'Magazziniere' },
   zone: { id: 'Z1', code: 'NORD', name: 'Firenze Nord' },
   publishedAt: '2026-10-27T09:00:00Z',
+  candidatureInProgress: false,
   ...overrides,
 });
 
@@ -91,5 +92,19 @@ describe('<TutorBoardPage>', () => {
     await user.click(screen.getByRole('button', { name: 'Azzera i filtri' }));
     expect(fetchTutorBoard).toHaveBeenLastCalledWith({ zoneId: undefined, jobCategoryId: undefined });
     expect(zone).toHaveValue('');
+  });
+
+  it('candidatura: link per gli annunci liberi, "in valutazione" per quelli bloccati', async () => {
+    vi.mocked(fetchTutorBoard).mockResolvedValue([post(4), post(2, { candidatureInProgress: true })]);
+    renderPage();
+
+    const list = await screen.findByRole('list', { name: 'Annunci aperti' });
+    const [free, blocked] = within(list).getAllByRole('article');
+    expect(
+      within(free).getByRole('link', { name: 'Candida un beneficiario all’annuncio #4' }),
+    ).toHaveAttribute('href', '/bacheca/P4/candidatura');
+    expect(within(blocked).getByText('Candidatura in valutazione')).toBeInTheDocument();
+    expect(within(blocked).queryByRole('link')).not.toBeInTheDocument();
+    await expectNoAxeViolations();
   });
 });

@@ -51,7 +51,9 @@ public class TicketStateMachineImpl implements TicketStateMachine {
                 .value("beneficiaryId", null, external(saved.getBeneficiary()))
                 .value("projectId", null, external(saved.getProject()))
                 .value("requestedJobCategoryId", null, external(saved.getRequestedJobCategory()))
-                .value("requestedJobFreeText", null, saved.getRequestedJobFreeText()), note);
+                .value("requestedJobFreeText", null, saved.getRequestedJobFreeText())
+                .value("fastTrack", false, saved.isFastTrack())
+                .value("boardPostId", null, external(saved.getBoardPost())), note);
         return saved;
     }
 

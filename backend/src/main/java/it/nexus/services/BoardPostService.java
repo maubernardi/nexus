@@ -21,6 +21,9 @@ public interface BoardPostService {
     /** Bacheca del Tutor corrente (US-901): pubblicati per tutti o per i suoi progetti, senza azienda, titolo e note. */
     List<TutorBoardPostDTO> listForTutor(String zoneId, String jobCategoryId);
 
+    /** Un annuncio della bacheca del Tutor (US-306); 404 se non è pubblicato o non è visibile al Tutor. */
+    TutorBoardPostDTO getForTutor(String id);
+
     /** Bozza da una mansione libera e a disposizione, senza altri annunci attivi (US-904). */
     BoardPostDTO create(BoardPostCreateDTO dto);
 
