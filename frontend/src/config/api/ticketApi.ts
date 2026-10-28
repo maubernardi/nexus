@@ -39,7 +39,14 @@ export const submitTicket = async (payload: TicketCreate): Promise<Ticket> => {
 
 /** Riga dell'elenco delle segnalazioni (Home, US-303). */
 export type TicketListItem = Ticket &
-  NewCategoryInfo & { tutorName: string; assignedOperatorName: string | null };
+  NewCategoryInfo & {
+    tutorName: string;
+    assignedOperatorName: string | null;
+    /** Ultimo giorno utile del timer attivo (aaaa-mm-gg), null senza scadenza (US-307). */
+    timerDeadline: string | null;
+    /** Promemoria del timer già inviato: scadenza vicina (US-307). */
+    timerDueSoon: boolean;
+  };
 
 /** Viste dell'elenco: MINE e PROJECT per il Tutor, le altre per Call Center e ADMIN. */
 export type TicketListView = 'MINE' | 'PROJECT' | 'TO_TAKE' | 'TO_APPROVE' | 'ASSIGNED_TO_ME' | 'ALL';

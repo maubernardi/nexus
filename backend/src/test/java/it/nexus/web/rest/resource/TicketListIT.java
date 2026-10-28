@@ -189,6 +189,39 @@ class TicketListIT {
                         (int) assignedNum, (int) advancedNum)));
     }
 
+    /** Timer attivo con scadenza alla mezzanotte di Roma che chiude {@code lastDay}; promemoria facoltativo. */
+    private void timer(long number, String lastDay, boolean reminderSent) {
+        em.createNativeQuery("""
+                UPDATE ticket SET status = 'PROPOSTA_ACCOLTA',
+                    timer_started_at = (CAST(:day AS date) - 10) AT TIME ZONE 'Europe/Rome',
+                    timer_deadline_at = (CAST(:day AS date) + 1) AT TIME ZONE 'Europe/Rome',
+                    timer_reminder_sent_at = CASE WHEN :reminder THEN now() END
+                WHERE number = :number""")
+                .setParameter("day", lastDay)
+                .setParameter("reminder", reminderSent)
+                .setParameter("number", number)
+                .executeUpdate();
+    }
+
+    @Test
+    void tutor_scadenzaPiuVicinaInCima_conEvidenzaDopoIlPromemoria() throws Exception {
+        timer(advancedNum, "2026-11-06", false);
+        timer(assignedNum, "2026-11-04", true);
+        mockMvc.perform(get(LIST).header(USER, "tutor1"))
+                .andExpect(jsonPath("$[*].number", contains((int) assignedNum, (int) advancedNum, (int) fastTrack,
+                        (int) normaleSud, (int) normaleNord)))
+                .andExpect(jsonPath("$[0].timerDeadline").value("2026-11-04"))
+                .andExpect(jsonPath("$[0].timerDueSoon").value(true))
+                .andExpect(jsonPath("$[1].timerDeadline").value("2026-11-06"))
+                .andExpect(jsonPath("$[1].timerDueSoon").value(false))
+                .andExpect(jsonPath("$[2].timerDeadline").doesNotExist())
+                .andExpect(jsonPath("$[2].timerDueSoon").value(false));
+        // anche "Del mio progetto"
+        mockMvc.perform(get(LIST).param("view", "PROJECT").header(USER, "tutor1"))
+                .andExpect(jsonPath("$[*].number", contains((int) assignedNum, (int) advancedNum, (int) fastTrack,
+                        (int) normaleNord, (int) colleagueNum)));
+    }
+
     @Test
     void tutor_delMioProgetto_ancheIlCollega_maiAltriProgetti() throws Exception {
         // tutor1 è assegnato solo a GOL: vede le segnalazioni GOL (anche del collega), non quella POLIS

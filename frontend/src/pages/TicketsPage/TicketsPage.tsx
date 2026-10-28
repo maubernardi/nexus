@@ -32,8 +32,8 @@ const TUTOR_VIEWS: TicketListView[] = ['MINE', 'PROJECT'];
 const CC_VIEWS: TicketListView[] = ['TO_TAKE', 'TO_APPROVE', 'ASSIGNED_TO_ME', 'ALL'];
 
 const COLUMNS: Record<TicketListView, TicketsTableColumns> = {
-  MINE: {},
-  PROJECT: { tutor: true },
+  MINE: { deadline: true },
+  PROJECT: { tutor: true, deadline: true },
   TO_TAKE: { priority: true, zone: true, tutor: true },
   TO_APPROVE: { zone: true, tutor: true },
   ASSIGNED_TO_ME: { priority: true, zone: true, tutor: true },
