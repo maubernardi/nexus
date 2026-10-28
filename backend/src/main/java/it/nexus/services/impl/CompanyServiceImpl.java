@@ -18,6 +18,7 @@ import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.services.AuditService;
+import it.nexus.services.BoardPostService;
 import it.nexus.services.CompanyService;
 import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.ConflictException;
@@ -34,6 +35,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository repository;
     private final JobSlotRepository jobSlotRepository;
+    private final BoardPostService boardPostService;
     private final AuditService auditService;
     private final CompanyMapper mapper;
 
@@ -120,6 +122,11 @@ public class CompanyServiceImpl implements CompanyService {
         Company saved = repository.saveAndFlush(company);
         auditService.record(AuditEntityType.COMPANY, saved.getId(), active ? "ACTIVATE" : "DEACTIVATE",
                 AuditChanges.of().value("active", !active, active), null);
+        if (!active) {
+            boardPostService.archiveForUnavailableSlots(
+                    jobSlotRepository.findByCompany(saved.getId()).stream().map(JobSlot::getId).toList(),
+                    "Azienda disattivata");
+        }
         return mapper.toDto(saved);
     }
 

@@ -80,6 +80,7 @@ import it.nexus.repository.TicketSpecifications;
 import it.nexus.repository.TicketStatusHistoryRepository;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
+import it.nexus.services.BoardPostService;
 import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.NotificationService;
 import it.nexus.services.TicketService;
@@ -124,6 +125,7 @@ public class TicketServiceImpl implements TicketService {
     private final CompanyRepository companyRepository;
     private final CompanyAuditEventRepository companyAuditEvents;
     private final AuditService auditService;
+    private final BoardPostService boardPostService;
     private final JobSlotMapper jobSlotMapper;
     private final BeneficiaryMapper beneficiaryMapper;
     private final ReferenceMapper referenceMapper;
@@ -425,6 +427,8 @@ public class TicketServiceImpl implements TicketService {
         auditService.record(AuditEntityType.JOB_SLOT, slot.getId(), "BLOCK", AuditChanges.of()
                 .value("status", JobSlotStatus.LIBERA.name(), JobSlotStatus.BLOCCATA.name())
                 .value("blockedByTicketId", null, TsidMapper.toExternal(saved.getId())), null);
+        boardPostService.archiveForUnavailableSlots(List.of(slot.getId()),
+                "Mansione abbinata alla segnalazione n. %d".formatted(saved.getNumber()));
         // storico dell'azienda: la proposta è un evento del rapporto con l'azienda (brief, audit trail)
         companyAuditEvents.save(new CompanyAuditEvent(company, saved, CompanyEventType.PROPOSTA_INVIATA.name(), Map.of(
                 "ticketNumber", saved.getNumber(),

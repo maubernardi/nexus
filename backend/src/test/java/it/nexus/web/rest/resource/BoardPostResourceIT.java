@@ -315,4 +315,26 @@ class BoardPostResourceIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldErrors[0].field").value("jobSlotId"));
     }
+
+    @Test
+    void mansioneRitirataOAziendaDisattivata_annunciArchiviatiConMotivo() throws Exception {
+        mockMvc.perform(post("/api/v1/job-slots/" + TsidMapper.toExternal(draftSlot.getId()) + "/deactivate")
+                        .header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"version\": " + draftSlot.getVersion() + "}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.activeBoardPostId").doesNotExist());
+        mockMvc.perform(post("/api/v1/companies/" + TsidMapper.toExternal(company.getId()) + "/deactivate")
+                        .header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"version\": " + company.getVersion() + "}"))
+                .andExpect(status().isOk());
+        em.flush();
+        em.clear();
+
+        assertThat(boardPosts.findById(draft.getId()).orElseThrow().getStatus()).isEqualTo(BoardPostStatus.ARCHIVED);
+        assertThat(boardPosts.findById(published.getId()).orElseThrow().getStatus()).isEqualTo(BoardPostStatus.ARCHIVED);
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.BOARD_POST, draft.getId()))
+                .singleElement().satisfies(e -> assertThat(e.getReason()).isEqualTo("Mansione ritirata"));
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.BOARD_POST, published.getId()))
+                .singleElement().satisfies(e -> assertThat(e.getReason()).isEqualTo("Azienda disattivata"));
+    }
 }

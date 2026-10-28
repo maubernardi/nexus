@@ -39,6 +39,30 @@ export type BoardPostForm = {
   version: number;
 };
 
+/**
+ * Annuncio come lo vede il Tutor (US-901): mai azienda, titolo né note. {@code project} è il suo progetto a cui è
+ * riservato; l'API omette i campi vuoti.
+ */
+export type TutorBoardPost = {
+  id: string;
+  number: number;
+  jobCategory: ReferenceItem;
+  zone: ReferenceItem;
+  ageMin?: number | null;
+  ageMax?: number | null;
+  weeklyHours?: number | null;
+  durationMonths?: number | null;
+  project?: ReferenceItem | null;
+  publishedAt: string;
+};
+
+export type TutorBoardFilters = { zoneId?: string; jobCategoryId?: string };
+
+export const fetchTutorBoard = async (filters: TutorBoardFilters): Promise<TutorBoardPost[]> => {
+  const { data } = await axiosInstance.get<TutorBoardPost[]>(ENDPOINTS.board, { params: filters });
+  return data;
+};
+
 export const fetchBoardPosts = async (status: BoardPostStatus): Promise<BoardPost[]> => {
   const { data } = await axiosInstance.get<BoardPost[]>(ENDPOINTS.boardPosts, { params: { status } });
   return data;

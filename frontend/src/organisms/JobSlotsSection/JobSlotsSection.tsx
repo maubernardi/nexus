@@ -20,6 +20,7 @@ type OutcomeKey =
   | 'jobSlot.outcome.saved'
   | 'jobSlot.outcome.activated'
   | 'jobSlot.outcome.deactivated'
+  | 'jobSlot.outcome.deactivatedWithPost'
   | 'jobSlot.outcome.conflict'
   | 'jobSlot.outcome.refused'
   | 'form.errors.generic';
@@ -68,10 +69,17 @@ export const JobSlotsSection = ({ companyId, companyActive }: JobSlotsSectionPro
       { id: slot.id, version: slot.version, active: !slot.active },
       {
         onSuccess: (s) =>
-          setOutcome({
-            key: s.active ? 'jobSlot.outcome.activated' : 'jobSlot.outcome.deactivated',
-            params: { title: s.title },
-          }),
+          // ritirata la mansione, il suo annuncio attivo viene archiviato (decisione del PO, 28/10)
+          setOutcome(
+            s.active
+              ? { key: 'jobSlot.outcome.activated', params: { title: s.title } }
+              : slot.activeBoardPostNumber
+                ? {
+                    key: 'jobSlot.outcome.deactivatedWithPost',
+                    params: { title: s.title, number: slot.activeBoardPostNumber },
+                  }
+                : { key: 'jobSlot.outcome.deactivated', params: { title: s.title } },
+          ),
         onError: (error) => {
           const body = apiError(error);
           setOutcome(

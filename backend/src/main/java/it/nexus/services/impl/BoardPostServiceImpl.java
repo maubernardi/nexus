@@ -2,6 +2,7 @@ package it.nexus.services.impl;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -16,16 +17,21 @@ import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.BoardPostCreateDTO;
 import it.nexus.domain.dto.BoardPostDTO;
 import it.nexus.domain.dto.BoardPostFormDTO;
+import it.nexus.domain.dto.TutorBoardPostDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.BoardPostStatus;
 import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.mapper.BoardPostMapper;
+import it.nexus.mapper.ReferenceMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ProjectRepository;
+import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BoardPostService;
+import it.nexus.services.CurrentAppUserService;
+import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.ConflictException;
 import it.nexus.web.errors.FieldValidationException;
 import it.nexus.web.errors.NotFoundException;
@@ -39,6 +45,9 @@ public class BoardPostServiceImpl implements BoardPostService {
     private final BoardPostRepository repository;
     private final ProjectRepository projectRepository;
     private final JobSlotRepository jobSlotRepository;
+    private final UserProjectRepository userProjectRepository;
+    private final CurrentAppUserService currentAppUserService;
+    private final ReferenceMapper referenceMapper;
     private final AuditService auditService;
     private final BoardPostMapper mapper;
     private final Clock clock;
@@ -53,6 +62,30 @@ public class BoardPostServiceImpl implements BoardPostService {
     @Transactional(readOnly = true)
     public BoardPostDTO get(String id) {
         return mapper.toDto(find(id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TutorBoardPostDTO> listForTutor(String zoneId, String jobCategoryId) {
+        Long me = currentAppUserService.getCurrentAppUser().getId();
+        List<Long> projects = userProjectRepository.findByIdUserId(me).stream()
+                .map(up -> up.getId().getProjectId()).toList();
+        // nessun progetto: solo gli annunci per tutti (un "in" vuoto non è SQL valido ovunque)
+        List<Long> visible = projects.isEmpty() ? List.of(-1L) : projects;
+        return repository.findVisibleToTutor(visible, filterId(zoneId, "zona"), filterId(jobCategoryId, "tipologia"))
+                .stream()
+                .map(p -> new TutorBoardPostDTO(
+                        TsidMapper.toExternal(p.getId()),
+                        p.getNumber(),
+                        referenceMapper.toDto(p.getJobSlot().getJobCategory()),
+                        referenceMapper.toDto(p.getJobSlot().getZone()),
+                        p.getAgeMin(),
+                        p.getAgeMax(),
+                        p.getWeeklyHours(),
+                        p.getDurationMonths(),
+                        referenceMapper.toDto(p.getProject()),
+                        p.getPublishedAt()))
+                .toList();
     }
 
     @Override
@@ -155,6 +188,23 @@ public class BoardPostServiceImpl implements BoardPostService {
         }
     }
 
+    @Override
+    public List<Long> archiveForUnavailableSlots(Collection<Long> jobSlotIds, String reason) {
+        if (jobSlotIds.isEmpty()) {
+            return List.of();
+        }
+        return repository.findByJobSlot_IdInAndStatusIn(jobSlotIds, BoardPostStatus.ACTIVE).stream()
+                .map(post -> {
+                    BoardPostStatus before = post.getStatus();
+                    post.setStatus(BoardPostStatus.ARCHIVED);
+                    BoardPost saved = repository.saveAndFlush(post);
+                    auditService.record(AuditEntityType.BOARD_POST, saved.getId(), "ARCHIVE", AuditChanges.of()
+                            .value("status", before.name(), BoardPostStatus.ARCHIVED.name()), reason);
+                    return saved.getNumber();
+                })
+                .toList();
+    }
+
     private BoardPost find(String id) {
         return Optional.ofNullable(TsidMapper.toInternal(id))
                 .flatMap(repository::findById)
@@ -170,6 +220,17 @@ public class BoardPostServiceImpl implements BoardPostService {
                 .flatMap(projectRepository::findById)
                 .filter(p -> p.isActive() || p.equals(current))
                 .orElseThrow(() -> new FieldValidationException("projectId", "Progetto non valido"));
+    }
+
+    private static Long filterId(String externalId, String what) {
+        if (externalId == null || externalId.isBlank()) {
+            return null;
+        }
+        Long id = TsidMapper.toInternal(externalId);
+        if (id == null) {
+            throw new BadRequestException("Filtro %s non valido", what);
+        }
+        return id;
     }
 
     private static void requireVersion(BoardPost post, long expectedVersion) {

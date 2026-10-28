@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.Instant;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.AppUser;
+import it.nexus.domain.BoardPost;
 import it.nexus.domain.Company;
 import it.nexus.domain.JobCategory;
 import it.nexus.domain.JobSlot;
@@ -36,6 +38,7 @@ import it.nexus.domain.Ticket;
 import it.nexus.domain.TicketCompanyBlacklist;
 import it.nexus.domain.Zone;
 import it.nexus.domain.enumeration.AuditEntityType;
+import it.nexus.domain.enumeration.BoardPostStatus;
 import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.domain.enumeration.Role;
 import it.nexus.domain.enumeration.TicketStatus;
@@ -43,6 +46,7 @@ import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.BeneficiaryRepository;
+import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.JobCategoryRepository;
@@ -77,6 +81,7 @@ class TicketMatchingIT {
     @Autowired TicketStatusHistoryRepository history;
     @Autowired AuditEventRepository audit;
     @Autowired CompanyAuditEventRepository companyAudit;
+    @Autowired BoardPostRepository boardPosts;
 
     private AppUser tutor;
     private AppUser operator;
@@ -209,6 +214,27 @@ class TicketMatchingIT {
                 .extracting(e -> e.getAction()).containsExactly("BLOCK");
         assertThat(companyAudit.findByCompanyIdOrderByCreatedAtAsc(match.getCompany().getId()))
                 .extracting(e -> e.getEventType()).containsExactly("PROPOSTA_INVIATA");
+    }
+
+    @Test
+    void abbinamento_archiviaLAnnuncioDellaMansione() throws Exception {
+        BoardPost post = TestEntities.boardPost(match);
+        post.setStatus(BoardPostStatus.PUBLISHED);
+        post.setPublishedAt(Instant.now());
+        post = boardPosts.saveAndFlush(post);
+
+        doMatch("operatore.cc", ticket, match, match.getVersion()).andExpect(status().isOk());
+        em.flush();
+        em.clear();
+
+        assertThat(boardPosts.findById(post.getId()).orElseThrow().getStatus())
+                .isEqualTo(BoardPostStatus.ARCHIVED);
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.BOARD_POST, post.getId()))
+                .singleElement()
+                .satisfies(e -> {
+                    assertThat(e.getAction()).isEqualTo("ARCHIVE");
+                    assertThat(e.getReason()).isEqualTo("Mansione abbinata alla segnalazione n. " + ticket.getNumber());
+                });
     }
 
     @Test
