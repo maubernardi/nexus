@@ -24,6 +24,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jayway.jsonpath.JsonPath;
+
 import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.AppUser;
@@ -79,7 +81,9 @@ class BoardPostResourceIT {
     private Project polis;
     private Zone zone;
     private JobCategory category;
+    private Company company;
     private JobSlot draftSlot;
+    private JobSlot freeSlot;
     private BoardPost draft;
     private BoardPost published;
     private Instant publishedAt;
@@ -93,9 +97,10 @@ class BoardPostResourceIT {
         polis = projects.save(TestEntities.project("BPOLIS"));
         zone = zones.save(TestEntities.zone("BNORD"));
         category = categories.save(TestEntities.jobCategory("BMAG"));
-        Company company = companies.save(TestEntities.company("99900000077"));
+        company = companies.save(TestEntities.company("99900000077"));
         draftSlot = jobSlots.save(TestEntities.jobSlot(company, category, zone));
         JobSlot publishedSlot = jobSlots.save(TestEntities.jobSlot(company, category, zone));
+        freeSlot = jobSlots.save(TestEntities.jobSlot(company, category, zone));
 
         BoardPost d = TestEntities.boardPost(draftSlot);
         d.setTitle("Magazziniere");
@@ -249,5 +254,65 @@ class BoardPostResourceIT {
         action(draft, "archive", 5).andExpect(status().isConflict());
         update(draft, form("Magazziniere", gol, "").replace("\"version\": 0", "\"version\": 3"))
                 .andExpect(status().isConflict());
+    }
+
+    private ResultActions create(JobSlot slot, String user) throws Exception {
+        return mockMvc.perform(post(POSTS).header(USER, user).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"jobSlotId\": \"" + TsidMapper.toExternal(slot.getId()) + "\"}"));
+    }
+
+    @Test
+    void creazioneDaMansioneLibera_bozzaPerTutti_conAudit() throws Exception {
+        String body = create(freeSlot, "operatore.cc")
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("DRAFT"))
+                .andExpect(jsonPath("$.number").isNumber())
+                .andExpect(jsonPath("$.title").value(freeSlot.getTitle()))
+                .andExpect(jsonPath("$.project").doesNotExist())
+                .andExpect(jsonPath("$.jobSlot.id").value(TsidMapper.toExternal(freeSlot.getId())))
+                .andReturn().getResponse().getContentAsString();
+        Long id = TsidMapper.toInternal(JsonPath.read(body, "$.id"));
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.BOARD_POST, id))
+                .singleElement()
+                .satisfies(e -> {
+                    assertThat(e.getAction()).isEqualTo("CREATE");
+                    assertThat(e.getChanges()).containsKeys("jobSlotId", "title", "status");
+                });
+
+        // la scheda dell'azienda indica l'annuncio attivo di ogni mansione
+        mockMvc.perform(get("/api/v1/companies/" + TsidMapper.toExternal(company.getId()) + "/job-slots")
+                        .header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$[?(@.id == '%s')].activeBoardPostNumber".formatted(
+                        TsidMapper.toExternal(freeSlot.getId()))).value(contains(
+                        JsonPath.<Integer>read(body, "$.number"))))
+                .andExpect(jsonPath("$[?(@.id == '%s')].activeBoardPostNumber".formatted(
+                        TsidMapper.toExternal(draftSlot.getId()))).value(contains(
+                        draft.getNumber().intValue())));
+    }
+
+    @Test
+    void creazione_unSoloAnnuncioAttivoPerMansione() throws Exception {
+        create(draftSlot, "operatore.cc")
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message", containsString("ha già l'annuncio #" + draft.getNumber())));
+        // archiviato l'annuncio, se ne può creare un altro
+        action(draft, "archive", 0).andExpect(status().isOk());
+        create(draftSlot, "admin").andExpect(status().isCreated());
+    }
+
+    @Test
+    void creazione_mansioneNonProponibileOTutor_rifiutata() throws Exception {
+        var ticket = tickets.save(TestEntities.ticket(tutor, gol, beneficiaries.save(TestEntities.beneficiary(tutor, zone)),
+                category));
+        freeSlot.blockFor(ticket);
+        jobSlots.saveAndFlush(freeSlot);
+        create(freeSlot, "operatore.cc")
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message", containsString("è bloccata dalla segnalazione n. " + ticket.getNumber())));
+        create(freeSlot, "tutor1").andExpect(status().isForbidden());
+        mockMvc.perform(post(POSTS).header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"jobSlotId\": \"xyz\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("jobSlotId"));
     }
 }

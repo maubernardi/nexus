@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router';
+import { Link, useLocation, useParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ import {
 import { BoardPostForm } from '@/organisms/BoardPostForm/BoardPostForm';
 
 type Outcome =
-  | { kind: 'saved' | 'published' | 'archived'; number: number }
+  | { kind: 'created' | 'saved' | 'published' | 'archived'; number: number }
   | { kind: 'refused'; reason: string }
   | { kind: 'error' };
 
@@ -29,13 +29,18 @@ export const BoardPostPage = () => {
   const { id = '' } = useParams();
   const post = useBoardPost(id);
   const update = useUpdateBoardPost();
-  const [outcome, setOutcome] = useState<Outcome | null>(null);
+  const location = useLocation();
+  // arrivo dalla creazione nella scheda dell'azienda (US-904)
+  const created = (location.state as { createdNumber?: number } | null)?.createdNumber;
+  const [outcome, setOutcome] = useState<Outcome | null>(
+    created === undefined ? null : { kind: 'created', number: created },
+  );
   const outcomeRef = useRef<HTMLDivElement>(null);
 
   // esito annunciato portandovi il focus
   useEffect(() => {
-    if (outcome) outcomeRef.current?.focus();
-  }, [outcome]);
+    if (outcome && post.data) outcomeRef.current?.focus();
+  }, [outcome, post.data]);
 
   if (post.isError) {
     const notFound = apiError(post.error)?.status === 404;

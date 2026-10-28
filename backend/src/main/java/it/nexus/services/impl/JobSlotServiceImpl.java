@@ -1,12 +1,16 @@
 package it.nexus.services.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.domain.AbstractTsidEntity;
+import it.nexus.domain.BoardPost;
 import it.nexus.domain.Company;
 import it.nexus.domain.JobCategory;
 import it.nexus.domain.JobSlot;
@@ -15,9 +19,11 @@ import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.JobSlotDTO;
 import it.nexus.domain.dto.JobSlotFormDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
+import it.nexus.domain.enumeration.BoardPostStatus;
 import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.mapper.JobSlotMapper;
 import it.nexus.mapper.TsidMapper;
+import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.JobSlotRepository;
@@ -39,6 +45,7 @@ public class JobSlotServiceImpl implements JobSlotService {
     private final CompanyRepository companyRepository;
     private final JobCategoryRepository jobCategoryRepository;
     private final ZoneRepository zoneRepository;
+    private final BoardPostRepository boardPostRepository;
     private final AuditService auditService;
     private final JobSlotMapper mapper;
 
@@ -46,7 +53,12 @@ public class JobSlotServiceImpl implements JobSlotService {
     @Transactional(readOnly = true)
     public List<JobSlotDTO> listByCompany(String companyId) {
         Company company = company(companyId);
-        return repository.findByCompany(company.getId()).stream().map(mapper::toDto).toList();
+        List<JobSlot> slots = repository.findByCompany(company.getId());
+        Map<Long, BoardPost> posts = boardPostRepository
+                .findByJobSlot_IdInAndStatusIn(slots.stream().map(JobSlot::getId).toList(), BoardPostStatus.ACTIVE)
+                .stream()
+                .collect(Collectors.toMap(p -> p.getJobSlot().getId(), Function.identity()));
+        return slots.stream().map(s -> withPost(mapper.toDto(s), posts.get(s.getId()))).toList();
     }
 
     @Override
@@ -65,7 +77,7 @@ public class JobSlotServiceImpl implements JobSlotService {
                 .value("jobCategoryId", null, external(saved.getJobCategory()))
                 .value("zoneId", null, external(saved.getZone()))
                 .value("description", null, saved.getDescription()), null);
-        return mapper.toDto(saved);
+        return dto(saved);
     }
 
     @Override
@@ -91,7 +103,7 @@ public class JobSlotServiceImpl implements JobSlotService {
         if (!changes.asMap().isEmpty()) {
             auditService.record(AuditEntityType.JOB_SLOT, saved.getId(), "UPDATE", changes, null);
         }
-        return mapper.toDto(saved);
+        return dto(saved);
     }
 
     @Override
@@ -99,7 +111,7 @@ public class JobSlotServiceImpl implements JobSlotService {
         JobSlot slot = find(id);
         requireVersion(slot, expectedVersion);
         if (slot.isActive() == active) {
-            return mapper.toDto(slot);
+            return dto(slot);
         }
         if (!active && slot.getStatus() == JobSlotStatus.BLOCCATA) {
             throw new ConflictException("La mansione è bloccata dalla segnalazione n. %d: non si può ritirare",
@@ -112,7 +124,17 @@ public class JobSlotServiceImpl implements JobSlotService {
         JobSlot saved = repository.saveAndFlush(slot);
         auditService.record(AuditEntityType.JOB_SLOT, saved.getId(), active ? "ACTIVATE" : "DEACTIVATE",
                 AuditChanges.of().value("active", !active, active), null);
-        return mapper.toDto(saved);
+        return dto(saved);
+    }
+
+    /** Mansione con l'annuncio attivo in bacheca, se c'è (US-904). */
+    private JobSlotDTO dto(JobSlot slot) {
+        return withPost(mapper.toDto(slot),
+                boardPostRepository.findFirstByJobSlot_IdAndStatusIn(slot.getId(), BoardPostStatus.ACTIVE).orElse(null));
+    }
+
+    private static JobSlotDTO withPost(JobSlotDTO dto, BoardPost post) {
+        return post == null ? dto : dto.withActiveBoardPost(TsidMapper.toExternal(post.getId()), post.getNumber());
     }
 
     private Company company(String companyId) {

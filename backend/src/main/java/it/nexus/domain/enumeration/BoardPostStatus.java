@@ -4,5 +4,8 @@ package it.nexus.domain.enumeration;
 public enum BoardPostStatus {
     DRAFT,
     PUBLISHED,
-    ARCHIVED
+    ARCHIVED;
+
+    /** Stati di un annuncio attivo: al più uno per mansione ({@code uq_board_post_active_job_slot}). */
+    public static final java.util.Set<BoardPostStatus> ACTIVE = java.util.EnumSet.of(DRAFT, PUBLISHED);
 }

@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Link, useNavigate } from 'react-router';
 
 import { Button } from '@/components/ui/button';
 import { apiError } from '@/config/api/errors';
 import type { JobSlot } from '@/config/api/jobSlotApi';
+import { useCreateBoardPost } from '@/config/hooks/useBoardPosts';
 import {
   useCreateJobSlot,
   useJobSlots,
@@ -36,6 +38,8 @@ export const JobSlotsSection = ({ companyId, companyActive }: JobSlotsSectionPro
   const createSlot = useCreateJobSlot();
   const updateSlot = useUpdateJobSlot();
   const setActive = useSetJobSlotActive();
+  const createPost = useCreateBoardPost();
+  const navigate = useNavigate();
   const [editing, setEditing] = useState<JobSlot | 'new' | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const formHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -78,6 +82,22 @@ export const JobSlotsSection = ({ companyId, companyActive }: JobSlotsSectionPro
         },
       },
     );
+  };
+
+  // bozza creata: si continua nella scheda dell'annuncio, che annuncia l'esito (US-904)
+  const onCreatePost = async (slot: JobSlot): Promise<void> => {
+    setOutcome(null);
+    try {
+      const post = await createPost.mutateAsync(slot.id);
+      void navigate(`/bacheca/${post.id}`, { state: { createdNumber: post.number } });
+    } catch (error) {
+      const body = apiError(error);
+      setOutcome(
+        body?.status === 409
+          ? { key: 'jobSlot.outcome.refused', params: { reason: body.message }, error: true }
+          : { key: 'form.errors.generic', error: true },
+      );
+    }
   };
 
   const th = 'px-3 py-2 text-left text-sm font-semibold whitespace-nowrap';
@@ -215,6 +235,27 @@ export const JobSlotsSection = ({ companyId, companyActive }: JobSlotsSectionPro
                           {t(s.active ? 'jobSlot.withdraw' : 'jobSlot.restore')}{' '}
                           <span className="sr-only">{s.title}</span>
                         </Button>
+                      )}
+                      {s.activeBoardPostId ? (
+                        <Button size="sm" variant="outline" asChild>
+                          <Link to={`/bacheca/${s.activeBoardPostId}`}>
+                            {t('jobSlot.openPost', { number: s.activeBoardPostNumber })}{' '}
+                            <span className="sr-only">{s.title}</span>
+                          </Link>
+                        </Button>
+                      ) : (
+                        s.active &&
+                        s.status === 'LIBERA' &&
+                        companyActive && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => void onCreatePost(s)}
+                            disabled={createPost.isPending}
+                          >
+                            {t('jobSlot.createPost')} <span className="sr-only">{s.title}</span>
+                          </Button>
+                        )
                       )}
                     </div>
                   </td>

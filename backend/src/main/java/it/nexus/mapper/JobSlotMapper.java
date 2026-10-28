@@ -14,6 +14,8 @@ public interface JobSlotMapper {
     @Mapping(target = "companyId", expression = "java(TsidMapper.toExternal(slot.getCompany().getId()))")
     @Mapping(target = "blockedByTicketNumber", source = "blockedByTicket.number")
     @Mapping(target = "active", source = "active")
+    @Mapping(target = "activeBoardPostId", ignore = true)
+    @Mapping(target = "activeBoardPostNumber", ignore = true)
     JobSlotDTO toDto(JobSlot slot);
 
     @Mapping(target = "id", expression = "java(TsidMapper.toExternal(slot.getId()))")
