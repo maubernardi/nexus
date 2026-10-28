@@ -181,7 +181,8 @@ export const TicketsTable = ({
               </td>
               {columns.deadline && (
                 <td className={`${td} whitespace-nowrap tabular-nums`}>
-                  {item.timerDeadline === null ? (
+                  {/* l'API omette i campi vuoti: assente e null valgono uguale */}
+                  {!item.timerDeadline ? (
                     <>
                       <span aria-hidden="true">—</span>
                       <span className="sr-only">{t('tickets.noDeadline')}</span>
