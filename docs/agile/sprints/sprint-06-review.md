@@ -150,11 +150,25 @@ fast-track su un annuncio che non c'è più.
 SPECIAL, tornano in lavorazione normale con il motivo "annuncio assegnato alla segnalazione n. N", e il loro Tutor
 riceve una notifica.
 
+> ✅ **Deciso (PO, 28/10): proposta modificata.** Non possono esserci due candidature sullo stesso annuncio: **la
+> prima blocca l'annuncio**. Finché la segnalazione speciale aspetta la decisione del Call Center, nessun altro Tutor
+> può candidare un beneficiario a quell'annuncio. Poi:
+> - se il Call Center approva (US-403), la mansione si blocca e l'annuncio si archivia;
+> - se rifiuta la corsia veloce (US-404), l'annuncio torna candidabile.
+>
+> *Interpretazione del team, da correggere se non torna:* in bacheca l'annuncio bloccato resta visibile con la scritta
+> «Candidatura in valutazione», senza il pulsante. Se l'annuncio si archivia mentre la candidatura aspetta (a mano,
+> oppure perché la mansione non è più disponibile, D3), la segnalazione perde la corsia veloce con il motivo e il suo
+> Tutor riceve una notifica.
+
 ### 8.2 Candidatura a un annuncio (US-306)
 *Proposta:* nella scheda dell'annuncio, in bacheca, il Tutor trova **"Candida un beneficiario"**. Sceglie tra i suoi
 beneficiari senza segnalazioni aperte e, se l'annuncio è riservato, tra i progetti a cui l'annuncio è riservato. La
 segnalazione nasce speciale, fast-track e in lavorazione, con la tipologia della mansione dell'annuncio. Un Tutor non
 può candidare lo stesso beneficiario due volte.
+
+> ✅ **Deciso (PO, 28/10): proposta accettata.** Il pulsante "Candida un beneficiario" compare solo sugli annunci non
+> bloccati da un'altra candidatura (§8.1).
 
 ### 8.3 Completamento dello Sprint 7 oltre R2
 R2 si chiude con 14 punti; ne restano circa 6. Le possibilità:
@@ -165,8 +179,13 @@ R2 si chiude con 14 punti; ne restano circa 6. Le possibilità:
 
 *Proposta:* **A**, perché non dipende da nessuno e porta avanti il flusso. B quando le credenziali sono pronte.
 
+> ✅ **Deciso (PO, 28/10): A.** US-1001 entra nello Sprint 7 con campi segnaposto (Q5). US-1202 si fa quando ci
+> saranno le credenziali SMTP.
+
 ### 8.4 Chiusura dello Sprint 6
 *Proposta:* chiudere lo Sprint 6 con questa review (velocity 20) e avviare lo Sprint 7 alla conferma del planning.
+
+> ✅ **Deciso (PO, 28/10).** Sprint 6 chiuso con velocity 20; lo Sprint 7 parte con il planning confermato (§9).
 
 ## 9. Proposta per lo Sprint 7 (3 giorni, ~20 punti)
 
@@ -183,6 +202,10 @@ rifiuta la corsia veloce; l'ADMIN gestisce zone e tipologie; inizia la scheda de
 | | | **Totale** | **19** | |
 
 Dipende dalle decisioni §8.1–§8.3. Per il PO: collaudo (sezioni 5 e 11) e US-1301.
+
+> ✅ **Deciso (PO, 28/10): piano confermato, 19 punti.** I punti non sono un tetto: «preferisco di più che di meno».
+> Se avanza tempo si prosegue con gli extra, nell'ordine **US-1002** *Griglia oraria e sospensioni* (5) e **US-1003**
+> *Avvio del tirocinio* (1). Sprint 7: [sprint-07.md](sprint-07.md).
 
 ## 10. Azioni a carico del PO
 

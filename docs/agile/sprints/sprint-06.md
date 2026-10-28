@@ -1,6 +1,6 @@
 # Sprint 6 — 28 – 30 ottobre 2026
 
-**Stato:** ✅ impegno completato il 28/10 (20/20 punti), in attesa della review. **Planning:** 28/10, nella [review dello Sprint 5](sprint-05-review.md) (§9); proposta del team
+**Stato:** ✅ chiuso il 28/10 con la [review](sprint-06-review.md): 20/20 punti, velocity 20. **Planning:** 28/10, nella [review dello Sprint 5](sprint-05-review.md) (§9); proposta del team
 confermata dal Product Owner.
 
 ## Obiettivo
@@ -58,9 +58,9 @@ difetto è emerso provando US-901 nell'applicazione locale, prima che arrivasse 
 | 28/10 (US-901, #69) | 7 |
 | 28/10 (US-803, #70) | 2 |
 | 28/10 (US-903, #71) | 0 |
-| Fine sprint | — |
+| Fine sprint (28/10) | 0 |
 
 ## Review, retrospettiva e planning successivo
 
-In un unico documento asincrono a fine sprint. Demo aggiornata il 28/10 alla versione `b8930e7` (tutto lo Sprint 6);
+[sprint-06-review.md](sprint-06-review.md). Demo aggiornata il 28/10 alla versione `b8930e7` (tutto lo Sprint 6);
 collaudo: T-5.8, T-5.9 e sezione 11.
