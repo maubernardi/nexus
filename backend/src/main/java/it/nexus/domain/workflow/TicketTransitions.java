@@ -58,6 +58,13 @@ public final class TicketTransitions {
             PROPOSTA_AZIENDA, Set.of(Role.CALL_CENTER, Role.ADMIN));
 
     /**
+     * Fase 3 — il Call Center approva la corsia veloce di una segnalazione speciale (US-403): diventa subito proposta
+     * all'azienda con la mansione dell'annuncio, che si blocca; l'annuncio si archivia. Serve la presa in carico.
+     */
+    public static final TicketTransition FAST_TRACK_APPROVE = new TicketTransition("FAST_TRACK_APPROVE",
+            Set.of(IN_LAVORAZIONE), PROPOSTA_AZIENDA, Set.of(Role.CALL_CENTER, Role.ADMIN));
+
+    /**
      * Fase 5 — il Tutor accetta la proposta (US-701): parte il timer di 7 giorni lavorativi. Solo il Tutor della
      * segnalazione (controllo nel servizio).
      */

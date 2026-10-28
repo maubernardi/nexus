@@ -13,11 +13,13 @@ import { Textarea } from '@/components/ui/textarea';
 import type { BoardPostStatus } from '@/config/api/boardPostApi';
 import { apiError } from '@/config/api/errors';
 import type { JobSlotMatch, TicketDetail, TicketEvent } from '@/config/api/ticketApi';
+import { useBoardPost } from '@/config/hooks/useBoardPosts';
 import { useCurrentUser } from '@/config/hooks/useCurrentUser';
 import { useJobCategories, useZones } from '@/config/hooks/useReferenceData';
 import {
   useAcceptProposal,
   useApproveCategory,
+  useApproveFastTrack,
   useAppointmentFailed,
   useAppointmentSet,
   useExcludeCompany,
@@ -46,6 +48,7 @@ const ALL = '';
 
 type Outcome =
   | { kind: 'proposed'; title: string; company: string }
+  | { kind: 'fastTrackApproved'; title: string; company: string }
   | { kind: 'takenOver' }
   | { kind: 'accepted'; deadline: string }
   | { kind: 'appointmentSet' }
@@ -102,7 +105,9 @@ export const TicketPage = () => {
   const workable = d.status === 'IN_LAVORAZIONE' || d.status === 'RIAPERTO';
   // l'API omette i campi vuoti: senza operatore il campo manca del tutto
   const assigned = Boolean(d.assignedOperatorName);
-  const canMatch = isCallCenter && workable && assigned;
+  // con la corsia veloce in attesa si decide prima su quella (US-403/404): niente ricerca delle compatibili
+  const pendingFastTrack = d.fastTrack && d.status === 'IN_LAVORAZIONE' && Boolean(d.boardPostId);
+  const canMatch = isCallCenter && workable && assigned && !pendingFastTrack;
   const ofColleague = isCallCenter && assigned && !d.assignedToMe;
   const onTakeOver = (): void => {
     takeOver.mutate(
@@ -169,9 +174,14 @@ export const TicketPage = () => {
                           ? t('work.accepted', { deadline: formatDay(outcome.deadline) })
                           : outcome.kind === 'proposed'
                             ? t('work.proposed', { title: outcome.title, company: outcome.company })
-                            : outcome.kind === 'conflict'
-                              ? t('work.conflict', { reason: outcome.reason })
-                              : t('work.error')}
+                            : outcome.kind === 'fastTrackApproved'
+                              ? t('work.fastTrack.approved', {
+                                  title: outcome.title,
+                                  company: outcome.company,
+                                })
+                              : outcome.kind === 'conflict'
+                                ? t('work.conflict', { reason: outcome.reason })
+                                : t('work.error')}
         </div>
       )}
 
@@ -190,7 +200,10 @@ export const TicketPage = () => {
           manage={isCallCenter}
         />
       )}
-      {isCallCenter && workable && !canMatch && (
+      {isCallCenter && pendingFastTrack && d.boardPostId && (
+        <FastTrackSection ticket={d} postId={d.boardPostId} canDecide={assigned} onOutcome={setOutcome} />
+      )}
+      {isCallCenter && workable && !assigned && (
         <p className="rounded-xl border border-border bg-card p-4">{t('work.notTaken')}</p>
       )}
       {canMatch && <CompatibleSection ticket={d} onOutcome={setOutcome} />}
@@ -201,6 +214,115 @@ export const TicketPage = () => {
         {t('work.backToList')}
       </Link>
     </div>
+  );
+};
+
+/**
+ * Corsia veloce di una segnalazione speciale (US-403): il Call Center vede la mansione e l'azienda dell'annuncio (dalla
+ * gestione della bacheca, mai dai dati della segnalazione che arrivano anche al Tutor) e, presa in carico la
+ * segnalazione, approva: proposta all'azienda e annuncio archiviato.
+ */
+const FastTrackSection = ({
+  ticket: d,
+  postId,
+  canDecide,
+  onOutcome,
+}: {
+  ticket: TicketDetail;
+  postId: string;
+  canDecide: boolean;
+  onOutcome: (o: Outcome) => void;
+}) => {
+  const { t } = useTranslation();
+  const post = useBoardPost(postId);
+  const approve = useApproveFastTrack();
+  const [confirming, setConfirming] = useState(false);
+  const confirmRef = useRef<HTMLHeadingElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const wasConfirming = useRef(false);
+
+  useEffect(() => {
+    if (confirming) confirmRef.current?.focus();
+    else if (wasConfirming.current) buttonRef.current?.focus();
+    wasConfirming.current = confirming;
+  }, [confirming]);
+
+  const slot = post.data?.jobSlot;
+
+  // mutateAsync: l'esito arriva anche se, diventata proposta, questa sezione sparisce
+  const onConfirm = async (): Promise<void> => {
+    if (!slot) return;
+    try {
+      await approve.mutateAsync({ id: d.id, version: d.version });
+      onOutcome({ kind: 'fastTrackApproved', title: slot.title, company: slot.companyName });
+    } catch (error) {
+      const body = apiError(error);
+      onOutcome(body?.status === 409 ? { kind: 'conflict', reason: body.message } : { kind: 'error' });
+      setConfirming(false);
+    }
+  };
+
+  return (
+    <section
+      aria-labelledby="work-fast-track"
+      className="space-y-3 rounded-xl border border-l-4 border-border border-l-gold bg-card p-4"
+    >
+      <h2 id="work-fast-track" className="flex items-center gap-2 text-lg font-semibold text-primary">
+        <Zap aria-hidden="true" className="size-5" />
+        {t('work.fastTrack.heading', { number: d.boardPostNumber })}
+      </h2>
+      <p>{t('work.fastTrack.intro')}</p>
+      {post.isError ? (
+        <p className="font-medium text-destructive">{t('work.fastTrack.loadError')}</p>
+      ) : !slot ? (
+        <p>{t('common.loading')}</p>
+      ) : (
+        <dl className="grid gap-x-6 gap-y-2 sm:grid-cols-[max-content_1fr]">
+          {/* etichette della mansione: "Zona" è quella della mansione, non la residenza del beneficiario */}
+          <dt className="font-medium">{t('board.jobSlot.title')}</dt>
+          <dd>{slot.title}</dd>
+          <dt className="font-medium">{t('board.jobSlot.company')}</dt>
+          <dd>{slot.companyName}</dd>
+          <dt className="font-medium">{t('board.jobSlot.jobCategory')}</dt>
+          <dd>{slot.jobCategory.name}</dd>
+          <dt className="font-medium">{t('board.jobSlot.zone')}</dt>
+          <dd>{slot.zone.name}</dd>
+        </dl>
+      )}
+      {canDecide &&
+        slot &&
+        (confirming ? (
+          <div className="space-y-3 rounded-xl border-2 border-primary bg-card p-4">
+            <h3 ref={confirmRef} tabIndex={-1} className="font-semibold">
+              {t('work.fastTrack.confirmHeading', { number: d.number })}
+            </h3>
+            <p>
+              {t('work.fastTrack.confirmText', {
+                title: slot.title,
+                company: slot.companyName,
+                post: d.boardPostNumber,
+              })}
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Button size="lg" onClick={() => void onConfirm()} disabled={approve.isPending}>
+                {t('work.fastTrack.confirm')}
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => setConfirming(false)}
+                disabled={approve.isPending}
+              >
+                {t('work.cancel')}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Button ref={buttonRef} size="lg" onClick={() => setConfirming(true)}>
+            {t('work.fastTrack.approve')}
+          </Button>
+        ))}
+    </section>
   );
 };
 
@@ -251,6 +373,7 @@ const KNOWN_ACTIONS = [
   'TAKE_CHARGE',
   'TAKE_OVER',
   'MATCH',
+  'FAST_TRACK_APPROVE',
   'ACCEPT',
   'APPOINTMENT_SET',
   'APPOINTMENT_FAILED',

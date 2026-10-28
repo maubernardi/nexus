@@ -105,6 +105,13 @@ public class TicketResource {
         return ResponseEntity.ok(ticketService.match(id, body));
     }
 
+    @PostMapping("/{id}/fast-track/approve")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Approva la corsia veloce: proposta all'azienda con la mansione dell'annuncio, annuncio archiviato")
+    public ResponseEntity<TicketDetailDTO> approveFastTrack(@PathVariable String id, @RequestBody @Valid VersionDTO body) {
+        return ResponseEntity.ok(ticketService.approveFastTrack(id, body.version()));
+    }
+
     @PostMapping("/{id}/take-over")
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
     @Operation(summary = "Sposta su di sé una segnalazione in carico a un collega")

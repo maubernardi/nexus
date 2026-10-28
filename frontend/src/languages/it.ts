@@ -488,6 +488,18 @@ export const it = {
       'Accettando la proposta «{{title}}» presso {{company}} parte il timer di 7 giorni lavorativi per contattare l’azienda.',
     acceptConfirm: 'Conferma accettazione',
     accepted: 'Proposta accettata. Scadenza del timer: {{deadline}}.',
+    fastTrack: {
+      heading: 'Corsia veloce: candidatura all’annuncio #{{number}}',
+      intro:
+        'Il Tutor ha candidato il beneficiario a questo annuncio. Approvando, la segnalazione diventa subito una proposta all’azienda per la mansione dell’annuncio e l’annuncio esce dalla bacheca.',
+      loadError: 'Impossibile caricare la mansione dell’annuncio. Ricarica la pagina.',
+      approve: 'Approva la corsia veloce',
+      confirmHeading: 'Approvare la corsia veloce della segnalazione n. {{number}}?',
+      confirmText:
+        'Proposta a {{company}} per «{{title}}»: la mansione si blocca, l’annuncio #{{post}} viene archiviato e il Tutor riceve la notifica.',
+      confirm: 'Sì, approva e proponi',
+      approved: 'Corsia veloce approvata: proposta inviata a {{company}} per «{{title}}».',
+    },
     timerDeadline: 'Scadenza del timer',
     reject: {
       action: 'Rifiuta la proposta',
@@ -553,6 +565,7 @@ export const it = {
       TAKE_CHARGE: 'Presa in carico',
       TAKE_OVER: 'Passata a un altro operatore',
       MATCH: 'Proposta all’azienda',
+      FAST_TRACK_APPROVE: 'Corsia veloce approvata: proposta all’azienda',
       ACCEPT: 'Proposta accettata',
       APPOINTMENT_SET: 'Appuntamento fissato',
       APPOINTMENT_FAILED: 'Appuntamento non andato a buon fine',

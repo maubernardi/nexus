@@ -63,6 +63,12 @@ public interface TicketService {
      */
     TicketDetailDTO match(String ticketId, MatchRequestDTO request);
 
+    /**
+     * Approva la corsia veloce di una segnalazione speciale presa in carico (US-403): proposta all'azienda con la
+     * mansione dell'annuncio, mansione bloccata e annuncio archiviato, in un'unica operazione (409 se non si può).
+     */
+    TicketDetailDTO approveFastTrack(String ticketId, long expectedVersion);
+
     /** "Prendila in carico tu": la segnalazione in carico a un collega passa all'operatore corrente (US-405). */
     TicketDetailDTO takeOver(String ticketId, long expectedVersion);
 

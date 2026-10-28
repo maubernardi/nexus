@@ -19,6 +19,7 @@ import {
   takeCharge,
   takeOverTicket,
   acceptProposal,
+  approveFastTrack,
   excludeCompany,
   fetchExclusions,
   appointmentFailed,
@@ -137,6 +138,23 @@ export const useTakeOver = (): UseMutationResult<TicketDetail, unknown, { id: st
 };
 
 /** Il Tutor accetta la proposta (US-701): la segnalazione e gli elenchi si aggiornano. */
+/** Approvazione della corsia veloce (US-403): cambiano segnalazione, mansione e bacheca (annuncio archiviato). */
+export const useApproveFastTrack = (): UseMutationResult<
+  TicketDetail,
+  unknown,
+  { id: string; version: number }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: approveFastTrack,
+    onSettled: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+        queryClient.invalidateQueries({ queryKey: ['board-posts'] }),
+      ]),
+  });
+};
+
 export const useAcceptProposal = (): UseMutationResult<
   TicketDetail,
   unknown,
