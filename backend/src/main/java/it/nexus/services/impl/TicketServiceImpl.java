@@ -1,6 +1,5 @@
 package it.nexus.services.impl;
 
-import java.text.Normalizer;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -8,7 +7,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -33,6 +31,7 @@ import it.nexus.domain.CompanyAuditEvent;
 import it.nexus.domain.JobCategory;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Project;
+import it.nexus.domain.ReferenceCodes;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.TicketCompanyBlacklist;
 import it.nexus.domain.TicketStatusHistory;
@@ -231,17 +230,7 @@ public class TicketServiceImpl implements TicketService {
 
     /** Codice del catalogo dal nome (es. "Tecnico del suono" → TECNICO_DEL_SUONO), reso univoco se serve. */
     private String newCategoryCode(String name) {
-        String base = Normalizer.normalize(name, Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "")
-                .toUpperCase(Locale.ROOT)
-                .replaceAll("[^A-Z0-9]+", "_")
-                .replaceAll("^_+|_+$", "");
-        base = base.isEmpty() ? "TIPOLOGIA" : base.substring(0, Math.min(base.length(), 26));
-        String code = base;
-        for (int i = 2; jobCategoryRepository.existsByCode(code); i++) {
-            code = base + "_" + i;
-        }
-        return code;
+        return ReferenceCodes.fromName(name, "TIPOLOGIA", jobCategoryRepository::existsByCode);
     }
 
     private static boolean isBlank(String value) {
