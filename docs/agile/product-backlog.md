@@ -344,7 +344,7 @@ Dipendenze: US-901
 Come **Tutor** voglio vedere nella Home la scadenza delle mie segnalazioni per non perdere il termine del passo in corso.
 
 Criteri di accettazione:
-- Nell'elenco del Tutor ("Le mie" e "Del progetto") la colonna "Scadenza" mostra l'ultimo giorno utile del timer attivo (es. "entro mar 4/11"), vuota se non c'è scadenza.
+- Nell'elenco del Tutor ("Le mie" e "Del progetto") la colonna "Scadenza" mostra l'ultimo giorno utile del timer attivo (es. "entro mer 04/11"), vuota se non c'è scadenza.
 - Dal promemoria (4° giorno lavorativo) la scadenza è in grassetto con la scritta "in scadenza": l'informazione non è affidata al solo colore.
 - Le segnalazioni con la scadenza più vicina sono in cima all'elenco.
 - Scadenze future (es. sblocco della bacheca) useranno la stessa colonna.
