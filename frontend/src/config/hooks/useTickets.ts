@@ -14,6 +14,7 @@ import {
   fetchTicket,
   fetchTicketHistory,
   matchTicket,
+  submitSpecialTicket,
   submitTicket,
   takeCharge,
   takeOverTicket,
@@ -30,6 +31,7 @@ import {
   type JobSlotMatch,
   type Ticket,
   type TicketCreate,
+  type TicketSpecialCreate,
   type TicketDetail,
   type TicketEvent,
   type TicketListItem,
@@ -47,6 +49,23 @@ export const useSubmitTicket = (): UseMutationResult<Ticket, unknown, TicketCrea
       Promise.all([
         queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
         queryClient.invalidateQueries({ queryKey: MY_BENEFICIARIES_KEY }),
+      ]),
+  });
+};
+
+/**
+ * Candidatura dalla bacheca (US-306): si riallineano segnalazioni, beneficiari (ora con una segnalazione aperta) e
+ * bacheca (l'annuncio è bloccato).
+ */
+export const useSubmitSpecialTicket = (): UseMutationResult<Ticket, unknown, TicketSpecialCreate> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: submitSpecialTicket,
+    onSettled: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+        queryClient.invalidateQueries({ queryKey: MY_BENEFICIARIES_KEY }),
+        queryClient.invalidateQueries({ queryKey: ['board-posts'] }),
       ]),
   });
 };

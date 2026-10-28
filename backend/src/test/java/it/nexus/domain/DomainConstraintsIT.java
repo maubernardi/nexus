@@ -229,6 +229,37 @@ class DomainConstraintsIT {
         }
 
         @Test
+        void unaSolaCandidaturaInValutazionePerAnnuncio() {
+            Graph g = fixtures.graph();
+            BoardPost post = boardPosts.saveAndFlush(boardPost(g.slot()));
+            Ticket first = ticket(g.tutor(), g.project(), g.beneficiary(), g.category());
+            first.setType(TicketType.SPECIAL);
+            first.setFastTrack(true);
+            first.setBoardPost(post);
+            tickets.saveAndFlush(first);
+            Ticket second = fixtures.ticket(g);
+            second.setType(TicketType.SPECIAL);
+            second.setFastTrack(true);
+            second.setBoardPost(post);
+            assertViolates("uq_ticket_fast_track_board_post", () -> tickets.saveAndFlush(second));
+        }
+
+        @Test
+        void candidaturaRifiutataNonBloccaLAnnuncio() {
+            Graph g = fixtures.graph();
+            BoardPost post = boardPosts.saveAndFlush(boardPost(g.slot()));
+            Ticket rejected = ticket(g.tutor(), g.project(), g.beneficiary(), g.category());
+            rejected.setType(TicketType.SPECIAL);
+            rejected.setBoardPost(post);
+            tickets.saveAndFlush(rejected);
+            Ticket next = fixtures.ticket(g);
+            next.setType(TicketType.SPECIAL);
+            next.setFastTrack(true);
+            next.setBoardPost(post);
+            assertThat(tickets.saveAndFlush(next).getNumber()).isNotNull();
+        }
+
+        @Test
         void fastTrackSoloPerSpeciali() {
             Graph g = fixtures.graph();
             Ticket t = ticket(g.tutor(), g.project(), g.beneficiary(), g.category());

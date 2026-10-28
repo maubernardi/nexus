@@ -535,6 +535,28 @@ describe('<TicketPage>', () => {
     await expectNoAxeViolations();
   });
 
+  it('segnalazione speciale: annuncio della candidatura, link solo per il Call Center', async () => {
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({ type: 'SPECIAL', fastTrack: true, boardPostId: 'P4', boardPostNumber: 4 }),
+    );
+    const { unmount } = renderPage();
+
+    expect(await screen.findByRole('link', { name: 'Annuncio #4' })).toHaveAttribute('href', '/bacheca/P4');
+    expect(screen.getByText('Candidatura dalla bacheca')).toBeInTheDocument();
+    unmount();
+
+    vi.mocked(fetchCurrentUser).mockResolvedValue({
+      id: 'tutor1',
+      username: 'tutor1',
+      firstName: 'Tutor',
+      lastName: 'Uno',
+      roles: ['TUTOR'],
+    });
+    renderPage();
+    expect(await screen.findByText('Annuncio #4')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Annuncio #4' })).not.toBeInTheDocument();
+  });
+
   it('Call Center: una segnalazione riaperta si abbina di nuovo', async () => {
     vi.mocked(fetchTicket).mockResolvedValue(detail({ status: 'RIAPERTO' }));
     renderPage();

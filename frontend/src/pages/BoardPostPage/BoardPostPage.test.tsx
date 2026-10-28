@@ -264,4 +264,22 @@ describe('<BoardPostPage>', () => {
     expect(await screen.findByText(/Visibile a tutti dal 28 ottobre 2026/)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Rendi visibile a tutti' })).not.toBeInTheDocument();
   });
+
+  it('candidatura in valutazione: link alla segnalazione che blocca l’annuncio', async () => {
+    vi.mocked(fetchBoardPost).mockResolvedValue(
+      boardPost(3, {
+        status: 'PUBLISHED',
+        publishedAt: '2026-10-27T09:00:00Z',
+        candidatureTicketId: 'T41',
+        candidatureTicketNumber: 41,
+      }),
+    );
+    renderPage();
+
+    expect(await screen.findByRole('link', { name: 'segnalazione n. 41' })).toHaveAttribute(
+      'href',
+      '/segnalazioni/T41',
+    );
+    expect(screen.getByText(/Candidatura in valutazione, in attesa della decisione/)).toBeInTheDocument();
+  });
 });

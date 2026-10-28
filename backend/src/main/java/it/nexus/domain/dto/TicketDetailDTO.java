@@ -34,5 +34,8 @@ public record TicketDetailDTO(
         /** Ultimo annuncio nato dal rilancio di questa segnalazione (US-803), se c'è. */
         String relaunchPostId,
         Long relaunchPostNumber,
-        BoardPostStatus relaunchPostStatus) {
+        BoardPostStatus relaunchPostStatus,
+        /** Annuncio della bacheca a cui è candidata la segnalazione speciale (US-306). */
+        String boardPostId,
+        Long boardPostNumber) {
 }

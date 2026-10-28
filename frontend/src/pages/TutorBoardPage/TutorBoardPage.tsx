@@ -1,18 +1,16 @@
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
 import { NativeSelect } from '@/components/ui/native-select';
-import type { TutorBoardPost } from '@/config/api/boardPostApi';
 import { useTutorBoard } from '@/config/hooks/useBoardPosts';
 import { useJobCategories, useZones } from '@/config/hooks/useReferenceData';
+import { TutorBoardPostCard } from '@/molecules/TutorBoardPostCard/TutorBoardPostCard';
 
 // filtri nell'indirizzo: Indietro e link condivisi li mantengono
 const ZONE_PARAM = 'zona';
 const CATEGORY_PARAM = 'tipologia';
-
-const date = new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' });
 
 /**
  * Bacheca del Tutor (US-901), pensata per lo smartphone: annunci aperti a tutti o riservati ai suoi progetti, senza
@@ -105,60 +103,29 @@ export const TutorBoardPage = () => {
         <ul aria-label={t('board.tutor.list')} className="grid gap-4 md:grid-cols-2">
           {posts.data.map((p) => (
             <li key={p.id}>
-              <PostCard post={p} />
+              <TutorBoardPostCard
+                post={p}
+                action={
+                  p.candidatureInProgress ? (
+                    // la prima candidatura blocca l'annuncio finché il Call Center non decide (Sprint 6, §8.1)
+                    <p className="font-semibold">{t('board.tutor.inProgress')}</p>
+                  ) : (
+                    <Button asChild size="lg" variant="outline">
+                      <Link to={`/bacheca/${p.id}/candidatura`}>
+                        {t('board.tutor.candidate')}
+                        {/* spazio come nodo a sé: nome accessibile "Candida un beneficiario all'annuncio #4" */}{' '}
+                        <span className="sr-only">
+                          {t('board.tutor.candidateTarget', { number: p.number })}
+                        </span>
+                      </Link>
+                    </Button>
+                  )
+                }
+              />
             </li>
           ))}
         </ul>
       )}
     </div>
-  );
-};
-
-/** Scheda di un annuncio: tipologia e zona in evidenza, poi le condizioni; il riservato è indicato in testo. */
-const PostCard = ({ post: p }: { post: TutorBoardPost }) => {
-  const { t } = useTranslation();
-  const headingId = `board-post-${p.id}`;
-  const age =
-    typeof p.ageMin === 'number' && typeof p.ageMax === 'number'
-      ? t('board.tutor.ageRange', { min: p.ageMin, max: p.ageMax })
-      : typeof p.ageMin === 'number'
-        ? t('board.tutor.ageFrom', { min: p.ageMin })
-        : typeof p.ageMax === 'number'
-          ? t('board.tutor.ageTo', { max: p.ageMax })
-          : null;
-
-  return (
-    <article
-      aria-labelledby={headingId}
-      className="h-full space-y-3 rounded-xl border border-border bg-card p-4"
-    >
-      <h2 id={headingId} className="text-lg font-semibold text-primary">
-        {t('board.numbered', { number: p.number })} · {p.jobCategory.name}
-      </h2>
-      <p className="font-medium">{p.zone.name}</p>
-      <p className={p.project ? 'font-semibold' : 'text-muted-foreground'}>
-        {p.project ? t('board.tutor.reserved', { project: p.project.name }) : t('board.tutor.forAll')}
-      </p>
-      <dl className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 text-sm">
-        <dt className="font-medium">{t('board.tutor.age')}</dt>
-        <dd>{age ?? t('board.tutor.notSpecified')}</dd>
-        <dt className="font-medium">{t('board.tutor.hours')}</dt>
-        <dd>
-          {typeof p.weeklyHours === 'number'
-            ? t('board.tutor.hoursValue', { count: p.weeklyHours })
-            : t('board.tutor.notSpecified')}
-        </dd>
-        <dt className="font-medium">{t('board.tutor.duration')}</dt>
-        <dd>
-          {typeof p.durationMonths === 'number'
-            ? t('board.tutor.durationValue', { count: p.durationMonths })
-            : t('board.tutor.notSpecified')}
-        </dd>
-        <dt className="font-medium">{t('board.tutor.published')}</dt>
-        <dd>
-          <time dateTime={p.publishedAt}>{date.format(new Date(p.publishedAt))}</time>
-        </dd>
-      </dl>
-    </article>
   );
 };

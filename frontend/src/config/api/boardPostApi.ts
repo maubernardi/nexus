@@ -28,6 +28,9 @@ export type BoardPost = {
   version: number;
   /** Da quando l'annuncio riservato si può rendere visibile a tutti (7 giorni dalla pubblicazione, US-903). */
   makePublicFrom?: string | null;
+  /** Segnalazione speciale candidata all'annuncio, in attesa della decisione del Call Center (US-306). */
+  candidatureTicketId?: string | null;
+  candidatureTicketNumber?: number | null;
 };
 
 export type BoardPostForm = {
@@ -56,12 +59,19 @@ export type TutorBoardPost = {
   durationMonths?: number | null;
   project?: ReferenceItem | null;
   publishedAt: string;
+  /** Un beneficiario è già candidato e il Call Center deve decidere: niente altre candidature (US-306). */
+  candidatureInProgress: boolean;
 };
 
 export type TutorBoardFilters = { zoneId?: string; jobCategoryId?: string };
 
 export const fetchTutorBoard = async (filters: TutorBoardFilters): Promise<TutorBoardPost[]> => {
   const { data } = await axiosInstance.get<TutorBoardPost[]>(ENDPOINTS.board, { params: filters });
+  return data;
+};
+
+export const fetchTutorBoardPost = async (id: string): Promise<TutorBoardPost> => {
+  const { data } = await axiosInstance.get<TutorBoardPost>(`${ENDPOINTS.board}/${id}`);
   return data;
 };
 

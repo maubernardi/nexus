@@ -175,7 +175,7 @@ export const TicketPage = () => {
         </div>
       )}
 
-      <TicketData ticket={d} />
+      <TicketData ticket={d} manage={isCallCenter} />
 
       {isCallCenter && d.status === 'IN_ATTESA_APPROVAZIONE' && d.requestedJobFreeText && (
         <CategoryDecisionSection ticket={d} onOutcome={setOutcome} />
@@ -875,7 +875,8 @@ const TicketHistory = ({ ticketId }: { ticketId: string }) => {
   );
 };
 
-const TicketData = ({ ticket: d }: { ticket: TicketDetail }) => {
+/** Dati della segnalazione; {@code manage}: il Call Center apre l'annuncio della candidatura nella gestione. */
+const TicketData = ({ ticket: d, manage }: { ticket: TicketDetail; manage: boolean }) => {
   const { t } = useTranslation();
   const beneficiaryLine = t('work.beneficiaryLine', {
     lastName: d.beneficiary.lastName,
@@ -923,6 +924,23 @@ const TicketData = ({ ticket: d }: { ticket: TicketDetail }) => {
             t('work.normal')
           )}
         </dd>
+        {d.boardPostId && d.boardPostNumber && (
+          <>
+            <dt className="font-medium">{t('work.fields.boardPost')}</dt>
+            <dd>
+              {manage ? (
+                <Link
+                  to={`/bacheca/${d.boardPostId}`}
+                  className="font-medium text-primary underline underline-offset-4"
+                >
+                  {t('board.numbered', { number: d.boardPostNumber })}
+                </Link>
+              ) : (
+                t('work.boardPostTutor', { number: d.boardPostNumber })
+              )}
+            </dd>
+          </>
+        )}
       </dl>
     </section>
   );

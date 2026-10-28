@@ -28,6 +28,13 @@ public final class TicketTransitions {
     public static final TicketTransition SUBMIT_NEW_CATEGORY = new TicketTransition("SUBMIT", Set.of(),
             IN_ATTESA_APPROVAZIONE, Set.of(Role.TUTOR));
 
+    /**
+     * Fase 1 — segnalazione speciale dalla bacheca (US-306): il Tutor candida un beneficiario a un annuncio; nasce in
+     * lavorazione, con la corsia veloce. Stesso nome di {@link #SUBMIT}: in cronologia è "Segnalazione inviata".
+     */
+    public static final TicketTransition SUBMIT_SPECIAL = new TicketTransition("SUBMIT", Set.of(), IN_LAVORAZIONE,
+            Set.of(Role.TUTOR));
+
     /** Fase 1 — un operatore approva la nuova tipologia, che entra nel catalogo; la segnalazione va in coda (US-302). */
     public static final TicketTransition APPROVE_CATEGORY = new TicketTransition("CATEGORY_APPROVE",
             Set.of(IN_ATTESA_APPROVAZIONE), NUOVA, Set.of(Role.CALL_CENTER, Role.ADMIN));

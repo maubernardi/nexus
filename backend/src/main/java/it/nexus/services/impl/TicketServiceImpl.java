@@ -48,12 +48,14 @@ import it.nexus.domain.dto.MatchRequestDTO;
 import it.nexus.domain.dto.ProposalRejectDTO;
 import it.nexus.domain.dto.RejectCategoryDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
+import it.nexus.domain.dto.TicketSpecialCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
 import it.nexus.domain.dto.TicketEventDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.enumeration.AppointmentFailureCause;
 import it.nexus.domain.enumeration.AuditEntityType;
+import it.nexus.domain.enumeration.BoardPostStatus;
 import it.nexus.domain.enumeration.CompanyEventType;
 import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.domain.enumeration.NotificationType;
@@ -156,6 +158,31 @@ public class TicketServiceImpl implements TicketService {
         });
         ticket.setRequestedJobFreeText(text);
         return mapper.toDto(stateMachine.create(ticket, TicketTransitions.SUBMIT_NEW_CATEGORY, null));
+    }
+
+    @Override
+    public TicketDTO submitSpecial(TicketSpecialCreateDTO dto) {
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        BoardPost post = visibleBoardPost(dto.boardPostId(), me);
+        if (post.getStatus() == BoardPostStatus.ARCHIVED) {
+            throw new ConflictException("L'annuncio #%d non è più in bacheca", post.getNumber());
+        }
+        Beneficiary beneficiary = ownBeneficiary(dto.beneficiaryId(), me);
+        ticketRepository.findFirstByBeneficiaryIdAndStatusNot(beneficiary.getId(), TicketStatus.CLOSED).ifPresent(open -> {
+            throw new FieldValidationException("beneficiaryId",
+                    "Il beneficiario ha già una segnalazione aperta (n. %d)".formatted(open.getNumber()));
+        });
+        // una sola candidatura per annuncio: la prima lo blocca finché il Call Center non decide (review Sprint 6, §8.1)
+        ticketRepository.findFirstByBoardPostIdAndFastTrackTrue(post.getId()).ifPresent(pending -> {
+            throw new ConflictException("L'annuncio #%d ha già una candidatura in valutazione", post.getNumber());
+        });
+        // annuncio riservato: vale il suo progetto; aperto a tutti: uno dei progetti del Tutor
+        Project project = post.getProject() != null ? post.getProject() : assignedProject(dto.projectId(), me);
+        Ticket ticket = new Ticket(me, project, beneficiary, TicketType.SPECIAL);
+        ticket.setFastTrack(true);
+        ticket.setBoardPost(post);
+        ticket.setRequestedJobCategory(post.getJobSlot().getJobCategory());
+        return mapper.toDto(stateMachine.create(ticket, TicketTransitions.SUBMIT_SPECIAL, null));
     }
 
     @Override
@@ -332,6 +359,10 @@ public class TicketServiceImpl implements TicketService {
     /** Dettaglio leggibile di un evento: chi ha preso in carico, a chi è passata, quale proposta. */
     private String describe(AuditEvent event) {
         return switch (event.getAction()) {
+            case "SUBMIT" -> Optional.ofNullable(TsidMapper.toInternal(changed(event, "boardPostId", "after")))
+                    .flatMap(boardPostRepository::findById)
+                    .map(post -> "Candidatura all'annuncio #%d della bacheca".formatted(post.getNumber()))
+                    .orElse(null);
             case "TAKE_CHARGE" -> userName(changed(event, "assignedCcOperatorId", "after"));
             case "TAKE_OVER" -> "%s → %s".formatted(userName(changed(event, "assignedCcOperatorId", "before")),
                     userName(changed(event, "assignedCcOperatorId", "after")));
@@ -658,7 +689,9 @@ public class TicketServiceImpl implements TicketService {
                 t.getTimerDeadlineAt() == null ? null : TimeConfig.lastDay(t.getTimerDeadlineAt()),
                 relaunch.map(p -> TsidMapper.toExternal(p.getId())).orElse(null),
                 relaunch.map(BoardPost::getNumber).orElse(null),
-                relaunch.map(BoardPost::getStatus).orElse(null));
+                relaunch.map(BoardPost::getStatus).orElse(null),
+                t.getBoardPost() == null ? null : TsidMapper.toExternal(t.getBoardPost().getId()),
+                t.getBoardPost() == null ? null : t.getBoardPost().getNumber());
     }
 
     private static String fullName(AppUser user) {
@@ -682,6 +715,17 @@ public class TicketServiceImpl implements TicketService {
                 .flatMap(beneficiaryRepository::findById)
                 .filter(c -> c.getOwnerTutor().getId().equals(me.getId()))
                 .orElseThrow(() -> new FieldValidationException("beneficiaryId", "Beneficiario non valido"));
+    }
+
+    /** Annuncio della bacheca visibile al Tutor: per tutti o riservato a un suo progetto; altrimenti 404. */
+    private BoardPost visibleBoardPost(String boardPostId, AppUser me) {
+        return Optional.ofNullable(TsidMapper.toInternal(boardPostId))
+                .flatMap(boardPostRepository::findById)
+                // una bozza non è in bacheca: per il Tutor non esiste
+                .filter(p -> p.getStatus() != BoardPostStatus.DRAFT)
+                .filter(p -> p.getProject() == null
+                        || userProjectRepository.existsById(new UserProject.Id(me.getId(), p.getProject().getId())))
+                .orElseThrow(() -> new NotFoundException("Annuncio non trovato"));
     }
 
     private Project assignedProject(String projectId, AppUser me) {

@@ -5,6 +5,9 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -29,6 +32,7 @@ import it.nexus.mapper.ReferenceMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.JobSlotRepository;
+import it.nexus.repository.TicketRepository;
 import it.nexus.repository.ProjectRepository;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
@@ -51,6 +55,7 @@ public class BoardPostServiceImpl implements BoardPostService {
     private final BoardPostRepository repository;
     private final ProjectRepository projectRepository;
     private final JobSlotRepository jobSlotRepository;
+    private final TicketRepository ticketRepository;
     private final UserProjectRepository userProjectRepository;
     private final CurrentAppUserService currentAppUserService;
     private final ReferenceMapper referenceMapper;
@@ -61,37 +66,36 @@ public class BoardPostServiceImpl implements BoardPostService {
     @Override
     @Transactional(readOnly = true)
     public List<BoardPostDTO> list(BoardPostStatus status) {
-        return repository.findByStatusOrderByNumberDesc(status).stream().map(mapper::toDto).toList();
+        List<BoardPost> posts = repository.findByStatusOrderByNumberDesc(status);
+        Map<Long, Ticket> candidatures = candidatures(posts);
+        return posts.stream().map(p -> withCandidature(mapper.toDto(p), candidatures.get(p.getId()))).toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public BoardPostDTO get(String id) {
-        return mapper.toDto(find(id));
+        return dto(find(id));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<TutorBoardPostDTO> listForTutor(String zoneId, String jobCategoryId) {
-        Long me = currentAppUserService.getCurrentAppUser().getId();
-        List<Long> projects = userProjectRepository.findByIdUserId(me).stream()
-                .map(up -> up.getId().getProjectId()).toList();
-        // nessun progetto: solo gli annunci per tutti (un "in" vuoto non è SQL valido ovunque)
-        List<Long> visible = projects.isEmpty() ? List.of(-1L) : projects;
-        return repository.findVisibleToTutor(visible, filterId(zoneId, "zona"), filterId(jobCategoryId, "tipologia"))
-                .stream()
-                .map(p -> new TutorBoardPostDTO(
-                        TsidMapper.toExternal(p.getId()),
-                        p.getNumber(),
-                        referenceMapper.toDto(p.getJobSlot().getJobCategory()),
-                        referenceMapper.toDto(p.getJobSlot().getZone()),
-                        p.getAgeMin(),
-                        p.getAgeMax(),
-                        p.getWeeklyHours(),
-                        p.getDurationMonths(),
-                        referenceMapper.toDto(p.getProject()),
-                        p.getPublishedAt()))
-                .toList();
+        List<BoardPost> posts = repository.findVisibleToTutor(visibleProjects(), filterId(zoneId, "zona"),
+                filterId(jobCategoryId, "tipologia"));
+        Map<Long, Ticket> candidatures = candidatures(posts);
+        return posts.stream().map(p -> tutorDto(p, candidatures.containsKey(p.getId()))).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TutorBoardPostDTO getForTutor(String id) {
+        BoardPost post = find(id);
+        boolean visible = post.getStatus() == BoardPostStatus.PUBLISHED
+                && (post.getProject() == null || visibleProjects().contains(post.getProject().getId()));
+        if (!visible) {
+            throw new NotFoundException("Annuncio non trovato");
+        }
+        return tutorDto(post, ticketRepository.findFirstByBoardPostIdAndFastTrackTrue(post.getId()).isPresent());
     }
 
     @Override
@@ -108,7 +112,7 @@ public class BoardPostServiceImpl implements BoardPostService {
                 .value("jobSlotId", null, TsidMapper.toExternal(slot.getId()))
                 .value("title", null, saved.getTitle())
                 .value("status", null, saved.getStatus().name()), null);
-        return mapper.toDto(saved);
+        return dto(saved);
     }
 
     @Override
@@ -147,7 +151,7 @@ public class BoardPostServiceImpl implements BoardPostService {
         if (!changes.asMap().isEmpty()) {
             auditService.record(AuditEntityType.BOARD_POST, saved.getId(), "UPDATE", changes, null);
         }
-        return mapper.toDto(saved);
+        return dto(saved);
     }
 
     @Override
@@ -165,7 +169,7 @@ public class BoardPostServiceImpl implements BoardPostService {
         auditService.record(AuditEntityType.BOARD_POST, saved.getId(), "PUBLISH", AuditChanges.of()
                 .value("status", BoardPostStatus.DRAFT.name(), BoardPostStatus.PUBLISHED.name())
                 .value("publishedAt", null, now.toString()), null);
-        return mapper.toDto(saved);
+        return dto(saved);
     }
 
     @Override
@@ -180,7 +184,7 @@ public class BoardPostServiceImpl implements BoardPostService {
         BoardPost saved = repository.saveAndFlush(post);
         auditService.record(AuditEntityType.BOARD_POST, saved.getId(), "ARCHIVE", AuditChanges.of()
                 .value("status", before.name(), BoardPostStatus.ARCHIVED.name()), null);
-        return mapper.toDto(saved);
+        return dto(saved);
     }
 
     /** La mansione si può offrire in bacheca: libera, a disposizione, di un'azienda attiva (design D3). */
@@ -239,7 +243,7 @@ public class BoardPostServiceImpl implements BoardPostService {
         auditService.record(AuditEntityType.BOARD_POST, saved.getId(), "MAKE_PUBLIC", AuditChanges.of()
                 .value("projectId", before, null)
                 .value("madePublicAt", null, now.toString()), null);
-        return mapper.toDto(saved);
+        return dto(saved);
     }
 
     @Override
@@ -274,6 +278,48 @@ public class BoardPostServiceImpl implements BoardPostService {
                 .flatMap(projectRepository::findById)
                 .filter(p -> p.isActive() || p.equals(current))
                 .orElseThrow(() -> new FieldValidationException("projectId", "Progetto non valido"));
+    }
+
+    /** Progetti del Tutor corrente; un elenco vuoto diventa {-1}: un "in" vuoto non è SQL valido ovunque. */
+    private List<Long> visibleProjects() {
+        Long me = currentAppUserService.getCurrentAppUser().getId();
+        List<Long> projects = userProjectRepository.findByIdUserId(me).stream()
+                .map(up -> up.getId().getProjectId()).toList();
+        return projects.isEmpty() ? List.of(-1L) : projects;
+    }
+
+    private TutorBoardPostDTO tutorDto(BoardPost p, boolean candidatureInProgress) {
+        return new TutorBoardPostDTO(
+                TsidMapper.toExternal(p.getId()),
+                p.getNumber(),
+                referenceMapper.toDto(p.getJobSlot().getJobCategory()),
+                referenceMapper.toDto(p.getJobSlot().getZone()),
+                p.getAgeMin(),
+                p.getAgeMax(),
+                p.getWeeklyHours(),
+                p.getDurationMonths(),
+                referenceMapper.toDto(p.getProject()),
+                p.getPublishedAt(),
+                candidatureInProgress);
+    }
+
+    /** Candidature in valutazione per annuncio (al più una per annuncio, US-306). */
+    private Map<Long, Ticket> candidatures(List<BoardPost> posts) {
+        if (posts.isEmpty()) {
+            return Map.of();
+        }
+        return ticketRepository.findByBoardPostIdInAndFastTrackTrue(posts.stream().map(BoardPost::getId).toList())
+                .stream()
+                .collect(Collectors.toMap(t -> t.getBoardPost().getId(), Function.identity()));
+    }
+
+    private BoardPostDTO dto(BoardPost post) {
+        return withCandidature(mapper.toDto(post),
+                ticketRepository.findFirstByBoardPostIdAndFastTrackTrue(post.getId()).orElse(null));
+    }
+
+    private static BoardPostDTO withCandidature(BoardPostDTO dto, Ticket ticket) {
+        return ticket == null ? dto : dto.withCandidature(TsidMapper.toExternal(ticket.getId()), ticket.getNumber());
     }
 
     private static Long filterId(String externalId, String what) {

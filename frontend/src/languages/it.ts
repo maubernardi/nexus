@@ -448,8 +448,10 @@ export const it = {
       company: 'Azienda',
       jobSlot: 'Mansione',
       jobCategory: 'Tipologia',
+      boardPost: 'Candidatura dalla bacheca',
     },
     normal: 'Normale',
+    boardPostTutor: 'Annuncio #{{number}}',
     beneficiaryLine: '{{lastName}} {{firstName}} ({{birthYear}})',
     // il nome accessibile comincia con il testo visibile (WCAG 2.5.3)
     openBeneficiary: '{{line}}, apri la scheda del beneficiario',
@@ -667,6 +669,29 @@ export const it = {
     offlineReady: 'NEXUS è pronta per essere usata anche offline.',
     close: 'Chiudi',
   },
+  candidature: {
+    heading: 'Candidatura all’annuncio #{{number}}',
+    intro:
+      'Candida un tuo beneficiario a questo annuncio: nasce una segnalazione speciale, che il Call Center trova in cima alla coda con la corsia veloce. Finché il Call Center non decide, l’annuncio resta bloccato.',
+    formHeading: 'La tua candidatura',
+    beneficiaryHint: 'Solo i tuoi beneficiari senza una segnalazione aperta.',
+    projectHint: 'L’annuncio è aperto a tutti: scegli il progetto della segnalazione.',
+    projectFixed: 'Progetto della segnalazione: {{project}} (l’annuncio è riservato a questo progetto).',
+    submit: 'Invia la candidatura',
+    submitting: 'Invio in corso…',
+    back: 'Torna alla bacheca',
+    refused: 'Candidatura non inviata: {{reason}}',
+    inProgressHeading: 'Candidatura già in valutazione',
+    inProgressText:
+      'Un altro beneficiario è già candidato a questo annuncio e il Call Center deve decidere. Se rifiuta la corsia veloce, l’annuncio torna candidabile.',
+    notFound: 'Annuncio non trovato',
+    notFoundText: 'L’annuncio non è più in bacheca oppure non è aperto ai tuoi progetti.',
+    success: {
+      heading: 'Candidatura inviata: segnalazione n. {{number}}',
+      text: 'La segnalazione speciale per {{name}} è in cima alla coda del Call Center, con la corsia veloce. L’annuncio #{{post}} resta bloccato finché il Call Center non decide.',
+      open: 'Apri la segnalazione',
+    },
+  },
   board: {
     views: 'Stato degli annunci',
     view: {
@@ -709,6 +734,9 @@ export const it = {
       durationValue_other: '{{count}} mesi',
       notSpecified: 'Non indicato',
       published: 'Pubblicato il',
+      candidate: 'Candida un beneficiario',
+      candidateTarget: 'all’annuncio #{{number}}',
+      inProgress: 'Candidatura in valutazione',
     },
     caption: 'Annunci della bacheca: {{view}}',
     count_one: '{{count}} annuncio',
@@ -777,6 +805,8 @@ export const it = {
       notYet: 'Riservato al progetto {{project}}: si potrà rendere visibile a tutti dal {{date}}.',
     },
     madePublicOn: 'Visibile a tutti dal {{date}}',
+    candidature: 'Candidatura in valutazione, in attesa della decisione sulla corsia veloce:',
+    candidatureTicket: 'segnalazione n. {{number}}',
     archive: {
       action: 'Archivia',
       heading: 'Archiviare l’annuncio #{{number}}?',
@@ -858,6 +888,9 @@ export const it = {
     },
     boardPost: {
       title: 'Annuncio della bacheca',
+    },
+    candidature: {
+      title: 'Candidatura a un annuncio',
     },
     ticket: {
       title: 'Segnalazione',
