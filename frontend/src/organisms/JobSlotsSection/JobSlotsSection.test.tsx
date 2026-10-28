@@ -186,4 +186,19 @@ describe('<JobSlotsSection>', () => {
       await screen.findByText('Operazione non possibile: La mansione «Magazziniere» ha già l’annuncio #3'),
     ).toHaveFocus();
   });
+
+  it('ritirando una mansione con annuncio, l’esito dice che l’annuncio è archiviato', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchJobSlots).mockResolvedValue([
+      slot('S2', 'Magazziniere', { activeBoardPostId: 'P3', activeBoardPostNumber: 3 }),
+    ]);
+    vi.mocked(setJobSlotActive).mockResolvedValue(slot('S2', 'Magazziniere', { active: false, version: 1 }));
+    renderSection();
+
+    await user.click(await screen.findByRole('button', { name: 'Ritira Magazziniere' }));
+
+    expect(
+      await screen.findByText('Mansione «Magazziniere» ritirata: l’annuncio #3 è stato archiviato.'),
+    ).toHaveFocus();
+  });
 });

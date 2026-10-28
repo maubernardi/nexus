@@ -4,7 +4,7 @@ import { DEV_LOGIN_PATH, ProtectedPage } from '@/config/routing/ProtectedPage';
 import { RoleRoute } from '@/config/routing/RoleRoute';
 import type { RouteHandle } from '@/config/routing/types';
 import { BeneficiariesPage } from '@/pages/BeneficiariesPage/BeneficiariesPage';
-import { BoardPage } from '@/pages/BoardPage/BoardPage';
+import { BoardRoute } from '@/pages/BoardPage/BoardRoute';
 import { BoardPostPage } from '@/pages/BoardPostPage/BoardPostPage';
 import { BeneficiaryEditPage } from '@/pages/BeneficiaryEditPage/BeneficiaryEditPage';
 import { BeneficiaryNewPage } from '@/pages/BeneficiaryNewPage/BeneficiaryNewPage';
@@ -117,8 +117,8 @@ export const routes: RouteObject[] = [
       {
         path: 'bacheca',
         element: (
-          <RoleRoute roles={['CALL_CENTER', 'ADMIN']}>
-            <BoardPage />
+          <RoleRoute roles={['TUTOR', 'CALL_CENTER', 'ADMIN']}>
+            <BoardRoute />
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.board.title' } satisfies RouteHandle,

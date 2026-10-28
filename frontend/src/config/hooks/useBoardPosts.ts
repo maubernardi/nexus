@@ -11,11 +11,14 @@ import {
   createBoardPost,
   fetchBoardPost,
   fetchBoardPosts,
+  fetchTutorBoard,
   publishBoardPost,
   updateBoardPost,
   type BoardPost,
   type BoardPostForm,
   type BoardPostStatus,
+  type TutorBoardFilters,
+  type TutorBoardPost,
 } from '@/config/api/boardPostApi';
 
 const BOARD_KEY = ['board-posts'] as const;
@@ -25,6 +28,9 @@ export const useBoardPosts = (status: BoardPostStatus): UseQueryResult<BoardPost
 
 export const useBoardPost = (id: string): UseQueryResult<BoardPost> =>
   useQuery({ queryKey: [...BOARD_KEY, 'detail', id], queryFn: () => fetchBoardPost(id) });
+
+export const useTutorBoard = (filters: TutorBoardFilters): UseQueryResult<TutorBoardPost[]> =>
+  useQuery({ queryKey: [...BOARD_KEY, 'tutor', filters], queryFn: () => fetchTutorBoard(filters) });
 
 const useBoardPostMutation = <V>(
   mutationFn: (vars: V) => Promise<BoardPost>,

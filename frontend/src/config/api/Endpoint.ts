@@ -10,6 +10,7 @@ export const ENDPOINTS = {
   companies: '/companies',
   jobSlots: '/job-slots',
   boardPosts: '/board-posts',
+  board: '/board',
   beneficiaries: '/beneficiaries',
   zones: '/reference/zones',
   jobCategories: '/reference/job-categories',

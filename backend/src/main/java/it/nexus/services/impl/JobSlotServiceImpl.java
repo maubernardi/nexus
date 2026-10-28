@@ -29,6 +29,7 @@ import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ZoneRepository;
 import it.nexus.services.AuditService;
+import it.nexus.services.BoardPostService;
 import it.nexus.services.JobSlotService;
 import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.ConflictException;
@@ -46,6 +47,7 @@ public class JobSlotServiceImpl implements JobSlotService {
     private final JobCategoryRepository jobCategoryRepository;
     private final ZoneRepository zoneRepository;
     private final BoardPostRepository boardPostRepository;
+    private final BoardPostService boardPostService;
     private final AuditService auditService;
     private final JobSlotMapper mapper;
 
@@ -124,6 +126,9 @@ public class JobSlotServiceImpl implements JobSlotService {
         JobSlot saved = repository.saveAndFlush(slot);
         auditService.record(AuditEntityType.JOB_SLOT, saved.getId(), active ? "ACTIVATE" : "DEACTIVATE",
                 AuditChanges.of().value("active", !active, active), null);
+        if (!active) {
+            boardPostService.archiveForUnavailableSlots(List.of(saved.getId()), "Mansione ritirata");
+        }
         return dto(saved);
     }
 

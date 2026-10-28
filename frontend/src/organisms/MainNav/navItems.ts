@@ -14,6 +14,6 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { to: '/', labelKey: 'nav.home', icon: ListOrdered, roles: [] },
   { to: '/beneficiari', labelKey: 'nav.beneficiaries', icon: Users, roles: ['TUTOR'] },
   { to: '/aziende', labelKey: 'nav.companies', icon: Building2, roles: ['CALL_CENTER', 'ADMIN'] },
-  { to: '/bacheca', labelKey: 'nav.board', icon: Megaphone, roles: ['CALL_CENTER', 'ADMIN'] },
+  { to: '/bacheca', labelKey: 'nav.board', icon: Megaphone, roles: [] },
   { to: '/calendario', labelKey: 'nav.calendar', icon: CalendarDays, roles: ['ADMIN'] },
 ];
