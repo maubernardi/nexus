@@ -4,8 +4,10 @@ import { AxiosError, AxiosHeaders } from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { fetchJobCategories, fetchZones } from '@/config/api/referenceApi';
+import { fetchBoardPost } from '@/config/api/boardPostApi';
 import {
   acceptProposal,
+  approveFastTrack,
   excludeCompany,
   appointmentFailed,
   appointmentSet,
@@ -23,6 +25,7 @@ import {
 import { fetchCurrentUser } from '@/config/api/userApi';
 import { TicketPage } from '@/pages/TicketPage/TicketPage';
 import { expectNoAxeViolations } from '@/tests/axe';
+import { boardPost } from '@/tests/fixtures/boardPost';
 import { renderRoutes } from '@/tests/renderWithProviders';
 
 vi.mock('@/config/api/ticketApi', () => ({
@@ -42,7 +45,9 @@ vi.mock('@/config/api/ticketApi', () => ({
   approveCategory: vi.fn(),
   rejectCategory: vi.fn(),
   rejectProposal: vi.fn(),
+  approveFastTrack: vi.fn(),
 }));
+vi.mock('@/config/api/boardPostApi', () => ({ fetchBoardPost: vi.fn() }));
 vi.mock('@/config/api/referenceApi', () => ({
   fetchZones: vi.fn(),
   fetchJobCategories: vi.fn(),
@@ -535,9 +540,76 @@ describe('<TicketPage>', () => {
     await expectNoAxeViolations();
   });
 
+  it('corsia veloce in attesa: mansione dell’annuncio, approvazione con conferma, niente ricerca', async () => {
+    const user = userEvent.setup();
+    const pending = detail({ type: 'SPECIAL', fastTrack: true, boardPostId: 'P4', boardPostNumber: 4 });
+    vi.mocked(fetchTicket).mockResolvedValue(pending);
+    vi.mocked(fetchBoardPost).mockResolvedValue(
+      boardPost(4, { id: 'P4', status: 'PUBLISHED', jobSlot: alfa }),
+    );
+    const proposed = detail({
+      type: 'SPECIAL',
+      status: 'PROPOSTA_AZIENDA',
+      proposal: alfa,
+      boardPostId: 'P4',
+      boardPostNumber: 4,
+      version: 3,
+    });
+    vi.mocked(approveFastTrack).mockResolvedValue(proposed);
+    renderPage();
+
+    const section = await screen.findByRole('region', { name: 'Corsia veloce: candidatura all’annuncio #4' });
+    expect(await within(section).findByText('Alfa Logistica')).toBeInTheDocument();
+    expect(fetchCompatibleJobSlots).not.toHaveBeenCalled();
+    expect(
+      screen.queryByText('Prendi in carico la segnalazione dalla coda per poterla abbinare.'),
+    ).not.toBeInTheDocument();
+    await expectNoAxeViolations();
+
+    await user.click(within(section).getByRole('button', { name: 'Approva la corsia veloce' }));
+    expect(
+      screen.getByRole('heading', { name: 'Approvare la corsia veloce della segnalazione n. 9?' }),
+    ).toHaveFocus();
+    // come nella realtà: ricaricata, la segnalazione è già una proposta e la sezione sparisce
+    vi.mocked(fetchTicket).mockResolvedValue(proposed);
+    await user.click(screen.getByRole('button', { name: 'Sì, approva e proponi' }));
+
+    const outcome = await screen.findByText(
+      'Corsia veloce approvata: proposta inviata a Alfa Logistica per «Magazziniere».',
+    );
+    await waitFor(() => expect(outcome).toHaveFocus());
+    expect(vi.mocked(approveFastTrack).mock.calls[0][0]).toEqual({ id: 'T9', version: 2 });
+    await waitFor(() =>
+      expect(screen.queryByRole('region', { name: /Corsia veloce/ })).not.toBeInTheDocument(),
+    );
+  });
+
+  it('corsia veloce non ancora presa in carico: si vede, ma si decide dopo la presa in carico', async () => {
+    const unassigned: Partial<TicketDetail> = detail({
+      type: 'SPECIAL',
+      fastTrack: true,
+      boardPostId: 'P4',
+      boardPostNumber: 4,
+      assignedToMe: false,
+    });
+    delete unassigned.assignedOperatorName;
+    vi.mocked(fetchTicket).mockResolvedValue(unassigned as TicketDetail);
+    vi.mocked(fetchBoardPost).mockResolvedValue(
+      boardPost(4, { id: 'P4', status: 'PUBLISHED', jobSlot: alfa }),
+    );
+    renderPage();
+
+    const section = await screen.findByRole('region', { name: /Corsia veloce/ });
+    expect(await within(section).findByText('Alfa Logistica')).toBeInTheDocument();
+    expect(within(section).queryByRole('button')).not.toBeInTheDocument();
+    expect(
+      screen.getByText('Prendi in carico la segnalazione dalla coda per poterla abbinare.'),
+    ).toBeInTheDocument();
+  });
+
   it('segnalazione speciale: annuncio della candidatura, link solo per il Call Center', async () => {
     vi.mocked(fetchTicket).mockResolvedValue(
-      detail({ type: 'SPECIAL', fastTrack: true, boardPostId: 'P4', boardPostNumber: 4 }),
+      detail({ type: 'SPECIAL', fastTrack: false, boardPostId: 'P4', boardPostNumber: 4 }),
     );
     const { unmount } = renderPage();
 

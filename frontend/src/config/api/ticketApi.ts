@@ -205,6 +205,20 @@ export const acceptProposal = async ({
   return data;
 };
 
+/** Il Call Center approva la corsia veloce (US-403): proposta con la mansione dell'annuncio, annuncio archiviato. */
+export const approveFastTrack = async ({
+  id,
+  version,
+}: {
+  id: string;
+  version: number;
+}): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/fast-track/approve`, {
+    version,
+  });
+  return data;
+};
+
 export const approveCategory = async ({
   id,
   name,

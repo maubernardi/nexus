@@ -343,6 +343,8 @@ public class TicketServiceImpl implements TicketService {
                 .map(e -> status(e, "before") + ">" + status(e, "after"))
                 .collect(Collectors.toSet());
         List<TicketStatusHistory> earlier = historyRepository.findByTicketIdOrderByCreatedAtAsc(ticket.getId()).stream()
+                // presa in carico di una speciale (già in lavorazione): lo stato non cambia, nulla da mostrare
+                .filter(r -> r.getFromStatus() != r.getToStatus())
                 .filter(r -> !inAudit.contains(r.getFromStatus() + ">" + r.getToStatus()))
                 .toList();
         Map<String, String> names = userDisplayNameService.displayNames(Stream.concat(
@@ -366,7 +368,8 @@ public class TicketServiceImpl implements TicketService {
             case "TAKE_CHARGE" -> userName(changed(event, "assignedCcOperatorId", "after"));
             case "TAKE_OVER" -> "%s → %s".formatted(userName(changed(event, "assignedCcOperatorId", "before")),
                     userName(changed(event, "assignedCcOperatorId", "after")));
-            case "MATCH" -> Optional.ofNullable(TsidMapper.toInternal(changed(event, "jobSlotId", "after")))
+            case "MATCH", "FAST_TRACK_APPROVE" -> Optional
+                    .ofNullable(TsidMapper.toInternal(changed(event, "jobSlotId", "after")))
                     .flatMap(jobSlotRepository::findById)
                     .map(slot -> "«%s» presso %s".formatted(slot.getTitle(), slot.getCompany().getName()))
                     .orElse(null);
@@ -438,39 +441,83 @@ public class TicketServiceImpl implements TicketService {
         JobSlot slot = Optional.ofNullable(TsidMapper.toInternal(request.jobSlotId()))
                 .flatMap(jobSlotRepository::findById)
                 .orElseThrow(() -> new FieldValidationException("jobSlotId", "Mansione non valida"));
-        Company company = slot.getCompany();
 
         Ticket saved = stateMachine.apply(ticket, TicketTransitions.MATCH, request.ticketVersion(), null, t -> {
-            requireTakenInCharge(t);
-            if (slot.getVersion() != request.jobSlotVersion() || slot.getStatus() != JobSlotStatus.LIBERA
-                    || !slot.isActive() || !company.isActive()) {
+            requireTakenInCharge(t, "abbinarla");
+            if (t.isFastTrack()) {
+                // prima si decide sulla corsia veloce: approvata è già una proposta, rifiutata torna normale (US-403/404)
+                throw new ConflictException("Decidi prima sulla corsia veloce della segnalazione n. %d", t.getNumber());
+            }
+            if (slot.getVersion() != request.jobSlotVersion()) {
                 throw new ConflictException(
                         "La mansione «%s» non è più disponibile: è stata appena bloccata o modificata", slot.getTitle());
             }
-            if (blacklistRepository.existsById(new TicketCompanyBlacklist.Id(t.getId(), company.getId()))) {
-                throw new ConflictException("L'azienda %s è esclusa per questa segnalazione", company.getName());
-            }
-            t.setJobSlot(slot);
-            slot.blockFor(t);
-            // flush subito: se un'altra segnalazione ha appena bloccato la mansione, il conflitto emerge qui (409)
-            jobSlotRepository.saveAndFlush(slot);
-            return AuditChanges.of()
-                    .value("jobSlotId", null, TsidMapper.toExternal(slot.getId()))
-                    .value("companyId", null, TsidMapper.toExternal(company.getId()));
+            return proposeSlot(t, slot);
         });
+        afterProposal(saved, slot, "Mansione abbinata alla segnalazione n. %d".formatted(saved.getNumber()));
+        return detail(saved, me);
+    }
 
+    @Override
+    public TicketDetailDTO approveFastTrack(String ticketId, long expectedVersion) {
+        Ticket ticket = findTicket(ticketId);
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        if (!ticket.isFastTrack() || ticket.getBoardPost() == null) {
+            throw new ConflictException("La segnalazione n. %d non ha una corsia veloce in attesa", ticket.getNumber());
+        }
+        BoardPost post = ticket.getBoardPost();
+        JobSlot slot = post.getJobSlot();
+
+        Ticket saved = stateMachine.apply(ticket, TicketTransitions.FAST_TRACK_APPROVE, expectedVersion, null, t -> {
+            requireTakenInCharge(t, "decidere sulla corsia veloce");
+            if (post.getStatus() != BoardPostStatus.PUBLISHED) {
+                throw new ConflictException("L'annuncio #%d non è più in bacheca", post.getNumber());
+            }
+            AuditChanges changes = proposeSlot(t, slot);
+            // la corsia veloce è consumata; il tipo SPECIAL resta come traccia dell'origine dalla bacheca
+            t.setFastTrack(false);
+            return changes.value("fastTrack", true, false);
+        });
+        afterProposal(saved, slot, "Corsia veloce approvata: segnalazione n. %d".formatted(saved.getNumber()));
+        return detail(saved, me);
+    }
+
+    /**
+     * Dentro la transizione: la mansione è libera, a disposizione e di un'azienda attiva non esclusa per la segnalazione;
+     * la blocca per la segnalazione e restituisce le scelte da registrare.
+     */
+    private AuditChanges proposeSlot(Ticket t, JobSlot slot) {
+        Company company = slot.getCompany();
+        if (slot.getStatus() != JobSlotStatus.LIBERA || !slot.isActive() || !company.isActive()) {
+            throw new ConflictException(
+                    "La mansione «%s» non è più disponibile: è stata appena bloccata o modificata", slot.getTitle());
+        }
+        if (blacklistRepository.existsById(new TicketCompanyBlacklist.Id(t.getId(), company.getId()))) {
+            throw new ConflictException("L'azienda %s è esclusa per questa segnalazione", company.getName());
+        }
+        t.setJobSlot(slot);
+        slot.blockFor(t);
+        // flush subito: se un'altra segnalazione ha appena bloccato la mansione, il conflitto emerge qui (409)
+        jobSlotRepository.saveAndFlush(slot);
+        return AuditChanges.of()
+                .value("jobSlotId", null, TsidMapper.toExternal(slot.getId()))
+                .value("companyId", null, TsidMapper.toExternal(company.getId()));
+    }
+
+    /**
+     * Dopo la transizione verso la proposta: blocco della mansione nell'audit, annuncio della mansione archiviato con
+     * il motivo, evento nello storico dell'azienda (brief, audit trail) e notifica al Tutor.
+     */
+    private void afterProposal(Ticket saved, JobSlot slot, String boardPostReason) {
         auditService.record(AuditEntityType.JOB_SLOT, slot.getId(), "BLOCK", AuditChanges.of()
                 .value("status", JobSlotStatus.LIBERA.name(), JobSlotStatus.BLOCCATA.name())
                 .value("blockedByTicketId", null, TsidMapper.toExternal(saved.getId())), null);
-        boardPostService.archiveForUnavailableSlots(List.of(slot.getId()),
-                "Mansione abbinata alla segnalazione n. %d".formatted(saved.getNumber()));
-        // storico dell'azienda: la proposta è un evento del rapporto con l'azienda (brief, audit trail)
-        companyAuditEvents.save(new CompanyAuditEvent(company, saved, CompanyEventType.PROPOSTA_INVIATA.name(), Map.of(
-                "ticketNumber", saved.getNumber(),
-                "jobSlotId", TsidMapper.toExternal(slot.getId()),
-                "jobSlotTitle", slot.getTitle())));
+        boardPostService.archiveForUnavailableSlots(List.of(slot.getId()), boardPostReason);
+        companyAuditEvents.save(new CompanyAuditEvent(slot.getCompany(), saved, CompanyEventType.PROPOSTA_INVIATA.name(),
+                Map.of("ticketNumber", saved.getNumber(),
+                        "jobSlotId", TsidMapper.toExternal(slot.getId()),
+                        "jobSlotTitle", slot.getTitle())));
         notificationService.notify(saved.getTutor(), NotificationType.PROPOSAL_SENT, saved);
-        return detail(saved, me);
     }
 
     @Override
@@ -598,7 +645,7 @@ public class TicketServiceImpl implements TicketService {
         if (ticket.getStatus() != TicketStatus.IN_LAVORAZIONE && ticket.getStatus() != TicketStatus.RIAPERTO) {
             throw new ConflictException("Si esclude un'azienda solo su una segnalazione in lavorazione o riaperta");
         }
-        requireTakenInCharge(ticket);
+        requireTakenInCharge(ticket, "escludere un'azienda");
         Company company = Optional.ofNullable(TsidMapper.toInternal(dto.companyId()))
                 .flatMap(companyRepository::findById)
                 .orElseThrow(() -> new FieldValidationException("companyId", "Azienda non valida"));
@@ -659,9 +706,9 @@ public class TicketServiceImpl implements TicketService {
      * Una segnalazione si lavora dopo la presa in carico, da parte di qualunque operatore o dell'ADMIN, anche se è in
      * carico a un collega (US-405, decisione del PO del 05/10): l'assegnazione non cambia e l'audit registra chi agisce.
      */
-    private static void requireTakenInCharge(Ticket ticket) {
+    private static void requireTakenInCharge(Ticket ticket, String action) {
         if (ticket.getAssignedCcOperator() == null) {
-            throw new ConflictException("Prendi in carico la segnalazione n. %d prima di abbinarla", ticket.getNumber());
+            throw new ConflictException("Prendi in carico la segnalazione n. %d prima di %s", ticket.getNumber(), action);
         }
     }
 
