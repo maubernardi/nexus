@@ -1,6 +1,6 @@
 # Sprint 5 — 27 – 29 ottobre 2026
 
-**Stato:** ✅ impegno completato il 27/10 (21/21 punti), in attesa della review. **Planning:** 27/10, nella [review dello Sprint 4](sprint-04-review.md) (§9); proposta del
+**Stato:** ✅ chiuso il 28/10 con la [review](sprint-05-review.md): 21/21 punti, velocity 21. **Planning:** 27/10, nella [review dello Sprint 4](sprint-04-review.md) (§9); proposta del
 team confermata dal Product Owner.
 
 ## Obiettivo
@@ -47,8 +47,8 @@ Fuori impegno, su richiesta del PO: documento di collaudo passo per passo
 | 27/10 (US-704, #57) | 5 |
 | 27/10 (US-705, #59) | 2 |
 | 27/10 (US-603, #60) | 0 |
-| Fine sprint | — |
+| Fine sprint (28/10) | 0 |
 
 ## Review, retrospettiva e planning successivo
 
-In un unico documento asincrono a fine sprint.
+[sprint-05-review.md](sprint-05-review.md).

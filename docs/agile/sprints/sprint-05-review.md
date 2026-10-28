@@ -191,6 +191,9 @@ dopo un appuntamento fallito) e il Tutor li consulta senza vedere l'azienda.*
 
 Dipende dalle decisioni §8.1 e §8.2. Per il PO: US-1301 (collaudo T-10.1) e le note operative (§8.3).
 
+> ✅ **Deciso (PO, 28/10): piano confermato, 18 punti** (US-306 come extra). Prima di US-902 si discutono le note
+> operative del 25/10 (§8.3). Sprint 6: [sprint-06.md](sprint-06.md).
+
 ## 10. Azioni a carico del PO
 
 - [ ] Eseguire il collaudo sulla versione `19bd629` (almeno sezioni 4, 5, 7, 9).
