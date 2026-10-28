@@ -4,6 +4,8 @@ import { DEV_LOGIN_PATH, ProtectedPage } from '@/config/routing/ProtectedPage';
 import { RoleRoute } from '@/config/routing/RoleRoute';
 import type { RouteHandle } from '@/config/routing/types';
 import { BeneficiariesPage } from '@/pages/BeneficiariesPage/BeneficiariesPage';
+import { BoardPage } from '@/pages/BoardPage/BoardPage';
+import { BoardPostPage } from '@/pages/BoardPostPage/BoardPostPage';
 import { BeneficiaryEditPage } from '@/pages/BeneficiaryEditPage/BeneficiaryEditPage';
 import { BeneficiaryNewPage } from '@/pages/BeneficiaryNewPage/BeneficiaryNewPage';
 import { BeneficiaryPage } from '@/pages/BeneficiaryPage/BeneficiaryPage';
@@ -111,6 +113,24 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.companyEdit.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'bacheca',
+        element: (
+          <RoleRoute roles={['CALL_CENTER', 'ADMIN']}>
+            <BoardPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.board.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'bacheca/:id',
+        element: (
+          <RoleRoute roles={['CALL_CENTER', 'ADMIN']}>
+            <BoardPostPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.boardPost.title' } satisfies RouteHandle,
       },
       {
         path: 'notifiche',
