@@ -16,6 +16,9 @@ export type JobSlot = {
   blockedByTicketNumber: number | null;
   active: boolean;
   version: number;
+  /** Annuncio attivo (bozza o pubblicato) in bacheca, se c'è (US-904); l'API omette i campi vuoti. */
+  activeBoardPostId?: string | null;
+  activeBoardPostNumber?: number | null;
 };
 
 export type JobSlotForm = {

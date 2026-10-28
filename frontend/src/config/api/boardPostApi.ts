@@ -49,6 +49,12 @@ export const fetchBoardPost = async (id: string): Promise<BoardPost> => {
   return data;
 };
 
+/** Bozza da una mansione libera (US-904): titolo della mansione, visibile a tutti i progetti. */
+export const createBoardPost = async (jobSlotId: string): Promise<BoardPost> => {
+  const { data } = await axiosInstance.post<BoardPost>(ENDPOINTS.boardPosts, { jobSlotId });
+  return data;
+};
+
 export const updateBoardPost = async ({
   id,
   payload,

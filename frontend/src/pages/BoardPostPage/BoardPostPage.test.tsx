@@ -33,7 +33,7 @@ const conflict = (message: string) =>
     data: { status: 409, message },
   });
 
-const renderPage = () =>
+const renderPage = (state?: unknown) =>
   renderRoutes({
     routes: [
       {
@@ -45,7 +45,7 @@ const renderPage = () =>
         ),
       },
     ],
-    initialPath: '/bacheca/P3',
+    initialPath: state === undefined ? '/bacheca/P3' : { pathname: '/bacheca/P3', state },
   });
 
 describe('<BoardPostPage>', () => {
@@ -109,6 +109,14 @@ describe('<BoardPostPage>', () => {
     expect(await screen.findByRole('textbox', { name: /^Età minima/ })).toHaveValue('');
     expect(screen.getByRole('textbox', { name: /^Età massima/ })).toHaveValue('');
     expect(screen.getByRole('textbox', { name: /^Note/ })).toHaveValue('');
+  });
+
+  it('arrivo dalla creazione: l’esito ha il focus', async () => {
+    vi.mocked(fetchBoardPost).mockResolvedValue(boardPost(3));
+    renderPage({ createdNumber: 3 });
+
+    const outcome = await screen.findByText('Bozza dell’annuncio #3 creata: controlla i dati e pubblicala.');
+    await waitFor(() => expect(outcome).toHaveFocus());
   });
 
   it('età incoerente o fuori intervallo: errori nel riepilogo, nessuna richiesta', async () => {

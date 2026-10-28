@@ -8,6 +8,7 @@ import {
 
 import {
   archiveBoardPost,
+  createBoardPost,
   fetchBoardPost,
   fetchBoardPosts,
   publishBoardPost,
@@ -33,6 +34,19 @@ const useBoardPostMutation = <V>(
     mutationFn,
     // anche in caso di conflitto elenchi e dettaglio vanno riallineati
     onSettled: () => queryClient.invalidateQueries({ queryKey: BOARD_KEY }),
+  });
+};
+
+/** Crea una bozza; si riallineano anche le mansioni, che indicano il proprio annuncio. */
+export const useCreateBoardPost = (): UseMutationResult<BoardPost, unknown, string> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createBoardPost,
+    onSettled: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: BOARD_KEY }),
+        queryClient.invalidateQueries({ queryKey: ['companies'] }),
+      ]),
   });
 };
 

@@ -93,6 +93,12 @@ public class BoardPost extends AbstractTsidEntity {
     @Setter(AccessLevel.NONE)
     private long version;
 
+    /** Nuova bozza per la mansione; visibile a tutti i progetti finché non se ne sceglie uno. */
+    public BoardPost(JobSlot jobSlot, String title) {
+        this.jobSlot = jobSlot;
+        this.title = title;
+    }
+
     @Override
     public String toString() {
         return "BoardPost[id=" + externalId() + ", number=" + number + ", status=" + status + "]";

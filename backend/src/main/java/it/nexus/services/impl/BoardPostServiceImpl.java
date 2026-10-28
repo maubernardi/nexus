@@ -13,6 +13,7 @@ import it.nexus.domain.BoardPost;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Project;
 import it.nexus.domain.audit.AuditChanges;
+import it.nexus.domain.dto.BoardPostCreateDTO;
 import it.nexus.domain.dto.BoardPostDTO;
 import it.nexus.domain.dto.BoardPostFormDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
@@ -21,6 +22,7 @@ import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.mapper.BoardPostMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.BoardPostRepository;
+import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ProjectRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BoardPostService;
@@ -36,6 +38,7 @@ public class BoardPostServiceImpl implements BoardPostService {
 
     private final BoardPostRepository repository;
     private final ProjectRepository projectRepository;
+    private final JobSlotRepository jobSlotRepository;
     private final AuditService auditService;
     private final BoardPostMapper mapper;
     private final Clock clock;
@@ -50,6 +53,23 @@ public class BoardPostServiceImpl implements BoardPostService {
     @Transactional(readOnly = true)
     public BoardPostDTO get(String id) {
         return mapper.toDto(find(id));
+    }
+
+    @Override
+    public BoardPostDTO create(BoardPostCreateDTO dto) {
+        JobSlot slot = Optional.ofNullable(TsidMapper.toInternal(dto.jobSlotId()))
+                .flatMap(jobSlotRepository::findById)
+                .orElseThrow(() -> new FieldValidationException("jobSlotId", "Mansione non valida"));
+        requireProposable(slot, "La mansione «%s»".formatted(slot.getTitle()));
+        repository.findFirstByJobSlot_IdAndStatusIn(slot.getId(), BoardPostStatus.ACTIVE).ifPresent(p -> {
+            throw new ConflictException("La mansione «%s» ha già l'annuncio #%d", slot.getTitle(), p.getNumber());
+        });
+        BoardPost saved = repository.saveAndFlush(new BoardPost(slot, slot.getTitle()));
+        auditService.record(AuditEntityType.BOARD_POST, saved.getId(), "CREATE", AuditChanges.of()
+                .value("jobSlotId", null, TsidMapper.toExternal(slot.getId()))
+                .value("title", null, saved.getTitle())
+                .value("status", null, saved.getStatus().name()), null);
+        return mapper.toDto(saved);
     }
 
     @Override
@@ -98,14 +118,7 @@ public class BoardPostServiceImpl implements BoardPostService {
         if (post.getStatus() != BoardPostStatus.DRAFT) {
             throw new ConflictException("Si pubblica solo una bozza: l'annuncio #%d non lo è", post.getNumber());
         }
-        JobSlot slot = post.getJobSlot();
-        if (!slot.isActive() || !slot.getCompany().isActive()) {
-            throw new ConflictException("La mansione dell'annuncio #%d non è a disposizione", post.getNumber());
-        }
-        if (slot.getStatus() == JobSlotStatus.BLOCCATA) {
-            throw new ConflictException("La mansione dell'annuncio #%d è bloccata dalla segnalazione n. %d",
-                    post.getNumber(), slot.getBlockedByTicket().getNumber());
-        }
+        requireProposable(post.getJobSlot(), "La mansione dell'annuncio #%d".formatted(post.getNumber()));
         Instant now = clock.instant();
         post.setStatus(BoardPostStatus.PUBLISHED);
         post.setPublishedAt(now);
@@ -129,6 +142,17 @@ public class BoardPostServiceImpl implements BoardPostService {
         auditService.record(AuditEntityType.BOARD_POST, saved.getId(), "ARCHIVE", AuditChanges.of()
                 .value("status", before.name(), BoardPostStatus.ARCHIVED.name()), null);
         return mapper.toDto(saved);
+    }
+
+    /** La mansione si può offrire in bacheca: libera, a disposizione, di un'azienda attiva (design D3). */
+    private static void requireProposable(JobSlot slot, String subject) {
+        if (!slot.isActive() || !slot.getCompany().isActive()) {
+            throw new ConflictException("%s non è a disposizione", subject);
+        }
+        if (slot.getStatus() == JobSlotStatus.BLOCCATA) {
+            throw new ConflictException("%s è bloccata dalla segnalazione n. %d", subject,
+                    slot.getBlockedByTicket().getNumber());
+        }
     }
 
     private BoardPost find(String id) {

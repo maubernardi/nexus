@@ -1,5 +1,6 @@
 package it.nexus.web.rest.resource;
 
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import it.nexus.domain.dto.BoardPostCreateDTO;
 import it.nexus.domain.dto.BoardPostDTO;
 import it.nexus.domain.dto.BoardPostFormDTO;
 import it.nexus.domain.dto.VersionDTO;
@@ -44,6 +46,14 @@ public class BoardPostResource {
     @Operation(summary = "Dettaglio di un annuncio (gestione, con l'azienda)")
     public ResponseEntity<BoardPostDTO> get(@PathVariable String id) {
         return ResponseEntity.ok(boardPostService.get(id));
+    }
+
+    @PostMapping
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Crea una bozza da una mansione libera (un solo annuncio attivo per mansione)")
+    public ResponseEntity<BoardPostDTO> create(@RequestBody @Valid BoardPostCreateDTO dto) {
+        BoardPostDTO created = boardPostService.create(dto);
+        return ResponseEntity.created(URI.create(PathAPI.BASE_PATH_V1 + "/board-posts/" + created.id())).body(created);
     }
 
     @PutMapping("/{id}")

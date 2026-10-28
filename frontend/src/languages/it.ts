@@ -409,6 +409,8 @@ export const it = {
     edit: 'Modifica',
     withdraw: 'Ritira',
     restore: 'Rimetti a disposizione',
+    createPost: 'Crea annuncio',
+    openPost: 'Annuncio #{{number}}',
     empty: 'L’azienda non ha ancora mansioni.',
     loadError: 'Impossibile caricare le mansioni. Ricarica la pagina.',
     outcome: {
@@ -659,7 +661,8 @@ export const it = {
       ARCHIVED: 'Archiviati',
     },
     viewHint: {
-      DRAFT: 'Annunci non ancora visibili ai Tutor: controllali e pubblicali.',
+      DRAFT:
+        'Annunci non ancora visibili ai Tutor: controllali e pubblicali. Per crearne uno, parti da una mansione libera nella scheda dell’azienda.',
       PUBLISHED: 'Annunci visibili ai Tutor (senza il nome dell’azienda).',
       ARCHIVED: 'Annunci ritirati, in sola lettura.',
     },
@@ -735,6 +738,7 @@ export const it = {
     },
     cancel: 'Annulla',
     outcome: {
+      created: 'Bozza dell’annuncio #{{number}} creata: controlla i dati e pubblicala.',
       saved: 'Annuncio #{{number}} salvato.',
       published: 'Annuncio #{{number}} pubblicato: ora è visibile ai Tutor.',
       archived: 'Annuncio #{{number}} archiviato.',
