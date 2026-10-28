@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
@@ -336,5 +337,41 @@ class BoardPostResourceIT {
                 .singleElement().satisfies(e -> assertThat(e.getReason()).isEqualTo("Mansione ritirata"));
         assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.BOARD_POST, published.getId()))
                 .singleElement().satisfies(e -> assertThat(e.getReason()).isEqualTo("Azienda disattivata"));
+    }
+
+    @Test
+    void visibileATutti_soloDopo7GiorniDallaPubblicazione_conDataEAudit() throws Exception {
+        // pubblicato da 2 giorni: troppo presto; il Tutor (senza progetti) non lo vede
+        mockMvc.perform(get(POSTS + "/" + id(published)).header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.makePublicFrom").value(publishedAt.plus(Duration.ofDays(7)).toString()));
+        action(published, "make-public", 0)
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message", containsString("si potrà rendere visibile a tutti dal")));
+        mockMvc.perform(get("/api/v1/board").header(USER, "tutor1")).andExpect(jsonPath("$.length()").value(0));
+
+        em.createNativeQuery("UPDATE board_post SET published_at = now() - interval '8 days' WHERE id = :id")
+                .setParameter("id", published.getId()).executeUpdate();
+        em.clear();
+        action(published, "make-public", 0)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.project").doesNotExist())
+                .andExpect(jsonPath("$.madePublicAt").isNotEmpty())
+                .andExpect(jsonPath("$.makePublicFrom").doesNotExist());
+        // ora lo vede anche un Tutor di un altro progetto
+        mockMvc.perform(get("/api/v1/board").header(USER, "tutor1"))
+                .andExpect(jsonPath("$[*].number", contains(published.getNumber().intValue())));
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.BOARD_POST, published.getId()))
+                .singleElement()
+                .satisfies(e -> {
+                    assertThat(e.getAction()).isEqualTo("MAKE_PUBLIC");
+                    assertThat(e.getChanges()).containsKeys("projectId", "madePublicAt");
+                });
+
+        action(published, "make-public", 1)
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message", containsString("è già visibile a tutti")));
+        action(draft, "make-public", 0)
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message", containsString("solo un annuncio pubblicato")));
     }
 }

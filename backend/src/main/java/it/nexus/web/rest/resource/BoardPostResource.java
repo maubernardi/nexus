@@ -70,6 +70,13 @@ public class BoardPostResource {
         return ResponseEntity.ok(boardPostService.publish(id, body.version()));
     }
 
+    @PostMapping("/{id}/make-public")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Rende visibile a tutti un annuncio riservato, dopo 7 giorni solari dalla pubblicazione")
+    public ResponseEntity<BoardPostDTO> makePublic(@PathVariable String id, @RequestBody @Valid VersionDTO body) {
+        return ResponseEntity.ok(boardPostService.makePublic(id, body.version()));
+    }
+
     @PostMapping("/{id}/archive")
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
     @Operation(summary = "Archivia una bozza o un annuncio pubblicato")

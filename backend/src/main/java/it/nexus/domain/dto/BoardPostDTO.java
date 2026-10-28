@@ -25,5 +25,7 @@ public record BoardPostDTO(
         String createdFromTicketId,
         Long createdFromTicketNumber,
         Instant createdAt,
-        long version) {
+        long version,
+        /** Da quando l'annuncio riservato si può rendere visibile a tutti (7 giorni dalla pubblicazione, US-903). */
+        Instant makePublicFrom) {
 }

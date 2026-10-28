@@ -9,19 +9,21 @@ import { apiError } from '@/config/api/errors';
 import {
   useArchiveBoardPost,
   useBoardPost,
+  useMakePublicBoardPost,
   usePublishBoardPost,
   useUpdateBoardPost,
 } from '@/config/hooks/useBoardPosts';
 import { BoardPostForm } from '@/organisms/BoardPostForm/BoardPostForm';
 
 type Outcome =
-  | { kind: 'created' | 'saved' | 'published' | 'archived'; number: number }
+  | { kind: 'created' | 'saved' | 'published' | 'archived' | 'madePublic'; number: number }
   | { kind: 'refused'; reason: string }
   | { kind: 'error' };
 
-type Action = 'publish' | 'archive';
+type Action = 'publish' | 'makePublic' | 'archive';
 
 const date = new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' });
+const dateTime = new Intl.DateTimeFormat('it-IT', { dateStyle: 'long', timeStyle: 'short' });
 
 /** Scheda di un annuncio per Call Center e ADMIN (US-902): mansione, dati modificabili, pubblicazione, archiviazione. */
 export const BoardPostPage = () => {
@@ -58,6 +60,8 @@ export const BoardPostPage = () => {
   }
   const p = post.data;
   const isError = outcome?.kind === 'refused' || outcome?.kind === 'error';
+  // il server verifica di nuovo i 7 giorni: qui si decide solo se mostrare il comando (US-903)
+  const canMakePublic = Boolean(p.makePublicFrom) && new Date(p.makePublicFrom as string) <= new Date();
 
   return (
     <div className="space-y-6">
@@ -68,6 +72,12 @@ export const BoardPostPage = () => {
           <>
             {' · '}
             {t('board.publishedOn', { date: date.format(new Date(p.publishedAt)) })}
+          </>
+        )}
+        {p.madePublicAt && (
+          <>
+            {' · '}
+            {t('board.madePublicOn', { date: date.format(new Date(p.madePublicAt)) })}
           </>
         )}
       </p>
@@ -153,8 +163,17 @@ export const BoardPostPage = () => {
       {p.status !== 'ARCHIVED' && (
         <div className="flex flex-wrap items-start gap-3">
           {p.status === 'DRAFT' && <PostAction action="publish" post={p} onOutcome={setOutcome} />}
+          {canMakePublic && <PostAction action="makePublic" post={p} onOutcome={setOutcome} />}
           <PostAction action="archive" post={p} onOutcome={setOutcome} />
         </div>
+      )}
+      {p.makePublicFrom && !canMakePublic && (
+        <p className="text-muted-foreground">
+          {t('board.makePublic.notYet', {
+            project: p.project?.name,
+            date: dateTime.format(new Date(p.makePublicFrom)),
+          })}
+        </p>
       )}
 
       <Button asChild size="lg" variant="outline">
@@ -205,8 +224,9 @@ const PostAction = ({
 }) => {
   const { t } = useTranslation();
   const publish = usePublishBoardPost();
+  const makePublic = useMakePublicBoardPost();
   const archive = useArchiveBoardPost();
-  const mutation = action === 'publish' ? publish : archive;
+  const mutation = action === 'publish' ? publish : action === 'makePublic' ? makePublic : archive;
   const [confirming, setConfirming] = useState(false);
   const confirmRef = useRef<HTMLHeadingElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -222,7 +242,10 @@ const PostAction = ({
   const onConfirm = async (): Promise<void> => {
     try {
       const saved = await mutation.mutateAsync({ id: p.id, version: p.version });
-      onOutcome({ kind: action === 'publish' ? 'published' : 'archived', number: saved.number });
+      onOutcome({
+        kind: action === 'publish' ? 'published' : action === 'makePublic' ? 'madePublic' : 'archived',
+        number: saved.number,
+      });
     } catch (error) {
       const body = apiError(error);
       onOutcome(body?.status === 409 ? { kind: 'refused', reason: body.message } : { kind: 'error' });
@@ -250,7 +273,9 @@ const PostAction = ({
       <p>
         {action === 'publish'
           ? t('board.publish.text', { audience: p.project?.name ?? t('board.allProjects') })
-          : t('board.archive.text')}
+          : action === 'makePublic'
+            ? t('board.makePublic.text', { project: p.project?.name })
+            : t('board.archive.text')}
       </p>
       <div className="flex flex-wrap gap-3">
         <Button size="lg" onClick={() => void onConfirm()} disabled={mutation.isPending}>
