@@ -9,8 +9,8 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | https://portalenexus.it |
-| **Versione della demo** | `19bd629` (27/10/2026): Sprint 1–5 completi |
-| **Ultimo aggiornamento** | 27/10/2026 (aggiunte T-5.7 e T-9.2) |
+| **Versione della demo** | `b8930e7` (28/10/2026): Sprint 1–6 completi |
+| **Ultimo aggiornamento** | 28/10/2026 (aggiunte T-5.8, T-5.9 e la sezione 11, bacheca) |
 
 ## Come prepararsi
 
@@ -277,6 +277,25 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
   2. Aggiungi una chiusura in un giorno lavorativo tra oggi e la scadenza, poi ricalcola.
   3. **Atteso:** la scadenza si sposta avanti di un giorno lavorativo. Rimuovi poi la chiusura di prova.
 
+- [ ] **T-5.8 Scadenza nella Home del Tutor (Sprint 6)**
+  1. Dopo T-5.3 (proposta accettata), come `tutor1` apri la Home: vista **Le mie segnalazioni**, poi **Del mio
+     progetto**.
+  2. **Atteso:** la colonna **Scadenza** mostra "entro <giorno> <gg/mm>" per **la tua segnalazione**, che è **in cima**;
+     le segnalazioni senza timer hanno "—". Dal 4° giorno lavorativo (dopo il promemoria, T-9.1) la scadenza è in
+     grassetto, preceduta da "in scadenza".
+  3. Come `operatore.cc`: **Atteso:** le viste del Call Center non hanno la colonna.
+
+- [ ] **T-5.9 Appuntamento fallito con rilancio in bacheca (Sprint 6)**
+  1. Porta una segnalazione di `tutor1` fino all'appuntamento (T-4.8, T-5.3, T-5.5).
+  2. → **L'appuntamento non è andato a buon fine** → scegli una causa e spunta **Chiedi il rilancio della mansione in
+     bacheca** (sotto c'è la spiegazione: bozza riservata al progetto, la pubblica il Call Center) → **Conferma**.
+  3. **Atteso:** "Esito registrato: … e il rilancio in bacheca è stato chiesto."; nella segnalazione la sezione
+     **Rilancio in bacheca** dice "annuncio #N (bozza)", senza link; in cronologia la causa è seguita da "rilancio in
+     bacheca richiesto".
+  4. Come `operatore.cc`: notifica "Il Tutor chiede di rilanciare in bacheca la mansione…"; nella segnalazione il link
+     **Annuncio #N · Stato: Bozza** apre la bozza, con il titolo della mansione e il progetto della segnalazione.
+  5. Come `tutor1`: **Atteso:** la bozza **non** è in **Bacheca** finché il Call Center non la pubblica (T-11.3).
+
 ## 9. Timer: promemoria e scadenza (Sprint 5)
 
 - [ ] **T-9.1 Promemoria al 4° giorno lavorativo**
@@ -324,3 +343,67 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
      campo sbagliato.
   2. **Atteso:** titoli e campi sono annunciati con il loro nome; gli errori e gli esiti delle azioni sono letti
      subito.
+
+## 11. Bacheca (Sprint 6)
+
+Dati demo: l'annuncio **#1** è pubblicato e aperto a tutti, il **#2** è pubblicato e riservato a GOL, il **#3** è una
+bozza nata da un rilancio.
+
+- [ ] **T-11.1 Gestione della bacheca (Call Center)**
+  1. Come `operatore.cc` → menu **Bacheca**.
+  2. **Atteso:** viste **Bozze**, **Pubblicati**, **Archiviati**, con il numero di annunci annunciato; la tabella ha
+     numero (#N), titolo, azienda, tipologia, zona, progetto ("Tutti i progetti" se aperto a tutti) e data di
+     pubblicazione. La vista resta nell'indirizzo.
+
+- [ ] **T-11.2 Modifica di una bozza**
+  1. Apri la bozza **#3** → nei **Dati dell'annuncio** scrivi età minima 30 ed età massima 20 → **Salva le
+     modifiche**.
+  2. **Atteso:** riepilogo errori con "L'età massima non può essere minore della minima"; nulla è salvato.
+  3. Correggi (es. 18 e 29), cambia il **Progetto** e le note → **Salva le modifiche**.
+  4. **Atteso:** "Annuncio #3 salvato."; titolo e note riportano l'avviso "visibili solo a Call Center e ADMIN".
+
+- [ ] **T-11.3 Pubblicazione**
+  1. Sulla bozza **#3** → **Pubblica** → leggi la domanda → **Sì, pubblica**.
+  2. **Atteso:** "Annuncio #3 pubblicato: ora è visibile ai Tutor."; stato «Pubblicato» con la data; "Pubblica" non c'è
+     più; il **Progetto** non si cambia più ("si sceglie solo nella bozza").
+  3. Se la mansione dell'annuncio è bloccata da una segnalazione o ritirata, **Atteso:** "Operazione non riuscita: …"
+     con il motivo.
+
+- [ ] **T-11.4 Annuncio da una mansione libera**
+  1. Come `operatore.cc` apri un'azienda → nelle **Mansioni**, accanto a una mansione libera → **Crea annuncio**.
+  2. **Atteso:** si apre la scheda **Annuncio #N** con "Bozza dell'annuncio #N creata…"; titolo della mansione,
+     progetto "Tutti i progetti".
+  3. Torna alla scheda dell'azienda. **Atteso:** accanto alla mansione c'è **Annuncio #N** (link) e non più "Crea
+     annuncio"; le mansioni bloccate o ritirate non hanno "Crea annuncio".
+
+- [ ] **T-11.5 Bacheca del Tutor**
+  1. Come `tutor1` (solo GOL) → menu **Bacheca**.
+  2. **Atteso:** schede degli annunci **pubblicati**: "Annuncio #N · tipologia", zona, "Riservato al tuo progetto GOL"
+     oppure "Aperto a tutti i progetti", età, orario, durata, data. **Mai** il nome dell'azienda, il titolo o le note;
+     niente bozze né archiviati.
+  3. Filtra per zona e per tipologia, poi **Azzera i filtri**. **Atteso:** l'elenco cambia e i filtri restano
+     nell'indirizzo.
+  4. Sul telefono: **Atteso:** schede leggibili, nessuno scorrimento laterale.
+  5. Come `tutor2` (GOL e POLIS) e, se c'è, un Tutor solo POLIS: gli annunci riservati a GOL li vede solo chi è in GOL.
+
+- [ ] **T-11.6 Annuncio legato alla disponibilità della mansione (decisione del 28/10)**
+  1. Come `operatore.cc` crea un annuncio da una mansione libera (T-11.4), poi nella scheda dell'azienda **Ritira**
+     quella mansione.
+  2. **Atteso:** "Mansione «…» ritirata: l'annuncio #N è stato archiviato."; l'annuncio è tra gli **Archiviati**.
+  3. Rimetti a disposizione la mansione, crea un nuovo annuncio e pubblicalo; poi **abbina** quella mansione a una
+     segnalazione (T-4.8).
+  4. **Atteso:** l'annuncio passa tra gli **Archiviati** e il Tutor non lo vede più in bacheca.
+
+- [ ] **T-11.7 Sblocco a tutti dopo 7 giorni**
+  1. Come `operatore.cc` apri un annuncio **pubblicato da meno di 7 giorni** e riservato a un progetto (es. T-11.3).
+  2. **Atteso:** nessun comando di sblocco; la riga "Riservato al progetto …: si potrà rendere visibile a tutti dal …".
+  3. Apri l'annuncio **#2** (riservato a GOL, pubblicato da più di 7 giorni) → **Rendi visibile a tutti** → **Sì,
+     rendi visibile a tutti**.
+  4. **Atteso:** "Annuncio #2 visibile ai Tutor di tutti i progetti."; stato con "Visibile a tutti dal …"; progetto
+     "Tutti i progetti"; un Tutor di un altro progetto ora lo vede come "Aperto a tutti i progetti".
+
+- [ ] **T-11.8 Archiviazione**
+  1. Su un annuncio → **Archivia** → **Annulla**. **Atteso:** il punto in cui sei torna sul pulsante "Archivia".
+  2. → **Archivia** → **Sì, archivia**.
+  3. **Atteso:** "Annuncio #N archiviato."; stato «Archiviato»; dati in sola lettura, nessun comando; il Tutor non lo
+     vede più.
