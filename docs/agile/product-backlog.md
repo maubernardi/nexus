@@ -590,7 +590,9 @@ Criteri di accettazione:
 Come **Tutor** voglio chiedere il rilancio della mansione in bacheca dopo un appuntamento fallito per offrirla ad altri beneficiari.
 
 Criteri di accettazione:
+- Nel modulo dell'appuntamento fallito (US-802) il Tutor trova la casella "Chiedi il rilancio in bacheca" (review Sprint 5, §8.1).
 - Si crea una bozza di post precompilata dalla mansione, riservata al progetto del ticket, collegata al ticket.
+- La bozza non è visibile ai Tutor finché il Call Center non la pubblica (US-902).
 - Il Call Center riceve una notifica.
 
 Dipendenze: US-802, US-1201
@@ -606,6 +608,7 @@ Come **Tutor** voglio consultare gli annunci pubblici e quelli dei miei progetti
 
 Criteri di accettazione:
 - Il nome dell'azienda non arriva mai al browser del tutor (filtrato dall'API).
+- Il Tutor non vede né il titolo né le note dell'annuncio (possono contenere il nome dell'azienda): solo numero (#N), tipologia, zona, fascia d'età, orario, durata e l'indicazione "solo per il tuo progetto" per i post riservati (review Sprint 5, §8.2).
 - Annunci filtrabili per zona e tipologia; consultabili da smartphone.
 
 #### US-902

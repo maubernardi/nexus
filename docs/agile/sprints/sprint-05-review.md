@@ -144,18 +144,33 @@ Tutor trova la casella **"Chiedi il rilancio in bacheca"**: nasce una **bozza** 
 riservata al progetto della segnalazione, e il Call Center riceve una notifica; pubblicarla resta una scelta del Call
 Center (US-902).
 
+> ✅ **Deciso (PO, 28/10): proposta accettata.** Nel modulo dell'appuntamento fallito la casella "Chiedi il rilancio in
+> bacheca" crea una **bozza** precompilata dalla mansione, riservata al progetto della segnalazione e collegata a essa;
+> il Call Center riceve una notifica e decide se pubblicarla (US-902). Criterio aggiunto a US-803.
+
 ### 8.2 Cosa vede il Tutor di un annuncio (US-901)
 Il nome dell'azienda non arriva mai al Tutor. *Proposta:* titolo, tipologia, zona, fascia d'età, orario, durata, note
 e numero dell'annuncio (#N); per i post riservati, l'indicazione "solo per il tuo progetto". Nessun contatto
 dell'azienda.
+
+> ✅ **Deciso (PO, 28/10): proposta modificata.** Per il timore che il nome dell'azienda compaia nel testo libero, il
+> Tutor **non vede né il titolo né le note** dell'annuncio. Vede solo dati strutturati: numero (#N), tipologia, zona,
+> fascia d'età, orario, durata e, per i post riservati, "solo per il tuo progetto". Titolo e note restano visibili a
+> Call Center e ADMIN. Criterio aggiunto a US-901.
 
 ### 8.3 Note operative del 25/10 (A5)
 Nel file `NoteOperative` ci sono tre note nuove (ordine per numero decrescente; nel Call Center solo "In carico a me" e
 "Tutte"; stati come filtro a tasti), l'ultima incompleta. *Proposta:* le discutiamo all'inizio dello Sprint 6, prima
 che il lavoro sulla bacheca tocchi la Home.
 
+> ✅ **Deciso (PO, 28/10): proposta accettata.** Le note del 25/10 si discutono all'inizio dello Sprint 6, prima del
+> lavoro sulla bacheca.
+
 ### 8.4 Chiusura dello Sprint 5
 *Proposta:* chiudere lo Sprint 5 con questa review (velocity 21) e avviare lo Sprint 6 alla conferma del planning.
+
+> ✅ **Deciso (PO, 28/10): proposta accettata.** Sprint 5 chiuso con velocity 21; lo Sprint 6 parte alla conferma del
+> planning.
 
 ## 9. Proposta per lo Sprint 6 (3 giorni, ~20 punti)
 
