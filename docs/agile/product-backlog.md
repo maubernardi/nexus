@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 65 elementi, 231 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-06](sprints/sprint-06.md).
+**Totale: 66 elementi, 233 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-06](sprints/sprint-06.md).
 
 ## Epiche
 
@@ -11,7 +11,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 |---|---|---|---|---|
 | E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, il calendario e i cataloghi senza passare dalla console di Keycloak. | 8 | 26 |
 | E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 5 | 18 |
-| E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 6 | 26 |
+| E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 7 | 28 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 5 | 17 |
 | E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 5 | 12 |
 | E6 | Abbinamento (fase 4) | Il Call Center abbina il beneficiario a una mansione libera e la blocca. | 4 | 17 |
@@ -28,7 +28,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | Release | Obiettivo | Storie | Punti |
 |---|---|---|---|
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
-| R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 20 | 67 |
+| R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 9 | 36 |
 | R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 11 | 50 |
 
@@ -79,6 +79,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-304](#us-304) | E3 | Ticket dei miei progetti | Should | 0 | R1 | ↪️ Assorbita in US-303 |
 | [US-305](#us-305) | E3 | Dettaglio e cronologia del ticket | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-306](#us-306) | E3 | Segnalazione speciale dalla bacheca | Must | 3 | R2 | 📋 Backlog |
+| [US-307](#us-307) | E3 | Scadenza nella Home del Tutor | Must | 2 | R2 | ✅ Ready (Sprint 6) |
 | [US-401](#us-401) | E4 | Coda FIFO | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | 📋 Backlog |
@@ -336,6 +337,21 @@ Criteri di accettazione:
 - Il ticket nasce SPECIAL, fast-track, in IN_LAVORAZIONE, collegato al post, con badge prioritario per il Call Center.
 
 Dipendenze: US-901
+
+#### US-307
+**Scadenza nella Home del Tutor** · Must · 2 punti · R2 · ✅ Ready (Sprint 6)
+
+Come **Tutor** voglio vedere nella Home la scadenza delle mie segnalazioni per non perdere il termine del passo in corso.
+
+Criteri di accettazione:
+- Nell'elenco del Tutor ("Le mie" e "Del progetto") la colonna "Scadenza" mostra l'ultimo giorno utile del timer attivo (es. "entro mar 4/11"), vuota se non c'è scadenza.
+- Dal promemoria (4° giorno lavorativo) la scadenza è in grassetto con la scritta "in scadenza": l'informazione non è affidata al solo colore.
+- Le segnalazioni con la scadenza più vicina sono in cima all'elenco.
+- Scadenze future (es. sblocco della bacheca) useranno la stessa colonna.
+
+Origine: note operative del PO, review dello Sprint 5 §8.3 (28/10).
+
+Dipendenze: US-704
 
 ### E4 — Coda Call Center e fast-track (fase 3)
 
