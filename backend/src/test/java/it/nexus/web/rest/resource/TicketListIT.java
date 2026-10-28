@@ -6,6 +6,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.TestcontainersConfiguration;
+import it.nexus.config.TimeConfig;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.AppUser;
 import it.nexus.domain.BoardPost;
@@ -191,13 +196,16 @@ class TicketListIT {
 
     /** Timer attivo con scadenza alla mezzanotte di Roma che chiude {@code lastDay}; promemoria facoltativo. */
     private void timer(long number, String lastDay, boolean reminderSent) {
+        // istanti calcolati in Java con il fuso di Roma: in SQL dipenderebbero dal fuso della sessione (UTC in CI)
+        Instant deadline = LocalDate.parse(lastDay).plusDays(1).atStartOfDay(TimeConfig.ZONE).toInstant();
         em.createNativeQuery("""
                 UPDATE ticket SET status = 'PROPOSTA_ACCOLTA',
-                    timer_started_at = (CAST(:day AS date) - 10) AT TIME ZONE 'Europe/Rome',
-                    timer_deadline_at = (CAST(:day AS date) + 1) AT TIME ZONE 'Europe/Rome',
+                    timer_started_at = :started,
+                    timer_deadline_at = :deadline,
                     timer_reminder_sent_at = CASE WHEN :reminder THEN now() END
                 WHERE number = :number""")
-                .setParameter("day", lastDay)
+                .setParameter("started", deadline.minus(Duration.ofDays(10)))
+                .setParameter("deadline", deadline)
                 .setParameter("reminder", reminderSent)
                 .setParameter("number", number)
                 .executeUpdate();
