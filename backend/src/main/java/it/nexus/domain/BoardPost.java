@@ -1,6 +1,7 @@
 package it.nexus.domain;
 
 import java.io.Serial;
+import java.time.Duration;
 import java.time.Instant;
 
 import org.hibernate.annotations.Generated;
@@ -92,6 +93,16 @@ public class BoardPost extends AbstractTsidEntity {
     @Column(name = "version", nullable = false)
     @Setter(AccessLevel.NONE)
     private long version;
+
+    /** Giorni solari dalla pubblicazione dopo i quali un annuncio riservato si può rendere visibile a tutti (US-903). */
+    public static final Duration MAKE_PUBLIC_AFTER = Duration.ofDays(7);
+
+    /** Da quando l'annuncio riservato e pubblicato si può rendere visibile a tutti; null se non si applica. */
+    public Instant makePublicFrom() {
+        return status == BoardPostStatus.PUBLISHED && project != null && publishedAt != null
+                ? publishedAt.plus(MAKE_PUBLIC_AFTER)
+                : null;
+    }
 
     /** Nuova bozza per la mansione; visibile a tutti i progetti finché non se ne sceglie uno. */
     public BoardPost(JobSlot jobSlot, String title) {

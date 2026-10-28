@@ -13,5 +13,6 @@ public interface BoardPostMapper {
     @Mapping(target = "createdFromTicketId",
             expression = "java(post.getCreatedFromTicket() == null ? null : TsidMapper.toExternal(post.getCreatedFromTicket().getId()))")
     @Mapping(target = "createdFromTicketNumber", source = "createdFromTicket.number")
+    @Mapping(target = "makePublicFrom", expression = "java(post.makePublicFrom())")
     BoardPostDTO toDto(BoardPost post);
 }

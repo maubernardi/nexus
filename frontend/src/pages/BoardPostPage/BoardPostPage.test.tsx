@@ -3,7 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { AxiosError, AxiosHeaders } from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fetchBoardPost, publishBoardPost, updateBoardPost, type BoardPost } from '@/config/api/boardPostApi';
+import {
+  fetchBoardPost,
+  makePublicBoardPost,
+  publishBoardPost,
+  updateBoardPost,
+  type BoardPost,
+} from '@/config/api/boardPostApi';
 import { fetchProjects } from '@/config/api/referenceApi';
 import { BoardPostPage } from '@/pages/BoardPostPage/BoardPostPage';
 import { expectNoAxeViolations } from '@/tests/axe';
@@ -15,6 +21,7 @@ vi.mock('@/config/api/boardPostApi', () => ({
   fetchBoardPost: vi.fn(),
   updateBoardPost: vi.fn(),
   publishBoardPost: vi.fn(),
+  makePublicBoardPost: vi.fn(),
   archiveBoardPost: vi.fn(),
 }));
 vi.mock('@/config/api/referenceApi', () => ({
@@ -204,5 +211,57 @@ describe('<BoardPostPage>', () => {
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Pubblica|Archivia|Salva/ })).not.toBeInTheDocument();
     await expectNoAxeViolations();
+  });
+
+  it('riservato pubblicato da meno di 7 giorni: dice da quando si potrà rendere visibile a tutti', async () => {
+    vi.mocked(fetchBoardPost).mockResolvedValue(
+      boardPost(3, {
+        status: 'PUBLISHED',
+        publishedAt: '2098-12-25T09:00:00Z',
+        makePublicFrom: '2099-01-01T09:00:00Z',
+      }),
+    );
+    renderPage();
+
+    expect(
+      await screen.findByText(
+        /Riservato al progetto GOL: si potrà rendere visibile a tutti dal 1 gennaio 2099/,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Rendi visibile a tutti' })).not.toBeInTheDocument();
+  });
+
+  it('dopo 7 giorni: rende visibile a tutti con conferma, poi la data dello sblocco', async () => {
+    const user = userEvent.setup();
+    const reserved = boardPost(3, {
+      status: 'PUBLISHED',
+      publishedAt: '2026-10-01T09:00:00Z',
+      makePublicFrom: '2026-10-08T09:00:00Z',
+    });
+    // come lo manda l'API: senza progetto e senza "da quando" i campi sono omessi
+    const forAll: Partial<BoardPost> = {
+      ...reserved,
+      madePublicAt: '2026-10-28T10:00:00Z',
+      version: 1,
+    };
+    delete forAll.project;
+    delete forAll.makePublicFrom;
+    vi.mocked(fetchBoardPost)
+      .mockResolvedValueOnce(reserved)
+      .mockResolvedValue(forAll as BoardPost);
+    vi.mocked(makePublicBoardPost).mockResolvedValue(forAll as BoardPost);
+    renderPage();
+
+    await user.click(await screen.findByRole('button', { name: 'Rendi visibile a tutti' }));
+    expect(screen.getByRole('heading', { name: 'Rendere l’annuncio #3 visibile a tutti?' })).toHaveFocus();
+    expect(screen.getByText(/Non sarà più riservato al progetto GOL/)).toBeInTheDocument();
+    await expectNoAxeViolations();
+    await user.click(screen.getByRole('button', { name: 'Sì, rendi visibile a tutti' }));
+
+    const outcome = await screen.findByText('Annuncio #3 visibile ai Tutor di tutti i progetti.');
+    await waitFor(() => expect(outcome).toHaveFocus());
+    expect(vi.mocked(makePublicBoardPost).mock.calls[0][0]).toEqual({ id: 'P3', version: 0 });
+    expect(await screen.findByText(/Visibile a tutti dal 28 ottobre 2026/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Rendi visibile a tutti' })).not.toBeInTheDocument();
   });
 });

@@ -12,6 +12,7 @@ import {
   fetchBoardPost,
   fetchBoardPosts,
   fetchTutorBoard,
+  makePublicBoardPost,
   publishBoardPost,
   updateBoardPost,
   type BoardPost,
@@ -67,6 +68,12 @@ export const usePublishBoardPost = (): UseMutationResult<
   unknown,
   { id: string; version: number }
 > => useBoardPostMutation(publishBoardPost);
+
+export const useMakePublicBoardPost = (): UseMutationResult<
+  BoardPost,
+  unknown,
+  { id: string; version: number }
+> => useBoardPostMutation(makePublicBoardPost);
 
 export const useArchiveBoardPost = (): UseMutationResult<
   BoardPost,

@@ -2,6 +2,7 @@ package it.nexus.services.impl;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -10,6 +11,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import it.nexus.config.TimeConfig;
 import it.nexus.domain.BoardPost;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Project;
@@ -42,6 +44,9 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 @RequiredArgsConstructor
 public class BoardPostServiceImpl implements BoardPostService {
+
+    private static final DateTimeFormatter UNLOCK_FORMAT = DateTimeFormatter.ofPattern("d/M/yyyy 'alle' HH:mm")
+            .withZone(TimeConfig.ZONE);
 
     private final BoardPostRepository repository;
     private final ProjectRepository projectRepository;
@@ -208,6 +213,33 @@ public class BoardPostServiceImpl implements BoardPostService {
                 .value("status", null, saved.getStatus().name()),
                 "Rilancio dopo l'appuntamento fallito della segnalazione n. %d".formatted(ticket.getNumber()));
         return saved.getNumber();
+    }
+
+    @Override
+    public BoardPostDTO makePublic(String id, long expectedVersion) {
+        BoardPost post = find(id);
+        requireVersion(post, expectedVersion);
+        if (post.getStatus() != BoardPostStatus.PUBLISHED) {
+            throw new ConflictException("Si rende visibile a tutti solo un annuncio pubblicato: l'annuncio #%d non lo è",
+                    post.getNumber());
+        }
+        if (post.getProject() == null) {
+            throw new ConflictException("L'annuncio #%d è già visibile a tutti", post.getNumber());
+        }
+        Instant now = clock.instant();
+        Instant from = post.makePublicFrom();
+        if (now.isBefore(from)) {
+            throw new ConflictException("L'annuncio #%d si potrà rendere visibile a tutti dal %s", post.getNumber(),
+                    UNLOCK_FORMAT.format(from));
+        }
+        String before = TsidMapper.toExternal(post.getProject().getId());
+        post.setProject(null);
+        post.setMadePublicAt(now);
+        BoardPost saved = repository.saveAndFlush(post);
+        auditService.record(AuditEntityType.BOARD_POST, saved.getId(), "MAKE_PUBLIC", AuditChanges.of()
+                .value("projectId", before, null)
+                .value("madePublicAt", null, now.toString()), null);
+        return mapper.toDto(saved);
     }
 
     @Override

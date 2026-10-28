@@ -26,6 +26,8 @@ export type BoardPost = {
   createdFromTicketNumber: number | null;
   createdAt: string;
   version: number;
+  /** Da quando l'annuncio riservato si può rendere visibile a tutti (7 giorni dalla pubblicazione, US-903). */
+  makePublicFrom?: string | null;
 };
 
 export type BoardPostForm = {
@@ -98,6 +100,19 @@ export const publishBoardPost = async ({
   version: number;
 }): Promise<BoardPost> => {
   const { data } = await axiosInstance.post<BoardPost>(`${ENDPOINTS.boardPosts}/${id}/publish`, { version });
+  return data;
+};
+
+export const makePublicBoardPost = async ({
+  id,
+  version,
+}: {
+  id: string;
+  version: number;
+}): Promise<BoardPost> => {
+  const { data } = await axiosInstance.post<BoardPost>(`${ENDPOINTS.boardPosts}/${id}/make-public`, {
+    version,
+  });
   return data;
 };
 

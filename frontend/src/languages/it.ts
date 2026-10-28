@@ -769,6 +769,14 @@ export const it = {
       text: 'Diventa visibile ai Tutor ({{audience}}), senza il nome dell’azienda.',
       confirm: 'Sì, pubblica',
     },
+    makePublic: {
+      action: 'Rendi visibile a tutti',
+      heading: 'Rendere l’annuncio #{{number}} visibile a tutti?',
+      text: 'Non sarà più riservato al progetto {{project}}: lo vedranno i Tutor di tutti i progetti.',
+      confirm: 'Sì, rendi visibile a tutti',
+      notYet: 'Riservato al progetto {{project}}: si potrà rendere visibile a tutti dal {{date}}.',
+    },
+    madePublicOn: 'Visibile a tutti dal {{date}}',
     archive: {
       action: 'Archivia',
       heading: 'Archiviare l’annuncio #{{number}}?',
@@ -781,6 +789,7 @@ export const it = {
       saved: 'Annuncio #{{number}} salvato.',
       published: 'Annuncio #{{number}} pubblicato: ora è visibile ai Tutor.',
       archived: 'Annuncio #{{number}} archiviato.',
+      madePublic: 'Annuncio #{{number}} visibile ai Tutor di tutti i progetti.',
       refused: 'Operazione non riuscita: {{reason}}',
       conflict: 'L’annuncio è stato modificato nel frattempo: ora vedi la versione aggiornata.',
     },

@@ -30,6 +30,9 @@ public interface BoardPostService {
 
     BoardPostDTO archive(String id, long expectedVersion);
 
+    /** Rende visibile a tutti un annuncio riservato, solo dopo 7 giorni solari dalla pubblicazione (US-903). */
+    BoardPostDTO makePublic(String id, long expectedVersion);
+
     /**
      * Archivia gli annunci attivi delle mansioni non più disponibili (abbinate, ritirate, azienda disattivata): un
      * annuncio vive solo finché la sua mansione si può proporre (decisione del PO, 28/10). Va chiamato nella
