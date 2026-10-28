@@ -30,6 +30,7 @@ import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.TimeConfig;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.AppUser;
+import it.nexus.domain.BoardPost;
 import it.nexus.domain.Company;
 import it.nexus.domain.JobCategory;
 import it.nexus.domain.JobSlot;
@@ -39,6 +40,7 @@ import it.nexus.domain.Ticket;
 import it.nexus.domain.UserProject;
 import it.nexus.domain.Zone;
 import it.nexus.domain.enumeration.AuditEntityType;
+import it.nexus.domain.enumeration.BoardPostStatus;
 import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.domain.enumeration.Role;
 import it.nexus.domain.enumeration.TicketStatus;
@@ -46,6 +48,7 @@ import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.BeneficiaryRepository;
+import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.JobCategoryRepository;
@@ -80,6 +83,7 @@ class TicketAcceptIT {
     @Autowired AuditEventRepository audit;
     @Autowired CompanyAuditEventRepository companyAudit;
     @Autowired WorkingDayService workingDays;
+    @Autowired BoardPostRepository boardPosts;
 
     private AppUser tutor;
     private AppUser colleague;
@@ -277,6 +281,50 @@ class TicketAcceptIT {
                                 jobSlots.findById(slot.getId()).orElseThrow().getVersion())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("PROPOSTA_AZIENDA"));
+    }
+
+    @Test
+    void appuntamentoFallito_conRilancio_bozzaRiservataAlProgettoNotificaECronologia() throws Exception {
+        accept("tutor1", version()).andExpect(status().isOk());
+        appointmentSet("tutor1", "{\"version\": %d}".formatted(version())).andExpect(status().isOk());
+
+        mockMvc.perform(post("/api/v1/tickets/" + id() + "/appointment-failed").header(USER, "tutor1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"version\": %d, \"cause\": \"BENEFICIARIO_RINUNCIA\", \"relaunch\": true}"
+                                .formatted(version())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("RIAPERTO"))
+                .andExpect(jsonPath("$.relaunchPostNumber").isNumber())
+                .andExpect(jsonPath("$.relaunchPostStatus").value("DRAFT"));
+        em.flush();
+        em.clear();
+
+        BoardPost draft = boardPosts.findFirstByCreatedFromTicket_IdOrderByNumberDesc(ticket.getId()).orElseThrow();
+        assertThat(draft.getStatus()).isEqualTo(BoardPostStatus.DRAFT);
+        assertThat(draft.getProject().getId()).isEqualTo(project.getId());
+        assertThat(draft.getJobSlot().getId()).isEqualTo(slot.getId());
+        assertThat(draft.getTitle()).isEqualTo("Magazziniere");
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.BOARD_POST, draft.getId()))
+                .singleElement()
+                .satisfies(e -> assertThat(e.getReason())
+                        .isEqualTo("Rilancio dopo l'appuntamento fallito della segnalazione n. " + ticket.getNumber()));
+        mockMvc.perform(get("/api/v1/notifications").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.items[0].type").value("BOARD_RELAUNCH_REQUESTED"))
+                .andExpect(jsonPath("$.items[1].type").value("APPOINTMENT_FAILED"));
+        mockMvc.perform(get("/api/v1/tickets/" + id() + "/history").header(USER, "tutor1"))
+                .andExpect(jsonPath("$[-1].detail")
+                        .value("Causa: Il beneficiario ha rinunciato; rilancio in bacheca richiesto"));
+        // la bozza non è in bacheca per il Tutor finché il Call Center non la pubblica
+        mockMvc.perform(get("/api/v1/board").header(USER, "tutor1")).andExpect(jsonPath("$.length()").value(0));
+
+        // nuova proposta con la stessa mansione: la bozza del rilancio si archivia (decisione del PO, 28/10)
+        mockMvc.perform(post("/api/v1/tickets/" + id() + "/match").header(USER, "operatore.cc")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"jobSlotId\": \"%s\", \"ticketVersion\": %d, \"jobSlotVersion\": %d}".formatted(
+                                TsidMapper.toExternal(slot.getId()), version(),
+                                jobSlots.findById(slot.getId()).orElseThrow().getVersion())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.relaunchPostStatus").value("ARCHIVED"));
     }
 
     @Test

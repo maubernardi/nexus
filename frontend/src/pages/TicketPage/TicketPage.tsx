@@ -6,9 +6,11 @@ import { Link, Navigate, useParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Textarea } from '@/components/ui/textarea';
+import type { BoardPostStatus } from '@/config/api/boardPostApi';
 import { apiError } from '@/config/api/errors';
 import type { JobSlotMatch, TicketDetail, TicketEvent } from '@/config/api/ticketApi';
 import { useCurrentUser } from '@/config/hooks/useCurrentUser';
@@ -47,7 +49,7 @@ type Outcome =
   | { kind: 'takenOver' }
   | { kind: 'accepted'; deadline: string }
   | { kind: 'appointmentSet' }
-  | { kind: 'appointmentFailed' }
+  | { kind: 'appointmentFailed'; relaunch: boolean }
   | { kind: 'proposalRejected' }
   | { kind: 'excluded'; company: string }
   | { kind: 'categoryApproved'; name: string }
@@ -156,7 +158,11 @@ export const TicketPage = () => {
                   : outcome.kind === 'proposalRejected'
                     ? t('work.reject.saved')
                     : outcome.kind === 'appointmentFailed'
-                      ? t('work.appointment.failedSaved')
+                      ? t(
+                          outcome.relaunch
+                            ? 'work.appointment.failedSavedRelaunch'
+                            : 'work.appointment.failedSaved',
+                        )
                       : outcome.kind === 'appointmentSet'
                         ? t('work.appointment.saved')
                         : outcome.kind === 'accepted'
@@ -176,6 +182,14 @@ export const TicketPage = () => {
       )}
 
       {d.proposal && <ProposalSection ticket={d} onOutcome={setOutcome} />}
+      {d.relaunchPostId && d.relaunchPostNumber && d.relaunchPostStatus && (
+        <RelaunchSection
+          postId={d.relaunchPostId}
+          number={d.relaunchPostNumber}
+          status={d.relaunchPostStatus}
+          manage={isCallCenter}
+        />
+      )}
       {isCallCenter && workable && !canMatch && (
         <p className="rounded-xl border border-border bg-card p-4">{t('work.notTaken')}</p>
       )}
@@ -187,6 +201,46 @@ export const TicketPage = () => {
         {t('work.backToList')}
       </Link>
     </div>
+  );
+};
+
+/**
+ * Annuncio nato dal rilancio in bacheca (US-803): il Call Center apre la scheda per controllarlo e pubblicarlo, il
+ * Tutor ne vede numero e stato (la gestione della bacheca non è sua).
+ */
+const RelaunchSection = ({
+  postId,
+  number,
+  status,
+  manage,
+}: {
+  postId: string;
+  number: number;
+  status: BoardPostStatus;
+  manage: boolean;
+}) => {
+  const { t } = useTranslation();
+  const statusLabel = t(`board.status.${status}`);
+  return (
+    <section
+      aria-labelledby="work-relaunch"
+      className="space-y-2 rounded-xl border border-border bg-card p-4"
+    >
+      <h2 id="work-relaunch" className="text-lg font-semibold text-primary">
+        {t('work.relaunch.heading')}
+      </h2>
+      {manage ? (
+        <p>
+          <Link to={`/bacheca/${postId}`} className="font-medium text-primary underline underline-offset-4">
+            {t('work.relaunch.post', { number })}
+          </Link>
+          {' · '}
+          {t('work.relaunch.status', { status: statusLabel })}
+        </p>
+      ) : (
+        <p>{t('work.relaunch.tutor', { number, status: statusLabel.toLowerCase() })}</p>
+      )}
+    </section>
   );
 };
 
@@ -629,7 +683,7 @@ const ProposalRejectAction = ({
   );
 };
 
-type FailedValues = { cause: AppointmentFailureCause | ''; note: string };
+type FailedValues = { cause: AppointmentFailureCause | ''; note: string; relaunch: boolean };
 
 /** Il Tutor della segnalazione registra l'appuntamento fallito, con causa e nota (US-802). */
 const AppointmentFailedAction = ({
@@ -645,7 +699,7 @@ const AppointmentFailedAction = ({
   const failed = useAppointmentFailed();
   const [confirming, setConfirming] = useState(false);
   const confirmRef = useRef<HTMLHeadingElement>(null);
-  const form = useForm<FailedValues>({ defaultValues: { cause: '', note: '' } });
+  const form = useForm<FailedValues>({ defaultValues: { cause: '', note: '', relaunch: false } });
   const { errors } = form.formState;
 
   useEffect(() => {
@@ -653,15 +707,16 @@ const AppointmentFailedAction = ({
   }, [confirming]);
 
   // mutateAsync: l'esito arriva anche se, riaperta la segnalazione, questa sezione sparisce
-  const onConfirm = async ({ cause, note }: FailedValues): Promise<void> => {
+  const onConfirm = async ({ cause, note, relaunch }: FailedValues): Promise<void> => {
     try {
       await failed.mutateAsync({
         id: d.id,
         version: d.version,
         cause: cause as AppointmentFailureCause,
         note: note.trim() || null,
+        relaunch,
       });
-      onOutcome({ kind: 'appointmentFailed' });
+      onOutcome({ kind: 'appointmentFailed', relaunch });
     } catch (error) {
       const body = apiError(error);
       const noteError = body?.fieldErrors?.find((fe) => fe.field === 'note');
@@ -728,6 +783,22 @@ const AppointmentFailedAction = ({
           />
         )}
       </FormField>
+      <div className="flex items-start gap-3">
+        <Checkbox
+          id="work-appointment-relaunch"
+          aria-describedby="work-appointment-relaunch-hint"
+          className="mt-0.5"
+          {...form.register('relaunch')}
+        />
+        <div className="space-y-1">
+          <label htmlFor="work-appointment-relaunch" className="font-medium">
+            {t('work.appointment.relaunch')}
+          </label>
+          <p id="work-appointment-relaunch-hint" className="text-sm text-muted-foreground">
+            {t('work.appointment.relaunchHint', { project: d.project.name })}
+          </p>
+        </div>
+      </div>
       <div className="flex flex-wrap gap-3">
         <Button type="submit" size="lg" disabled={failed.isPending}>
           {t('work.appointment.failedConfirm')}

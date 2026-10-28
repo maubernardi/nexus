@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import it.nexus.domain.BoardPost;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Project;
+import it.nexus.domain.Ticket;
 import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.BoardPostCreateDTO;
 import it.nexus.domain.dto.BoardPostDTO;
@@ -186,6 +187,27 @@ public class BoardPostServiceImpl implements BoardPostService {
             throw new ConflictException("%s è bloccata dalla segnalazione n. %d", subject,
                     slot.getBlockedByTicket().getNumber());
         }
+    }
+
+    @Override
+    public Long createRelaunchDraft(JobSlot slot, Ticket ticket) {
+        String subject = "La mansione «%s»".formatted(slot.getTitle());
+        requireProposable(slot, subject);
+        repository.findFirstByJobSlot_IdAndStatusIn(slot.getId(), BoardPostStatus.ACTIVE).ifPresent(p -> {
+            throw new ConflictException("%s ha già l'annuncio #%d", subject, p.getNumber());
+        });
+        BoardPost post = new BoardPost(slot, slot.getTitle());
+        post.setProject(ticket.getProject());
+        post.setCreatedFromTicket(ticket);
+        BoardPost saved = repository.saveAndFlush(post);
+        auditService.record(AuditEntityType.BOARD_POST, saved.getId(), "CREATE", AuditChanges.of()
+                .value("jobSlotId", null, TsidMapper.toExternal(slot.getId()))
+                .value("title", null, saved.getTitle())
+                .value("projectId", null, TsidMapper.toExternal(ticket.getProject().getId()))
+                .value("createdFromTicketId", null, TsidMapper.toExternal(ticket.getId()))
+                .value("status", null, saved.getStatus().name()),
+                "Rilancio dopo l'appuntamento fallito della segnalazione n. %d".formatted(ticket.getNumber()));
+        return saved.getNumber();
     }
 
     @Override

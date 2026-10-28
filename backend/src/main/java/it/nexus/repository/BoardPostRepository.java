@@ -41,5 +41,8 @@ public interface BoardPostRepository extends JpaRepository<BoardPost, Long> {
     List<BoardPost> findVisibleToTutor(@Param("projectIds") Collection<Long> projectIds, @Param("zoneId") Long zoneId,
             @Param("jobCategoryId") Long jobCategoryId);
 
+    /** Ultimo annuncio nato dal rilancio della segnalazione (US-803). */
+    Optional<BoardPost> findFirstByCreatedFromTicket_IdOrderByNumberDesc(Long ticketId);
+
     Optional<BoardPost> findFirstByJobSlot_IdAndStatusIn(Long jobSlotId, Collection<BoardPostStatus> statuses);
 }

@@ -3,6 +3,8 @@ package it.nexus.domain.dto;
 import java.time.Instant;
 import java.time.LocalDate;
 
+import it.nexus.domain.enumeration.BoardPostStatus;
+
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.domain.enumeration.TicketType;
 
@@ -28,5 +30,9 @@ public record TicketDetailDTO(
         /** L'utente corrente è il Tutor della segnalazione: può accettare la proposta (US-701). */
         boolean myTicket,
         /** Ultimo giorno lavorativo del timer della proposta accettata (US-701), se il timer è attivo. */
-        LocalDate timerDeadline) {
+        LocalDate timerDeadline,
+        /** Ultimo annuncio nato dal rilancio di questa segnalazione (US-803), se c'è. */
+        String relaunchPostId,
+        Long relaunchPostNumber,
+        BoardPostStatus relaunchPostStatus) {
 }
