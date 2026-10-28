@@ -16,6 +16,7 @@ export const it = {
     beneficiaries: 'Beneficiari',
     companies: 'Aziende',
     board: 'Bacheca',
+    catalogs: 'Cataloghi',
     calendar: 'Calendario',
   },
   common: {
@@ -720,6 +721,45 @@ export const it = {
       open: 'Apri la segnalazione',
     },
   },
+  catalog: {
+    zones: {
+      heading: 'Zone',
+      intro: 'Quartieri di Firenze e comuni dell’area: residenza dei beneficiari e luogo delle mansioni.',
+      add: 'Aggiungi zona',
+      newHeading: 'Nuova zona',
+      caption_one: 'Zone: {{count}} voce',
+      caption_other: 'Zone: {{count}} voci',
+    },
+    'job-categories': {
+      heading: 'Tipologie di mansione',
+      intro:
+        'Le tipologie che il Tutor richiede nella segnalazione e che descrivono le mansioni delle aziende.',
+      add: 'Aggiungi tipologia',
+      newHeading: 'Nuova tipologia',
+      caption_one: 'Tipologie di mansione: {{count}} voce',
+      caption_other: 'Tipologie di mansione: {{count}} voci',
+    },
+    columns: { name: 'Nome', code: 'Codice', status: 'Stato', actions: 'Azioni' },
+    active: 'Attiva',
+    inactive: 'Disattivata',
+    rename: 'Rinomina',
+    deactivate: 'Disattiva',
+    activate: 'Riattiva',
+    renameHeading: 'Nuovo nome per «{{name}}»',
+    nameHint: 'Il codice si ricava dal nome e poi non cambia.',
+    renameHint: 'Il nuovo nome vale anche sui dati che già la usano; il codice non cambia.',
+    create: 'Aggiungi',
+    save: 'Salva',
+    cancel: 'Annulla',
+    loadError: 'Impossibile caricare il catalogo. Controlla la connessione e riprova.',
+    outcome: {
+      created: '«{{name}}» aggiunta al catalogo (codice {{code}}).',
+      renamed: 'Nome salvato: «{{name}}».',
+      deactivated: '«{{name}}» disattivata: non si può più scegliere, resta sui dati che la usano.',
+      activated: '«{{name}}» riattivata.',
+      refused: 'Operazione non possibile: {{reason}}',
+    },
+  },
   board: {
     views: 'Stato degli annunci',
     view: {
@@ -862,6 +902,12 @@ export const it = {
     notifications: {
       title: 'Notifiche',
       heading: 'Notifiche',
+    },
+    catalogs: {
+      title: 'Cataloghi',
+      heading: 'Cataloghi',
+      intro:
+        'Le zone e le tipologie di mansione usate in tutta l’applicazione. Le voci non si cancellano: una voce disattivata non si può più scegliere, ma resta su beneficiari, mansioni e segnalazioni che la usano.',
     },
     calendar: {
       title: 'Calendario',

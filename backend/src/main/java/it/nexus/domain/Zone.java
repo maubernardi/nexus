@@ -15,4 +15,10 @@ public class Zone extends AbstractReferenceEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    /** Nuova zona del catalogo (US-106). */
+    public Zone(String code, String name) {
+        setCode(code);
+        setName(name);
+    }
 }

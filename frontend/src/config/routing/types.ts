@@ -15,6 +15,7 @@ export type RouteHandle = {
     | 'pages.board.title'
     | 'pages.boardPost.title'
     | 'pages.candidature.title'
+    | 'pages.catalogs.title'
     | 'pages.calendar.title'
     | 'pages.notifications.title'
     | 'pages.forbidden.title';

@@ -2,6 +2,7 @@ package it.nexus.domain;
 
 import static it.nexus.domain.TestEntities.boardPost;
 import static it.nexus.domain.TestEntities.company;
+import static it.nexus.domain.TestEntities.jobCategory;
 import static it.nexus.domain.TestEntities.project;
 import static it.nexus.domain.TestEntities.ticket;
 import static it.nexus.domain.TestEntities.user;
@@ -41,6 +42,7 @@ import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyNoteRepository;
 import it.nexus.repository.CompanyRepository;
+import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ProjectRepository;
 import it.nexus.repository.TicketCompanyBlacklistRepository;
@@ -65,6 +67,7 @@ class DomainConstraintsIT {
     @Autowired JdbcTemplate jdbc;
     @Autowired ProjectRepository projects;
     @Autowired ZoneRepository zones;
+    @Autowired JobCategoryRepository categories;
     @Autowired AppUserRepository users;
     @Autowired UserProjectRepository userProjects;
     @Autowired CompanyRepository companies;
@@ -86,6 +89,39 @@ class DomainConstraintsIT {
 
     @Nested
     class Unicita {
+
+        @Test
+        void nomeDiZonaAttivaDuplicato() {
+            String name = "Zona " + DomainFixtures.code("N");
+            Zone first = zone(DomainFixtures.code("Z"));
+            first.setName(name);
+            zones.saveAndFlush(first);
+            Zone second = zone(DomainFixtures.code("Z"));
+            second.setName(name.toUpperCase());
+            assertViolates("uq_zone_active_name", () -> zones.saveAndFlush(second));
+        }
+
+        @Test
+        void nomeDiTipologiaAttivaDuplicato_ammessoSeLAltraEDisattivata() {
+            String name = "Tipologia " + DomainFixtures.code("N");
+            JobCategory inactive = jobCategory(DomainFixtures.code("C"));
+            inactive.setName(name);
+            inactive.setActive(false);
+            categories.saveAndFlush(inactive);
+            JobCategory active = jobCategory(DomainFixtures.code("C"));
+            active.setName(name);
+            categories.saveAndFlush(active);
+            JobCategory twin = jobCategory(DomainFixtures.code("C"));
+            twin.setName(name.toLowerCase());
+            assertViolates("uq_job_category_active_name", () -> categories.saveAndFlush(twin));
+        }
+
+        @Test
+        void nomeDiCatalogoVuoto() {
+            Zone zone = zone(DomainFixtures.code("Z"));
+            zone.setName("  ");
+            assertViolates("ck_zone_name", () -> zones.saveAndFlush(zone));
+        }
 
         @Test
         void codiceProgettoDuplicato() {

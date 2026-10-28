@@ -15,6 +15,9 @@ public interface JobCategoryRepository extends JpaRepository<JobCategory, Long> 
 
     List<JobCategory> findByActiveTrueOrderByNameAsc();
 
+    /** Catalogo per l'ADMIN (US-106): prima le attive, poi per nome. */
+    List<JobCategory> findAllByOrderByActiveDescNameAsc();
+
     /** Tipologia attiva con lo stesso nome, senza distinguere maiuscole e minuscole (US-302). */
     Optional<JobCategory> findFirstByNameIgnoreCaseAndActiveTrue(String name);
 

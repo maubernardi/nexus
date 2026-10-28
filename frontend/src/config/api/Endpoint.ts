@@ -11,6 +11,7 @@ export const ENDPOINTS = {
   jobSlots: '/job-slots',
   boardPosts: '/board-posts',
   board: '/board',
+  catalogs: '/catalogs',
   beneficiaries: '/beneficiaries',
   zones: '/reference/zones',
   jobCategories: '/reference/job-categories',

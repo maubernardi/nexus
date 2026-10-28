@@ -6,6 +6,7 @@ import type { RouteHandle } from '@/config/routing/types';
 import { BeneficiariesPage } from '@/pages/BeneficiariesPage/BeneficiariesPage';
 import { BoardRoute } from '@/pages/BoardPage/BoardRoute';
 import { CandidaturePage } from '@/pages/CandidaturePage/CandidaturePage';
+import { CatalogsPage } from '@/pages/CatalogsPage/CatalogsPage';
 import { BoardPostPage } from '@/pages/BoardPostPage/BoardPostPage';
 import { BeneficiaryEditPage } from '@/pages/BeneficiaryEditPage/BeneficiaryEditPage';
 import { BeneficiaryNewPage } from '@/pages/BeneficiaryNewPage/BeneficiaryNewPage';
@@ -146,6 +147,15 @@ export const routes: RouteObject[] = [
         path: 'notifiche',
         element: <NotificationsPage />,
         handle: { titleKey: 'pages.notifications.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'cataloghi',
+        element: (
+          <RoleRoute roles={['ADMIN']}>
+            <CatalogsPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.catalogs.title' } satisfies RouteHandle,
       },
       {
         path: 'calendario',
