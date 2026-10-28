@@ -83,7 +83,7 @@ export const CompanyHistorySection = ({
                 <li key={`${e.at}-${i}`} className="border-l-4 border-primary/40 pl-3">
                   <p className="font-medium">
                     {typeLabel(e)}
-                    {e.ticketId && e.ticketNumber !== null && (
+                    {e.ticketId && typeof e.ticketNumber === 'number' && (
                       <>
                         {' – '}
                         <Link
