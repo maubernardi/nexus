@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 66 elementi, 233 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-06](sprints/sprint-06.md).
+**Totale: 66 elementi, 233 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-07](sprints/sprint-07.md).
 
 ## Epiche
 
@@ -63,7 +63,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-103](#us-103) | E1 | Creazione utente | Must | 8 | R4 | 📋 Backlog |
 | [US-104](#us-104) | E1 | Assegnazione utenti ai progetti | Must | 3 | R4 | 📋 Backlog |
 | [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | 📋 Backlog |
-| [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | 📋 Backlog |
+| [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | ✅ Ready (Sprint 7) |
 | [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
@@ -78,12 +78,12 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-303](#us-303) | E3 | Elenco delle segnalazioni (Home) | Must | 5 | R1 | 🎉 Done (Sprint 3) |
 | [US-304](#us-304) | E3 | Ticket dei miei progetti | Should | 0 | R1 | ↪️ Assorbita in US-303 |
 | [US-305](#us-305) | E3 | Dettaglio e cronologia del ticket | Must | 3 | R1 | 🎉 Done (Sprint 3) |
-| [US-306](#us-306) | E3 | Segnalazione speciale dalla bacheca | Must | 3 | R2 | 📋 Backlog |
+| [US-306](#us-306) | E3 | Segnalazione speciale dalla bacheca | Must | 3 | R2 | ✅ Ready (Sprint 7) |
 | [US-307](#us-307) | E3 | Scadenza nella Home del Tutor | Must | 2 | R2 | 🎉 Done (Sprint 6) |
 | [US-401](#us-401) | E4 | Coda FIFO | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | 🎉 Done (Sprint 2) |
-| [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | 📋 Backlog |
-| [US-404](#us-404) | E4 | Rifiuto fast-track | Must | 3 | R2 | 📋 Backlog |
+| [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | ✅ Ready (Sprint 7) |
+| [US-404](#us-404) | E4 | Rifiuto fast-track | Must | 3 | R2 | ✅ Ready (Sprint 7) |
 | [US-405](#us-405) | E4 | Lavorazione condivisa tra operatori | Must | 2 | R1 | 🎉 Done (Sprint 3) |
 | [US-501](#us-501) | E5 | Anagrafica aziende | Must | 3 | R1 | 🎉 Done (Sprint 2) |
 | [US-502](#us-502) | E5 | Mansioni dell'azienda | Must | 3 | R1 | 🎉 Done (Sprint 2) |
@@ -106,7 +106,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-902](#us-902) | E9 | Gestione della bacheca | Must | 5 | R2 | 🎉 Done (Sprint 6) |
 | [US-903](#us-903) | E9 | Sblocco a tutti dopo 7 giorni | Must | 2 | R2 | 🎉 Done (Sprint 6) |
 | [US-904](#us-904) | E9 | Annuncio da una mansione libera | Should | 3 | R2 | 🎉 Done (Sprint 6) |
-| [US-1001](#us-1001) | E10 | Scheda amministrativa del tirocinio | Must | 5 | R3 | 📋 Backlog |
+| [US-1001](#us-1001) | E10 | Scheda amministrativa del tirocinio | Must | 5 | R3 | ✅ Ready (Sprint 7) |
 | [US-1002](#us-1002) | E10 | Griglia oraria e sospensioni | Must | 5 | R3 | 📋 Backlog |
 | [US-1003](#us-1003) | E10 | Avvio del tirocinio | Must | 1 | R3 | 📋 Backlog |
 | [US-1004](#us-1004) | E10 | Convenzione in Word | Must | 5 | R3 | 📋 Backlog |
@@ -177,7 +177,7 @@ Criteri di accettazione:
 - Quando cambio il ruolo, allora il nuovo ruolo vale dal login successivo.
 
 #### US-106
-**Cataloghi di zone e tipologie di mansione** · Must · 3 punti · R2 · 📋 Backlog
+**Cataloghi di zone e tipologie di mansione** · Must · 3 punti · R2 · ✅ Ready (Sprint 7)
 
 Come **ADMIN** voglio inserire, modificare e disattivare zone e tipologie di mansione da maschere dedicate per usare i valori reali della cooperativa senza rilasci.
 
@@ -329,12 +329,14 @@ Criteri di accettazione:
 - La cronologia mostra per ogni cambio di stato data, autore e nota.
 
 #### US-306
-**Segnalazione speciale dalla bacheca** · Must · 3 punti · R2 · 📋 Backlog
+**Segnalazione speciale dalla bacheca** · Must · 3 punti · R2 · ✅ Ready (Sprint 7)
 
 Come **Tutor** voglio candidare un mio beneficiario direttamente a un post #N della bacheca per ottenere una corsia prioritaria (fast-track).
 
 Criteri di accettazione:
 - Il ticket nasce SPECIAL, fast-track, in IN_LAVORAZIONE, collegato al post, con badge prioritario per il Call Center.
+- Dalla bacheca il Tutor candida un suo beneficiario senza segnalazioni aperte; la segnalazione ha la tipologia della mansione dell'annuncio (review dello Sprint 6, §8.2).
+- Un annuncio accetta una sola candidatura: la prima lo blocca finché il Call Center non decide; in bacheca l'annuncio bloccato mostra «Candidatura in valutazione», senza il pulsante (review dello Sprint 6, §8.1).
 
 Dipendenze: US-901
 
@@ -377,7 +379,7 @@ Criteri di accettazione:
 Dipendenze: EN-1
 
 #### US-403
-**Approvazione fast-track** · Must · 5 punti · R2 · 📋 Backlog
+**Approvazione fast-track** · Must · 5 punti · R2 · ✅ Ready (Sprint 7)
 
 Come **operatore Call Center** voglio approvare una segnalazione speciale per trasformarla subito in proposta all'azienda.
 
@@ -387,12 +389,12 @@ Criteri di accettazione:
 Dipendenze: US-306
 
 #### US-404
-**Rifiuto fast-track** · Must · 3 punti · R2 · 📋 Backlog
+**Rifiuto fast-track** · Must · 3 punti · R2 · ✅ Ready (Sprint 7)
 
 Come **operatore Call Center** voglio rifiutare una segnalazione speciale per declassarla a lavorazione normale.
 
 Criteri di accettazione:
-- Al rifiuto: fast-track disattivato, il tipo resta SPECIAL (traccia dell'origine), ticket in IN_LAVORAZIONE, post ancora PUBLISHED.
+- Al rifiuto: fast-track disattivato, il tipo resta SPECIAL (traccia dell'origine), ticket in IN_LAVORAZIONE, post ancora PUBLISHED e di nuovo candidabile (review dello Sprint 6, §8.1).
 - Il rifiuto richiede un motivo ed è registrato nell'audit (EN-2).
 
 #### US-405
@@ -657,12 +659,13 @@ Criteri di accettazione:
 _I dati amministrativi del tirocinio producono Convenzione e Progetto Formativo in Word._
 
 #### US-1001
-**Scheda amministrativa del tirocinio** · Must · 5 punti · R3 · 📋 Backlog
+**Scheda amministrativa del tirocinio** · Must · 5 punti · R3 · ✅ Ready (Sprint 7)
 
 Come **Tutor** voglio compilare i dati del tirocinio (date, monte ore, dati anagrafici necessari come il codice fiscale) per preparare i documenti.
 
 Criteri di accettazione:
 - I campi e le validazioni seguono i moduli ufficiali della cooperativa.
+- Fino ai moduli reali (Q5) si usano campi segnaposto, sostituibili senza cambiare il flusso (review dello Sprint 6, §8.3).
 
 Domande aperte: Q5
 
