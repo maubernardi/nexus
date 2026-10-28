@@ -8,6 +8,7 @@ import { fetchBoardPost } from '@/config/api/boardPostApi';
 import {
   acceptProposal,
   approveFastTrack,
+  rejectFastTrack,
   excludeCompany,
   appointmentFailed,
   appointmentSet,
@@ -46,6 +47,7 @@ vi.mock('@/config/api/ticketApi', () => ({
   rejectCategory: vi.fn(),
   rejectProposal: vi.fn(),
   approveFastTrack: vi.fn(),
+  rejectFastTrack: vi.fn(),
 }));
 vi.mock('@/config/api/boardPostApi', () => ({ fetchBoardPost: vi.fn() }));
 vi.mock('@/config/api/referenceApi', () => ({
@@ -582,6 +584,61 @@ describe('<TicketPage>', () => {
     await waitFor(() =>
       expect(screen.queryByRole('region', { name: /Corsia veloce/ })).not.toBeInTheDocument(),
     );
+  });
+
+  it('corsia veloce: rifiuto con motivo obbligatorio, poi lavorazione normale', async () => {
+    const user = userEvent.setup();
+    const pending = detail({ type: 'SPECIAL', fastTrack: true, boardPostId: 'P4', boardPostNumber: 4 });
+    vi.mocked(fetchTicket).mockResolvedValue(pending);
+    vi.mocked(fetchBoardPost).mockResolvedValue(
+      boardPost(4, { id: 'P4', status: 'PUBLISHED', jobSlot: alfa }),
+    );
+    vi.mocked(fetchCompatibleJobSlots).mockResolvedValue([]);
+    const declassed = detail({
+      type: 'SPECIAL',
+      fastTrack: false,
+      boardPostId: 'P4',
+      boardPostNumber: 4,
+      version: 3,
+    });
+    vi.mocked(rejectFastTrack).mockResolvedValue(declassed);
+    renderPage();
+
+    const section = await screen.findByRole('region', { name: /Corsia veloce/ });
+    await within(section).findByText('Alfa Logistica');
+    // annullare riporta il focus al pulsante che ha aperto la domanda
+    await user.click(within(section).getByRole('button', { name: 'Rifiuta la corsia veloce' }));
+    expect(
+      screen.getByRole('heading', { name: 'Rifiutare la corsia veloce della segnalazione n. 9?' }),
+    ).toHaveFocus();
+    await user.click(within(section).getByRole('button', { name: 'Annulla' }));
+    await waitFor(() =>
+      expect(within(section).getByRole('button', { name: 'Rifiuta la corsia veloce' })).toHaveFocus(),
+    );
+
+    await user.click(within(section).getByRole('button', { name: 'Rifiuta la corsia veloce' }));
+    await user.click(screen.getByRole('button', { name: 'Sì, rifiuta' }));
+    expect(await screen.findByText('Campo obbligatorio')).toBeInTheDocument();
+    expect(rejectFastTrack).not.toHaveBeenCalled();
+    await expectNoAxeViolations();
+
+    await user.type(screen.getByLabelText(/^Motivo/), 'Serve il patentino del muletto');
+    // come nella realtà: ricaricata, la segnalazione è una normale lavorazione
+    vi.mocked(fetchTicket).mockResolvedValue(declassed);
+    await user.click(screen.getByRole('button', { name: 'Sì, rifiuta' }));
+
+    const outcome = await screen.findByText(
+      'Corsia veloce rifiutata: la segnalazione continua in lavorazione normale e l’annuncio #4 torna candidabile.',
+    );
+    await waitFor(() => expect(outcome).toHaveFocus());
+    expect(vi.mocked(rejectFastTrack).mock.calls[0][0]).toEqual({
+      id: 'T9',
+      version: 2,
+      reason: 'Serve il patentino del muletto',
+    });
+    // ora si cercano le compatibili come per le altre
+    expect(await screen.findByRole('heading', { name: 'Mansioni compatibili' })).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: /Corsia veloce/ })).not.toBeInTheDocument();
   });
 
   it('corsia veloce non ancora presa in carico: si vede, ma si decide dopo la presa in carico', async () => {

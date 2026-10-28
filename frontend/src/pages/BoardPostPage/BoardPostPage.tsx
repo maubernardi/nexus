@@ -289,6 +289,10 @@ const PostAction = ({
           : action === 'makePublic'
             ? t('board.makePublic.text', { project: p.project?.name })
             : t('board.archive.text')}
+        {/* una candidatura in attesa su un annuncio archiviato perde la corsia veloce (Sprint 6, §8.1) */}
+        {action === 'archive' && p.candidatureTicketNumber && (
+          <> {t('board.archive.candidature', { number: p.candidatureTicketNumber })}</>
+        )}
       </p>
       <div className="flex flex-wrap gap-3">
         <Button size="lg" onClick={() => void onConfirm()} disabled={mutation.isPending}>

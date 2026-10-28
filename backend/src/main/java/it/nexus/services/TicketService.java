@@ -12,6 +12,7 @@ import it.nexus.domain.dto.MatchRequestDTO;
 import it.nexus.domain.dto.ProposalRejectDTO;
 import it.nexus.domain.dto.RejectCategoryDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
+import it.nexus.domain.dto.FastTrackRejectDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketSpecialCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
@@ -68,6 +69,12 @@ public interface TicketService {
      * mansione dell'annuncio, mansione bloccata e annuncio archiviato, in un'unica operazione (409 se non si può).
      */
     TicketDetailDTO approveFastTrack(String ticketId, long expectedVersion);
+
+    /**
+     * Rifiuta la corsia veloce di una segnalazione speciale presa in carico, con il motivo (US-404): resta SPECIAL e in
+     * lavorazione, l'annuncio torna candidabile, il Tutor è avvisato.
+     */
+    TicketDetailDTO rejectFastTrack(String ticketId, FastTrackRejectDTO dto);
 
     /** "Prendila in carico tu": la segnalazione in carico a un collega passa all'operatore corrente (US-405). */
     TicketDetailDTO takeOver(String ticketId, long expectedVersion);

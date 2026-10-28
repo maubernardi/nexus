@@ -65,6 +65,20 @@ public final class TicketTransitions {
             Set.of(IN_LAVORAZIONE), PROPOSTA_AZIENDA, Set.of(Role.CALL_CENTER, Role.ADMIN));
 
     /**
+     * Fase 3 — il Call Center rifiuta la corsia veloce con il motivo (US-404): la segnalazione resta SPECIAL e in
+     * lavorazione, senza corsia veloce; l'annuncio torna candidabile. Serve la presa in carico.
+     */
+    public static final TicketTransition FAST_TRACK_REJECT = new TicketTransition("FAST_TRACK_REJECT",
+            Set.of(IN_LAVORAZIONE), IN_LAVORAZIONE, Set.of(Role.CALL_CENTER, Role.ADMIN));
+
+    /**
+     * Fase 3 — l'annuncio è stato archiviato mentre la candidatura aspettava (review dello Sprint 6, §8.1): la corsia
+     * veloce decade, con il motivo. La provoca l'operatore che archivia l'annuncio o rende indisponibile la mansione.
+     */
+    public static final TicketTransition FAST_TRACK_DROP = new TicketTransition("FAST_TRACK_DROP",
+            Set.of(IN_LAVORAZIONE), IN_LAVORAZIONE, Set.of(Role.CALL_CENTER, Role.ADMIN));
+
+    /**
      * Fase 5 — il Tutor accetta la proposta (US-701): parte il timer di 7 giorni lavorativi. Solo il Tutor della
      * segnalazione (controllo nel servizio).
      */

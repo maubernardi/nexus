@@ -13,6 +13,8 @@ export const NOTIFICATION_TYPES = [
   'TIMER_REMINDER',
   'TIMER_EXPIRED',
   'BOARD_RELAUNCH_REQUESTED',
+  'FAST_TRACK_REJECTED',
+  'FAST_TRACK_DROPPED',
 ] as const;
 
 export type AppNotification = {

@@ -20,6 +20,7 @@ import {
   takeOverTicket,
   acceptProposal,
   approveFastTrack,
+  rejectFastTrack,
   excludeCompany,
   fetchExclusions,
   appointmentFailed,
@@ -147,6 +148,23 @@ export const useApproveFastTrack = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: approveFastTrack,
+    onSettled: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+        queryClient.invalidateQueries({ queryKey: ['board-posts'] }),
+      ]),
+  });
+};
+
+/** Rifiuto della corsia veloce (US-404): cambia la segnalazione e l'annuncio torna candidabile. */
+export const useRejectFastTrack = (): UseMutationResult<
+  TicketDetail,
+  unknown,
+  { id: string; version: number; reason: string }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: rejectFastTrack,
     onSettled: () =>
       Promise.all([
         queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),

@@ -282,4 +282,22 @@ describe('<BoardPostPage>', () => {
     );
     expect(screen.getByText(/Candidatura in valutazione, in attesa della decisione/)).toBeInTheDocument();
   });
+
+  it('archiviando un annuncio con una candidatura in attesa, la conferma avvisa che perde la corsia veloce', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchBoardPost).mockResolvedValue(
+      boardPost(3, {
+        status: 'PUBLISHED',
+        publishedAt: '2026-10-27T09:00:00Z',
+        candidatureTicketId: 'T41',
+        candidatureTicketNumber: 41,
+      }),
+    );
+    renderPage();
+
+    await user.click(await screen.findByRole('button', { name: 'Archivia' }));
+    expect(
+      screen.getByText(/La segnalazione n. 41, candidata a questo annuncio, perde la corsia veloce/),
+    ).toBeInTheDocument();
+  });
 });
