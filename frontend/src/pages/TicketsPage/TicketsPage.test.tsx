@@ -54,6 +54,12 @@ const item = (number: number, overrides: Partial<TicketListItem> = {}): TicketLi
   ...overrides,
 });
 
+const withoutDeadline = (it: TicketListItem): TicketListItem => {
+  const copy: Partial<TicketListItem> = { ...it };
+  delete copy.timerDeadline;
+  return copy as TicketListItem;
+};
+
 const asUser = (role: Role) =>
   vi.mocked(fetchCurrentUser).mockResolvedValue({
     id: 'u',
@@ -217,7 +223,8 @@ describe('<TicketsPage>', () => {
     vi.mocked(fetchTickets).mockResolvedValue([
       item(5, { status: 'PROPOSTA_ACCOLTA', timerDeadline: '2026-11-04', timerDueSoon: true }),
       item(6, { status: 'PROPOSTA_ACCOLTA', timerDeadline: '2026-11-06' }),
-      item(7),
+      // come lo manda l'API: senza timer il campo è omesso, non null
+      withoutDeadline(item(7)),
     ]);
     renderPage();
 

@@ -346,7 +346,10 @@ describe('<TicketPage>', () => {
   });
 
   it('non ancora presa in carico: niente ricerca, rimanda alla coda', async () => {
-    vi.mocked(fetchTicket).mockResolvedValue(detail({ assignedToMe: false, assignedOperatorName: null }));
+    // come lo manda l'API: i campi vuoti sono omessi, non null
+    const unassigned: Partial<TicketDetail> = detail({ assignedToMe: false });
+    delete unassigned.assignedOperatorName;
+    vi.mocked(fetchTicket).mockResolvedValue(unassigned as TicketDetail);
     renderPage();
 
     expect(
@@ -354,6 +357,7 @@ describe('<TicketPage>', () => {
     ).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Mansioni compatibili' })).not.toBeInTheDocument();
     expect(fetchCompatibleJobSlots).not.toHaveBeenCalled();
+    expect(screen.queryByRole('button', { name: /Prendila in carico tu/ })).not.toBeInTheDocument();
   });
 
   it('dopo l’abbinamento mostra la proposta e non la ricerca', async () => {

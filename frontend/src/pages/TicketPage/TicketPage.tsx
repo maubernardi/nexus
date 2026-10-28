@@ -98,8 +98,10 @@ export const TicketPage = () => {
   // dopo la presa in carico chiunque del Call Center (o l'ADMIN) può lavorarla, anche se è di un collega (US-405)
   // anche una segnalazione riaperta (appuntamento fallito) si abbina di nuovo (US-802)
   const workable = d.status === 'IN_LAVORAZIONE' || d.status === 'RIAPERTO';
-  const canMatch = isCallCenter && workable && d.assignedOperatorName !== null;
-  const ofColleague = isCallCenter && d.assignedOperatorName !== null && !d.assignedToMe;
+  // l'API omette i campi vuoti: senza operatore il campo manca del tutto
+  const assigned = Boolean(d.assignedOperatorName);
+  const canMatch = isCallCenter && workable && assigned;
+  const ofColleague = isCallCenter && assigned && !d.assignedToMe;
   const onTakeOver = (): void => {
     takeOver.mutate(
       { id: d.id, version: d.version },
@@ -750,7 +752,7 @@ const TicketHistory = ({ ticketId }: { ticketId: string }) => {
   const history = useTicketHistory(ticketId);
   // dallo storico degli stati, un evento senza stato di partenza è la creazione: "Segnalazione inviata"
   const actionLabel = (e: TicketEvent): string => {
-    const action = e.action === 'STATUS' && e.fromStatus === null ? 'SUBMIT' : e.action;
+    const action = e.action === 'STATUS' && !e.fromStatus ? 'SUBMIT' : e.action;
     return (KNOWN_ACTIONS as readonly string[]).includes(action)
       ? t(`work.actions.${action as (typeof KNOWN_ACTIONS)[number]}`)
       : action;
