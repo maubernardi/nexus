@@ -3,6 +3,8 @@ package it.nexus.services;
 import java.util.Collection;
 import java.util.List;
 
+import it.nexus.domain.JobSlot;
+import it.nexus.domain.Ticket;
 import it.nexus.domain.dto.BoardPostCreateDTO;
 import it.nexus.domain.dto.BoardPostDTO;
 import it.nexus.domain.dto.BoardPostFormDTO;
@@ -35,5 +37,13 @@ public interface BoardPostService {
      *
      * @return i numeri degli annunci archiviati
      */
+    /**
+     * Bozza del rilancio in bacheca dopo un appuntamento fallito (US-803): mansione appena liberata, riservata al
+     * progetto della segnalazione e collegata a essa. Va chiamato nella transazione dell'esito dell'appuntamento.
+     *
+     * @return il numero dell'annuncio
+     */
+    Long createRelaunchDraft(JobSlot slot, Ticket ticket);
+
     List<Long> archiveForUnavailableSlots(Collection<Long> jobSlotIds, String reason);
 }

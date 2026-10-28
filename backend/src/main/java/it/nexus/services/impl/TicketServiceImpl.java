@@ -27,6 +27,7 @@ import it.nexus.config.security.SecurityUtils;
 import it.nexus.domain.AppUser;
 import it.nexus.domain.AuditEvent;
 import it.nexus.domain.Beneficiary;
+import it.nexus.domain.BoardPost;
 import it.nexus.domain.Company;
 import it.nexus.domain.CompanyAuditEvent;
 import it.nexus.domain.JobCategory;
@@ -69,6 +70,7 @@ import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.BeneficiaryRepository;
+import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.JobCategoryRepository;
@@ -126,6 +128,7 @@ public class TicketServiceImpl implements TicketService {
     private final CompanyAuditEventRepository companyAuditEvents;
     private final AuditService auditService;
     private final BoardPostService boardPostService;
+    private final BoardPostRepository boardPostRepository;
     private final JobSlotMapper jobSlotMapper;
     private final BeneficiaryMapper beneficiaryMapper;
     private final ReferenceMapper referenceMapper;
@@ -350,7 +353,8 @@ public class TicketServiceImpl implements TicketService {
                     .map(c -> "%s esclusa per questa segnalazione".formatted(c.getName()))
                     .orElse(null);
             case "APPOINTMENT_FAILED" -> Optional.ofNullable(changed(event, "cause", "after"))
-                    .map(cause -> "Causa: " + AppointmentFailureCause.valueOf(cause).label())
+                    .map(cause -> "Causa: " + AppointmentFailureCause.valueOf(cause).label()
+                            + (changed(event, "boardRelaunch", "after") != null ? "; rilancio in bacheca richiesto" : ""))
                     .orElse(null);
             case "ACCEPT" -> Optional.ofNullable(changed(event, "timerDeadlineAt", "after"))
                     .map(at -> "Scadenza " + DATE.format(TimeConfig.lastDay(Instant.parse(at))))
@@ -497,9 +501,10 @@ public class TicketServiceImpl implements TicketService {
             // la mansione torna libera; nessuna esclusione automatica dell'azienda: decide l'operatore (PO, 27/10)
             slot.release();
             t.setJobSlot(null);
-            return AuditChanges.of()
+            AuditChanges changes = AuditChanges.of()
                     .value("cause", null, dto.cause().name())
                     .value("jobSlotId", TsidMapper.toExternal(slot.getId()), null);
+            return dto.relaunchRequested() ? changes.value("boardRelaunch", null, true) : changes;
         });
         auditService.record(AuditEntityType.JOB_SLOT, slot.getId(), "RELEASE", AuditChanges.of()
                 .value("status", JobSlotStatus.BLOCCATA.name(), JobSlotStatus.LIBERA.name())
@@ -508,6 +513,11 @@ public class TicketServiceImpl implements TicketService {
                 CompanyEventType.APPUNTAMENTO_FALLITO.name(), Map.of("ticketNumber", saved.getNumber(),
                         "jobSlotTitle", slot.getTitle(), "cause", dto.cause().name())));
         notificationService.notify(saved.getAssignedCcOperator(), NotificationType.APPOINTMENT_FAILED, saved);
+        if (dto.relaunchRequested()) {
+            // bozza riservata al progetto della segnalazione; pubblicarla resta una scelta del Call Center (US-803)
+            boardPostService.createRelaunchDraft(slot, saved);
+            notificationService.notify(saved.getAssignedCcOperator(), NotificationType.BOARD_RELAUNCH_REQUESTED, saved);
+        }
         return detail(saved, me);
     }
 
@@ -626,6 +636,7 @@ public class TicketServiceImpl implements TicketService {
 
     private TicketDetailDTO detail(Ticket t, AppUser me) {
         AppUser assigned = t.getAssignedCcOperator();
+        Optional<BoardPost> relaunch = boardPostRepository.findFirstByCreatedFromTicket_IdOrderByNumberDesc(t.getId());
         return new TicketDetailDTO(
                 TsidMapper.toExternal(t.getId()),
                 t.getNumber(),
@@ -644,7 +655,10 @@ public class TicketServiceImpl implements TicketService {
                 t.getJobSlot() == null ? null : jobSlotMapper.toMatch(t.getJobSlot()),
                 t.getCreatedAt(),
                 t.getTutor().getId().equals(me.getId()),
-                t.getTimerDeadlineAt() == null ? null : TimeConfig.lastDay(t.getTimerDeadlineAt()));
+                t.getTimerDeadlineAt() == null ? null : TimeConfig.lastDay(t.getTimerDeadlineAt()),
+                relaunch.map(p -> TsidMapper.toExternal(p.getId())).orElse(null),
+                relaunch.map(BoardPost::getNumber).orElse(null),
+                relaunch.map(BoardPost::getStatus).orElse(null));
     }
 
     private static String fullName(AppUser user) {

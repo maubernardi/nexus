@@ -22,5 +22,7 @@ public enum NotificationType {
     /** Al Tutor: promemoria al 4° giorno lavorativo dall'accettazione, senza appuntamento registrato (US-704). */
     TIMER_REMINDER,
     /** Al Tutor e all'operatore: il timer è scaduto senza appuntamento, la segnalazione è riaperta (US-705). */
-    TIMER_EXPIRED
+    TIMER_EXPIRED,
+    /** All'operatore: il Tutor chiede il rilancio in bacheca, c'è una bozza da controllare (US-803). */
+    BOARD_RELAUNCH_REQUESTED
 }

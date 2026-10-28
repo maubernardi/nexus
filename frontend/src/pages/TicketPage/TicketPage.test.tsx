@@ -474,9 +474,65 @@ describe('<TicketPage>', () => {
     const outcome = await screen.findByText(/Esito registrato: la segnalazione è tornata all’operatore/);
     await waitFor(() => expect(outcome).toHaveFocus());
     expect(appointmentFailed).toHaveBeenCalledWith(
-      { id: 'T9', version: 2, cause: 'BENEFICIARIO_RINUNCIA', note: null },
+      { id: 'T9', version: 2, cause: 'BENEFICIARIO_RINUNCIA', note: null, relaunch: false },
       expect.anything(),
     );
+  });
+
+  it('Tutor della segnalazione: appuntamento fallito con il rilancio in bacheca', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchCurrentUser).mockResolvedValue({
+      id: 'tutor1',
+      username: 'tutor1',
+      firstName: 'Tutor',
+      lastName: 'Uno',
+      roles: ['TUTOR'],
+    });
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({ status: 'APPUNTAMENTO', proposal: alfa, myTicket: true }),
+    );
+    const reopened = detail({
+      status: 'RIAPERTO',
+      myTicket: true,
+      version: 5,
+      relaunchPostId: 'P7',
+      relaunchPostNumber: 7,
+      relaunchPostStatus: 'DRAFT',
+    });
+    vi.mocked(appointmentFailed).mockResolvedValue(reopened);
+    renderPage();
+
+    await user.click(await screen.findByRole('button', { name: 'L’appuntamento non è andato a buon fine' }));
+    const relaunch = screen.getByRole('checkbox', { name: 'Chiedi il rilancio della mansione in bacheca' });
+    expect(relaunch).toHaveAccessibleDescription(/riservata al progetto GOL/);
+    await user.selectOptions(screen.getByLabelText(/^Causa/), 'AZIENDA_NON_CONFERMA');
+    await user.click(relaunch);
+    vi.mocked(fetchTicket).mockResolvedValue(reopened);
+    await user.click(screen.getByRole('button', { name: 'Conferma' }));
+
+    const outcome = await screen.findByText(/il rilancio in bacheca è stato chiesto/);
+    await waitFor(() => expect(outcome).toHaveFocus());
+    expect(vi.mocked(appointmentFailed).mock.calls[0][0]).toMatchObject({ relaunch: true });
+    // il Tutor vede numero e stato dell'annuncio, senza link alla gestione della bacheca
+    expect(
+      await screen.findByText('Hai chiesto il rilancio della mansione in bacheca: annuncio #7 (bozza).'),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Annuncio #7' })).not.toBeInTheDocument();
+  });
+
+  it('Call Center: link alla bozza del rilancio', async () => {
+    const reopened: Partial<TicketDetail> = detail({
+      status: 'RIAPERTO',
+      relaunchPostId: 'P7',
+      relaunchPostNumber: 7,
+      relaunchPostStatus: 'DRAFT',
+    });
+    vi.mocked(fetchTicket).mockResolvedValue(reopened as TicketDetail);
+    renderPage();
+
+    expect(await screen.findByRole('link', { name: 'Annuncio #7' })).toHaveAttribute('href', '/bacheca/P7');
+    expect(screen.getByText(/Stato: Bozza/)).toBeInTheDocument();
+    await expectNoAxeViolations();
   });
 
   it('Call Center: una segnalazione riaperta si abbina di nuovo', async () => {

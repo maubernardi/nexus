@@ -1,5 +1,6 @@
 import { axiosInstance } from '@/config/api/axiosInstance';
 import type { BeneficiarySummary } from '@/config/api/beneficiaryApi';
+import type { BoardPostStatus } from '@/config/api/boardPostApi';
 import { ENDPOINTS } from '@/config/api/Endpoint';
 import type { ReferenceItem } from '@/config/api/referenceApi';
 import type { AppointmentFailureCause, TicketStatus, TicketType } from '@/lib/domainValues';
@@ -103,6 +104,10 @@ export type TicketDetail = {
   myTicket: boolean;
   /** Ultimo giorno lavorativo del timer della proposta accettata (aaaa-mm-gg), se attivo. */
   timerDeadline: string | null;
+  /** Ultimo annuncio nato dal rilancio in bacheca di questa segnalazione (US-803); l'API omette i campi vuoti. */
+  relaunchPostId?: string | null;
+  relaunchPostNumber?: number | null;
+  relaunchPostStatus?: BoardPostStatus | null;
 };
 
 export type CompatibleFilters = { zoneId?: string; jobCategoryId?: string };
@@ -240,16 +245,20 @@ export const appointmentFailed = async ({
   version,
   cause,
   note,
+  relaunch,
 }: {
   id: string;
   version: number;
   cause: AppointmentFailureCause;
   note: string | null;
+  /** Chiede il rilancio della mansione in bacheca (US-803). */
+  relaunch: boolean;
 }): Promise<TicketDetail> => {
   const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/appointment-failed`, {
     version,
     cause,
     note,
+    relaunch,
   });
   return data;
 };

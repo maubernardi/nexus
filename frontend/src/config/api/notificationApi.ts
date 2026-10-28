@@ -12,6 +12,7 @@ export const NOTIFICATION_TYPES = [
   'PROPOSAL_REJECTED',
   'TIMER_REMINDER',
   'TIMER_EXPIRED',
+  'BOARD_RELAUNCH_REQUESTED',
 ] as const;
 
 export type AppNotification = {

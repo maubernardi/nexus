@@ -324,6 +324,8 @@ export const it = {
         'Promemoria: per la segnalazione n. {{number}} manca la registrazione dell’appuntamento con l’azienda. La scadenza del timer è nel dettaglio.',
       TIMER_EXPIRED:
         'Il timer della segnalazione n. {{number}} è scaduto senza appuntamento: la segnalazione è riaperta e la mansione è di nuovo libera.',
+      BOARD_RELAUNCH_REQUESTED:
+        'Il Tutor chiede di rilanciare in bacheca la mansione della segnalazione n. {{number}}: c’è una bozza di annuncio da controllare e pubblicare.',
     },
   },
   companyNote: {
@@ -495,6 +497,12 @@ export const it = {
       saved:
         'Proposta rifiutata: la segnalazione è tornata all’operatore del Call Center per una nuova ricerca.',
     },
+    relaunch: {
+      heading: 'Rilancio in bacheca',
+      post: 'Annuncio #{{number}}',
+      status: 'Stato: {{status}}',
+      tutor: 'Hai chiesto il rilancio della mansione in bacheca: annuncio #{{number}} ({{status}}).',
+    },
     appointment: {
       set: 'Appuntamento fissato',
       setHeading: 'Conferma l’appuntamento',
@@ -513,6 +521,11 @@ export const it = {
       failedConfirm: 'Conferma',
       failedSaved:
         'Esito registrato: la segnalazione è tornata all’operatore del Call Center per una nuova ricerca.',
+      relaunch: 'Chiedi il rilancio della mansione in bacheca',
+      relaunchHint:
+        'Il Call Center riceve una bozza di annuncio per questa mansione, riservata al progetto {{project}}, e decide se pubblicarla.',
+      failedSavedRelaunch:
+        'Esito registrato: la segnalazione è tornata all’operatore del Call Center e il rilancio in bacheca è stato chiesto.',
     },
     category: {
       heading: 'Nuova tipologia da approvare',
