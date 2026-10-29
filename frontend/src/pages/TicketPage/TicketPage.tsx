@@ -437,12 +437,11 @@ const RelaunchSection = ({
   );
 };
 
-/** Stati in cui il Tutor della segnalazione apre la scheda del tirocinio (US-1001): si modifica solo in APPUNTAMENTO. */
+/** Stati in cui il Tutor della segnalazione apre la scheda del tirocinio (US-1001) e la modifica (PO, 29/10). */
 const INTERNSHIP_STATUSES: readonly TicketStatus[] = ['APPUNTAMENTO', 'IN_TIROCINIO', 'FORM_RESTITUZIONE'];
 
 const InternshipLink = ({ ticket: d }: { ticket: TicketDetail }) => {
   const { t } = useTranslation();
-  const editable = d.status === 'APPUNTAMENTO';
   return (
     <section
       aria-labelledby="work-internship"
@@ -452,10 +451,8 @@ const InternshipLink = ({ ticket: d }: { ticket: TicketDetail }) => {
         {t('work.internship.heading')}
       </h2>
       <p>{t('work.internship.text')}</p>
-      <Button asChild size="lg" variant={editable ? 'default' : 'outline'}>
-        <Link to={`/segnalazioni/${d.id}/tirocinio`}>
-          {t(editable ? 'work.internship.open' : 'work.internship.view')}
-        </Link>
+      <Button asChild size="lg">
+        <Link to={`/segnalazioni/${d.id}/tirocinio`}>{t('work.internship.open')}</Link>
       </Button>
     </section>
   );

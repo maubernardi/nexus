@@ -18,7 +18,6 @@ export type Suspension = { from: string; to: string };
  */
 export type Internship = {
   version?: number | null;
-  editable: boolean;
   companyName?: string | null;
   legalRepresentative?: LegalRepresentative | null;
   atecoCodes: AtecoCode[];
