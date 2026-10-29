@@ -170,6 +170,8 @@ Il tema era già nel backlog come **US-1304** (Should, 3 punti, R4). L'abbiamo f
 *Proposta:* US-1304 Done nello Sprint 7, **fuori piano**, ma **senza contarla nella velocity** (resta 31), come le
 correzioni fuori impegno degli sprint precedenti: così la velocity resta una base onesta per il planning.
 
+> ✅ **Deciso (PO, 29/10): proposta accettata.** US-1304 Done (Sprint 7, fuori piano); velocity 31.
+
 ### 8.2 Quando la scheda è "completa" per l'avvio (US-1003)
 L'avvio porta la segnalazione in IN_TIROCINIO solo con la scheda completa, e la scheda resta modificabile (D6).
 *Proposta:* per l'avvio servono:
@@ -181,6 +183,8 @@ L'avvio porta la segnalazione in IN_TIROCINIO solo con la scheda completa, e la 
 
 Sospensioni e note restano facoltative. Se manca qualcosa, la pagina dice **cosa** manca e porta al campo.
 
+> ✅ **Deciso (PO, 29/10): proposta accettata.**
+
 ### 8.3 Modelli Word di Convenzione e Progetto Formativo (US-1004, US-1005)
 I modelli veri non ci sono ancora (Q5) e dovranno essere modificabili, con modalità ancora da decidere.
 *Proposta:*
@@ -190,14 +194,21 @@ I modelli veri non ci sono ancora (Q5) e dovranno essere modificabili, con modal
 - la modifica dei modelli diventa una **storia a parte**, quando avrai deciso come: per esempio l'ADMIN carica i
   `.docx` nella pagina "Cataloghi".
 
+> ✅ **Deciso (PO, 29/10): proposta accettata.** Modelli segnaposto per tipo di tirocinio; la modifica dei modelli più
+> avanti, in una storia a parte.
+
 ### 8.4 Voci dei menu del report di restituzione (US-1101)
 Le formule di assunzione e i motivi della mancata assunzione "devono poter cambiare senza rilascio".
 *Proposta:* due cataloghi in più nella pagina "Cataloghi" dell'ADMIN, come zone, tipologie e tipi di tirocinio. Sono
 una storia nuova, **US-109** *Cataloghi del report di restituzione* (2 punti, R3), con le voci provvisorie di Q6 come
 valori iniziali.
 
+> ✅ **Deciso (PO, 29/10): proposta accettata.** US-109 entra nel backlog (2 punti, R3).
+
 ### 8.5 Chiusura dello Sprint 7
 *Proposta:* chiudere lo Sprint 7 con questa review (velocity 31) e avviare lo Sprint 8 alla conferma del planning.
+
+> ✅ **Deciso (PO, 29/10).** Sprint 7 chiuso con velocity 31; lo Sprint 8 parte con il planning confermato (§9).
 
 ## 9. Proposta per lo Sprint 8 (3 giorni, ~20 punti)
 
@@ -222,9 +233,15 @@ Formativo compilati e chiude con il report di restituzione; la mansione torna di
 Ordine tecnico: prima A13 (test lenti), poi le storie. Dipende dalle decisioni §8.2–§8.4. Per il PO: collaudo
 (sezioni 12–15) e US-1301.
 
+> ✅ **Deciso (PO, 29/10): piano confermato, con le email nell'impegno.** Arrivano i dati SMTP, quindi **US-1202**
+> *Email transazionali* (5) entra nello sprint: **23 punti**. Extra, nell'ordine: US-205 *Curriculum del beneficiario*
+> (5), US-102 *Gestione progetti* (3). La password SMTP va solo nel `.env` del server, mai nel repository né in chat.
+> Sprint 8: [sprint-08.md](sprint-08.md).
+
 ## 10. Azioni a carico del PO
 
 - [ ] Eseguire il collaudo sulla versione `db3fdaa`: almeno le sezioni 12–15.
 - [ ] US-1301: PWA su Android e iOS (collaudo T-10.1).
-- [ ] Decidere i punti §8.1–§8.5 e confermare il planning (§9).
-- [ ] Quando possibile: credenziali SMTP IONOS per le email (US-1202).
+- [x] Decidere i punti §8.1–§8.5 e confermare il planning (§9).
+- [ ] Dati SMTP IONOS per le email (US-1202): server, porta, utente e mittente al team; la password direttamente nel
+  `.env` del server.

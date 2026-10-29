@@ -32,7 +32,7 @@ un tetto: «preferisco di più che di meno» (PO, 28/10).
 **Velocità:** 31 punti (26 di impegno più 5 di extra).
 
 **Fuori piano:** US-1304 *Tema di Keycloak* (3), anticipata da R4 su richiesta del PO del 29/10
-([#85](https://github.com/maubernardi/nexus/pull/85)); conteggio nella velocity da decidere nella review (§8.1).
+([#85](https://github.com/maubernardi/nexus/pull/85)); non conta nella velocity (review, §8.1).
 
 Ordine: preparazione comune dei test (azione A7) → US-306 → US-403 → US-404 → US-106 → US-108 → US-506 → US-1001. Una PR per storia; gli
 stati del backlog si aggiornano nella PR di documentazione dopo i merge. Per il PO: collaudo (T-5.8, T-5.9, sezione 11)
