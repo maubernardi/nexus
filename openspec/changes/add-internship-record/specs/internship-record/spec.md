@@ -3,7 +3,7 @@
 ### Requirement: Scheda del tirocinio del Tutor
 Il Tutor della segnalazione SHALL poter compilare la scheda amministrativa del tirocinio dopo l'appuntamento fissato e
 correggerla in qualunque momento, anche a tirocinio avviato. La scheda contiene:
-- tipo di tirocinio, data di inizio, data di fine prevista, ore settimanali, sede;
+- tipo di tirocinio, data di inizio, data di fine prevista, sede (l'orario è la griglia oraria di US-1002);
 - uno o più tutor aziendali, con nome e recapito;
 - il codice ATECO scelto tra quelli dell'azienda;
 - codice fiscale, data e luogo di nascita e residenza del beneficiario;
@@ -18,7 +18,7 @@ altri utenti, Call Center e ADMIN compresi, MUST NOT accedervi.
 - **THEN** la scheda è salvata e, riaprendola, mostra quei dati con gli altri campi vuoti
 
 #### Scenario: Tirocinio avviato
-- **WHEN** il Tutor corregge le ore settimanali della scheda di un tirocinio già avviato
+- **WHEN** il Tutor corregge la sede nella scheda di un tirocinio già avviato
 - **THEN** la modifica è salvata
 
 #### Scenario: Prima dell'appuntamento
@@ -36,7 +36,6 @@ altri utenti, Call Center e ADMIN compresi, MUST NOT accedervi.
 ### Requirement: Controlli sui dati della scheda
 La scheda MUST controllare i dati presenti:
 - la fine prevista non precede l'inizio;
-- le ore settimanali vanno da 1 a 40;
 - il codice fiscale è valido e corrisponde alla data di nascita, se indicata;
 - il tipo di tirocinio è attivo;
 - il codice ATECO è dell'azienda della segnalazione;

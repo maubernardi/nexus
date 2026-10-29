@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -65,6 +66,7 @@ class InternshipIT {
     @Autowired InternshipRepository internships;
     @Autowired InternshipTypeRepository internshipTypes;
     @Autowired CompanyAtecoCodeRepository atecoCodes;
+    @Autowired JdbcTemplate jdbc;
 
     private Place place;
     private Ticket ticket;
@@ -88,14 +90,16 @@ class InternshipIT {
         return mockMvc.perform(put(base).header(USER, user).contentType(MediaType.APPLICATION_JSON).content(json));
     }
 
-    /** Modulo con i campi indicati (JSON senza graffe); liste vuote se non indicate. */
+    /** Modulo con i campi indicati (JSON senza graffe); liste vuote, fasce precompilate e festività escluse se mancano. */
     private static String form(String fields) {
         String json = "{" + fields + "}";
-        if (!json.contains("\"companyTutors\"")) {
-            json = json.replaceFirst("\\{", "{\"companyTutors\": [], ");
-        }
-        if (!json.contains("\"suspensions\"")) {
-            json = json.replaceFirst("\\{", "{\"suspensions\": [], ");
+        Map<String, String> defaults = Map.of("companyTutors", "[]", "suspensions", "[]", "schedule", "[]",
+                "firstSlotStart", "\"09:00\"", "firstSlotEnd", "\"13:00\"", "secondSlotStart", "\"14:00\"",
+                "secondSlotEnd", "\"18:00\"", "excludeHolidays", "true");
+        for (Map.Entry<String, String> d : defaults.entrySet()) {
+            if (!json.contains("\"" + d.getKey() + "\"")) {
+                json = json.replaceFirst("\\{", "{\"" + d.getKey() + "\": " + d.getValue() + ", ");
+            }
         }
         return json.replace(", }", "}");
     }
@@ -103,7 +107,7 @@ class InternshipIT {
     private String full(Long version) {
         return form("""
                 "internshipTypeId": "%s", "startDate": "2026-12-01", "expectedEndDate": "2027-05-31",
-                "weeklyHours": 30, "site": "Via Roma 1, Firenze",
+                "site": "Via Roma 1, Firenze", "schedule": [{"dayOfWeek": 1, "firstSlot": true, "secondSlot": false}],
                 "companyTutors": [{"fullName": "Anna Verdi", "contact": "055 123456"}, {"fullName": "Luca Neri"}],
                 "fiscalCode": "rssmra85t10a562s", "birthDate": "1985-12-10", "birthPlace": "Firenze",
                 "residence": "Via Dante 2, Firenze",
@@ -165,7 +169,7 @@ class InternshipIT {
                 .containsEntry("residence", Map.of("redacted", true))
                 .containsEntry("companyTutors", Map.of("redacted", true))
                 .containsEntry("notes", Map.of("redacted", true));
-        assertThat(changes.get("weeklyHours")).extracting("after").isEqualTo(30);
+        assertThat(changes.get("schedule")).extracting("after").isEqualTo(List.of("1 F1"));
         assertThat(changes.get("suspensions")).extracting("after")
                 .isEqualTo(List.of("2026-12-08/2026-12-08", "2026-12-22/2027-01-06"));
 
@@ -196,8 +200,6 @@ class InternshipIT {
         save("tutor1", form("\"startDate\": \"2027-01-10\", \"expectedEndDate\": \"2027-01-09\", \"version\": null"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldErrors[0].field").value("expectedEndDate"));
-        save("tutor1", form("\"weeklyHours\": 41, \"version\": null"))
-                .andExpect(jsonPath("$.fieldErrors[0].field").value("weeklyHours"));
         save("tutor1", form("\"companyTutors\": [{\"fullName\": \" \"}], \"version\": null"))
                 .andExpect(jsonPath("$.fieldErrors[0].field").value("companyTutors[0].fullName"));
         save("tutor1", form("""
@@ -233,6 +235,82 @@ class InternshipIT {
         assertThat(internships.findByTicketId(ticket.getId())).isEmpty();
     }
 
+    /** Lunedì 7 – domenica 13 dicembre 2026; martedì 8 è festivo. */
+    private static String week(String schedule, boolean excludeHolidays, String suspensions, Long version) {
+        return form("""
+                "startDate": "2026-12-07", "expectedEndDate": "2026-12-13", "schedule": %s,
+                "excludeHolidays": %s, "suspensions": %s, "version": %s"""
+                .formatted(schedule, excludeHolidays, suspensions, version));
+    }
+
+    @Test
+    void grigliaOraria_monteOreConFestivitaESospensioni_ricalcolato() throws Exception {
+        // lunedì prima fascia (4 ore), martedì entrambe ma 3 ore (esempio del PO)
+        String schedule = """
+                [{"dayOfWeek": 2, "firstSlot": true, "secondSlot": true, "minutes": 180},
+                 {"dayOfWeek": 1, "firstSlot": true, "secondSlot": false}]""";
+        mockMvc.perform(get(base).header(USER, "tutor1"))
+                .andExpect(jsonPath("$.firstSlotStart").value("09:00:00"))
+                .andExpect(jsonPath("$.secondSlotEnd").value("18:00:00"))
+                .andExpect(jsonPath("$.excludeHolidays").value(true))
+                .andExpect(jsonPath("$.weeklyMinutes").doesNotExist())
+                .andExpect(jsonPath("$.totalMinutes").doesNotExist());
+
+        save("tutor1", week(schedule, true, "[]", null))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.schedule[0].dayOfWeek").value(1))
+                .andExpect(jsonPath("$.schedule[1].minutes").value(180))
+                .andExpect(jsonPath("$.weeklyMinutes").value(420))
+                // martedì 8 dicembre festivo: solo il lunedì
+                .andExpect(jsonPath("$.totalMinutes").value(240));
+        assertThat(ticketAudit().getLast().getChanges().get("schedule")).extracting("after")
+                .isEqualTo(List.of("1 F1", "2 F1+F2 180'"));
+
+        save("tutor1", week(schedule, false, "[]", version()))
+                .andExpect(jsonPath("$.totalMinutes").value(420));
+        // ricalcolo: una sospensione il lunedì, poi la prima fascia spostata a 8:30–12:00
+        save("tutor1", week(schedule, false, "[{\"from\": \"2026-12-07\", \"to\": \"2026-12-07\"}]", version()))
+                .andExpect(jsonPath("$.totalMinutes").value(180));
+        save("tutor1", week(schedule, false, "[]", version()).replace("\"09:00\"", "\"08:30\"")
+                        .replace("\"13:00\"", "\"12:00\""))
+                .andExpect(jsonPath("$.firstSlotStart").value("08:30:00"))
+                .andExpect(jsonPath("$.weeklyMinutes").value(390));
+
+        // riletto dal database l'orario resta quello scritto, senza conversioni di fuso
+        em.flush();
+        em.clear();
+        mockMvc.perform(get(base).header(USER, "tutor1"))
+                .andExpect(jsonPath("$.firstSlotStart").value("08:30:00"))
+                .andExpect(jsonPath("$.secondSlotEnd").value("18:00:00"));
+        assertThat(jdbc.queryForObject("SELECT first_slot_start FROM internship WHERE ticket_id = ?", Integer.class,
+                ticket.getId())).isEqualTo(510);
+    }
+
+    @Test
+    void grigliaOraria_controlli() throws Exception {
+        save("tutor1", form("\"schedule\": [{\"dayOfWeek\": 1, \"firstSlot\": true, \"secondSlot\": false, "
+                + "\"minutes\": 300}], \"version\": null"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("schedule[0].minutes"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value("Al massimo 4 ore nelle fasce scelte"));
+        save("tutor1", form("\"schedule\": [{\"dayOfWeek\": 3, \"firstSlot\": false, \"secondSlot\": false}], "
+                + "\"version\": null"))
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("schedule[0]"));
+        save("tutor1", form("\"schedule\": [{\"dayOfWeek\": 1, \"firstSlot\": true, \"secondSlot\": false}, "
+                + "{\"dayOfWeek\": 1, \"firstSlot\": false, \"secondSlot\": true}], \"version\": null"))
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("schedule"));
+        save("tutor1", form("\"secondSlotStart\": \"12:00\", \"version\": null"))
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("secondSlotStart"));
+        // cinque giorni pieni: 40 ore ammesse, il sesto le supera
+        String full = "{\"dayOfWeek\": %d, \"firstSlot\": true, \"secondSlot\": true}";
+        String five = String.join(", ", java.util.stream.IntStream.rangeClosed(1, 5)
+                .mapToObj(full::formatted).toList());
+        save("tutor1", form("\"schedule\": [%s, %s], \"version\": null".formatted(five, full.formatted(6))))
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("schedule"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value("Il totale settimanale (48 ore) supera le 40 ore"));
+        save("tutor1", form("\"schedule\": [%s], \"version\": null".formatted(five))).andExpect(status().isOk());
+    }
+
     @Test
     void soloIlTutorDellaSegnalazione_eDallAppuntamentoInPoi() throws Exception {
         mockMvc.perform(get(base).header(USER, "tutor2")).andExpect(status().isForbidden());
@@ -248,22 +326,22 @@ class InternshipIT {
 
     @Test
     void ilTutorLaModificaInQualunqueMomento_ancheATirocinioAvviatoOConcluso() throws Exception {
-        save("tutor1", form("\"weeklyHours\": 20, \"version\": null")).andExpect(status().isOk());
+        save("tutor1", form("\"site\": \"Via Roma 1\", \"version\": null")).andExpect(status().isOk());
 
         ticket.setStatus(TicketStatus.IN_TIROCINIO);
         em.flush();
-        save("tutor1", form("\"weeklyHours\": 25, \"version\": %d".formatted(version())))
+        save("tutor1", form("\"site\": \"Via Roma 2\", \"version\": %d".formatted(version())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.weeklyHours").value(25));
+                .andExpect(jsonPath("$.site").value("Via Roma 2"));
         mockMvc.perform(post(base + "/ateco-codes").header(USER, "tutor1")
                         .contentType(MediaType.APPLICATION_JSON).content("{\"code\": \"56.10\"}"))
                 .andExpect(status().isCreated());
 
         ticket.setStatus(TicketStatus.FORM_RESTITUZIONE);
         em.flush();
-        save("tutor1", form("\"weeklyHours\": 30, \"version\": %d".formatted(version())))
+        save("tutor1", form("\"site\": \"Via Roma 3\", \"version\": %d".formatted(version())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.weeklyHours").value(30));
+                .andExpect(jsonPath("$.site").value("Via Roma 3"));
     }
 
     @Test
@@ -326,6 +404,8 @@ class InternshipIT {
         assertThat(left.getNotes()).isNull();
         assertThat(left.getCompanyTutors()).isEmpty();
         assertThat(left.getSuspensions()).isEmpty();
+        assertThat(left.getScheduleDays()).isEmpty();
+        assertThat(left.isExcludeHolidays()).isTrue();
         assertThat(ticketAudit().getLast().getChanges().get("internshipReset")).extracting("after").isEqualTo(true);
     }
 }

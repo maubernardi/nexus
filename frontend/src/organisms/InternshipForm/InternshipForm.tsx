@@ -14,12 +14,21 @@ import { useInternshipTypes } from '@/config/hooks/useReferenceData';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
 import { FormField } from '@/molecules/FormField/FormField';
+import {
+  DAYS,
+  minutesToHoursText,
+  parseHours,
+  slotMinutes,
+  timeToMinutes,
+  weeklyMinutes,
+  type ScheduleDayValues,
+} from '@/organisms/InternshipForm/schedule';
+import { ScheduleFields } from '@/organisms/InternshipForm/ScheduleFields';
 
 type Values = {
   internshipTypeId: string;
   startDate: string;
   expectedEndDate: string;
-  weeklyHours: string;
   site: string;
   atecoCodeId: string;
   companyTutors: { fullName: string; contact: string }[];
@@ -29,9 +38,31 @@ type Values = {
   residence: string;
   suspensions: { from: string; to: string }[];
   notes: string;
+  /** Griglia oraria (US-1002): fasce "hh:mm" e i sette giorni da lunedì. */
+  firstSlotStart: string;
+  firstSlotEnd: string;
+  secondSlotStart: string;
+  secondSlotEnd: string;
+  excludeHolidays: boolean;
+  days: ScheduleDayValues[];
 };
 
-type Scalar = Exclude<keyof Values, 'companyTutors' | 'suspensions'>;
+export type InternshipFormValues = Values;
+
+type Scalar = Exclude<
+  keyof Values,
+  | 'companyTutors'
+  | 'suspensions'
+  | 'days'
+  | 'excludeHolidays'
+  | 'firstSlotStart'
+  | 'firstSlotEnd'
+  | 'secondSlotStart'
+  | 'secondSlotEnd'
+>;
+
+/** Totale settimanale massimo: segnaposto di US-1001, da confermare con i moduli ufficiali (Q5). */
+const MAX_WEEKLY_MINUTES = 40 * 60;
 
 const fieldId = (path: string): string => `internship-${path.replace(/\./g, '-')}`;
 
@@ -40,7 +71,6 @@ const toValues = (i: Internship): Values => ({
   internshipTypeId: i.internshipType?.id ?? '',
   startDate: i.startDate ?? '',
   expectedEndDate: i.expectedEndDate ?? '',
-  weeklyHours: typeof i.weeklyHours === 'number' ? String(i.weeklyHours) : '',
   site: i.site ?? '',
   atecoCodeId: i.atecoCodeId ?? '',
   companyTutors: i.companyTutors.map((c) => ({ fullName: c.fullName, contact: c.contact ?? '' })),
@@ -50,13 +80,26 @@ const toValues = (i: Internship): Values => ({
   residence: i.residence ?? '',
   suspensions: i.suspensions.map((s) => ({ from: s.from, to: s.to })),
   notes: i.notes ?? '',
+  // l'API manda "hh:mm:ss", il campo orario vuole "hh:mm"
+  firstSlotStart: i.firstSlotStart.slice(0, 5),
+  firstSlotEnd: i.firstSlotEnd.slice(0, 5),
+  secondSlotStart: i.secondSlotStart.slice(0, 5),
+  secondSlotEnd: i.secondSlotEnd.slice(0, 5),
+  excludeHolidays: i.excludeHolidays,
+  days: DAYS.map((dow) => {
+    const day = i.schedule.find((d) => d.dayOfWeek === dow);
+    return {
+      first: day?.firstSlot ?? false,
+      second: day?.secondSlot ?? false,
+      hours: typeof day?.minutes === 'number' ? minutesToHoursText(day.minutes) : '',
+    };
+  }),
 });
 
 const toPayload = (v: Values, version: number | null): InternshipPayload => ({
   internshipTypeId: v.internshipTypeId || null,
   startDate: v.startDate || null,
   expectedEndDate: v.expectedEndDate || null,
-  weeklyHours: v.weeklyHours.trim() === '' ? null : Number(v.weeklyHours.trim()),
   site: v.site.trim() || null,
   atecoCodeId: v.atecoCodeId || null,
   companyTutors: v.companyTutors.map((c) => ({
@@ -69,8 +112,30 @@ const toPayload = (v: Values, version: number | null): InternshipPayload => ({
   residence: v.residence.trim() || null,
   suspensions: v.suspensions.map((s) => ({ from: s.from, to: s.to })),
   notes: v.notes.trim() || null,
+  firstSlotStart: v.firstSlotStart,
+  firstSlotEnd: v.firstSlotEnd,
+  secondSlotStart: v.secondSlotStart,
+  secondSlotEnd: v.secondSlotEnd,
+  excludeHolidays: v.excludeHolidays,
+  // solo i giorni con almeno una fascia
+  schedule: v.days.flatMap((d, k) =>
+    d.first || d.second
+      ? [{ dayOfWeek: DAYS[k], firstSlot: d.first, secondSlot: d.second, minutes: parseHours(d.hours) }]
+      : [],
+  ),
   version,
 });
+
+/**
+ * Campo del modulo per un errore del server. La griglia inviata ha solo i giorni con una fascia: `schedule[i]` si
+ * riporta al giorno della settimana.
+ */
+const toFieldPath = (field: string, payload: InternshipPayload): FieldPath<Values> => {
+  const match = /^schedule(?:\[(\d+)\](\.minutes)?)?/.exec(field);
+  if (!match) return toFormPath(field) as FieldPath<Values>;
+  const day = match[1] === undefined ? undefined : payload.schedule[Number(match[1])];
+  return day && match[2] ? `days.${day.dayOfWeek - 1}.hours` : 'days';
+};
 
 /** Tipi attivi più quello già scelto, anche se nel frattempo disattivato. */
 const withCurrent = (items: ReferenceItem[] | undefined, current?: ReferenceItem | null): ReferenceItem[] => {
@@ -117,7 +182,6 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
     internshipTypeId: t('internship.fields.internshipType'),
     startDate: t('internship.fields.startDate'),
     expectedEndDate: t('internship.fields.expectedEndDate'),
-    weeklyHours: t('internship.fields.weeklyHours'),
     site: t('internship.fields.site'),
     atecoCodeId: t('internship.fields.atecoCode'),
     fiscalCode: t('internship.fields.fiscalCode'),
@@ -132,9 +196,23 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
   const push = (path: string, label: string, message?: string): void => {
     if (message) summary.push({ fieldId: fieldId(path), message: `${label}: ${message}` });
   };
-  (
-    ['internshipTypeId', 'startDate', 'expectedEndDate', 'weeklyHours', 'site', 'atecoCodeId'] as const
-  ).forEach((f) => push(f, labels[f], errors[f]?.message));
+  (['internshipTypeId', 'startDate', 'expectedEndDate', 'site', 'atecoCodeId'] as const).forEach((f) =>
+    push(f, labels[f], errors[f]?.message),
+  );
+  const first = t('internship.schedule.first');
+  const second = t('internship.schedule.second');
+  push('firstSlotStart', t('internship.schedule.start', { slot: first }), errors.firstSlotStart?.message);
+  push('firstSlotEnd', t('internship.schedule.end', { slot: first }), errors.firstSlotEnd?.message);
+  push('secondSlotStart', t('internship.schedule.start', { slot: second }), errors.secondSlotStart?.message);
+  push('secondSlotEnd', t('internship.schedule.end', { slot: second }), errors.secondSlotEnd?.message);
+  DAYS.forEach((dow, k) =>
+    push(
+      `days.${k}.hours`,
+      t('internship.schedule.dayHours', { day: t(`internship.schedule.days.${dow}`).toLowerCase() }),
+      errors.days?.[k]?.hours?.message,
+    ),
+  );
+  push('days', t('internship.schedule.heading'), errors.days?.message);
   tutorRows.fields.forEach((_, i) => {
     const n = i + 1;
     push(
@@ -182,10 +260,48 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
     return true;
   };
 
+  const hoursText = (minutes: number): string =>
+    t('internship.schedule.hoursValue', { count: minutes / 60, value: minutesToHoursText(minutes) });
+  const slotValues = () => getValues(['firstSlotStart', 'firstSlotEnd', 'secondSlotStart', 'secondSlotEnd']);
+  const after = (start: string, end: string): boolean => {
+    const from = timeToMinutes(start);
+    const to = timeToMinutes(end);
+    return from === null || to === null || to > from;
+  };
+  const scheduleRules = {
+    firstSlotEnd: (v: string) =>
+      after(getValues('firstSlotStart'), v) || t('internship.schedule.errors.slotOrder'),
+    secondSlotEnd: (v: string) =>
+      after(getValues('secondSlotStart'), v) || t('internship.schedule.errors.slotOrder'),
+    secondSlotStart: (v: string) =>
+      !after(v, getValues('firstSlotEnd')) || t('internship.schedule.errors.slotsOverlap'),
+    /** Ore del giorno: facoltative, a quarti d'ora, con una fascia scelta e non oltre le fasce scelte. */
+    hours: (k: number) => (v: string) => {
+      const minutes = parseHours(v);
+      if (minutes === null) return true;
+      const day = getValues(`days.${k}`);
+      if (!day.first && !day.second) return t('internship.schedule.errors.hoursWithoutSlot');
+      if (Number.isNaN(minutes)) return t('internship.schedule.errors.hoursFormat');
+      const [firstSlotStart, firstSlotEnd, secondSlotStart, secondSlotEnd] = slotValues();
+      const max = slotMinutes({ firstSlotStart, firstSlotEnd, secondSlotStart, secondSlotEnd }, day);
+      return minutes <= max || t('internship.schedule.errors.hoursOverSlots', { hours: hoursText(max) });
+    },
+  };
+
   const onValid = async (v: Values): Promise<void> => {
     setGenericError(false);
+    const weekly = weeklyMinutes(v, v.days);
+    if (weekly !== null && weekly > MAX_WEEKLY_MINUTES) {
+      setError('days', {
+        type: 'max',
+        message: t('internship.schedule.errors.weeklyMax', { hours: hoursText(weekly) }),
+      });
+      requestSummaryFocus();
+      return;
+    }
+    const payload = toPayload(v, internship.version ?? null);
     try {
-      await onSubmit(toPayload(v, internship.version ?? null));
+      await onSubmit(payload);
       onSuccess();
     } catch (error) {
       const body = apiError(error);
@@ -196,7 +312,7 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
       const fieldErrors = body?.fieldErrors ?? [];
       if (fieldErrors.length > 0) {
         fieldErrors.forEach((fe) =>
-          setError(toFormPath(fe.field) as FieldPath<Values>, { type: 'server', message: fe.message }),
+          setError(toFieldPath(fe.field, payload), { type: 'server', message: fe.message }),
         );
       } else {
         setGenericError(true);
@@ -240,27 +356,6 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
                   </option>
                 ))}
               </NativeSelect>
-            )}
-          </FormField>
-          <FormField
-            id={fieldId('weeklyHours')}
-            label={labels.weeklyHours}
-            hint={t('internship.hints.weeklyHours')}
-            error={errors.weeklyHours?.message}
-          >
-            {(p) => (
-              <Input
-                {...p}
-                inputMode="numeric"
-                autoComplete="off"
-                className="max-w-32"
-                {...register('weeklyHours', {
-                  validate: (v) =>
-                    v.trim() === '' ||
-                    (/^\d+$/.test(v.trim()) && Number(v) >= 1 && Number(v) <= 40) ||
-                    t('internship.errors.weeklyHours'),
-                })}
-              />
             )}
           </FormField>
           <FormField id={fieldId('startDate')} label={labels.startDate} error={errors.startDate?.message}>
@@ -338,6 +433,15 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
           )}
         </fieldset>
       </section>
+
+      <ScheduleFields
+        control={control}
+        register={register}
+        errors={errors}
+        rules={scheduleRules}
+        totalMinutes={internship.totalMinutes}
+        fieldId={fieldId}
+      />
 
       <section aria-labelledby="internship-section-tutors" className="space-y-4">
         <h2 id="internship-section-tutors" className="text-lg font-semibold text-primary">

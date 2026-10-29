@@ -12,6 +12,14 @@ export type CompanyTutor = { fullName: string; contact?: string | null };
 /** Periodo di sospensione, estremi compresi (aaaa-mm-gg). */
 export type Suspension = { from: string; to: string };
 
+/** Giorno della griglia oraria (US-1002): 1 = lunedì … 7 = domenica; minuti assenti = fasce intere. */
+export type ScheduleDay = {
+  dayOfWeek: number;
+  firstSlot: boolean;
+  secondSlot: boolean;
+  minutes?: number | null;
+};
+
 /**
  * Scheda del tirocinio (US-1001) con i dati dell'azienda per i documenti. L'API omette i campi vuoti; `version`
  * assente = scheda mai salvata.
@@ -24,7 +32,6 @@ export type Internship = {
   internshipType?: ReferenceItem | null;
   startDate?: string | null;
   expectedEndDate?: string | null;
-  weeklyHours?: number | null;
   site?: string | null;
   atecoCodeId?: string | null;
   companyTutors: CompanyTutor[];
@@ -34,13 +41,22 @@ export type Internship = {
   residence?: string | null;
   suspensions: Suspension[];
   notes?: string | null;
+  /** Fasce orarie, "hh:mm:ss" (US-1002). */
+  firstSlotStart: string;
+  firstSlotEnd: string;
+  secondSlotStart: string;
+  secondSlotEnd: string;
+  excludeHolidays: boolean;
+  schedule: ScheduleDay[];
+  /** Totale settimanale e monte ore in minuti, calcolati sui dati salvati; assenti se non calcolabili. */
+  weeklyMinutes?: number | null;
+  totalMinutes?: number | null;
 };
 
 export type InternshipForm = {
   internshipTypeId: string | null;
   startDate: string | null;
   expectedEndDate: string | null;
-  weeklyHours: number | null;
   site: string | null;
   atecoCodeId: string | null;
   companyTutors: { fullName: string; contact: string | null }[];
@@ -50,6 +66,14 @@ export type InternshipForm = {
   residence: string | null;
   suspensions: Suspension[];
   notes: string | null;
+  /** "hh:mm" */
+  firstSlotStart: string;
+  firstSlotEnd: string;
+  secondSlotStart: string;
+  secondSlotEnd: string;
+  excludeHolidays: boolean;
+  /** Solo i giorni con almeno una fascia. */
+  schedule: { dayOfWeek: number; firstSlot: boolean; secondSlot: boolean; minutes: number | null }[];
   /** null al primo salvataggio. */
   version: number | null;
 };

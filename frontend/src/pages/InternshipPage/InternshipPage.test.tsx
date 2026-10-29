@@ -55,6 +55,12 @@ const internship = (overrides: Partial<Internship> = {}): Internship => ({
   atecoCodes: [],
   companyTutors: [],
   suspensions: [],
+  firstSlotStart: '09:00:00',
+  firstSlotEnd: '13:00:00',
+  secondSlotStart: '14:00:00',
+  secondSlotEnd: '18:00:00',
+  excludeHolidays: true,
+  schedule: [],
   ...overrides,
 });
 
@@ -182,6 +188,9 @@ describe('<InternshipPage>', () => {
         atecoCodeId: 'A1',
         companyTutors: [{ fullName: 'Anna Verdi', contact: '055 123456' }],
         suspensions: [{ from: '2026-12-22', to: '2027-01-06' }],
+        schedule: [{ dayOfWeek: 1, firstSlot: true, secondSlot: false }],
+        weeklyMinutes: 240,
+        totalMinutes: 4800,
       }),
     );
     vi.mocked(saveInternship).mockResolvedValue(internship({ version: 5 }));
@@ -191,6 +200,8 @@ describe('<InternshipPage>', () => {
     expect(screen.getByRole('radio', { name: /56\.10\.11/ })).toBeChecked();
     expect(screen.getByLabelText(/^Nome e cognome del tutor aziendale 1/)).toHaveValue('Anna Verdi');
     expect(screen.getByLabelText(/^Periodo 1: al/)).toHaveValue('2027-01-06');
+    expect(screen.getByRole('checkbox', { name: 'Lunedì, Prima fascia' })).toBeChecked();
+    expect(screen.getByText('Monte ore complessivo: 80 ore')).toBeInTheDocument();
     // il legale rappresentante c'è: da qui non si corregge
     expect(
       screen.queryByRole('button', { name: 'Inserisci il legale rappresentante' }),
