@@ -19,4 +19,4 @@
 
 ## 3. Consegna
 
-- [ ] 3.1 PR con CI verde (stati del backlog e collaudo aggiornati dopo il merge)
+- [x] 3.1 PR con CI verde (stati del backlog e collaudo aggiornati dopo il merge)
