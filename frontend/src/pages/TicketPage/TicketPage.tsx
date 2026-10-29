@@ -476,6 +476,7 @@ const KNOWN_ACTIONS = [
   'TIMER_EXPIRE',
   'COMPANY_EXCLUDE',
   'INTERNSHIP_SAVE',
+  'START',
   'STATUS',
 ] as const;
 

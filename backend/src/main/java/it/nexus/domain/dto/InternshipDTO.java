@@ -33,5 +33,7 @@ public record InternshipDTO(
         boolean excludeHolidays,
         List<ScheduleDayDTO> schedule,
         Integer weeklyMinutes,
-        Integer totalMinutes) {
+        Integer totalMinutes,
+        /** Dati che mancano per avviare il tirocinio (US-1003), in base alla scheda salvata; vuoto = completa. */
+        List<String> missingForStart) {
 }

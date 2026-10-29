@@ -89,6 +89,15 @@ public interface TicketService {
     TicketDetailDTO appointmentSet(String ticketId, AppointmentSetDTO dto);
 
     /**
+     * Il Tutor della segnalazione avvia il tirocinio (US-1003): stato IN_TIROCINIO, solo con la scheda completa;
+     * evento nello storico dell'azienda e notifica all'operatore.
+     *
+     * @throws it.nexus.web.errors.ConflictException se la scheda è incompleta, lo stato non lo ammette o la versione è
+     *         superata
+     */
+    TicketDetailDTO startInternship(String ticketId, long expectedVersion);
+
+    /**
      * Il Tutor della segnalazione registra l'appuntamento fallito, con causa: stato RIAPERTO in carico allo stesso
      * operatore, mansione di nuovo libera, nessuna esclusione automatica dell'azienda (US-802).
      */

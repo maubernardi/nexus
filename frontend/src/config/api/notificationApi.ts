@@ -15,6 +15,7 @@ export const NOTIFICATION_TYPES = [
   'BOARD_RELAUNCH_REQUESTED',
   'FAST_TRACK_REJECTED',
   'FAST_TRACK_DROPPED',
+  'INTERNSHIP_STARTED',
 ] as const;
 
 export type AppNotification = {

@@ -37,6 +37,13 @@ public interface InternshipService {
     AtecoCodeDTO addAtecoCode(String ticketId, AtecoCodeFormDTO dto);
 
     /**
+     * Avvio del tirocinio (US-1003): la scheda salvata deve essere completa (review dello Sprint 7, §8.2).
+     *
+     * @throws it.nexus.web.errors.ConflictException con l'elenco di ciò che manca
+     */
+    void requireCompleteForStart(Ticket ticket);
+
+    /**
      * Appuntamento non andato a buon fine: della scheda restano solo i dati del beneficiario.
      *
      * @return {@code true} se c'era qualcosa da azzerare

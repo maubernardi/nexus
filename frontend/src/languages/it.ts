@@ -331,6 +331,7 @@ export const it = {
         'L’annuncio della segnalazione n. {{number}} non è più in bacheca: la corsia veloce è decaduta e la segnalazione continua in lavorazione normale.',
       BOARD_RELAUNCH_REQUESTED:
         'Il Tutor chiede di rilanciare in bacheca la mansione della segnalazione n. {{number}}: c’è una bozza di annuncio da controllare e pubblicare.',
+      INTERNSHIP_STARTED: 'Il Tutor ha avviato il tirocinio della segnalazione n. {{number}}.',
     },
   },
   legalRep: {
@@ -436,6 +437,38 @@ export const it = {
         'Per esempio la chiusura per le feste. Le date sono comprese e i periodi non si sovrappongono.',
       fiscalCode: '16 caratteri: si controlla anche che corrisponda alla data di nascita.',
       residence: 'Indirizzo completo: via, numero, CAP e comune.',
+    },
+    start: {
+      heading: 'Avvio del tirocinio',
+      missingIntro:
+        'Per avviare il tirocinio la scheda salvata deve essere completa. Mancano (salva prima le modifiche in corso):',
+      missing: {
+        internshipType: 'Tipo di tirocinio',
+        startDate: 'Data di inizio',
+        expectedEndDate: 'Data di fine prevista',
+        site: 'Sede del tirocinio',
+        atecoCode: 'Codice ATECO del tirocinio',
+        companyTutors: 'Almeno un tutor aziendale',
+        schedule: 'La griglia oraria (almeno un giorno)',
+        fiscalCode: 'Codice fiscale del beneficiario',
+        birthDate: 'Data di nascita del beneficiario',
+        birthPlace: 'Luogo di nascita del beneficiario',
+        residence: 'Residenza del beneficiario',
+        legalRepresentative: 'Il legale rappresentante dell’azienda: puoi inserirlo da questa pagina',
+        legalRepresentativeData:
+          'Codice fiscale, nascita e residenza del legale rappresentante: chiedi al Call Center di completarli',
+      },
+      ready: 'La scheda è completa: puoi avviare il tirocinio. Anche dopo l’avvio potrai correggerla.',
+      action: 'Avvia il tirocinio',
+      confirmHeading: 'Avviare il tirocinio di {{beneficiary}} presso {{company}}?',
+      confirmText:
+        'La segnalazione passa a «In tirocinio» e l’operatore del Call Center riceve la notifica. La scheda resta modificabile.',
+      confirm: 'Sì, avvia',
+      cancel: 'Annulla',
+      done: 'Tirocinio avviato: la segnalazione è «In tirocinio».',
+      refused: 'Tirocinio non avviato: {{reason}}',
+      started:
+        'Il tirocinio è avviato. Puoi comunque correggere la scheda: le modifiche restano nella cronologia.',
     },
     schedule: {
       heading: 'Griglia oraria e monte ore',
@@ -705,7 +738,7 @@ export const it = {
     },
     internship: {
       heading: 'Scheda del tirocinio',
-      text: 'I dati per Convenzione e Progetto Formativo: la scheda la vedi solo tu.',
+      text: 'I dati per Convenzione e Progetto Formativo e l’avvio del tirocinio: la scheda la vedi solo tu.',
       open: 'Apri la scheda del tirocinio',
     },
     appointment: {
@@ -767,6 +800,7 @@ export const it = {
       TIMER_EXPIRE: 'Scadenza del timer',
       COMPANY_EXCLUDE: 'Azienda esclusa dal Call Center',
       INTERNSHIP_SAVE: 'Scheda del tirocinio aggiornata',
+      START: 'Tirocinio avviato',
       CATEGORY_APPROVE: 'Nuova tipologia approvata',
       CATEGORY_REJECT: 'Tipologia cambiata dal Call Center',
       STATUS: 'Cambio di stato',

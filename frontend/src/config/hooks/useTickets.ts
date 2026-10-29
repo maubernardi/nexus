@@ -28,6 +28,7 @@ import {
   approveCategory,
   rejectCategory,
   rejectProposal,
+  startInternship,
   type CompanyExclusion,
   type CompatibleFilters,
   type JobSlotMatch,
@@ -219,6 +220,19 @@ export const useAppointmentSet = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: appointmentSet,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+  });
+};
+
+/** Il Tutor avvia il tirocinio (US-1003): segnalazione, scheda e cronologia si aggiornano (stessa chiave). */
+export const useStartInternship = (): UseMutationResult<
+  TicketDetail,
+  unknown,
+  { id: string; version: number }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: startInternship,
     onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
   });
 };

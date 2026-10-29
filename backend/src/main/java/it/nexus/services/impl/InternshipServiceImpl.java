@@ -4,14 +4,17 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -68,6 +71,21 @@ public class InternshipServiceImpl implements InternshipService {
     private static final DateTimeFormatter DAY = DateTimeFormatter.ofPattern("d/M/yyyy", Locale.ITALIAN);
     /** Totale settimanale massimo, segnaposto da confermare con i moduli ufficiali (Q5). */
     private static final int MAX_WEEKLY_MINUTES = 40 * 60;
+    /** Dati richiesti per l'avvio (review dello Sprint 7, §8.2) e come si chiamano nel messaggio di rifiuto. */
+    private static final Map<String, String> START_LABELS = Map.ofEntries(
+            Map.entry("internshipType", "il tipo di tirocinio"),
+            Map.entry("startDate", "la data di inizio"),
+            Map.entry("expectedEndDate", "la data di fine prevista"),
+            Map.entry("site", "la sede"),
+            Map.entry("atecoCode", "il codice ATECO"),
+            Map.entry("companyTutors", "almeno un tutor aziendale"),
+            Map.entry("schedule", "la griglia oraria"),
+            Map.entry("fiscalCode", "il codice fiscale del beneficiario"),
+            Map.entry("birthDate", "la data di nascita del beneficiario"),
+            Map.entry("birthPlace", "il luogo di nascita del beneficiario"),
+            Map.entry("residence", "la residenza del beneficiario"),
+            Map.entry("legalRepresentative", "il legale rappresentante dell'azienda"),
+            Map.entry("legalRepresentativeData", "codice fiscale, nascita e residenza del legale rappresentante"));
 
     private final InternshipRepository internshipRepository;
     private final TicketRepository ticketRepository;
@@ -181,6 +199,17 @@ public class InternshipServiceImpl implements InternshipService {
     public AtecoCodeDTO addAtecoCode(String ticketId, AtecoCodeFormDTO dto) {
         Company company = company(internshipTicket(ticketId));
         return companyLegalDataService.addAtecoCode(TsidMapper.toExternal(company.getId()), dto);
+    }
+
+    @Override
+    public void requireCompleteForStart(Ticket ticket) {
+        Internship internship = internshipRepository.findByTicketId(ticket.getId())
+                .orElseGet(() -> new Internship(ticket));
+        List<String> missing = missingForStart(internship, legalRepresentative(company(ticket)));
+        if (!missing.isEmpty()) {
+            throw new ConflictException("Per avviare il tirocinio la scheda deve essere completa; mancano: %s",
+                    missing.stream().map(START_LABELS::get).collect(Collectors.joining(", ")));
+        }
     }
 
     @Override
@@ -360,8 +389,7 @@ public class InternshipServiceImpl implements InternshipService {
     private InternshipDTO toDto(Ticket ticket, Internship i) {
         Company company = company(ticket);
         String companyId = company == null ? null : TsidMapper.toExternal(company.getId());
-        LegalRepresentativeDTO rep = companyId == null ? null
-                : companyLegalDataService.legalRepresentative(companyId).orElse(null);
+        LegalRepresentativeDTO rep = legalRepresentative(company);
         List<AtecoCodeDTO> codes = companyId == null ? List.of() : companyLegalDataService.atecoCodes(companyId);
         List<ScheduleDayDTO> schedule = schedule(i);
         InternshipHours.Slots slots = new InternshipHours.Slots(i.getFirstSlotStart(), i.getFirstSlotEnd(),
@@ -376,7 +404,61 @@ public class InternshipServiceImpl implements InternshipService {
                 i.getAtecoCode() == null ? null : TsidMapper.toExternal(i.getAtecoCode().getId()), tutors(i),
                 i.getFiscalCode(), i.getBirthDate(), i.getBirthPlace(), i.getResidence(), suspensions(i), i.getNotes(),
                 i.getFirstSlotStart(), i.getFirstSlotEnd(), i.getSecondSlotStart(), i.getSecondSlotEnd(),
-                i.isExcludeHolidays(), schedule, InternshipHours.weeklyMinutes(slots, days), total);
+                i.isExcludeHolidays(), schedule, InternshipHours.weeklyMinutes(slots, days), total,
+                missingForStart(i, rep));
+    }
+
+    private LegalRepresentativeDTO legalRepresentative(Company company) {
+        return company == null ? null
+                : companyLegalDataService.legalRepresentative(TsidMapper.toExternal(company.getId())).orElse(null);
+    }
+
+    /**
+     * Dati che mancano per l'avvio, nell'ordine della pagina. Il legale rappresentante può mancare del tutto (lo
+     * inserisce il Tutor) o essere incompleto (lo completa il Call Center).
+     */
+    private static List<String> missingForStart(Internship i, LegalRepresentativeDTO rep) {
+        List<String> missing = new ArrayList<>();
+        if (i.getInternshipType() == null) {
+            missing.add("internshipType");
+        }
+        if (i.getStartDate() == null) {
+            missing.add("startDate");
+        }
+        if (i.getExpectedEndDate() == null) {
+            missing.add("expectedEndDate");
+        }
+        if (i.getSite() == null) {
+            missing.add("site");
+        }
+        if (i.getAtecoCode() == null) {
+            missing.add("atecoCode");
+        }
+        if (i.getCompanyTutors().isEmpty()) {
+            missing.add("companyTutors");
+        }
+        if (i.getScheduleDays().isEmpty()) {
+            missing.add("schedule");
+        }
+        if (i.getFiscalCode() == null) {
+            missing.add("fiscalCode");
+        }
+        if (i.getBirthDate() == null) {
+            missing.add("birthDate");
+        }
+        if (i.getBirthPlace() == null) {
+            missing.add("birthPlace");
+        }
+        if (i.getResidence() == null) {
+            missing.add("residence");
+        }
+        if (rep == null) {
+            missing.add("legalRepresentative");
+        } else if (rep.fiscalCode() == null || rep.birthDate() == null || rep.birthPlace() == null
+                || rep.residence() == null) {
+            missing.add("legalRepresentativeData");
+        }
+        return missing;
     }
 
     private static List<ScheduleDayDTO> schedule(Internship i) {
