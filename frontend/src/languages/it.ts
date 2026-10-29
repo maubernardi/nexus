@@ -438,6 +438,16 @@ export const it = {
       fiscalCode: '16 caratteri: si controlla anche che corrisponda alla data di nascita.',
       residence: 'Indirizzo completo: via, numero, CAP e comune.',
     },
+    documents: {
+      heading: 'Documenti',
+      intro:
+        'Compilati con i dati salvati della scheda. Per ora sono modelli provvisori, in attesa dei moduli ufficiali della cooperativa.',
+      incomplete: 'La scheda non è completa: nel documento i dati mancanti restano da completare a mano.',
+      convenzione: 'Scarica la Convenzione (.docx)',
+      preparing: 'Preparazione del documento…',
+      downloaded: 'Convenzione scaricata: {{filename}}',
+      error: 'Download non riuscito. Controlla la connessione e riprova.',
+    },
     start: {
       heading: 'Avvio del tirocinio',
       missingIntro:
@@ -801,6 +811,7 @@ export const it = {
       COMPANY_EXCLUDE: 'Azienda esclusa dal Call Center',
       INTERNSHIP_SAVE: 'Scheda del tirocinio aggiornata',
       START: 'Tirocinio avviato',
+      DOCUMENT_GENERATED: 'Documento scaricato',
       CATEGORY_APPROVE: 'Nuova tipologia approvata',
       CATEGORY_REJECT: 'Tipologia cambiata dal Call Center',
       STATUS: 'Cambio di stato',

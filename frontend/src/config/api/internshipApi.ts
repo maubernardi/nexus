@@ -115,6 +115,23 @@ export const saveInternship = async ({
   return data;
 };
 
+/** Documenti del tirocinio generati dai modelli Word (US-1004). */
+export type InternshipDocumentKind = 'convenzione';
+
+/** Documento compilato dalla scheda salvata, come file .docx. */
+export const downloadInternshipDocument = async ({
+  ticketId,
+  kind,
+}: {
+  ticketId: string;
+  kind: InternshipDocumentKind;
+}): Promise<Blob> => {
+  const { data } = await axiosInstance.get<Blob>(`${internshipUrl(ticketId)}/documents/${kind}`, {
+    responseType: 'blob',
+  });
+  return data;
+};
+
 /** Legale rappresentante dell'azienda inserito dal Tutor: solo se manca (correggerlo spetta al Call Center). */
 export const addInternshipLegalRepresentative = async ({
   ticketId,

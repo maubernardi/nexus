@@ -477,6 +477,7 @@ const KNOWN_ACTIONS = [
   'COMPANY_EXCLUDE',
   'INTERNSHIP_SAVE',
   'START',
+  'DOCUMENT_GENERATED',
   'STATUS',
 ] as const;
 

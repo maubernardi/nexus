@@ -1,11 +1,12 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AxiosError, AxiosHeaders } from 'axios';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   addInternshipAtecoCode,
   addInternshipLegalRepresentative,
+  downloadInternshipDocument,
   fetchInternship,
   saveInternship,
   type Internship,
@@ -17,6 +18,7 @@ import { expectNoAxeViolations } from '@/tests/axe';
 import { renderRoutes } from '@/tests/renderWithProviders';
 
 vi.mock('@/config/api/internshipApi', () => ({
+  downloadInternshipDocument: vi.fn(),
   fetchInternship: vi.fn(),
   saveInternship: vi.fn(),
   addInternshipLegalRepresentative: vi.fn(),
@@ -90,6 +92,67 @@ describe('<InternshipPage>', () => {
     vi.mocked(addInternshipLegalRepresentative).mockReset();
     vi.mocked(addInternshipAtecoCode).mockReset();
     vi.mocked(startInternship).mockReset();
+    vi.mocked(downloadInternshipDocument).mockReset();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it('documenti: la Convenzione si scarica dalla scheda, con l’avviso se è incompleta', async () => {
+    const user = userEvent.setup();
+    // jsdom non crea URL di blob né naviga: si intercetta il link temporaneo del download
+    vi.stubGlobal(
+      'URL',
+      class extends URL {
+        static createObjectURL = vi.fn(() => 'blob:convenzione');
+        static revokeObjectURL = vi.fn();
+      },
+    );
+    const clicked: string[] = [];
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {
+      clicked.push(this.download);
+    });
+    vi.mocked(fetchInternship).mockResolvedValue(internship({ missingForStart: ['fiscalCode'] }));
+    vi.mocked(downloadInternshipDocument).mockResolvedValue(new Blob(['docx']));
+    renderPage();
+
+    const section = await screen.findByRole('region', { name: 'Documenti' });
+    expect(
+      within(section).getByText(
+        'La scheda non è completa: nel documento i dati mancanti restano da completare a mano.',
+      ),
+    ).toBeInTheDocument();
+    await expectNoAxeViolations();
+
+    const button = within(section).getByRole('button', { name: 'Scarica la Convenzione (.docx)' });
+    await user.click(button);
+
+    expect(
+      await within(section).findByText('Convenzione scaricata: Convenzione-segnalazione-9.docx'),
+    ).toBeInTheDocument();
+    expect(clicked).toEqual(['Convenzione-segnalazione-9.docx']);
+    expect(vi.mocked(downloadInternshipDocument).mock.calls[0][0]).toEqual({
+      ticketId: 'T9',
+      kind: 'convenzione',
+    });
+    expect(button).toHaveFocus();
+  });
+
+  it('documenti: download non riuscito', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchInternship).mockResolvedValue(internship());
+    vi.mocked(downloadInternshipDocument).mockRejectedValue(error(500, { message: 'Errore' }));
+    renderPage();
+
+    const section = await screen.findByRole('region', { name: 'Documenti' });
+    expect(within(section).queryByText(/non è completa/)).not.toBeInTheDocument();
+    await user.click(within(section).getByRole('button', { name: 'Scarica la Convenzione (.docx)' }));
+
+    expect(
+      await within(section).findByText('Download non riuscito. Controlla la connessione e riprova.'),
+    ).toBeInTheDocument();
   });
 
   it('avvio con la scheda incompleta: l’elenco di ciò che manca porta ai campi', async () => {
