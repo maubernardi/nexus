@@ -26,6 +26,12 @@ const empty: Internship = {
   atecoCodes: [{ id: 'A1', code: '56.10.11', description: 'Ristorazione con somministrazione' }],
   companyTutors: [],
   suspensions: [],
+  firstSlotStart: '09:00:00',
+  firstSlotEnd: '13:00:00',
+  secondSlotStart: '14:00:00',
+  secondSlotEnd: '18:00:00',
+  excludeHolidays: true,
+  schedule: [],
 };
 
 const renderForm = (internship: Internship = empty) => {
@@ -80,7 +86,6 @@ describe('<InternshipForm>', () => {
       internshipTypeId: 'T3',
       startDate: '2026-12-01',
       expectedEndDate: null,
-      weeklyHours: null,
       site: null,
       atecoCodeId: 'A1',
       companyTutors: [{ fullName: 'Anna Verdi', contact: null }],
@@ -90,8 +95,104 @@ describe('<InternshipForm>', () => {
       residence: null,
       suspensions: [{ from: '2026-12-22', to: '2027-01-06' }],
       notes: null,
+      firstSlotStart: '09:00',
+      firstSlotEnd: '13:00',
+      secondSlotStart: '14:00',
+      secondSlotEnd: '18:00',
+      excludeHolidays: true,
+      schedule: [],
       version: null,
     });
+  });
+
+  it('griglia oraria: fasce modificabili, ore del giorno, totale mentre si compila', async () => {
+    const user = userEvent.setup();
+    const { onSubmit, onSuccess } = renderForm();
+    onSubmit
+      .mockRejectedValueOnce(
+        error(400, {
+          fieldErrors: [{ field: 'schedule[1].minutes', message: 'Al massimo 7,5 ore nelle fasce scelte' }],
+        }),
+      )
+      .mockResolvedValueOnce({ ...empty, version: 0 });
+
+    expect(await screen.findByText('Totale settimanale: nessun giorno scelto')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Il monte ore si calcola quando la scheda salvata ha data di inizio, data di fine prevista e almeno un giorno nella griglia.',
+      ),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('checkbox', { name: 'Lunedì, Prima fascia' }));
+    await user.click(screen.getByRole('checkbox', { name: 'Martedì, Prima fascia' }));
+    await user.click(screen.getByRole('checkbox', { name: 'Martedì, Seconda fascia' }));
+    expect(screen.getByText('Totale settimanale: 12 ore')).toBeInTheDocument();
+    // 9–13 e 14–18, ma 3 ore (esempio del PO)
+    await user.type(screen.getByRole('textbox', { name: 'Ore di martedì' }), '3');
+    expect(screen.getByText('Totale settimanale: 7 ore')).toBeInTheDocument();
+    // la prima fascia finisce prima: il lunedì vale 3 ore e mezza
+    const firstEnd = screen.getByLabelText('Prima fascia: alle');
+    await user.clear(firstEnd);
+    await user.type(firstEnd, '12:30');
+    expect(screen.getByRole('columnheader', { name: 'Prima fascia (09:00–12:30)' })).toBeInTheDocument();
+    expect(screen.getByText('Totale settimanale: 6,5 ore')).toBeInTheDocument();
+    await user.click(screen.getByRole('checkbox', { name: 'Escludi dal monte ore le festività nazionali' }));
+    await expectNoAxeViolations();
+
+    // controlli prima dell'invio: ore senza fascia, oltre le fasce, non a quarti d'ora
+    await user.type(screen.getByRole('textbox', { name: 'Ore di mercoledì' }), '5');
+    await user.type(screen.getByRole('textbox', { name: 'Ore di lunedì' }), '4');
+    await user.click(screen.getByRole('button', { name: 'Salva la scheda' }));
+    expect(
+      await screen.findByRole('link', { name: 'Ore di mercoledì: Scegli prima almeno una fascia' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Ore di lunedì: Al massimo 3,5 ore nelle fasce scelte' }),
+    ).toBeInTheDocument();
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    await user.clear(screen.getByRole('textbox', { name: 'Ore di mercoledì' }));
+    await user.clear(screen.getByRole('textbox', { name: 'Ore di lunedì' }));
+    // l'errore del server sul secondo giorno inviato torna sul martedì
+    await user.click(screen.getByRole('button', { name: 'Salva la scheda' }));
+    expect(
+      await screen.findByRole('link', { name: 'Ore di martedì: Al massimo 7,5 ore nelle fasce scelte' }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Salva la scheda' }));
+    await waitFor(() => expect(onSuccess).toHaveBeenCalled());
+    expect(onSubmit.mock.calls[1][0]).toMatchObject({
+      firstSlotEnd: '12:30',
+      excludeHolidays: false,
+      schedule: [
+        { dayOfWeek: 1, firstSlot: true, secondSlot: false, minutes: null },
+        { dayOfWeek: 2, firstSlot: true, secondSlot: true, minutes: 180 },
+      ],
+    });
+  });
+
+  it('griglia salvata e monte ore; oltre 40 ore settimanali non si salva', async () => {
+    const user = userEvent.setup();
+    const full = (dayOfWeek: number) => ({ dayOfWeek, firstSlot: true, secondSlot: true });
+    const { onSubmit } = renderForm({
+      ...empty,
+      version: 2,
+      schedule: [full(1), full(2), full(3), full(4), { ...full(5), minutes: 270 }],
+      weeklyMinutes: 2190,
+      totalMinutes: 30750,
+    });
+
+    expect(await screen.findByText('Monte ore complessivo: 512,5 ore')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Ore di venerdì' })).toHaveValue('4,5');
+    expect(screen.getByText('Totale settimanale: 36,5 ore')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('checkbox', { name: 'Sabato, Prima fascia' }));
+    await user.click(screen.getByRole('button', { name: 'Salva la scheda' }));
+    expect(
+      await screen.findByRole('link', {
+        name: 'Griglia oraria e monte ore: Il totale settimanale (40,5 ore) supera le 40 ore',
+      }),
+    ).toBeInTheDocument();
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 
   it('controlli prima dell’invio: date nell’ordine giusto e periodi senza sovrapposizioni', async () => {
@@ -101,7 +202,6 @@ describe('<InternshipForm>', () => {
       version: 3,
       startDate: '2026-12-01',
       expectedEndDate: '2026-11-30',
-      weeklyHours: 45,
       companyTutors: [{ fullName: ' ' }],
       suspensions: [
         { from: '2026-12-22', to: '2027-01-06' },
@@ -115,9 +215,6 @@ describe('<InternshipForm>', () => {
       await screen.findByRole('link', {
         name: 'Data di fine prevista: La fine prevista non può precedere l’inizio',
       }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'Ore settimanali: Inserisci un numero intero da 1 a 40' }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: 'Nome e cognome del tutor aziendale 1: Campo obbligatorio' }),

@@ -20,7 +20,7 @@ dalla scheda. Prima dell'appuntamento fissato, o se la segnalazione è riaperta,
 ### D3 — Salvataggi parziali
 Ogni campo è facoltativo: la scheda si compila un po' alla volta. Si controlla solo ciò che c'è:
 - la fine prevista non precede l'inizio;
-- ore settimanali da 1 a 40, valore segnaposto da confermare con i moduli (Q5);
+- le ore settimanali, all'inizio un numero da 1 a 40, sono diventate il totale della griglia oraria (US-1002);
 - codice fiscale valido, carattere di controllo compreso. Se c'è anche la data di nascita, il codice deve
   corrispondere: anno, mese e giorno, anche per le donne (+40) e con l'omocodia;
 - tipo di tirocinio attivo, oppure quello già scelto;

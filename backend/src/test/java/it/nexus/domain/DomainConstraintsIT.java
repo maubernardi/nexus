@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
@@ -467,10 +468,39 @@ class DomainConstraintsIT {
         }
 
         @Test
-        void oreSettimanaliOltreIlMassimo() {
+        void fasceOrarieSovrapposte() {
             Internship i = internship();
-            i.setWeeklyHours(41);
-            assertViolates("ck_internship_weekly_hours", () -> internships.saveAndFlush(i));
+            i.setSecondSlotStart(LocalTime.of(12, 0));
+            assertViolates("ck_internship_slots", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void giornoDellaGrigliaRipetuto() {
+            Internship i = internship();
+            i.addScheduleDay(1, true, false, null);
+            i.addScheduleDay(1, false, true, null);
+            assertViolates("uq_internship_schedule_day", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void giornoDellaGrigliaInesistente() {
+            Internship i = internship();
+            i.addScheduleDay(8, true, false, null);
+            assertViolates("ck_internship_schedule_day_dow", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void giornoDellaGrigliaSenzaFasce() {
+            Internship i = internship();
+            i.addScheduleDay(1, false, false, null);
+            assertViolates("ck_internship_schedule_day_slot", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void giornoDellaGrigliaSenzaMinuti() {
+            Internship i = internship();
+            i.addScheduleDay(1, true, false, 0);
+            assertViolates("ck_internship_schedule_day_minutes", () -> internships.saveAndFlush(i));
         }
 
         @Test

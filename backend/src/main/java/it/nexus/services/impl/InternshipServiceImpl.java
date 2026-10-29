@@ -1,9 +1,12 @@
 package it.nexus.services.impl;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -29,9 +32,11 @@ import it.nexus.domain.dto.InternshipDTO;
 import it.nexus.domain.dto.InternshipFormDTO;
 import it.nexus.domain.dto.LegalRepresentativeDTO;
 import it.nexus.domain.dto.LegalRepresentativeFormDTO;
+import it.nexus.domain.dto.ScheduleDayDTO;
 import it.nexus.domain.dto.SuspensionDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.TicketStatus;
+import it.nexus.domain.workflow.InternshipHours;
 import it.nexus.mapper.ReferenceMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.CompanyAtecoCodeRepository;
@@ -61,6 +66,8 @@ public class InternshipServiceImpl implements InternshipService {
     private static final Set<TicketStatus> WITH_INTERNSHIP = EnumSet.of(TicketStatus.APPUNTAMENTO, TicketStatus.IN_TIROCINIO,
             TicketStatus.FORM_RESTITUZIONE);
     private static final DateTimeFormatter DAY = DateTimeFormatter.ofPattern("d/M/yyyy", Locale.ITALIAN);
+    /** Totale settimanale massimo, segnaposto da confermare con i moduli ufficiali (Q5). */
+    private static final int MAX_WEEKLY_MINUTES = 40 * 60;
 
     private final InternshipRepository internshipRepository;
     private final TicketRepository ticketRepository;
@@ -76,7 +83,9 @@ public class InternshipServiceImpl implements InternshipService {
     @Transactional(readOnly = true)
     public InternshipDTO get(String ticketId) {
         Ticket ticket = internshipTicket(ticketId);
-        return toDto(ticket, internshipRepository.findByTicketId(ticket.getId()).orElse(null));
+        // scheda mai salvata: un'istanza non persistita porta le fasce precompilate
+        return toDto(ticket, internshipRepository.findByTicketId(ticket.getId())
+                .orElseGet(() -> new Internship(ticket)));
     }
 
     @Override
@@ -96,6 +105,7 @@ public class InternshipServiceImpl implements InternshipService {
             throw new FieldValidationException("expectedEndDate", "La fine prevista non può precedere l'inizio");
         }
         checkSuspensions(dto);
+        checkSchedule(dto);
         String fiscalCode = blankToNull(dto.fiscalCode());
         fiscalCode = fiscalCode == null ? null : fiscalCode.toUpperCase(Locale.ROOT);
         if (fiscalCode != null && dto.birthDate() != null && !FiscalCodes.matchesBirthDate(fiscalCode, dto.birthDate())) {
@@ -107,13 +117,20 @@ public class InternshipServiceImpl implements InternshipService {
         List<SuspensionDTO> suspensions = dto.suspensions().stream()
                 .sorted(Comparator.comparing(SuspensionDTO::from))
                 .toList();
+        List<ScheduleDayDTO> schedule = dto.schedule().stream()
+                .sorted(Comparator.comparing(ScheduleDayDTO::dayOfWeek))
+                .toList();
 
         // dati del tirocinio con i valori; dati personali (beneficiario, tutor aziendali, note) solo come "cambiato"
         AuditChanges changes = AuditChanges.of()
                 .value("internshipType", code(internship.getInternshipType()), code(type))
                 .value("startDate", text(internship.getStartDate()), text(dto.startDate()))
                 .value("expectedEndDate", text(internship.getExpectedEndDate()), text(dto.expectedEndDate()))
-                .value("weeklyHours", internship.getWeeklyHours(), dto.weeklyHours())
+                .value("slots", slotsText(internship.getFirstSlotStart(), internship.getFirstSlotEnd(),
+                        internship.getSecondSlotStart(), internship.getSecondSlotEnd()),
+                        slotsText(dto.firstSlotStart(), dto.firstSlotEnd(), dto.secondSlotStart(), dto.secondSlotEnd()))
+                .value("schedule", scheduleText(schedule(internship)), scheduleText(schedule))
+                .value("excludeHolidays", internship.isExcludeHolidays(), dto.excludeHolidays())
                 .value("site", internship.getSite(), blankToNull(dto.site()))
                 .value("atecoCode", atecoText(internship.getAtecoCode()), atecoText(ateco))
                 .value("suspensions", periods(suspensions(internship)), periods(suspensions))
@@ -127,7 +144,11 @@ public class InternshipServiceImpl implements InternshipService {
         internship.setInternshipType(type);
         internship.setStartDate(dto.startDate());
         internship.setExpectedEndDate(dto.expectedEndDate());
-        internship.setWeeklyHours(dto.weeklyHours());
+        internship.setFirstSlotStart(dto.firstSlotStart());
+        internship.setFirstSlotEnd(dto.firstSlotEnd());
+        internship.setSecondSlotStart(dto.secondSlotStart());
+        internship.setSecondSlotEnd(dto.secondSlotEnd());
+        internship.setExcludeHolidays(dto.excludeHolidays());
         internship.setSite(blankToNull(dto.site()));
         internship.setAtecoCode(ateco);
         internship.setFiscalCode(fiscalCode);
@@ -135,7 +156,7 @@ public class InternshipServiceImpl implements InternshipService {
         internship.setBirthPlace(blankToNull(dto.birthPlace()));
         internship.setResidence(blankToNull(dto.residence()));
         internship.setNotes(blankToNull(dto.notes()));
-        replaceRows(internship, tutors, suspensions);
+        replaceRows(internship, tutors, suspensions, schedule);
         Internship saved = internshipRepository.saveAndFlush(internship);
         if (!changes.asMap().isEmpty()) {
             auditService.record(AuditEntityType.TICKET, ticket.getId(), "INTERNSHIP_SAVE", changes, null);
@@ -166,8 +187,9 @@ public class InternshipServiceImpl implements InternshipService {
     public boolean clearCompanyData(Ticket ticket) {
         return internshipRepository.findByTicketId(ticket.getId())
                 .filter(i -> i.getInternshipType() != null || i.getStartDate() != null || i.getExpectedEndDate() != null
-                        || i.getWeeklyHours() != null || i.getSite() != null || i.getAtecoCode() != null
-                        || i.getNotes() != null || !i.getCompanyTutors().isEmpty() || !i.getSuspensions().isEmpty())
+                        || i.getSite() != null || i.getAtecoCode() != null || i.getNotes() != null
+                        || !i.getCompanyTutors().isEmpty() || !i.getSuspensions().isEmpty()
+                        || !i.getScheduleDays().isEmpty())
                 .map(i -> {
                     i.clearCompanyData();
                     internshipRepository.saveAndFlush(i);
@@ -259,13 +281,56 @@ public class InternshipServiceImpl implements InternshipService {
     }
 
     /**
-     * Righe figlie sostituite in blocco, solo se cambiate. Prima si cancellano le vecchie con un flush: Hibernate
-     * inserisce prima di cancellare e un periodo spostato violerebbe {@code ex_internship_suspension_overlap}.
+     * Griglia oraria (US-1002): fasce in ordine, ogni giorno una sola volta e con almeno una fascia, ore del giorno non
+     * oltre le fasce scelte, totale settimanale entro il massimo.
      */
-    private void replaceRows(Internship internship, List<CompanyTutorDTO> tutors, List<SuspensionDTO> suspensions) {
+    private static void checkSchedule(InternshipFormDTO dto) {
+        if (!dto.firstSlotStart().isBefore(dto.firstSlotEnd())) {
+            throw new FieldValidationException("firstSlotEnd", "La fascia deve finire dopo l'inizio");
+        }
+        if (!dto.secondSlotStart().isBefore(dto.secondSlotEnd())) {
+            throw new FieldValidationException("secondSlotEnd", "La fascia deve finire dopo l'inizio");
+        }
+        if (dto.secondSlotStart().isBefore(dto.firstSlotEnd())) {
+            throw new FieldValidationException("secondSlotStart",
+                    "La seconda fascia non può iniziare prima della fine della prima");
+        }
+        InternshipHours.Slots slots = new InternshipHours.Slots(dto.firstSlotStart(), dto.firstSlotEnd(),
+                dto.secondSlotStart(), dto.secondSlotEnd());
+        Set<Integer> seen = new HashSet<>();
+        for (int i = 0; i < dto.schedule().size(); i++) {
+            ScheduleDayDTO day = dto.schedule().get(i);
+            if (!seen.add(day.dayOfWeek())) {
+                throw new FieldValidationException("schedule", "Ogni giorno può comparire una sola volta");
+            }
+            if (!day.firstSlot() && !day.secondSlot()) {
+                throw new FieldValidationException("schedule[%d]".formatted(i), "Scegli almeno una fascia");
+            }
+            int max = InternshipHours.slotMinutes(slots, hoursDay(day));
+            if (day.minutes() != null && day.minutes() > max) {
+                throw new FieldValidationException("schedule[%d].minutes".formatted(i),
+                        "Al massimo %s nelle fasce scelte".formatted(hours(max)));
+            }
+        }
+        Integer weekly = InternshipHours.weeklyMinutes(slots, dto.schedule().stream()
+                .map(InternshipServiceImpl::hoursDay).toList());
+        if (weekly != null && weekly > MAX_WEEKLY_MINUTES) {
+            throw new FieldValidationException("schedule",
+                    "Il totale settimanale (%s) supera le 40 ore".formatted(hours(weekly)));
+        }
+    }
+
+    /**
+     * Righe figlie sostituite in blocco, solo se cambiate. Prima si cancellano le vecchie con un flush: Hibernate
+     * inserisce prima di cancellare e un periodo spostato violerebbe {@code ex_internship_suspension_overlap}, un giorno
+     * ripetuto {@code uq_internship_schedule_day}.
+     */
+    private void replaceRows(Internship internship, List<CompanyTutorDTO> tutors, List<SuspensionDTO> suspensions,
+            List<ScheduleDayDTO> schedule) {
         boolean tutorsChanged = !tutors.equals(tutors(internship));
         boolean suspensionsChanged = !suspensions.equals(suspensions(internship));
-        if (!tutorsChanged && !suspensionsChanged) {
+        boolean scheduleChanged = !schedule.equals(schedule(internship));
+        if (!tutorsChanged && !suspensionsChanged && !scheduleChanged) {
             return;
         }
         if (tutorsChanged) {
@@ -273,6 +338,9 @@ public class InternshipServiceImpl implements InternshipService {
         }
         if (suspensionsChanged) {
             internship.getSuspensions().clear();
+        }
+        if (scheduleChanged) {
+            internship.getScheduleDays().clear();
         }
         if (internship.getId() != null) {
             internshipRepository.flush();
@@ -283,24 +351,67 @@ public class InternshipServiceImpl implements InternshipService {
         if (suspensionsChanged) {
             suspensions.forEach(s -> internship.addSuspension(s.from(), s.to()));
         }
+        if (scheduleChanged) {
+            schedule.forEach(d -> internship.addScheduleDay(d.dayOfWeek(), d.firstSlot(), d.secondSlot(), d.minutes()));
+        }
     }
 
+    /** Scheda per il Tutor; versione nulla se non ancora salvata. Totale settimanale e monte ore calcolati qui. */
     private InternshipDTO toDto(Ticket ticket, Internship i) {
         Company company = company(ticket);
         String companyId = company == null ? null : TsidMapper.toExternal(company.getId());
         LegalRepresentativeDTO rep = companyId == null ? null
                 : companyLegalDataService.legalRepresentative(companyId).orElse(null);
         List<AtecoCodeDTO> codes = companyId == null ? List.of() : companyLegalDataService.atecoCodes(companyId);
-        String companyName = company == null ? null : company.getName();
-        if (i == null) {
-            return new InternshipDTO(null, companyName, rep, codes, null, null, null, null, null, null,
-                    List.of(), null, null, null, null, List.of(), null);
-        }
-        return new InternshipDTO(i.getVersion(), companyName, rep, codes,
-                referenceMapper.toDto(i.getInternshipType()), i.getStartDate(), i.getExpectedEndDate(),
-                i.getWeeklyHours(), i.getSite(),
+        List<ScheduleDayDTO> schedule = schedule(i);
+        InternshipHours.Slots slots = new InternshipHours.Slots(i.getFirstSlotStart(), i.getFirstSlotEnd(),
+                i.getSecondSlotStart(), i.getSecondSlotEnd());
+        List<InternshipHours.Day> days = schedule.stream().map(InternshipServiceImpl::hoursDay).toList();
+        Integer total = InternshipHours.totalMinutes(slots, days, i.getStartDate(), i.getExpectedEndDate(),
+                suspensions(i).stream().map(s -> new InternshipHours.Period(s.from(), s.to())).toList(),
+                i.isExcludeHolidays());
+        return new InternshipDTO(i.getId() == null ? null : i.getVersion(),
+                company == null ? null : company.getName(), rep, codes,
+                referenceMapper.toDto(i.getInternshipType()), i.getStartDate(), i.getExpectedEndDate(), i.getSite(),
                 i.getAtecoCode() == null ? null : TsidMapper.toExternal(i.getAtecoCode().getId()), tutors(i),
-                i.getFiscalCode(), i.getBirthDate(), i.getBirthPlace(), i.getResidence(), suspensions(i), i.getNotes());
+                i.getFiscalCode(), i.getBirthDate(), i.getBirthPlace(), i.getResidence(), suspensions(i), i.getNotes(),
+                i.getFirstSlotStart(), i.getFirstSlotEnd(), i.getSecondSlotStart(), i.getSecondSlotEnd(),
+                i.isExcludeHolidays(), schedule, InternshipHours.weeklyMinutes(slots, days), total);
+    }
+
+    private static List<ScheduleDayDTO> schedule(Internship i) {
+        return i.getScheduleDays().stream()
+                .map(d -> new ScheduleDayDTO(d.getDayOfWeek(), d.isFirstSlot(), d.isSecondSlot(), d.getMinutes()))
+                .sorted(Comparator.comparing(ScheduleDayDTO::dayOfWeek))
+                .toList();
+    }
+
+    private static InternshipHours.Day hoursDay(ScheduleDayDTO d) {
+        return new InternshipHours.Day(DayOfWeek.of(d.dayOfWeek()), d.firstSlot(), d.secondSlot(), d.minutes());
+    }
+
+    /** Ore in italiano per i messaggi: "1 ora", "4 ore", "2,5 ore". */
+    private static String hours(int minutes) {
+        if (minutes == 60) {
+            return "1 ora";
+        }
+        String value = minutes % 60 == 0 ? String.valueOf(minutes / 60)
+                : String.valueOf(minutes / 60.0).replace('.', ',');
+        return value + " ore";
+    }
+
+    private static String slotsText(LocalTime firstStart, LocalTime firstEnd, LocalTime secondStart,
+            LocalTime secondEnd) {
+        return "%s-%s, %s-%s".formatted(firstStart, firstEnd, secondStart, secondEnd);
+    }
+
+    /** Griglia per l'audit: giorno (1 = lunedì), fasce e minuti se indicati, es. "2 F1+F2 180'". */
+    private static List<String> scheduleText(List<ScheduleDayDTO> schedule) {
+        return schedule.stream()
+                .map(d -> "%d %s%s".formatted(d.dayOfWeek(),
+                        d.firstSlot() && d.secondSlot() ? "F1+F2" : d.firstSlot() ? "F1" : "F2",
+                        d.minutes() == null ? "" : " " + d.minutes() + "'"))
+                .toList();
     }
 
     private static List<CompanyTutorDTO> tutors(Internship i) {
