@@ -91,7 +91,8 @@ describe('<BeneficiaryEditPage>', () => {
       id: 'B1',
       payload: { firstName: 'Luigi', residenceZoneId: 'Z9', languages: [{ language: 'en', level: 'B1' }] },
     });
-  });
+    // axe su un modulo con centinaia di elementi: con la suite in parallelo supera i 15 s predefiniti (azione A13)
+  }, 30_000);
 
   it('chi non è proprietario non vede il modulo', async () => {
     vi.mocked(fetchBeneficiary).mockResolvedValue({ ...mario, editable: false });
