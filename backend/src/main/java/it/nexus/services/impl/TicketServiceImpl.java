@@ -40,6 +40,7 @@ import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.AppointmentFailedDTO;
 import it.nexus.domain.dto.AppointmentSetDTO;
 import it.nexus.domain.dto.ApproveCategoryDTO;
+import it.nexus.domain.dto.ClosureReportFormDTO;
 import it.nexus.domain.dto.CompanyExclusionDTO;
 import it.nexus.domain.dto.CompanyExclusionFormDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
@@ -86,6 +87,7 @@ import it.nexus.repository.TicketStatusHistoryRepository;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BoardPostService;
+import it.nexus.services.ClosureReportService;
 import it.nexus.services.FastTrackService;
 import it.nexus.services.InternshipService;
 import it.nexus.services.CurrentAppUserService;
@@ -135,6 +137,7 @@ public class TicketServiceImpl implements TicketService {
     private final BoardPostService boardPostService;
     private final FastTrackService fastTrackService;
     private final InternshipService internshipService;
+    private final ClosureReportService closureReportService;
     private final BoardPostRepository boardPostRepository;
     private final JobSlotMapper jobSlotMapper;
     private final BeneficiaryMapper beneficiaryMapper;
@@ -374,6 +377,7 @@ public class TicketServiceImpl implements TicketService {
             case "CATEGORY_REJECT" -> "«%s» → «%s»".formatted(changed(event, "requestedJobFreeText", "before"),
                     changed(event, "requestedJobCategory", "after"));
             case "APPOINTMENT_SET" -> "Timer fermato";
+            case "CLOSE" -> closureReportService.outcome(event.getEntityId()).orElse(null);
             case "DOCUMENT_GENERATED" -> Optional.ofNullable(changed(event, "document", "after"))
                     .map(kind -> InternshipDocumentKind.valueOf(kind).label())
                     .orElse(null);
@@ -593,6 +597,17 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    public TicketDetailDTO submitClosureReport(String ticketId, ClosureReportFormDTO form) {
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        Ticket ticket = ownTicket(ticketId, me, "inviare il report di restituzione");
+        // dentro la transizione: prima si controllano versione e stato, poi il report
+        Ticket saved = stateMachine.apply(ticket, TicketTransitions.CLOSE, form.version(), null,
+                t -> closureReportService.create(t, form));
+        notificationService.notify(saved.getAssignedCcOperator(), NotificationType.CLOSURE_REPORT_SUBMITTED, saved);
+        return detail(saved, me);
+    }
+
+    @Override
     public TicketDetailDTO appointmentFailed(String ticketId, AppointmentFailedDTO dto) {
         AppUser me = currentAppUserService.getCurrentAppUser();
         Ticket ticket = ownTicket(ticketId, me, "registrare l'esito dell'appuntamento");
@@ -768,7 +783,8 @@ public class TicketServiceImpl implements TicketService {
                 relaunch.map(BoardPost::getNumber).orElse(null),
                 relaunch.map(BoardPost::getStatus).orElse(null),
                 t.getBoardPost() == null ? null : TsidMapper.toExternal(t.getBoardPost().getId()),
-                t.getBoardPost() == null ? null : t.getBoardPost().getNumber());
+                t.getBoardPost() == null ? null : t.getBoardPost().getNumber(),
+                t.getStatus() == TicketStatus.FORM_RESTITUZIONE ? closureReportService.find(t).orElse(null) : null);
     }
 
     private static String fullName(AppUser user) {

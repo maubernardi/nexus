@@ -10,6 +10,7 @@ export type RouteHandle = {
     | 'pages.ticketNew.title'
     | 'pages.ticket.title'
     | 'pages.internship.title'
+    | 'pages.closureReport.title'
     | 'pages.companies.title'
     | 'pages.companyNew.title'
     | 'pages.companyEdit.title'

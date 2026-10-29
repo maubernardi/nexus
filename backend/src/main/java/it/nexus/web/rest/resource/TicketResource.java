@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import it.nexus.domain.dto.AppointmentFailedDTO;
 import it.nexus.domain.dto.AppointmentSetDTO;
 import it.nexus.domain.dto.ApproveCategoryDTO;
+import it.nexus.domain.dto.ClosureReportFormDTO;
 import it.nexus.domain.dto.CompanyExclusionDTO;
 import it.nexus.domain.dto.CompanyExclusionFormDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
@@ -180,6 +181,14 @@ public class TicketResource {
     @Operation(summary = "Il Tutor della segnalazione avvia il tirocinio: solo con la scheda completa")
     public ResponseEntity<TicketDetailDTO> startInternship(@PathVariable String id, @RequestBody @Valid VersionDTO body) {
         return ResponseEntity.ok(ticketService.startInternship(id, body.version()));
+    }
+
+    @PostMapping("/{id}/closure-report")
+    @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
+    @Operation(summary = "Il Tutor della segnalazione invia il report di restituzione: il percorso si chiude")
+    public ResponseEntity<TicketDetailDTO> submitClosureReport(@PathVariable String id,
+            @RequestBody @Valid ClosureReportFormDTO body) {
+        return ResponseEntity.ok(ticketService.submitClosureReport(id, body));
     }
 
     @PostMapping("/special")

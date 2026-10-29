@@ -37,5 +37,7 @@ public record TicketDetailDTO(
         BoardPostStatus relaunchPostStatus,
         /** Annuncio della bacheca a cui è candidata la segnalazione speciale (US-306). */
         String boardPostId,
-        Long boardPostNumber) {
+        Long boardPostNumber,
+        /** Report di restituzione inviato (US-1101), se c'è. */
+        ClosureReportDTO closureReport) {
 }

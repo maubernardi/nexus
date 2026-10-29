@@ -11,6 +11,7 @@ import { BoardPostPage } from '@/pages/BoardPostPage/BoardPostPage';
 import { BeneficiaryEditPage } from '@/pages/BeneficiaryEditPage/BeneficiaryEditPage';
 import { BeneficiaryNewPage } from '@/pages/BeneficiaryNewPage/BeneficiaryNewPage';
 import { BeneficiaryPage } from '@/pages/BeneficiaryPage/BeneficiaryPage';
+import { ClosureReportPage } from '@/pages/ClosureReportPage/ClosureReportPage';
 import { DevLoginPage } from '@/pages/DevLoginPage/DevLoginPage';
 import { InternshipPage } from '@/pages/InternshipPage/InternshipPage';
 import { CalendarPage } from '@/pages/CalendarPage/CalendarPage';
@@ -97,6 +98,17 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.internship.title' } satisfies RouteHandle,
+      },
+      {
+        // US-1101: il report lo invia solo il Tutor della segnalazione (lo verifica l'API); gli altri lo leggono nel
+        // dettaglio della segnalazione
+        path: 'segnalazioni/:id/restituzione',
+        element: (
+          <RoleRoute roles={['TUTOR']}>
+            <ClosureReportPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.closureReport.title' } satisfies RouteHandle,
       },
       // indirizzo della vecchia pagina di lavorazione: porta al dettaglio unico
       { path: 'lavorazioni/:id', element: <LegacyWorkRedirect /> },

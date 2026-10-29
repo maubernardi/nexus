@@ -40,6 +40,7 @@ import {
   type TicketStatus,
 } from '@/lib/domainValues';
 import { FormField } from '@/molecules/FormField/FormField';
+import { ClosureReportView } from '@/organisms/ClosureReportView/ClosureReportView';
 import { MatchDetailsDialog } from '@/organisms/MatchDetailsDialog/MatchDetailsDialog';
 import type { BeneficiaryLinkState } from '@/pages/BeneficiaryPage/BeneficiaryPage';
 
@@ -198,6 +199,8 @@ export const TicketPage = () => {
 
       {d.proposal && <ProposalSection ticket={d} onOutcome={setOutcome} />}
       {d.myTicket && INTERNSHIP_STATUSES.includes(d.status) && <InternshipLink ticket={d} />}
+      {d.myTicket && d.status === 'IN_TIROCINIO' && <ClosureReportLink ticket={d} />}
+      {d.closureReport && <ClosureReportView report={d.closureReport} />}
       {d.relaunchPostId && d.relaunchPostNumber && d.relaunchPostStatus && (
         <RelaunchSection
           postId={d.relaunchPostId}
@@ -458,6 +461,25 @@ const InternshipLink = ({ ticket: d }: { ticket: TicketDetail }) => {
   );
 };
 
+/** Durante il tirocinio il Tutor della segnalazione compila il report di restituzione (US-1101). */
+const ClosureReportLink = ({ ticket: d }: { ticket: TicketDetail }) => {
+  const { t } = useTranslation();
+  return (
+    <section
+      aria-labelledby="work-closure-report"
+      className="space-y-3 rounded-xl border border-border bg-card p-4"
+    >
+      <h2 id="work-closure-report" className="text-lg font-semibold text-primary">
+        {t('work.closureReport.heading')}
+      </h2>
+      <p>{t('work.closureReport.text')}</p>
+      <Button asChild size="lg">
+        <Link to={`/segnalazioni/${d.id}/restituzione`}>{t('work.closureReport.open')}</Link>
+      </Button>
+    </section>
+  );
+};
+
 const KNOWN_ACTIONS = [
   'SUBMIT',
   'CATEGORY_APPROVE',
@@ -477,6 +499,7 @@ const KNOWN_ACTIONS = [
   'COMPANY_EXCLUDE',
   'INTERNSHIP_SAVE',
   'START',
+  'CLOSE',
   'DOCUMENT_GENERATED',
   'STATUS',
 ] as const;

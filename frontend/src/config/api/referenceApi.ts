@@ -30,3 +30,15 @@ export const fetchInternshipTypes = async (): Promise<ReferenceItem[]> => {
   const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.internshipTypes);
   return data;
 };
+
+/** Formule di assunzione attive (US-109), per il report di restituzione. */
+export const fetchHiringFormulas = async (): Promise<ReferenceItem[]> => {
+  const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.hiringFormulas);
+  return data;
+};
+
+/** Motivi attivi della mancata assunzione (US-109), per il report di restituzione. */
+export const fetchNoHireReasons = async (): Promise<ReferenceItem[]> => {
+  const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.noHireReasons);
+  return data;
+};

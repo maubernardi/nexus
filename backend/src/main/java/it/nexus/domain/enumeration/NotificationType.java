@@ -30,5 +30,7 @@ public enum NotificationType {
     /** Al Tutor: l'annuncio è uscito dalla bacheca mentre la candidatura aspettava, la corsia veloce è decaduta. */
     FAST_TRACK_DROPPED,
     /** All'operatore: il Tutor ha avviato il tirocinio (US-1003). */
-    INTERNSHIP_STARTED
+    INTERNSHIP_STARTED,
+    /** All'operatore: il Tutor ha inviato il report di restituzione, il percorso è concluso (US-1101). */
+    CLOSURE_REPORT_SUBMITTED
 }

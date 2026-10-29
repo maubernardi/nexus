@@ -41,6 +41,7 @@ import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.AuditEventRepository;
+import it.nexus.repository.ClosureReportRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyNoteRepository;
 import it.nexus.repository.CompanyRepository;
@@ -92,6 +93,7 @@ class DomainConstraintsIT {
     @Autowired BoardPostRepository boardPosts;
     @Autowired CompanyAuditEventRepository auditEvents;
     @Autowired CompanyNoteRepository companyNotes;
+    @Autowired ClosureReportRepository closureReports;
     @Autowired AuditEventRepository auditLog;
 
     private static CompanyLegalRepresentative legalRepresentative(Company company, String fiscalCode) {
@@ -787,6 +789,75 @@ class DomainConstraintsIT {
         void svuotamentoRifiutato() {
             addNote();
             assertViolates("company_note è in sola aggiunta", () -> jdbc.execute("TRUNCATE company_note"));
+        }
+    }
+
+    @Nested
+    class ReportDiRestituzione {
+
+        private Ticket newTicket() {
+            Graph g = fixtures.graph();
+            return tickets.saveAndFlush(ticket(g.tutor(), g.project(), g.beneficiary(), g.category()));
+        }
+
+        private ClosureReport report(Ticket ticket, int companySatisfaction) {
+            return new ClosureReport(ticket, (short) companySatisfaction, (short) 4, "Obiettivi raggiunti", null,
+                    hiringFormulas.findByActiveTrueOrderByNameAsc().getFirst(), null, true);
+        }
+
+        private Long addReport() {
+            return closureReports.saveAndFlush(report(newTicket(), 5)).getId();
+        }
+
+        @Test
+        void soddisfazioneFuoriScala() {
+            assertViolates("ck_closure_report_company_satisfaction",
+                    () -> closureReports.saveAndFlush(report(newTicket(), 6)));
+        }
+
+        @Test
+        void assuntoConIlMotivoInveceDellaFormula() {
+            Long ticketId = newTicket().getId();
+            assertViolates("ck_closure_report_outcome", () -> jdbc.update("""
+                    INSERT INTO closure_report (id, ticket_id, company_satisfaction, beneficiary_satisfaction, hired,
+                        no_hire_reason_id, job_slot_still_available, created_at, created_by)
+                    VALUES (1, ?, 3, 3, true, 893700000000000301, false, now(), 'test')""", ticketId));
+        }
+
+        @Test
+        void testoVuoto() {
+            Long ticketId = newTicket().getId();
+            assertViolates("ck_closure_report_objectives", () -> jdbc.update("""
+                    INSERT INTO closure_report (id, ticket_id, company_satisfaction, beneficiary_satisfaction,
+                        objectives, hired, no_hire_reason_id, job_slot_still_available, created_at, created_by)
+                    VALUES (1, ?, 3, 3, '   ', false, 893700000000000301, false, now(), 'test')""", ticketId));
+        }
+
+        @Test
+        void unSoloReportPerSegnalazione() {
+            Ticket t = newTicket();
+            closureReports.saveAndFlush(report(t, 5));
+            assertViolates("uq_closure_report_ticket", () -> closureReports.saveAndFlush(report(t, 4)));
+        }
+
+        @Test
+        void modificaRifiutata() {
+            Long id = addReport();
+            assertViolates("closure_report non si modifica dopo l'invio",
+                    () -> jdbc.update("UPDATE closure_report SET company_satisfaction = 1 WHERE id = ?", id));
+        }
+
+        @Test
+        void cancellazioneRifiutata() {
+            Long id = addReport();
+            assertViolates("closure_report non si modifica dopo l'invio",
+                    () -> jdbc.update("DELETE FROM closure_report WHERE id = ?", id));
+        }
+
+        @Test
+        void svuotamentoRifiutato() {
+            addReport();
+            assertViolates("closure_report non si modifica dopo l'invio", () -> jdbc.execute("TRUNCATE closure_report"));
         }
     }
 
