@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Plus } from 'lucide-react';
+import { FileDown, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 
@@ -11,12 +11,14 @@ import type { TicketDetail } from '@/config/api/ticketApi';
 import {
   useAddInternshipAtecoCode,
   useAddInternshipLegalRepresentative,
+  useDownloadInternshipDocument,
   useInternship,
   useSaveInternship,
 } from '@/config/hooks/useInternship';
 import { useStartInternship, useTicket } from '@/config/hooks/useTickets';
 import { AtecoCodeForm } from '@/organisms/AtecoCodesSection/AtecoCodesSection';
 import { InternshipForm } from '@/organisms/InternshipForm/InternshipForm';
+import { saveBlob } from '@/lib/download';
 import {
   LegalRepresentativeDetails,
   LegalRepresentativeForm,
@@ -121,6 +123,8 @@ export const InternshipPage = () => {
       {ticket.data.status === 'APPUNTAMENTO' && (
         <StartSection ticket={ticket.data} internship={data} onOutcome={setOutcome} />
       )}
+
+      <DocumentsSection ticket={ticket.data} internship={data} />
 
       <CompanyData ticketId={id} internship={data} onOutcome={setOutcome} />
 
@@ -247,6 +251,51 @@ const StartSection = ({ ticket: d, internship, onOutcome }: StartSectionProps) =
           </div>
         </div>
       )}
+    </section>
+  );
+};
+
+/**
+ * Documenti del tirocinio (US-1004): compilati dal server con la scheda salvata, si scaricano come .docx. L'esito si
+ * annuncia lì accanto (stato), il focus resta sul pulsante.
+ */
+const DocumentsSection = ({ ticket: d, internship }: { ticket: TicketDetail; internship: Internship }) => {
+  const { t } = useTranslation();
+  const download = useDownloadInternshipDocument();
+  const [status, setStatus] = useState<{ text: string; error?: boolean } | null>(null);
+
+  const onDownload = async (): Promise<void> => {
+    const filename = `Convenzione-segnalazione-${d.number}.docx`;
+    setStatus({ text: t('internship.documents.preparing') });
+    try {
+      saveBlob(await download.mutateAsync({ ticketId: d.id, kind: 'convenzione' }), filename);
+      setStatus({ text: t('internship.documents.downloaded', { filename }) });
+    } catch {
+      setStatus({ text: t('internship.documents.error'), error: true });
+    }
+  };
+
+  return (
+    <section
+      aria-labelledby="internship-documents"
+      className="space-y-3 rounded-xl border border-border bg-card p-4"
+    >
+      <h2 id="internship-documents" className="text-lg font-semibold text-primary">
+        {t('internship.documents.heading')}
+      </h2>
+      <p className="text-muted-foreground">{t('internship.documents.intro')}</p>
+      {internship.missingForStart.length > 0 && (
+        <p className="rounded-md bg-warning p-3 text-warning-foreground">
+          {t('internship.documents.incomplete')}
+        </p>
+      )}
+      <Button size="lg" variant="outline" onClick={() => void onDownload()} disabled={download.isPending}>
+        <FileDown aria-hidden="true" />
+        {t('internship.documents.convenzione')}
+      </Button>
+      <p role="status" className={status?.error ? 'font-medium text-destructive' : 'text-muted-foreground'}>
+        {status?.text}
+      </p>
     </section>
   );
 };

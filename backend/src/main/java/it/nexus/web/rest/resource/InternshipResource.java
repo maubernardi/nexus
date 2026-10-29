@@ -1,6 +1,9 @@
 package it.nexus.web.rest.resource;
 
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +22,11 @@ import it.nexus.domain.dto.InternshipDTO;
 import it.nexus.domain.dto.InternshipFormDTO;
 import it.nexus.domain.dto.LegalRepresentativeDTO;
 import it.nexus.domain.dto.LegalRepresentativeFormDTO;
+import it.nexus.domain.enumeration.InternshipDocumentKind;
+import it.nexus.services.InternshipDocumentService;
+import it.nexus.services.InternshipDocumentService.GeneratedDocument;
 import it.nexus.services.InternshipService;
+import it.nexus.web.errors.NotFoundException;
 import it.nexus.web.rest.PathAPI;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +38,11 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Segnalazioni")
 public class InternshipResource {
 
+    private static final MediaType DOCX = MediaType
+            .parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+
     private final InternshipService service;
+    private final InternshipDocumentService documentService;
 
     @GetMapping
     @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
@@ -53,6 +64,20 @@ public class InternshipResource {
     public ResponseEntity<LegalRepresentativeDTO> addLegalRepresentative(@PathVariable String ticketId,
             @RequestBody @Valid LegalRepresentativeFormDTO dto) {
         return ResponseEntity.ok(service.addLegalRepresentative(ticketId, dto));
+    }
+
+    @GetMapping("/documents/{kind}")
+    @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
+    @Operation(summary = "Documento del tirocinio compilato dalla scheda (.docx), es. la Convenzione")
+    public ResponseEntity<byte[]> document(@PathVariable String ticketId, @PathVariable String kind) {
+        InternshipDocumentKind documentKind = InternshipDocumentKind.fromSlug(kind)
+                .orElseThrow(() -> new NotFoundException("Documento non trovato"));
+        GeneratedDocument document = documentService.generate(ticketId, documentKind);
+        return ResponseEntity.ok()
+                .contentType(DOCX)
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
+                        .filename(document.filename()).build().toString())
+                .body(document.content());
     }
 
     @PostMapping("/ateco-codes")

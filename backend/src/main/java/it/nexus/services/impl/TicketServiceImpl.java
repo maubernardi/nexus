@@ -57,6 +57,7 @@ import it.nexus.domain.enumeration.AppointmentFailureCause;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.BoardPostStatus;
 import it.nexus.domain.enumeration.CompanyEventType;
+import it.nexus.domain.enumeration.InternshipDocumentKind;
 import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.domain.enumeration.NotificationType;
 import it.nexus.domain.enumeration.Role;
@@ -373,6 +374,9 @@ public class TicketServiceImpl implements TicketService {
             case "CATEGORY_REJECT" -> "«%s» → «%s»".formatted(changed(event, "requestedJobFreeText", "before"),
                     changed(event, "requestedJobCategory", "after"));
             case "APPOINTMENT_SET" -> "Timer fermato";
+            case "DOCUMENT_GENERATED" -> Optional.ofNullable(changed(event, "document", "after"))
+                    .map(kind -> InternshipDocumentKind.valueOf(kind).label())
+                    .orElse(null);
             case "TIMER_REMINDER" -> "Promemoria inviato al Tutor";
             case "TIMER_EXPIRE" -> "Nessun appuntamento entro la scadenza: mansione di nuovo libera";
             case "PROPOSAL_REJECT", "COMPANY_EXCLUDE" -> Optional
