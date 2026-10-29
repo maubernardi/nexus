@@ -12,6 +12,7 @@ import { BeneficiaryEditPage } from '@/pages/BeneficiaryEditPage/BeneficiaryEdit
 import { BeneficiaryNewPage } from '@/pages/BeneficiaryNewPage/BeneficiaryNewPage';
 import { BeneficiaryPage } from '@/pages/BeneficiaryPage/BeneficiaryPage';
 import { DevLoginPage } from '@/pages/DevLoginPage/DevLoginPage';
+import { InternshipPage } from '@/pages/InternshipPage/InternshipPage';
 import { CalendarPage } from '@/pages/CalendarPage/CalendarPage';
 import { CompaniesPage } from '@/pages/CompaniesPage/CompaniesPage';
 import { CompanyEditPage } from '@/pages/CompanyEditPage/CompanyEditPage';
@@ -86,6 +87,16 @@ export const routes: RouteObject[] = [
         path: 'segnalazioni/:id',
         element: <TicketPage />,
         handle: { titleKey: 'pages.ticket.title' } satisfies RouteHandle,
+      },
+      {
+        // US-1001: la scheda è solo del Tutor della segnalazione (lo verifica l'API)
+        path: 'segnalazioni/:id/tirocinio',
+        element: (
+          <RoleRoute roles={['TUTOR']}>
+            <InternshipPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.internship.title' } satisfies RouteHandle,
       },
       // indirizzo della vecchia pagina di lavorazione: porta al dettaglio unico
       { path: 'lavorazioni/:id', element: <LegacyWorkRedirect /> },

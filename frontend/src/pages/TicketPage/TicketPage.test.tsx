@@ -446,6 +446,11 @@ describe('<TicketPage>', () => {
       { id: 'T9', version: 2, note: 'Giovedì alle 10' },
       expect.anything(),
     );
+    // con l'appuntamento fissato si compila la scheda del tirocinio (US-1001)
+    expect(await screen.findByRole('link', { name: 'Compila la scheda del tirocinio' })).toHaveAttribute(
+      'href',
+      '/segnalazioni/T9/tirocinio',
+    );
   });
 
   it('Tutor della segnalazione: appuntamento fallito con causa; con "Altro" la nota è obbligatoria', async () => {
@@ -742,6 +747,14 @@ describe('<TicketPage>', () => {
     const proposal = await screen.findByRole('region', { name: 'Proposta all’azienda' });
     expect(within(proposal).getByText('martedì 03/11/2026 (7 giorni lavorativi)')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Accetta la proposta' })).not.toBeInTheDocument();
+  });
+
+  it('scheda del tirocinio: solo il Tutor della segnalazione la apre', async () => {
+    vi.mocked(fetchTicket).mockResolvedValue(detail({ status: 'APPUNTAMENTO', proposal: alfa }));
+    renderPage();
+
+    await screen.findByRole('region', { name: 'Proposta all’azienda' });
+    expect(screen.queryByRole('link', { name: /scheda del tirocinio/ })).not.toBeInTheDocument();
   });
 
   it('Call Center: approva la nuova tipologia con il nome corretto', async () => {

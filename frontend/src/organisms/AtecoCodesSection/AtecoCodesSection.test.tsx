@@ -47,6 +47,30 @@ describe('<AtecoCodesSection>', () => {
     expect(vi.mocked(removeAtecoCode).mock.calls[0][0]).toEqual({ companyId: 'C1', id: 'A1' });
   });
 
+  it('codice scelto nella scheda di un tirocinio: il motivo del server', async () => {
+    const user = userEvent.setup();
+    vi.mocked(removeAtecoCode).mockRejectedValue(
+      new AxiosError('409', '409', undefined, undefined, {
+        status: 409,
+        statusText: '409',
+        headers: {},
+        config: { headers: new AxiosHeaders() },
+        data: {
+          status: 409,
+          message: 'Il codice 47.11 è scelto nella scheda del tirocinio della segnalazione n. 9',
+        },
+      }),
+    );
+    renderSection();
+
+    const list = await screen.findByRole('list', { name: 'Codici ATECO dell’azienda' });
+    await user.click(within(list).getByRole('button', { name: 'Togli il codice 47.11' }));
+
+    expect(
+      await screen.findByText('Il codice 47.11 è scelto nella scheda del tirocinio della segnalazione n. 9'),
+    ).toHaveFocus();
+  });
+
   it('aggiunta: formato controllato, codice già presente dal server, poi esito', async () => {
     const user = userEvent.setup();
     vi.mocked(addAtecoCode)

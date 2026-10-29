@@ -9,6 +9,7 @@ export type RouteHandle = {
     | 'pages.beneficiaryEdit.title'
     | 'pages.ticketNew.title'
     | 'pages.ticket.title'
+    | 'pages.internship.title'
     | 'pages.companies.title'
     | 'pages.companyNew.title'
     | 'pages.companyEdit.title'

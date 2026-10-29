@@ -86,6 +86,7 @@ import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BoardPostService;
 import it.nexus.services.FastTrackService;
+import it.nexus.services.InternshipService;
 import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.NotificationService;
 import it.nexus.services.TicketService;
@@ -132,6 +133,7 @@ public class TicketServiceImpl implements TicketService {
     private final AuditService auditService;
     private final BoardPostService boardPostService;
     private final FastTrackService fastTrackService;
+    private final InternshipService internshipService;
     private final BoardPostRepository boardPostRepository;
     private final JobSlotMapper jobSlotMapper;
     private final BeneficiaryMapper beneficiaryMapper;
@@ -585,6 +587,10 @@ public class TicketServiceImpl implements TicketService {
             AuditChanges changes = AuditChanges.of()
                     .value("cause", null, dto.cause().name())
                     .value("jobSlotId", TsidMapper.toExternal(slot.getId()), null);
+            // la scheda del tirocinio riguardava quell'azienda: restano solo i dati del beneficiario (US-1001)
+            if (internshipService.clearCompanyData(t)) {
+                changes.value("internshipReset", null, true);
+            }
             return dto.relaunchRequested() ? changes.value("boardRelaunch", null, true) : changes;
         });
         auditService.record(AuditEntityType.JOB_SLOT, slot.getId(), "RELEASE", AuditChanges.of()

@@ -37,6 +37,7 @@ import {
   APPOINTMENT_FAILURE_CAUSES,
   TICKET_STATUSES,
   type AppointmentFailureCause,
+  type TicketStatus,
 } from '@/lib/domainValues';
 import { FormField } from '@/molecules/FormField/FormField';
 import { MatchDetailsDialog } from '@/organisms/MatchDetailsDialog/MatchDetailsDialog';
@@ -196,6 +197,7 @@ export const TicketPage = () => {
       )}
 
       {d.proposal && <ProposalSection ticket={d} onOutcome={setOutcome} />}
+      {d.myTicket && INTERNSHIP_STATUSES.includes(d.status) && <InternshipLink ticket={d} />}
       {d.relaunchPostId && d.relaunchPostNumber && d.relaunchPostStatus && (
         <RelaunchSection
           postId={d.relaunchPostId}
@@ -435,6 +437,30 @@ const RelaunchSection = ({
   );
 };
 
+/** Stati in cui il Tutor della segnalazione apre la scheda del tirocinio (US-1001): si modifica solo in APPUNTAMENTO. */
+const INTERNSHIP_STATUSES: readonly TicketStatus[] = ['APPUNTAMENTO', 'IN_TIROCINIO', 'FORM_RESTITUZIONE'];
+
+const InternshipLink = ({ ticket: d }: { ticket: TicketDetail }) => {
+  const { t } = useTranslation();
+  const editable = d.status === 'APPUNTAMENTO';
+  return (
+    <section
+      aria-labelledby="work-internship"
+      className="space-y-3 rounded-xl border border-border bg-card p-4"
+    >
+      <h2 id="work-internship" className="text-lg font-semibold text-primary">
+        {t('work.internship.heading')}
+      </h2>
+      <p>{t('work.internship.text')}</p>
+      <Button asChild size="lg" variant={editable ? 'default' : 'outline'}>
+        <Link to={`/segnalazioni/${d.id}/tirocinio`}>
+          {t(editable ? 'work.internship.open' : 'work.internship.view')}
+        </Link>
+      </Button>
+    </section>
+  );
+};
+
 const KNOWN_ACTIONS = [
   'SUBMIT',
   'CATEGORY_APPROVE',
@@ -452,6 +478,7 @@ const KNOWN_ACTIONS = [
   'TIMER_REMINDER',
   'TIMER_EXPIRE',
   'COMPANY_EXCLUDE',
+  'INTERNSHIP_SAVE',
   'STATUS',
 ] as const;
 

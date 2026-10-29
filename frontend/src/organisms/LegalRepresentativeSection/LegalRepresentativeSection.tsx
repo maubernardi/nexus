@@ -4,7 +4,10 @@ import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { LegalRepresentative } from '@/config/api/companyLegalDataApi';
+import type {
+  LegalRepresentative,
+  LegalRepresentativeForm as LegalRepresentativePayload,
+} from '@/config/api/companyLegalDataApi';
 import { apiError } from '@/config/api/errors';
 import { useLegalRepresentative, useSaveLegalRepresentative } from '@/config/hooks/useCompanyLegalData';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
@@ -37,6 +40,7 @@ const formatDay = (iso: string): string => {
 export const LegalRepresentativeSection = ({ companyId }: { companyId: string }) => {
   const { t } = useTranslation();
   const rep = useLegalRepresentative(companyId);
+  const save = useSaveLegalRepresentative();
   const [editing, setEditing] = useState(false);
   const [outcome, setOutcome] = useState<{ text: string; error?: boolean } | null>(null);
   const formHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -48,8 +52,6 @@ export const LegalRepresentativeSection = ({ companyId }: { companyId: string })
   useEffect(() => {
     if (outcome) outcomeRef.current?.focus();
   }, [outcome]);
-
-  const value = (v?: string | null): string => v || t('legalRep.missing');
 
   return (
     <section aria-labelledby="legal-rep-heading" className="space-y-4">
@@ -92,8 +94,8 @@ export const LegalRepresentativeSection = ({ companyId }: { companyId: string })
             {t(rep.data ? 'legalRep.editHeading' : 'legalRep.addHeading')}
           </h3>
           <LegalRepresentativeForm
-            companyId={companyId}
             current={rep.data}
+            submit={(payload) => save.mutateAsync({ companyId, payload })}
             onSaved={() => {
               setEditing(false);
               setOutcome({ text: t('legalRep.saved') });
@@ -114,46 +116,56 @@ export const LegalRepresentativeSection = ({ companyId }: { companyId: string })
       ) : rep.data === null ? (
         <p className="rounded-xl border border-border bg-card p-4">{t('legalRep.none')}</p>
       ) : (
-        <dl className="grid gap-x-6 gap-y-2 rounded-xl border border-border bg-card p-4 sm:grid-cols-[max-content_1fr]">
-          <dt className="font-medium">{t('legalRep.fields.name')}</dt>
-          <dd>
-            {rep.data.firstName} {rep.data.lastName}
-          </dd>
-          <dt className="font-medium">{t('legalRep.fields.fiscalCode')}</dt>
-          <dd className="font-mono">{value(rep.data.fiscalCode)}</dd>
-          <dt className="font-medium">{t('legalRep.fields.birth')}</dt>
-          <dd>
-            {rep.data.birthDate || rep.data.birthPlace
-              ? [rep.data.birthDate ? formatDay(rep.data.birthDate) : null, rep.data.birthPlace]
-                  .filter(Boolean)
-                  .join(', ')
-              : t('legalRep.missing')}
-          </dd>
-          <dt className="font-medium">{t('legalRep.fields.residence')}</dt>
-          <dd>{value(rep.data.residence)}</dd>
-        </dl>
+        <LegalRepresentativeDetails rep={rep.data} />
       )}
     </section>
   );
 };
 
+/** Dati del legale rappresentante in sola lettura, "Non indicato" per quelli mancanti. */
+export const LegalRepresentativeDetails = ({ rep }: { rep: LegalRepresentative }) => {
+  const { t } = useTranslation();
+  const value = (v?: string | null): string => v || t('legalRep.missing');
+  return (
+    <dl className="grid gap-x-6 gap-y-2 rounded-xl border border-border bg-card p-4 sm:grid-cols-[max-content_1fr]">
+      <dt className="font-medium">{t('legalRep.fields.name')}</dt>
+      <dd>
+        {rep.firstName} {rep.lastName}
+      </dd>
+      <dt className="font-medium">{t('legalRep.fields.fiscalCode')}</dt>
+      <dd className="font-mono">{value(rep.fiscalCode)}</dd>
+      <dt className="font-medium">{t('legalRep.fields.birth')}</dt>
+      <dd>
+        {rep.birthDate || rep.birthPlace
+          ? [rep.birthDate ? formatDay(rep.birthDate) : null, rep.birthPlace].filter(Boolean).join(', ')
+          : t('legalRep.missing')}
+      </dd>
+      <dt className="font-medium">{t('legalRep.fields.residence')}</dt>
+      <dd>{value(rep.residence)}</dd>
+    </dl>
+  );
+};
+
 type LegalRepresentativeFormProps = {
-  companyId: string;
   current: LegalRepresentative | null;
+  submit: (payload: LegalRepresentativePayload) => Promise<unknown>;
   onSaved: () => void;
   onConflict: (reason: string) => void;
   onCancel: () => void;
 };
 
-const LegalRepresentativeForm = ({
-  companyId,
+/**
+ * Modulo del legale rappresentante: nella scheda dell'azienda (Call Center) e, se manca, nella scheda del tirocinio
+ * (Tutor, US-1001). Chi lo usa decide dove salvare.
+ */
+export const LegalRepresentativeForm = ({
   current,
+  submit,
   onSaved,
   onConflict,
   onCancel,
 }: LegalRepresentativeFormProps) => {
   const { t } = useTranslation();
-  const save = useSaveLegalRepresentative();
   const [genericError, setGenericError] = useState(false);
   const {
     register,
@@ -194,17 +206,14 @@ const LegalRepresentativeForm = ({
   const onValid = async (v: Values): Promise<void> => {
     setGenericError(false);
     try {
-      await save.mutateAsync({
-        companyId,
-        payload: {
-          firstName: v.firstName.trim(),
-          lastName: v.lastName.trim(),
-          fiscalCode: v.fiscalCode.trim().toUpperCase() || null,
-          birthDate: v.birthDate || null,
-          birthPlace: v.birthPlace.trim() || null,
-          residence: v.residence.trim() || null,
-          version: current?.version ?? null,
-        },
+      await submit({
+        firstName: v.firstName.trim(),
+        lastName: v.lastName.trim(),
+        fiscalCode: v.fiscalCode.trim().toUpperCase() || null,
+        birthDate: v.birthDate || null,
+        birthPlace: v.birthPlace.trim() || null,
+        residence: v.residence.trim() || null,
+        version: current?.version ?? null,
       });
       onSaved();
     } catch (error) {

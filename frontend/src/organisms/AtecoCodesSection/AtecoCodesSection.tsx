@@ -18,6 +18,7 @@ type Values = { code: string; description: string };
 export const AtecoCodesSection = ({ companyId }: { companyId: string }) => {
   const { t } = useTranslation();
   const codes = useAtecoCodes(companyId);
+  const add = useAddAtecoCode();
   const remove = useRemoveAtecoCode();
   const [adding, setAdding] = useState(false);
   const [outcome, setOutcome] = useState<{ text: string; error?: boolean } | null>(null);
@@ -37,7 +38,11 @@ export const AtecoCodesSection = ({ companyId }: { companyId: string }) => {
       { companyId, id: item.id },
       {
         onSuccess: () => setOutcome({ text: t('ateco.removed', { code: item.code }) }),
-        onError: () => setOutcome({ text: t('form.errors.generic'), error: true }),
+        // un codice scelto nella scheda di un tirocinio non si toglie (US-1001): il motivo arriva dall'API
+        onError: (error) => {
+          const body = apiError(error);
+          setOutcome({ text: body?.status === 409 ? body.message : t('form.errors.generic'), error: true });
+        },
       },
     );
   };
@@ -83,7 +88,7 @@ export const AtecoCodesSection = ({ companyId }: { companyId: string }) => {
             {t('ateco.addHeading')}
           </h3>
           <AtecoCodeForm
-            companyId={companyId}
+            submit={(v) => add.mutateAsync({ companyId, ...v })}
             onAdded={(item) => {
               setAdding(false);
               setOutcome({ text: t('ateco.added', { code: item.code }) });
@@ -125,17 +130,20 @@ export const AtecoCodesSection = ({ companyId }: { companyId: string }) => {
   );
 };
 
-const AtecoCodeForm = ({
-  companyId,
+/**
+ * Modulo di un nuovo codice ATECO: nella scheda dell'azienda (Call Center) e nella scheda del tirocinio (Tutor,
+ * US-1001). Chi lo usa decide dove salvare.
+ */
+export const AtecoCodeForm = ({
+  submit,
   onAdded,
   onCancel,
 }: {
-  companyId: string;
+  submit: (v: { code: string; description: string | null }) => Promise<AtecoCode>;
   onAdded: (item: AtecoCode) => void;
   onCancel: () => void;
 }) => {
   const { t } = useTranslation();
-  const add = useAddAtecoCode();
   const [genericError, setGenericError] = useState(false);
   const {
     register,
@@ -158,9 +166,7 @@ const AtecoCodeForm = ({
   const onValid = async (v: Values): Promise<void> => {
     setGenericError(false);
     try {
-      onAdded(
-        await add.mutateAsync({ companyId, code: v.code.trim(), description: v.description.trim() || null }),
-      );
+      onAdded(await submit({ code: v.code.trim(), description: v.description.trim() || null }));
     } catch (error) {
       const message = apiError(error)?.fieldErrors?.find((fe) => fe.field === 'code')?.message;
       if (message) {
