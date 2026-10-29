@@ -4,10 +4,10 @@
   "displayName": "NEXUS",
   "internationalizationEnabled": true,
   "supportedLocales": [
-    "it",
-    "en"
+    "it"
   ],
   "defaultLocale": "it",
+  "loginTheme": "nexus",
   "sslRequired": "external",
   "registrationAllowed": false,
   "loginWithEmailAllowed": true,
