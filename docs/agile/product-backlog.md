@@ -3,13 +3,13 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 68 elementi, 240 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-07](sprints/sprint-07.md).
+**Totale: 69 elementi, 242 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-08](sprints/sprint-08.md).
 
 ## Epiche
 
 | Epica | Titolo | Obiettivo | Storie | Punti |
 |---|---|---|---|---|
-| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, il calendario e i cataloghi senza passare dalla console di Keycloak. | 9 | 27 |
+| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, il calendario e i cataloghi senza passare dalla console di Keycloak. | 10 | 29 |
 | E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 5 | 18 |
 | E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 7 | 28 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 5 | 17 |
@@ -29,7 +29,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 |---|---|---|---|
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
-| R3 | Tirocinio, documenti Word, chiusura, email | 11 | 43 |
+| R3 | Tirocinio, documenti Word, chiusura, email | 12 | 45 |
 | R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 11 | 50 |
 
 ## Domande aperte per il Product Owner
@@ -43,7 +43,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | Q3 | Il Tutor può rifiutare una proposta? Con quali effetti (es. azienda esclusa automaticamente)? | US-702 | **Sì, con motivo obbligatorio**: ticket al Call Center (RIAPERTO), mansione LIBERA, azienda esclusa per quel ticket (PO, 01/10). |
 | Q4 | Festività da escludere: solo nazionali o anche il patrono locale? Chiusure della cooperativa? | US-703, US-107 | Festività nazionali + **patrono configurabile per progetto** (24 giugno per l'attuale) + chiusure; vale il calendario del progetto del ticket (PO, 01/10). **Aggiornata il 24/10 (review dello Sprint 3):** il calendario è **unico per tutti** i progetti: festività nazionali (senza il 4 ottobre), patrono del 24 giugno e chiusure, impostati dall'ADMIN. |
 | Q5 | Campi della scheda amministrativa e template Word reali di Convenzione e Progetto Formativo. | US-1001..1005 | Per ora **segnaposto**; i documenti reali arriveranno più avanti. I modelli dovranno essere modificabili (modalità da definire: il PO ci sta pensando) (PO, 01/10). |
-| Q6 | Voci esatte dei gradimenti 1–5 del report di restituzione. | US-1101 | Soddisfazione dell'azienda (1–5), soddisfazione del beneficiario (1–5), obiettivi raggiunti (testo), difficoltà riscontrate (testo); assunto sì → formula (menu), no → motivo (menu). Voci dei menu provvisorie, definitive più avanti (PO, 01/10). |
+| Q6 | Voci esatte dei gradimenti 1–5 del report di restituzione. | US-1101 | Soddisfazione dell'azienda (1–5), soddisfazione del beneficiario (1–5), obiettivi raggiunti (testo), difficoltà riscontrate (testo); assunto sì → formula (menu), no → motivo (menu). Voci dei menu provvisorie, definitive più avanti (PO, 01/10). Le voci si gestiscono come cataloghi dell'ADMIN, US-109 (review dello Sprint 7, §8.4). |
 | Q7 | Durata di conservazione dei dati dei beneficiari (decisione della cooperativa/DPO). | US-1303 | **Parametrica**, per ora 2 anni (PO, 01/10). |
 | Q8 | Chi approva la mansione a testo libero (ADMIN?) e se, approvata, entra nel catalogo. | US-302 | **ADMIN**; non entra da sola nel catalogo, l'ADMIN può aggiungerla con un clic; se respinta il Tutor vede il motivo (PO, 01/10). **Aggiornata il 24/10:** approva un **operatore** del Call Center (o l'ADMIN) e la tipologia approvata **entra nel catalogo**; se respinta, l'operatore sceglie la tipologia corretta e il Tutor riceve una notifica. |
 | Q9 | Canali delle notifiche per evento (solo app, app + email) e destinatari. | US-1201, US-1202 | **In app e via email**, alla controparte del passaggio (Tutor ↔ operatore, già definiti per ogni fase) (PO, 01/10). |
@@ -65,6 +65,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | 📋 Backlog |
 | [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | 🎉 Done (Sprint 7) |
 | [US-108](#us-108) | E1 | Tipi di tirocinio | Must | 1 | R3 | 🎉 Done (Sprint 7) |
+| [US-109](#us-109) | E1 | Cataloghi del report di restituzione | Must | 2 | R3 | ✅ Ready (Sprint 8) |
 | [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
@@ -110,17 +111,17 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-904](#us-904) | E9 | Annuncio da una mansione libera | Should | 3 | R2 | 🎉 Done (Sprint 6) |
 | [US-1001](#us-1001) | E10 | Scheda amministrativa del tirocinio | Must | 8 | R3 | 🎉 Done (Sprint 7) |
 | [US-1002](#us-1002) | E10 | Griglia oraria e monte ore | Must | 5 | R3 | 🎉 Done (Sprint 7) |
-| [US-1003](#us-1003) | E10 | Avvio del tirocinio | Must | 1 | R3 | 📋 Backlog |
-| [US-1004](#us-1004) | E10 | Convenzione in Word | Must | 5 | R3 | 📋 Backlog |
-| [US-1005](#us-1005) | E10 | Progetto Formativo in Word | Must | 3 | R3 | 📋 Backlog |
-| [US-1101](#us-1101) | E11 | Report di restituzione | Must | 5 | R3 | 📋 Backlog |
-| [US-1102](#us-1102) | E11 | Esito sulla mansione e audit trail | Must | 2 | R3 | 📋 Backlog |
+| [US-1003](#us-1003) | E10 | Avvio del tirocinio | Must | 1 | R3 | ✅ Ready (Sprint 8) |
+| [US-1004](#us-1004) | E10 | Convenzione in Word | Must | 5 | R3 | ✅ Ready (Sprint 8) |
+| [US-1005](#us-1005) | E10 | Progetto Formativo in Word | Must | 3 | R3 | ✅ Ready (Sprint 8) |
+| [US-1101](#us-1101) | E11 | Report di restituzione | Must | 5 | R3 | ✅ Ready (Sprint 8) |
+| [US-1102](#us-1102) | E11 | Esito sulla mansione e audit trail | Must | 2 | R3 | ✅ Ready (Sprint 8) |
 | [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | 🎉 Done (Sprint 5) |
-| [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 📋 Backlog |
+| [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | ✅ Ready (Sprint 8) |
 | [US-1301](#us-1301) | E13 | Verifica della PWA online | Must | 1 | R1 | 📋 Backlog |
 | [US-1302](#us-1302) | E13 | Backup del database | Must | 5 | R4 | 📋 Backlog |
 | [US-1303](#us-1303) | E13 | Anonimizzazione a scadenza | Must | 5 | R4 | 📋 Backlog |
-| [US-1304](#us-1304) | E13 | Tema di Keycloak | Should | 3 | R4 | 📋 Backlog |
+| [US-1304](#us-1304) | E13 | Tema di Keycloak | Should | 3 | R4 | 🎉 Done (Sprint 7, fuori piano) |
 | [US-1305](#us-1305) | E13 | Revisione UX/UI | Should | 8 | R4 | 📋 Backlog |
 | [US-1306](#us-1306) | E13 | Passaggio in produzione | Must | 5 | R4 | 📋 Backlog |
 | [US-1307](#us-1307) | E13 | Monitoraggio e revisione di sicurezza | Must | 5 | R4 | 📋 Backlog |
@@ -198,6 +199,20 @@ Criteri di accettazione:
 - Voci iniziali: Curriculare, Extracurriculare, Di inclusione, Di inserimento socio-terapeutico.
 - Il Tutor sceglie il tipo nella scheda del tirocinio (US-1001). Il tipo determina il tipo di documento (US-1004,
   US-1005); altri parametri legati al tipo arriveranno più avanti.
+
+#### US-109
+**Cataloghi del report di restituzione** · Must · 2 punti · R3 · ✅ Ready (Sprint 8)
+
+Come **ADMIN** voglio gestire le formule di assunzione e i motivi della mancata assunzione per cambiare le voci del
+report di restituzione senza un rilascio. Decisione del PO, review dello Sprint 7 (§8.4).
+
+Criteri di accettazione:
+- Due cataloghi in più nella pagina "Cataloghi", con le stesse regole di US-106 (aggiunta, nuovo nome, disattivazione,
+  audit).
+- Voci iniziali: quelle provvisorie di Q6. Formule: tempo determinato 3, 6 e 12 mesi, tempo indeterminato, contratto a
+  chiamata, prestazione occasionale. Motivi: l'azienda non ha risorse; giudica il tirocinante non idoneo; non aveva mai
+  espresso l'intenzione di assumere.
+- Il report di restituzione (US-1101) propone solo le voci attive.
 
 #### EN-3
 **Zone iniziali: Firenze e hinterland** · Must · 2 punti · R1 · 🎉 Done (Sprint 2)
@@ -729,29 +744,36 @@ Criteri di accettazione:
 Domande aperte: Q5
 
 #### US-1003
-**Avvio del tirocinio** · Must · 1 punti · R3 · 📋 Backlog
+**Avvio del tirocinio** · Must · 1 punti · R3 · ✅ Ready (Sprint 8)
 
 Come **Tutor** voglio confermare l'avvio del tirocinio per tracciarne l'inizio.
 
 Criteri di accettazione:
-- Il ticket passa in IN_TIROCINIO solo con scheda completa.
+- Il ticket passa in IN_TIROCINIO solo con scheda completa (review dello Sprint 7, §8.2):
+  - tipo di tirocinio, data di inizio, data di fine prevista, sede, codice ATECO;
+  - almeno un tutor aziendale e la griglia oraria con almeno un giorno;
+  - codice fiscale, data e luogo di nascita e residenza del beneficiario;
+  - legale rappresentante dell'azienda con codice fiscale, nascita e residenza.
+
+  Sospensioni e note sono facoltative. Se manca qualcosa, la pagina dice cosa e porta al campo.
 - L'avvio non blocca la scheda: il Tutor la corregge anche a tirocinio avviato (PO, 29/10).
 
 #### US-1004
-**Convenzione in Word** · Must · 5 punti · R3 · 📋 Backlog
+**Convenzione in Word** · Must · 5 punti · R3 · ✅ Ready (Sprint 8)
 
 Come **Tutor** voglio generare e scaricare la Convenzione compilata per evitare la compilazione manuale. I documenti
 sono competenza del Tutor (PO, 29/10).
 
 Criteri di accettazione:
 - I segnaposto del template (es. {NOME_TIROCINANTE}, {MONTE_ORE_TOTALE}, {GRIGLIA_ORARIA}) sono sostituiti; il file si apre in Word senza errori.
-- Per ora modelli segnaposto; i modelli dovranno essere modificabili (modalità da definire con il PO).
+- Per ora modelli segnaposto, **uno per tipo di tirocinio**, nel codice; il Tutor li scarica compilati dalla scheda
+  (review dello Sprint 7, §8.3). La modifica dei modelli sarà una storia a parte, quando il PO avrà deciso come.
 - Il modello dipende dal tipo di tirocinio (US-108, PO 29/10); altri parametri da definire.
 
 Domande aperte: Q5
 
 #### US-1005
-**Progetto Formativo in Word** · Must · 3 punti · R3 · 📋 Backlog
+**Progetto Formativo in Word** · Must · 3 punti · R3 · ✅ Ready (Sprint 8)
 
 Come **Tutor** voglio generare e scaricare il Progetto Formativo per completare la documentazione.
 
@@ -765,17 +787,18 @@ Dipendenze: US-1004 · Domande aperte: Q5
 _Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda._
 
 #### US-1101
-**Report di restituzione** · Must · 5 punti · R3 · 📋 Backlog
+**Report di restituzione** · Must · 5 punti · R3 · ✅ Ready (Sprint 8)
 
 Come **Tutor** voglio compilare il report finale (gradimenti 1–5, assunzione sì/no, mansione ancora disponibile sì/no) per chiudere il percorso.
 
 Criteri di accettazione:
 - Campi: soddisfazione dell'azienda (1–5), soddisfazione del beneficiario (1–5), obiettivi raggiunti (testo), difficoltà riscontrate (testo), mansione ancora disponibile sì/no.
-- Assunto sì → formula da menu (tempo determinato 3/6/12 mesi, tempo indeterminato, contratto a chiamata, prestazione occasionale); no → motivo da menu (l'azienda non ha risorse; giudica il tirocinante non idoneo; non aveva mai espresso l'intenzione di assumere). Le voci dei menu sono provvisorie: devono poter cambiare senza rilascio.
+- Assunto sì → formula da menu (tempo determinato 3/6/12 mesi, tempo indeterminato, contratto a chiamata, prestazione occasionale); no → motivo da menu (l'azienda non ha risorse; giudica il tirocinante non idoneo; non aveva mai espresso l'intenzione di assumere). Le voci dei menu sono provvisorie: devono poter cambiare senza rilascio, quindi vengono dai cataloghi dell'ADMIN
+  (US-109).
 - Il ticket passa in FORM_RESTITUZIONE; il report non è più modificabile dopo l'invio.
 
 #### US-1102
-**Esito sulla mansione e audit trail** · Must · 2 punti · R3 · 📋 Backlog
+**Esito sulla mansione e audit trail** · Must · 2 punti · R3 · ✅ Ready (Sprint 8)
 
 Come **Call Center** voglio che la chiusura aggiorni mansione e storico dell'azienda per avere dati affidabili per i prossimi abbinamenti.
 
@@ -801,13 +824,14 @@ Criteri di accettazione:
   Sprint 4, §8.3).
 
 #### US-1202
-**Email transazionali** · Must · 5 punti · R3 · 📋 Backlog
+**Email transazionali** · Must · 5 punti · R3 · ✅ Ready (Sprint 8)
 
 Come **Tutor / Call Center** voglio ricevere per email le notifiche importanti per essere avvisato anche fuori dall'app.
 
 Criteri di accettazione:
 - Ogni notifica in app arriva anche via email alla stessa controparte.
 - Invio tramite SMTP IONOS da un indirizzo del dominio; nessun dato personale sensibile nel testo dell'email.
+- Dati SMTP dal PO (review dello Sprint 7): la password solo nel `.env` del server, mai nel repository.
 
 ### E13 — Trasversali e produzione
 
@@ -871,12 +895,14 @@ Criteri di accettazione:
 - Restano solo i dati statistici; l'operazione è registrata.
 
 #### US-1304
-**Tema di Keycloak** · Should · 3 punti · R4 · 📋 Backlog
+**Tema di Keycloak** · Should · 3 punti · R4 · 🎉 Done (Sprint 7, fuori piano)
 
 Come **utente** voglio una pagina di login con l'identità visiva di NEXUS per riconoscere l'app e fidarmi.
 
 Criteri di accettazione:
 - Login con la palette NEXUS, 0 violazioni WCAG, in italiano.
+- Anticipata il 29/10 su richiesta del PO: aspetto del sito (intestazione, colori chiari e scuri, piè di pagina);
+  localizzazione attiva ma con il **solo italiano**, senza selettore della lingua.
 
 #### US-1305
 **Revisione UX/UI** · Should · 8 punti · R4 · 📋 Backlog

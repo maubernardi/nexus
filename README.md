@@ -134,6 +134,9 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
 
 - **Deploy su comando.** Il workflow costruisce le immagini del commit scelto, le pubblica su GHCR e le installa sul
   server con una chiave SSH che può solo eseguire `nexus-deploy`. Se l'avvio fallisce, torna alla release precedente.
+- **Immagine nuova.** Il primo caricamento di un'immagine mai pubblicata può essere rifiutato da GHCR (`denied`): il
+  pacchetto viene comunque creato e collegato al repository, quindi basta rilanciare il job fallito (successo con
+  `nexus-keycloak` il 29/10). Il server non viene toccato finché il build non riesce.
 - **Segreti** in `/opt/nexus/.env` sul server (generati da `bootstrap.sh`, mai in git); le credenziali demo si
   rileggono con `sudo cat /opt/nexus/.env`.
 - **Console di Keycloak** non esposta su Internet: `ssh -L 8081:127.0.0.1:8081 <server>`, poi

@@ -8,8 +8,8 @@ Con sprint corti di 3 giorni (dal 05/10), la durata delle release si stimerà da
 |---|---|---|---|---|
 | **R0** ✅ | Fondamenta | infrastruttura, modello dati, deploy, restyle | — | demo online con login e shell (Sprint 0, completato) |
 | **R1** | Flusso base: dalla segnalazione alla proposta | E2, E3, E4 (coda), E5, E6, audit (EN-2, EN-4), zone di Firenze (EN-3), CI (EN-5) | 78 | il tutor registra e segnala un beneficiario; il Call Center lo prende in carico e lo abbina a una mansione (PROPOSTA_AZIENDA) |
-| **R2** | Proposta, timer, appuntamenti, bacheca, fast-track | E7, E8, E9, E4 (fast-track), E12 (in app), calendario unico (US-107), cataloghi (US-106) | 69 | ciclo completo fino all'appuntamento, con timer, rilancio in bacheca e segnalazioni speciali |
-| **R3** | Tirocinio e chiusura | E10, E11, E12 (email), tipi di tirocinio (US-108), dati dell'azienda per i documenti (US-506) | 43 | Convenzione e Progetto Formativo in Word, report di restituzione, audit trail |
+| **R2** ✅ | Proposta, timer, appuntamenti, bacheca, fast-track | E7, E8, E9, E4 (fast-track), E12 (in app), calendario unico (US-107), cataloghi (US-106) | 69 | ciclo completo fino all'appuntamento, con timer, rilancio in bacheca e segnalazioni speciali |
+| **R3** | Tirocinio e chiusura | E10, E11, E12 (email), tipi di tirocinio (US-108), dati dell'azienda per i documenti (US-506), cataloghi del report (US-109) | 45 | Convenzione e Progetto Formativo in Word, report di restituzione, audit trail |
 | **R4** | Produzione | E1, E13 | 50 | gestione utenti, backup, GDPR, UX, sicurezza; go-live con dati reali |
 
 ## Prerequisiti da preparare in anticipo (lato cooperativa)
