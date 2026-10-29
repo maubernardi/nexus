@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Genera i modelli segnaposto dei documenti del tirocinio (US-1004) in formato .docx, senza librerie esterne.
+"""Genera i modelli segnaposto dei documenti del tirocinio (US-1004, US-1005) in formato .docx, senza librerie esterne.
 
 Uso: python3 tools/genera-modelli-docx.py   (dalla radice del repository)
 
-Scrive backend/src/main/resources/templates/documents/convenzione/{CODICE_TIPO,default}.docx. I file sono
+Scrive backend/src/main/resources/templates/documents/{convenzione,progetto-formativo}/{CODICE_TIPO,default}.docx. I file sono
 riproducibili (date fisse nell'archivio): rigenerarli non cambia nulla se il testo non cambia. Sono modelli provvisori,
 da sostituire con i moduli ufficiali della cooperativa (Q5); i segnaposto sono quelli di InternshipDocumentServiceImpl.
 """
@@ -17,14 +17,18 @@ FIXED_DATE = (2026, 10, 29, 0, 0, 0)
 W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 R = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
 
-# tipi di tirocinio iniziali (V21): codice -> titolo del modello
+# tipi di tirocinio iniziali (V21): codice -> come il tipo compare nel titolo; default = tipi aggiunti dall'ADMIN
 TYPES = {
-    'CURRICULARE': 'CONVENZIONE DI TIROCINIO CURRICULARE',
-    'EXTRACURRICULARE': 'CONVENZIONE DI TIROCINIO EXTRACURRICULARE',
-    'INCLUSIONE': 'CONVENZIONE DI TIROCINIO DI INCLUSIONE',
-    'SOCIO_TERAPEUTICO': 'CONVENZIONE DI TIROCINIO DI INSERIMENTO SOCIO-TERAPEUTICO',
-    'default': 'CONVENZIONE DI TIROCINIO',
+    'CURRICULARE': 'CURRICULARE',
+    'EXTRACURRICULARE': 'EXTRACURRICULARE',
+    'INCLUSIONE': 'DI INCLUSIONE',
+    'SOCIO_TERAPEUTICO': 'DI INSERIMENTO SOCIO-TERAPEUTICO',
+    'default': '',
 }
+
+
+def title(prefix, suffix):
+    return f'{prefix} {suffix}' if suffix else prefix
 
 CONTENT_TYPES = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
@@ -153,6 +157,54 @@ def convenzione(title):
             f'<w:document xmlns:w="{W}" xmlns:r="{R}"><w:body>{"".join(body)}{sect}</w:body></w:document>')
 
 
+def progetto_formativo(title):
+    lines = '__________________________________________________________________'
+    body = [
+        para(title, 'Title'),
+        para('Modello segnaposto di NEXUS: il testo definitivo arriverà con i moduli ufficiali della cooperativa.',
+             'Nota'),
+        para('Tirocinante', 'Heading1'),
+        para('{NOME_TIROCINANTE}, nato/a a {LUOGO_NASCITA_TIROCINANTE} il {DATA_NASCITA_TIROCINANTE}, codice fiscale '
+             '{CODICE_FISCALE_TIROCINANTE}, residente in {RESIDENZA_TIROCINANTE}.'),
+        para('Soggetto promotore', 'Heading1'),
+        para('Cooperativa Sociale «Il Girasole» – Area Lavoro, progetto {PROGETTO}. Tutor: {TUTOR_PROMOTORE}.'),
+        para('Soggetto ospitante', 'Heading1'),
+        para('{RAGIONE_SOCIALE}, partita IVA {PARTITA_IVA}, sede legale in {SEDE_LEGALE}, codice ATECO {CODICE_ATECO}. '
+             'Legale rappresentante: {LEGALE_RAPPRESENTANTE}. Tutor aziendali: {TUTOR_AZIENDALI}.'),
+        para('Tirocinio', 'Heading1'),
+        table([
+            ('Tipo di tirocinio', '{TIPO_TIROCINIO}'),
+            ('Mansione', '{MANSIONE}'),
+            ('Sede del tirocinio', '{SEDE_TIROCINIO}'),
+            ('Periodo', 'dal {DATA_INIZIO} al {DATA_FINE}'),
+            ('Periodi di sospensione', '{SOSPENSIONI}'),
+            ('Ore settimanali', '{ORE_SETTIMANALI}'),
+            ('Monte ore complessivo', '{MONTE_ORE_TOTALE}'),
+        ]),
+        para('Articolazione dell\'orario', 'Heading1'),
+        para('{GRIGLIA_ORARIA}'),
+        para('Obiettivi e attività del tirocinio', 'Heading1'),
+        para('Da definire con il tutor aziendale:'),
+        para(lines),
+        para(lines),
+        para(lines),
+        para('Obblighi del tirocinante', 'Heading1'),
+        para('Il tirocinante svolge le attività previste dal progetto formativo, segue le indicazioni dei tutor, '
+             'rispetta le norme su igiene, salute e sicurezza sul lavoro e mantiene la riservatezza sui dati e sulle '
+             'informazioni di cui viene a conoscenza.'),
+        para('Firenze, {DATA_DOCUMENTO}'),
+        para('Il tirocinante ______________________________'),
+        para('Il tutor del soggetto promotore ______________________________'),
+        para('Il tutor del soggetto ospitante ______________________________'),
+    ]
+    sect = (f'<w:sectPr><w:footerReference w:type="default" r:id="rId2"/>'
+            '<w:pgSz w:w="11906" w:h="16838"/>'
+            '<w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="567" w:footer="567" '
+            'w:gutter="0"/></w:sectPr>')
+    return (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+            f'<w:document xmlns:w="{W}" xmlns:r="{R}"><w:body>{"".join(body)}{sect}</w:body></w:document>')
+
+
 def write(path, title, document):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     parts = [
@@ -173,10 +225,16 @@ def write(path, title, document):
 
 
 def main():
-    for code, title in TYPES.items():
-        path = os.path.normpath(os.path.join(OUT, 'convenzione', f'{code}.docx'))
-        write(path, title, convenzione(title))
-        print(path)
+    documents = [
+        ('convenzione', 'CONVENZIONE DI TIROCINIO', convenzione),
+        ('progetto-formativo', 'PROGETTO FORMATIVO DEL TIROCINIO', progetto_formativo),
+    ]
+    for folder, prefix, build in documents:
+        for code, suffix in TYPES.items():
+            path = os.path.normpath(os.path.join(OUT, folder, f'{code}.docx'))
+            doc_title = title(prefix, suffix)
+            write(path, doc_title, build(doc_title))
+            print(path)
 
 
 if __name__ == '__main__':

@@ -115,8 +115,8 @@ export const saveInternship = async ({
   return data;
 };
 
-/** Documenti del tirocinio generati dai modelli Word (US-1004). */
-export type InternshipDocumentKind = 'convenzione';
+/** Documenti del tirocinio generati dai modelli Word (US-1004, US-1005). */
+export type InternshipDocumentKind = 'convenzione' | 'progetto-formativo';
 
 /** Documento compilato dalla scheda salvata, come file .docx. */
 export const downloadInternshipDocument = async ({

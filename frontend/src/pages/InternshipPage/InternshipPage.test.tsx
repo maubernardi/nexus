@@ -100,7 +100,7 @@ describe('<InternshipPage>', () => {
     vi.restoreAllMocks();
   });
 
-  it('documenti: la Convenzione si scarica dalla scheda, con l’avviso se è incompleta', async () => {
+  it('documenti: Convenzione e Progetto Formativo si scaricano dalla scheda, con l’avviso se è incompleta', async () => {
     const user = userEvent.setup();
     // jsdom non crea URL di blob né naviga: si intercetta il link temporaneo del download
     vi.stubGlobal(
@@ -138,6 +138,18 @@ describe('<InternshipPage>', () => {
       kind: 'convenzione',
     });
     expect(button).toHaveFocus();
+
+    await user.click(within(section).getByRole('button', { name: 'Scarica il Progetto Formativo (.docx)' }));
+    expect(
+      await within(section).findByText(
+        'Progetto Formativo scaricato: Progetto-formativo-segnalazione-9.docx',
+      ),
+    ).toBeInTheDocument();
+    expect(clicked).toEqual(['Convenzione-segnalazione-9.docx', 'Progetto-formativo-segnalazione-9.docx']);
+    expect(vi.mocked(downloadInternshipDocument).mock.calls[1][0]).toEqual({
+      ticketId: 'T9',
+      kind: 'progetto-formativo',
+    });
   });
 
   it('documenti: download non riuscito', async () => {

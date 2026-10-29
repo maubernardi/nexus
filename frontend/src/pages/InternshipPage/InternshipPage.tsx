@@ -6,7 +6,7 @@ import { Link, useParams } from 'react-router';
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
 import { apiError } from '@/config/api/errors';
-import type { Internship, StartRequirement } from '@/config/api/internshipApi';
+import type { Internship, InternshipDocumentKind, StartRequirement } from '@/config/api/internshipApi';
 import type { TicketDetail } from '@/config/api/ticketApi';
 import {
   useAddInternshipAtecoCode,
@@ -255,21 +255,27 @@ const StartSection = ({ ticket: d, internship, onOutcome }: StartSectionProps) =
   );
 };
 
+/** Documenti del tirocinio: tipo per l'API, prefisso del nome del file (lo stesso del server) e testi. */
+const DOCUMENTS = [
+  { kind: 'convenzione', filePrefix: 'Convenzione', key: 'convenzione' },
+  { kind: 'progetto-formativo', filePrefix: 'Progetto-formativo', key: 'progettoFormativo' },
+] as const satisfies readonly { kind: InternshipDocumentKind; filePrefix: string; key: string }[];
+
 /**
- * Documenti del tirocinio (US-1004): compilati dal server con la scheda salvata, si scaricano come .docx. L'esito si
- * annuncia lì accanto (stato), il focus resta sul pulsante.
+ * Documenti del tirocinio (US-1004, US-1005): compilati dal server con la scheda salvata, si scaricano come .docx.
+ * L'esito si annuncia lì accanto (stato), il focus resta sul pulsante.
  */
 const DocumentsSection = ({ ticket: d, internship }: { ticket: TicketDetail; internship: Internship }) => {
   const { t } = useTranslation();
   const download = useDownloadInternshipDocument();
   const [status, setStatus] = useState<{ text: string; error?: boolean } | null>(null);
 
-  const onDownload = async (): Promise<void> => {
-    const filename = `Convenzione-segnalazione-${d.number}.docx`;
+  const onDownload = async (item: (typeof DOCUMENTS)[number]): Promise<void> => {
+    const filename = `${item.filePrefix}-segnalazione-${d.number}.docx`;
     setStatus({ text: t('internship.documents.preparing') });
     try {
-      saveBlob(await download.mutateAsync({ ticketId: d.id, kind: 'convenzione' }), filename);
-      setStatus({ text: t('internship.documents.downloaded', { filename }) });
+      saveBlob(await download.mutateAsync({ ticketId: d.id, kind: item.kind }), filename);
+      setStatus({ text: t(`internship.documents.downloaded.${item.key}`, { filename }) });
     } catch {
       setStatus({ text: t('internship.documents.error'), error: true });
     }
@@ -289,10 +295,20 @@ const DocumentsSection = ({ ticket: d, internship }: { ticket: TicketDetail; int
           {t('internship.documents.incomplete')}
         </p>
       )}
-      <Button size="lg" variant="outline" onClick={() => void onDownload()} disabled={download.isPending}>
-        <FileDown aria-hidden="true" />
-        {t('internship.documents.convenzione')}
-      </Button>
+      <div className="flex flex-wrap gap-3">
+        {DOCUMENTS.map((item) => (
+          <Button
+            key={item.kind}
+            size="lg"
+            variant="outline"
+            onClick={() => void onDownload(item)}
+            disabled={download.isPending}
+          >
+            <FileDown aria-hidden="true" />
+            {t(`internship.documents.download.${item.key}`)}
+          </Button>
+        ))}
+      </div>
       <p role="status" className={status?.error ? 'font-medium text-destructive' : 'text-muted-foreground'}>
         {status?.text}
       </p>
