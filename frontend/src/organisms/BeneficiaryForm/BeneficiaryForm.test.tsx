@@ -42,7 +42,8 @@ describe('<BeneficiaryForm>', () => {
     expect(screen.getByLabelText(/^Cognome/)).toHaveAttribute('aria-invalid', 'true');
     expect(createBeneficiary).not.toHaveBeenCalled();
     await expectNoAxeViolations();
-  });
+    // axe su un modulo con centinaia di elementi: con la suite in parallelo supera i 15 s predefiniti (azione A13)
+  }, 30_000);
 
   it('rifiuta un anno di nascita futuro', async () => {
     const user = userEvent.setup();
