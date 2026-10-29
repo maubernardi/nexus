@@ -757,6 +757,41 @@ describe('<TicketPage>', () => {
     expect(screen.queryByRole('link', { name: /scheda del tirocinio/ })).not.toBeInTheDocument();
   });
 
+  it('report di restituzione: durante il tirocinio il Tutor lo compila, inviato lo leggono tutti', async () => {
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({ status: 'IN_TIROCINIO', proposal: alfa, myTicket: true }),
+    );
+    const { unmount } = renderPage();
+    expect(await screen.findByRole('link', { name: 'Compila il report di restituzione' })).toHaveAttribute(
+      'href',
+      '/segnalazioni/T9/restituzione',
+    );
+    await expectNoAxeViolations();
+    unmount();
+
+    // collega o Call Center: nessun collegamento al modulo, il report inviato in sola lettura
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({
+        status: 'FORM_RESTITUZIONE',
+        proposal: alfa,
+        closureReport: {
+          companySatisfaction: 4,
+          beneficiarySatisfaction: 5,
+          hired: true,
+          hiringFormula: { id: 'F2', code: 'TEMPO_INDETERMINATO', name: 'Tempo indeterminato' },
+          jobSlotStillAvailable: false,
+          submittedAt: '2026-10-30T09:30:00Z',
+          submittedBy: 'Mario Rossi',
+        },
+      }),
+    );
+    renderPage();
+    const report = await screen.findByRole('region', { name: 'Report di restituzione' });
+    expect(report).toHaveTextContent('Sì, con Tempo indeterminato');
+    expect(screen.queryByRole('link', { name: /report di restituzione/ })).not.toBeInTheDocument();
+    await expectNoAxeViolations();
+  });
+
   it('Call Center: approva la nuova tipologia con il nome corretto', async () => {
     const user = userEvent.setup();
     vi.mocked(fetchTicket).mockResolvedValue(

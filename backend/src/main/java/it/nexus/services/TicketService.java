@@ -5,6 +5,7 @@ import java.util.List;
 import it.nexus.domain.dto.AppointmentFailedDTO;
 import it.nexus.domain.dto.AppointmentSetDTO;
 import it.nexus.domain.dto.ApproveCategoryDTO;
+import it.nexus.domain.dto.ClosureReportFormDTO;
 import it.nexus.domain.dto.CompanyExclusionDTO;
 import it.nexus.domain.dto.CompanyExclusionFormDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
@@ -96,6 +97,15 @@ public interface TicketService {
      *         superata
      */
     TicketDetailDTO startInternship(String ticketId, long expectedVersion);
+
+    /**
+     * Il Tutor della segnalazione invia il report di restituzione (US-1101): stato FORM_RESTITUZIONE, il report non si
+     * modifica più; notifica all'operatore.
+     *
+     * @throws it.nexus.web.errors.FieldValidationException se manca la formula o il motivo, o la voce non è attiva
+     * @throws it.nexus.web.errors.ConflictException se lo stato non lo ammette o la versione è superata
+     */
+    TicketDetailDTO submitClosureReport(String ticketId, ClosureReportFormDTO form);
 
     /**
      * Il Tutor della segnalazione registra l'appuntamento fallito, con causa: stato RIAPERTO in carico allo stesso

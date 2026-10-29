@@ -1,9 +1,11 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 
 import {
+  fetchHiringFormulas,
   fetchInternshipTypes,
   fetchJobCategories,
   fetchMyProjects,
+  fetchNoHireReasons,
   fetchProjects,
   fetchZones,
   type ReferenceItem,
@@ -20,6 +22,12 @@ export const useJobCategories = (): UseQueryResult<ReferenceItem[]> =>
 
 export const useInternshipTypes = (): UseQueryResult<ReferenceItem[]> =>
   useQuery({ queryKey: ['reference', 'internshipTypes'], queryFn: fetchInternshipTypes, staleTime: STALE });
+
+export const useHiringFormulas = (): UseQueryResult<ReferenceItem[]> =>
+  useQuery({ queryKey: ['reference', 'hiringFormulas'], queryFn: fetchHiringFormulas, staleTime: STALE });
+
+export const useNoHireReasons = (): UseQueryResult<ReferenceItem[]> =>
+  useQuery({ queryKey: ['reference', 'noHireReasons'], queryFn: fetchNoHireReasons, staleTime: STALE });
 
 /** Tutti i progetti attivi: solo per Call Center e ADMIN (per il Tutor l'API risponde 403). */
 export const useProjects = (enabled = true): UseQueryResult<ReferenceItem[]> =>

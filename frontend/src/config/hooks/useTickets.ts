@@ -29,6 +29,7 @@ import {
   rejectCategory,
   rejectProposal,
   startInternship,
+  submitClosureReport,
   type CompanyExclusion,
   type CompatibleFilters,
   type JobSlotMatch,
@@ -233,6 +234,19 @@ export const useStartInternship = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: startInternship,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+  });
+};
+
+/** Il Tutor della segnalazione invia il report di restituzione (US-1101): il percorso si chiude. */
+export const useSubmitClosureReport = (): UseMutationResult<
+  TicketDetail,
+  unknown,
+  Parameters<typeof submitClosureReport>[0]
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: submitClosureReport,
     onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
   });
 };

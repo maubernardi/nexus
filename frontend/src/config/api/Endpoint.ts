@@ -16,4 +16,6 @@ export const ENDPOINTS = {
   zones: '/reference/zones',
   jobCategories: '/reference/job-categories',
   internshipTypes: '/reference/internship-types',
+  hiringFormulas: '/reference/hiring-formulas',
+  noHireReasons: '/reference/no-hire-reasons',
 } as const;

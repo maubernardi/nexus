@@ -124,6 +124,37 @@ export type TicketDetail = {
   /** Annuncio della bacheca a cui è candidata la segnalazione speciale (US-306). */
   boardPostId?: string | null;
   boardPostNumber?: number | null;
+  /** Report di restituzione inviato (US-1101), solo in FORM_RESTITUZIONE. */
+  closureReport?: ClosureReport;
+};
+
+/**
+ * Report di restituzione inviato (US-1101), non più modificabile. L'API omette i campi vuoti: testi non scritti e la
+ * voce dell'esito non scelto (formula se non assunto, motivo se assunto).
+ */
+export type ClosureReport = {
+  companySatisfaction: number;
+  beneficiarySatisfaction: number;
+  objectives?: string;
+  difficulties?: string;
+  hired: boolean;
+  hiringFormula?: ReferenceItem;
+  noHireReason?: ReferenceItem;
+  jobSlotStillAvailable: boolean;
+  submittedAt: string;
+  submittedBy: string;
+};
+
+/** Report di restituzione dal modulo (US-1101): conta la formula se assunto, il motivo se non assunto. */
+export type ClosureReportForm = {
+  companySatisfaction: number;
+  beneficiarySatisfaction: number;
+  objectives: string | null;
+  difficulties: string | null;
+  hired: boolean;
+  hiringFormulaId: string | null;
+  noHireReasonId: string | null;
+  jobSlotStillAvailable: boolean;
 };
 
 export type CompatibleFilters = { zoneId?: string; jobCategoryId?: string };
@@ -280,6 +311,23 @@ export const startInternship = async ({
   version: number;
 }): Promise<TicketDetail> => {
   const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/start`, { version });
+  return data;
+};
+
+/** Il Tutor della segnalazione invia il report di restituzione (US-1101): il percorso si chiude. */
+export const submitClosureReport = async ({
+  id,
+  version,
+  report,
+}: {
+  id: string;
+  version: number;
+  report: ClosureReportForm;
+}): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/closure-report`, {
+    version,
+    ...report,
+  });
   return data;
 };
 

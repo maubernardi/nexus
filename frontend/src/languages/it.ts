@@ -332,6 +332,8 @@ export const it = {
       BOARD_RELAUNCH_REQUESTED:
         'Il Tutor chiede di rilanciare in bacheca la mansione della segnalazione n. {{number}}: c’è una bozza di annuncio da controllare e pubblicare.',
       INTERNSHIP_STARTED: 'Il Tutor ha avviato il tirocinio della segnalazione n. {{number}}.',
+      CLOSURE_REPORT_SUBMITTED:
+        'Il Tutor ha inviato il report di restituzione della segnalazione n. {{number}}: il percorso è concluso.',
     },
   },
   legalRep: {
@@ -554,6 +556,48 @@ export const it = {
       birthDate: 'La data di nascita deve essere passata',
     },
   },
+  closureReport: {
+    heading: 'Report di restituzione della segnalazione n. {{number}}',
+    who: 'Tirocinio di {{beneficiary}} presso {{company}}.',
+    intro:
+      'Com’è andato il tirocinio e com’è finito. Con l’invio il percorso si chiude e il report non si può più modificare.',
+    fields: {
+      companySatisfaction: 'Soddisfazione dell’azienda',
+      beneficiarySatisfaction: 'Soddisfazione del beneficiario',
+      objectives: 'Obiettivi raggiunti',
+      difficulties: 'Difficoltà riscontrate',
+      hired: 'Il beneficiario è stato assunto?',
+      hiringFormulaId: 'Formula di assunzione',
+      noHireReasonId: 'Motivo della mancata assunzione',
+      jobSlotStillAvailable: 'La mansione è ancora disponibile?',
+    },
+    hints: {
+      scale: 'Da 1 (per niente soddisfatto) a 5 (molto soddisfatto).',
+      texts: 'Facoltativo.',
+      jobSlotStillAvailable: 'Cioè se l’azienda cerca ancora qualcuno per questa mansione.',
+    },
+    submit: 'Invia il report',
+    confirmHeading: 'Confermi l’invio del report?',
+    confirmText:
+      'Dopo l’invio il report non si può più modificare e il percorso della segnalazione n. {{number}} si chiude.',
+    confirm: 'Sì, invia il report',
+    back: 'Torna al modulo',
+    sent: 'Report inviato: il percorso della segnalazione n. {{number}} è concluso.',
+    conflict: 'Il report non è stato inviato: {{reason}}',
+    error: 'Il report non è stato inviato. Controlla la connessione e riprova.',
+    notAvailable: 'Il report si compila durante il tirocinio',
+    loadError: 'Impossibile caricare la segnalazione. Controlla la connessione e riprova.',
+    noOptions: 'Nessuna voce disponibile: chiedi all’amministratore di aggiungerla nei cataloghi.',
+    backToTicket: 'Torna alla segnalazione',
+    view: {
+      heading: 'Report di restituzione',
+      submitted: 'Inviato da {{name}} il {{date}}. Il report non si modifica.',
+      score: '{{value}} su 5',
+      hiredYes: 'Sì, con {{formula}}',
+      hiredNo: 'No: {{reason}}',
+      none: 'Non indicate',
+    },
+  },
   companyNote: {
     heading: 'Note',
     intro:
@@ -757,6 +801,11 @@ export const it = {
       text: 'I dati per Convenzione e Progetto Formativo e l’avvio del tirocinio: la scheda la vedi solo tu.',
       open: 'Apri la scheda del tirocinio',
     },
+    closureReport: {
+      heading: 'Report di restituzione',
+      text: 'A fine tirocinio, o se si interrompe prima, compila il report: con l’invio il percorso si chiude.',
+      open: 'Compila il report di restituzione',
+    },
     appointment: {
       set: 'Appuntamento fissato',
       setHeading: 'Conferma l’appuntamento',
@@ -817,6 +866,7 @@ export const it = {
       COMPANY_EXCLUDE: 'Azienda esclusa dal Call Center',
       INTERNSHIP_SAVE: 'Scheda del tirocinio aggiornata',
       START: 'Tirocinio avviato',
+      CLOSE: 'Report di restituzione inviato',
       DOCUMENT_GENERATED: 'Documento scaricato',
       CATEGORY_APPROVE: 'Nuova tipologia approvata',
       CATEGORY_REJECT: 'Tipologia cambiata dal Call Center',
@@ -1230,6 +1280,9 @@ export const it = {
     },
     internship: {
       title: 'Scheda del tirocinio',
+    },
+    closureReport: {
+      title: 'Report di restituzione',
     },
     forbidden: {
       title: 'Accesso non consentito',

@@ -1,6 +1,7 @@
 package it.nexus.domain.workflow;
 
 import static it.nexus.domain.enumeration.TicketStatus.APPUNTAMENTO;
+import static it.nexus.domain.enumeration.TicketStatus.FORM_RESTITUZIONE;
 import static it.nexus.domain.enumeration.TicketStatus.IN_ATTESA_APPROVAZIONE;
 import static it.nexus.domain.enumeration.TicketStatus.IN_LAVORAZIONE;
 import static it.nexus.domain.enumeration.TicketStatus.IN_TIROCINIO;
@@ -105,6 +106,14 @@ public final class TicketTransitions {
      * servizio). La scheda resta modificabile anche dopo (PO, 29/10).
      */
     public static final TicketTransition START = new TicketTransition("START", Set.of(APPUNTAMENTO), IN_TIROCINIO,
+            Set.of(Role.TUTOR));
+
+    /**
+     * Fase finale — il Tutor della segnalazione invia il report di restituzione (US-1101) in qualunque momento del
+     * tirocinio: il percorso si chiude e il beneficiario può avere una nuova segnalazione. Solo il Tutor della
+     * segnalazione (controllo nel servizio).
+     */
+    public static final TicketTransition CLOSE = new TicketTransition("CLOSE", Set.of(IN_TIROCINIO), FORM_RESTITUZIONE,
             Set.of(Role.TUTOR));
 
     /**
