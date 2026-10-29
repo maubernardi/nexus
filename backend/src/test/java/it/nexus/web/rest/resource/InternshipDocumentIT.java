@@ -173,6 +173,30 @@ class InternshipDocumentIT {
     }
 
     @Test
+    void progettoFormativo_modelloDelTipoECronologia() throws Exception {
+        String totalHours = save(typeId("SOCIO_TERAPEUTICO"), true);
+
+        MvcResult result = mockMvc.perform(get(internshipPath + "/documents/progetto-formativo")
+                        .header(USER, "tutor1"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", DOCX))
+                .andExpect(header().string("Content-Disposition",
+                        "attachment; filename=\"Progetto-formativo-segnalazione-%d.docx\"".formatted(ticket.getNumber())))
+                .andReturn();
+
+        assertThat(text(result))
+                .startsWith("PROGETTO FORMATIVO DEL TIROCINIO DI INSERIMENTO SOCIO-TERAPEUTICO\n")
+                .contains("Mario Rossi, nato/a a Firenze il 10/12/1985")
+                .contains("Tutor aziendali: Anna Verdi (055 123456).")
+                .contains("Monte ore complessivo\n" + totalHours)
+                .contains("Lunedì: 09:00–13:00 (4 ore)\nMercoledì: 09:00–13:00 e 14:00–18:00 (6 ore)")
+                .doesNotContain("{");
+        mockMvc.perform(get("/api/v1/tickets/" + TsidMapper.toExternal(ticket.getId()) + "/history")
+                        .header(USER, "tutor1"))
+                .andExpect(jsonPath("$[-1].detail").value("Progetto Formativo"));
+    }
+
+    @Test
     void tipoSenzaModello_eSchedaIncompleta_righeVuote() throws Exception {
         String typeId = TsidMapper.toExternal(internshipTypes.save(new InternshipType("T_DOC_" + ticket.getId(),
                 "Tipo nuovo " + ticket.getId())).getId());

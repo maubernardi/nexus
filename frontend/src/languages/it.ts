@@ -443,9 +443,15 @@ export const it = {
       intro:
         'Compilati con i dati salvati della scheda. Per ora sono modelli provvisori, in attesa dei moduli ufficiali della cooperativa.',
       incomplete: 'La scheda non è completa: nel documento i dati mancanti restano da completare a mano.',
-      convenzione: 'Scarica la Convenzione (.docx)',
+      download: {
+        convenzione: 'Scarica la Convenzione (.docx)',
+        progettoFormativo: 'Scarica il Progetto Formativo (.docx)',
+      },
       preparing: 'Preparazione del documento…',
-      downloaded: 'Convenzione scaricata: {{filename}}',
+      downloaded: {
+        convenzione: 'Convenzione scaricata: {{filename}}',
+        progettoFormativo: 'Progetto Formativo scaricato: {{filename}}',
+      },
       error: 'Download non riuscito. Controlla la connessione e riprova.',
     },
     start: {

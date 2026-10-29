@@ -6,18 +6,22 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.core.io.ClassPathResource;
 
 import it.nexus.services.impl.InternshipDocumentServiceImpl;
 
-/** I modelli segnaposto forniti (US-1004) usano solo segnaposto che il servizio sa compilare. */
+/** I modelli segnaposto forniti (US-1004, US-1005) usano solo segnaposto che il servizio sa compilare. */
 class InternshipTemplatesTest {
 
     @ParameterizedTest
-    @ValueSource(strings = {"CURRICULARE", "EXTRACURRICULARE", "INCLUSIONE", "SOCIO_TERAPEUTICO", "default"})
-    void convenzione_soloSegnapostiNoti(String name) throws IOException {
-        try (InputStream template = new ClassPathResource("templates/documents/convenzione/" + name + ".docx")
+    @CsvSource({
+        "convenzione, CURRICULARE", "convenzione, EXTRACURRICULARE", "convenzione, INCLUSIONE",
+        "convenzione, SOCIO_TERAPEUTICO", "convenzione, default",
+        "progetto-formativo, CURRICULARE", "progetto-formativo, EXTRACURRICULARE", "progetto-formativo, INCLUSIONE",
+        "progetto-formativo, SOCIO_TERAPEUTICO", "progetto-formativo, default"})
+    void soloSegnapostiNoti(String folder, String name) throws IOException {
+        try (InputStream template = new ClassPathResource("templates/documents/" + folder + "/" + name + ".docx")
                 .getInputStream()) {
             assertThat(DocxTemplate.placeholders(template))
                     .isNotEmpty()

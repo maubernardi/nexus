@@ -79,7 +79,8 @@ public class InternshipDocumentServiceImpl implements InternshipDocumentService 
         }
         auditService.record(AuditEntityType.TICKET, ticket.getId(), "DOCUMENT_GENERATED",
                 AuditChanges.of().value("document", null, kind.name()), null);
-        return new GeneratedDocument("%s-segnalazione-%d.docx".formatted(kind.label(), ticket.getNumber()), content);
+        return new GeneratedDocument("%s-segnalazione-%d.docx".formatted(kind.filePrefix(), ticket.getNumber()),
+                content);
     }
 
     /** Il modello del tipo di tirocinio oppure, per i tipi senza modello (aggiunti dall'ADMIN), quello predefinito. */
