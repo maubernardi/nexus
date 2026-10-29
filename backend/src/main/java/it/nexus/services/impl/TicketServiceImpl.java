@@ -572,6 +572,23 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    public TicketDetailDTO startInternship(String ticketId, long expectedVersion) {
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        Ticket ticket = ownTicket(ticketId, me, "avviare il tirocinio");
+        // dentro la transizione: prima si controllano versione e stato, poi la scheda
+        Ticket saved = stateMachine.apply(ticket, TicketTransitions.START, expectedVersion, null, t -> {
+            internshipService.requireCompleteForStart(t);
+            return AuditChanges.none();
+        });
+        JobSlot slot = saved.getJobSlot();
+        companyAuditEvents.save(new CompanyAuditEvent(slot.getCompany(), saved,
+                CompanyEventType.TIROCINIO_AVVIATO.name(), Map.of("ticketNumber", saved.getNumber(),
+                        "jobSlotTitle", slot.getTitle())));
+        notificationService.notify(saved.getAssignedCcOperator(), NotificationType.INTERNSHIP_STARTED, saved);
+        return detail(saved, me);
+    }
+
+    @Override
     public TicketDetailDTO appointmentFailed(String ticketId, AppointmentFailedDTO dto) {
         AppUser me = currentAppUserService.getCurrentAppUser();
         Ticket ticket = ownTicket(ticketId, me, "registrare l'esito dell'appuntamento");

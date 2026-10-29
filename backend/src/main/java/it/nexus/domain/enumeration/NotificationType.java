@@ -28,5 +28,7 @@ public enum NotificationType {
     /** Al Tutor: il Call Center ha rifiutato la corsia veloce, la segnalazione continua normale (US-404). */
     FAST_TRACK_REJECTED,
     /** Al Tutor: l'annuncio è uscito dalla bacheca mentre la candidatura aspettava, la corsia veloce è decaduta. */
-    FAST_TRACK_DROPPED
+    FAST_TRACK_DROPPED,
+    /** All'operatore: il Tutor ha avviato il tirocinio (US-1003). */
+    INTERNSHIP_STARTED
 }

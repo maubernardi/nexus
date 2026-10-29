@@ -444,7 +444,8 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
       />
 
       <section aria-labelledby="internship-section-tutors" className="space-y-4">
-        <h2 id="internship-section-tutors" className="text-lg font-semibold text-primary">
+        {/* focalizzabile: l'elenco di ciò che manca per l'avvio porta qui */}
+        <h2 id="internship-section-tutors" tabIndex={-1} className="text-lg font-semibold text-primary">
           {t('internship.sections.companyTutors')}
         </h2>
         {tutorRows.fields.length === 0 && (

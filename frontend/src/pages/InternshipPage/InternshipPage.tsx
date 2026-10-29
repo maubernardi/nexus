@@ -6,14 +6,15 @@ import { Link, useParams } from 'react-router';
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
 import { apiError } from '@/config/api/errors';
-import type { Internship } from '@/config/api/internshipApi';
+import type { Internship, StartRequirement } from '@/config/api/internshipApi';
+import type { TicketDetail } from '@/config/api/ticketApi';
 import {
   useAddInternshipAtecoCode,
   useAddInternshipLegalRepresentative,
   useInternship,
   useSaveInternship,
 } from '@/config/hooks/useInternship';
-import { useTicket } from '@/config/hooks/useTickets';
+import { useStartInternship, useTicket } from '@/config/hooks/useTickets';
 import { AtecoCodeForm } from '@/organisms/AtecoCodesSection/AtecoCodesSection';
 import { InternshipForm } from '@/organisms/InternshipForm/InternshipForm';
 import {
@@ -22,6 +23,23 @@ import {
 } from '@/organisms/LegalRepresentativeSection/LegalRepresentativeSection';
 
 type Outcome = { text: string; error?: boolean };
+
+/** Campo o sezione della pagina a cui porta ciascun dato mancante per l'avvio (US-1003). */
+const START_TARGETS: Record<StartRequirement, string> = {
+  internshipType: 'internship-internshipTypeId',
+  startDate: 'internship-startDate',
+  expectedEndDate: 'internship-expectedEndDate',
+  site: 'internship-site',
+  atecoCode: 'internship-atecoCodeId',
+  companyTutors: 'internship-section-tutors',
+  schedule: 'internship-days',
+  fiscalCode: 'internship-fiscalCode',
+  birthDate: 'internship-birthDate',
+  birthPlace: 'internship-birthPlace',
+  residence: 'internship-residence',
+  legalRepresentative: 'internship-company',
+  legalRepresentativeData: 'internship-company',
+};
 
 /**
  * Scheda amministrativa del tirocinio (US-1001), solo per il Tutor della segnalazione: in alto i dati dell'azienda
@@ -82,6 +100,9 @@ export const InternshipPage = () => {
         })}
       </p>
       <p>{t('internship.intro')}</p>
+      {(ticket.data.status === 'IN_TIROCINIO' || ticket.data.status === 'FORM_RESTITUZIONE') && (
+        <p className="rounded-md border-l-4 border-gold bg-card p-4">{t('internship.start.started')}</p>
+      )}
 
       {outcome && (
         <div
@@ -95,6 +116,10 @@ export const InternshipPage = () => {
         >
           {outcome.text}
         </div>
+      )}
+
+      {ticket.data.status === 'APPUNTAMENTO' && (
+        <StartSection ticket={ticket.data} internship={data} onOutcome={setOutcome} />
       )}
 
       <CompanyData ticketId={id} internship={data} onOutcome={setOutcome} />
@@ -112,6 +137,117 @@ export const InternshipPage = () => {
 
       {backLink}
     </div>
+  );
+};
+
+type StartSectionProps = {
+  ticket: TicketDetail;
+  internship: Internship;
+  onOutcome: (o: Outcome) => void;
+};
+
+/**
+ * Avvio del tirocinio (US-1003): con la scheda salvata completa il Tutor lo conferma; altrimenti l'elenco di ciò che
+ * manca porta a ogni campo. La conferma prende il focus e, se si annulla, il focus torna al pulsante.
+ */
+const StartSection = ({ ticket: d, internship, onOutcome }: StartSectionProps) => {
+  const { t } = useTranslation();
+  const start = useStartInternship();
+  const [confirming, setConfirming] = useState(false);
+  const confirmRef = useRef<HTMLHeadingElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const wasConfirming = useRef(false);
+  const missing = internship.missingForStart;
+
+  useEffect(() => {
+    if (confirming) confirmRef.current?.focus();
+    else if (wasConfirming.current) buttonRef.current?.focus();
+    wasConfirming.current = confirming;
+  }, [confirming]);
+
+  // il campo del codice ATECO c'è solo se l'azienda ha dei codici: altrimenti si va ai dati dell'azienda
+  const focusTarget = (event: React.MouseEvent<HTMLAnchorElement>, code: StartRequirement): void => {
+    const target =
+      document.getElementById(START_TARGETS[code]) ?? document.getElementById('internship-company');
+    if (target) {
+      event.preventDefault();
+      target.focus();
+    }
+  };
+
+  // mutateAsync: l'esito arriva anche se, avviato il tirocinio, la sezione sparisce
+  const onConfirm = async (): Promise<void> => {
+    try {
+      await start.mutateAsync({ id: d.id, version: d.version });
+      onOutcome({ text: t('internship.start.done') });
+    } catch (error) {
+      const body = apiError(error);
+      onOutcome({
+        text:
+          body?.status === 409 ? t('internship.start.refused', { reason: body.message }) : t('work.error'),
+        error: true,
+      });
+      setConfirming(false);
+    }
+  };
+
+  return (
+    <section
+      aria-labelledby="internship-start"
+      className="space-y-3 rounded-xl border border-border bg-card p-4"
+    >
+      <h2 id="internship-start" className="text-lg font-semibold text-primary">
+        {t('internship.start.heading')}
+      </h2>
+      {missing.length > 0 ? (
+        <>
+          <p>{t('internship.start.missingIntro')}</p>
+          <ul className="list-disc space-y-1 pl-5">
+            {missing.map((code) => (
+              <li key={code}>
+                <a
+                  href={`#${START_TARGETS[code]}`}
+                  onClick={(e) => focusTarget(e, code)}
+                  className="text-primary underline underline-offset-4"
+                >
+                  {t(`internship.start.missing.${code}`)}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : !confirming ? (
+        <>
+          <p>{t('internship.start.ready')}</p>
+          <Button ref={buttonRef} size="lg" onClick={() => setConfirming(true)}>
+            {t('internship.start.action')}
+          </Button>
+        </>
+      ) : (
+        <div className="space-y-3 rounded-xl border-2 border-primary p-4">
+          <h3 ref={confirmRef} tabIndex={-1} className="font-semibold">
+            {t('internship.start.confirmHeading', {
+              beneficiary: `${d.beneficiary.firstName} ${d.beneficiary.lastName}`,
+              company: internship.companyName ?? t('internship.none'),
+            })}
+          </h3>
+          <p>{t('internship.start.confirmText')}</p>
+          <div className="flex flex-wrap gap-3">
+            <Button size="lg" onClick={() => void onConfirm()} disabled={start.isPending}>
+              {t('internship.start.confirm')}
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={() => setConfirming(false)}
+              disabled={start.isPending}
+            >
+              {t('internship.start.cancel')}
+            </Button>
+          </div>
+        </div>
+      )}
+    </section>
   );
 };
 
@@ -142,7 +278,8 @@ const CompanyData = ({ ticketId, internship, onOutcome }: CompanyDataProps) => {
       aria-labelledby="internship-company"
       className="space-y-4 rounded-xl border border-border bg-card p-4"
     >
-      <h2 id="internship-company" className="text-lg font-semibold text-primary">
+      {/* focalizzabile: l'elenco di ciò che manca per l'avvio porta qui */}
+      <h2 id="internship-company" tabIndex={-1} className="text-lg font-semibold text-primary">
         {t('internship.sections.company')}
       </h2>
       <p className="text-muted-foreground">{t('internship.companyIntro')}</p>

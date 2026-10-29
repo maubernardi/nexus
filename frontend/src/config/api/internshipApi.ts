@@ -51,7 +51,25 @@ export type Internship = {
   /** Totale settimanale e monte ore in minuti, calcolati sui dati salvati; assenti se non calcolabili. */
   weeklyMinutes?: number | null;
   totalMinutes?: number | null;
+  /** Dati che mancano per avviare il tirocinio (US-1003), in base alla scheda salvata; vuoto = completa. */
+  missingForStart: StartRequirement[];
 };
+
+/** Codici dei dati richiesti per l'avvio (review dello Sprint 7, §8.2). */
+export type StartRequirement =
+  | 'internshipType'
+  | 'startDate'
+  | 'expectedEndDate'
+  | 'site'
+  | 'atecoCode'
+  | 'companyTutors'
+  | 'schedule'
+  | 'fiscalCode'
+  | 'birthDate'
+  | 'birthPlace'
+  | 'residence'
+  | 'legalRepresentative'
+  | 'legalRepresentativeData';
 
 export type InternshipForm = {
   internshipTypeId: string | null;

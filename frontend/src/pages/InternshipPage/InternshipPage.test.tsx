@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AxiosError, AxiosHeaders } from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -11,7 +11,7 @@ import {
   type Internship,
 } from '@/config/api/internshipApi';
 import { fetchInternshipTypes } from '@/config/api/referenceApi';
-import { fetchTicket, type TicketDetail } from '@/config/api/ticketApi';
+import { fetchTicket, startInternship, type TicketDetail } from '@/config/api/ticketApi';
 import { InternshipPage } from '@/pages/InternshipPage/InternshipPage';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderRoutes } from '@/tests/renderWithProviders';
@@ -23,7 +23,7 @@ vi.mock('@/config/api/internshipApi', () => ({
   addInternshipAtecoCode: vi.fn(),
 }));
 vi.mock('@/config/api/referenceApi', () => ({ fetchInternshipTypes: vi.fn() }));
-vi.mock('@/config/api/ticketApi', () => ({ fetchTicket: vi.fn() }));
+vi.mock('@/config/api/ticketApi', () => ({ fetchTicket: vi.fn(), startInternship: vi.fn() }));
 
 const error = (status: number, body: Record<string, unknown>) =>
   new AxiosError(String(status), String(status), undefined, undefined, {
@@ -61,6 +61,7 @@ const internship = (overrides: Partial<Internship> = {}): Internship => ({
   secondSlotEnd: '18:00:00',
   excludeHolidays: true,
   schedule: [],
+  missingForStart: [],
   ...overrides,
 });
 
@@ -88,6 +89,80 @@ describe('<InternshipPage>', () => {
     vi.mocked(saveInternship).mockReset();
     vi.mocked(addInternshipLegalRepresentative).mockReset();
     vi.mocked(addInternshipAtecoCode).mockReset();
+    vi.mocked(startInternship).mockReset();
+  });
+
+  it('avvio con la scheda incompleta: l’elenco di ciò che manca porta ai campi', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchInternship).mockResolvedValue(
+      internship({ missingForStart: ['companyTutors', 'fiscalCode', 'legalRepresentativeData'] }),
+    );
+    renderPage();
+
+    const section = await screen.findByRole('region', { name: 'Avvio del tirocinio' });
+    expect(
+      within(section)
+        .getAllByRole('link')
+        .map((l) => l.textContent),
+    ).toEqual([
+      'Almeno un tutor aziendale',
+      'Codice fiscale del beneficiario',
+      'Codice fiscale, nascita e residenza del legale rappresentante: chiedi al Call Center di completarli',
+    ]);
+    expect(within(section).queryByRole('button', { name: 'Avvia il tirocinio' })).not.toBeInTheDocument();
+    await expectNoAxeViolations();
+
+    await user.click(within(section).getByRole('link', { name: 'Codice fiscale del beneficiario' }));
+    expect(screen.getByLabelText(/^Codice fiscale/)).toHaveFocus();
+    await user.click(within(section).getByRole('link', { name: /legale rappresentante/ }));
+    expect(screen.getByRole('heading', { name: 'Dati dell’azienda per i documenti' })).toHaveFocus();
+  });
+
+  it('avvio con la scheda completa: conferma con il focus, annulla e poi avvia', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchInternship).mockResolvedValue(internship({ version: 3 }));
+    vi.mocked(startInternship).mockResolvedValue({ ...ticket, status: 'IN_TIROCINIO', version: 6 });
+    renderPage();
+
+    const action = await screen.findByRole('button', { name: 'Avvia il tirocinio' });
+    await user.click(action);
+    expect(
+      screen.getByRole('heading', { name: 'Avviare il tirocinio di Anna Bianchi presso Demo Ristorazione?' }),
+    ).toHaveFocus();
+    await expectNoAxeViolations();
+    await user.click(screen.getByRole('button', { name: 'Annulla' }));
+    expect(screen.getByRole('button', { name: 'Avvia il tirocinio' })).toHaveFocus();
+
+    vi.mocked(fetchTicket).mockResolvedValue({ ...ticket, status: 'IN_TIROCINIO', version: 6 });
+    await user.click(screen.getByRole('button', { name: 'Avvia il tirocinio' }));
+    await user.click(screen.getByRole('button', { name: 'Sì, avvia' }));
+
+    const done = await screen.findByText('Tirocinio avviato: la segnalazione è «In tirocinio».');
+    await waitFor(() => expect(done).toHaveFocus());
+    expect(vi.mocked(startInternship).mock.calls[0][0]).toEqual({ id: 'T9', version: 5 });
+    expect(
+      await screen.findByText(
+        'Il tirocinio è avviato. Puoi comunque correggere la scheda: le modifiche restano nella cronologia.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Avvio del tirocinio' })).not.toBeInTheDocument();
+  });
+
+  it('avvio rifiutato dal server: il motivo con il focus', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchInternship).mockResolvedValue(internship());
+    vi.mocked(startInternship).mockRejectedValue(
+      error(409, { message: 'Per avviare il tirocinio la scheda deve essere completa; mancano: la sede' }),
+    );
+    renderPage();
+
+    await user.click(await screen.findByRole('button', { name: 'Avvia il tirocinio' }));
+    await user.click(screen.getByRole('button', { name: 'Sì, avvia' }));
+
+    const refused = await screen.findByText(
+      'Tirocinio non avviato: Per avviare il tirocinio la scheda deve essere completa; mancano: la sede',
+    );
+    await waitFor(() => expect(refused).toHaveFocus());
   });
 
   it('dati dell’azienda mancanti: il Tutor li aggiunge da qui, poi salva la scheda', async () => {

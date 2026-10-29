@@ -271,6 +271,18 @@ export const rejectCategory = async ({
   return data;
 };
 
+/** Il Tutor della segnalazione avvia il tirocinio (US-1003): solo con la scheda completa. */
+export const startInternship = async ({
+  id,
+  version,
+}: {
+  id: string;
+  version: number;
+}): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.post<TicketDetail>(`${ENDPOINTS.tickets}/${id}/start`, { version });
+  return data;
+};
+
 export const appointmentSet = async ({
   id,
   version,

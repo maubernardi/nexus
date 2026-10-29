@@ -32,6 +32,7 @@ const empty: Internship = {
   secondSlotEnd: '18:00:00',
   excludeHolidays: true,
   schedule: [],
+  missingForStart: [],
 };
 
 const renderForm = (internship: Internship = empty) => {

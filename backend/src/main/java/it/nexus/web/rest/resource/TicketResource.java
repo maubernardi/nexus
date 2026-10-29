@@ -175,6 +175,13 @@ public class TicketResource {
         return ResponseEntity.ok(ticketService.accept(id, body.version()));
     }
 
+    @PostMapping("/{id}/start")
+    @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
+    @Operation(summary = "Il Tutor della segnalazione avvia il tirocinio: solo con la scheda completa")
+    public ResponseEntity<TicketDetailDTO> startInternship(@PathVariable String id, @RequestBody @Valid VersionDTO body) {
+        return ResponseEntity.ok(ticketService.startInternship(id, body.version()));
+    }
+
     @PostMapping("/special")
     @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
     @Operation(summary = "Candida un beneficiario del Tutor a un annuncio della bacheca: segnalazione speciale (US-306)")

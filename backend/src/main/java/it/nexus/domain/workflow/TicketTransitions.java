@@ -3,6 +3,7 @@ package it.nexus.domain.workflow;
 import static it.nexus.domain.enumeration.TicketStatus.APPUNTAMENTO;
 import static it.nexus.domain.enumeration.TicketStatus.IN_ATTESA_APPROVAZIONE;
 import static it.nexus.domain.enumeration.TicketStatus.IN_LAVORAZIONE;
+import static it.nexus.domain.enumeration.TicketStatus.IN_TIROCINIO;
 import static it.nexus.domain.enumeration.TicketStatus.NUOVA;
 import static it.nexus.domain.enumeration.TicketStatus.PROPOSTA_ACCOLTA;
 import static it.nexus.domain.enumeration.TicketStatus.PROPOSTA_AZIENDA;
@@ -98,6 +99,13 @@ public final class TicketTransitions {
      */
     public static final TicketTransition APPOINTMENT_FAILED = new TicketTransition("APPOINTMENT_FAILED",
             Set.of(APPUNTAMENTO), RIAPERTO, Set.of(Role.TUTOR));
+
+    /**
+     * Fase 7 — il Tutor della segnalazione avvia il tirocinio (US-1003), solo con la scheda completa (controllo nel
+     * servizio). La scheda resta modificabile anche dopo (PO, 29/10).
+     */
+    public static final TicketTransition START = new TicketTransition("START", Set.of(APPUNTAMENTO), IN_TIROCINIO,
+            Set.of(Role.TUTOR));
 
     /**
      * Fase 5 — il Tutor rifiuta la proposta con motivo (US-702, Q3): la segnalazione torna al Call Center, la mansione
