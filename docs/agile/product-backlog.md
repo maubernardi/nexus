@@ -3,22 +3,22 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 66 elementi, 233 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-07](sprints/sprint-07.md).
+**Totale: 68 elementi, 238 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-07](sprints/sprint-07.md).
 
 ## Epiche
 
 | Epica | Titolo | Obiettivo | Storie | Punti |
 |---|---|---|---|---|
-| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, il calendario e i cataloghi senza passare dalla console di Keycloak. | 8 | 26 |
+| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, il calendario e i cataloghi senza passare dalla console di Keycloak. | 9 | 27 |
 | E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 5 | 18 |
 | E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 7 | 28 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 5 | 17 |
-| E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 5 | 12 |
+| E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 6 | 15 |
 | E6 | Abbinamento (fase 4) | Il Call Center abbina il beneficiario a una mansione libera e la blocca. | 4 | 17 |
 | E7 | Proposta e timer (fase 5) | Il Tutor valuta la proposta; i tempi di risposta sono presidiati da un timer di 7 giorni lavorativi. | 5 | 15 |
 | E8 | Appuntamento e rilancio (fase 6) | Il Tutor registra l'esito dell'appuntamento; se fallisce, la mansione può essere rilanciata in bacheca. | 3 | 9 |
 | E9 | Bacheca opportunità | Le mansioni disponibili sono visibili ai Tutor in forma anonima e gestite dal Call Center. | 4 | 13 |
-| E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione e Progetto Formativo in Word. | 5 | 19 |
+| E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione e Progetto Formativo in Word. | 5 | 20 |
 | E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 2 | 7 |
 | E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 2 | 10 |
 | E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 11 | 41 |
@@ -29,7 +29,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 |---|---|---|---|
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
-| R3 | Tirocinio, documenti Word, chiusura, email | 9 | 36 |
+| R3 | Tirocinio, documenti Word, chiusura, email | 11 | 41 |
 | R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 11 | 50 |
 
 ## Domande aperte per il Product Owner
@@ -63,7 +63,8 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-103](#us-103) | E1 | Creazione utente | Must | 8 | R4 | 📋 Backlog |
 | [US-104](#us-104) | E1 | Assegnazione utenti ai progetti | Must | 3 | R4 | 📋 Backlog |
 | [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | 📋 Backlog |
-| [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | ✅ Ready (Sprint 7) |
+| [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | 🎉 Done (Sprint 7) |
+| [US-108](#us-108) | E1 | Tipi di tirocinio | Must | 1 | R3 | ✅ Ready (Sprint 7) |
 | [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
@@ -78,18 +79,19 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-303](#us-303) | E3 | Elenco delle segnalazioni (Home) | Must | 5 | R1 | 🎉 Done (Sprint 3) |
 | [US-304](#us-304) | E3 | Ticket dei miei progetti | Should | 0 | R1 | ↪️ Assorbita in US-303 |
 | [US-305](#us-305) | E3 | Dettaglio e cronologia del ticket | Must | 3 | R1 | 🎉 Done (Sprint 3) |
-| [US-306](#us-306) | E3 | Segnalazione speciale dalla bacheca | Must | 3 | R2 | ✅ Ready (Sprint 7) |
+| [US-306](#us-306) | E3 | Segnalazione speciale dalla bacheca | Must | 3 | R2 | 🎉 Done (Sprint 7) |
 | [US-307](#us-307) | E3 | Scadenza nella Home del Tutor | Must | 2 | R2 | 🎉 Done (Sprint 6) |
 | [US-401](#us-401) | E4 | Coda FIFO | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | 🎉 Done (Sprint 2) |
-| [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | ✅ Ready (Sprint 7) |
-| [US-404](#us-404) | E4 | Rifiuto fast-track | Must | 3 | R2 | ✅ Ready (Sprint 7) |
+| [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | 🎉 Done (Sprint 7) |
+| [US-404](#us-404) | E4 | Rifiuto fast-track | Must | 3 | R2 | 🎉 Done (Sprint 7) |
 | [US-405](#us-405) | E4 | Lavorazione condivisa tra operatori | Must | 2 | R1 | 🎉 Done (Sprint 3) |
 | [US-501](#us-501) | E5 | Anagrafica aziende | Must | 3 | R1 | 🎉 Done (Sprint 2) |
 | [US-502](#us-502) | E5 | Mansioni dell'azienda | Must | 3 | R1 | 🎉 Done (Sprint 2) |
 | [US-503](#us-503) | E5 | Storico e pregressi dell'azienda | Must | 3 | R1 | 🎉 Done (Sprint 4) |
 | [US-504](#us-504) | E5 | Disattivazione impedita con mansioni bloccate | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [US-505](#us-505) | E5 | Diario delle note dell'azienda | Must | 2 | R1 | 🎉 Done (Sprint 4) |
+| [US-506](#us-506) | E5 | Legale rappresentante e codici ATECO dell'azienda | Must | 3 | R3 | ✅ Ready (Sprint 7) |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 🎉 Done (Sprint 5) |
@@ -106,8 +108,8 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-902](#us-902) | E9 | Gestione della bacheca | Must | 5 | R2 | 🎉 Done (Sprint 6) |
 | [US-903](#us-903) | E9 | Sblocco a tutti dopo 7 giorni | Must | 2 | R2 | 🎉 Done (Sprint 6) |
 | [US-904](#us-904) | E9 | Annuncio da una mansione libera | Should | 3 | R2 | 🎉 Done (Sprint 6) |
-| [US-1001](#us-1001) | E10 | Scheda amministrativa del tirocinio | Must | 5 | R3 | ✅ Ready (Sprint 7) |
-| [US-1002](#us-1002) | E10 | Griglia oraria e sospensioni | Must | 5 | R3 | 📋 Backlog |
+| [US-1001](#us-1001) | E10 | Scheda amministrativa del tirocinio | Must | 8 | R3 | ✅ Ready (Sprint 7) |
+| [US-1002](#us-1002) | E10 | Griglia oraria e monte ore | Must | 3 | R3 | 📋 Backlog |
 | [US-1003](#us-1003) | E10 | Avvio del tirocinio | Must | 1 | R3 | 📋 Backlog |
 | [US-1004](#us-1004) | E10 | Convenzione in Word | Must | 5 | R3 | 📋 Backlog |
 | [US-1005](#us-1005) | E10 | Progetto Formativo in Word | Must | 3 | R3 | 📋 Backlog |
@@ -177,7 +179,7 @@ Criteri di accettazione:
 - Quando cambio il ruolo, allora il nuovo ruolo vale dal login successivo.
 
 #### US-106
-**Cataloghi di zone e tipologie di mansione** · Must · 3 punti · R2 · ✅ Ready (Sprint 7)
+**Cataloghi di zone e tipologie di mansione** · Must · 3 punti · R2 · 🎉 Done (Sprint 7)
 
 Come **ADMIN** voglio inserire, modificare e disattivare zone e tipologie di mansione da maschere dedicate per usare i valori reali della cooperativa senza rilasci.
 
@@ -185,6 +187,17 @@ Criteri di accettazione:
 - Quando disattivo una voce, allora non è più selezionabile ma resta sui dati esistenti.
 - Ogni modifica è registrata nell'audit (EN-2).
 
+#### US-108
+**Tipi di tirocinio** · Must · 1 punti · R3 · ✅ Ready (Sprint 7)
+
+Come **ADMIN** voglio gestire il catalogo dei tipi di tirocinio per classificare ogni tirocinio e scegliere i
+documenti giusti. Richiesta del PO, 29/10.
+
+Criteri di accettazione:
+- Terzo catalogo della pagina "Cataloghi", con le stesse regole di US-106 (aggiunta, nuovo nome, disattivazione, audit).
+- Voci iniziali: Curriculare, Extracurriculare, Di inclusione, Di inserimento socio-terapeutico.
+- Il Tutor sceglie il tipo nella scheda del tirocinio (US-1001). Il tipo determina il tipo di documento (US-1004,
+  US-1005); altri parametri legati al tipo arriveranno più avanti.
 
 #### EN-3
 **Zone iniziali: Firenze e hinterland** · Must · 2 punti · R1 · 🎉 Done (Sprint 2)
@@ -329,7 +342,7 @@ Criteri di accettazione:
 - La cronologia mostra per ogni cambio di stato data, autore e nota.
 
 #### US-306
-**Segnalazione speciale dalla bacheca** · Must · 3 punti · R2 · ✅ Ready (Sprint 7)
+**Segnalazione speciale dalla bacheca** · Must · 3 punti · R2 · 🎉 Done (Sprint 7)
 
 Come **Tutor** voglio candidare un mio beneficiario direttamente a un post #N della bacheca per ottenere una corsia prioritaria (fast-track).
 
@@ -379,7 +392,7 @@ Criteri di accettazione:
 Dipendenze: EN-1
 
 #### US-403
-**Approvazione fast-track** · Must · 5 punti · R2 · ✅ Ready (Sprint 7)
+**Approvazione fast-track** · Must · 5 punti · R2 · 🎉 Done (Sprint 7)
 
 Come **operatore Call Center** voglio approvare una segnalazione speciale per trasformarla subito in proposta all'azienda.
 
@@ -389,7 +402,7 @@ Criteri di accettazione:
 Dipendenze: US-306
 
 #### US-404
-**Rifiuto fast-track** · Must · 3 punti · R2 · ✅ Ready (Sprint 7)
+**Rifiuto fast-track** · Must · 3 punti · R2 · 🎉 Done (Sprint 7)
 
 Come **operatore Call Center** voglio rifiutare una segnalazione speciale per declassarla a lavorazione normale.
 
@@ -466,6 +479,21 @@ Criteri di accettazione:
   obbligatorio, fino a 2000 caratteri). Le note si aggiungono, non si sovrascrivono né si cancellano.
 - Visibili solo a Call Center e ADMIN.
 - Audit: evento "nota aggiunta" sull'azienda, **senza il testo** (può contenere dati personali, come EN-4).
+
+#### US-506
+**Legale rappresentante e codici ATECO dell'azienda** · Must · 3 punti · R3 · ✅ Ready (Sprint 7)
+
+Come **operatore Call Center** voglio registrare nella scheda dell'azienda il legale rappresentante e i codici ATECO
+per avere i dati pronti per i documenti dei tirocini. Richiesta del PO, 29/10.
+
+Criteri di accettazione:
+- Legale rappresentante: nome, cognome, codice fiscale (con controllo formale), data e luogo di nascita, residenza.
+  Può non coincidere con il referente.
+- Codici ATECO: uno o più per azienda, con descrizione facoltativa; si aggiungono e si tolgono.
+- Sono dati personali: visibili a Call Center e ADMIN e, per i propri tirocini, al Tutor; mai nei log; nell'audit solo
+  che cosa è cambiato, senza i valori del legale rappresentante.
+
+Dipendenze: US-501
 
 ### E6 — Abbinamento (fase 4)
 
@@ -666,16 +694,29 @@ Come **Tutor** voglio compilare i dati del tirocinio (date, monte ore, dati anag
 Criteri di accettazione:
 - I campi e le validazioni seguono i moduli ufficiali della cooperativa.
 - Fino ai moduli reali (Q5) si usano campi segnaposto, sostituibili senza cambiare il flusso (review dello Sprint 6, §8.3).
+- La compila il Tutor della segnalazione dopo l'appuntamento fissato; si corregge fino all'avvio (US-1003).
+- Campi (PO, 28–29/10):
+  - tipo di tirocinio (US-108), data di inizio, data di fine prevista, ore settimanali, sede del tirocinio;
+  - uno o più tutor aziendali (nome e recapito);
+  - il codice ATECO giusto, scelto tra quelli dell'azienda (US-506). Se manca, il Tutor lo aggiunge da qui e va nella
+    scheda dell'azienda;
+  - il legale rappresentante dell'azienda (US-506). Se manca, il Tutor lo inserisce da qui; correggerlo resta al Call
+    Center;
+  - dati del beneficiario per i documenti: codice fiscale, data e luogo di nascita, residenza. Sono solo nella scheda
+    del tirocinio, non nell'anagrafica (minimizzazione), e rientrano nell'anonimizzazione (US-1303);
+  - periodi di sospensione previsti (dal–al, più righe, senza sovrapposizioni), anticipati da US-1002;
+  - note.
 
-Domande aperte: Q5
+Dipendenze: US-108, US-506 · Domande aperte: Q5
 
 #### US-1002
-**Griglia oraria e sospensioni** · Must · 5 punti · R3 · 📋 Backlog
+**Griglia oraria e monte ore** · Must · 3 punti · R3 · 📋 Backlog
 
-Come **Tutor** voglio definire l'orario settimanale e i periodi di sospensione (dal–al) per calcolare correttamente il monte ore.
+Come **Tutor** voglio definire l'orario settimanale per calcolare correttamente il monte ore.
 
 Criteri di accettazione:
-- Periodi di sospensione sovrapposti vengono rifiutati; il monte ore si ricalcola.
+- Il monte ore si calcola da griglia oraria, date e periodi di sospensione, e si ricalcola quando cambiano.
+- I periodi di sospensione si inseriscono nella scheda del tirocinio (US-1001, dal 29/10); qui si usano per il calcolo.
 
 Domande aperte: Q5
 
@@ -695,6 +736,7 @@ Come **Tutor / Call Center** voglio generare e scaricare la Convenzione compilat
 Criteri di accettazione:
 - I segnaposto del template (es. {NOME_TIROCINANTE}, {MONTE_ORE_TOTALE}, {GRIGLIA_ORARIA}) sono sostituiti; il file si apre in Word senza errori.
 - Per ora modelli segnaposto; i modelli dovranno essere modificabili (modalità da definire con il PO).
+- Il modello dipende dal tipo di tirocinio (US-108, PO 29/10); altri parametri da definire.
 
 Domande aperte: Q5
 

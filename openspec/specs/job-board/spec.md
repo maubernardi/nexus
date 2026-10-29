@@ -140,3 +140,74 @@ rispondere `409` indicando da quando si potrà fare.
 - **WHEN** l'annuncio è già visibile a tutti oppure è una bozza
 - **THEN** lo sblocco è rifiutato con il motivo
 
+### Requirement: Candidatura a un annuncio
+Il Tutor SHALL poter candidare dalla bacheca un suo beneficiario senza segnalazioni aperte a un annuncio pubblicato,
+aperto a tutti o riservato a un suo progetto. Nasce una segnalazione speciale con la corsia veloce, in lavorazione,
+collegata all'annuncio e con la tipologia della mansione. Il progetto è quello dell'annuncio se riservato, altrimenti
+uno dei progetti del Tutor. Un annuncio MUST NOT avere più di una candidatura in valutazione: la prima lo blocca finché
+il Call Center non decide, e in bacheca l'annuncio mostra «Candidatura in valutazione», senza il comando.
+
+#### Scenario: Candidatura
+- **WHEN** il Tutor sceglie "Candida un beneficiario" su un annuncio libero e invia la candidatura
+- **THEN** nasce la segnalazione speciale n. N, in cima alla coda del Call Center con la corsia veloce, e la cronologia
+  riporta "Candidatura all'annuncio #M della bacheca"
+
+#### Scenario: Annuncio bloccato
+- **WHEN** un altro beneficiario è già candidato all'annuncio
+- **THEN** in bacheca l'annuncio mostra «Candidatura in valutazione» e una nuova candidatura è rifiutata con il motivo
+
+#### Scenario: Annuncio non visibile
+- **WHEN** l'annuncio è una bozza o è riservato a un progetto del quale il Tutor non fa parte
+- **THEN** per il Tutor l'annuncio non esiste
+
+#### Scenario: Gestione
+- **WHEN** l'operatore apre un annuncio bloccato
+- **THEN** vede quale segnalazione lo blocca, con il link
+
+### Requirement: Approvazione della corsia veloce
+Il Call Center e l'ADMIN SHALL poter approvare la corsia veloce di una segnalazione speciale presa in carico. In
+un'unica operazione la segnalazione passa a `PROPOSTA_AZIENDA` con la mansione dell'annuncio, la mansione si blocca,
+l'annuncio si archivia e il Tutor riceve la notifica della proposta. La corsia veloce è consumata, il tipo SPECIAL
+resta. Finché la corsia veloce aspetta la decisione, la segnalazione MUST NOT essere abbinata a un'altra mansione.
+
+#### Scenario: Approvazione
+- **WHEN** l'operatore che ha preso in carico la segnalazione speciale approva la corsia veloce e conferma
+- **THEN** la segnalazione è una proposta all'azienda dell'annuncio, la mansione è bloccata, l'annuncio è archiviato
+  e il Tutor riceve la notifica
+
+#### Scenario: Mansione non più disponibile
+- **WHEN** la mansione dell'annuncio è stata ritirata o bloccata, oppure l'annuncio non è più in bacheca
+- **THEN** l'approvazione è rifiutata con il motivo e nulla cambia
+
+#### Scenario: Abbinamento con la corsia veloce in attesa
+- **WHEN** l'operatore prova ad abbinare un'altra mansione prima di decidere sulla corsia veloce
+- **THEN** l'abbinamento è rifiutato: prima si decide sulla corsia veloce
+
+### Requirement: Rifiuto della corsia veloce
+Il Call Center e l'ADMIN SHALL poter rifiutare, con un motivo obbligatorio, la corsia veloce di una segnalazione
+speciale presa in carico. La segnalazione resta SPECIAL e in lavorazione, senza corsia veloce, e si lavora come le
+altre; l'annuncio resta pubblicato e torna candidabile; il Tutor riceve la notifica e il motivo è in cronologia.
+
+#### Scenario: Rifiuto
+- **WHEN** l'operatore rifiuta la corsia veloce scrivendo il motivo
+- **THEN** la segnalazione continua in lavorazione normale, l'annuncio #N torna candidabile e il Tutor è avvisato
+
+#### Scenario: Motivo mancante
+- **WHEN** l'operatore conferma il rifiuto senza motivo
+- **THEN** il motivo è segnalato come obbligatorio e nulla cambia
+
+### Requirement: Corsia veloce che decade con l'annuncio
+Quando un annuncio con una candidatura in attesa viene archiviato, la segnalazione SHALL perdere la corsia veloce
+nella stessa operazione, con il motivo in cronologia e la notifica al Tutor. Vale sia per l'archiviazione a mano, sia
+per quella automatica (mansione abbinata o ritirata, azienda disattivata). La conferma dell'archiviazione SHALL
+avvisare l'operatore.
+
+#### Scenario: Archiviazione a mano
+- **WHEN** l'operatore archivia un annuncio con una candidatura in attesa
+- **THEN** la conferma lo avvisa, e dopo la segnalazione è in lavorazione normale con il motivo "Annuncio #N archiviato
+  dal Call Center"
+
+#### Scenario: Mansione abbinata a un'altra segnalazione
+- **WHEN** la mansione dell'annuncio viene abbinata a un'altra segnalazione
+- **THEN** la candidatura in attesa perde la corsia veloce con il motivo
+
