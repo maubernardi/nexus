@@ -42,6 +42,8 @@ import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyNoteRepository;
 import it.nexus.repository.CompanyRepository;
+import it.nexus.repository.CompanyAtecoCodeRepository;
+import it.nexus.repository.CompanyLegalRepresentativeRepository;
 import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.JobSlotRepository;
@@ -70,6 +72,8 @@ class DomainConstraintsIT {
     @Autowired ZoneRepository zones;
     @Autowired JobCategoryRepository categories;
     @Autowired InternshipTypeRepository internshipTypes;
+    @Autowired CompanyLegalRepresentativeRepository legalRepresentatives;
+    @Autowired CompanyAtecoCodeRepository atecoCodes;
     @Autowired AppUserRepository users;
     @Autowired UserProjectRepository userProjects;
     @Autowired CompanyRepository companies;
@@ -83,6 +87,14 @@ class DomainConstraintsIT {
     @Autowired AuditEventRepository auditLog;
 
     /** L'operazione deve fallire per il vincolo indicato (nome del vincolo o testo dell'errore del database). */
+    private static CompanyLegalRepresentative legalRepresentative(Company company, String fiscalCode) {
+        CompanyLegalRepresentative rep = new CompanyLegalRepresentative(company);
+        rep.setFirstName("Laura");
+        rep.setLastName("Bianchi");
+        rep.setFiscalCode(fiscalCode);
+        return rep;
+    }
+
     static void assertViolates(String constraint, ThrowingCallable operation) {
         assertThatThrownBy(operation)
                 .isInstanceOf(DataAccessException.class)
@@ -135,6 +147,34 @@ class DomainConstraintsIT {
             Zone zone = zone(DomainFixtures.code("Z"));
             zone.setName("  ");
             assertViolates("ck_zone_name", () -> zones.saveAndFlush(zone));
+        }
+
+        @Test
+        void unSoloLegaleRappresentantePerAzienda() {
+            Company c = companies.saveAndFlush(company(DomainFixtures.vatCode()));
+            legalRepresentatives.saveAndFlush(legalRepresentative(c, null));
+            assertViolates("uq_company_legal_representative_company",
+                    () -> legalRepresentatives.saveAndFlush(legalRepresentative(c, null)));
+        }
+
+        @Test
+        void codiceFiscaleDelLegaleRappresentanteFuoriFormato() {
+            Company c = companies.saveAndFlush(company(DomainFixtures.vatCode()));
+            assertViolates("ck_company_legal_representative_fiscal_code",
+                    () -> legalRepresentatives.saveAndFlush(legalRepresentative(c, "rss-mra")));
+        }
+
+        @Test
+        void codiceAtecoDuplicatoPerAzienda() {
+            Company c = companies.saveAndFlush(company(DomainFixtures.vatCode()));
+            atecoCodes.saveAndFlush(new CompanyAtecoCode(c, "56.10.11", null));
+            assertViolates("uq_company_ateco_code", () -> atecoCodes.saveAndFlush(new CompanyAtecoCode(c, "56.10.11", "bis")));
+        }
+
+        @Test
+        void codiceAtecoFuoriFormato() {
+            Company c = companies.saveAndFlush(company(DomainFixtures.vatCode()));
+            assertViolates("ck_company_ateco_code_format", () -> atecoCodes.saveAndFlush(new CompanyAtecoCode(c, "561011", null)));
         }
 
         @Test

@@ -27,6 +27,13 @@ vi.mock('@/config/api/companyHistoryApi', () => ({
     events: [],
   }),
 }));
+vi.mock('@/config/api/companyLegalDataApi', () => ({
+  fetchLegalRepresentative: vi.fn().mockResolvedValue(null),
+  saveLegalRepresentative: vi.fn(),
+  fetchAtecoCodes: vi.fn().mockResolvedValue([]),
+  addAtecoCode: vi.fn(),
+  removeAtecoCode: vi.fn(),
+}));
 vi.mock('@/config/api/companyNoteApi', () => ({
   fetchCompanyNotes: vi.fn().mockResolvedValue([]),
   addCompanyNote: vi.fn(),
