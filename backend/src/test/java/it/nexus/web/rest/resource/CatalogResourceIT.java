@@ -177,4 +177,40 @@ class CatalogResourceIT {
                 TsidMapper.toInternal(id)))
                 .extracting(e -> e.getAction()).containsExactly("CREATE", "DEACTIVATE");
     }
+
+    @Test
+    void cataloghiDelReport_vociInizialiDiQ6_eSoloLeAttivePerIlReport() throws Exception {
+        mockMvc.perform(get("/api/v1/catalogs/hiring-formulas").header(USER, "admin"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].name", hasItems("Tempo determinato 3 mesi", "Tempo determinato 6 mesi",
+                        "Tempo determinato 12 mesi", "Tempo indeterminato", "Contratto a chiamata",
+                        "Prestazione occasionale")));
+        mockMvc.perform(get("/api/v1/catalogs/no-hire-reasons").header(USER, "admin"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].code", hasItems("AZIENDA_SENZA_RISORSE", "TIROCINANTE_NON_IDONEO",
+                        "NESSUNA_INTENZIONE")));
+
+        String formula = JsonPath.read(create("/api/v1/catalogs/hiring-formulas", "Apprendistato")
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.code").value("APPRENDISTATO"))
+                .andReturn().getResponse().getContentAsString(), "$.id");
+        String reason = JsonPath.read(create("/api/v1/catalogs/no-hire-reasons", "Il tirocinante ha rinunciato")
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString(), "$.id");
+        action("/api/v1/catalogs/no-hire-reasons", reason, "deactivate").andExpect(status().isOk());
+
+        // il Tutor li sceglie nel report di restituzione (US-1101): solo le voci attive
+        mockMvc.perform(get("/api/v1/reference/hiring-formulas").header(USER, "tutor1"))
+                .andExpect(jsonPath("$[*].name", hasItem("Apprendistato")));
+        mockMvc.perform(get("/api/v1/reference/no-hire-reasons").header(USER, "tutor1"))
+                .andExpect(jsonPath("$[*].name", hasItem("L'azienda non ha risorse")))
+                .andExpect(jsonPath("$[*].name", not(hasItem("Il tirocinante ha rinunciato"))));
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.HIRING_FORMULA,
+                TsidMapper.toInternal(formula))).extracting(e -> e.getAction()).containsExactly("CREATE");
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.NO_HIRE_REASON,
+                TsidMapper.toInternal(reason))).extracting(e -> e.getAction()).containsExactly("CREATE", "DEACTIVATE");
+        // gestiti solo dall'ADMIN
+        mockMvc.perform(get("/api/v1/catalogs/hiring-formulas").header(USER, "operatore.cc"))
+                .andExpect(status().isForbidden());
+    }
 }

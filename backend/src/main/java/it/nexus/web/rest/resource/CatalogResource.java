@@ -26,7 +26,8 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * Cataloghi per l'ADMIN: zone ({@code zones}) e tipologie di mansione ({@code job-categories}, US-106), tipi di
- * tirocinio ({@code internship-types}, US-108).
+ * tirocinio ({@code internship-types}, US-108), formule di assunzione ({@code hiring-formulas}) e motivi della mancata
+ * assunzione ({@code no-hire-reasons}, US-109).
  */
 @RestController
 @RequestMapping(PathAPI.BASE_PATH_V1 + "/catalogs/{kind}")

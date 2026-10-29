@@ -47,7 +47,9 @@ import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.CompanyAtecoCodeRepository;
 import it.nexus.repository.InternshipRepository;
 import it.nexus.repository.CompanyLegalRepresentativeRepository;
+import it.nexus.repository.HiringFormulaRepository;
 import it.nexus.repository.InternshipTypeRepository;
+import it.nexus.repository.NoHireReasonRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ProjectRepository;
@@ -75,6 +77,8 @@ class DomainConstraintsIT {
     @Autowired ZoneRepository zones;
     @Autowired JobCategoryRepository categories;
     @Autowired InternshipTypeRepository internshipTypes;
+    @Autowired HiringFormulaRepository hiringFormulas;
+    @Autowired NoHireReasonRepository noHireReasons;
     @Autowired CompanyLegalRepresentativeRepository legalRepresentatives;
     @Autowired CompanyAtecoCodeRepository atecoCodes;
     @Autowired InternshipRepository internships;
@@ -144,6 +148,24 @@ class DomainConstraintsIT {
         void nomeDiTipoDiTirocinioAttivoDuplicato() {
             assertViolates("uq_internship_type_active_name", () -> internshipTypes.saveAndFlush(
                     new InternshipType(DomainFixtures.code("T"), "di INCLUSIONE")));
+        }
+
+        @Test
+        void codiceFormulaDiAssunzioneDuplicato() {
+            assertViolates("uq_hiring_formula_code", () -> hiringFormulas.saveAndFlush(
+                    new HiringFormula("TEMPO_INDETERMINATO", "Tempo indeterminato bis")));
+        }
+
+        @Test
+        void nomeDiMotivoDiMancataAssunzioneAttivoDuplicato() {
+            assertViolates("uq_no_hire_reason_active_name", () -> noHireReasons.saveAndFlush(
+                    new NoHireReason(DomainFixtures.code("M"), "l'azienda NON ha risorse")));
+        }
+
+        @Test
+        void nomeDiFormulaVuoto() {
+            assertViolates("ck_hiring_formula_name", () -> hiringFormulas.saveAndFlush(
+                    new HiringFormula(DomainFixtures.code("F"), "  ")));
         }
 
         @Test

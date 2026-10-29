@@ -7,7 +7,10 @@ import java.util.Optional;
 public enum CatalogKind {
     ZONES("zones", AuditEntityType.ZONE, "ZONA"),
     JOB_CATEGORIES("job-categories", AuditEntityType.JOB_CATEGORY, "TIPOLOGIA"),
-    INTERNSHIP_TYPES("internship-types", AuditEntityType.INTERNSHIP_TYPE, "TIPO");
+    INTERNSHIP_TYPES("internship-types", AuditEntityType.INTERNSHIP_TYPE, "TIPO"),
+    /** Report di restituzione (US-109). */
+    HIRING_FORMULAS("hiring-formulas", AuditEntityType.HIRING_FORMULA, "FORMULA"),
+    NO_HIRE_REASONS("no-hire-reasons", AuditEntityType.NO_HIRE_REASON, "MOTIVO");
 
     private final String path;
     private final AuditEntityType auditType;

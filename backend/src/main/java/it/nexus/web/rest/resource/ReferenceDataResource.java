@@ -44,6 +44,20 @@ public class ReferenceDataResource {
         return ResponseEntity.ok(referenceDataService.activeInternshipTypes());
     }
 
+    @GetMapping("/hiring-formulas")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Formule di assunzione attive, per il report di restituzione (US-109)")
+    public ResponseEntity<List<ReferenceItemDTO>> hiringFormulas() {
+        return ResponseEntity.ok(referenceDataService.activeHiringFormulas());
+    }
+
+    @GetMapping("/no-hire-reasons")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Motivi della mancata assunzione attivi, per il report di restituzione (US-109)")
+    public ResponseEntity<List<ReferenceItemDTO>> noHireReasons() {
+        return ResponseEntity.ok(referenceDataService.activeNoHireReasons());
+    }
+
     @GetMapping("/job-categories")
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
     @Operation(summary = "Tipologie di mansione attive")
