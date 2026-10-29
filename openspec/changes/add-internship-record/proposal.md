@@ -18,8 +18,8 @@ Fino ai moduli ufficiali della cooperativa (Q5) i campi sono segnaposto, sostitu
   - `PUT` per salvarla, anche incompleta: la versione è nulla al primo salvataggio;
   - `PUT …/legal-representative` per inserire il legale rappresentante dell'azienda, solo se manca;
   - `POST …/ateco-codes` per aggiungere un codice ATECO all'azienda.
-- **Quando**: la scheda si legge dall'appuntamento fissato in poi e si modifica solo con l'appuntamento fissato,
-  prima dell'avvio (US-1003).
+- **Quando**: la scheda c'è dall'appuntamento fissato in poi. Il Tutor la modifica in qualunque momento, anche a
+  tirocinio avviato (PO, 29/10, dopo il merge della prima versione, che la bloccava all'avvio).
 - **Se l'appuntamento poi fallisce**, della scheda restano solo i dati del beneficiario; gli altri si azzerano.
 - **Codici ATECO**: un codice scelto in una scheda non si toglie dall'azienda.
 - **Audit `TICKET`, azione `INTERNSHIP_SAVE`**:

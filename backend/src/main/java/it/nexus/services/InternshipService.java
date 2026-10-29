@@ -10,7 +10,8 @@ import it.nexus.domain.dto.LegalRepresentativeFormDTO;
 
 /**
  * Scheda amministrativa del tirocinio (US-1001). È solo del Tutor della segnalazione: i documenti sono di sua
- * competenza (PO, 29/10). Si legge dall'appuntamento fissato in poi, si modifica fino all'avvio del tirocinio.
+ * competenza (PO, 29/10). C'è dall'appuntamento fissato in poi e il Tutor la modifica in qualunque momento, anche a
+ * tirocinio avviato (PO, 29/10).
  */
 public interface InternshipService {
 
@@ -20,8 +21,8 @@ public interface InternshipService {
     /**
      * Salva la scheda, anche incompleta.
      *
-     * @throws it.nexus.web.errors.ConflictException se la segnalazione non ha l'appuntamento fissato o la versione è
-     *         superata
+     * @throws it.nexus.web.errors.ConflictException se la segnalazione non è ancora arrivata all'appuntamento fissato o
+     *         la versione è superata
      * @throws it.nexus.web.errors.FieldValidationException se un dato presente non è valido
      */
     InternshipDTO save(String ticketId, InternshipFormDTO dto);

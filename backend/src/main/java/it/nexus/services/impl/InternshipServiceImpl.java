@@ -54,8 +54,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class InternshipServiceImpl implements InternshipService {
 
-    /** Stati in cui la scheda si legge: dall'appuntamento fissato in poi. Si modifica solo in {@code APPUNTAMENTO}. */
-    private static final Set<TicketStatus> READABLE = EnumSet.of(TicketStatus.APPUNTAMENTO, TicketStatus.IN_TIROCINIO,
+    /**
+     * Stati in cui c'è la scheda: dall'appuntamento fissato in poi. Il Tutor la modifica in qualunque momento, anche a
+     * tirocinio avviato (PO, 29/10).
+     */
+    private static final Set<TicketStatus> WITH_INTERNSHIP = EnumSet.of(TicketStatus.APPUNTAMENTO, TicketStatus.IN_TIROCINIO,
             TicketStatus.FORM_RESTITUZIONE);
     private static final DateTimeFormatter DAY = DateTimeFormatter.ofPattern("d/M/yyyy", Locale.ITALIAN);
 
@@ -72,16 +75,13 @@ public class InternshipServiceImpl implements InternshipService {
     @Override
     @Transactional(readOnly = true)
     public InternshipDTO get(String ticketId) {
-        Ticket ticket = ownTicket(ticketId);
-        if (!READABLE.contains(ticket.getStatus())) {
-            throw new ConflictException("La scheda del tirocinio si compila dopo l'appuntamento fissato");
-        }
+        Ticket ticket = internshipTicket(ticketId);
         return toDto(ticket, internshipRepository.findByTicketId(ticket.getId()).orElse(null));
     }
 
     @Override
     public InternshipDTO save(String ticketId, InternshipFormDTO dto) {
-        Ticket ticket = editableTicket(ticketId);
+        Ticket ticket = internshipTicket(ticketId);
         Optional<Internship> existing = internshipRepository.findByTicketId(ticket.getId());
         if (existing.isPresent() != (dto.version() != null)
                 || existing.filter(i -> i.getVersion() != dto.version()).isPresent()) {
@@ -145,7 +145,7 @@ public class InternshipServiceImpl implements InternshipService {
 
     @Override
     public LegalRepresentativeDTO addLegalRepresentative(String ticketId, LegalRepresentativeFormDTO dto) {
-        Company company = company(editableTicket(ticketId));
+        Company company = company(internshipTicket(ticketId));
         String companyId = TsidMapper.toExternal(company.getId());
         if (companyLegalDataService.legalRepresentative(companyId).isPresent()) {
             throw new ConflictException("Il legale rappresentante di %s è già indicato: per correggerlo rivolgiti al "
@@ -158,7 +158,7 @@ public class InternshipServiceImpl implements InternshipService {
 
     @Override
     public AtecoCodeDTO addAtecoCode(String ticketId, AtecoCodeFormDTO dto) {
-        Company company = company(editableTicket(ticketId));
+        Company company = company(internshipTicket(ticketId));
         return companyLegalDataService.addAtecoCode(TsidMapper.toExternal(company.getId()), dto);
     }
 
@@ -194,11 +194,11 @@ public class InternshipServiceImpl implements InternshipService {
         throw new NotFoundException("Segnalazione non trovata");
     }
 
-    private Ticket editableTicket(String ticketId) {
+    /** Segnalazione del Tutor corrente con la scheda: dall'appuntamento fissato in poi. */
+    private Ticket internshipTicket(String ticketId) {
         Ticket ticket = ownTicket(ticketId);
-        if (ticket.getStatus() != TicketStatus.APPUNTAMENTO) {
-            throw new ConflictException("La scheda del tirocinio si modifica con l'appuntamento fissato, prima "
-                    + "dell'avvio del tirocinio");
+        if (!WITH_INTERNSHIP.contains(ticket.getStatus())) {
+            throw new ConflictException("La scheda del tirocinio si compila dopo l'appuntamento fissato");
         }
         return ticket;
     }
@@ -291,13 +291,12 @@ public class InternshipServiceImpl implements InternshipService {
         LegalRepresentativeDTO rep = companyId == null ? null
                 : companyLegalDataService.legalRepresentative(companyId).orElse(null);
         List<AtecoCodeDTO> codes = companyId == null ? List.of() : companyLegalDataService.atecoCodes(companyId);
-        boolean editable = ticket.getStatus() == TicketStatus.APPUNTAMENTO;
         String companyName = company == null ? null : company.getName();
         if (i == null) {
-            return new InternshipDTO(null, editable, companyName, rep, codes, null, null, null, null, null, null,
+            return new InternshipDTO(null, companyName, rep, codes, null, null, null, null, null, null,
                     List.of(), null, null, null, null, List.of(), null);
         }
-        return new InternshipDTO(i.getVersion(), editable, companyName, rep, codes,
+        return new InternshipDTO(i.getVersion(), companyName, rep, codes,
                 referenceMapper.toDto(i.getInternshipType()), i.getStartDate(), i.getExpectedEndDate(),
                 i.getWeeklyHours(), i.getSite(),
                 i.getAtecoCode() == null ? null : TsidMapper.toExternal(i.getAtecoCode().getId()), tutors(i),

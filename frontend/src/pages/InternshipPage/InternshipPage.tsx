@@ -23,17 +23,10 @@ import {
 
 type Outcome = { text: string; error?: boolean };
 
-const dateFormat = new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' });
-
-/** Giorno ISO (aaaa-mm-gg) in esteso, senza passare dal fuso orario. */
-const formatDay = (iso: string): string => {
-  const [y, m, d] = iso.split('-').map(Number);
-  return dateFormat.format(new Date(y, m - 1, d));
-};
-
 /**
  * Scheda amministrativa del tirocinio (US-1001), solo per il Tutor della segnalazione: in alto i dati dell'azienda
- * (legale rappresentante e ATECO, che si salvano subito), sotto il modulo della scheda. Dopo l'avvio si legge soltanto.
+ * (legale rappresentante e ATECO, che si salvano subito), sotto il modulo della scheda. Il Tutor la corregge in
+ * qualunque momento, anche a tirocinio avviato (PO, 29/10).
  */
 export const InternshipPage = () => {
   const { t } = useTranslation();
@@ -88,7 +81,7 @@ export const InternshipPage = () => {
           company: data.companyName ?? t('internship.none'),
         })}
       </p>
-      <p>{data.editable ? t('internship.intro') : t('internship.readOnly')}</p>
+      <p>{t('internship.intro')}</p>
 
       {outcome && (
         <div
@@ -107,18 +100,14 @@ export const InternshipPage = () => {
       <CompanyData ticketId={id} internship={data} onOutcome={setOutcome} />
 
       <div className="rounded-xl border border-border bg-card p-4">
-        {data.editable ? (
-          <InternshipForm
-            // nuova versione = valori aggiornati nel modulo
-            key={data.version ?? 'new'}
-            internship={data}
-            onSubmit={(payload) => save.mutateAsync({ ticketId: id, payload })}
-            onSuccess={() => setOutcome({ text: t('internship.saved') })}
-            onConflict={(reason) => setOutcome({ text: t('internship.conflict', { reason }), error: true })}
-          />
-        ) : (
-          <InternshipSummary internship={data} />
-        )}
+        <InternshipForm
+          // nuova versione = valori aggiornati nel modulo
+          key={data.version ?? 'new'}
+          internship={data}
+          onSubmit={(payload) => save.mutateAsync({ ticketId: id, payload })}
+          onSuccess={() => setOutcome({ text: t('internship.saved') })}
+          onConflict={(reason) => setOutcome({ text: t('internship.conflict', { reason }), error: true })}
+        />
       </div>
 
       {backLink}
@@ -160,7 +149,7 @@ const CompanyData = ({ ticketId, internship, onOutcome }: CompanyDataProps) => {
 
       <h3 className="font-semibold">{t('legalRep.heading')}</h3>
       {rep ? <LegalRepresentativeDetails rep={rep} /> : <p>{t('internship.legalRepNone')}</p>}
-      {!rep && internship.editable && form !== 'legalRep' && (
+      {!rep && form !== 'legalRep' && (
         <Button size="lg" onClick={() => setForm('legalRep')}>
           {t('internship.legalRepAdd')}
         </Button>
@@ -199,7 +188,7 @@ const CompanyData = ({ ticketId, internship, onOutcome }: CompanyDataProps) => {
           ))}
         </ul>
       )}
-      {internship.editable && form !== 'ateco' && (
+      {form !== 'ateco' && (
         <Button size="lg" variant="outline" onClick={() => setForm('ateco')}>
           <Plus aria-hidden="true" />
           {t('internship.atecoAdd')}
@@ -220,59 +209,6 @@ const CompanyData = ({ ticketId, internship, onOutcome }: CompanyDataProps) => {
           />
         </div>
       )}
-    </section>
-  );
-};
-
-/** Scheda in sola lettura, dopo l'avvio del tirocinio. */
-const InternshipSummary = ({ internship: i }: { internship: Internship }) => {
-  const { t } = useTranslation();
-  const value = (v?: string | null): string => v || t('internship.none');
-  const day = (v?: string | null): string => (v ? formatDay(v) : t('internship.none'));
-  const ateco = i.atecoCodes.find((a) => a.id === i.atecoCodeId);
-  return (
-    <section aria-labelledby="internship-summary" className="space-y-3">
-      <h2 id="internship-summary" className="text-lg font-semibold text-primary">
-        {t('internship.sections.internship')}
-      </h2>
-      <dl className="grid gap-x-6 gap-y-2 sm:grid-cols-[max-content_1fr]">
-        <dt className="font-medium">{t('internship.fields.internshipType')}</dt>
-        <dd>{value(i.internshipType?.name)}</dd>
-        <dt className="font-medium">{t('internship.fields.startDate')}</dt>
-        <dd>{day(i.startDate)}</dd>
-        <dt className="font-medium">{t('internship.fields.expectedEndDate')}</dt>
-        <dd>{day(i.expectedEndDate)}</dd>
-        <dt className="font-medium">{t('internship.fields.weeklyHours')}</dt>
-        <dd>{typeof i.weeklyHours === 'number' ? i.weeklyHours : t('internship.none')}</dd>
-        <dt className="font-medium">{t('internship.fields.site')}</dt>
-        <dd>{value(i.site)}</dd>
-        <dt className="font-medium">{t('internship.fields.atecoCode')}</dt>
-        <dd>{ateco ? ateco.code : t('internship.none')}</dd>
-        <dt className="font-medium">{t('internship.sections.companyTutors')}</dt>
-        <dd>
-          {i.companyTutors.length === 0
-            ? t('internship.none')
-            : i.companyTutors.map((c) => [c.fullName, c.contact].filter(Boolean).join(', ')).join('; ')}
-        </dd>
-        <dt className="font-medium">{t('internship.sections.suspensions')}</dt>
-        <dd>
-          {i.suspensions.length === 0
-            ? t('internship.none')
-            : i.suspensions
-                .map((s) => t('internship.period', { from: formatDay(s.from), to: formatDay(s.to) }))
-                .join('; ')}
-        </dd>
-        <dt className="font-medium">{t('internship.fields.fiscalCode')}</dt>
-        <dd className="font-mono">{value(i.fiscalCode)}</dd>
-        <dt className="font-medium">{t('internship.fields.birthDate')}</dt>
-        <dd>{day(i.birthDate)}</dd>
-        <dt className="font-medium">{t('internship.fields.birthPlace')}</dt>
-        <dd>{value(i.birthPlace)}</dd>
-        <dt className="font-medium">{t('internship.fields.residence')}</dt>
-        <dd>{value(i.residence)}</dd>
-        <dt className="font-medium">{t('internship.fields.notes')}</dt>
-        <dd className="whitespace-pre-line">{value(i.notes)}</dd>
-      </dl>
     </section>
   );
 };

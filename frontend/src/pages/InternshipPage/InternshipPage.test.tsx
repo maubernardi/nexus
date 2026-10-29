@@ -51,7 +51,6 @@ const ticket = {
 
 // come lo manda l'API: i campi vuoti sono omessi
 const internship = (overrides: Partial<Internship> = {}): Internship => ({
-  editable: true,
   companyName: 'Demo Ristorazione',
   atecoCodes: [],
   companyTutors: [],
@@ -171,11 +170,12 @@ describe('<InternshipPage>', () => {
     await waitFor(() => expect(outcome).toHaveFocus());
   });
 
-  it('tirocinio avviato: scheda in sola lettura, senza modifiche ai dati dell’azienda', async () => {
+  it('scheda già salvata: il modulo riparte dai dati salvati e si corregge in qualunque momento', async () => {
+    const user = userEvent.setup();
     vi.mocked(fetchInternship).mockResolvedValue(
       internship({
-        editable: false,
         version: 4,
+        legalRepresentative: { firstName: 'Laura', lastName: 'Bianchi', version: 0 },
         internshipType: { id: 'T1', code: 'CURRICULARE', name: 'Curriculare' },
         startDate: '2026-12-01',
         atecoCodes: [{ id: 'A1', code: '56.10.11' }],
@@ -184,18 +184,26 @@ describe('<InternshipPage>', () => {
         suspensions: [{ from: '2026-12-22', to: '2027-01-06' }],
       }),
     );
+    vi.mocked(saveInternship).mockResolvedValue(internship({ version: 5 }));
     renderPage();
 
+    expect(await screen.findByLabelText('Data di inizio')).toHaveValue('2026-12-01');
+    expect(screen.getByRole('radio', { name: /56\.10\.11/ })).toBeChecked();
+    expect(screen.getByLabelText(/^Nome e cognome del tutor aziendale 1/)).toHaveValue('Anna Verdi');
+    expect(screen.getByLabelText(/^Periodo 1: al/)).toHaveValue('2027-01-06');
+    // il legale rappresentante c'è: da qui non si corregge
     expect(
-      await screen.findByText('Il tirocinio è avviato: la scheda si può solo consultare.'),
-    ).toBeInTheDocument();
-    expect(screen.getByText('Curriculare')).toBeInTheDocument();
-    expect(screen.getByText('1 dicembre 2026')).toBeInTheDocument();
-    expect(screen.getByText('Anna Verdi, 055 123456')).toBeInTheDocument();
-    expect(screen.getByText('dal 22 dicembre 2026 al 6 gennaio 2027')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Salva la scheda' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Aggiungi un codice ATECO' })).not.toBeInTheDocument();
+      screen.queryByRole('button', { name: 'Inserisci il legale rappresentante' }),
+    ).not.toBeInTheDocument();
     await expectNoAxeViolations();
+
+    await user.click(screen.getByRole('button', { name: 'Salva la scheda' }));
+    await screen.findByText('Scheda del tirocinio salvata.');
+    expect(vi.mocked(saveInternship).mock.calls[0][0].payload).toMatchObject({
+      internshipTypeId: 'T1',
+      atecoCodeId: 'A1',
+      version: 4,
+    });
   });
 
   it('prima dell’appuntamento fissato: la scheda non c’è ancora', async () => {

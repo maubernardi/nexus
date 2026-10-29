@@ -125,7 +125,6 @@ class InternshipIT {
         mockMvc.perform(get(base).header(USER, "tutor1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.version").doesNotExist())
-                .andExpect(jsonPath("$.editable").value(true))
                 .andExpect(jsonPath("$.companyName").value(place.company().getName()))
                 .andExpect(jsonPath("$.atecoCodes").isEmpty())
                 .andExpect(jsonPath("$.companyTutors").isEmpty());
@@ -235,7 +234,7 @@ class InternshipIT {
     }
 
     @Test
-    void soloIlTutorDellaSegnalazione_eSoloDallAppuntamento() throws Exception {
+    void soloIlTutorDellaSegnalazione_eDallAppuntamentoInPoi() throws Exception {
         mockMvc.perform(get(base).header(USER, "tutor2")).andExpect(status().isForbidden());
         mockMvc.perform(get(base).header(USER, "operatore.cc")).andExpect(status().isForbidden());
         mockMvc.perform(get(base).header(USER, "admin")).andExpect(status().isForbidden());
@@ -244,14 +243,27 @@ class InternshipIT {
         ticket.setStatus(TicketStatus.PROPOSTA_ACCOLTA);
         em.flush();
         mockMvc.perform(get(base).header(USER, "tutor1")).andExpect(status().isConflict());
+        save("tutor1", form("\"version\": null")).andExpect(status().isConflict());
+    }
 
-        // tirocinio avviato: si legge, non si modifica
+    @Test
+    void ilTutorLaModificaInQualunqueMomento_ancheATirocinioAvviatoOConcluso() throws Exception {
+        save("tutor1", form("\"weeklyHours\": 20, \"version\": null")).andExpect(status().isOk());
+
         ticket.setStatus(TicketStatus.IN_TIROCINIO);
         em.flush();
-        mockMvc.perform(get(base).header(USER, "tutor1"))
+        save("tutor1", form("\"weeklyHours\": 25, \"version\": %d".formatted(version())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.editable").value(false));
-        save("tutor1", form("\"version\": null")).andExpect(status().isConflict());
+                .andExpect(jsonPath("$.weeklyHours").value(25));
+        mockMvc.perform(post(base + "/ateco-codes").header(USER, "tutor1")
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"code\": \"56.10\"}"))
+                .andExpect(status().isCreated());
+
+        ticket.setStatus(TicketStatus.FORM_RESTITUZIONE);
+        em.flush();
+        save("tutor1", form("\"weeklyHours\": 30, \"version\": %d".formatted(version())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.weeklyHours").value(30));
     }
 
     @Test

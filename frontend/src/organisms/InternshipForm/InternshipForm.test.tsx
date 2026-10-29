@@ -22,7 +22,6 @@ const error = (status: number, body: Record<string, unknown>) =>
 
 // come lo manda l'API per una scheda mai salvata: i campi vuoti sono omessi
 const empty: Internship = {
-  editable: true,
   companyName: 'Demo Ristorazione',
   atecoCodes: [{ id: 'A1', code: '56.10.11', description: 'Ristorazione con somministrazione' }],
   companyTutors: [],

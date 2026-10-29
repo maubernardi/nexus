@@ -7,12 +7,15 @@
 - [x] 1.5 Azzeramento della scheda all'appuntamento fallito
 - [x] 1.6 IT (`InternshipIT`): stati, accessi, salvataggio parziale, versione, controlli, dati dell'azienda, appuntamento fallito, audit
 
+- [x] 1.7 Scheda modificabile in qualunque momento, anche a tirocinio avviato (PO, 29/10)
+
 ## 2. Frontend
 
 - [x] 2.1 API e hook della scheda
 - [x] 2.2 Moduli di legale rappresentante e ATECO resi riusabili
 - [x] 2.3 Pagina "Scheda del tirocinio", collegamento dalla segnalazione e voce della cronologia
 - [x] 2.4 Test dei componenti con axe
+- [x] 2.5 Niente più sola lettura dopo l'avvio: modulo sempre disponibile (PO, 29/10)
 
 ## 3. Consegna
 

@@ -389,9 +389,8 @@ export const it = {
   internship: {
     heading: 'Scheda del tirocinio · segnalazione n. {{number}}',
     intro:
-      'I dati per Convenzione e Progetto Formativo. Puoi salvare anche una parte: la scheda completa servirà per avviare il tirocinio.',
+      'I dati per Convenzione e Progetto Formativo. Puoi salvarne anche una parte e correggerla in qualunque momento, anche a tirocinio avviato.',
     who: 'Beneficiario: {{beneficiary}} · Azienda: {{company}}',
-    readOnly: 'Il tirocinio è avviato: la scheda si può solo consultare.',
     notAvailable: 'La scheda del tirocinio si compila dopo l’appuntamento fissato.',
     loadError: 'Impossibile caricare la scheda del tirocinio.',
     backToTicket: 'Torna alla segnalazione',
@@ -451,7 +450,6 @@ export const it = {
     saved: 'Scheda del tirocinio salvata.',
     conflict: 'Non salvata: {{reason}}',
     none: 'Non indicato',
-    period: 'dal {{from}} al {{to}}',
     errors: {
       weeklyHours: 'Inserisci un numero intero da 1 a 40',
       endBeforeStart: 'La fine prevista non può precedere l’inizio',
@@ -664,8 +662,7 @@ export const it = {
     internship: {
       heading: 'Scheda del tirocinio',
       text: 'I dati per Convenzione e Progetto Formativo: la scheda la vedi solo tu.',
-      open: 'Compila la scheda del tirocinio',
-      view: 'Vedi la scheda del tirocinio',
+      open: 'Apri la scheda del tirocinio',
     },
     appointment: {
       set: 'Appuntamento fissato',

@@ -25,8 +25,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Scheda amministrativa del tirocinio (US-1001), una per segnalazione: la compila il Tutor dopo l'appuntamento fissato.
- * Campi segnaposto fino ai moduli ufficiali (Q5), tutti facoltativi. Contiene dati personali del beneficiario e dei
+ * Scheda amministrativa del tirocinio (US-1001), una per segnalazione: la compila il Tutor dopo l'appuntamento fissato
+ * e la corregge in qualunque momento. Campi segnaposto fino ai moduli ufficiali (Q5), tutti facoltativi. Contiene dati personali del beneficiario e dei
  * tutor aziendali: {@code toString()} senza valori (da {@link AbstractTsidEntity}), mai nei log.
  */
 @Getter

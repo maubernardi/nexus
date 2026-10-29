@@ -12,10 +12,10 @@ segnalazione sia la sua:
 - un Tutor dello stesso progetto riceve `403`;
 - il Call Center e l'ADMIN non hanno accesso, perché la scheda contiene dati personali che non servono loro.
 
-Lettura e modifica dipendono dallo stato:
-- si legge in `APPUNTAMENTO` e dopo (`IN_TIROCINIO`, `FORM_RESTITUZIONE`);
-- si modifica solo in `APPUNTAMENTO`;
-- negli altri stati la risposta è `409`.
+La scheda c'è dall'appuntamento fissato in poi (`APPUNTAMENTO`, `IN_TIROCINIO`, `FORM_RESTITUZIONE`). In questi
+stati il Tutor la legge e la modifica in qualunque momento, anche a tirocinio avviato: lo ha deciso il PO il 29/10,
+correggendo la prima versione, che la bloccava all'avvio. Lo stesso vale per legale rappresentante e ATECO aggiunti
+dalla scheda. Prima dell'appuntamento fissato, o se la segnalazione è riaperta, la risposta è `409`.
 
 ### D3 — Salvataggi parziali
 Ogni campo è facoltativo: la scheda si compila un po' alla volta. Si controlla solo ciò che c'è:

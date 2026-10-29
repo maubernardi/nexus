@@ -447,7 +447,7 @@ describe('<TicketPage>', () => {
       expect.anything(),
     );
     // con l'appuntamento fissato si compila la scheda del tirocinio (US-1001)
-    expect(await screen.findByRole('link', { name: 'Compila la scheda del tirocinio' })).toHaveAttribute(
+    expect(await screen.findByRole('link', { name: 'Apri la scheda del tirocinio' })).toHaveAttribute(
       'href',
       '/segnalazioni/T9/tirocinio',
     );
