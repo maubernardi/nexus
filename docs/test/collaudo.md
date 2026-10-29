@@ -9,8 +9,8 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | https://portalenexus.it |
-| **Versione della demo** | `b8930e7` (28/10/2026): Sprint 1–6 completi. Le sezioni 12–14 (Sprint 7) richiedono il deploy dello Sprint 7 |
-| **Ultimo aggiornamento** | 29/10/2026 (aggiunte le sezioni 12–14 dello Sprint 7: candidature e corsia veloce, cataloghi, dati dell'azienda e scheda del tirocinio) |
+| **Versione della demo** | `db3fdaa` (29/10/2026): Sprint 1–7 completi e pagina di accesso con il tema di NEXUS |
+| **Ultimo aggiornamento** | 29/10/2026 (sezioni 12–15 dello Sprint 7; T-1.2 con i menu attuali) |
 
 ## Come prepararsi
 
@@ -38,9 +38,10 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
   2. **Atteso:** si apre la Home "Segnalazioni"; in alto il nome "Tutor Uno" (su smartphone dentro il menu) e "Esci".
 
 - [ ] **T-1.2 Menu per ruolo**
-  1. Come `tutor1`: il menu ha **Segnalazioni** e **Beneficiari**, più la campanella delle notifiche.
-  2. Esci ed entra come `operatore.cc`: il menu ha **Segnalazioni** e **Aziende**.
-  3. Esci ed entra come `admin`: il menu ha **Segnalazioni**, **Aziende** e **Calendario**.
+  1. Come `tutor1`: il menu ha **Segnalazioni**, **Beneficiari** e **Bacheca**, più la campanella delle notifiche.
+  2. Esci ed entra come `operatore.cc`: il menu ha **Segnalazioni**, **Aziende** e **Bacheca**.
+  3. Esci ed entra come `admin`: il menu ha **Segnalazioni**, **Aziende**, **Bacheca**, **Cataloghi** e
+     **Calendario**.
   4. **Atteso:** ogni ruolo vede solo le sue voci; la voce della pagina aperta è evidenziata (sottolineata in oro).
 
 - [ ] **T-1.3 Pagina non consentita**
@@ -522,3 +523,18 @@ bozza nata da un rilancio.
      il testo avvisa che della scheda restano solo i dati del beneficiario.
   2. Quando la segnalazione avrà un nuovo appuntamento fissato, apri la scheda. **Atteso:** codice fiscale, nascita e
      residenza ci sono; tipo, date, sede, ATECO, tutor, sospensioni, griglia e note sono vuoti.
+
+## 15. Pagina di accesso (Sprint 7)
+
+- [ ] **T-15.1 Aspetto del sito**
+  1. Esci e apri https://portalenexus.it.
+  2. **Atteso:** pagina "Accedi a NEXUS" con la barra verde e il filetto oro, il logo, "NEXUS · Area Lavoro e Call
+     Center Sociale", il titolo con il filetto oro, il pulsante "Accedi" verde e il piè di pagina del sito.
+  3. Con il telefono o il computer in **modalità scura**. **Atteso:** la pagina passa ai colori scuri del sito.
+  4. Sul telefono. **Atteso:** nessuno scorrimento laterale, campi e pulsante comodi da toccare.
+
+- [ ] **T-15.2 Solo italiano ed errore di accesso**
+  1. **Atteso:** nessun selettore della lingua; anche con il browser in inglese la pagina resta in italiano.
+  2. Entra con un utente esistente e una password sbagliata. **Atteso:** "Nome utente o password non validi." in
+     rosso, con il campo evidenziato.
+  3. Entra con le credenziali giuste. **Atteso:** si apre la Home di NEXUS.

@@ -120,7 +120,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1301](#us-1301) | E13 | Verifica della PWA online | Must | 1 | R1 | 📋 Backlog |
 | [US-1302](#us-1302) | E13 | Backup del database | Must | 5 | R4 | 📋 Backlog |
 | [US-1303](#us-1303) | E13 | Anonimizzazione a scadenza | Must | 5 | R4 | 📋 Backlog |
-| [US-1304](#us-1304) | E13 | Tema di Keycloak | Should | 3 | R4 | 📋 Backlog |
+| [US-1304](#us-1304) | E13 | Tema di Keycloak | Should | 3 | R4 | 🎉 Done (Sprint 7, fuori piano) |
 | [US-1305](#us-1305) | E13 | Revisione UX/UI | Should | 8 | R4 | 📋 Backlog |
 | [US-1306](#us-1306) | E13 | Passaggio in produzione | Must | 5 | R4 | 📋 Backlog |
 | [US-1307](#us-1307) | E13 | Monitoraggio e revisione di sicurezza | Must | 5 | R4 | 📋 Backlog |
@@ -871,12 +871,14 @@ Criteri di accettazione:
 - Restano solo i dati statistici; l'operazione è registrata.
 
 #### US-1304
-**Tema di Keycloak** · Should · 3 punti · R4 · 📋 Backlog
+**Tema di Keycloak** · Should · 3 punti · R4 · 🎉 Done (Sprint 7, fuori piano)
 
 Come **utente** voglio una pagina di login con l'identità visiva di NEXUS per riconoscere l'app e fidarmi.
 
 Criteri di accettazione:
 - Login con la palette NEXUS, 0 violazioni WCAG, in italiano.
+- Anticipata il 29/10 su richiesta del PO: aspetto del sito (intestazione, colori chiari e scuri, piè di pagina);
+  localizzazione attiva ma con il **solo italiano**, senza selettore della lingua.
 
 #### US-1305
 **Revisione UX/UI** · Should · 8 punti · R4 · 📋 Backlog

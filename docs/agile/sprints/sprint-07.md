@@ -31,6 +31,9 @@ un tetto: «preferisco di più che di meno» (PO, 28/10).
 
 **Velocità:** 31 punti (26 di impegno più 5 di extra).
 
+**Fuori piano:** US-1304 *Tema di Keycloak* (3), anticipata da R4 su richiesta del PO del 29/10
+([#85](https://github.com/maubernardi/nexus/pull/85)); conteggio nella velocity da decidere nella review (§8.1).
+
 Ordine: preparazione comune dei test (azione A7) → US-306 → US-403 → US-404 → US-106 → US-108 → US-506 → US-1001. Una PR per storia; gli
 stati del backlog si aggiornano nella PR di documentazione dopo i merge. Per il PO: collaudo (T-5.8, T-5.9, sezione 11)
 e US-1301.
@@ -89,4 +92,4 @@ e US-1301.
 
 ## Review, retrospettiva e planning successivo
 
-In un unico documento asincrono a fine sprint.
+[Review dello Sprint 7](sprint-07-review.md), con la retrospettiva e la proposta per lo Sprint 8.
