@@ -30,7 +30,8 @@ services:
     logging: *logging
 
   keycloak:
-    image: quay.io/keycloak/keycloak:26.7.4
+    # Keycloak 26.7.4 con il tema di accesso "nexus" (keycloak/Dockerfile)
+    image: ${NEXUS_REGISTRY:-ghcr.io/maubernardi}/nexus-keycloak:${NEXUS_VERSION:?}
     restart: unless-stopped
     command: ["start", "--import-realm"]
     environment:

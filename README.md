@@ -17,6 +17,7 @@ nexus/
 ├── backend/    Spring Boot 4.1 · Java 25 LTS · PostgreSQL · Flyway · Spring Security 7 (Keycloak JWT)
 ├── frontend/   React 19.3 · React Router 8 · Vite 8 · TypeScript 6 · Tailwind v4 + shadcn/ui · PWA (Workbox)
 ├── infra/      docker-compose: PostgreSQL 18 + Keycloak 26.7 (realm "nexus" importato)
+├── keycloak/   tema di accesso "nexus" (aspetto del sito, solo italiano) e immagine nexus-keycloak
 └── openspec/   specifiche e change proposal (spec-driven development)
 ```
 
@@ -61,6 +62,9 @@ in stati diversi e 3 post di bacheca. Gli script sono idempotenti; per ripartire
 cd backend && PROFILES_ACTIVE=keycloak,seed ./mvnw spring-boot:run
 cd frontend && VITE_AUTH_MODE=keycloak pnpm dev
 ```
+
+La pagina di accesso usa il tema `keycloak/themes/nexus`, montato nel Keycloak di sviluppo: in `start-dev` la cache dei
+temi è spenta, quindi le modifiche a template, CSS e testi si vedono ricaricando la pagina.
 
 ### Utenti di test
 
@@ -124,7 +128,7 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
 | Cosa | Dove |
 |---|---|
 | Stack (Caddy, backend, Keycloak, PostgreSQL) | `infra/deploy/compose.yaml` |
-| Immagini | `backend/Dockerfile`, `frontend/Dockerfile` + `frontend/Caddyfile` → `ghcr.io/maubernardi/nexus-{backend,web}` |
+| Immagini | `backend/Dockerfile`, `frontend/Dockerfile` + `frontend/Caddyfile`, `keycloak/Dockerfile` (tema di accesso) → `ghcr.io/maubernardi/nexus-{backend,web,keycloak}` |
 | Preparazione del server (una volta) | `infra/deploy/bootstrap.sh` |
 | Deploy | GitHub → Actions → **Deploy demo** → *Run workflow* (`.github/workflows/deploy-demo.yml`) |
 
@@ -134,6 +138,17 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
   rileggono con `sudo cat /opt/nexus/.env`.
 - **Console di Keycloak** non esposta su Internet: `ssh -L 8081:127.0.0.1:8081 <server>`, poi
   `http://localhost:8081/admin` (utente `admin`, password `KEYCLOAK_ADMIN_PASSWORD` del `.env`).
+- **Tema e lingua del realm (una volta, dopo il primo deploy con il tema).** L'import all'avvio non modifica un realm
+  già esistente: sulla demo tema `nexus` e sola lingua italiana si impostano con
+  ```bash
+  cd /opt/nexus/current && sudo docker compose --env-file ../.env --env-file release.env exec -T keycloak bash -c \
+    '/opt/keycloak/bin/kcadm.sh config credentials --server http://localhost:8080 --realm master --user admin \
+       --password "$KC_BOOTSTRAP_ADMIN_PASSWORD" --config /tmp/kcadm.config \
+     && /opt/keycloak/bin/kcadm.sh update realms/nexus --config /tmp/kcadm.config -s loginTheme=nexus \
+       -s internationalizationEnabled=true -s "supportedLocales=[\"it\"]" -s defaultLocale=it; rm -f /tmp/kcadm.config'
+  ```
+  oppure dalla console: *Realm settings → Themes → Login theme* `nexus`; *Localization → Supported locales* solo
+  Italiano. Utenti e client non cambiano.
 - **Stato e log sul server:**
   `cd /opt/nexus/current && sudo docker compose --env-file ../.env --env-file release.env ps` (oppure `logs -f backend`).
 - **DNS (IONOS):** A `@`, `auth`, `www` → IP del server; CAA `0 issue "letsencrypt.org"`; i record email restano.

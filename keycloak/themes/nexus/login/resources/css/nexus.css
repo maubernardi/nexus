@@ -1,0 +1,313 @@
+/*
+ * NEXUS: aspetto del sito sulla pagina di accesso (sopra PatternFly 5 di keycloak.v2). I colori sono i token di
+ * frontend/src/index.css, già verificati per WCAG 2.2 AA in chiaro e in scuro: se cambiano lì, vanno cambiati qui.
+ */
+:root {
+  --nexus-background: #fdfbf7;
+  --nexus-foreground: #0f2417;
+  --nexus-card: #ffffff;
+  --nexus-brand: #014c17;
+  --nexus-brand-foreground: #fdfbf7;
+  --nexus-gold: #d4af37;
+  --nexus-primary: #014c17;
+  --nexus-primary-hover: #013311;
+  --nexus-primary-foreground: #fdfbf7;
+  --nexus-muted: #eff5ef;
+  --nexus-muted-foreground: #3f5a47;
+  --nexus-border: #d6e4d9;
+  /* bordi dei controlli: contrasto non testuale >= 3:1 */
+  --nexus-input: #5b7a63;
+  /* focus: Irish Green (3,8:1 sul fondo) */
+  --nexus-ring: #019529;
+  --nexus-destructive: #b42318;
+  --nexus-destructive-background: #fef3f2;
+  --nexus-radius: 0.625rem;
+  --nexus-font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* PatternFly: font, colori e raggi del sito */
+  --pf-v5-global--FontFamily--text: var(--nexus-font);
+  --pf-v5-global--FontFamily--heading: var(--nexus-font);
+  --pf-v5-global--FontFamily--redhat-updated--sans-serif: var(--nexus-font);
+  --pf-v5-global--FontFamily--redhat-updated--heading--sans-serif: var(--nexus-font);
+  --pf-v5-global--primary-color--100: var(--nexus-primary);
+  --pf-v5-global--primary-color--200: var(--nexus-primary-hover);
+  --pf-v5-global--link--Color: var(--nexus-primary);
+  --pf-v5-global--link--Color--hover: var(--nexus-primary-hover);
+  --pf-v5-global--BackgroundColor--100: var(--nexus-card);
+  --pf-v5-global--BackgroundColor--200: var(--nexus-background);
+  --pf-v5-global--Color--100: var(--nexus-foreground);
+  --pf-v5-global--Color--200: var(--nexus-muted-foreground);
+  --pf-v5-global--BorderColor--100: var(--nexus-border);
+  --pf-v5-global--danger-color--100: var(--nexus-destructive);
+  --pf-v5-global--BorderRadius--sm: calc(var(--nexus-radius) - 2px);
+}
+
+/* Tema scuro: keycloak.v2 aggiunge la classe quando il sistema lo preferisce, come fa il sito */
+:root.pf-v5-theme-dark {
+  --nexus-background: #0b1a10;
+  --nexus-foreground: #f4f1e8;
+  --nexus-card: #12261a;
+  --nexus-brand: #0e3a1c;
+  --nexus-brand-foreground: #fdfbf7;
+  --nexus-primary: #5ccb7c;
+  --nexus-primary-hover: #7fd897;
+  --nexus-primary-foreground: #0b1a10;
+  --nexus-muted: #16301f;
+  --nexus-muted-foreground: #b7cdbe;
+  --nexus-border: #25402d;
+  --nexus-input: #7f9f88;
+  --nexus-ring: #d4af37;
+  --nexus-destructive: #f97066;
+  --nexus-destructive-background: #2a1210;
+}
+
+/* Rispetta la dimensione del testo scelta dall'utente (zoom 200%) */
+html.login-pf {
+  font-size: 100%;
+}
+
+.login-pf body {
+  background: var(--nexus-background);
+  color: var(--nexus-foreground);
+  font-family: var(--nexus-font);
+  line-height: 1.5;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Focus visibile uniforme (WCAG 2.4.7 / 2.4.11 / 2.4.13) */
+.login-pf :focus-visible {
+  outline: 2px solid var(--nexus-ring);
+  outline-offset: 2px;
+}
+
+/* Intestazione: fondo Deep Emerald con filetto oro, come nel sito; dentro, il focus è oro */
+.nexus-header {
+  background: var(--nexus-brand);
+  border-bottom: 2px solid var(--nexus-gold);
+  color: var(--nexus-brand-foreground);
+  --nexus-ring: var(--nexus-gold);
+}
+
+.nexus-header__inner {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin: 0 auto;
+  max-width: 72rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+}
+
+.nexus-header__logo {
+  height: 2rem;
+  width: 2rem;
+}
+
+.nexus-header__name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+}
+
+.nexus-header__tagline {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+/* Contenuto: il riquadro di accesso al centro, senza lo sfondo e l'intestazione di Keycloak */
+.pf-v5-c-login {
+  flex: 1;
+  /* PatternFly vuole tutta l'altezza della finestra: qui la divide con intestazione e piè di pagina */
+  min-height: 0;
+  --pf-v5-c-login--PaddingTop: 2.5rem;
+  --pf-v5-c-login--PaddingBottom: 2.5rem;
+}
+
+.pf-v5-c-login__container {
+  grid-template-areas: 'main';
+  grid-template-columns: minmax(0, 30rem);
+  /* margine di 16 px anche sul telefono */
+  padding-inline: 1rem;
+}
+
+.pf-v5-c-login__main {
+  background: var(--nexus-card);
+  border: 1px solid var(--nexus-border);
+  border-radius: calc(var(--nexus-radius) + 4px);
+  box-shadow: 0 1px 3px rgb(15 36 23 / 0.08);
+  color: var(--nexus-foreground);
+}
+
+.pf-v5-c-login__main-header {
+  border-top: 0;
+}
+
+/* Titolo come quello delle pagine del sito: verde, con il filetto oro sotto */
+#kc-page-title {
+  color: var(--nexus-primary);
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+#kc-page-title::after {
+  background: var(--nexus-gold);
+  border-radius: 9999px;
+  content: '';
+  display: block;
+  height: 0.25rem;
+  margin-top: 0.5rem;
+  width: 3.5rem;
+}
+
+/* Campi: bordi a contrasto 3:1, 44 px di altezza, testo a 16 px (niente zoom su iOS) */
+.login-pf .pf-v5-c-form__label-text {
+  color: var(--nexus-foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.login-pf .pf-v5-c-form-control {
+  --pf-v5-c-form-control--BackgroundColor: var(--nexus-background);
+  background: var(--nexus-background);
+  border: 1px solid var(--nexus-input);
+  border-radius: calc(var(--nexus-radius) - 2px);
+  color: var(--nexus-foreground);
+  min-height: 2.75rem;
+}
+
+/* i bordi di PatternFly (solo sotto, chiari) lasciano il posto al bordo intero del sito */
+.login-pf .pf-v5-c-form-control::before,
+.login-pf .pf-v5-c-form-control::after {
+  border: 0;
+}
+
+.login-pf .pf-v5-c-form-control:hover {
+  border-color: var(--nexus-primary);
+}
+
+/* il campo ha overflow nascosto: il contorno del focus va sul riquadro, non sul controllo interno */
+.login-pf .pf-v5-c-form-control:focus-within {
+  outline: 2px solid var(--nexus-ring);
+  outline-offset: 2px;
+}
+
+.login-pf .pf-v5-c-form-control > :is(input, select):focus-visible {
+  outline: none;
+}
+
+.login-pf .pf-v5-c-form-control > :is(input, select) {
+  color: var(--nexus-foreground);
+  font-size: 1rem;
+  min-height: 2.75rem;
+}
+
+.login-pf .pf-v5-c-form-control.pf-m-error {
+  border: 2px solid var(--nexus-destructive);
+}
+
+.login-pf .pf-v5-c-form-control.pf-m-readonly {
+  background: var(--nexus-muted);
+}
+
+/* campo password con il pulsante "mostra": un unico controllo con il bordo esterno */
+.login-pf .pf-v5-c-input-group > .pf-v5-c-input-group__item:not(:last-child) .pf-v5-c-form-control {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.login-pf .pf-v5-c-helper-text__item-text.pf-m-error,
+.login-pf .kc-feedback-text.pf-m-error {
+  color: var(--nexus-destructive);
+  font-weight: 500;
+}
+
+/* Pulsanti: primario Deep Emerald come nel sito, 44 px di altezza */
+.login-pf .pf-v5-c-button {
+  border-radius: calc(var(--nexus-radius) - 2px);
+  font-size: 1rem;
+  font-weight: 500;
+  min-height: 2.75rem;
+}
+
+.login-pf .pf-v5-c-button.pf-m-primary {
+  --pf-v5-c-button--m-primary--BackgroundColor: var(--nexus-primary);
+  --pf-v5-c-button--m-primary--Color: var(--nexus-primary-foreground);
+  --pf-v5-c-button--m-primary--hover--BackgroundColor: var(--nexus-primary-hover);
+  --pf-v5-c-button--m-primary--hover--Color: var(--nexus-primary-foreground);
+  --pf-v5-c-button--m-primary--focus--BackgroundColor: var(--nexus-primary-hover);
+  --pf-v5-c-button--m-primary--focus--Color: var(--nexus-primary-foreground);
+  --pf-v5-c-button--m-primary--active--BackgroundColor: var(--nexus-primary-hover);
+  --pf-v5-c-button--m-primary--active--Color: var(--nexus-primary-foreground);
+}
+
+.login-pf .pf-v5-c-button.pf-m-secondary {
+  --pf-v5-c-button--m-secondary--Color: var(--nexus-primary);
+  --pf-v5-c-button--m-secondary--BorderColor: var(--nexus-input);
+  --pf-v5-c-button--m-secondary--hover--Color: var(--nexus-primary-hover);
+  --pf-v5-c-button--m-secondary--hover--BorderColor: var(--nexus-primary);
+}
+
+.login-pf .pf-v5-c-button.pf-m-control {
+  --pf-v5-c-button--m-control--Color: var(--nexus-muted-foreground);
+  --pf-v5-c-button--m-control--hover--Color: var(--nexus-primary);
+  --pf-v5-c-button--m-control--BackgroundColor: var(--nexus-background);
+  --pf-v5-c-button--m-control--hover--BackgroundColor: var(--nexus-muted);
+  border: 1px solid var(--nexus-input);
+  border-bottom-left-radius: 0;
+  border-left: 0;
+  border-top-left-radius: 0;
+  min-width: 2.75rem;
+}
+
+.login-pf .pf-v5-c-button.pf-m-control::after {
+  border: 0;
+}
+
+/* Link sottolineati, come nel sito */
+.login-pf a:not(.pf-v5-c-button) {
+  color: var(--nexus-primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.login-pf a:not(.pf-v5-c-button):hover {
+  color: var(--nexus-primary-hover);
+}
+
+/* Messaggi: errore con il rosso del sito */
+.login-pf .pf-v5-c-alert {
+  border-radius: calc(var(--nexus-radius) - 2px);
+  --pf-v5-c-alert--m-inline--BackgroundColor: var(--nexus-muted);
+}
+
+.login-pf .pf-v5-c-alert.pf-m-danger {
+  --pf-v5-c-alert--m-danger--BorderTopColor: var(--nexus-destructive);
+  --pf-v5-c-alert--m-danger__icon--Color: var(--nexus-destructive);
+  --pf-v5-c-alert--m-danger__title--Color: var(--nexus-destructive);
+  --pf-v5-c-alert--m-inline--m-danger--BackgroundColor: var(--nexus-destructive-background);
+}
+
+/* Piè di pagina come nel sito */
+.nexus-footer {
+  background: var(--nexus-muted);
+  border-top: 2px solid var(--nexus-gold);
+  color: var(--nexus-muted-foreground);
+  font-size: 0.875rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+/* Movimento ridotto (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  .login-pf *,
+  .login-pf *::before,
+  .login-pf *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

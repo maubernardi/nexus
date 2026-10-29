@@ -71,7 +71,7 @@ jobs:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
-          for image in backend:backend web:frontend; do
+          for image in backend:backend web:frontend keycloak:keycloak; do
             name="${image%%:*}"; dir="${image##*:}"
             docker build -t "$REGISTRY/nexus-$name:$SHA" -t "$REGISTRY/nexus-$name:demo" "$dir"
             docker push "$REGISTRY/nexus-$name:$SHA"

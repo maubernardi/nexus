@@ -66,6 +66,35 @@ jobs:
       - name: Build PWA
         run: pnpm build
 
+  keycloak-theme:
+    name: Tema di Keycloak
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Immagine con il tema
+        run: docker build -t nexus-keycloak:ci keycloak
+      - name: Pagina di accesso con il tema (realm di sviluppo)
+        run: |
+          docker run -d --name kc -p 8080:8080 -v "$PWD/infra/keycloak:/opt/keycloak/data/import:ro" \
+            -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+            nexus-keycloak:ci start-dev --import-realm
+          for i in $(seq 1 60); do
+            curl -fs -o /dev/null http://localhost:8080/realms/nexus/.well-known/openid-configuration && break
+            [ "$i" -eq 60 ] && { echo "Keycloak non risponde"; exit 1; }
+            sleep 3
+          done
+          # una richiesta di accesso come quella della PWA (PKCE): la pagina deve usare il tema, solo in italiano
+          page=$(curl -fsS "http://localhost:8080/realms/nexus/protocol/openid-connect/auth?client_id=nexus-frontend&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2F&response_type=code&scope=openid&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256")
+          grep -q 'lang="it"' <<<"$page"
+          grep -q '<title>Accedi a NEXUS</title>' <<<"$page"
+          grep -q 'class="nexus-header"' <<<"$page"
+          if grep -q 'login-select-toggle' <<<"$page"; then echo "C'è il selettore della lingua"; exit 1; fi
+          css=$(grep -oE '/resources/[^"]+/login/nexus/css/nexus\.css' <<<"$page")
+          curl -fsS -o /dev/null "http://localhost:8080$css"
+      - name: Log di Keycloak
+        if: failure()
+        run: docker logs kc
+
   openspec:
     name: OpenSpec
     runs-on: ubuntu-26.04
