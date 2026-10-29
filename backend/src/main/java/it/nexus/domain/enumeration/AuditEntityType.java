@@ -11,6 +11,8 @@ public enum AuditEntityType {
     ZONE,
     JOB_CATEGORY,
     INTERNSHIP_TYPE,
+    HIRING_FORMULA,
+    NO_HIRE_REASON,
     APP_USER,
     CALENDAR
 }

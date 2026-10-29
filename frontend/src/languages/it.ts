@@ -977,6 +977,24 @@ export const it = {
       caption_one: 'Tipi di tirocinio: {{count}} voce',
       caption_other: 'Tipi di tirocinio: {{count}} voci',
     },
+    'hiring-formulas': {
+      heading: 'Formule di assunzione',
+      intro:
+        'Nel report di restituzione, se il tirocinio si chiude con un’assunzione, il Tutor sceglie la formula da questo elenco.',
+      add: 'Aggiungi formula',
+      newHeading: 'Nuova formula di assunzione',
+      caption_one: 'Formule di assunzione: {{count}} voce',
+      caption_other: 'Formule di assunzione: {{count}} voci',
+    },
+    'no-hire-reasons': {
+      heading: 'Motivi della mancata assunzione',
+      intro:
+        'Nel report di restituzione, se non c’è assunzione, il Tutor sceglie il motivo da questo elenco.',
+      add: 'Aggiungi motivo',
+      newHeading: 'Nuovo motivo della mancata assunzione',
+      caption_one: 'Motivi della mancata assunzione: {{count}} voce',
+      caption_other: 'Motivi della mancata assunzione: {{count}} voci',
+    },
     columns: { name: 'Nome', code: 'Codice', status: 'Stato', actions: 'Azioni' },
     active: 'Attiva',
     inactive: 'Disattivata',
@@ -1145,7 +1163,7 @@ export const it = {
       title: 'Cataloghi',
       heading: 'Cataloghi',
       intro:
-        'Le zone, le tipologie di mansione e i tipi di tirocinio usati in tutta l’applicazione. Le voci non si cancellano: una voce disattivata non si può più scegliere, ma resta sui dati che la usano.',
+        'Le voci usate in tutta l’applicazione: zone, tipologie di mansione, tipi di tirocinio e le scelte del report di restituzione. Le voci non si cancellano: una voce disattivata non si può più scegliere, ma resta sui dati che la usano.',
     },
     calendar: {
       title: 'Calendario',

@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.domain.AbstractReferenceEntity;
+import it.nexus.domain.HiringFormula;
 import it.nexus.domain.InternshipType;
+import it.nexus.domain.NoHireReason;
 import it.nexus.domain.JobCategory;
 import it.nexus.domain.ReferenceCodes;
 import it.nexus.domain.Zone;
@@ -21,7 +23,9 @@ import it.nexus.domain.dto.CatalogFormDTO;
 import it.nexus.domain.dto.CatalogItemDTO;
 import it.nexus.domain.enumeration.CatalogKind;
 import it.nexus.mapper.TsidMapper;
+import it.nexus.repository.HiringFormulaRepository;
 import it.nexus.repository.InternshipTypeRepository;
+import it.nexus.repository.NoHireReasonRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.ZoneRepository;
 import it.nexus.services.AuditService;
@@ -39,6 +43,8 @@ public class CatalogServiceImpl implements CatalogService {
     private final ZoneRepository zoneRepository;
     private final JobCategoryRepository jobCategoryRepository;
     private final InternshipTypeRepository internshipTypeRepository;
+    private final HiringFormulaRepository hiringFormulaRepository;
+    private final NoHireReasonRepository noHireReasonRepository;
     private final AuditService auditService;
 
     /** Le operazioni che servono su un catalogo: i due repository hanno metodi omonimi ma tipi diversi. */
@@ -64,6 +70,14 @@ public class CatalogServiceImpl implements CatalogService {
                     internshipTypeRepository::findById, internshipTypeRepository::findFirstByNameIgnoreCaseAndActiveTrue,
                     internshipTypeRepository::existsByCode, InternshipType::new,
                     e -> internshipTypeRepository.saveAndFlush((InternshipType) e));
+            case HIRING_FORMULAS -> new Store(hiringFormulaRepository::findAllByOrderByActiveDescNameAsc,
+                    hiringFormulaRepository::findById, hiringFormulaRepository::findFirstByNameIgnoreCaseAndActiveTrue,
+                    hiringFormulaRepository::existsByCode, HiringFormula::new,
+                    e -> hiringFormulaRepository.saveAndFlush((HiringFormula) e));
+            case NO_HIRE_REASONS -> new Store(noHireReasonRepository::findAllByOrderByActiveDescNameAsc,
+                    noHireReasonRepository::findById, noHireReasonRepository::findFirstByNameIgnoreCaseAndActiveTrue,
+                    noHireReasonRepository::existsByCode, NoHireReason::new,
+                    e -> noHireReasonRepository.saveAndFlush((NoHireReason) e));
         };
     }
 
