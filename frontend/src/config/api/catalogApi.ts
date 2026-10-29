@@ -1,8 +1,8 @@
 import { axiosInstance } from '@/config/api/axiosInstance';
 import { ENDPOINTS } from '@/config/api/Endpoint';
 
-/** Cataloghi gestiti dall'ADMIN (US-106). */
-export type CatalogKind = 'zones' | 'job-categories';
+/** Cataloghi gestiti dall'ADMIN (US-106, tipi di tirocinio US-108). */
+export type CatalogKind = 'zones' | 'job-categories' | 'internship-types';
 
 export type CatalogItem = {
   id: string;

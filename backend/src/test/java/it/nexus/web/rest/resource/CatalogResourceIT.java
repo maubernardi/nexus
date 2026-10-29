@@ -2,6 +2,7 @@ package it.nexus.web.rest.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -155,5 +156,25 @@ class CatalogResourceIT {
         mockMvc.perform(post(CATEGORIES).header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
                 .content("{\"name\": \"Prova\"}")).andExpect(status().isForbidden());
         mockMvc.perform(get("/api/v1/catalogs/projects").header(USER, "admin")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void tipiDiTirocinio_vociIniziali_gestiteComeGliAltriCataloghi() throws Exception {
+        mockMvc.perform(get("/api/v1/catalogs/internship-types").header(USER, "admin"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].code", hasItems("CURRICULARE", "EXTRACURRICULARE",
+                        "INCLUSIONE", "SOCIO_TERAPEUTICO")));
+        String id = JsonPath.read(create("/api/v1/catalogs/internship-types", "Estivo")
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.code").value("ESTIVO"))
+                .andReturn().getResponse().getContentAsString(), "$.id");
+        // il Tutor li sceglie nella scheda del tirocinio: solo i tipi attivi
+        action("/api/v1/catalogs/internship-types", id, "deactivate").andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/reference/internship-types").header(USER, "tutor1"))
+                .andExpect(jsonPath("$[*].name", hasItem("Di inclusione")))
+                .andExpect(jsonPath("$[*].name", not(hasItem("Estivo"))));
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.INTERNSHIP_TYPE,
+                TsidMapper.toInternal(id)))
+                .extracting(e -> e.getAction()).containsExactly("CREATE", "DEACTIVATE");
     }
 }

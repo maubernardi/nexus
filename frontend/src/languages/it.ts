@@ -739,6 +739,15 @@ export const it = {
       caption_one: 'Tipologie di mansione: {{count}} voce',
       caption_other: 'Tipologie di mansione: {{count}} voci',
     },
+    'internship-types': {
+      heading: 'Tipi di tirocinio',
+      intro:
+        'Il Tutor sceglie il tipo nella scheda del tirocinio: determina il tipo di documento da preparare.',
+      add: 'Aggiungi tipo',
+      newHeading: 'Nuovo tipo di tirocinio',
+      caption_one: 'Tipi di tirocinio: {{count}} voce',
+      caption_other: 'Tipi di tirocinio: {{count}} voci',
+    },
     columns: { name: 'Nome', code: 'Codice', status: 'Stato', actions: 'Azioni' },
     active: 'Attiva',
     inactive: 'Disattivata',
@@ -907,7 +916,7 @@ export const it = {
       title: 'Cataloghi',
       heading: 'Cataloghi',
       intro:
-        'Le zone e le tipologie di mansione usate in tutta l’applicazione. Le voci non si cancellano: una voce disattivata non si può più scegliere, ma resta su beneficiari, mansioni e segnalazioni che la usano.',
+        'Le zone, le tipologie di mansione e i tipi di tirocinio usati in tutta l’applicazione. Le voci non si cancellano: una voce disattivata non si può più scegliere, ma resta sui dati che la usano.',
     },
     calendar: {
       title: 'Calendario',
