@@ -24,7 +24,10 @@ import it.nexus.web.rest.PathAPI;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-/** Cataloghi di zone ({@code zones}) e tipologie di mansione ({@code job-categories}) per l'ADMIN (US-106). */
+/**
+ * Cataloghi per l'ADMIN: zone ({@code zones}) e tipologie di mansione ({@code job-categories}, US-106), tipi di
+ * tirocinio ({@code internship-types}, US-108).
+ */
 @RestController
 @RequestMapping(PathAPI.BASE_PATH_V1 + "/catalogs/{kind}")
 @RequiredArgsConstructor

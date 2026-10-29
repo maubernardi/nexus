@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.domain.dto.ReferenceItemDTO;
 import it.nexus.mapper.ReferenceMapper;
+import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.ProjectRepository;
 import it.nexus.repository.ZoneRepository;
@@ -21,6 +22,7 @@ public class ReferenceDataServiceImpl implements ReferenceDataService {
 
     private final ZoneRepository zoneRepository;
     private final JobCategoryRepository jobCategoryRepository;
+    private final InternshipTypeRepository internshipTypeRepository;
     private final ProjectRepository projectRepository;
     private final CurrentAppUserService currentAppUserService;
     private final ReferenceMapper mapper;
@@ -33,6 +35,11 @@ public class ReferenceDataServiceImpl implements ReferenceDataService {
     @Override
     public List<ReferenceItemDTO> activeJobCategories() {
         return jobCategoryRepository.findByActiveTrueOrderByNameAsc().stream().map(mapper::toDto).toList();
+    }
+
+    @Override
+    public List<ReferenceItemDTO> activeInternshipTypes() {
+        return internshipTypeRepository.findByActiveTrueOrderByNameAsc().stream().map(mapper::toDto).toList();
     }
 
     @Override

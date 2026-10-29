@@ -42,6 +42,7 @@ import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyNoteRepository;
 import it.nexus.repository.CompanyRepository;
+import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ProjectRepository;
@@ -68,6 +69,7 @@ class DomainConstraintsIT {
     @Autowired ProjectRepository projects;
     @Autowired ZoneRepository zones;
     @Autowired JobCategoryRepository categories;
+    @Autowired InternshipTypeRepository internshipTypes;
     @Autowired AppUserRepository users;
     @Autowired UserProjectRepository userProjects;
     @Autowired CompanyRepository companies;
@@ -114,6 +116,18 @@ class DomainConstraintsIT {
             JobCategory twin = jobCategory(DomainFixtures.code("C"));
             twin.setName(name.toLowerCase());
             assertViolates("uq_job_category_active_name", () -> categories.saveAndFlush(twin));
+        }
+
+        @Test
+        void codiceTipoDiTirocinioDuplicato() {
+            assertViolates("uq_internship_type_code", () -> internshipTypes.saveAndFlush(
+                    new InternshipType("CURRICULARE", "Curriculare bis")));
+        }
+
+        @Test
+        void nomeDiTipoDiTirocinioAttivoDuplicato() {
+            assertViolates("uq_internship_type_active_name", () -> internshipTypes.saveAndFlush(
+                    new InternshipType(DomainFixtures.code("T"), "di INCLUSIONE")));
         }
 
         @Test
