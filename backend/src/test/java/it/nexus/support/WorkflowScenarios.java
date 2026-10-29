@@ -122,8 +122,26 @@ public class WorkflowScenarios {
         return tickets.saveAndFlush(ticket);
     }
 
+    /**
+     * Segnalazione con l'appuntamento fissato (US-801) sulla mansione, che resta bloccata dalla segnalazione; in carico
+     * all'operatore indicato.
+     */
+    public Ticket appointmentTicket(AppUser tutor, Project project, JobSlot slot, AppUser operator) {
+        Ticket ticket = TestEntities.ticket(tutor, project, beneficiary(tutor, placeOf(slot)), slot.getJobCategory());
+        ticket.setStatus(TicketStatus.APPUNTAMENTO);
+        ticket.setAssignedCcOperator(operator);
+        ticket.setJobSlot(slot);
+        Ticket saved = tickets.saveAndFlush(ticket);
+        slot.blockFor(saved);
+        jobSlots.saveAndFlush(slot);
+        return saved;
+    }
+
     private static Place placeOf(BoardPost post) {
-        JobSlot slot = post.getJobSlot();
+        return placeOf(post.getJobSlot());
+    }
+
+    private static Place placeOf(JobSlot slot) {
         return new Place(slot.getZone(), slot.getJobCategory(), slot.getCompany());
     }
 

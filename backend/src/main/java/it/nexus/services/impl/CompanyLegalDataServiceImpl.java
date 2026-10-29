@@ -20,6 +20,7 @@ import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.CompanyAtecoCodeRepository;
 import it.nexus.repository.CompanyLegalRepresentativeRepository;
 import it.nexus.repository.CompanyRepository;
+import it.nexus.repository.InternshipRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.CompanyLegalDataService;
 import it.nexus.web.errors.ConflictException;
@@ -35,6 +36,7 @@ public class CompanyLegalDataServiceImpl implements CompanyLegalDataService {
     private final CompanyRepository companyRepository;
     private final CompanyLegalRepresentativeRepository legalRepresentativeRepository;
     private final CompanyAtecoCodeRepository atecoCodeRepository;
+    private final InternshipRepository internshipRepository;
     private final AuditService auditService;
 
     @Override
@@ -106,6 +108,11 @@ public class CompanyLegalDataServiceImpl implements CompanyLegalDataService {
                 .flatMap(atecoCodeRepository::findById)
                 .filter(a -> a.getCompany().getId().equals(company.getId()))
                 .orElseThrow(() -> new NotFoundException("Codice ATECO non trovato"));
+        // la scheda del tirocinio punta al codice scelto (fk_internship_ateco_code, US-1001)
+        internshipRepository.findFirstByAtecoCodeId(ateco.getId()).ifPresent(i -> {
+            throw new ConflictException("Il codice %s è scelto nella scheda del tirocinio della segnalazione n. %d",
+                    ateco.getCode(), i.getTicket().getNumber());
+        });
         atecoCodeRepository.delete(ateco);
         auditService.record(AuditEntityType.COMPANY, company.getId(), "ATECO_REMOVE",
                 AuditChanges.of().value("atecoCode", ateco.getCode(), null), null);

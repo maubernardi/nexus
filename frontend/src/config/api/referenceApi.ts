@@ -24,3 +24,9 @@ export const fetchJobCategories = async (): Promise<ReferenceItem[]> => {
   const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.jobCategories);
   return data;
 };
+
+/** Tipi di tirocinio attivi (US-108), per la scheda del tirocinio. */
+export const fetchInternshipTypes = async (): Promise<ReferenceItem[]> => {
+  const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.internshipTypes);
+  return data;
+};

@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
@@ -43,6 +44,7 @@ import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyNoteRepository;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.CompanyAtecoCodeRepository;
+import it.nexus.repository.InternshipRepository;
 import it.nexus.repository.CompanyLegalRepresentativeRepository;
 import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.repository.JobCategoryRepository;
@@ -74,6 +76,7 @@ class DomainConstraintsIT {
     @Autowired InternshipTypeRepository internshipTypes;
     @Autowired CompanyLegalRepresentativeRepository legalRepresentatives;
     @Autowired CompanyAtecoCodeRepository atecoCodes;
+    @Autowired InternshipRepository internships;
     @Autowired AppUserRepository users;
     @Autowired UserProjectRepository userProjects;
     @Autowired CompanyRepository companies;
@@ -86,7 +89,6 @@ class DomainConstraintsIT {
     @Autowired CompanyNoteRepository companyNotes;
     @Autowired AuditEventRepository auditLog;
 
-    /** L'operazione deve fallire per il vincolo indicato (nome del vincolo o testo dell'errore del database). */
     private static CompanyLegalRepresentative legalRepresentative(Company company, String fiscalCode) {
         CompanyLegalRepresentative rep = new CompanyLegalRepresentative(company);
         rep.setFirstName("Laura");
@@ -95,6 +97,7 @@ class DomainConstraintsIT {
         return rep;
     }
 
+    /** L'operazione deve fallire per il vincolo indicato (nome del vincolo o testo dell'errore del database). */
     static void assertViolates(String constraint, ThrowingCallable operation) {
         assertThatThrownBy(operation)
                 .isInstanceOf(DataAccessException.class)
@@ -438,6 +441,89 @@ class DomainConstraintsIT {
             g.slot().release();
             jobSlots.saveAndFlush(g.slot());
             assertThat(jobSlots.findByBlockedByTicketId(t.getId())).isEmpty();
+        }
+    }
+
+    @Nested
+    class Tirocinio {
+
+        private Internship internship() {
+            Graph g = fixtures.graph();
+            return new Internship(tickets.saveAndFlush(ticket(g.tutor(), g.project(), g.beneficiary(), g.category())));
+        }
+
+        @Test
+        void unaSolaSchedaPerSegnalazione() {
+            Internship first = internships.saveAndFlush(internship());
+            assertViolates("uq_internship_ticket", () -> internships.saveAndFlush(new Internship(first.getTicket())));
+        }
+
+        @Test
+        void fineAnterioreAllInizio() {
+            Internship i = internship();
+            i.setStartDate(LocalDate.of(2027, 1, 10));
+            i.setExpectedEndDate(LocalDate.of(2027, 1, 9));
+            assertViolates("ck_internship_dates", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void oreSettimanaliOltreIlMassimo() {
+            Internship i = internship();
+            i.setWeeklyHours(41);
+            assertViolates("ck_internship_weekly_hours", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void codiceFiscaleFuoriFormato() {
+            Internship i = internship();
+            i.setFiscalCode("rssmra85t10a562s");
+            assertViolates("ck_internship_fiscal_code", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void tutorAziendaleSenzaNome() {
+            Internship i = internship();
+            i.addCompanyTutor("  ", null);
+            assertViolates("ck_internship_company_tutor_name", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void sospensioneConFinePrimaDellInizio() {
+            Internship i = internship();
+            i.addSuspension(LocalDate.of(2027, 1, 6), LocalDate.of(2027, 1, 5));
+            assertViolates("ck_internship_suspension_dates", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void sospensioniSovrapposte() {
+            Internship i = internship();
+            i.addSuspension(LocalDate.of(2026, 12, 22), LocalDate.of(2027, 1, 6));
+            i.addSuspension(LocalDate.of(2027, 1, 6), LocalDate.of(2027, 1, 10));
+            assertViolates("ex_internship_suspension_overlap", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void sospensioniContigueEdiAltriTirociniAmmesse() {
+            Internship i = internship();
+            i.addSuspension(LocalDate.of(2026, 12, 22), LocalDate.of(2027, 1, 6));
+            i.addSuspension(LocalDate.of(2027, 1, 7), LocalDate.of(2027, 1, 10));
+            internships.saveAndFlush(i);
+            Internship other = internship();
+            other.addSuspension(LocalDate.of(2026, 12, 22), LocalDate.of(2027, 1, 6));
+
+            assertThat(internships.saveAndFlush(other).getSuspensions()).hasSize(1);
+        }
+
+        @Test
+        void codiceAtecoSceltoNonCancellabile() {
+            Internship i = internship();
+            CompanyAtecoCode code = atecoCodes.saveAndFlush(new CompanyAtecoCode(fixtures.graph().company(), "56.10.11",
+                    null));
+            i.setAtecoCode(code);
+            internships.saveAndFlush(i);
+            // direttamente nel database: Hibernate fermerebbe prima la cancellazione di un'entità referenziata
+            assertViolates("fk_internship_ateco_code",
+                    () -> jdbc.update("DELETE FROM company_ateco_code WHERE id = ?", code.getId()));
         }
     }
 
