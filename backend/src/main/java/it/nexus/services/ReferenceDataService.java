@@ -10,6 +10,9 @@ public interface ReferenceDataService {
 
     List<ReferenceItemDTO> activeJobCategories();
 
+    /** Tipi di tirocinio attivi, per la scheda del tirocinio (US-108). */
+    List<ReferenceItemDTO> activeInternshipTypes();
+
     List<ReferenceItemDTO> activeProjects();
 
     /** Progetti attivi a cui è assegnato l'utente corrente. */

@@ -19,7 +19,9 @@ describe('<CatalogsPage>', () => {
       Promise.resolve(
         kind === 'zones'
           ? [{ id: 'Z1', code: 'NORD', name: 'Firenze Nord', active: true }]
-          : [{ id: 'C1', code: 'MAGAZZINIERE', name: 'Magazziniere', active: true }],
+          : kind === 'job-categories'
+            ? [{ id: 'C1', code: 'MAGAZZINIERE', name: 'Magazziniere', active: true }]
+            : [{ id: 'T1', code: 'CURRICULARE', name: 'Curriculare', active: true }],
       ),
     );
     renderWithProviders(
@@ -32,7 +34,10 @@ describe('<CatalogsPage>', () => {
     expect(await screen.findByRole('table', { name: 'Zone: 1 voce' })).toBeInTheDocument();
     expect(await screen.findByRole('table', { name: 'Tipologie di mansione: 1 voce' })).toBeInTheDocument();
     expect(fetchCatalog).toHaveBeenCalledWith('zones');
+    expect(await screen.findByRole('table', { name: 'Tipi di tirocinio: 1 voce' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Aggiungi tipo' })).toBeInTheDocument();
     expect(fetchCatalog).toHaveBeenCalledWith('job-categories');
+    expect(fetchCatalog).toHaveBeenCalledWith('internship-types');
     await expectNoAxeViolations();
   });
 });

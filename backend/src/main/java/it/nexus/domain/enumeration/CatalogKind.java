@@ -6,7 +6,8 @@ import java.util.Optional;
 /** Cataloghi gestiti dall'ADMIN (US-106), con il tratto dell'indirizzo e il tipo di oggetto nell'audit. */
 public enum CatalogKind {
     ZONES("zones", AuditEntityType.ZONE, "ZONA"),
-    JOB_CATEGORIES("job-categories", AuditEntityType.JOB_CATEGORY, "TIPOLOGIA");
+    JOB_CATEGORIES("job-categories", AuditEntityType.JOB_CATEGORY, "TIPOLOGIA"),
+    INTERNSHIP_TYPES("internship-types", AuditEntityType.INTERNSHIP_TYPE, "TIPO");
 
     private final String path;
     private final AuditEntityType auditType;

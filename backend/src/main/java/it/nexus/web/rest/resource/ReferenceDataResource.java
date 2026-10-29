@@ -37,6 +37,13 @@ public class ReferenceDataResource {
         return ResponseEntity.ok(referenceDataService.activeProjects());
     }
 
+    @GetMapping("/internship-types")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Tipi di tirocinio attivi (US-108)")
+    public ResponseEntity<List<ReferenceItemDTO>> internshipTypes() {
+        return ResponseEntity.ok(referenceDataService.activeInternshipTypes());
+    }
+
     @GetMapping("/job-categories")
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
     @Operation(summary = "Tipologie di mansione attive")
