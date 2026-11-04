@@ -82,7 +82,7 @@ public class ClosureReportServiceImpl implements ClosureReportService {
         return repository.findByTicketId(ticketId).map(r -> "%s; %s".formatted(
                 r.isHired() ? "Assunto: " + r.getHiringFormula().getName()
                         : "Non assunto: " + r.getNoHireReason().getName(),
-                r.isJobSlotStillAvailable() ? "mansione ancora disponibile" : "mansione non più disponibile"));
+                r.isJobSlotStillAvailable() ? "mansione di nuovo libera" : "mansione non più disponibile"));
     }
 
     /** Voce attiva del catalogo: le voci disattivate non si scelgono più (US-109). */

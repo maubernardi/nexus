@@ -24,6 +24,6 @@ public interface ClosureReportService {
     /** Il report inviato della segnalazione, se c'è. */
     Optional<ClosureReportDTO> find(Ticket ticket);
 
-    /** Esito per la cronologia: «Assunto: Tempo indeterminato; mansione ancora disponibile». */
+    /** Esito per la cronologia: «Assunto: Tempo indeterminato; mansione di nuovo libera». */
     Optional<String> outcome(Long ticketId);
 }

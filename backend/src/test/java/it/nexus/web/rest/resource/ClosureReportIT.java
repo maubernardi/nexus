@@ -23,12 +23,15 @@ import org.springframework.transaction.annotation.Transactional;
 import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.HiringFormula;
+import it.nexus.domain.JobSlot;
 import it.nexus.domain.NoHireReason;
 import it.nexus.domain.Project;
 import it.nexus.domain.Ticket;
+import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.HiringFormulaRepository;
+import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.NoHireReasonRepository;
 import it.nexus.repository.TicketRepository;
 import it.nexus.support.WorkflowScenarios;
@@ -53,9 +56,12 @@ class ClosureReportIT {
     @Autowired HiringFormulaRepository hiringFormulas;
     @Autowired NoHireReasonRepository noHireReasons;
     @Autowired TicketRepository tickets;
+    @Autowired JobSlotRepository jobSlots;
 
     private Ticket ticket;
+    private JobSlot slot;
     private String ticketPath;
+    private String companyHistoryPath;
     private HiringFormula formula;
     private NoHireReason reason;
 
@@ -64,8 +70,9 @@ class ClosureReportIT {
         Actors a = scenarios.actors();
         Place place = scenarios.place();
         Project project = scenarios.project("GOL", a.tutor1(), a.tutor2());
-        ticket = scenarios.appointmentTicket(a.tutor1(), project, scenarios.freeSlot(place, "Aiuto cuoco"),
-                a.operator());
+        slot = scenarios.freeSlot(place, "Aiuto cuoco");
+        ticket = scenarios.appointmentTicket(a.tutor1(), project, slot, a.operator());
+        companyHistoryPath = "/api/v1/companies/" + TsidMapper.toExternal(place.company().getId()) + "/history";
         // tirocinio avviato (US-1003)
         ticket.setStatus(TicketStatus.IN_TIROCINIO);
         tickets.saveAndFlush(ticket);
@@ -82,11 +89,16 @@ class ClosureReportIT {
 
     private ResultActions send(String user, long version, Boolean hired, String formulaId, String reasonId)
             throws Exception {
+        return send(user, version, hired, formulaId, reasonId, false);
+    }
+
+    private ResultActions send(String user, long version, Boolean hired, String formulaId, String reasonId,
+            boolean jobSlotStillAvailable) throws Exception {
         String json = """
                 {"version": %d, "companySatisfaction": 5, "beneficiarySatisfaction": 4,
                  "objectives": "Autonomia in cucina raggiunta", "difficulties": "   ",
-                 "hired": %s, "hiringFormulaId": %s, "noHireReasonId": %s, "jobSlotStillAvailable": false}"""
-                .formatted(version, hired, quoted(formulaId), quoted(reasonId));
+                 "hired": %s, "hiringFormulaId": %s, "noHireReasonId": %s, "jobSlotStillAvailable": %s}"""
+                .formatted(version, hired, quoted(formulaId), quoted(reasonId), jobSlotStillAvailable);
         return mockMvc.perform(post(ticketPath + "/closure-report").header(USER, user)
                 .contentType(MediaType.APPLICATION_JSON).content(json));
     }
@@ -181,6 +193,50 @@ class ClosureReportIT {
                 .andExpect(jsonPath("$.fieldErrors[*].field", hasItem("beneficiarySatisfaction")));
 
         assertThat(tickets.findById(ticket.getId()).orElseThrow().getStatus()).isEqualTo(TicketStatus.IN_TIROCINIO);
+    }
+
+    @Test
+    void mansioneAncoraDisponibile_tornaLibera_eLoStoricoDellAziendaRegistraLEsito() throws Exception {
+        send("tutor1", ticketVersion(), true, formulaId(), null, true).andExpect(status().isOk());
+
+        em.flush();
+        em.clear();
+        JobSlot released = jobSlots.findById(slot.getId()).orElseThrow();
+        assertThat(released.getStatus()).isEqualTo(JobSlotStatus.LIBERA);
+        assertThat(released.getBlockedByTicket()).isNull();
+        // la segnalazione conclusa resta collegata alla mansione, per lo storico
+        assertThat(tickets.findById(ticket.getId()).orElseThrow().getJobSlot().getId()).isEqualTo(slot.getId());
+        assertThat(jdbc.queryForObject(
+                "SELECT count(*) FROM audit_event WHERE entity_id = ? AND action = 'RELEASE'", Long.class,
+                slot.getId())).isEqualTo(1);
+
+        mockMvc.perform(get(companyHistoryPath).header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.summary.hirings").value(1))
+                .andExpect(jsonPath("$.summary.negativeOutcomes").value(0))
+                .andExpect(jsonPath("$.events[0].type").value("TIROCINIO_CONCLUSO"))
+                .andExpect(jsonPath("$.events[0].ticketNumber").value(ticket.getNumber()))
+                .andExpect(jsonPath("$.events[0].detail")
+                        .value("Con assunzione: «" + formula.getName() + "»; mansione di nuovo libera"));
+        mockMvc.perform(get(ticketPath + "/history").header(USER, "tutor1"))
+                .andExpect(jsonPath("$[-1].detail")
+                        .value("Assunto: " + formula.getName() + "; mansione di nuovo libera"));
+    }
+
+    @Test
+    void mansioneNonPiuDisponibile_restaBloccata_eLEsitoNegativoNelloStorico() throws Exception {
+        send("tutor1", ticketVersion(), false, null, reasonId(), false).andExpect(status().isOk());
+
+        em.flush();
+        em.clear();
+        JobSlot kept = jobSlots.findById(slot.getId()).orElseThrow();
+        assertThat(kept.getStatus()).isEqualTo(JobSlotStatus.BLOCCATA);
+        assertThat(kept.getBlockedByTicket().getId()).isEqualTo(ticket.getId());
+
+        mockMvc.perform(get(companyHistoryPath).header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.summary.hirings").value(0))
+                .andExpect(jsonPath("$.summary.negativeOutcomes").value(1))
+                .andExpect(jsonPath("$.events[0].detail")
+                        .value("Senza assunzione: «" + reason.getName() + "»; mansione non più disponibile"));
     }
 
     @Test
