@@ -574,7 +574,8 @@ export const it = {
     hints: {
       scale: 'Da 1 (per niente soddisfatto) a 5 (molto soddisfatto).',
       texts: 'Facoltativo.',
-      jobSlotStillAvailable: 'Cioè se l’azienda cerca ancora qualcuno per questa mansione.',
+      jobSlotStillAvailable:
+        'Cioè se l’azienda cerca ancora qualcuno per questa mansione: se sì, la mansione torna libera e si può proporre ad altri beneficiari.',
     },
     submit: 'Invia il report',
     confirmHeading: 'Confermi l’invio del report?',

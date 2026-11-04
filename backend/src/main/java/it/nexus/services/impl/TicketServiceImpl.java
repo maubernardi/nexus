@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,6 +41,7 @@ import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.AppointmentFailedDTO;
 import it.nexus.domain.dto.AppointmentSetDTO;
 import it.nexus.domain.dto.ApproveCategoryDTO;
+import it.nexus.domain.dto.ClosureReportDTO;
 import it.nexus.domain.dto.ClosureReportFormDTO;
 import it.nexus.domain.dto.CompanyExclusionDTO;
 import it.nexus.domain.dto.CompanyExclusionFormDTO;
@@ -600,9 +602,33 @@ public class TicketServiceImpl implements TicketService {
     public TicketDetailDTO submitClosureReport(String ticketId, ClosureReportFormDTO form) {
         AppUser me = currentAppUserService.getCurrentAppUser();
         Ticket ticket = ownTicket(ticketId, me, "inviare il report di restituzione");
+        JobSlot slot = ticket.getJobSlot();
         // dentro la transizione: prima si controllano versione e stato, poi il report
-        Ticket saved = stateMachine.apply(ticket, TicketTransitions.CLOSE, form.version(), null,
-                t -> closureReportService.create(t, form));
+        Ticket saved = stateMachine.apply(ticket, TicketTransitions.CLOSE, form.version(), null, t -> {
+            AuditChanges changes = closureReportService.create(t, form);
+            // US-1102: se l'azienda offre ancora la mansione, torna libera; altrimenti resta bloccata da questa
+            // segnalazione, che resta collegata alla mansione per lo storico
+            if (form.jobSlotStillAvailable()) {
+                slot.release();
+                changes.value("jobSlotReleased", null, true);
+            }
+            return changes;
+        });
+        if (form.jobSlotStillAvailable()) {
+            auditService.record(AuditEntityType.JOB_SLOT, slot.getId(), "RELEASE", AuditChanges.of()
+                    .value("status", JobSlotStatus.BLOCCATA.name(), JobSlotStatus.LIBERA.name())
+                    .value("blockedByTicketId", TsidMapper.toExternal(saved.getId()), null), null);
+        }
+        ClosureReportDTO report = closureReportService.find(saved).orElseThrow();
+        Map<String, Object> outcome = new LinkedHashMap<>();
+        outcome.put("ticketNumber", saved.getNumber());
+        outcome.put("jobSlotTitle", slot.getTitle());
+        outcome.put("assunto", report.hired());
+        outcome.put(report.hired() ? "formula" : "motivo",
+                report.hired() ? report.hiringFormula().name() : report.noHireReason().name());
+        outcome.put("mansioneDisponibile", report.jobSlotStillAvailable());
+        companyAuditEvents.save(new CompanyAuditEvent(slot.getCompany(), saved,
+                CompanyEventType.TIROCINIO_CONCLUSO.name(), outcome));
         notificationService.notify(saved.getAssignedCcOperator(), NotificationType.CLOSURE_REPORT_SUBMITTED, saved);
         return detail(saved, me);
     }

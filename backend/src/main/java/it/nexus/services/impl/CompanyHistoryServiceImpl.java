@@ -101,7 +101,17 @@ public class CompanyHistoryServiceImpl implements CompanyHistoryService {
             }
         }
         if (isConcluded(event)) {
-            return hired(event) ? "Con assunzione" : "Senza assunzione";
+            // dal report di restituzione (US-1102): formula o motivo e sorte della mansione, se registrati
+            String outcome = hired(event) ? "Con assunzione" : "Senza assunzione";
+            Object choice = d.get(hired(event) ? "formula" : "motivo");
+            if (choice != null) {
+                outcome += ": «" + choice + "»";
+            }
+            if (d.get("mansioneDisponibile") != null) {
+                outcome += Boolean.TRUE.equals(d.get("mansioneDisponibile")) ? "; mansione di nuovo libera"
+                        : "; mansione non più disponibile";
+            }
+            return outcome;
         }
         return null;
     }
