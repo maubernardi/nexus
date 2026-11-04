@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `db3fdaa` (29/10/2026): Sprint 1–7 completi e pagina di accesso con il tema di NEXUS |
-| **Ultimo aggiornamento** | 29/10/2026 (sezioni 12–15 dello Sprint 7; T-1.2 con i menu attuali) |
+| **Ultimo aggiornamento** | 04/11/2026 (T-13.4 e sezioni 16–18 dello Sprint 8: da provare dopo il prossimo deploy) |
 
 ## Come prepararsi
 
@@ -463,6 +463,12 @@ bozza nata da un rilancio.
   1. Come `operatore.cc` e come `tutor1`. **Atteso:** nel menu non c'è **Cataloghi**; all'indirizzo
      `/cataloghi` compare "Accesso non consentito".
 
+- [ ] **T-13.4 Voci del report di restituzione (US-109, Sprint 8)**
+  1. Come `admin` → **Cataloghi**. **Atteso:** due sezioni in più, **Formule di assunzione** (tempo determinato 3, 6
+     e 12 mesi, tempo indeterminato, contratto a chiamata, prestazione occasionale) e **Motivi della mancata
+     assunzione** (tre voci).
+  2. Disattiva un motivo. **Atteso:** nel report di restituzione (T-17.1) non si può più scegliere.
+
 ## 14. Dati dell'azienda e scheda del tirocinio (Sprint 7)
 
 - [ ] **T-14.1 Legale rappresentante dell'azienda (US-506)**
@@ -538,3 +544,70 @@ bozza nata da un rilancio.
   2. Entra con un utente esistente e una password sbagliata. **Atteso:** "Nome utente o password non validi." in
      rosso, con il campo evidenziato.
   3. Entra con le credenziali giuste. **Atteso:** si apre la Home di NEXUS.
+
+## 16. Avvio del tirocinio e documenti (Sprint 8)
+
+- [ ] **T-16.1 Scheda incompleta (US-1003)**
+  1. Come `tutor1`, apri la scheda di una segnalazione con l'appuntamento fissato e la scheda non ancora compilata.
+     **Atteso:** sezione **Avvio del tirocinio** con l'elenco di ciò che manca; ogni voce porta al campo.
+  2. Se il legale rappresentante dell'azienda non ha codice fiscale, nascita e residenza. **Atteso:** la voce dice di
+     chiedere al Call Center di completarli.
+
+- [ ] **T-16.2 Avvio con la scheda completa (US-1003)**
+  1. Completa la scheda (T-14.5, T-14.6) e salva. **Atteso:** "La scheda è completa: puoi avviare il tirocinio."
+  2. **Avvia il tirocinio** → conferma. **Atteso:** la segnalazione è «In tirocinio»; la scheda resta modificabile.
+  3. Come `operatore.cc`. **Atteso:** notifica dell'avvio; nell'azienda, **Storico e pregressi** con "Tirocinio
+     avviato".
+
+- [ ] **T-16.3 Convenzione e Progetto Formativo (US-1004, US-1005)**
+  1. Nella scheda → **Documenti** → **Scarica la Convenzione (.docx)**. **Atteso:** si scarica
+     `Convenzione-segnalazione-N.docx`, compilato con i dati della scheda (per ora un modello provvisorio).
+  2. **Scarica il Progetto Formativo (.docx)**. **Atteso:** `Progetto-formativo-segnalazione-N.docx` con orari, monte
+     ore e tutor aziendali.
+  3. Con un dato mancante nella scheda. **Atteso:** l'avviso che i dati mancanti restano da completare a mano; nel
+     documento al loro posto c'è una riga `____________`.
+  4. Nella segnalazione → cronologia. **Atteso:** "Documento scaricato" con il nome del documento.
+
+## 17. Report di restituzione e chiusura (Sprint 8)
+
+- [ ] **T-17.1 Compilazione e invio (US-1101)**
+  1. Come `tutor1`, su una segnalazione «In tirocinio» → **Compila il report di restituzione**. **Atteso:** pagina
+     "Report di restituzione della segnalazione n. N" con le due soddisfazioni da 1 a 5, assunto sì/no, mansione ancora
+     disponibile sì/no, obiettivi e difficoltà (facoltativi).
+  2. **Invia il report** senza scegliere nulla. **Atteso:** riepilogo degli errori con i campi obbligatori.
+  3. Rispondi **Sì** all'assunzione. **Atteso:** compare **Formula di assunzione**; con **No** compare invece **Motivo
+     della mancata assunzione**.
+  4. Compila e **Invia il report**. **Atteso:** "Confermi l'invio del report?" e i campi bloccati; **Torna al modulo**
+     li riapre.
+  5. **Sì, invia il report**. **Atteso:** "Report inviato: il percorso della segnalazione n. N è concluso." e il
+     report in sola lettura.
+
+- [ ] **T-17.2 Dopo l'invio (US-1101)**
+  1. Nella segnalazione. **Atteso:** stato «Report di restituzione», riquadro del report, nessun collegamento per
+     compilarlo di nuovo; in cronologia "Report di restituzione inviato" con l'esito.
+  2. Come `tutor2` (stesso progetto) e come `operatore.cc`. **Atteso:** vedono il report; l'operatore ha la notifica.
+  3. Come `tutor1`, crea una nuova segnalazione per lo stesso beneficiario. **Atteso:** è possibile, perché il
+     percorso precedente è concluso.
+
+- [ ] **T-17.3 Mansione e storico dell'azienda (US-1102)**
+  1. In un report rispondi **Sì** a "La mansione è ancora disponibile?". **Atteso:** come `operatore.cc` la mansione
+     è di nuovo **libera** e torna tra le compatibili; nell'azienda, **Storico e pregressi** con "Tirocinio concluso"
+     e "Con assunzione: «…»; mansione di nuovo libera" (o "Senza assunzione: «…»").
+  2. In un altro report rispondi **No**. **Atteso:** la mansione resta bloccata; lo storico dice "mansione non più
+     disponibile".
+  3. **Atteso:** il riepilogo dello storico conta assunzioni ed esiti negativi.
+
+## 18. Email delle notifiche (Sprint 8)
+
+Servono la password SMTP nel `.env` del server e un indirizzo vero per un utente demo (README, «Demo online»).
+
+- [ ] **T-18.1 Email ricevuta (US-1202)**
+  1. Dai il tuo indirizzo a `operatore.cc`. Come `tutor1` fai un passaggio che lo notifica (per esempio accetta una
+     proposta). **Atteso:** entro pochi secondi arriva un'email da `noreply@portalenexus.it` con oggetto «NEXUS ·
+     segnalazione n. N», lo stesso testo della notifica in app e il collegamento alla segnalazione.
+  2. **Atteso:** nell'email non ci sono nomi né altri dati del beneficiario.
+  3. Il collegamento apre la segnalazione (dopo l'accesso).
+
+- [ ] **T-18.2 Email spente senza password**
+  1. Prima di aggiungere la password. **Atteso:** l'app funziona normalmente, nessuna email; il log del backend
+     segnala "Email delle notifiche spente: manca la password SMTP".

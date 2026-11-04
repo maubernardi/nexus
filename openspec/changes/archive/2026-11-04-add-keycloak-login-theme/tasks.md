@@ -12,4 +12,4 @@
 
 ## 3. Consegna
 
-- [ ] 3.1 PR con CI verde; dopo il merge, deploy e aggiornamento del realm della demo (su richiesta del PO)
+- [x] 3.1 PR con CI verde; dopo il merge, deploy e aggiornamento del realm della demo (su richiesta del PO)
