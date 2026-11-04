@@ -11,5 +11,5 @@
 
 ## 3. Consegna
 
-- [ ] 3.1 PR con CI verde (stati del backlog e collaudo aggiornati dopo il merge)
+- [x] 3.1 PR con CI verde (stati del backlog e collaudo aggiornati dopo il merge)
 - [ ] 3.2 Il PO aggiunge la password al `.env`; prova di invio reale dopo il deploy

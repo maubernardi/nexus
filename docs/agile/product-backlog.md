@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 69 elementi, 242 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Sprint in corso: [sprint-08](sprints/sprint-08.md).
+**Totale: 69 elementi, 242 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint: [sprint-08](sprints/sprint-08.md), concluso il 04/11 (le storie Must di R3 sono tutte fatte).
 
 ## Epiche
 
@@ -65,7 +65,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | 📋 Backlog |
 | [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | 🎉 Done (Sprint 7) |
 | [US-108](#us-108) | E1 | Tipi di tirocinio | Must | 1 | R3 | 🎉 Done (Sprint 7) |
-| [US-109](#us-109) | E1 | Cataloghi del report di restituzione | Must | 2 | R3 | ✅ Ready (Sprint 8) |
+| [US-109](#us-109) | E1 | Cataloghi del report di restituzione | Must | 2 | R3 | 🎉 Done (Sprint 8) |
 | [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
@@ -111,13 +111,13 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-904](#us-904) | E9 | Annuncio da una mansione libera | Should | 3 | R2 | 🎉 Done (Sprint 6) |
 | [US-1001](#us-1001) | E10 | Scheda amministrativa del tirocinio | Must | 8 | R3 | 🎉 Done (Sprint 7) |
 | [US-1002](#us-1002) | E10 | Griglia oraria e monte ore | Must | 5 | R3 | 🎉 Done (Sprint 7) |
-| [US-1003](#us-1003) | E10 | Avvio del tirocinio | Must | 1 | R3 | ✅ Ready (Sprint 8) |
-| [US-1004](#us-1004) | E10 | Convenzione in Word | Must | 5 | R3 | ✅ Ready (Sprint 8) |
-| [US-1005](#us-1005) | E10 | Progetto Formativo in Word | Must | 3 | R3 | ✅ Ready (Sprint 8) |
-| [US-1101](#us-1101) | E11 | Report di restituzione | Must | 5 | R3 | ✅ Ready (Sprint 8) |
-| [US-1102](#us-1102) | E11 | Esito sulla mansione e audit trail | Must | 2 | R3 | ✅ Ready (Sprint 8) |
+| [US-1003](#us-1003) | E10 | Avvio del tirocinio | Must | 1 | R3 | 🎉 Done (Sprint 8) |
+| [US-1004](#us-1004) | E10 | Convenzione in Word | Must | 5 | R3 | 🎉 Done (Sprint 8) |
+| [US-1005](#us-1005) | E10 | Progetto Formativo in Word | Must | 3 | R3 | 🎉 Done (Sprint 8) |
+| [US-1101](#us-1101) | E11 | Report di restituzione | Must | 5 | R3 | 🎉 Done (Sprint 8) |
+| [US-1102](#us-1102) | E11 | Esito sulla mansione e audit trail | Must | 2 | R3 | 🎉 Done (Sprint 8) |
 | [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | 🎉 Done (Sprint 5) |
-| [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | ✅ Ready (Sprint 8) |
+| [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1301](#us-1301) | E13 | Verifica della PWA online | Must | 1 | R1 | 📋 Backlog |
 | [US-1302](#us-1302) | E13 | Backup del database | Must | 5 | R4 | 📋 Backlog |
 | [US-1303](#us-1303) | E13 | Anonimizzazione a scadenza | Must | 5 | R4 | 📋 Backlog |
@@ -201,7 +201,7 @@ Criteri di accettazione:
   US-1005); altri parametri legati al tipo arriveranno più avanti.
 
 #### US-109
-**Cataloghi del report di restituzione** · Must · 2 punti · R3 · ✅ Ready (Sprint 8)
+**Cataloghi del report di restituzione** · Must · 2 punti · R3 · 🎉 Done (Sprint 8)
 
 Come **ADMIN** voglio gestire le formule di assunzione e i motivi della mancata assunzione per cambiare le voci del
 report di restituzione senza un rilascio. Decisione del PO, review dello Sprint 7 (§8.4).
@@ -744,7 +744,7 @@ Criteri di accettazione:
 Domande aperte: Q5
 
 #### US-1003
-**Avvio del tirocinio** · Must · 1 punti · R3 · ✅ Ready (Sprint 8)
+**Avvio del tirocinio** · Must · 1 punti · R3 · 🎉 Done (Sprint 8)
 
 Come **Tutor** voglio confermare l'avvio del tirocinio per tracciarne l'inizio.
 
@@ -759,7 +759,7 @@ Criteri di accettazione:
 - L'avvio non blocca la scheda: il Tutor la corregge anche a tirocinio avviato (PO, 29/10).
 
 #### US-1004
-**Convenzione in Word** · Must · 5 punti · R3 · ✅ Ready (Sprint 8)
+**Convenzione in Word** · Must · 5 punti · R3 · 🎉 Done (Sprint 8)
 
 Come **Tutor** voglio generare e scaricare la Convenzione compilata per evitare la compilazione manuale. I documenti
 sono competenza del Tutor (PO, 29/10).
@@ -773,7 +773,7 @@ Criteri di accettazione:
 Domande aperte: Q5
 
 #### US-1005
-**Progetto Formativo in Word** · Must · 3 punti · R3 · ✅ Ready (Sprint 8)
+**Progetto Formativo in Word** · Must · 3 punti · R3 · 🎉 Done (Sprint 8)
 
 Come **Tutor** voglio generare e scaricare il Progetto Formativo per completare la documentazione.
 
@@ -787,7 +787,7 @@ Dipendenze: US-1004 · Domande aperte: Q5
 _Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda._
 
 #### US-1101
-**Report di restituzione** · Must · 5 punti · R3 · ✅ Ready (Sprint 8)
+**Report di restituzione** · Must · 5 punti · R3 · 🎉 Done (Sprint 8)
 
 Come **Tutor** voglio compilare il report finale (gradimenti 1–5, assunzione sì/no, mansione ancora disponibile sì/no) per chiudere il percorso.
 
@@ -798,7 +798,7 @@ Criteri di accettazione:
 - Il ticket passa in FORM_RESTITUZIONE; il report non è più modificabile dopo l'invio.
 
 #### US-1102
-**Esito sulla mansione e audit trail** · Must · 2 punti · R3 · ✅ Ready (Sprint 8)
+**Esito sulla mansione e audit trail** · Must · 2 punti · R3 · 🎉 Done (Sprint 8)
 
 Come **Call Center** voglio che la chiusura aggiorni mansione e storico dell'azienda per avere dati affidabili per i prossimi abbinamenti.
 
@@ -824,7 +824,7 @@ Criteri di accettazione:
   Sprint 4, §8.3).
 
 #### US-1202
-**Email transazionali** · Must · 5 punti · R3 · ✅ Ready (Sprint 8)
+**Email transazionali** · Must · 5 punti · R3 · 🎉 Done (Sprint 8)
 
 Come **Tutor / Call Center** voglio ricevere per email le notifiche importanti per essere avvisato anche fuori dall'app.
 

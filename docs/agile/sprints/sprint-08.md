@@ -1,7 +1,8 @@
 # Sprint 8 — 30 ottobre – 1 novembre 2026
 
-**Stato:** 📋 pronto a partire. **Planning:** 29/10, nella [review dello Sprint 7](sprint-07-review.md) (§9); proposta
-del team confermata dal Product Owner, con le email nell'impegno.
+**Stato:** 🎉 concluso il 04/11: impegno di 23 punti completato, tutte le storie Must di R3 fatte. Oltre la data
+prevista (01/11) per la pausa del cambio di PC del PO; nessun extra. **Planning:** 29/10, nella [review dello
+Sprint 7](sprint-07-review.md) (§9); proposta del team confermata dal Product Owner, con le email nell'impegno.
 
 ## Obiettivo
 
@@ -13,13 +14,16 @@ del team confermata dal Product Owner, con le email nell'impegno.
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-1003 | Avvio del tirocinio (scheda completa) | 1 | ✅ Ready | | |
-| US-1004 | Convenzione in Word (modelli segnaposto per tipo) | 5 | ✅ Ready | | |
-| US-1005 | Progetto Formativo in Word | 3 | ✅ Ready | | |
-| US-109 | Cataloghi del report di restituzione | 2 | ✅ Ready | | |
-| US-1101 | Report di restituzione | 5 | ✅ Ready | | |
-| US-1102 | Esito sulla mansione e audit trail | 2 | ✅ Ready | | |
-| US-1202 | Email transazionali (SMTP IONOS) | 5 | ✅ Ready | | |
+| US-1003 | Avvio del tirocinio (scheda completa) | 1 | 🎉 Done | `add-internship-start` | [#88](https://github.com/maubernardi/nexus/pull/88) |
+| US-1004 | Convenzione in Word (modelli segnaposto per tipo) | 5 | 🎉 Done | `add-internship-documents` | [#89](https://github.com/maubernardi/nexus/pull/89) |
+| US-1005 | Progetto Formativo in Word | 3 | 🎉 Done | `add-progetto-formativo` | [#90](https://github.com/maubernardi/nexus/pull/90) |
+| US-109 | Cataloghi del report di restituzione | 2 | 🎉 Done | `add-report-catalogs` | [#91](https://github.com/maubernardi/nexus/pull/91) |
+| US-1101 | Report di restituzione | 5 | 🎉 Done | `add-closure-report` | [#92](https://github.com/maubernardi/nexus/pull/92) |
+| US-1102 | Esito sulla mansione e audit trail | 2 | 🎉 Done | `add-closure-outcome` | [#93](https://github.com/maubernardi/nexus/pull/93) |
+| US-1202 | Email transazionali (SMTP IONOS) | 5 | 🎉 Done | `add-notification-emails` | [#94](https://github.com/maubernardi/nexus/pull/94) |
+
+**Velocità:** 23 punti. Azione A13 (test lenti con axe) fatta per prima ([#87](https://github.com/maubernardi/nexus/pull/87)).
+Gli extra (US-205, US-102) non sono iniziati e restano nel backlog.
 
 **Extra**, nell'ordine: US-205 *Curriculum del beneficiario* (5), US-102 *Gestione progetti* (3). I punti non sono un
 tetto: «preferisco di più che di meno» (PO, 28/10).
@@ -40,15 +44,26 @@ storia; gli stati del backlog si aggiornano nella PR di documentazione dopo i me
 
 ## Decisioni durante lo sprint
 
-—
+- **Report di restituzione** (US-1101), scelte del team che non limitano il Tutor (azione A14), da confermare nella
+  review: invio in qualunque momento del tirocinio, obiettivi e difficoltà facoltativi, niente bozza (un solo invio
+  con conferma). Il report non si modifica, nemmeno nel database (trigger, come le note dell'azienda).
+- **Mansione non più disponibile** (US-1102): resta bloccata dalla segnalazione conclusa, senza ritiro automatico;
+  decide il Call Center.
+- **Email** (US-1202): stesso testo delle notifiche in app, solo il numero della segnalazione; la password SMTP
+  (`NEXUS_SMTP_PASSWORD`) la aggiunge il PO nel `.env` del server, senza la quale le email restano spente.
+- **Cambio di PC del PO** (29/10–04/11): backup dei file di Claude e nuova chiave SSH `portalenexus` per il server.
 
 ## Burndown
 
 | Momento | Punti residui |
 |---|---|
-| Inizio (30/10) | 23 |
-| Fine sprint | — |
+| Inizio (29/10, il planning ha anticipato la partenza) | 23 |
+| 29/10, sera (US-1003, US-1004, US-1005, US-109, US-1101) | 7 |
+| 04/11 (US-1102, US-1202) | 0 |
 
 ## Review, retrospettiva e planning successivo
 
-In un unico documento asincrono a fine sprint.
+In un unico documento asincrono, `sprint-08-review.md`, da preparare dopo il deploy dello Sprint 8. Per il PO prima
+della review:
+- collaudo: T-13.4 e sezioni 16–18;
+- password SMTP nel `.env` del server e prova di un'email reale (T-18.1).
