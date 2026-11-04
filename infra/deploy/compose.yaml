@@ -86,6 +86,11 @@ services:
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/nexus/protocol/openid-connect/certs
       SERVER_FORWARD_HEADERS_STRATEGY: framework
       OPENAPI_ENABLED: "false"
+      # email delle notifiche (US-1202): server, utente e mittente nel backend; la password solo nel .env
+      # (NEXUS_SMTP_PASSWORD), senza password le email restano spente
+      MAIL_ENABLED: "true"
+      MAIL_PASSWORD: ${NEXUS_SMTP_PASSWORD:-}
+      APP_URL: https://${NEXUS_DOMAIN:?}
     depends_on:
       postgres:
         condition: service_healthy

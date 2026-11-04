@@ -3,6 +3,7 @@ package it.nexus.services.impl;
 import java.time.Clock;
 import java.util.Optional;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.NotificationRepository;
 import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.NotificationService;
+import it.nexus.services.mail.NotificationCreatedEvent;
 import it.nexus.web.errors.NotFoundException;
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +34,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository repository;
     private final CurrentAppUserService currentAppUserService;
     private final Clock clock;
+    private final ApplicationEventPublisher events;
 
     @Override
     public void notify(AppUser recipient, NotificationType type, Ticket ticket) {
@@ -41,7 +44,11 @@ public class NotificationServiceImpl implements NotificationService {
         if (recipient == null || byRecipient) {
             return;
         }
-        repository.save(new Notification(recipient, type, ticket));
+        Notification saved = repository.save(new Notification(recipient, type, ticket));
+        // anche via email, dopo il commit (US-1202)
+        events.publishEvent(new NotificationCreatedEvent(saved.getId(), recipient.getEmail(), type,
+                ticket == null ? null : TsidMapper.toExternal(ticket.getId()),
+                ticket == null ? null : ticket.getNumber()));
     }
 
     @Override

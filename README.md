@@ -152,6 +152,19 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
   ```
   oppure dalla console: *Realm settings → Themes → Login theme* `nexus`; *Localization → Supported locales* solo
   Italiano. Utenti e client non cambiano.
+- **Email delle notifiche (US-1202).** Ogni notifica in app arriva anche via email, inviata da
+  `noreply@portalenexus.it` tramite `smtp.ionos.it:587` con l'utente `admin@portalenexus.it`. La password non sta nel
+  repository: si aggiunge a mano nel `.env` del server, poi si rifà il deploy (o si riavvia il backend):
+  ```bash
+  sudo nano /opt/nexus/.env      # aggiungere la riga NEXUS_SMTP_PASSWORD=<password della casella admin@>
+  ```
+  Senza la password le email restano spente e il log del backend lo dice all'avvio. Le email vanno all'indirizzo
+  dell'anagrafica utenti di NEXUS (`app_user.email`): gli utenti demo hanno indirizzi finti `@nexus.local`, che non le
+  ricevono (l'errore resta nel log, l'app continua). Per una prova, si dà un indirizzo vero a un utente demo:
+  ```bash
+  cd /opt/nexus/current && sudo docker compose --env-file ../.env --env-file release.env exec -T postgres \
+    psql -U postgres -d nexus -c "UPDATE nexus.app_user SET email = '<indirizzo>' WHERE username = 'operatore.cc'"
+  ```
 - **Stato e log sul server:**
   `cd /opt/nexus/current && sudo docker compose --env-file ../.env --env-file release.env ps` (oppure `logs -f backend`).
 - **DNS (IONOS):** A `@`, `auth`, `www` → IP del server; CAA `0 issue "letsencrypt.org"`; i record email restano.
