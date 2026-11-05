@@ -23,7 +23,7 @@ export const UserMenu = ({ user }: UserMenuProps) => {
 
   return (
     <div className="flex shrink-0 items-center gap-3">
-      <UserIdentity user={user} className="hidden md:flex" />
+      <UserIdentity user={user} linkToProfile className="hidden md:flex" />
       <Button variant="brand" size="sm" onClick={() => void handleLogout()}>
         <LogOut aria-hidden="true" />
         {t('user.logout')}

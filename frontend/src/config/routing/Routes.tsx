@@ -19,6 +19,7 @@ import { CompaniesPage } from '@/pages/CompaniesPage/CompaniesPage';
 import { CompanyEditPage } from '@/pages/CompanyEditPage/CompanyEditPage';
 import { CompanyNewPage } from '@/pages/CompanyNewPage/CompanyNewPage';
 import { NotificationsPage } from '@/pages/NotificationsPage/NotificationsPage';
+import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 import { LegacyWorkRedirect, TicketPage } from '@/pages/TicketPage/TicketPage';
 import { TicketNewPage } from '@/pages/TicketNewPage/TicketNewPage';
@@ -170,6 +171,11 @@ export const routes: RouteObject[] = [
         path: 'notifiche',
         element: <NotificationsPage />,
         handle: { titleKey: 'pages.notifications.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'profilo',
+        element: <ProfilePage />,
+        handle: { titleKey: 'pages.profile.title' } satisfies RouteHandle,
       },
       {
         path: 'cataloghi',

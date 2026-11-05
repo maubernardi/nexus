@@ -8,3 +8,12 @@ spring:
         jwt:
           issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/nexus}
           audiences: ${KEYCLOAK_AUDIENCE:nexus-backend}
+
+nexus:
+  # API di amministrazione di Keycloak per il cambio email (US-110): client tecnico nexus-backend-admin.
+  # Il segreto solo da variabile d'ambiente (NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET nel .env del server).
+  keycloak-admin:
+    base-url: ${KEYCLOAK_ADMIN_URL:http://localhost:8180}
+    realm: ${KEYCLOAK_REALM:nexus}
+    client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:nexus-backend-admin}
+    client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET:}

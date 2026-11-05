@@ -1,6 +1,9 @@
 # Utenti fittizi per sviluppo locale e test (header X-USER-ID = username).
 # id = soggetto dell'utente: identico agli id del realm Keycloak di infra/ e agli utenti del seed.
 nexus:
+  # email spente in locale: il codice del cambio di indirizzo (US-110) va nel log per provare il flusso
+  mail:
+    log-otp: true
   security:
     mock:
       users:

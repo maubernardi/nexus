@@ -17,4 +17,7 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     Optional<AppUser> findByUsername(String username);
 
     List<AppUser> findByUsernameIn(Collection<String> usernames);
+
+    /** Indirizzo già usato da un altro utente (unicità senza distinzione tra maiuscole e minuscole). */
+    boolean existsByEmailIgnoreCaseAndIdNot(String email, Long id);
 }

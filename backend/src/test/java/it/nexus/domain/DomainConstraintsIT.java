@@ -48,6 +48,7 @@ import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.CompanyAtecoCodeRepository;
 import it.nexus.repository.InternshipRepository;
 import it.nexus.repository.CompanyLegalRepresentativeRepository;
+import it.nexus.repository.EmailChangeRequestRepository;
 import it.nexus.repository.HiringFormulaRepository;
 import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.repository.NoHireReasonRepository;
@@ -95,6 +96,7 @@ class DomainConstraintsIT {
     @Autowired CompanyNoteRepository companyNotes;
     @Autowired ClosureReportRepository closureReports;
     @Autowired AuditEventRepository auditLog;
+    @Autowired EmailChangeRequestRepository emailChanges;
 
     private static CompanyLegalRepresentative legalRepresentative(Company company, String fiscalCode) {
         CompanyLegalRepresentative rep = new CompanyLegalRepresentative(company);
@@ -962,6 +964,47 @@ class DomainConstraintsIT {
         void svuotamentoRifiutato() {
             registerEvent();
             assertViolates("audit_event è in sola aggiunta", () -> jdbc.execute("TRUNCATE audit_event"));
+        }
+    }
+
+    @Nested
+    class CambioEmail {
+
+        private AppUser newUser(String username) {
+            return users.saveAndFlush(TestEntities.user(username, Role.TUTOR));
+        }
+
+        private EmailChangeRequest request(AppUser user, String email) {
+            Instant now = Instant.parse("2026-11-05T10:00:00Z");
+            return new EmailChangeRequest(user, email, "$2a$10$hash", now, now.plusSeconds(1800));
+        }
+
+        @Test
+        void unaSolaRichiestaPerUtente() {
+            AppUser user = newUser("email.uno");
+            emailChanges.saveAndFlush(request(user, "a@example.org"));
+            assertViolates("uq_email_change_request_user",
+                    () -> emailChanges.saveAndFlush(request(user, "b@example.org")));
+        }
+
+        @Test
+        void indirizzoNonValido() {
+            assertViolates("ck_email_change_request_new_email",
+                    () -> emailChanges.saveAndFlush(request(newUser("email.due"), "senza-chiocciola")));
+        }
+
+        @Test
+        void tentativiOltreIlMassimo() {
+            Long id = emailChanges.saveAndFlush(request(newUser("email.tre"), "c@example.org")).getId();
+            assertViolates("ck_email_change_request_attempts",
+                    () -> jdbc.update("UPDATE email_change_request SET attempts = 6 WHERE id = ?", id));
+        }
+
+        @Test
+        void scadenzaPrimaDellInvio() {
+            Long id = emailChanges.saveAndFlush(request(newUser("email.quattro"), "d@example.org")).getId();
+            assertViolates("ck_email_change_request_expiry",
+                    () -> jdbc.update("UPDATE email_change_request SET expires_at = sent_at WHERE id = ?", id));
         }
     }
 }

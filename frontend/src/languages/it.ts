@@ -964,11 +964,39 @@ export const it = {
   },
   user: {
     loggedAs: 'Utente collegato',
+    profile: 'Il mio profilo',
     role: 'Ruolo',
     logout: 'Esci',
     loading: 'Caricamento del profilo utente…',
     loadError: 'Impossibile caricare il profilo utente. Riprova più tardi.',
     retry: 'Riprova',
+  },
+  profile: {
+    heading: 'Il mio profilo',
+    account: 'Dati dell’account',
+    name: 'Nome',
+    role: 'Ruolo',
+    email: 'Email',
+    loadError: 'Impossibile caricare l’indirizzo email.',
+    changeEmail: 'Cambia indirizzo email',
+    changeIntro:
+      'Ti mandiamo un codice di 6 cifre al nuovo indirizzo: l’indirizzo cambia solo quando scrivi qui il codice. Le notifiche arrivano a questo indirizzo, che serve anche per accedere.',
+    newEmail: 'Nuovo indirizzo email',
+    invalidEmail: 'Scrivi un indirizzo email valido, ad esempio nome@dominio.it',
+    sameEmail: 'È già il tuo indirizzo attuale',
+    sendCode: 'Invia il codice',
+    codeSent: 'Codice inviato a {{email}}. Controlla la posta, anche la cartella dello spam.',
+    pending:
+      'Abbiamo inviato un codice di 6 cifre a {{email}}. Il codice vale fino alle {{time}}: scrivilo qui per confermare il nuovo indirizzo.',
+    code: 'Codice ricevuto',
+    codeFormat: 'Il codice è di 6 cifre',
+    confirm: 'Conferma il nuovo indirizzo',
+    exhausted: 'Troppi tentativi sbagliati: questo codice non vale più. Chiedi un nuovo codice.',
+    resend: 'Invia un nuovo codice',
+    cancel: 'Annulla il cambio',
+    cancelled: 'Cambio annullato: l’indirizzo resta quello di prima.',
+    changed: 'Indirizzo email aggiornato: ora è {{email}}.',
+    error: 'Operazione non riuscita. Controlla la connessione e riprova.',
   },
   pwa: {
     offline: 'Sei offline. Alcune funzioni non sono disponibili finché la connessione non torna.',
@@ -1202,6 +1230,9 @@ export const it = {
     },
   },
   pages: {
+    profile: {
+      title: 'Il mio profilo',
+    },
     tickets: {
       title: 'Segnalazioni',
       heading: 'Segnalazioni',

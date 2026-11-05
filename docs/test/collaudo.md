@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `db3fdaa` (29/10/2026): Sprint 1–7 completi e pagina di accesso con il tema di NEXUS |
-| **Ultimo aggiornamento** | 04/11/2026 (T-13.4 e sezioni 16–18 dello Sprint 8: da provare dopo il prossimo deploy) |
+| **Ultimo aggiornamento** | 05/11/2026 (sezione 19, cambio dell'indirizzo email: da provare dopo il deploy di US-110) |
 
 ## Come prepararsi
 
@@ -599,11 +599,11 @@ bozza nata da un rilancio.
 
 ## 18. Email delle notifiche (Sprint 8)
 
-Servono la password SMTP nel `.env` del server e un indirizzo vero per un utente demo (README, «Demo online»).
+Servono la password SMTP nel `.env` del server e un indirizzo vero per un utente demo (dal profilo, sezione 19).
 
 - [ ] **T-18.1 Email ricevuta (US-1202)**
-  1. Dai il tuo indirizzo a `operatore.cc`. Come `tutor1` fai un passaggio che lo notifica (per esempio accetta una
-     proposta). **Atteso:** entro pochi secondi arriva un'email da `noreply@portalenexus.it` con oggetto «NEXUS ·
+  1. Dai il tuo indirizzo a `operatore.cc` dal suo profilo (T-19.1). Come `tutor1` fai un passaggio che lo notifica
+     (per esempio accetta una proposta). **Atteso:** entro pochi secondi arriva un'email da `noreply@portalenexus.it` con oggetto «NEXUS ·
      segnalazione n. N», lo stesso testo della notifica in app e il collegamento alla segnalazione.
   2. **Atteso:** nell'email non ci sono nomi né altri dati del beneficiario.
   3. Il collegamento apre la segnalazione (dopo l'accesso).
@@ -611,3 +611,33 @@ Servono la password SMTP nel `.env` del server e un indirizzo vero per un utente
 - [ ] **T-18.2 Email spente senza password**
   1. Prima di aggiungere la password. **Atteso:** l'app funziona normalmente, nessuna email; il log del backend
      segnala "Email delle notifiche spente: manca la password SMTP".
+
+## 19. Il mio profilo e cambio dell'indirizzo email (Sprint 9)
+
+Servono la password SMTP e il client tecnico di Keycloak sul server (README, «Demo online»). Usa un tuo indirizzo
+vero; per l'avviso al vecchio indirizzo, parti da un utente che ha già un indirizzo vero.
+
+- [ ] **T-19.1 Cambio dell'indirizzo (US-110)**
+  1. Accedi come `operatore.cc` e attiva il tuo nome nell'intestazione (su mobile: nel menu). **Atteso:** si apre
+     «Il mio profilo» con nome, ruolo e indirizzo email attuale.
+  2. Scrivi il tuo indirizzo in «Nuovo indirizzo email» e premi «Invia il codice». **Atteso:** arriva un'email da
+     `noreply@portalenexus.it` con un codice di 6 cifre e l'ora di scadenza (30 minuti); la pagina chiede il codice.
+  3. Scrivi il codice e premi «Conferma il nuovo indirizzo». **Atteso:** «Indirizzo email aggiornato» e il profilo
+     mostra il nuovo indirizzo.
+  4. Esci e accedi scrivendo il **nuovo indirizzo** al posto del nome utente. **Atteso:** l'accesso funziona (anche
+     Keycloak è aggiornato).
+
+- [ ] **T-19.2 Codice sbagliato, nuovo codice, annullamento**
+  1. Chiedi un altro cambio e scrivi un codice sbagliato. **Atteso:** «Codice non valido: 4 tentativi rimasti»,
+     l'indirizzo non cambia.
+  2. Premi subito «Invia un nuovo codice». **Atteso:** messaggio di attesa (puoi chiederne un altro tra N secondi).
+     Dopo un minuto riprova. **Atteso:** arriva un nuovo codice; il primo non vale più.
+  3. Premi «Annulla il cambio». **Atteso:** «Cambio annullato», l'indirizzo resta quello di prima.
+
+- [ ] **T-19.3 Avviso al vecchio indirizzo**
+  1. Cambia di nuovo l'indirizzo di un utente che ne ha già uno vero. **Atteso:** al vecchio indirizzo arriva
+     «NEXUS · il tuo indirizzo email è stato cambiato», senza il nuovo indirizzo.
+
+- [ ] **T-19.4 Indirizzo già usato**
+  1. Come `tutor1`, prova a passare all'indirizzo che hai dato a `operatore.cc`. **Atteso:** errore sul campo
+     «Indirizzo già usato da un altro utente», nessun codice inviato.
