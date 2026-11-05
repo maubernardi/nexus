@@ -35,12 +35,14 @@ public class KeycloakIdentityProviderUsers implements IdentityProviderUsers {
     private final ApplicationProperties.KeycloakAdmin properties;
     private final RestClient restClient;
 
-    public KeycloakIdentityProviderUsers(ApplicationProperties applicationProperties, RestClient.Builder builder) {
+    public KeycloakIdentityProviderUsers(ApplicationProperties applicationProperties) {
         this.properties = applicationProperties.getKeycloakAdmin();
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(TIMEOUT);
         requestFactory.setReadTimeout(TIMEOUT);
-        this.restClient = builder.baseUrl(properties.getBaseUrl()).requestFactory(requestFactory).build();
+        // RestClient.builder() e non il bean RestClient.Builder: in Spring Boot 4 l'autoconfigurazione del client HTTP
+        // sta in un modulo che il backend non usa (il bean non esiste)
+        this.restClient = RestClient.builder().baseUrl(properties.getBaseUrl()).requestFactory(requestFactory).build();
         if (!StringUtils.hasText(properties.getClientSecret())) {
             log.warn("Cambio email non disponibile: manca il segreto del client Keycloak {} "
                     + "(NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET nel .env del server)", properties.getClientId());
