@@ -28,7 +28,7 @@ export const AppHeader = ({ user }: AppHeaderProps) => {
             <img src="/favicon.svg" alt="" className="size-8" />
             <span aria-hidden="true">{t('app.name')}</span>
           </Link>
-          <MainNav roles={user.roles} mobileHeader={<UserIdentity user={user} />} />
+          <MainNav roles={user.roles} mobileHeader={<UserIdentity user={user} linkToProfile />} />
         </div>
         <div className="flex shrink-0 items-center gap-1 md:gap-2">
           <NotificationsBell />

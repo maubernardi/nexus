@@ -78,6 +78,7 @@ NEXUS_DEMO_PASSWORD_TUTOR1=$demo_tutor1
 NEXUS_DEMO_PASSWORD_TUTOR2=$demo_tutor2
 NEXUS_DEMO_PASSWORD_OPERATORE=$demo_op
 NEXUS_DEMO_PASSWORD_ADMIN=$demo_admin
+NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET=$(gen 40)
 ENV
   chown deploy:deploy "$BASE/.env" && chmod 600 "$BASE/.env"
   cat <<INFO

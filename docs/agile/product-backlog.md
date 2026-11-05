@@ -9,7 +9,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 
 | Epica | Titolo | Obiettivo | Storie | Punti |
 |---|---|---|---|---|
-| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, il calendario e i cataloghi senza passare dalla console di Keycloak. | 10 | 29 |
+| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, il calendario e i cataloghi senza passare dalla console di Keycloak. | 11 | 37 |
 | E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 5 | 18 |
 | E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 7 | 28 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 5 | 17 |
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 12 | 45 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 11 | 50 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 12 | 58 |
 
 ## Domande aperte per il Product Owner
 
@@ -66,6 +66,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | 🎉 Done (Sprint 7) |
 | [US-108](#us-108) | E1 | Tipi di tirocinio | Must | 1 | R3 | 🎉 Done (Sprint 7) |
 | [US-109](#us-109) | E1 | Cataloghi del report di restituzione | Must | 2 | R3 | 🎉 Done (Sprint 8) |
+| [US-110](#us-110) | E1 | Cambio del proprio indirizzo email con codice | Must | 8 | R4 | Ready (Sprint 9) |
 | [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
@@ -213,6 +214,23 @@ Criteri di accettazione:
   chiamata, prestazione occasionale. Motivi: l'azienda non ha risorse; giudica il tirocinante non idoneo; non aveva mai
   espresso l'intenzione di assumere.
 - Il report di restituzione (US-1101) propone solo le voci attive.
+
+#### US-110
+**Cambio del proprio indirizzo email con codice** · Must · 8 punti · R4 · Ready (Sprint 9)
+
+Come **utente di NEXUS** (Tutor, Call Center, ADMIN) voglio cambiare da solo il mio indirizzo email per ricevere le
+notifiche all'indirizzo giusto senza chiedere all'amministratore. Richiesta del PO del 05/11, durante la prova delle
+email (US-1202): oggi l'indirizzo si cambia solo da database o dalla console di Keycloak.
+
+Criteri di accettazione:
+- Pagina «Il mio profilo», raggiungibile dal proprio nome nell'intestazione, con nome, ruolo e indirizzo email.
+- Il cambio è sicuro: al nuovo indirizzo arriva un codice di 6 cifre valido 30 minuti; l'indirizzo cambia solo con il
+  codice corretto (decisioni del PO, 05/11).
+- L'indirizzo cambia sia in NEXUS sia in Keycloak, dove serve anche per accedere: le due copie restano uguali.
+- Al vecchio indirizzo arriva un avviso del cambio, con l'invito a contattare l'amministratore se non è stato
+  l'utente.
+- Al massimo 5 tentativi per codice; un nuovo codice dopo 60 secondi; la richiesta si può annullare.
+- Un indirizzo già usato da un altro utente è rifiutato. Il cambio si registra nell'audit, senza gli indirizzi.
 
 #### EN-3
 **Zone iniziali: Firenze e hinterland** · Must · 2 punti · R1 · 🎉 Done (Sprint 2)

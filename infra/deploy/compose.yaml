@@ -55,6 +55,8 @@ services:
       NEXUS_DEMO_PASSWORD_TUTOR2: ${NEXUS_DEMO_PASSWORD_TUTOR2:?}
       NEXUS_DEMO_PASSWORD_OPERATORE: ${NEXUS_DEMO_PASSWORD_OPERATORE:?}
       NEXUS_DEMO_PASSWORD_ADMIN: ${NEXUS_DEMO_PASSWORD_ADMIN:?}
+      # segreto del client tecnico del backend (US-110); sui server installati prima lo crea keycloak-backend-client.sh
+      NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET: ${NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET:-}
     volumes:
       - ./keycloak:/opt/keycloak/data/import:ro,Z
     ports:
@@ -91,6 +93,10 @@ services:
       MAIL_ENABLED: "true"
       MAIL_PASSWORD: ${NEXUS_SMTP_PASSWORD:-}
       APP_URL: https://${NEXUS_DOMAIN:?}
+      # cambio email (US-110): API di amministrazione di Keycloak sulla rete interna, client nexus-backend-admin.
+      # Senza segreto il cambio email risponde "non disponibile", il resto dell'app funziona
+      KEYCLOAK_ADMIN_URL: http://keycloak:8080
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET:-}
     depends_on:
       postgres:
         condition: service_healthy

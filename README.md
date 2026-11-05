@@ -63,6 +63,11 @@ cd backend && PROFILES_ACTIVE=keycloak,seed ./mvnw spring-boot:run
 cd frontend && VITE_AUTH_MODE=keycloak pnpm dev
 ```
 
+Il cambio dell'indirizzo email (US-110) aggiorna anche Keycloak tramite il client tecnico `nexus-backend-admin` del
+realm di sviluppo: per provarlo con Keycloak reale avviare il backend con
+`KEYCLOAK_ADMIN_CLIENT_SECRET=nexus-backend-admin-dev-secret`. Con gli utenti mock le email sono spente e il codice di
+conferma compare nel log del backend.
+
 La pagina di accesso usa il tema `keycloak/themes/nexus`, montato nel Keycloak di sviluppo: in `start-dev` la cache dei
 temi è spenta, quindi le modifiche a template, CSS e testi si vedono ricaricando la pagina.
 
@@ -160,11 +165,18 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
   ```
   Senza la password le email restano spente e il log del backend lo dice all'avvio. Le email vanno all'indirizzo
   dell'anagrafica utenti di NEXUS (`app_user.email`): gli utenti demo hanno indirizzi finti `@nexus.local`, che non le
-  ricevono (l'errore resta nel log, l'app continua). Per una prova, si dà un indirizzo vero a un utente demo:
+  ricevono (l'errore resta nel log, l'app continua). Per una prova si dà un indirizzo vero a un utente demo dal suo
+  profilo (US-110, punto seguente).
+- **Cambio dell'indirizzo email (US-110).** Ogni utente lo cambia da «Il mio profilo» (il proprio nome
+  nell'intestazione) con un codice inviato al nuovo indirizzo; l'indirizzo cambia in NEXUS e in Keycloak. Il backend
+  usa il client tecnico `nexus-backend-admin` (solo `view-users` e `manage-users`), con il segreto
+  `NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET` nel `.env`. Sulle nuove installazioni lo creano `bootstrap.sh` e l'import del
+  realm; sul server già installato, **una volta, dopo il deploy di US-110**:
   ```bash
-  cd /opt/nexus/current && sudo docker compose --env-file ../.env --env-file release.env exec -T postgres \
-    psql -U postgres -d nexus -c "UPDATE nexus.app_user SET email = '<indirizzo>' WHERE username = 'operatore.cc'"
+  curl -fsSLO https://raw.githubusercontent.com/maubernardi/nexus/main/infra/deploy/keycloak-backend-client.sh
+  sudo bash keycloak-backend-client.sh   # genera il segreto nel .env, crea il client, riavvia il backend
   ```
+  Finché manca, il cambio risponde «non disponibile» e il log del backend lo segnala all'avvio; il resto funziona.
 - **Stato e log sul server:**
   `cd /opt/nexus/current && sudo docker compose --env-file ../.env --env-file release.env ps` (oppure `logs -f backend`).
 - **DNS (IONOS):** A `@`, `auth`, `www` → IP del server; CAA `0 issue "letsencrypt.org"`; i record email restano.

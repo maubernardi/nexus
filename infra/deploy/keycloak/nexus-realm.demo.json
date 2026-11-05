@@ -70,6 +70,20 @@
           }
         }
       ]
+    },
+    {
+      "clientId": "nexus-backend-admin",
+      "name": "NEXUS backend (amministrazione utenti)",
+      "description": "Client tecnico del backend per aggiornare gli utenti (cambio email, US-110). Solo service account.",
+      "enabled": true,
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET}",
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "protocol": "openid-connect"
     }
   ],
   "users": [
@@ -148,6 +162,17 @@
           "temporary": false
         }
       ]
+    },
+    {
+      "username": "service-account-nexus-backend-admin",
+      "enabled": true,
+      "serviceAccountClientId": "nexus-backend-admin",
+      "clientRoles": {
+        "realm-management": [
+          "view-users",
+          "manage-users"
+        ]
+      }
     }
   ]
 }

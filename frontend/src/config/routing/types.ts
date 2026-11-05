@@ -20,5 +20,6 @@ export type RouteHandle = {
     | 'pages.catalogs.title'
     | 'pages.calendar.title'
     | 'pages.notifications.title'
+    | 'pages.profile.title'
     | 'pages.forbidden.title';
 };
