@@ -9,8 +9,8 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | https://portalenexus.it |
-| **Versione della demo** | `db3fdaa` (29/10/2026): Sprint 1–7 completi e pagina di accesso con il tema di NEXUS |
-| **Ultimo aggiornamento** | 05/11/2026 (sezione 19, cambio dell'indirizzo email: da provare dopo il deploy di US-110) |
+| **Versione della demo** | `0fbb22a` (05/11/2026): Sprint 1–8 completi e cambio dell'indirizzo email (US-110) |
+| **Ultimo aggiornamento** | 05/11/2026 (esiti del PO: T-18.1, T-19.1, T-19.3, T-19.4 superate) |
 
 ## Come prepararsi
 
@@ -601,7 +601,7 @@ bozza nata da un rilancio.
 
 Servono la password SMTP nel `.env` del server e un indirizzo vero per un utente demo (dal profilo, sezione 19).
 
-- [ ] **T-18.1 Email ricevuta (US-1202)**
+- [x] **T-18.1 Email ricevuta (US-1202)**
   1. Dai il tuo indirizzo a `operatore.cc` dal suo profilo (T-19.1). Come `tutor1` fai un passaggio che lo notifica
      (per esempio accetta una proposta). **Atteso:** entro pochi secondi arriva un'email da `noreply@portalenexus.it` con oggetto «NEXUS ·
      segnalazione n. N», lo stesso testo della notifica in app e il collegamento alla segnalazione.
@@ -617,7 +617,7 @@ Servono la password SMTP nel `.env` del server e un indirizzo vero per un utente
 Servono la password SMTP e il client tecnico di Keycloak sul server (README, «Demo online»). Usa un tuo indirizzo
 vero; per l'avviso al vecchio indirizzo, parti da un utente che ha già un indirizzo vero.
 
-- [ ] **T-19.1 Cambio dell'indirizzo (US-110)**
+- [x] **T-19.1 Cambio dell'indirizzo (US-110)**
   1. Accedi come `operatore.cc` e attiva il tuo nome nell'intestazione (su mobile: nel menu). **Atteso:** si apre
      «Il mio profilo» con nome, ruolo e indirizzo email attuale.
   2. Scrivi il tuo indirizzo in «Nuovo indirizzo email» e premi «Invia il codice». **Atteso:** arriva un'email da
@@ -634,10 +634,10 @@ vero; per l'avviso al vecchio indirizzo, parti da un utente che ha già un indir
      Dopo un minuto riprova. **Atteso:** arriva un nuovo codice; il primo non vale più.
   3. Premi «Annulla il cambio». **Atteso:** «Cambio annullato», l'indirizzo resta quello di prima.
 
-- [ ] **T-19.3 Avviso al vecchio indirizzo**
+- [x] **T-19.3 Avviso al vecchio indirizzo**
   1. Cambia di nuovo l'indirizzo di un utente che ne ha già uno vero. **Atteso:** al vecchio indirizzo arriva
      «NEXUS · il tuo indirizzo email è stato cambiato», senza il nuovo indirizzo.
 
-- [ ] **T-19.4 Indirizzo già usato**
+- [x] **T-19.4 Indirizzo già usato**
   1. Come `tutor1`, prova a passare all'indirizzo che hai dato a `operatore.cc`. **Atteso:** errore sul campo
      «Indirizzo già usato da un altro utente», nessun codice inviato.
