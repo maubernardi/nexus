@@ -60,7 +60,7 @@ class KeycloakIdentityProviderUsersIT {
         ApplicationProperties properties = new ApplicationProperties();
         properties.getKeycloakAdmin().setBaseUrl(baseUrl);
         properties.getKeycloakAdmin().setClientSecret(secret);
-        return new KeycloakIdentityProviderUsers(properties, RestClient.builder());
+        return new KeycloakIdentityProviderUsers(properties);
     }
 
     @Test
