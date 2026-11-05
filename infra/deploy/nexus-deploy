@@ -4,6 +4,9 @@
 # Uso (dalla pipeline): printf '%s' "$GHCR_TOKEN" | ssh deploy@server "deploy <sha40> <github-actor>"
 # Scarica i file di infra/deploy del commit indicato dal repository pubblico, avvia le immagini taggate con quel
 # commit e attende che i servizi siano sani; se l'avvio fallisce ripristina la release precedente.
+# In sola lettura (A16, workflow "Stato del server"): "status" e "logs <backend|postgres> [righe]".
+# I log escono nelle Actions di un repository pubblico: solo i servizi che non registrano dati personali
+# (Keycloak e Caddy registrano utenti e indirizzi IP).
 set -euo pipefail
 
 readonly REPO="maubernardi/nexus"
@@ -11,11 +14,40 @@ readonly BASE="/opt/nexus"
 readonly FILES=(compose.yaml postgres/init/10-create-roles.sh keycloak/nexus-realm.demo.json)
 readonly KEEP_RELEASES=5
 
+readonly LOG_SERVICES="backend postgres"
+
 fail() { echo "ERRORE: $*" >&2; exit 2; }
 
-read -r cmd sha actor extra <<<"${SSH_ORIGINAL_COMMAND:-}"
+compose() {
+  docker compose --project-directory "$1" -f "$1/compose.yaml" --env-file "$BASE/.env" --env-file "$1/release.env" "${@:2}"
+}
+
+# log recenti dei soli servizi senza dati personali (vedi intestazione)
+safe_logs() {
+  compose "$1" logs --no-color --tail "$2" $LOG_SERVICES || true
+}
+
+read -r cmd arg1 arg2 extra <<<"${SSH_ORIGINAL_COMMAND:-}"
+case "${cmd:-}" in
+  status|logs)
+    current="$(readlink -f "$BASE/current" 2>/dev/null || true)"
+    [[ -n $current && -d $current ]] || fail "nessuna release in esecuzione"
+    echo "==> Release in esecuzione: $(basename "$current")"
+    if [[ $cmd == status && -z "${arg1:-}" ]]; then
+      compose "$current" ps -a --format 'table {{.Service}}\t{{.Status}}\t{{.Image}}'
+      exit 0
+    fi
+    [[ $cmd == logs && " $LOG_SERVICES " == *" ${arg1:-} "* && -z "${extra:-}" ]] \
+      || fail "comando non consentito. Uso: status | logs <backend|postgres> [righe]"
+    lines="${arg2:-200}"
+    [[ $lines =~ ^[0-9]{1,4}$ ]] && (( lines >= 1 && lines <= 2000 )) || fail "righe tra 1 e 2000"
+    compose "$current" logs --no-color --timestamps --tail "$lines" "$arg1"
+    exit 0
+    ;;
+esac
+sha="${arg1:-}"; actor="${arg2:-}"
 [[ "${cmd:-}" == "deploy" && "${sha:-}" =~ ^[0-9a-f]{40}$ && "${actor:-}" =~ ^[A-Za-z0-9][A-Za-z0-9-]{0,38}$ && -z "${extra:-}" ]] \
-  || fail "comando non consentito. Uso: deploy <sha40> <github-actor>"
+  || fail "comando non consentito. Uso: deploy <sha40> <github-actor> | status | logs <backend|postgres> [righe]"
 
 # un deploy alla volta
 exec 9>"$BASE/.deploy.lock"
@@ -23,10 +55,6 @@ flock -n 9 || fail "un altro deploy è in corso"
 
 token="$(head -c 4096)"
 [[ -n "$token" ]] || fail "token GHCR mancante su stdin"
-
-compose() {
-  docker compose --project-directory "$1" -f "$1/compose.yaml" --env-file "$BASE/.env" --env-file "$1/release.env" "${@:2}"
-}
 
 cleanup() { docker logout ghcr.io >/dev/null 2>&1 || true; }
 trap cleanup EXIT
@@ -53,12 +81,19 @@ if compose "$release" up -d --remove-orphans --wait --wait-timeout 420; then
   echo "==> OK: in esecuzione $sha"
   compose "$release" ps --format 'table {{.Service}}\t{{.Status}}'
 else
-  echo "==> Avvio fallito: stato e log recenti" >&2
+  echo "==> Avvio fallito: stato e log recenti (backend e postgres)" >&2
   compose "$release" ps -a >&2 || true
-  compose "$release" logs --tail 40 >&2 || true
+  safe_logs "$release" 80 >&2
   if [[ -n "$previous" && -d "$previous" && "$previous" != "$release" ]]; then
     echo "==> Ripristino della release precedente: $(basename "$previous")" >&2
-    compose "$previous" up -d --remove-orphans --wait --wait-timeout 420 >&2 || true
+    if compose "$previous" up -d --remove-orphans --wait --wait-timeout 420 >&2; then
+      echo "==> Ripristino riuscito: in esecuzione $(basename "$previous")" >&2
+    else
+      # A16: il 05/11 il ripristino è fallito senza lasciare traccia del motivo
+      echo "==> ERRORE: anche il ripristino è fallito, la demo è ferma. Stato e log:" >&2
+      compose "$previous" ps -a >&2 || true
+      safe_logs "$previous" 120 >&2
+    fi
   fi
   exit 1
 fi
