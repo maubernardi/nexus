@@ -29,7 +29,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 |---|---|---|---|
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
-| R3 | Tirocinio, documenti Word, chiusura, email | 12 | 45 |
+| R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
 | R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 12 | 58 |
 
 ## Domande aperte per il Product Owner
@@ -59,14 +59,14 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [EN-1](#en-1) | E3 | Motore delle transizioni del ticket | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [EN-2](#en-2) | E13 | Audit di ogni cambio di stato e scelta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-101](#us-101) | E1 | Messaggio "utente non abilitato" | Should | 1 | R1 | 🎉 Done (Sprint 1) |
-| [US-102](#us-102) | E1 | Gestione progetti | Must | 3 | R4 | 📋 Backlog |
-| [US-103](#us-103) | E1 | Creazione utente | Must | 8 | R4 | 📋 Backlog |
-| [US-104](#us-104) | E1 | Assegnazione utenti ai progetti | Must | 3 | R4 | 📋 Backlog |
-| [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | 📋 Backlog |
+| [US-102](#us-102) | E1 | Gestione progetti | Must | 3 | R4 | ✅ Ready (Sprint 9) |
+| [US-103](#us-103) | E1 | Creazione utente | Must | 8 | R4 | ✅ Ready (Sprint 9) |
+| [US-104](#us-104) | E1 | Assegnazione utenti ai progetti | Must | 3 | R4 | ✅ Ready (Sprint 9) |
+| [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | ✅ Ready (Sprint 9) |
 | [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | 🎉 Done (Sprint 7) |
 | [US-108](#us-108) | E1 | Tipi di tirocinio | Must | 1 | R3 | 🎉 Done (Sprint 7) |
 | [US-109](#us-109) | E1 | Cataloghi del report di restituzione | Must | 2 | R3 | 🎉 Done (Sprint 8) |
-| [US-110](#us-110) | E1 | Cambio del proprio indirizzo email con codice | Must | 8 | R4 | Ready (Sprint 9) |
+| [US-110](#us-110) | E1 | Cambio del proprio indirizzo email con codice | Must | 8 | R4 | 🎉 Done (fuori piano, 05/11) |
 | [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
@@ -75,7 +75,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 🎉 Done (Sprint 3) |
 | [US-204](#us-204) | E2 | Visibilità dei beneficiari per progetto | Must | 3 | R1 | 🎉 Done (Sprint 3) |
-| [US-205](#us-205) | E2 | Curriculum del beneficiario | Could | 5 | R3 | 📋 Backlog |
+| [US-205](#us-205) | E2 | Curriculum del beneficiario | Could | 5 | — | 📋 Backlog |
 | [US-301](#us-301) | E3 | Nuova segnalazione | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-302](#us-302) | E3 | Nuova tipologia di mansione dal Tutor, approvata dal Call Center | Should | 5 | R2 | 🎉 Done (Sprint 4) |
 | [US-303](#us-303) | E3 | Elenco delle segnalazioni (Home) | Must | 5 | R1 | 🎉 Done (Sprint 3) |
@@ -126,7 +126,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1305](#us-1305) | E13 | Revisione UX/UI | Should | 8 | R4 | 📋 Backlog |
 | [US-1306](#us-1306) | E13 | Passaggio in produzione | Must | 5 | R4 | 📋 Backlog |
 | [US-1307](#us-1307) | E13 | Monitoraggio e revisione di sicurezza | Must | 5 | R4 | 📋 Backlog |
-| [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | 📋 Backlog |
+| [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | ✅ Ready (Sprint 9) |
 
 ## Dettaglio per epica
 
@@ -143,7 +143,7 @@ Criteri di accettazione:
 - Dato un utente che riceve 403 "Utente non abilitato a NEXUS", quando apre l'app, allora vede un messaggio dedicato con l'indicazione di contattare l'amministratore e il pulsante Esci, senza "Riprova".
 
 #### US-102
-**Gestione progetti** · Must · 3 punti · R4 · 📋 Backlog
+**Gestione progetti** · Must · 3 punti · R4 · ✅ Ready (Sprint 9)
 
 Come **ADMIN** voglio creare, modificare e disattivare i progetti (es. GOL, POLIS) per abilitare nuovi finanziamenti senza interventi tecnici.
 
@@ -152,7 +152,7 @@ Criteri di accettazione:
 - Quando disattivo un progetto, allora non è più selezionabile per nuove segnalazioni ma lo storico resta consultabile.
 
 #### US-103
-**Creazione utente** · Must · 8 punti · R4 · 📋 Backlog
+**Creazione utente** · Must · 8 punti · R4 · ✅ Ready (Sprint 9)
 
 Come **ADMIN** voglio creare un utente con ruolo in NEXUS e in Keycloak in un'unica operazione per abilitare nuovi tutor e operatori senza usare la console di Keycloak.
 
@@ -163,8 +163,11 @@ Criteri di accettazione:
 
 Dipendenze: US-1202 per l'invio email
 
+Decisioni del PO (review dello Sprint 8, §8.7–§8.8): l'email per impostare la password la manda Keycloak, con lo
+stesso SMTP di IONOS (password inserita dal PO); lo username lo scrive l'ADMIN, con il suggerimento `nome.cognome`.
+
 #### US-104
-**Assegnazione utenti ai progetti** · Must · 3 punti · R4 · 📋 Backlog
+**Assegnazione utenti ai progetti** · Must · 3 punti · R4 · ✅ Ready (Sprint 9)
 
 Come **ADMIN** voglio assegnare e rimuovere progetti a un utente per regolare la visibilità dei ticket tra tutor.
 
@@ -172,7 +175,7 @@ Criteri di accettazione:
 - Quando assegno un progetto a un tutor, allora vede in sola lettura i ticket di quel progetto (US-304).
 
 #### US-105
-**Disattivazione e cambio ruolo** · Must · 3 punti · R4 · 📋 Backlog
+**Disattivazione e cambio ruolo** · Must · 3 punti · R4 · ✅ Ready (Sprint 9)
 
 Come **ADMIN** voglio disattivare/riattivare un utente e cambiarne il ruolo per gestire uscite e cambi di mansione senza perdere lo storico.
 
@@ -216,7 +219,7 @@ Criteri di accettazione:
 - Il report di restituzione (US-1101) propone solo le voci attive.
 
 #### US-110
-**Cambio del proprio indirizzo email con codice** · Must · 8 punti · R4 · Ready (Sprint 9)
+**Cambio del proprio indirizzo email con codice** · Must · 8 punti · R4 · 🎉 Done (fuori piano, 05/11)
 
 Come **utente di NEXUS** (Tutor, Call Center, ADMIN) voglio cambiare da solo il mio indirizzo email per ricevere le
 notifiche all'indirizzo giusto senza chiedere all'amministratore. Richiesta del PO del 05/11, durante la prova delle
@@ -291,7 +294,7 @@ Criteri di accettazione:
 - Un tutor di altri progetti non vede né il beneficiario né le sue segnalazioni; il controllo è nelle API, non solo nell'interfaccia.
 
 #### US-205
-**Curriculum del beneficiario** · Could · 5 punti · R3 · 📋 Backlog
+**Curriculum del beneficiario** · Could · 5 punti · — · 📋 Backlog
 
 Come **Tutor** voglio allegare il CV (PDF) al beneficiario per metterlo a disposizione del Call Center per l'abbinamento.
 
@@ -949,11 +952,11 @@ Criteri di accettazione:
 - Controllo di disponibilità esterno con avviso; checklist OWASP ASVS di livello 1 verificata.
 
 #### US-1308
-**Recupero password** · Should · 2 punti · R4 · 📋 Backlog
+**Recupero password** · Should · 2 punti · R4 · ✅ Ready (Sprint 9)
 
 Come **utente** voglio reimpostare la password dimenticata per non dipendere dall'amministratore.
 
 Criteri di accettazione:
 - Il link di recupero arriva per email ed è valido per un tempo limitato.
 
-Dipendenze: US-1202
+Dipendenze: US-1202. Lo fa Keycloak con l'SMTP di IONOS (review dello Sprint 8, §8.7)

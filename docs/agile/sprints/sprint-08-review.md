@@ -171,18 +171,26 @@ Le avevo segnate da confermare:
 
 *Proposta:* confermarle così come sono.
 
+> ✅ **Deciso (PO, 05/11): proposta accettata.** Report e mansione restano come sono.
+
 ### 8.2 Chiusura dello Sprint 8
 *Proposta:* Sprint 8 chiuso con velocity **23**.
+
+> ✅ **Deciso (PO, 05/11): proposta accettata.** Sprint 8 chiuso con velocity 23.
 
 ### 8.3 Come contare US-110
 US-110 (8 punti) è stata chiesta e fatta il 05/11, dopo la chiusura dello Sprint 8 e prima del planning dello Sprint 9.
 *Proposta:* come US-1304 nello Sprint 7, **Done fuori piano, senza contarla nella velocity** di nessuno sprint: così
 la velocity resta una base onesta per il planning.
 
+> ✅ **Deciso (PO, 05/11): proposta accettata.** US-110 Done fuori piano, fuori dalla velocity.
+
 ### 8.4 R3 chiusa e US-205
 Tutte le Must di R3 sono pubblicate sulla demo. *Proposta:*
 - **R3 completa** nella roadmap;
 - **US-205** *Curriculum del beneficiario* (Could) resta nel backlog come extra, senza legarla a una release.
+
+> ✅ **Deciso (PO, 05/11): proposta accettata.** R3 completa (40 punti); US-205 senza release.
 
 ### 8.5 Leggere i log del server (A16)
 Per indagare il ripristino, e in generale per non dipendere da te per un log, propongo un **comando di sola lettura**
@@ -191,10 +199,14 @@ nello script di deploy: la chiave di deploy, oggi capace solo di `deploy`, potre
 
 *Alternativa:* nessun accesso in più; in caso di problemi mi incolli tu i log.
 
+> ✅ **Deciso (PO, 05/11): proposta accettata.** Comandi `logs` e `status` di sola lettura per la chiave di deploy (parte di A16).
+
 ### 8.6 Il collaudo
 Ci sono 4 caselle spuntate su circa 90. *Proposta:* nella review di ogni sprint mi dici quali sezioni hai provato e io
 le spunto (come oggi). Per le prove degli sprint passati che hai già fatto senza segnarle, basta un elenco delle
 sezioni.
+
+> ✅ **Deciso (PO, 05/11): proposta accettata.**
 
 ### 8.7 Istruzioni per la password dei nuovi utenti (US-103 e US-1308)
 Quando l'ADMIN crea un utente (US-103), l'utente deve ricevere un'email per impostare la password. Il recupero della
@@ -203,8 +215,13 @@ password dimenticata (US-1308) è lo stesso meccanismo.
 il tema di NEXUS. Serve configurare in Keycloak lo stesso SMTP di IONOS: la password la inserisci tu nella console
 (o con uno script, mai nel repository). Così US-1308 diventa poco più di una configurazione.
 
+> ✅ **Deciso (PO, 05/11): proposta accettata.** Le email di password le manda Keycloak con l'SMTP di IONOS; la password SMTP
+> in Keycloak la inserisce il PO.
+
 ### 8.8 Username dei nuovi utenti (US-103)
 *Proposta:* lo scrive l'ADMIN, con il suggerimento `nome.cognome`; l'utente può accedere anche con l'email.
+
+> ✅ **Deciso (PO, 05/11): proposta accettata.**
 
 ## 9. Proposta per lo Sprint 9 (3 giorni, ~20 punti)
 
@@ -227,10 +244,13 @@ US-103 e US-105 riusano l'accesso tecnico a Keycloak di US-110, che ha già i pe
 decisioni §8.5–§8.8. Nella PR che apre lo sprint archivio anche la change di US-110 (`add-email-change`). Per il PO:
 collaudo (T-13.4, sezioni 16–17, T-19.2), US-1301, e l'SMTP in Keycloak se accetti §8.7.
 
+> ✅ **Deciso (PO, 05/11): piano confermato** (19 punti; extra US-1302, US-205). Sprint 9: [sprint-09.md](sprint-09.md).
+
 ## 10. Azioni a carico del PO
 
-- [ ] Decidere i punti §8.1–§8.8 e confermare il planning (§9).
+- [x] Decidere i punti §8.1–§8.8 e confermare il planning (§9).
 - [ ] Collaudo sulla versione `0fbb22a`: T-13.4, sezioni 16–17, T-19.2.
+- [ ] Password SMTP in Keycloak (§8.7), quando arriva US-103: ti do la lista dei passi.
 - [ ] US-1301: PWA su Android e iOS (collaudo T-10.1).
 - [x] Password SMTP nel `.env` del server e prova di un'email reale (T-18.1, 05/11).
 - [x] Script del client Keycloak sul server (US-110, 05/11).
