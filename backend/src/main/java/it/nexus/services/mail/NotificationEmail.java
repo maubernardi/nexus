@@ -35,6 +35,8 @@ public record NotificationEmail(String subject, String body) {
             case INTERNSHIP_STARTED -> "Il Tutor ha avviato il tirocinio della segnalazione n. %d.";
             case CLOSURE_REPORT_SUBMITTED -> "Il Tutor ha inviato il report di restituzione della segnalazione n. %d: "
                     + "il percorso è concluso.";
+            case TICKET_TRANSFERRED -> "Ti è stata affidata la segnalazione n. %d, con il suo beneficiario: prima la "
+                    + "seguiva un altro Tutor.";
         };
         String text = template.formatted(ticketNumber);
         String body = """

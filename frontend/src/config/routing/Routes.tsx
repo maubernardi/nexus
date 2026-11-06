@@ -22,6 +22,7 @@ import { NotificationsPage } from '@/pages/NotificationsPage/NotificationsPage';
 import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
 import { UserNewPage } from '@/pages/UserNewPage/UserNewPage';
 import { UserProjectsPage } from '@/pages/UserProjectsPage/UserProjectsPage';
+import { UserTicketsPage } from '@/pages/UserTicketsPage/UserTicketsPage';
 import { UsersPage } from '@/pages/UsersPage/UsersPage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 import { LegacyWorkRedirect, TicketPage } from '@/pages/TicketPage/TicketPage';
@@ -215,6 +216,15 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.userProjects.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'utenti/:id/segnalazioni',
+        element: (
+          <RoleRoute roles={['ADMIN']}>
+            <UserTicketsPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.userTickets.title' } satisfies RouteHandle,
       },
       {
         path: 'calendario',

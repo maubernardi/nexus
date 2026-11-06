@@ -335,6 +335,8 @@ export const it = {
       INTERNSHIP_STARTED: 'Il Tutor ha avviato il tirocinio della segnalazione n. {{number}}.',
       CLOSURE_REPORT_SUBMITTED:
         'Il Tutor ha inviato il report di restituzione della segnalazione n. {{number}}: il percorso è concluso.',
+      TICKET_TRANSFERRED:
+        'Ti è stata affidata la segnalazione n. {{number}}, con il suo beneficiario: prima la seguiva un altro Tutor.',
     },
   },
   legalRep: {
@@ -855,6 +857,7 @@ export const it = {
       SUBMIT: 'Segnalazione inviata',
       TAKE_CHARGE: 'Presa in carico',
       TAKE_OVER: 'Passata a un altro operatore',
+      TRANSFER: 'Passata a un altro Tutor',
       MATCH: 'Proposta all’azienda',
       FAST_TRACK_APPROVE: 'Corsia veloce approvata: proposta all’azienda',
       FAST_TRACK_REJECT: 'Corsia veloce rifiutata',
@@ -1026,6 +1029,32 @@ export const it = {
       noneInCatalog: 'Non ci sono progetti attivi.',
       toCatalogs: 'Aggiungili nei Cataloghi',
       loadError: 'Impossibile caricare l’utente o i progetti. Controlla la connessione e riprova.',
+    },
+    tickets: {
+      heading: 'Segnalazioni di {{name}}',
+      intro:
+        'Le segnalazioni aperte, per progetto. Spostale su un altro Tutor attivo dello stesso progetto: con ogni segnalazione passa anche il beneficiario, con tirocinio e documenti. Le segnalazioni chiuse restano nello storico.',
+      edit: 'Segnalazioni',
+      editFor: 'Segnalazioni di {{name}}',
+      none: 'Nessuna segnalazione aperta.',
+      project_one: '{{name}}: {{count}} segnalazione aperta',
+      project_other: '{{name}}: {{count}} segnalazioni aperte',
+      legend: 'Segnalazioni da spostare',
+      item: 'n. {{number}} · {{name}} · {{status}}',
+      target: 'Tutor che le riceve',
+      noTargets:
+        'Nessun altro Tutor attivo è assegnato a {{name}}: assegna il progetto a un collega dalla pagina dei suoi progetti.',
+      toUsers: 'Vai agli utenti',
+      move_one: 'Sposta {{count}} segnalazione',
+      move_other: 'Sposta {{count}} segnalazioni',
+      moving: 'Spostamento in corso…',
+      moved_one: '{{count}} segnalazione spostata a {{name}}, con il beneficiario.',
+      moved_other: '{{count}} segnalazioni spostate a {{name}}, con i beneficiari.',
+      loadError: 'Impossibile caricare le segnalazioni. Controlla la connessione e riprova.',
+      errors: {
+        noTicket: 'Scegli almeno una segnalazione da spostare.',
+        noTutor: 'Scegli il Tutor che riceve le segnalazioni.',
+      },
     },
     hints: {
       username:
@@ -1318,6 +1347,9 @@ export const it = {
     },
     userProjects: {
       title: 'Progetti dell’utente',
+    },
+    userTickets: {
+      title: 'Segnalazioni dell’utente',
     },
     tickets: {
       title: 'Segnalazioni',

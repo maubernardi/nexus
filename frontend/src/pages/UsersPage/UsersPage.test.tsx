@@ -78,7 +78,11 @@ describe('<UsersPage>', () => {
       'href',
       '/utenti/U1/progetti',
     );
-    // l'invito si reinvia solo agli utenti attivi; i progetti solo per i Tutor
+    expect(within(rows[1]).getByRole('link', { name: 'Segnalazioni di Rossi Mario' })).toHaveAttribute(
+      'href',
+      '/utenti/U1/segnalazioni',
+    );
+    // l'invito si reinvia solo agli utenti attivi; progetti e segnalazioni solo per i Tutor
     expect(within(rows[2]).queryByRole('button')).not.toBeInTheDocument();
     expect(within(rows[2]).queryByRole('link')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Nuovo utente' })).toHaveAttribute('href', '/utenti/nuovo');

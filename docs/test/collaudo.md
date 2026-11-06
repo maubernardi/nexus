@@ -687,3 +687,13 @@ nuovo utente, per esempio un alias.
      più; i suoi restano.
   5. Disattiva un progetto nei **Cataloghi** e apri i progetti di un Tutor che non lo ha. **Atteso:** il progetto
      disattivato non compare; su un Tutor che lo ha, compare come «disattivato» e si può solo togliere.
+
+- [ ] **T-20.6 Spostamento delle segnalazioni (US-111)**
+  1. Come `admin`, in **Utenti**, pulsante **Segnalazioni** su `tutor1`. **Atteso:** le sue segnalazioni aperte per
+     progetto, tutte già selezionate; le chiuse non ci sono.
+  2. Su GOL scegli `tutor2` come Tutor che le riceve, togli una segnalazione dalla selezione e sposta. **Atteso:**
+     «1 segnalazione spostata a …» e la segnalazione sparisce dall'elenco.
+  3. Entra come `tutor2`. **Atteso:** la notifica «Ti è stata affidata la segnalazione n. …», anche per email; la
+     segnalazione è tra le sue, con il beneficiario tra i suoi; nella cronologia «Passata a un altro Tutor: … → …».
+  4. Su un progetto senza altri Tutor assegnati. **Atteso:** il messaggio che invita ad assegnare il progetto a un
+     collega, senza pulsante.

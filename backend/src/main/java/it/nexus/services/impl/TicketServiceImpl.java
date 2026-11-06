@@ -368,6 +368,8 @@ public class TicketServiceImpl implements TicketService {
             case "TAKE_CHARGE" -> userName(changed(event, "assignedCcOperatorId", "after"));
             case "TAKE_OVER" -> "%s → %s".formatted(userName(changed(event, "assignedCcOperatorId", "before")),
                     userName(changed(event, "assignedCcOperatorId", "after")));
+            case "TRANSFER" -> "%s → %s".formatted(userName(changed(event, "tutorId", "before")),
+                    userName(changed(event, "tutorId", "after")));
             case "MATCH", "FAST_TRACK_APPROVE" -> Optional
                     .ofNullable(TsidMapper.toInternal(changed(event, "jobSlotId", "after")))
                     .flatMap(jobSlotRepository::findById)
