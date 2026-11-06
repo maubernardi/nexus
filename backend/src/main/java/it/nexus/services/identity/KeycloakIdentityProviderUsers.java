@@ -1,7 +1,10 @@
 package it.nexus.services.identity;
 
+import java.net.URI;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
@@ -17,10 +20,11 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 
 import it.nexus.config.ApplicationProperties;
+import it.nexus.services.identity.IdentityProviderException.Conflict;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Utenti Keycloak tramite la API di amministrazione (US-110), con il client tecnico {@code nexus-backend-admin}
+ * Utenti Keycloak tramite la API di amministrazione (US-110, US-103), con il client tecnico {@code nexus-backend-admin}
  * ({@code client_credentials}, ruoli view-users e manage-users). Il token si chiede a ogni operazione: sono rare.
  */
 @Slf4j
@@ -31,6 +35,13 @@ public class KeycloakIdentityProviderUsers implements IdentityProviderUsers {
     private static final Duration TIMEOUT = Duration.ofSeconds(10);
     private static final ParameterizedTypeReference<Map<String, Object>> JSON_OBJECT = new ParameterizedTypeReference<>() {
     };
+    private static final ParameterizedTypeReference<List<Map<String, Object>>> JSON_ARRAY =
+            new ParameterizedTypeReference<>() {
+            };
+    private static final String USERS = "/admin/realms/{realm}/users";
+    private static final String USER = USERS + "/{id}";
+    /** Client della PWA: dopo aver impostato la password, l'utente torna all'app da qui. */
+    private static final String APP_CLIENT_ID = "nexus-frontend";
 
     private final ApplicationProperties.KeycloakAdmin properties;
     private final RestClient restClient;
@@ -44,41 +55,142 @@ public class KeycloakIdentityProviderUsers implements IdentityProviderUsers {
         // sta in un modulo che il backend non usa (il bean non esiste)
         this.restClient = RestClient.builder().baseUrl(properties.getBaseUrl()).requestFactory(requestFactory).build();
         if (!StringUtils.hasText(properties.getClientSecret())) {
-            log.warn("Cambio email non disponibile: manca il segreto del client Keycloak {} "
+            log.warn("Gestione utenti in Keycloak non disponibile: manca il segreto del client {} "
                     + "(NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET nel .env del server)", properties.getClientId());
         }
     }
 
     @Override
     public void updateEmail(String externalId, String email) {
-        if (!StringUtils.hasText(properties.getClientSecret())) {
-            throw new IdentityProviderException("Segreto del client Keycloak non configurato", false, null);
-        }
-        try {
-            String token = accessToken();
-            String userPath = "/admin/realms/{realm}/users/{id}";
+        call("cambio email", token -> {
             // si riscrive l'utente intero: con lo User Profile un PUT parziale può azzerare gli attributi mancanti
-            Map<String, Object> user = restClient.get().uri(userPath, properties.getRealm(), externalId)
+            Map<String, Object> user = restClient.get().uri(USER, realm(), externalId)
                     .headers(h -> h.setBearerAuth(token))
                     .retrieve().body(JSON_OBJECT);
             if (user == null) {
-                throw new IdentityProviderException("Utente Keycloak senza dati", false, null);
+                throw new IdentityProviderException("Utente Keycloak senza dati", Conflict.NONE, null);
             }
             user.put("email", email);
             user.put("emailVerified", true);
-            restClient.put().uri(userPath, properties.getRealm(), externalId)
+            restClient.put().uri(USER, realm(), externalId)
                     .headers(h -> h.setBearerAuth(token))
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(user)
                     .retrieve().toBodilessEntity();
-        } catch (RestClientResponseException e) {
-            boolean taken = e.getStatusCode().isSameCodeAs(HttpStatus.CONFLICT);
-            log.warn("Keycloak ha rifiutato il cambio email: HTTP {}", e.getStatusCode().value());
-            throw new IdentityProviderException("Keycloak ha risposto " + e.getStatusCode().value(), taken, e);
-        } catch (RestClientException e) {
-            log.warn("Keycloak non raggiungibile per il cambio email: {}", e.getClass().getSimpleName());
-            throw new IdentityProviderException("Keycloak non raggiungibile", false, e);
+            return null;
+        });
+    }
+
+    @Override
+    public String createUser(NewIdentityUser user) {
+        String id = call("creazione utente", token -> {
+            URI location = restClient.post().uri(USERS, realm())
+                    .headers(h -> h.setBearerAuth(token))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of(
+                            "username", user.username(),
+                            "firstName", user.firstName(),
+                            "lastName", user.lastName(),
+                            "email", user.email(),
+                            // l'indirizzo lo verifica l'utente stesso aprendo l'email per la password
+                            "emailVerified", true,
+                            "enabled", true))
+                    .retrieve().toBodilessEntity().getHeaders().getLocation();
+            String path = location == null ? "" : location.getPath();
+            String created = path.substring(path.lastIndexOf('/') + 1);
+            if (created.isBlank()) {
+                throw new IdentityProviderException("Keycloak non ha restituito l'utente creato", Conflict.NONE, null);
+            }
+            return created;
+        });
+        try {
+            call("assegnazione del ruolo", token -> {
+                // i ruoli assegnabili si leggono dall'utente: bastano view-users e manage-users, senza view-realm
+                List<Map<String, Object>> available = restClient.get()
+                        .uri(USER + "/role-mappings/realm/available", realm(), id)
+                        .headers(h -> h.setBearerAuth(token))
+                        .retrieve().body(JSON_ARRAY);
+                Map<String, Object> role = (available == null ? List.<Map<String, Object>>of() : available).stream()
+                        .filter(r -> user.role().name().equals(r.get("name")))
+                        .findFirst()
+                        .orElseThrow(() -> new IdentityProviderException(
+                                "Ruolo " + user.role() + " assente nel realm", Conflict.NONE, null));
+                restClient.post().uri(USER + "/role-mappings/realm", realm(), id)
+                        .headers(h -> h.setBearerAuth(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(List.of(Map.of("id", role.get("id"), "name", role.get("name"))))
+                        .retrieve().toBodilessEntity();
+                return null;
+            });
+        } catch (IdentityProviderException e) {
+            deleteQuietly(id);
+            throw e;
         }
+        return id;
+    }
+
+    @Override
+    public void deleteUser(String externalId) {
+        call("cancellazione utente", token -> {
+            restClient.delete().uri(USER, realm(), externalId)
+                    .headers(h -> h.setBearerAuth(token))
+                    .retrieve().toBodilessEntity();
+            return null;
+        });
+    }
+
+    @Override
+    public void sendPasswordSetupEmail(String externalId, Duration lifespan, String redirectUri) {
+        call("email per la password", token -> {
+            restClient.put()
+                    .uri(b -> b.path(USER + "/execute-actions-email")
+                            .queryParam("lifespan", lifespan.toSeconds())
+                            .queryParam("client_id", APP_CLIENT_ID)
+                            .queryParam("redirect_uri", redirectUri)
+                            .build(realm(), externalId))
+                    .headers(h -> h.setBearerAuth(token))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(List.of("UPDATE_PASSWORD"))
+                    .retrieve().toBodilessEntity();
+            return null;
+        });
+    }
+
+    private void deleteQuietly(String externalId) {
+        try {
+            deleteUser(externalId);
+        } catch (IdentityProviderException e) {
+            log.error("Utente Keycloak {} creato a metà e non cancellato: va rimosso dalla console", externalId);
+        }
+    }
+
+    /** Esegue una chiamata con un token nuovo, traducendo gli errori HTTP in {@link IdentityProviderException}. */
+    private <T> T call(String operation, Function<String, T> request) {
+        if (!StringUtils.hasText(properties.getClientSecret())) {
+            throw new IdentityProviderException("Segreto del client Keycloak non configurato", Conflict.NONE, null);
+        }
+        try {
+            return request.apply(accessToken());
+        } catch (RestClientResponseException e) {
+            Conflict conflict = conflictOf(e);
+            log.warn("Keycloak ha rifiutato {}: HTTP {}", operation, e.getStatusCode().value());
+            throw new IdentityProviderException("Keycloak ha risposto " + e.getStatusCode().value(), conflict, e);
+        } catch (RestClientException e) {
+            log.warn("Keycloak non raggiungibile per {}: {}", operation, e.getClass().getSimpleName());
+            throw new IdentityProviderException("Keycloak non raggiungibile", Conflict.NONE, e);
+        }
+    }
+
+    /** 409 di Keycloak: «User exists with same username» oppure «… same email». */
+    private static Conflict conflictOf(RestClientResponseException e) {
+        if (!e.getStatusCode().isSameCodeAs(HttpStatus.CONFLICT)) {
+            return Conflict.NONE;
+        }
+        return e.getResponseBodyAsString().toLowerCase().contains("username") ? Conflict.USERNAME : Conflict.EMAIL;
+    }
+
+    private String realm() {
+        return properties.getRealm();
     }
 
     private String accessToken() {
@@ -87,13 +199,13 @@ public class KeycloakIdentityProviderUsers implements IdentityProviderUsers {
         form.add("client_id", properties.getClientId());
         form.add("client_secret", properties.getClientSecret());
         Map<String, Object> response = restClient.post()
-                .uri("/realms/{realm}/protocol/openid-connect/token", properties.getRealm())
+                .uri("/realms/{realm}/protocol/openid-connect/token", realm())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(form)
                 .retrieve().body(JSON_OBJECT);
         Object token = response == null ? null : response.get("access_token");
         if (!(token instanceof String value) || value.isBlank()) {
-            throw new IdentityProviderException("Token del client Keycloak assente", false, null);
+            throw new IdentityProviderException("Token del client Keycloak assente", Conflict.NONE, null);
         }
         return value;
     }

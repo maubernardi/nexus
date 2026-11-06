@@ -177,6 +177,15 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
   sudo bash keycloak-backend-client.sh   # genera il segreto nel .env, crea il client, riavvia il backend
   ```
   Finché manca, il cambio risponde «non disponibile» e il log del backend lo segnala all'avvio; il resto funziona.
+- **Utenti creati da NEXUS (US-103).** L'ADMIN crea gli utenti da «Utenti»; Keycloak invia loro l'email per
+  impostare la password, con lo stesso SMTP IONOS delle notifiche. Sulle nuove installazioni il server di posta è nel
+  realm importato (password da `NEXUS_SMTP_PASSWORD`); sul server già installato, **una volta, dopo il deploy di
+  US-103** (e di nuovo se cambia la password SMTP):
+  ```bash
+  curl -fsSLO https://raw.githubusercontent.com/maubernardi/nexus/main/infra/deploy/keycloak-email.sh
+  sudo bash keycloak-email.sh   # legge NEXUS_SMTP_PASSWORD dal .env e imposta la posta del realm nexus
+  ```
+  Finché manca, gli utenti si creano ma l'invito non parte: l'elenco lo dice e propone «Invia di nuovo l'invito».
 - **Stato e log sul server:**
   `cd /opt/nexus/current && sudo docker compose --env-file ../.env --env-file release.env ps` (oppure `logs -f backend`).
 - **DNS (IONOS):** A `@`, `auth`, `www` → IP del server; CAA `0 issue "letsencrypt.org"`; i record email restano.

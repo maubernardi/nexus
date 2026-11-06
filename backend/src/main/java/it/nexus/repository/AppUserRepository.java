@@ -18,6 +18,13 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
 
     List<AppUser> findByUsernameIn(Collection<String> usernames);
 
+    /** Elenco per l'ADMIN (US-103): prima gli attivi, poi per cognome e nome. */
+    List<AppUser> findAllByOrderByActiveDescLastNameAscFirstNameAsc();
+
+    boolean existsByUsernameIgnoreCase(String username);
+
+    boolean existsByEmailIgnoreCase(String email);
+
     /** Indirizzo già usato da un altro utente (unicità senza distinzione tra maiuscole e minuscole). */
     boolean existsByEmailIgnoreCaseAndIdNot(String email, Long id);
 }

@@ -18,6 +18,7 @@ export const it = {
     board: 'Bacheca',
     catalogs: 'Cataloghi',
     calendar: 'Calendario',
+    users: 'Utenti',
   },
   common: {
     loading: 'Caricamento in corso…',
@@ -971,6 +972,53 @@ export const it = {
     loadError: 'Impossibile caricare il profilo utente. Riprova più tardi.',
     retry: 'Riprova',
   },
+  users: {
+    heading: 'Utenti',
+    intro:
+      'Chi può accedere a NEXUS e con quale ruolo. Un nuovo utente riceve per email il collegamento per impostare la password, valido 3 giorni.',
+    new: 'Nuovo utente',
+    caption_one: 'Utenti: {{count}} persona',
+    caption_other: 'Utenti: {{count}} persone',
+    loadError: 'Impossibile caricare gli utenti. Controlla la connessione e riprova.',
+    active: 'Attivo',
+    inactive: 'Disattivato',
+    resend: 'Invia di nuovo l’invito',
+    resendFor: 'Invia di nuovo l’invito a {{name}}',
+    invitationSent: 'Invito inviato a {{email}}: il collegamento per impostare la password vale 3 giorni.',
+    created:
+      'Utente {{name}} creato. Abbiamo inviato a {{email}} il collegamento per impostare la password, valido 3 giorni.',
+    createdNoInvitation:
+      'Utente {{name}} creato, ma l’email per impostare la password non è partita. Usa «Invia di nuovo l’invito» quando la posta di Keycloak funziona.',
+    error: 'Operazione non riuscita. Controlla la connessione e riprova.',
+    newHeading: 'Nuovo utente',
+    newIntro:
+      'L’utente nasce in NEXUS e nell’account di accesso con il ruolo scelto, e riceve per email il collegamento per impostare la password. L’assegnazione ai progetti arriverà con una prossima versione.',
+    create: 'Crea l’utente',
+    creating: 'Creazione in corso…',
+    backToList: 'Torna agli utenti',
+    fields: {
+      name: 'Nome e cognome',
+      firstName: 'Nome',
+      lastName: 'Cognome',
+      username: 'Username',
+      email: 'Email',
+      phone: 'Telefono',
+      role: 'Ruolo',
+      status: 'Stato',
+      actions: 'Azioni',
+    },
+    hints: {
+      username:
+        'Serve per accedere, insieme all’email. Proposto come nome.cognome; solo lettere, cifre e i separatori . _ -',
+      email: 'Qui arriva il collegamento per impostare la password, poi le notifiche.',
+    },
+    errors: {
+      username: 'Solo lettere, cifre e i separatori . _ - (es. mario.rossi)',
+      usernameLength: 'Almeno 3 caratteri',
+      email: 'Scrivi un indirizzo email valido, ad esempio nome@dominio.it',
+      phone: 'Solo cifre, spazi e + ( ) . / -',
+    },
+  },
   profile: {
     heading: 'Il mio profilo',
     account: 'Dati dell’account',
@@ -1241,6 +1289,12 @@ export const it = {
   pages: {
     profile: {
       title: 'Il mio profilo',
+    },
+    users: {
+      title: 'Utenti',
+    },
+    userNew: {
+      title: 'Nuovo utente',
     },
     tickets: {
       title: 'Segnalazioni',
