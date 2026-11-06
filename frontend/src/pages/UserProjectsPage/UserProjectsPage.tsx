@@ -16,7 +16,8 @@ const backLink = 'font-medium text-primary underline underline-offset-4';
 
 /**
  * Progetti di un Tutor (US-104): l'ADMIN sceglie i progetti di cui il Tutor vede i ticket in sola lettura e su cui può
- * segnalare. Un progetto disattivato già assegnato resta in elenco per poterlo togliere, ma non si assegna.
+ * segnalare. Un progetto disattivato già assegnato resta in elenco per poterlo togliere, ma non si assegna. Per ogni
+ * progetto assegnato l'ADMIN può nominarlo Coordinatore, che ne sposta le segnalazioni tra i Tutor (US-112).
  */
 export const UserProjectsPage = () => {
   const { t } = useTranslation();
@@ -69,6 +70,9 @@ const ProjectsForm = ({ user, catalog }: ProjectsFormProps) => {
   const navigate = useNavigate();
   const update = useUpdateUserProjects();
   const [selected, setSelected] = useState<string[]>(() => user.projects.map((p) => p.id));
+  const [coordinated, setCoordinated] = useState<string[]>(() =>
+    (user.coordinatedProjects ?? []).map((p) => p.id),
+  );
   const [error, setError] = useState<string | null>(null);
   const errorRef = useRef<HTMLParagraphElement>(null);
 
@@ -80,11 +84,19 @@ const ProjectsForm = ({ user, catalog }: ProjectsFormProps) => {
   const toggle = (projectId: string, checked: boolean): void =>
     setSelected((current) => (checked ? [...current, projectId] : current.filter((v) => v !== projectId)));
 
+  const toggleCoordinator = (projectId: string, checked: boolean): void =>
+    setCoordinated((current) => (checked ? [...current, projectId] : current.filter((v) => v !== projectId)));
+
   const onSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     setError(null);
     try {
-      await update.mutateAsync({ id: user.id, projectIds: selected });
+      // si coordina solo un progetto assegnato: togliendo il progetto si toglie anche il coordinamento
+      await update.mutateAsync({
+        id: user.id,
+        projectIds: selected,
+        coordinatedProjectIds: coordinated.filter((v) => selected.includes(v)),
+      });
       const state: UsersPageState = { projectsSaved: name };
       void navigate('/utenti', { state });
     } catch (e) {
@@ -122,19 +134,34 @@ const ProjectsForm = ({ user, catalog }: ProjectsFormProps) => {
           <legend className="mb-2 font-semibold">{t('users.projects.legend', { name })}</legend>
           {options.map((p) => {
             const inputId = `project-${p.id}`;
+            const coordinatorId = `coordinator-${p.id}`;
+            const isSelected = selected.includes(p.id);
             return (
-              <label
+              <div
                 key={p.id}
-                htmlFor={inputId}
-                className="flex min-h-11 items-center gap-3 rounded-md border border-border bg-card px-3"
+                className="flex min-h-11 flex-wrap items-center justify-between gap-x-4 rounded-md border border-border bg-card px-3"
               >
-                <Checkbox
-                  id={inputId}
-                  checked={selected.includes(p.id)}
-                  onChange={(e) => toggle(p.id, e.target.checked)}
-                />
-                <span>{p.active ? p.name : t('users.projects.inactive', { name: p.name })}</span>
-              </label>
+                <label htmlFor={inputId} className="flex min-h-11 items-center gap-3">
+                  <Checkbox
+                    id={inputId}
+                    checked={isSelected}
+                    onChange={(e) => toggle(p.id, e.target.checked)}
+                  />
+                  <span>{p.active ? p.name : t('users.projects.inactive', { name: p.name })}</span>
+                </label>
+                {isSelected && (
+                  <label htmlFor={coordinatorId} className="flex min-h-11 items-center gap-3">
+                    <Checkbox
+                      id={coordinatorId}
+                      // il nome visibile è «Coordinatore»: quello accessibile dice di quale progetto
+                      aria-label={t('users.projects.coordinatorOf', { name: p.name })}
+                      checked={coordinated.includes(p.id)}
+                      onChange={(e) => toggleCoordinator(p.id, e.target.checked)}
+                    />
+                    <span>{t('users.projects.coordinator')}</span>
+                  </label>
+                )}
+              </div>
             );
           })}
         </fieldset>

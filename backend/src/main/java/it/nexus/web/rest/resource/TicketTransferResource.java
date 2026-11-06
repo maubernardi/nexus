@@ -36,9 +36,17 @@ public class TicketTransferResource {
         return ResponseEntity.ok(ticketTransferService.openTickets(id));
     }
 
+    @GetMapping("/me/coordination")
+    @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
+    @Operation(summary = "Segnalazioni aperte dei progetti coordinati dall'utente, con i Tutor che possono riceverle (US-112)")
+    public ResponseEntity<List<TransferGroupDTO>> coordination() {
+        return ResponseEntity.ok(ticketTransferService.coordination());
+    }
+
     @PostMapping("/tickets/transfer")
-    @PreAuthorize("hasRole(@requestsAuthorizer.ADMIN)")
-    @Operation(summary = "Sposta segnalazioni aperte dello stesso progetto su un altro Tutor, con i beneficiari (US-111)")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.ADMIN, @requestsAuthorizer.TUTOR)")
+    @Operation(summary = "Sposta segnalazioni aperte dello stesso progetto su un altro Tutor, con i beneficiari "
+            + "(US-111); un Tutor solo nei progetti che coordina (US-112)")
     public ResponseEntity<TicketTransferResultDTO> transfer(@RequestBody @Valid TicketTransferDTO dto) {
         return ResponseEntity.ok(ticketTransferService.transfer(dto));
     }

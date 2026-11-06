@@ -16,6 +16,8 @@ export type AdminUser = {
   role: Role;
   active: boolean;
   projects: ReferenceItem[];
+  /** Progetti che il Tutor coordina (US-112). */
+  coordinatedProjects?: ReferenceItem[];
 };
 
 export type NewUserForm = {
@@ -52,15 +54,19 @@ export const fetchUser = async (id: string): Promise<AdminUser> => {
   return data;
 };
 
-/** Sostituisce i progetti del Tutor (US-104); un elenco vuoto toglie tutti i progetti. */
+/** Progetti del Tutor scelti dall'ADMIN: tra questi, quelli che coordina (US-112). */
+export type UserProjectsVars = { id: string; projectIds: string[]; coordinatedProjectIds: string[] };
+
+/** Sostituisce i progetti del Tutor (US-104) e quelli che coordina (US-112); un elenco vuoto li toglie tutti. */
 export const updateUserProjects = async ({
   id,
   projectIds,
-}: {
-  id: string;
-  projectIds: string[];
-}): Promise<AdminUser> => {
-  const { data } = await axiosInstance.put<AdminUser>(`${ENDPOINTS.users}/${id}/projects`, { projectIds });
+  coordinatedProjectIds,
+}: UserProjectsVars): Promise<AdminUser> => {
+  const { data } = await axiosInstance.put<AdminUser>(`${ENDPOINTS.users}/${id}/projects`, {
+    projectIds,
+    coordinatedProjectIds,
+  });
   return data;
 };
 

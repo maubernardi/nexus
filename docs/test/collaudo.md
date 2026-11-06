@@ -710,3 +710,14 @@ nuovo utente, per esempio un alias.
   5. Cambia il ruolo del Tutor creato in T-20.1 in Call Center. **Atteso:** «Il ruolo … ora è Call Center»; al suo
      prossimo accesso vede la Home del Call Center. Poi riportalo a Tutor.
   6. **Accesso e ruolo** sul tuo utente `admin`. **Atteso:** il messaggio che lo cambia un altro ADMIN, senza pulsanti.
+
+- [ ] **T-20.8 Coordinatore di progetto (US-112)**
+  1. Come `admin`, **Progetti** di `tutor1`: accanto a GOL spunta **Coordinatore** e salva (lascia POLIS senza).
+     **Atteso:** nell'elenco degli utenti «GOL (Coordinatore), POLIS»; la casella c'è solo per i progetti assegnati.
+  2. Entra come `tutor1` (o ricarica la pagina). **Atteso:** nel menu la voce **Coordinamento**; la pagina mostra
+     tutte le segnalazioni aperte di GOL, anche di `tutor2`, con il Tutor di ognuna, e nessuna già selezionata.
+  3. Scegli una segnalazione di `tutor2` e come Tutor che la riceve te stesso; sposta. **Atteso:** «1 segnalazione
+     spostata a …»; nella pagina la segnalazione ora è tua; `tutor2` vede in cronologia «Passata a un altro Tutor».
+  4. Entra come `tutor2`. **Atteso:** nel menu non c'è **Coordinamento**.
+  5. Come `admin`, togli la spunta **Coordinatore** a `tutor1`. **Atteso:** al prossimo accesso di `tutor1` la voce
+     **Coordinamento** non c'è più.

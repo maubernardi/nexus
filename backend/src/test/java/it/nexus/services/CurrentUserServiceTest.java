@@ -20,6 +20,7 @@ import it.nexus.config.security.UserAuthenticationToken;
 import it.nexus.domain.dto.CurrentUserDTO;
 import it.nexus.domain.enumeration.Role;
 import it.nexus.mapper.CurrentUserMapper;
+import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.impl.CurrentUserServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,6 +28,9 @@ class CurrentUserServiceTest {
 
     @Mock
     CurrentUserMapper mapper;
+
+    @Mock
+    UserProjectRepository userProjectRepository;
 
     @InjectMocks
     CurrentUserServiceImpl service;
@@ -40,10 +44,11 @@ class CurrentUserServiceTest {
     void getCurrentUser_returnsDto_whenAuthenticated() {
         AuthenticatedUser user = new AuthenticatedUser("id-1", "tutor1", "Tutor", "Uno", "t@x.it", Set.of(Role.TUTOR));
         SecurityContextHolder.getContext().setAuthentication(new UserAuthenticationToken(user, null));
-        CurrentUserDTO dto = new CurrentUserDTO("id-1", "tutor1", "Tutor", "Uno", "t@x.it", Set.of(Role.TUTOR));
+        CurrentUserDTO dto = new CurrentUserDTO("id-1", "tutor1", "Tutor", "Uno", "t@x.it", Set.of(Role.TUTOR), false);
         when(mapper.toDto(user)).thenReturn(dto);
+        when(userProjectRepository.existsByUserExternalIdAndCoordinatorTrue("id-1")).thenReturn(true);
 
-        assertThat(service.getCurrentUser()).isEqualTo(dto);
+        assertThat(service.getCurrentUser()).isEqualTo(dto.withCoordinator(true));
     }
 
     @Test

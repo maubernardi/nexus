@@ -33,6 +33,7 @@ import it.nexus.domain.Notification;
 import it.nexus.domain.Project;
 import it.nexus.domain.TestEntities;
 import it.nexus.domain.Ticket;
+import it.nexus.domain.UserProject;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.NotificationType;
 import it.nexus.domain.enumeration.Role;
@@ -42,11 +43,15 @@ import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.NotificationRepository;
 import it.nexus.repository.TicketRepository;
+import it.nexus.repository.UserProjectRepository;
 import it.nexus.support.WorkflowScenarios;
 import it.nexus.support.WorkflowScenarios.Actors;
 import it.nexus.support.WorkflowScenarios.Place;
 
-/** Spostamento delle segnalazioni aperte da un Tutor a un altro dello stesso progetto (US-111). */
+/**
+ * Spostamento delle segnalazioni aperte da un Tutor a un altro dello stesso progetto (US-111), anche da parte del
+ * Coordinatore del progetto (US-112).
+ */
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
@@ -62,6 +67,7 @@ class TicketTransferIT {
     @Autowired AppUserRepository users;
     @Autowired AuditEventRepository audit;
     @Autowired NotificationRepository notifications;
+    @Autowired UserProjectRepository userProjects;
 
     private Actors actors;
     private Place place;
@@ -175,12 +181,50 @@ class TicketTransferIT {
         assertThat(tickets.findById(a.getId()).orElseThrow().getTutor().getId()).isEqualTo(actors.tutor1().getId());
     }
 
+    private void coordinate(AppUser tutor, Project project) {
+        UserProject assignment = userProjects.findById(new UserProject.Id(tutor.getId(), project.getId())).orElseThrow();
+        assignment.setCoordinator(true);
+        userProjects.saveAndFlush(assignment);
+    }
+
     @Test
-    void soloLAdmin() throws Exception {
+    void coordinatore_spostaTraITutorDelProgettoCheCoordina() throws Exception {
+        Project polis = scenarios.project("POLIS", actors.tutor1(), actors.tutor2());
+        coordinate(actors.tutor1(), gol);
+        Ticket ofTutor2 = ticket(actors.tutor2(), gol, "A");
+        Ticket mine = ticket(actors.tutor1(), gol, "B");
+        Ticket otherProject = ticket(actors.tutor2(), polis, "C");
+
+        // tutte le segnalazioni aperte del progetto coordinato; il Coordinatore stesso può riceverle
+        mockMvc.perform(get("/api/v1/me/coordination").header(USER, "tutor1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].project.code").value(gol.getCode()))
+                .andExpect(jsonPath("$[0].tickets[*].id", contains(id(ofTutor2), id(mine))))
+                .andExpect(jsonPath("$[0].targets", hasSize(2)));
+        mockMvc.perform(get("/api/v1/me").header(USER, "tutor1")).andExpect(jsonPath("$.coordinator").value(true));
+
+        transfer("tutor1", actors.tutor1(), ofTutor2).andExpect(status().isOk());
+        assertThat(tickets.findById(ofTutor2.getId()).orElseThrow().getTutor().getId())
+                .isEqualTo(actors.tutor1().getId());
+        transfer("tutor1", actors.tutor2(), mine).andExpect(status().isOk());
+
+        // in POLIS è solo Tutor: non sposta
+        transfer("tutor1", actors.tutor1(), otherProject).andExpect(status().isForbidden());
+        assertThat(tickets.findById(otherProject.getId()).orElseThrow().getTutor().getId())
+                .isEqualTo(actors.tutor2().getId());
+        mockMvc.perform(get("/api/v1/me/coordination").header(USER, "tutor2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    void soloLAdminOIlCoordinatore() throws Exception {
         Ticket a = ticket(actors.tutor1(), gol, "A");
         transfer("tutor1", actors.tutor2(), a).andExpect(status().isForbidden());
         transfer("operatore.cc", actors.tutor2(), a).andExpect(status().isForbidden());
         mockMvc.perform(get("/api/v1/users/" + TsidMapper.toExternal(actors.tutor1().getId()) + "/open-tickets")
                 .header(USER, "tutor2")).andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/v1/me/coordination").header(USER, "operatore.cc")).andExpect(status().isForbidden());
     }
 }

@@ -1,6 +1,7 @@
 package it.nexus.services.impl;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -70,9 +71,8 @@ public class UserAdminServiceImpl implements UserAdminService {
     @Override
     @Transactional(readOnly = true)
     public List<UserDTO> list() {
-        Map<Long, List<Project>> projectsByUser = userProjectRepository.findAllWithProject().stream()
-                .collect(Collectors.groupingBy(up -> up.getId().getUserId(),
-                        Collectors.mapping(UserProject::getProject, Collectors.toList())));
+        Map<Long, List<UserProject>> projectsByUser = userProjectRepository.findAllWithProject().stream()
+                .collect(Collectors.groupingBy(up -> up.getId().getUserId()));
         return appUserRepository.findAllByOrderByActiveDescLastNameAscFirstNameAsc().stream()
                 .map(u -> toDto(u, projectsByUser.getOrDefault(u.getId(), List.of()))).toList();
     }
@@ -91,13 +91,12 @@ public class UserAdminServiceImpl implements UserAdminService {
             throw new BadRequestException(
                     "Solo i Tutor hanno progetti assegnati: Call Center e ADMIN vedono già tutti i progetti");
         }
-        Set<Long> requested = new LinkedHashSet<>();
-        for (String projectId : dto.projectIds()) {
-            Long internal = TsidMapper.toInternal(projectId);
-            if (internal == null) {
-                throw new FieldValidationException("projectIds", "Progetto non valido");
-            }
-            requested.add(internal);
+        Set<Long> requested = projectIds(dto.projectIds(), "projectIds");
+        Set<Long> coordinated = projectIds(
+                dto.coordinatedProjectIds() == null ? List.of() : dto.coordinatedProjectIds(), "coordinatedProjectIds");
+        if (!requested.containsAll(coordinated)) {
+            throw new FieldValidationException("coordinatedProjectIds",
+                    "Un Tutor coordina solo i progetti a cui è assegnato");
         }
         Map<Long, Project> chosen = projectRepository.findAllById(requested).stream()
                 .collect(Collectors.toMap(Project::getId, Function.identity()));
@@ -115,18 +114,44 @@ public class UserAdminServiceImpl implements UserAdminService {
         });
         List<UserProject> removed = current.stream()
                 .filter(up -> !requested.contains(up.getId().getProjectId())).toList();
-        if (added.isEmpty() && removed.isEmpty()) {
-            return toDto(user, current.stream().map(UserProject::getProject).toList());
+        List<UserProject> kept = current.stream().filter(up -> requested.contains(up.getId().getProjectId())).toList();
+        List<UserProject> toggled = kept.stream()
+                .filter(up -> up.isCoordinator() != coordinated.contains(up.getId().getProjectId())).toList();
+        if (added.isEmpty() && removed.isEmpty() && toggled.isEmpty()) {
+            return toDto(user, current);
         }
 
+        List<String> projectsBefore = codes(current, false);
+        List<String> coordinatedBefore = codes(current, true);
+        toggled.forEach(up -> up.setCoordinator(!up.isCoordinator()));
+        List<UserProject> created = added.stream().map(p -> {
+            UserProject up = new UserProject(user, p);
+            up.setCoordinator(coordinated.contains(p.getId()));
+            return up;
+        }).toList();
         userProjectRepository.deleteAll(removed);
-        userProjectRepository.saveAll(added.stream().map(p -> new UserProject(user, p)).toList());
+        userProjectRepository.saveAll(created);
         userProjectRepository.flush();
-        List<Project> after = List.copyOf(chosen.values());
+        List<UserProject> after = new ArrayList<>(kept);
+        after.addAll(created);
         auditService.record(AuditEntityType.APP_USER, user.getId(), "PROJECTS_CHANGED", AuditChanges.of()
-                .value("projects", codes(current.stream().map(UserProject::getProject).toList()), codes(after)), null);
-        log.info("Progetti di {} aggiornati: +{} -{}", user, added.size(), removed.size());
+                .value("projects", projectsBefore, codes(after, false))
+                .value("coordinated", coordinatedBefore, codes(after, true)), null);
+        log.info("Progetti di {} aggiornati: +{} -{}, coordinamento cambiato su {}", user, added.size(), removed.size(),
+                toggled.size());
         return toDto(user, after);
+    }
+
+    private static Set<Long> projectIds(List<String> ids, String field) {
+        Set<Long> result = new LinkedHashSet<>();
+        for (String projectId : ids) {
+            Long internal = TsidMapper.toInternal(projectId);
+            if (internal == null) {
+                throw new FieldValidationException(field, "Progetto non valido");
+            }
+            result.add(internal);
+        }
+        return result;
     }
 
     @Override
@@ -268,6 +293,12 @@ public class UserAdminServiceImpl implements UserAdminService {
         if (role == Role.TUTOR) {
             changes.merge(released(release(user)));
         }
+        // il coordinamento è un permesso in più del Tutor (US-112): con un altro ruolo non resta in sospeso
+        if (before == Role.TUTOR) {
+            List<UserProject> coordinated = userProjectRepository.findCoordinatedBy(user.getId());
+            changes.value("coordinated", codes(coordinated, false), List.of());
+            coordinated.forEach(up -> up.setCoordinator(false));
+        }
         user.setRole(role);
         appUserRepository.saveAndFlush(user);
         auditService.record(AuditEntityType.APP_USER, user.getId(), "ROLE_CHANGE", changes, null);
@@ -327,19 +358,27 @@ public class UserAdminServiceImpl implements UserAdminService {
                 .orElseThrow(() -> new NotFoundException("Utente non trovato"));
     }
 
-    private List<Project> assignedProjects(AppUser user) {
-        return userProjectRepository.findByUserIdWithProject(user.getId()).stream().map(UserProject::getProject).toList();
+    private List<UserProject> assignedProjects(AppUser user) {
+        return userProjectRepository.findByUserIdWithProject(user.getId());
     }
 
-    /** Codici dei progetti in ordine alfabetico, per l'audit. */
-    private static List<String> codes(List<Project> projects) {
-        return projects.stream().map(Project::getCode).sorted().toList();
+    /** Codici dei progetti assegnati (o solo coordinati) in ordine alfabetico, per l'audit. */
+    private static List<String> codes(List<UserProject> assignments, boolean onlyCoordinated) {
+        return assignments.stream().filter(up -> !onlyCoordinated || up.isCoordinator())
+                .map(up -> up.getProject().getCode()).sorted().toList();
     }
 
-    private static UserDTO toDto(AppUser user, List<Project> projects) {
-        List<ReferenceItemDTO> items = projects.stream().sorted(BY_NAME)
-                .map(p -> new ReferenceItemDTO(TsidMapper.toExternal(p.getId()), p.getCode(), p.getName())).toList();
+    private static UserDTO toDto(AppUser user, List<UserProject> assignments) {
+        List<UserProject> sorted = assignments.stream().sorted(Comparator.comparing(UserProject::getProject, BY_NAME))
+                .toList();
         return new UserDTO(TsidMapper.toExternal(user.getId()), user.getUsername(), user.getFirstName(),
-                user.getLastName(), user.getEmail(), user.getPhone(), user.getRole(), user.isActive(), items);
+                user.getLastName(), user.getEmail(), user.getPhone(), user.getRole(), user.isActive(),
+                sorted.stream().map(UserAdminServiceImpl::item).toList(),
+                sorted.stream().filter(UserProject::isCoordinator).map(UserAdminServiceImpl::item).toList());
+    }
+
+    private static ReferenceItemDTO item(UserProject assignment) {
+        Project p = assignment.getProject();
+        return new ReferenceItemDTO(TsidMapper.toExternal(p.getId()), p.getCode(), p.getName());
     }
 }

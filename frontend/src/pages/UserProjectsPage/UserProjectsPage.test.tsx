@@ -86,9 +86,40 @@ describe('<UserProjectsPage>', () => {
     vi.mocked(updateUserProjects).mockResolvedValueOnce(tutor);
     await user.click(screen.getByRole('button', { name: 'Salva i progetti' }));
 
-    expect(updateUserProjects).toHaveBeenCalledWith({ id: 'U1', projectIds: ['P1', 'P2'] });
+    expect(updateUserProjects).toHaveBeenCalledWith({
+      id: 'U1',
+      projectIds: ['P1', 'P2'],
+      coordinatedProjectIds: [],
+    });
     await waitFor(() => expect(router.state.location.pathname).toBe('/utenti'));
     expect(router.state.location.state).toEqual({ projectsSaved: 'Mario Rossi' });
+  });
+
+  it('Coordinatore di un progetto assegnato; togliendo il progetto si toglie anche il coordinamento', async () => {
+    vi.mocked(fetchUser).mockResolvedValue({
+      ...tutor,
+      coordinatedProjects: [{ id: 'P1', code: 'GOL', name: 'GOL' }],
+    });
+    const user = userEvent.setup();
+    renderPage();
+
+    expect(await screen.findByRole('checkbox', { name: 'Coordinatore di GOL' })).toBeChecked();
+    expect(screen.getByRole('checkbox', { name: 'Coordinatore di Vecchio' })).not.toBeChecked();
+    // si coordina solo un progetto assegnato
+    expect(screen.queryByRole('checkbox', { name: 'Coordinatore di POLIS' })).not.toBeInTheDocument();
+    await expectNoAxeViolations();
+
+    await user.click(screen.getByRole('checkbox', { name: 'POLIS' }));
+    await user.click(screen.getByRole('checkbox', { name: 'Coordinatore di POLIS' }));
+    await user.click(screen.getByRole('checkbox', { name: 'GOL' }));
+    vi.mocked(updateUserProjects).mockResolvedValueOnce(tutor);
+    await user.click(screen.getByRole('button', { name: 'Salva i progetti' }));
+
+    expect(updateUserProjects).toHaveBeenCalledWith({
+      id: 'U1',
+      projectIds: ['P3', 'P2'],
+      coordinatedProjectIds: ['P2'],
+    });
   });
 
   it('errore del server sul campo', async () => {

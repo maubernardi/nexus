@@ -19,6 +19,7 @@ export const it = {
     catalogs: 'Cataloghi',
     calendar: 'Calendario',
     users: 'Utenti',
+    coordination: 'Coordinamento',
   },
   common: {
     loading: 'Caricamento in corso…',
@@ -976,6 +977,15 @@ export const it = {
     loadError: 'Impossibile caricare il profilo utente. Riprova più tardi.',
     retry: 'Riprova',
   },
+  coordination: {
+    heading: 'Coordinamento',
+    intro:
+      'Le segnalazioni aperte dei progetti che coordini. Scegli quali spostare e il Tutor del progetto che le riceve, anche te stesso: con ogni segnalazione passa anche il beneficiario, con tirocinio e documenti.',
+    none: 'Non coordini nessun progetto. Il Coordinatore lo nomina l’ADMIN, nella pagina dei progetti del Tutor.',
+    empty: 'Nessuna segnalazione aperta in {{name}}.',
+    loadError:
+      'Impossibile caricare le segnalazioni dei progetti che coordini. Controlla la connessione e riprova.',
+  },
   users: {
     heading: 'Utenti',
     intro:
@@ -1015,9 +1025,12 @@ export const it = {
     projects: {
       heading: 'Progetti di {{name}}',
       intro:
-        'Il Tutor vede in sola lettura i ticket dei progetti scelti e può segnalare solo su questi. La modifica vale subito; i ticket che ha già segnalato restano suoi.',
+        'Il Tutor vede in sola lettura i ticket dei progetti scelti e può segnalare solo su questi. Come Coordinatore di un progetto può anche spostarne le segnalazioni tra i Tutor del progetto. La modifica vale subito; i ticket che ha già segnalato restano suoi.',
       legend: 'Progetti assegnati a {{name}}',
       inactive: '{{name}} (disattivato: se lo togli non si può riassegnare)',
+      coordinator: 'Coordinatore',
+      coordinatorOf: 'Coordinatore di {{name}}',
+      coordinated: '{{name}} (Coordinatore)',
       all: 'Tutti',
       none: 'Nessuno',
       edit: 'Progetti',
@@ -1073,6 +1086,7 @@ export const it = {
       project_other: '{{name}}: {{count}} segnalazioni aperte',
       legend: 'Segnalazioni da spostare',
       item: 'n. {{number}} · {{name}} · {{status}}',
+      itemWithTutor: 'n. {{number}} · {{name}} · {{status}} · Tutor: {{tutor}}',
       target: 'Tutor che le riceve',
       noTargets:
         'Nessun altro Tutor attivo è assegnato a {{name}}: assegna il progetto a un collega dalla pagina dei suoi progetti.',
@@ -1382,6 +1396,9 @@ export const it = {
     },
     userTickets: {
       title: 'Segnalazioni dell’utente',
+    },
+    coordination: {
+      title: 'Coordinamento',
     },
     userAccount: {
       title: 'Accesso e ruolo dell’utente',

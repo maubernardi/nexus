@@ -24,6 +24,6 @@ Tutor.
 - **WHEN** tra le segnalazioni scelte ce n'è una chiusa, oppure sono di progetti diversi
 - **THEN** lo spostamento è rifiutato e nulla cambia
 
-#### Scenario: Solo l'ADMIN
-- **WHEN** un Tutor o un operatore prova a spostare una segnalazione
+#### Scenario: Solo l'ADMIN (o il Coordinatore, US-112)
+- **WHEN** un operatore, o un Tutor che non coordina il progetto, prova a spostare una segnalazione
 - **THEN** la risposta è `403`

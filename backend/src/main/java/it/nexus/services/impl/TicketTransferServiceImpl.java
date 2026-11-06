@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +35,7 @@ import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.TicketRepository;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
+import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.NotificationService;
 import it.nexus.services.TicketTransferService;
 import it.nexus.web.errors.BadRequestException;
@@ -56,6 +58,7 @@ public class TicketTransferServiceImpl implements TicketTransferService {
     private final AuditService auditService;
     private final NotificationService notificationService;
     private final TicketMapper ticketMapper;
+    private final CurrentAppUserService currentAppUserService;
 
     @Override
     @Transactional(readOnly = true)
@@ -68,14 +71,34 @@ public class TicketTransferServiceImpl implements TicketTransferService {
                         () -> new TreeMap<>(Comparator.comparing(Project::getName, String.CASE_INSENSITIVE_ORDER)
                                 .thenComparing(Project::getId)),
                         Collectors.toList()));
-        return byProject.entrySet().stream().map(e -> new TransferGroupDTO(
-                new ReferenceItemDTO(TsidMapper.toExternal(e.getKey().getId()), e.getKey().getCode(), e.getKey().getName()),
-                e.getValue().stream().map(ticketMapper::toListItem).toList(),
-                userProjectRepository.findActiveTutorsOf(e.getKey().getId()).stream()
-                        .filter(u -> !u.getId().equals(tutor.getId()))
-                        .map(u -> new TutorOptionDTO(TsidMapper.toExternal(u.getId()), fullName(u)))
-                        .toList()))
+        return byProject.entrySet().stream()
+                .map(e -> group(e.getKey(), e.getValue(), tutor.getId()))
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TransferGroupDTO> coordination() {
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        if (me.getRole() != Role.TUTOR) {
+            return List.of();
+        }
+        return userProjectRepository.findCoordinatedBy(me.getId()).stream()
+                .map(UserProject::getProject)
+                .map(p -> group(p, ticketRepository.findByProjectIdAndStatusNotOrderByNumberAsc(p.getId(),
+                        TicketStatus.CLOSED), null))
+                .toList();
+    }
+
+    /** Segnalazioni di un progetto con i Tutor attivi del progetto che possono riceverle, tranne {@code excluded}. */
+    private TransferGroupDTO group(Project project, List<Ticket> tickets, Long excluded) {
+        return new TransferGroupDTO(
+                new ReferenceItemDTO(TsidMapper.toExternal(project.getId()), project.getCode(), project.getName()),
+                tickets.stream().map(ticketMapper::toListItem).toList(),
+                userProjectRepository.findActiveTutorsOf(project.getId()).stream()
+                        .filter(u -> !u.getId().equals(excluded))
+                        .map(u -> new TutorOptionDTO(TsidMapper.toExternal(u.getId()), fullName(u)))
+                        .toList());
     }
 
     @Override
@@ -93,6 +116,7 @@ public class TicketTransferServiceImpl implements TicketTransferService {
             throw new FieldValidationException("ticketIds", "Segnalazione non valida");
         }
         Project project = tickets.getFirst().getProject();
+        requireCanTransfer(project);
         for (Ticket ticket : tickets) {
             if (ticket.getStatus() == TicketStatus.CLOSED) {
                 throw new BadRequestException("La segnalazione n. %d è chiusa: non si sposta".formatted(ticket.getNumber()));
@@ -130,6 +154,19 @@ public class TicketTransferServiceImpl implements TicketTransferService {
         tickets.forEach(t -> notificationService.notify(target, NotificationType.TICKET_TRANSFERRED, t));
         log.info("{} segnalazioni del progetto {} spostate su {}", tickets.size(), project.getId(), target);
         return new TicketTransferResultDTO(tickets.size(), fullName(target));
+    }
+
+    /** L'ADMIN sposta in ogni progetto; un Tutor solo nei progetti che coordina (US-112). */
+    private void requireCanTransfer(Project project) {
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        if (me.getRole() == Role.ADMIN) {
+            return;
+        }
+        boolean coordinator = me.getRole() == Role.TUTOR && userProjectRepository
+                .findById(new UserProject.Id(me.getId(), project.getId())).map(UserProject::isCoordinator).orElse(false);
+        if (!coordinator) {
+            throw new AccessDeniedException("Solo il Coordinatore del progetto può spostarne le segnalazioni");
+        }
     }
 
     private static String fullName(AppUser user) {

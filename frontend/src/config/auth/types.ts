@@ -9,4 +9,6 @@ export type CurrentUser = {
   lastName?: string;
   email?: string;
   roles: Role[];
+  /** Tutor che coordina almeno un progetto (US-112). */
+  coordinator?: boolean;
 };

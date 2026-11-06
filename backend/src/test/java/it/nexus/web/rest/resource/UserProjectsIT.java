@@ -3,6 +3,7 @@ package it.nexus.web.rest.resource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -73,6 +74,15 @@ class UserProjectsIT {
         String ids = Stream.of(chosen).map(p -> "\"" + id(p) + "\"").collect(Collectors.joining(","));
         return mockMvc.perform(put("/api/v1/users/" + id(target) + "/projects").header(USER, user)
                 .contentType(MediaType.APPLICATION_JSON).content("{\"projectIds\": [" + ids + "]}"));
+    }
+
+    private ResultActions assign(String user, AppUser target, List<Project> chosen, List<Project> coordinated)
+            throws Exception {
+        String ids = chosen.stream().map(p -> "\"" + id(p) + "\"").collect(Collectors.joining(","));
+        String coord = coordinated.stream().map(p -> "\"" + id(p) + "\"").collect(Collectors.joining(","));
+        return mockMvc.perform(put("/api/v1/users/" + id(target) + "/projects").header(USER, user)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"projectIds\": [%s], \"coordinatedProjectIds\": [%s]}".formatted(ids, coord)));
     }
 
     private ResultActions ticketAs(String user, Ticket ticket) throws Exception {
@@ -173,5 +183,39 @@ class UserProjectsIT {
         assign("operatore.cc", actors.tutor1(), gol).andExpect(status().isForbidden());
         mockMvc.perform(get("/api/v1/users/" + id(actors.tutor1())).header(USER, "tutor1"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void coordinatore_perProgetto_conAudit_eSoloTraIProgettiAssegnati() throws Exception {
+        Project gol = scenarios.project("GOL", actors.tutor1());
+        Project polis = scenarios.project("POLIS", actors.tutor1());
+
+        // Coordinatore di GOL e solo Tutor di POLIS (decisione del PO, 06/11)
+        assign("admin", actors.tutor1(), List.of(gol, polis), List.of(gol))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.projects[*].code", contains(gol.getCode(), polis.getCode())))
+                .andExpect(jsonPath("$.coordinatedProjects[*].code", contains(gol.getCode())));
+        Map<String, Object> change = (Map<String, Object>) events(actors.tutor1()).getLast().getChanges()
+                .get("coordinated");
+        assertThat(change).containsEntry("before", List.of()).containsEntry("after", List.of(gol.getCode()));
+        mockMvc.perform(get("/api/v1/me").header(USER, "tutor1")).andExpect(jsonPath("$.coordinator").value(true));
+        mockMvc.perform(get("/api/v1/users").header(USER, "admin"))
+                .andExpect(jsonPath("$[?(@.username == 'tutor1')].coordinatedProjects[*].code",
+                        contains(gol.getCode())));
+
+        // un progetto non assegnato non si coordina: nulla cambia
+        assign("admin", actors.tutor1(), List.of(polis), List.of(gol))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("coordinatedProjectIds"));
+
+        // tolto il coordinamento, resta Tutor del progetto; senza il campo nessun progetto è coordinato
+        assign("admin", actors.tutor1(), gol, polis)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.projects", hasSize(2)))
+                .andExpect(jsonPath("$.coordinatedProjects", empty()));
+        assertThat(events(actors.tutor1())).extracting(AuditEvent::getAction)
+                .containsExactly("PROJECTS_CHANGED", "PROJECTS_CHANGED");
+        mockMvc.perform(get("/api/v1/me").header(USER, "tutor1")).andExpect(jsonPath("$.coordinator").value(false));
     }
 }

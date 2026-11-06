@@ -1,6 +1,7 @@
 import {
   Building2,
   CalendarDays,
+  ArrowLeftRight,
   ListOrdered,
   ListTree,
   Megaphone,
@@ -20,16 +21,26 @@ export type NavItem = {
     | 'nav.board'
     | 'nav.users'
     | 'nav.catalogs'
-    | 'nav.calendar';
+    | 'nav.calendar'
+    | 'nav.coordination';
   icon: LucideIcon;
   /** Ruoli abilitati; vuoto = tutti. */
   roles: readonly Role[];
+  /** Solo per chi coordina almeno un progetto (US-112). */
+  coordinatorOnly?: boolean;
 };
 
 export const NAV_ITEMS: readonly NavItem[] = [
   { to: '/', labelKey: 'nav.home', icon: ListOrdered, roles: [] },
   { to: '/beneficiari', labelKey: 'nav.beneficiaries', icon: Users, roles: ['TUTOR'] },
   { to: '/aziende', labelKey: 'nav.companies', icon: Building2, roles: ['CALL_CENTER', 'ADMIN'] },
+  {
+    to: '/coordinamento',
+    labelKey: 'nav.coordination',
+    icon: ArrowLeftRight,
+    roles: ['TUTOR'],
+    coordinatorOnly: true,
+  },
   { to: '/bacheca', labelKey: 'nav.board', icon: Megaphone, roles: [] },
   { to: '/utenti', labelKey: 'nav.users', icon: UserCog, roles: ['ADMIN'] },
   { to: '/cataloghi', labelKey: 'nav.catalogs', icon: ListTree, roles: ['ADMIN'] },

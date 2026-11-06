@@ -10,5 +10,11 @@ public record CurrentUserDTO(
         String firstName,
         String lastName,
         String email,
-        Set<Role> roles) {
+        Set<Role> roles,
+        /** Tutor che coordina almeno un progetto (US-112): vede la pagina del coordinamento. */
+        boolean coordinator) {
+
+    public CurrentUserDTO withCoordinator(boolean value) {
+        return new CurrentUserDTO(id, username, firstName, lastName, email, roles, value);
+    }
 }

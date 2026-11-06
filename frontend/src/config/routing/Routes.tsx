@@ -14,6 +14,7 @@ import { BeneficiaryPage } from '@/pages/BeneficiaryPage/BeneficiaryPage';
 import { ClosureReportPage } from '@/pages/ClosureReportPage/ClosureReportPage';
 import { DevLoginPage } from '@/pages/DevLoginPage/DevLoginPage';
 import { InternshipPage } from '@/pages/InternshipPage/InternshipPage';
+import { CoordinationPage } from '@/pages/CoordinationPage/CoordinationPage';
 import { CalendarPage } from '@/pages/CalendarPage/CalendarPage';
 import { CompaniesPage } from '@/pages/CompaniesPage/CompaniesPage';
 import { CompanyEditPage } from '@/pages/CompanyEditPage/CompanyEditPage';
@@ -235,6 +236,15 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.userAccount.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'coordinamento',
+        element: (
+          <RoleRoute roles={['TUTOR']}>
+            <CoordinationPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.coordination.title' } satisfies RouteHandle,
       },
       {
         path: 'calendario',

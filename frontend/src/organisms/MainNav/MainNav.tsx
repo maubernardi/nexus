@@ -10,12 +10,14 @@ import { NAV_ITEMS } from '@/organisms/MainNav/navItems';
 
 type MainNavProps = {
   roles: readonly Role[];
+  /** Coordina almeno un progetto: vede la voce Coordinamento (US-112). */
+  coordinator?: boolean;
   /** Contenuto mostrato in cima al menu a tendina, solo su mobile (es. identità dell'utente). */
   mobileHeader?: React.ReactNode;
 };
 
 /** Navigazione principale: lista orizzontale da desktop, menu a scomparsa (disclosure) su mobile. */
-export const MainNav = ({ roles, mobileHeader }: MainNavProps) => {
+export const MainNav = ({ roles, coordinator = false, mobileHeader }: MainNavProps) => {
   const { t } = useTranslation();
   const listId = useId();
   const location = useLocation();
@@ -25,7 +27,9 @@ export const MainNav = ({ roles, mobileHeader }: MainNavProps) => {
   const toggleRef = useRef<HTMLButtonElement>(null);
 
   const items = NAV_ITEMS.filter(
-    (item) => item.roles.length === 0 || item.roles.some((r) => roles.includes(r)),
+    (item) =>
+      (item.roles.length === 0 || item.roles.some((r) => roles.includes(r))) &&
+      (!item.coordinatorOnly || coordinator),
   );
 
   // Escape chiude il menu mobile e riporta il focus sul pulsante

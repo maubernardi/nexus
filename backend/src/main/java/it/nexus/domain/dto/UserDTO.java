@@ -17,5 +17,7 @@ public record UserDTO(
         String phone,
         Role role,
         boolean active,
-        List<ReferenceItemDTO> projects) {
+        List<ReferenceItemDTO> projects,
+        /** Progetti che il Tutor coordina (US-112), sottoinsieme di {@code projects}. */
+        List<ReferenceItemDTO> coordinatedProjects) {
 }
