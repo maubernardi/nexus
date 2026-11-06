@@ -10,7 +10,7 @@
   "loginTheme": "nexus",
   "sslRequired": "external",
   "registrationAllowed": false,
-  "resetPasswordAllowed": false,
+  "resetPasswordAllowed": true,
   "rememberMe": false,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
@@ -21,6 +21,7 @@
   "permanentLockout": false,
   "passwordPolicy": "length(12) and notUsername and notEmail",
   "accessTokenLifespan": 300,
+  "actionTokenGeneratedByUserLifespan": 1800,
   "ssoSessionIdleTimeout": 1800,
   "ssoSessionMaxLifespan": 36000,
   "smtpServer": {
