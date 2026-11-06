@@ -17,25 +17,30 @@ describe('<CatalogsPage>', () => {
   it('un titolo per la pagina e una sezione per catalogo', async () => {
     vi.mocked(fetchCatalog).mockImplementation((kind) =>
       Promise.resolve(
-        kind === 'zones'
-          ? [{ id: 'Z1', code: 'NORD', name: 'Firenze Nord', active: true }]
-          : kind === 'job-categories'
-            ? [{ id: 'C1', code: 'MAGAZZINIERE', name: 'Magazziniere', active: true }]
-            : kind === 'internship-types'
-              ? [{ id: 'T1', code: 'CURRICULARE', name: 'Curriculare', active: true }]
-              : kind === 'hiring-formulas'
-                ? [
-                    { id: 'F1', code: 'TEMPO_INDETERMINATO', name: 'Tempo indeterminato', active: true },
-                    { id: 'F2', code: 'CONTRATTO_A_CHIAMATA', name: 'Contratto a chiamata', active: true },
-                  ]
-                : [
-                    {
-                      id: 'M1',
-                      code: 'AZIENDA_SENZA_RISORSE',
-                      name: 'L’azienda non ha risorse',
-                      active: true,
-                    },
-                  ],
+        kind === 'projects'
+          ? [
+              { id: 'P1', code: 'GOL', name: 'GOL', active: true },
+              { id: 'P2', code: 'POLIS', name: 'POLIS', active: false },
+            ]
+          : kind === 'zones'
+            ? [{ id: 'Z1', code: 'NORD', name: 'Firenze Nord', active: true }]
+            : kind === 'job-categories'
+              ? [{ id: 'C1', code: 'MAGAZZINIERE', name: 'Magazziniere', active: true }]
+              : kind === 'internship-types'
+                ? [{ id: 'T1', code: 'CURRICULARE', name: 'Curriculare', active: true }]
+                : kind === 'hiring-formulas'
+                  ? [
+                      { id: 'F1', code: 'TEMPO_INDETERMINATO', name: 'Tempo indeterminato', active: true },
+                      { id: 'F2', code: 'CONTRATTO_A_CHIAMATA', name: 'Contratto a chiamata', active: true },
+                    ]
+                  : [
+                      {
+                        id: 'M1',
+                        code: 'AZIENDA_SENZA_RISORSE',
+                        name: 'L’azienda non ha risorse',
+                        active: true,
+                      },
+                    ],
       ),
     );
     renderWithProviders(
@@ -45,6 +50,10 @@ describe('<CatalogsPage>', () => {
     );
 
     expect(screen.getByRole('heading', { level: 1, name: 'Cataloghi' })).toBeInTheDocument();
+    // progetti (US-102), per primi
+    expect(await screen.findByRole('table', { name: 'Progetti: 2 voci' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Aggiungi progetto' })).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { level: 2 })[0]).toHaveTextContent('Progetti');
     expect(await screen.findByRole('table', { name: 'Zone: 1 voce' })).toBeInTheDocument();
     expect(await screen.findByRole('table', { name: 'Tipologie di mansione: 1 voce' })).toBeInTheDocument();
     expect(fetchCatalog).toHaveBeenCalledWith('zones');

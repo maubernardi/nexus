@@ -1030,6 +1030,15 @@ export const it = {
     },
   },
   catalog: {
+    projects: {
+      heading: 'Progetti',
+      intro:
+        'I progetti finanziati (es. GOL, POLIS). Il Tutor sceglie il progetto nella segnalazione tra quelli attivi a cui è assegnato; un progetto disattivato non si sceglie più, ma le segnalazioni già fatte lo mantengono.',
+      add: 'Aggiungi progetto',
+      newHeading: 'Nuovo progetto',
+      caption_one: 'Progetti: {{count}} voce',
+      caption_other: 'Progetti: {{count}} voci',
+    },
     zones: {
       heading: 'Zone',
       intro: 'Quartieri di Firenze e comuni dell’area: residenza dei beneficiari e luogo delle mansioni.',
@@ -1245,7 +1254,7 @@ export const it = {
       title: 'Cataloghi',
       heading: 'Cataloghi',
       intro:
-        'Le voci usate in tutta l’applicazione: zone, tipologie di mansione, tipi di tirocinio e le scelte del report di restituzione. Le voci non si cancellano: una voce disattivata non si può più scegliere, ma resta sui dati che la usano.',
+        'Le voci usate in tutta l’applicazione: progetti, zone, tipologie di mansione, tipi di tirocinio e le scelte del report di restituzione. Le voci non si cancellano: una voce disattivata non si può più scegliere, ma resta sui dati che la usano.',
     },
     calendar: {
       title: 'Calendario',

@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `0fbb22a` (05/11/2026): Sprint 1–8 completi e cambio dell'indirizzo email (US-110) |
-| **Ultimo aggiornamento** | 05/11/2026 (esiti del PO: T-18.1, T-19.1, T-19.3, T-19.4 superate) |
+| **Ultimo aggiornamento** | 06/11/2026 (T-13.5, progetti: da provare dopo il deploy di US-102) |
 
 ## Come prepararsi
 
@@ -468,6 +468,14 @@ bozza nata da un rilancio.
      e 12 mesi, tempo indeterminato, contratto a chiamata, prestazione occasionale) e **Motivi della mancata
      assunzione** (tre voci).
   2. Disattiva un motivo. **Atteso:** nel report di restituzione (T-17.1) non si può più scegliere.
+
+- [ ] **T-13.5 Progetti (US-102, Sprint 9)**
+  1. Come `admin` → **Cataloghi**. **Atteso:** in cima la sezione **Progetti**, con GOL e POLIS.
+  2. Aggiungi il progetto «Prova collaudo». **Atteso:** compare attivo, con il codice `PROVA_COLLAUDO`. Aggiungerlo
+     una seconda volta, anche in minuscolo, è rifiutato: «è già nel catalogo».
+  3. Disattiva **POLIS**. **Atteso:** come `tutor2` (GOL e POLIS), nella nuova segnalazione POLIS non c'è più; le
+     segnalazioni POLIS già fatte si aprono ancora e mostrano il progetto.
+  4. Riattiva **POLIS**. **Atteso:** torna sceglibile nella nuova segnalazione.
 
 ## 14. Dati dell'azienda e scheda del tirocinio (Sprint 7)
 

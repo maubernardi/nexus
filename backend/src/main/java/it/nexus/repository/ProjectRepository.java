@@ -17,6 +17,14 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     List<Project> findByActiveTrueOrderByNameAsc();
 
+    /** Catalogo per l'ADMIN (US-102): prima gli attivi, poi per nome. */
+    List<Project> findAllByOrderByActiveDescNameAsc();
+
+    /** Progetto attivo con lo stesso nome, senza distinguere maiuscole e minuscole ({@code uq_project_active_name}). */
+    Optional<Project> findFirstByNameIgnoreCaseAndActiveTrue(String name);
+
+    boolean existsByCode(String code);
+
     /** Progetti attivi a cui l'utente è assegnato, ordinati per nome. */
     @Query("""
             select up.project from UserProject up

@@ -143,6 +143,23 @@ class DomainConstraintsIT {
         }
 
         @Test
+        void nomeDiProgettoAttivoDuplicato() {
+            Project first = project(DomainFixtures.code("P"));
+            first.setName("Progetto " + first.getCode());
+            projects.saveAndFlush(first);
+            Project twin = project(DomainFixtures.code("P"));
+            twin.setName(first.getName().toUpperCase());
+            assertViolates("uq_project_active_name", () -> projects.saveAndFlush(twin));
+        }
+
+        @Test
+        void nomeDiProgettoVuoto() {
+            Project blank = project(DomainFixtures.code("P"));
+            blank.setName("  ");
+            assertViolates("ck_project_name", () -> projects.saveAndFlush(blank));
+        }
+
+        @Test
         void codiceTipoDiTirocinioDuplicato() {
             assertViolates("uq_internship_type_code", () -> internshipTypes.saveAndFlush(
                     new InternshipType("CURRICULARE", "Curriculare bis")));

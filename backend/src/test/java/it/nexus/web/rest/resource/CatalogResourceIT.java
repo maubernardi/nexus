@@ -29,10 +29,15 @@ import com.jayway.jsonpath.JsonPath;
 import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.Beneficiary;
+import it.nexus.domain.Project;
+import it.nexus.domain.Ticket;
+import it.nexus.domain.UserProject;
 import it.nexus.domain.Zone;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.AuditEventRepository;
+import it.nexus.repository.ProjectRepository;
+import it.nexus.repository.UserProjectRepository;
 import it.nexus.support.WorkflowScenarios;
 import it.nexus.support.WorkflowScenarios.Actors;
 import it.nexus.support.WorkflowScenarios.Place;
@@ -49,11 +54,14 @@ class CatalogResourceIT {
     private static final String USER = MockHeaderAuthenticationFilter.HEADER;
     private static final String ZONES = "/api/v1/catalogs/zones";
     private static final String CATEGORIES = "/api/v1/catalogs/job-categories";
+    private static final String PROJECTS = "/api/v1/catalogs/projects";
 
     @Autowired MockMvc mockMvc;
     @Autowired EntityManager em;
     @Autowired WorkflowScenarios scenarios;
     @Autowired AuditEventRepository audit;
+    @Autowired ProjectRepository projects;
+    @Autowired UserProjectRepository userProjects;
 
     private Actors actors;
 
@@ -155,7 +163,7 @@ class CatalogResourceIT {
         mockMvc.perform(get(ZONES).header(USER, "operatore.cc")).andExpect(status().isForbidden());
         mockMvc.perform(post(CATEGORIES).header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
                 .content("{\"name\": \"Prova\"}")).andExpect(status().isForbidden());
-        mockMvc.perform(get("/api/v1/catalogs/projects").header(USER, "admin")).andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/v1/catalogs/non-esiste").header(USER, "admin")).andExpect(status().isNotFound());
     }
 
     @Test
@@ -212,5 +220,50 @@ class CatalogResourceIT {
         // gestiti solo dall'ADMIN
         mockMvc.perform(get("/api/v1/catalogs/hiring-formulas").header(USER, "operatore.cc"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void progetto_nuovoEDisattivato_nonSiSceglieInUnaNuovaSegnalazioneMaLoStoricoResta() throws Exception {
+        String name = "FSE+ Inclusione 2027";
+        String id = JsonPath.read(create(PROJECTS, name)
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.code").value("FSE_INCLUSIONE_2027"))
+                .andExpect(jsonPath("$.active").value(true))
+                .andReturn().getResponse().getContentAsString(), "$.id");
+        // nome già usato da un progetto attivo, anche con maiuscole diverse
+        create(PROJECTS, "fse+ inclusione 2027").andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("name"));
+
+        Project project = projects.findById(TsidMapper.toInternal(id)).orElseThrow();
+        userProjects.saveAndFlush(new UserProject(actors.tutor1(), project));
+        Place place = scenarios.place();
+        Ticket ticket = scenarios.appointmentTicket(actors.tutor1(), project, scenarios.freeSlot(place, "Aiuto cuoco"),
+                actors.operator());
+        mockMvc.perform(get("/api/v1/me/projects").header(USER, "tutor1"))
+                .andExpect(jsonPath("$[*].name", hasItem(name)));
+
+        action(PROJECTS, id, "deactivate").andExpect(status().isOk()).andExpect(jsonPath("$.active").value(false));
+
+        // non si sceglie più per una nuova segnalazione
+        mockMvc.perform(get("/api/v1/me/projects").header(USER, "tutor1"))
+                .andExpect(jsonPath("$[*].name", not(hasItem(name))));
+        mockMvc.perform(get("/api/v1/reference/projects").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$[*].name", not(hasItem(name))));
+        Beneficiary beneficiary = scenarios.beneficiary(actors.tutor1(), place);
+        mockMvc.perform(post("/api/v1/tickets").header(USER, "tutor1").contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"beneficiaryId": "%s", "projectId": "%s", "jobCategoryId": "%s"}
+                                """.formatted(TsidMapper.toExternal(beneficiary.getId()), id,
+                                TsidMapper.toExternal(place.category().getId()))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("projectId"));
+        // la segnalazione già fatta resta consultabile, con il suo progetto
+        mockMvc.perform(get("/api/v1/tickets/" + TsidMapper.toExternal(ticket.getId())).header(USER, "tutor1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.project.name").value(name));
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.PROJECT,
+                project.getId())).extracting(e -> e.getAction()).containsExactly("CREATE", "DEACTIVATE");
+        // gestiti solo dall'ADMIN
+        mockMvc.perform(get(PROJECTS).header(USER, "operatore.cc")).andExpect(status().isForbidden());
     }
 }

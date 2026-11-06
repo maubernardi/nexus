@@ -4,7 +4,7 @@ import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { CatalogSection } from '@/organisms/CatalogSection/CatalogSection';
 
 /**
- * Cataloghi per l'ADMIN: zone e tipologie di mansione (US-106), tipi di tirocinio (US-108), formule di assunzione e
+ * Cataloghi per l'ADMIN: progetti (US-102), zone e tipologie di mansione (US-106), tipi di tirocinio (US-108), formule di assunzione e
  * motivi della mancata assunzione del report di restituzione (US-109). I valori reali della cooperativa senza rilasci.
  */
 export const CatalogsPage = () => {
@@ -13,6 +13,7 @@ export const CatalogsPage = () => {
     <div className="space-y-8">
       <PageHeading>{t('pages.catalogs.heading')}</PageHeading>
       <p className="text-muted-foreground">{t('pages.catalogs.intro')}</p>
+      <CatalogSection kind="projects" />
       <CatalogSection kind="zones" />
       <CatalogSection kind="job-categories" />
       <CatalogSection kind="internship-types" />
