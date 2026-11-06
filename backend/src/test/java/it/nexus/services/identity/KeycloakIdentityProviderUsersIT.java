@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -13,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
@@ -20,6 +22,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 
 import it.nexus.config.ApplicationProperties;
+import it.nexus.domain.enumeration.Role;
 
 /**
  * Cambio email in un Keycloak vero (US-110), con il realm di sviluppo di {@code infra/keycloak}: verifica anche che il
@@ -33,6 +36,9 @@ class KeycloakIdentityProviderUsersIT {
     private static final String TUTOR2 = "00000000-0000-4000-8000-000000000002";
     private static final ParameterizedTypeReference<Map<String, Object>> JSON = new ParameterizedTypeReference<>() {
     };
+    private static final ParameterizedTypeReference<List<Map<String, Object>>> JSON_LIST =
+            new ParameterizedTypeReference<>() {
+            };
 
     @Container
     static final GenericContainer<?> KEYCLOAK = new GenericContainer<>("quay.io/keycloak/keycloak:26.7.4")
@@ -90,16 +96,68 @@ class KeycloakIdentityProviderUsersIT {
                 .isInstanceOf(IdentityProviderException.class);
     }
 
-    private static Map<String, Object> readUser(String id) {
-        RestClient client = RestClient.create(baseUrl);
+
+    @Test
+    void nuovoUtente_conIlRuoloScelto_eCancellabile() {
+        KeycloakIdentityProviderUsers users = users(DEV_SECRET);
+        String id = users.createUser(new NewIdentityUser("mario.rossi", "Mario", "Rossi", "mario.rossi@example.org",
+                Role.CALL_CENTER));
+
+        assertThat(readUser(id)).containsEntry("username", "mario.rossi")
+                .containsEntry("email", "mario.rossi@example.org")
+                .containsEntry("firstName", "Mario")
+                .containsEntry("enabled", true);
+        assertThat(realmRoles(id)).contains("CALL_CENTER").doesNotContain("TUTOR", "ADMIN");
+
+        users.deleteUser(id);
+        assertThatThrownBy(() -> readUser(id)).isInstanceOf(RestClientResponseException.class);
+    }
+
+    @Test
+    void nuovoUtente_usernameOEmailGiaUsati_rifiutatiConIlMotivo() {
+        KeycloakIdentityProviderUsers users = users(DEV_SECRET);
+        assertThatThrownBy(() -> users.createUser(
+                new NewIdentityUser("tutor1", "Altro", "Tutor", "altro@example.org", Role.TUTOR)))
+                .isInstanceOfSatisfying(IdentityProviderException.class,
+                        e -> assertThat(e.isUsernameTaken()).isTrue());
+        assertThatThrownBy(() -> users.createUser(
+                new NewIdentityUser("altro.tutor", "Altro", "Tutor", "admin@nexus.local", Role.TUTOR)))
+                .isInstanceOfSatisfying(IdentityProviderException.class, e -> assertThat(e.isEmailTaken()).isTrue());
+    }
+
+    @Test
+    void emailPerLaPassword_senzaServerDiPostaNelRealm_errore() {
+        KeycloakIdentityProviderUsers users = users(DEV_SECRET);
+        String id = users.createUser(new NewIdentityUser("senza.posta", "Senza", "Posta", "senza.posta@example.org",
+                Role.TUTOR));
+        assertThatThrownBy(() -> users.sendPasswordSetupEmail(id, Duration.ofDays(3), "http://localhost:5173/"))
+                .isInstanceOf(IdentityProviderException.class);
+        users.deleteUser(id);
+    }
+
+    private static List<String> realmRoles(String id) {
+        String token = adminToken();
+        List<Map<String, Object>> roles = RestClient.create(baseUrl).get()
+                .uri("/admin/realms/nexus/users/{id}/role-mappings/realm", id)
+                .headers(h -> h.setBearerAuth(token))
+                .retrieve().body(JSON_LIST);
+        return roles.stream().map(r -> (String) r.get("name")).toList();
+    }
+
+    private static String adminToken() {
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
         form.add("grant_type", "client_credentials");
         form.add("client_id", "nexus-backend-admin");
         form.add("client_secret", DEV_SECRET);
-        Map<String, Object> token = client.post().uri("/realms/nexus/protocol/openid-connect/token")
+        Map<String, Object> token = RestClient.create(baseUrl).post().uri("/realms/nexus/protocol/openid-connect/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(form).retrieve().body(JSON);
-        return client.get().uri("/admin/realms/nexus/users/{id}", id)
-                .headers(h -> h.setBearerAuth((String) token.get("access_token")))
+        return (String) token.get("access_token");
+    }
+
+    private static Map<String, Object> readUser(String id) {
+        String token = adminToken();
+        return RestClient.create(baseUrl).get().uri("/admin/realms/nexus/users/{id}", id)
+                .headers(h -> h.setBearerAuth(token))
                 .retrieve().body(JSON);
     }
 }

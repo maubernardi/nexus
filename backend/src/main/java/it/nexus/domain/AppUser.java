@@ -51,4 +51,16 @@ public class AppUser extends AbstractTsidEntity {
 
     @Column(name = "active", nullable = false)
     private boolean active = true;
+
+    /** Nuovo utente creato dall'ADMIN (US-103), già presente nell'identity provider con il soggetto {@code externalId}. */
+    public AppUser(String externalId, String username, String firstName, String lastName, String email, String phone,
+            Role role) {
+        this.externalId = externalId;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.role = role;
+    }
 }

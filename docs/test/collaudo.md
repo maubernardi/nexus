@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `0fbb22a` (05/11/2026): Sprint 1–8 completi e cambio dell'indirizzo email (US-110) |
-| **Ultimo aggiornamento** | 06/11/2026 (T-13.5, progetti: da provare dopo il deploy di US-102) |
+| **Ultimo aggiornamento** | 06/11/2026 (T-13.5 progetti e sezione 20 utenti: da provare dopo il deploy) |
 
 ## Come prepararsi
 
@@ -649,3 +649,29 @@ vero; per l'avviso al vecchio indirizzo, parti da un utente che ha già un indir
 - [x] **T-19.4 Indirizzo già usato**
   1. Come `tutor1`, prova a passare all'indirizzo che hai dato a `operatore.cc`. **Atteso:** errore sul campo
      «Indirizzo già usato da un altro utente», nessun codice inviato.
+
+## 20. Utenti (ADMIN, Sprint 9)
+
+Serve la posta di Keycloak sul server (README, «Demo online», `keycloak-email.sh`). Usa un tuo indirizzo vero per il
+nuovo utente, per esempio un alias.
+
+- [ ] **T-20.1 Nuovo utente (US-103)**
+  1. Come `admin`: nel menu c'è **Utenti**. **Atteso:** l'elenco con gli utenti demo, ruolo e stato.
+  2. **Nuovo utente**: scrivi nome e cognome. **Atteso:** lo username si propone da solo come `nome.cognome`.
+  3. Completa email e ruolo **Tutor** e crea. **Atteso:** torni all'elenco con «Utente … creato» e il nuovo utente
+     compare in elenco.
+  4. **Atteso:** all'indirizzo arriva da Keycloak l'email per impostare la password. Apri il collegamento, imposta la
+     password. **Atteso:** entri in NEXUS come Tutor.
+  5. Nella console di Keycloak (tunnel) l'utente c'è con il ruolo TUTOR (facoltativo).
+
+- [ ] **T-20.2 Dati già usati e campi obbligatori**
+  1. Crea un utente con username `tutor1`. **Atteso:** errore sul campo «Username già usato da un altro utente».
+  2. Crea un utente con l'email di un utente esistente. **Atteso:** errore sul campo Email.
+  3. Invia il modulo vuoto. **Atteso:** riepilogo degli errori con i campi obbligatori.
+
+- [ ] **T-20.3 Nuovo invito**
+  1. Nell'elenco, **Invia di nuovo l'invito** sull'utente creato. **Atteso:** «Invito inviato a …» e una nuova
+     email; il collegamento precedente non serve più.
+
+- [ ] **T-20.4 Solo l'ADMIN**
+  1. Come `operatore.cc` apri `/utenti`. **Atteso:** «Pagina non consentita»; la voce Utenti non è nel menu.

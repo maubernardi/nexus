@@ -21,5 +21,7 @@ export type RouteHandle = {
     | 'pages.calendar.title'
     | 'pages.notifications.title'
     | 'pages.profile.title'
+    | 'pages.users.title'
+    | 'pages.userNew.title'
     | 'pages.forbidden.title';
 };

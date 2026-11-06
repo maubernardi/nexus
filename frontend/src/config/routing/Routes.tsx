@@ -20,6 +20,8 @@ import { CompanyEditPage } from '@/pages/CompanyEditPage/CompanyEditPage';
 import { CompanyNewPage } from '@/pages/CompanyNewPage/CompanyNewPage';
 import { NotificationsPage } from '@/pages/NotificationsPage/NotificationsPage';
 import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
+import { UserNewPage } from '@/pages/UserNewPage/UserNewPage';
+import { UsersPage } from '@/pages/UsersPage/UsersPage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 import { LegacyWorkRedirect, TicketPage } from '@/pages/TicketPage/TicketPage';
 import { TicketNewPage } from '@/pages/TicketNewPage/TicketNewPage';
@@ -185,6 +187,24 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.catalogs.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'utenti',
+        element: (
+          <RoleRoute roles={['ADMIN']}>
+            <UsersPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.users.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'utenti/nuovo',
+        element: (
+          <RoleRoute roles={['ADMIN']}>
+            <UserNewPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.userNew.title' } satisfies RouteHandle,
       },
       {
         path: 'calendario',

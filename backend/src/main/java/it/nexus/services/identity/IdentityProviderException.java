@@ -4,18 +4,37 @@ import java.io.Serial;
 
 import lombok.Getter;
 
-/** Aggiornamento rifiutato dall'identity provider o non riuscito. Il messaggio non contiene dati personali. */
+/** Operazione rifiutata dall'identity provider o non riuscita. Il messaggio non contiene dati personali. */
 @Getter
 public class IdentityProviderException extends RuntimeException {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /** Vero se l'identity provider ha rifiutato l'indirizzo perché già usato da un altro utente. */
-    private final boolean emailTaken;
+    /** Dato già usato da un altro account, se è questo il motivo del rifiuto. */
+    public enum Conflict {
+        NONE,
+        EMAIL,
+        USERNAME
+    }
 
-    public IdentityProviderException(String message, boolean emailTaken, Throwable cause) {
+    private final Conflict conflict;
+
+    public IdentityProviderException(String message, Conflict conflict, Throwable cause) {
         super(message, cause);
-        this.emailTaken = emailTaken;
+        this.conflict = conflict;
+    }
+
+    /** @param emailTaken vero se l'indirizzo è già usato da un altro utente */
+    public IdentityProviderException(String message, boolean emailTaken, Throwable cause) {
+        this(message, emailTaken ? Conflict.EMAIL : Conflict.NONE, cause);
+    }
+
+    public boolean isEmailTaken() {
+        return conflict == Conflict.EMAIL;
+    }
+
+    public boolean isUsernameTaken() {
+        return conflict == Conflict.USERNAME;
     }
 }

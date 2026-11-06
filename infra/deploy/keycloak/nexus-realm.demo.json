@@ -23,6 +23,18 @@
   "accessTokenLifespan": 300,
   "ssoSessionIdleTimeout": 1800,
   "ssoSessionMaxLifespan": 36000,
+  "smtpServer": {
+    "host": "smtp.ionos.it",
+    "port": "587",
+    "from": "noreply@portalenexus.it",
+    "fromDisplayName": "NEXUS",
+    "replyTo": "",
+    "starttls": "true",
+    "ssl": "false",
+    "auth": "true",
+    "user": "admin@portalenexus.it",
+    "password": "${NEXUS_SMTP_PASSWORD}"
+  },
   "roles": {
     "realm": [
       {

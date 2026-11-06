@@ -57,6 +57,9 @@ services:
       NEXUS_DEMO_PASSWORD_ADMIN: ${NEXUS_DEMO_PASSWORD_ADMIN:?}
       # segreto del client tecnico del backend (US-110); sui server installati prima lo crea keycloak-backend-client.sh
       NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET: ${NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET:-}
+      # email del realm (invito dei nuovi utenti, US-103): stesso SMTP IONOS del backend; sui server installati prima
+      # la imposta keycloak-email.sh
+      NEXUS_SMTP_PASSWORD: ${NEXUS_SMTP_PASSWORD:-}
     volumes:
       - ./keycloak:/opt/keycloak/data/import:ro,Z
     ports:
