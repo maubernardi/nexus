@@ -19,5 +19,5 @@
 
 ## 4. Consegna
 
-- [ ] 4.1 PR con CI verde
-- [ ] 4.2 Sul server: script del client Keycloak, poi prova reale del cambio dopo il deploy
+- [x] 4.1 PR con CI verde
+- [x] 4.2 Sul server: script del client Keycloak, poi prova reale del cambio dopo il deploy (PO, 05/11)
