@@ -9,7 +9,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | https://portalenexus.it |
-| **Versione della demo** | `0fbb22a` (05/11/2026): Sprint 1–8 completi e cambio dell'indirizzo email (US-110) |
+| **Versione della demo** | `e30269f` (06/11/2026): Sprint 1–9 completi (gestione di progetti e utenti, Coordinatore) e cambio dell'indirizzo email (US-110) |
 | **Ultimo aggiornamento** | 06/11/2026 (T-13.5 progetti e sezione 20 utenti: da provare dopo il deploy) |
 
 ## Come prepararsi
@@ -655,7 +655,7 @@ vero; per l'avviso al vecchio indirizzo, parti da un utente che ha già un indir
 Serve la posta di Keycloak sul server (README, «Demo online», `keycloak-email.sh`). Usa un tuo indirizzo vero per il
 nuovo utente, per esempio un alias.
 
-- [ ] **T-20.1 Nuovo utente (US-103)**
+- [x] **T-20.1 Nuovo utente (US-103)**
   1. Come `admin`: nel menu c'è **Utenti**. **Atteso:** l'elenco con gli utenti demo, ruolo e stato.
   2. **Nuovo utente**: scrivi nome e cognome. **Atteso:** lo username si propone da solo come `nome.cognome`.
   3. Completa email e ruolo **Tutor** e crea. **Atteso:** torni all'elenco con «Utente … creato» e il nuovo utente
