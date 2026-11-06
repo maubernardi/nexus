@@ -19,6 +19,7 @@ import {
   type NewUserForm,
   type UserCreated,
   type UserImpact,
+  type UserProjectsVars,
 } from '@/config/api/userAdminApi';
 import type { Role } from '@/config/auth/types';
 import { TICKETS_KEY } from '@/config/hooks/useTickets';
@@ -44,14 +45,10 @@ export const useResendInvitation = (): UseMutationResult<void, unknown, string> 
 export const useUser = (id: string): UseQueryResult<AdminUser> =>
   useQuery({ queryKey: [...USERS_KEY, id], queryFn: () => fetchUser(id) });
 
-export const useUpdateUserProjects = (): UseMutationResult<
-  AdminUser,
-  unknown,
-  { id: string; projectIds: string[] }
-> => {
+export const useUpdateUserProjects = (): UseMutationResult<AdminUser, unknown, UserProjectsVars> => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (vars: { id: string; projectIds: string[] }) => updateUserProjects(vars),
+    mutationFn: (vars: UserProjectsVars) => updateUserProjects(vars),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: USERS_KEY }),
   });
 };

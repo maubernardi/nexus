@@ -20,6 +20,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecif
     /** Segnalazioni del Tutor non chiuse, per lo spostamento (US-111). */
     List<Ticket> findByTutorIdAndStatusNotOrderByNumberAsc(Long tutorId, TicketStatus closed);
 
+    /** Segnalazioni del progetto non chiuse, per il Coordinatore (US-112). */
+    List<Ticket> findByProjectIdAndStatusNotOrderByNumberAsc(Long projectId, TicketStatus closed);
+
     /** Segnalazioni aperte di cui l'utente è il Tutor: bloccano disattivazione e cambio di ruolo (US-105). */
     long countByTutorIdAndStatusNot(Long tutorId, TicketStatus closed);
 

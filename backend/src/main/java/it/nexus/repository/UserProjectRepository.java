@@ -31,4 +31,15 @@ public interface UserProjectRepository extends JpaRepository<UserProject, UserPr
             order by up.user.lastName, up.user.firstName
             """)
     List<AppUser> findActiveTutorsOf(@Param("projectId") Long projectId);
+
+    /** Progetti che l'utente coordina, con il progetto, per nome (US-112). */
+    @Query("""
+            select up from UserProject up join fetch up.project
+            where up.user.id = :userId and up.coordinator = true
+            order by lower(up.project.name), up.project.id
+            """)
+    List<UserProject> findCoordinatedBy(@Param("userId") Long userId);
+
+    /** Vero se l'utente (per identificativo di Keycloak) coordina almeno un progetto (US-112). */
+    boolean existsByUserExternalIdAndCoordinatorTrue(String externalId);
 }

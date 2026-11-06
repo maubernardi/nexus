@@ -157,7 +157,13 @@ export const UsersPage = () => {
                       {u.role !== 'TUTOR'
                         ? t('users.projects.all')
                         : u.projects.length > 0
-                          ? u.projects.map((p) => p.name).join(', ')
+                          ? u.projects
+                              .map((p) =>
+                                (u.coordinatedProjects ?? []).some((c) => c.id === p.id)
+                                  ? t('users.projects.coordinated', { name: p.name })
+                                  : p.name,
+                              )
+                              .join(', ')
                           : t('users.projects.none')}
                     </td>
                     <td className={td}>{t(u.active ? 'users.active' : 'users.inactive')}</td>

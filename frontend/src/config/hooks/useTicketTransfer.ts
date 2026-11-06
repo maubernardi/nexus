@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-query';
 
 import {
+  fetchCoordination,
   fetchOpenTickets,
   transferTickets,
   type TransferGroup,
@@ -20,6 +21,10 @@ const openTicketsKey = (userId: string) => [...USERS_KEY, userId, 'open-tickets'
 /** Segnalazioni aperte di un Tutor, per progetto (US-111). */
 export const useOpenTickets = (userId: string): UseQueryResult<TransferGroup[]> =>
   useQuery({ queryKey: openTicketsKey(userId), queryFn: () => fetchOpenTickets(userId) });
+
+/** Progetti coordinati dall'utente (US-112); sotto TICKETS_KEY, così uno spostamento li ricarica. */
+export const useCoordination = (): UseQueryResult<TransferGroup[]> =>
+  useQuery({ queryKey: [...TICKETS_KEY, 'coordination'], queryFn: fetchCoordination });
 
 type TransferVars = { ticketIds: string[]; tutorId: string };
 

@@ -14,6 +14,14 @@ describe('<MainNav>', () => {
     await expectNoAxeViolations();
   });
 
+  it('Coordinamento solo per il Tutor che coordina un progetto', () => {
+    const { unmount } = renderWithProviders(<MainNav roles={['TUTOR']} />);
+    expect(screen.queryAllByRole('link', { name: 'Coordinamento' })).toHaveLength(0);
+    unmount();
+    renderWithProviders(<MainNav roles={['TUTOR']} coordinator />);
+    expect(screen.getAllByRole('link', { name: 'Coordinamento' }).length).toBeGreaterThan(0);
+  });
+
   it('apre e chiude il menu mobile da tastiera, restituendo il focus al pulsante', async () => {
     renderWithProviders(<MainNav roles={['TUTOR']} />);
     const user = userEvent.setup();

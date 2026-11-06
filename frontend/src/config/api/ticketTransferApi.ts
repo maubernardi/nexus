@@ -20,6 +20,12 @@ export const fetchOpenTickets = async (userId: string): Promise<TransferGroup[]>
   return data;
 };
 
+/** Segnalazioni aperte dei progetti che l'utente coordina, con i Tutor che possono riceverle (US-112). */
+export const fetchCoordination = async (): Promise<TransferGroup[]> => {
+  const { data } = await axiosInstance.get<TransferGroup[]>(ENDPOINTS.myCoordination);
+  return data;
+};
+
 /** Sposta segnalazioni aperte dello stesso progetto sul Tutor indicato, con i loro beneficiari (US-111). */
 export const transferTickets = async (body: {
   ticketIds: string[];

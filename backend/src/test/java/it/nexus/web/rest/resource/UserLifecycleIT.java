@@ -3,6 +3,7 @@ package it.nexus.web.rest.resource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -37,6 +38,7 @@ import it.nexus.domain.AuditEvent;
 import it.nexus.domain.Project;
 import it.nexus.domain.TestEntities;
 import it.nexus.domain.Ticket;
+import it.nexus.domain.UserProject;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.Role;
 import it.nexus.domain.enumeration.TicketStatus;
@@ -44,6 +46,7 @@ import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.TicketRepository;
+import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.identity.IdentityProviderException;
 import it.nexus.services.identity.IdentityProviderException.Conflict;
 import it.nexus.services.identity.IdentityProviderUsers;
@@ -66,6 +69,7 @@ class UserLifecycleIT {
     @Autowired AppUserRepository users;
     @Autowired TicketRepository tickets;
     @Autowired AuditEventRepository audit;
+    @Autowired UserProjectRepository userProjects;
 
     @MockitoBean IdentityProviderUsers identityProvider;
 
@@ -179,6 +183,21 @@ class UserLifecycleIT {
         Ticket second = scenarios.appointmentTicket(actors.tutor2(), gol, scenarios.freeSlot(place, "Cuoco"), other);
         changeRole("admin", other, Role.ADMIN).andExpect(status().isOk());
         assertThat(tickets.findById(second.getId()).orElseThrow().getAssignedCcOperator()).isEqualTo(other);
+    }
+
+    @Test
+    void chiNonEPiuTutor_nonCoordinaPiu() throws Exception {
+        UserProject assignment = userProjects.findById(new UserProject.Id(actors.tutor2().getId(), gol.getId()))
+                .orElseThrow();
+        assignment.setCoordinator(true);
+        userProjects.saveAndFlush(assignment);
+
+        changeRole("admin", actors.tutor2(), Role.CALL_CENTER)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.coordinatedProjects", hasSize(0)));
+        assertThat(userProjects.findCoordinatedBy(actors.tutor2().getId())).isEmpty();
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.APP_USER,
+                actors.tutor2().getId()).getLast().getChanges()).containsKey("coordinated");
     }
 
     @Test

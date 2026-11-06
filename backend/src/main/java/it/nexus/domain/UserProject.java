@@ -21,8 +21,12 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-/** Assegnazione di un utente a un progetto (determina la visibilità in lettura dei ticket). */
+/**
+ * Assegnazione di un utente a un progetto (determina la visibilità in lettura dei ticket); un Tutor può anche
+ * coordinare il progetto (US-112).
+ */
 @Getter
 @Entity
 @Table(name = "user_project")
@@ -51,6 +55,11 @@ public class UserProject extends AbstractCreationAuditingEntity implements Persi
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "project_id")
     private Project project;
+
+    /** Coordinatore del progetto (US-112): sposta le segnalazioni del progetto tra i suoi Tutor. */
+    @Setter
+    @Column(name = "coordinator", nullable = false)
+    private boolean coordinator;
 
     public UserProject(AppUser user, Project project) {
         this.id = new Id(user.getId(), project.getId());
