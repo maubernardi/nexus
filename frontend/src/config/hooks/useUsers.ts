@@ -8,8 +8,10 @@ import {
 
 import {
   createUser,
+  fetchUser,
   fetchUsers,
   resendInvitation,
+  updateUserProjects,
   type AdminUser,
   type NewUserForm,
   type UserCreated,
@@ -31,3 +33,19 @@ export const useCreateUser = (): UseMutationResult<UserCreated, unknown, NewUser
 
 export const useResendInvitation = (): UseMutationResult<void, unknown, string> =>
   useMutation({ mutationFn: (id: string) => resendInvitation(id) });
+
+/** Un utente con i progetti assegnati (US-104). */
+export const useUser = (id: string): UseQueryResult<AdminUser> =>
+  useQuery({ queryKey: [...USERS_KEY, id], queryFn: () => fetchUser(id) });
+
+export const useUpdateUserProjects = (): UseMutationResult<
+  AdminUser,
+  unknown,
+  { id: string; projectIds: string[] }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (vars: { id: string; projectIds: string[] }) => updateUserProjects(vars),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: USERS_KEY }),
+  });
+};

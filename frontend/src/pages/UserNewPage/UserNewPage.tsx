@@ -15,7 +15,7 @@ import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { suggestUsername } from '@/lib/username';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
 import { FormField } from '@/molecules/FormField/FormField';
-import type { UserCreatedState } from '@/pages/UsersPage/UsersPage';
+import type { UsersPageState } from '@/pages/UsersPage/UsersPage';
 
 type Values = {
   firstName: string;
@@ -85,7 +85,7 @@ export const UserNewPage = () => {
     };
     try {
       const result = await create.mutateAsync(payload);
-      const state: UserCreatedState = {
+      const state: UsersPageState = {
         created: {
           name: `${result.user.firstName} ${result.user.lastName}`,
           email: result.user.email,

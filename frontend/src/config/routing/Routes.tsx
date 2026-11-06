@@ -21,6 +21,7 @@ import { CompanyNewPage } from '@/pages/CompanyNewPage/CompanyNewPage';
 import { NotificationsPage } from '@/pages/NotificationsPage/NotificationsPage';
 import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
 import { UserNewPage } from '@/pages/UserNewPage/UserNewPage';
+import { UserProjectsPage } from '@/pages/UserProjectsPage/UserProjectsPage';
 import { UsersPage } from '@/pages/UsersPage/UsersPage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 import { LegacyWorkRedirect, TicketPage } from '@/pages/TicketPage/TicketPage';
@@ -205,6 +206,15 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.userNew.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'utenti/:id/progetti',
+        element: (
+          <RoleRoute roles={['ADMIN']}>
+            <UserProjectsPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.userProjects.title' } satisfies RouteHandle,
       },
       {
         path: 'calendario',
