@@ -17,6 +17,7 @@ export const NOTIFICATION_TYPES = [
   'FAST_TRACK_DROPPED',
   'INTERNSHIP_STARTED',
   'CLOSURE_REPORT_SUBMITTED',
+  'TICKET_TRANSFERRED',
 ] as const;
 
 export type AppNotification = {

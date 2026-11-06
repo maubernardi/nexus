@@ -19,7 +19,7 @@ type Feedback = { kind: 'status' | 'alert'; text: string };
 
 /**
  * Utenti di NEXUS per l'ADMIN (US-103): elenco, nuovo utente e nuovo invito per impostare la password, senza la
- * console di Keycloak; progetti dei Tutor (US-104).
+ * console di Keycloak; progetti dei Tutor (US-104) e spostamento delle loro segnalazioni (US-111).
  */
 export const UsersPage = () => {
   const { t } = useTranslation();
@@ -158,14 +158,24 @@ export const UsersPage = () => {
                     <td className={td}>{t(u.active ? 'users.active' : 'users.inactive')}</td>
                     <td className={`${td} space-x-2 whitespace-nowrap`}>
                       {u.role === 'TUTOR' && (
-                        <Button asChild variant="outline" size="sm">
-                          <Link
-                            to={`/utenti/${u.id}/progetti`}
-                            aria-label={t('users.projects.editFor', { name })}
-                          >
-                            {t('users.projects.edit')}
-                          </Link>
-                        </Button>
+                        <>
+                          <Button asChild variant="outline" size="sm">
+                            <Link
+                              to={`/utenti/${u.id}/progetti`}
+                              aria-label={t('users.projects.editFor', { name })}
+                            >
+                              {t('users.projects.edit')}
+                            </Link>
+                          </Button>
+                          <Button asChild variant="outline" size="sm">
+                            <Link
+                              to={`/utenti/${u.id}/segnalazioni`}
+                              aria-label={t('users.tickets.editFor', { name })}
+                            >
+                              {t('users.tickets.edit')}
+                            </Link>
+                          </Button>
+                        </>
                       )}
                       {u.active && (
                         <Button

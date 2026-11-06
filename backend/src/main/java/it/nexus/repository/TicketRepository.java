@@ -17,6 +17,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecif
 
     Optional<Ticket> findByNumber(Long number);
 
+    /** Segnalazioni del Tutor non chiuse, per lo spostamento (US-111). */
+    List<Ticket> findByTutorIdAndStatusNotOrderByNumberAsc(Long tutorId, TicketStatus closed);
+
     /** Segnalazioni non concluse dei beneficiari indicati (al più una per beneficiario). */
     List<Ticket> findByBeneficiaryIdInAndStatusNot(Collection<Long> beneficiaryIds, TicketStatus closed);
 

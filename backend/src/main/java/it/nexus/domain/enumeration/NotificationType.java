@@ -32,5 +32,7 @@ public enum NotificationType {
     /** All'operatore: il Tutor ha avviato il tirocinio (US-1003). */
     INTERNSHIP_STARTED,
     /** All'operatore: il Tutor ha inviato il report di restituzione, il percorso è concluso (US-1101). */
-    CLOSURE_REPORT_SUBMITTED
+    CLOSURE_REPORT_SUBMITTED,
+    /** Al Tutor: gli è stata affidata la segnalazione di un altro Tutor, con il beneficiario (US-111). */
+    TICKET_TRANSFERRED
 }

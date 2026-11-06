@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import it.nexus.domain.AppUser;
 import it.nexus.domain.UserProject;
 
 @Repository
@@ -21,4 +22,13 @@ public interface UserProjectRepository extends JpaRepository<UserProject, UserPr
     /** Assegnazioni di un utente con il progetto (US-104). */
     @Query("select up from UserProject up join fetch up.project where up.user.id = :userId")
     List<UserProject> findByUserIdWithProject(@Param("userId") Long userId);
+
+    /** Tutor attivi assegnati al progetto, per cognome e nome (US-111). */
+    @Query("""
+            select up.user from UserProject up
+            where up.project.id = :projectId and up.user.active = true
+              and up.user.role = it.nexus.domain.enumeration.Role.TUTOR
+            order by up.user.lastName, up.user.firstName
+            """)
+    List<AppUser> findActiveTutorsOf(@Param("projectId") Long projectId);
 }
