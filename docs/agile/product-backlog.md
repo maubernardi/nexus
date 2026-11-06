@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 12 | 58 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 14 | 66 |
 
 ## Domande aperte per il Product Owner
 
@@ -67,6 +67,8 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-108](#us-108) | E1 | Tipi di tirocinio | Must | 1 | R3 | 🎉 Done (Sprint 7) |
 | [US-109](#us-109) | E1 | Cataloghi del report di restituzione | Must | 2 | R3 | 🎉 Done (Sprint 8) |
 | [US-110](#us-110) | E1 | Cambio del proprio indirizzo email con codice | Must | 8 | R4 | 🎉 Done (fuori piano, 05/11) |
+| [US-111](#us-111) | E1 | Spostamento delle segnalazioni tra Tutor | Must | 5 | R4 | ✅ Ready (Sprint 9) |
+| [US-112](#us-112) | E1 | Coordinatore di progetto | Must | 3 | R4 | ✅ Ready (Sprint 9) |
 | [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
@@ -126,7 +128,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1305](#us-1305) | E13 | Revisione UX/UI | Should | 8 | R4 | 📋 Backlog |
 | [US-1306](#us-1306) | E13 | Passaggio in produzione | Must | 5 | R4 | 📋 Backlog |
 | [US-1307](#us-1307) | E13 | Monitoraggio e revisione di sicurezza | Must | 5 | R4 | 📋 Backlog |
-| [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | ✅ Ready (Sprint 9) |
+| [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | ✅ Ready (Sprint 10) |
 
 ## Dettaglio per epica
 
@@ -182,6 +184,13 @@ Come **ADMIN** voglio disattivare/riattivare un utente e cambiarne il ruolo per 
 Criteri di accettazione:
 - Quando disattivo un utente, allora non può più accedere (NEXUS e Keycloak) e i suoi ticket restano consultabili.
 - Quando cambio il ruolo, allora il nuovo ruolo vale dal login successivo.
+- Un Tutor con segnalazioni aperte non si disattiva e non cambia ruolo: prima l'ADMIN le sposta su un altro Tutor
+  attivo dello stesso progetto (US-111). Decisione del PO, 06/11.
+- Un operatore del Call Center con ticket in carico si può disattivare o cambiare di ruolo, dopo un avviso con il
+  numero dei ticket: i ticket tornano senza operatore nella coda da prendere in carico (decisione del PO, 06/11).
+- L'ADMIN non può disattivare se stesso né cambiarsi il ruolo.
+
+Dipendenze: US-111
 
 #### US-106
 **Cataloghi di zone e tipologie di mansione** · Must · 3 punti · R2 · 🎉 Done (Sprint 7)
@@ -234,6 +243,33 @@ Criteri di accettazione:
   l'utente.
 - Al massimo 5 tentativi per codice; un nuovo codice dopo 60 secondi; la richiesta si può annullare.
 - Un indirizzo già usato da un altro utente è rifiutato. Il cambio si registra nell'audit, senza gli indirizzi.
+
+#### US-111
+**Spostamento delle segnalazioni tra Tutor** · Must · 5 punti · R4 · ✅ Ready (Sprint 9)
+
+Come **ADMIN** voglio spostare le segnalazioni aperte di un Tutor su un altro Tutor dello stesso progetto per non
+lasciarle senza nessuno quando un Tutor esce o cambia mansione. Richiesta del PO del 06/11, nel definire US-105.
+
+Criteri di accettazione:
+- Si sposta una segnalazione aperta, oppure tutte quelle aperte di un Tutor, su un Tutor attivo assegnato allo stesso
+  progetto.
+- Con la segnalazione passa al nuovo Tutor anche il beneficiario, con tirocinio e documenti; le segnalazioni già
+  chiuse restano nello storico a nome del Tutor di allora (decisione del PO, 06/11).
+- Il nuovo Tutor riceve una notifica; lo spostamento si registra nell'audit e nella cronologia della segnalazione.
+
+#### US-112
+**Coordinatore di progetto** · Must · 3 punti · R4 · ✅ Ready (Sprint 9)
+
+Come **Coordinatore** di un progetto (un Tutor con un permesso in più) voglio spostare le segnalazioni tra i Tutor del
+mio progetto per riorganizzare il lavoro senza passare dall'ADMIN. Richiesta del PO del 06/11.
+
+Criteri di accettazione:
+- Il Coordinatore si definisce per progetto: nella pagina dei progetti di un Tutor l'ADMIN lo segna come Coordinatore
+  di un progetto; lo stesso Tutor può essere Coordinatore di un progetto e solo Tutor di un altro.
+- Il Coordinatore sposta (come in US-111) solo le segnalazioni dei progetti che coordina; per il resto è un Tutor.
+- Un progetto può avere più Coordinatori; non serve un nuovo ruolo in Keycloak.
+
+Dipendenze: US-104, US-111
 
 #### EN-3
 **Zone iniziali: Firenze e hinterland** · Must · 2 punti · R1 · 🎉 Done (Sprint 2)
@@ -952,7 +988,7 @@ Criteri di accettazione:
 - Controllo di disponibilità esterno con avviso; checklist OWASP ASVS di livello 1 verificata.
 
 #### US-1308
-**Recupero password** · Should · 2 punti · R4 · ✅ Ready (Sprint 9)
+**Recupero password** · Should · 2 punti · R4 · ✅ Ready (Sprint 10)
 
 Come **utente** voglio reimpostare la password dimenticata per non dipendere dall'amministratore.
 

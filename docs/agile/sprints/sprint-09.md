@@ -6,9 +6,10 @@ confermata dal Product Owner.
 ## Obiettivo
 
 > L'ADMIN gestisce progetti e utenti da NEXUS, senza la console di Keycloak: crea gli utenti, li assegna ai progetti,
-> li disattiva o cambia il ruolo; chi dimentica la password la reimposta da solo.
+> sposta le segnalazioni di un Tutor su un collega, li disattiva o cambia il ruolo; i Coordinatori riorganizzano le
+> segnalazioni dei loro progetti.
 
-## Impegno (19 punti)
+## Impegno (25 punti, ripianificato il 06/11)
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
@@ -16,14 +17,29 @@ confermata dal Product Owner.
 | US-102 | Gestione progetti | 3 | ✅ Ready | — | — |
 | US-103 | Creazione utente | 8 | ✅ Ready | — | — |
 | US-104 | Assegnazione utenti ai progetti | 3 | ✅ Ready | — | — |
+| US-111 | Spostamento delle segnalazioni tra Tutor | 5 | ✅ Ready | — | — |
 | US-105 | Disattivazione e cambio ruolo | 3 | ✅ Ready | — | — |
-| US-1308 | Recupero password | 2 | ✅ Ready | — | — |
+| US-112 | Coordinatore di progetto | 3 | ✅ Ready | — | — |
 
 **Extra**, nell'ordine: US-1302 *Backup del database* (5), US-205 *Curriculum del beneficiario* (5).
 
-Ordine: A16 → US-102 → US-103 → US-104 → US-105 → US-1308. Una PR per storia; gli stati del backlog si aggiornano
+Ordine: A16 → US-102 → US-103 → US-104 → US-111 → US-105 → US-112. Una PR per storia; gli stati del backlog si aggiornano
 nella PR di documentazione dopo i merge. Prima dello sprint, fuori piano: US-110 *Cambio del proprio indirizzo email*
 (8 punti, non conteggiati nella velocity, §8.3 della review).
+
+## Ripianificazione del 06/11
+
+Definendo US-105 il PO ha deciso che un Tutor con segnalazioni aperte non si disattiva: prima le segnalazioni passano
+a un altro Tutor attivo dello stesso progetto. Ne nascono due storie, entrate nello sprint su decisione del PO:
+
+- **US-111** *Spostamento delle segnalazioni tra Tutor* (5): lo fa l'ADMIN; con la segnalazione passa anche il
+  beneficiario, con tirocinio e documenti.
+- **US-112** *Coordinatore di progetto* (3): un Tutor segnato dall'ADMIN come Coordinatore di un progetto sposta le
+  segnalazioni di quel progetto. Si definisce per progetto, senza un nuovo ruolo in Keycloak.
+
+Altre decisioni su US-105: un operatore del Call Center con ticket in carico si può disattivare dopo un avviso, e i
+ticket tornano nella coda da prendere in carico. **US-1308** *Recupero password* (2) passa allo Sprint 10. L'impegno
+sale da 19 a 25 punti, sopra la media: se non si chiude, US-112 slitta allo Sprint 10.
 
 ## Decisioni del planning (review dello Sprint 8)
 
@@ -39,6 +55,7 @@ nella PR di documentazione dopo i merge. Prima dello sprint, fuori piano: US-110
 | Momento | Punti residui |
 |---|---|
 | Inizio (05/11, sera) | 19 |
+| Ripianificazione (06/11): +US-111, +US-112, −US-1308; fatte US-102, US-103, US-104 | 11 |
 
 ## Per il PO durante lo sprint
 
