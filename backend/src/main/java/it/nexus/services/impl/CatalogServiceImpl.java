@@ -15,6 +15,7 @@ import it.nexus.domain.AbstractReferenceEntity;
 import it.nexus.domain.HiringFormula;
 import it.nexus.domain.InternshipType;
 import it.nexus.domain.NoHireReason;
+import it.nexus.domain.Project;
 import it.nexus.domain.JobCategory;
 import it.nexus.domain.ReferenceCodes;
 import it.nexus.domain.Zone;
@@ -26,6 +27,7 @@ import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.HiringFormulaRepository;
 import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.repository.NoHireReasonRepository;
+import it.nexus.repository.ProjectRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.ZoneRepository;
 import it.nexus.services.AuditService;
@@ -45,6 +47,7 @@ public class CatalogServiceImpl implements CatalogService {
     private final InternshipTypeRepository internshipTypeRepository;
     private final HiringFormulaRepository hiringFormulaRepository;
     private final NoHireReasonRepository noHireReasonRepository;
+    private final ProjectRepository projectRepository;
     private final AuditService auditService;
 
     /** Le operazioni che servono su un catalogo: i due repository hanno metodi omonimi ma tipi diversi. */
@@ -78,6 +81,9 @@ public class CatalogServiceImpl implements CatalogService {
                     noHireReasonRepository::findById, noHireReasonRepository::findFirstByNameIgnoreCaseAndActiveTrue,
                     noHireReasonRepository::existsByCode, NoHireReason::new,
                     e -> noHireReasonRepository.saveAndFlush((NoHireReason) e));
+            case PROJECTS -> new Store(projectRepository::findAllByOrderByActiveDescNameAsc, projectRepository::findById,
+                    projectRepository::findFirstByNameIgnoreCaseAndActiveTrue, projectRepository::existsByCode,
+                    Project::new, e -> projectRepository.saveAndFlush((Project) e));
         };
     }
 

@@ -26,11 +26,12 @@ const useCatalogMutation = <V extends { kind: CatalogKind }>(
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn,
-    // anche in caso di conflitto si riallinea; e i menu di zone e tipologie degli altri moduli
+    // anche in caso di conflitto si riallinea; e i menu degli altri moduli (progetti assegnati compresi)
     onSettled: (_item, _error, vars) =>
       Promise.all([
         queryClient.invalidateQueries({ queryKey: catalogKey(vars.kind) }),
         queryClient.invalidateQueries({ queryKey: ['reference'] }),
+        queryClient.invalidateQueries({ queryKey: ['me', 'projects'] }),
       ]),
   });
 };

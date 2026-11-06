@@ -15,4 +15,10 @@ public class Project extends AbstractReferenceEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    /** Nuovo progetto del catalogo (US-102). */
+    public Project(String code, String name) {
+        setCode(code);
+        setName(name);
+    }
 }
