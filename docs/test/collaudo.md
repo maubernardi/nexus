@@ -697,3 +697,16 @@ nuovo utente, per esempio un alias.
      segnalazione è tra le sue, con il beneficiario tra i suoi; nella cronologia «Passata a un altro Tutor: … → …».
   4. Su un progetto senza altri Tutor assegnati. **Atteso:** il messaggio che invita ad assegnare il progetto a un
      collega, senza pulsante.
+
+- [ ] **T-20.7 Disattivazione, riattivazione e cambio di ruolo (US-105)**
+  1. Come `admin`, **Accesso e ruolo** su un Tutor con segnalazioni aperte (es. `tutor1`). **Atteso:** l'avviso «Ha
+     N segnalazioni aperte…» con il collegamento **Sposta le segnalazioni**, senza pulsanti.
+  2. **Accesso e ruolo** su `operatore.cc` con ticket in carico. **Atteso:** l'avviso «Ha N ticket in carico…».
+     **Disattiva l'utente**. **Atteso:** torni all'elenco con «… è disattivato»; in un'altra finestra `operatore.cc`
+     non riesce più a entrare.
+  3. Come `admin`, vista **Da prendere in carico**. **Atteso:** i ticket di `operatore.cc` sono in coda, anche quelli
+     più avanti (es. ad appuntamento fissato); prendine uno: resta nella sua fase. In cronologia «Tornata in coda».
+  4. Riattiva `operatore.cc`. **Atteso:** entra di nuovo con la sua password.
+  5. Cambia il ruolo del Tutor creato in T-20.1 in Call Center. **Atteso:** «Il ruolo … ora è Call Center»; al suo
+     prossimo accesso vede la Home del Call Center. Poi riportalo a Tutor.
+  6. **Accesso e ruolo** sul tuo utente `admin`. **Atteso:** il messaggio che lo cambia un altro ADMIN, senza pulsanti.

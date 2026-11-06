@@ -135,6 +135,29 @@ class KeycloakIdentityProviderUsersIT {
         users.deleteUser(id);
     }
 
+    @Test
+    void disattivazione_cambioRuolo_eChiusuraDelleSessioni() {
+        KeycloakIdentityProviderUsers users = users(DEV_SECRET);
+        String id = users.createUser(new NewIdentityUser("da.cambiare", "Da", "Cambiare", "da.cambiare@example.org",
+                Role.TUTOR));
+        List<String> others = realmRoles(id).stream().filter(r -> Role.fromName(r).isEmpty()).toList();
+
+        users.setEnabled(id, false);
+        assertThat(readUser(id)).containsEntry("enabled", false).containsEntry("username", "da.cambiare");
+        users.setEnabled(id, true);
+        assertThat(readUser(id)).containsEntry("enabled", true);
+
+        users.changeRole(id, Role.CALL_CENTER);
+        // il ruolo NEXUS si sostituisce, gli altri ruoli del realm restano
+        assertThat(realmRoles(id)).contains("CALL_CENTER").doesNotContain("TUTOR", "ADMIN")
+                .containsAll(others);
+        users.changeRole(id, Role.CALL_CENTER);
+        assertThat(realmRoles(id)).filteredOn(r -> Role.fromName(r).isPresent()).containsExactly("CALL_CENTER");
+
+        users.logout(id);
+        users.deleteUser(id);
+    }
+
     private static List<String> realmRoles(String id) {
         String token = adminToken();
         List<Map<String, Object>> roles = RestClient.create(baseUrl).get()

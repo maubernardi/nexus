@@ -7,15 +7,21 @@ import {
 } from '@tanstack/react-query';
 
 import {
+  changeUserRole,
   createUser,
   fetchUser,
   fetchUsers,
+  fetchUserImpact,
   resendInvitation,
+  setUserActive,
   updateUserProjects,
   type AdminUser,
   type NewUserForm,
   type UserCreated,
+  type UserImpact,
 } from '@/config/api/userAdminApi';
+import type { Role } from '@/config/auth/types';
+import { TICKETS_KEY } from '@/config/hooks/useTickets';
 
 export const USERS_KEY = ['users'] as const;
 
@@ -49,3 +55,28 @@ export const useUpdateUserProjects = (): UseMutationResult<
     onSuccess: () => queryClient.invalidateQueries({ queryKey: USERS_KEY }),
   });
 };
+
+/** Che cosa tocca disattivare l'utente o cambiargli il ruolo (US-105). */
+export const useUserImpact = (id: string): UseQueryResult<UserImpact> =>
+  useQuery({ queryKey: [...USERS_KEY, id, 'impact'], queryFn: () => fetchUserImpact(id) });
+
+/** Dopo il cambio si riallineano utenti e segnalazioni: i ticket in carico possono essere tornati in coda. */
+const useUserMutation = <V>(
+  mutationFn: (vars: V) => Promise<AdminUser>,
+): UseMutationResult<AdminUser, unknown, V> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn,
+    onSettled: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: USERS_KEY }),
+        queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+      ]),
+  });
+};
+
+export const useSetUserActive = (): UseMutationResult<AdminUser, unknown, { id: string; active: boolean }> =>
+  useUserMutation((vars: { id: string; active: boolean }) => setUserActive(vars));
+
+export const useChangeUserRole = (): UseMutationResult<AdminUser, unknown, { id: string; role: Role }> =>
+  useUserMutation((vars: { id: string; role: Role }) => changeUserRole(vars));

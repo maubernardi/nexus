@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import it.nexus.domain.enumeration.Role;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -36,5 +37,20 @@ public class LocalIdentityProviderUsers implements IdentityProviderUsers {
     @Override
     public void sendPasswordSetupEmail(String externalId, Duration lifespan, String redirectUri) {
         log.info("Identity provider assente (profilo senza keycloak): nessuna email per la password");
+    }
+
+    @Override
+    public void setEnabled(String externalId, boolean enabled) {
+        log.info("Identity provider assente (profilo senza keycloak): stato aggiornato solo in NEXUS");
+    }
+
+    @Override
+    public void changeRole(String externalId, Role role) {
+        log.info("Identity provider assente (profilo senza keycloak): ruolo aggiornato solo in NEXUS");
+    }
+
+    @Override
+    public void logout(String externalId) {
+        // nessuna sessione da chiudere
     }
 }

@@ -20,6 +20,7 @@ import { CompanyEditPage } from '@/pages/CompanyEditPage/CompanyEditPage';
 import { CompanyNewPage } from '@/pages/CompanyNewPage/CompanyNewPage';
 import { NotificationsPage } from '@/pages/NotificationsPage/NotificationsPage';
 import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
+import { UserAccountPage } from '@/pages/UserAccountPage/UserAccountPage';
 import { UserNewPage } from '@/pages/UserNewPage/UserNewPage';
 import { UserProjectsPage } from '@/pages/UserProjectsPage/UserProjectsPage';
 import { UserTicketsPage } from '@/pages/UserTicketsPage/UserTicketsPage';
@@ -225,6 +226,15 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.userTickets.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'utenti/:id/accesso',
+        element: (
+          <RoleRoute roles={['ADMIN']}>
+            <UserAccountPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.userAccount.title' } satisfies RouteHandle,
       },
       {
         path: 'calendario',

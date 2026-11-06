@@ -63,3 +63,28 @@ export const updateUserProjects = async ({
   const { data } = await axiosInstance.put<AdminUser>(`${ENDPOINTS.users}/${id}/projects`, { projectIds });
   return data;
 };
+
+/** Che cosa tocca disattivare l'utente o cambiargli il ruolo (US-105). */
+export type UserImpact = {
+  /** Segnalazioni aperte di cui è il Tutor: bloccano, prima vanno spostate. */
+  openTickets: number;
+  /** Ticket in carico come operatore: tornano in coda. */
+  ticketsInCharge: number;
+  /** È l'ADMIN collegato: non può toccare se stesso. */
+  self: boolean;
+};
+
+export const fetchUserImpact = async (id: string): Promise<UserImpact> => {
+  const { data } = await axiosInstance.get<UserImpact>(`${ENDPOINTS.users}/${id}/impact`);
+  return data;
+};
+
+export const setUserActive = async ({ id, active }: { id: string; active: boolean }): Promise<AdminUser> => {
+  const { data } = await axiosInstance.put<AdminUser>(`${ENDPOINTS.users}/${id}/active`, { active });
+  return data;
+};
+
+export const changeUserRole = async ({ id, role }: { id: string; role: Role }): Promise<AdminUser> => {
+  const { data } = await axiosInstance.put<AdminUser>(`${ENDPOINTS.users}/${id}/role`, { role });
+  return data;
+};
