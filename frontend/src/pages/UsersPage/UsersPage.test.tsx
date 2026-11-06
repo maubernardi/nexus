@@ -4,7 +4,7 @@ import { AxiosError, AxiosHeaders } from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { fetchUsers, resendInvitation, type AdminUser } from '@/config/api/userAdminApi';
-import { UsersPage } from '@/pages/UsersPage/UsersPage';
+import { UsersPage, type UsersPageState } from '@/pages/UsersPage/UsersPage';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderRoutes } from '@/tests/renderWithProviders';
 
@@ -23,6 +23,10 @@ const users: AdminUser[] = [
     email: 'mario@example.org',
     role: 'TUTOR',
     active: true,
+    projects: [
+      { id: 'P1', code: 'GOL', name: 'GOL' },
+      { id: 'P2', code: 'POLIS', name: 'POLIS' },
+    ],
   },
   {
     id: 'U2',
@@ -32,10 +36,11 @@ const users: AdminUser[] = [
     email: 'anna@example.org',
     role: 'CALL_CENTER',
     active: false,
+    projects: [],
   },
 ];
 
-const renderPage = () =>
+const renderPage = (state?: UsersPageState) =>
   renderRoutes({
     routes: [
       {
@@ -47,7 +52,7 @@ const renderPage = () =>
         ),
       },
     ],
-    initialPath: '/utenti',
+    initialPath: { pathname: '/utenti', state },
   });
 
 describe('<UsersPage>', () => {
@@ -66,8 +71,16 @@ describe('<UsersPage>', () => {
     expect(rows[1]).toHaveTextContent('Tutor territoriale');
     expect(rows[1]).toHaveTextContent('Attivo');
     expect(rows[2]).toHaveTextContent('Disattivato');
-    // l'invito si reinvia solo agli utenti attivi
+    // progetti (US-104): solo i Tutor li hanno; Call Center e ADMIN li vedono tutti
+    expect(rows[1]).toHaveTextContent('GOL, POLIS');
+    expect(rows[2]).toHaveTextContent('Tutti');
+    expect(within(rows[1]).getByRole('link', { name: 'Progetti di Rossi Mario' })).toHaveAttribute(
+      'href',
+      '/utenti/U1/progetti',
+    );
+    // l'invito si reinvia solo agli utenti attivi; i progetti solo per i Tutor
     expect(within(rows[2]).queryByRole('button')).not.toBeInTheDocument();
+    expect(within(rows[2]).queryByRole('link')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Nuovo utente' })).toHaveAttribute('href', '/utenti/nuovo');
     await expectNoAxeViolations();
   });
@@ -97,5 +110,10 @@ describe('<UsersPage>', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'L’email per impostare la password non è partita',
     );
+  });
+
+  it('conferma dopo il salvataggio dei progetti', async () => {
+    renderPage({ projectsSaved: 'Mario Rossi' });
+    expect(await screen.findByRole('status')).toHaveTextContent('Progetti di Mario Rossi aggiornati.');
   });
 });

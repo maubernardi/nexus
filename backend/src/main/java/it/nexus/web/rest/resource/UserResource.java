@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import it.nexus.domain.dto.UserCreateDTO;
 import it.nexus.domain.dto.UserCreatedDTO;
 import it.nexus.domain.dto.UserDTO;
+import it.nexus.domain.dto.UserProjectsDTO;
 import it.nexus.services.UserAdminService;
 import it.nexus.web.rest.PathAPI;
 import jakarta.validation.Valid;
@@ -50,5 +52,19 @@ public class UserResource {
     public ResponseEntity<Void> resendInvitation(@PathVariable String id) {
         userAdminService.resendInvitation(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole(@requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Un utente con i progetti assegnati (US-104)")
+    public ResponseEntity<UserDTO> get(@PathVariable String id) {
+        return ResponseEntity.ok(userAdminService.get(id));
+    }
+
+    @PutMapping("/{id}/projects")
+    @PreAuthorize("hasRole(@requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Sostituisce i progetti assegnati a un Tutor (US-104)")
+    public ResponseEntity<UserDTO> updateProjects(@PathVariable String id, @RequestBody @Valid UserProjectsDTO dto) {
+        return ResponseEntity.ok(userAdminService.updateProjects(id, dto));
     }
 }

@@ -992,7 +992,7 @@ export const it = {
     error: 'Operazione non riuscita. Controlla la connessione e riprova.',
     newHeading: 'Nuovo utente',
     newIntro:
-      'L’utente nasce in NEXUS e nell’account di accesso con il ruolo scelto, e riceve per email il collegamento per impostare la password. L’assegnazione ai progetti arriverà con una prossima versione.',
+      'L’utente nasce in NEXUS e nell’account di accesso con il ruolo scelto, e riceve per email il collegamento per impostare la password. A un Tutor assegna poi i progetti dall’elenco degli utenti.',
     create: 'Crea l’utente',
     creating: 'Creazione in corso…',
     backToList: 'Torna agli utenti',
@@ -1004,8 +1004,28 @@ export const it = {
       email: 'Email',
       phone: 'Telefono',
       role: 'Ruolo',
+      projects: 'Progetti',
       status: 'Stato',
       actions: 'Azioni',
+    },
+    projects: {
+      heading: 'Progetti di {{name}}',
+      intro:
+        'Il Tutor vede in sola lettura i ticket dei progetti scelti e può segnalare solo su questi. La modifica vale subito; i ticket che ha già segnalato restano suoi.',
+      legend: 'Progetti assegnati a {{name}}',
+      inactive: '{{name}} (disattivato: se lo togli non si può riassegnare)',
+      all: 'Tutti',
+      none: 'Nessuno',
+      edit: 'Progetti',
+      editFor: 'Progetti di {{name}}',
+      save: 'Salva i progetti',
+      saving: 'Salvataggio in corso…',
+      saved: 'Progetti di {{name}} aggiornati.',
+      notTutor:
+        'Solo i Tutor hanno progetti assegnati: il ruolo {{role}} vede già i ticket di tutti i progetti.',
+      noneInCatalog: 'Non ci sono progetti attivi.',
+      toCatalogs: 'Aggiungili nei Cataloghi',
+      loadError: 'Impossibile caricare l’utente o i progetti. Controlla la connessione e riprova.',
     },
     hints: {
       username:
@@ -1295,6 +1315,9 @@ export const it = {
     },
     userNew: {
       title: 'Nuovo utente',
+    },
+    userProjects: {
+      title: 'Progetti dell’utente',
     },
     tickets: {
       title: 'Segnalazioni',

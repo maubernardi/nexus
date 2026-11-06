@@ -675,3 +675,15 @@ nuovo utente, per esempio un alias.
 
 - [ ] **T-20.4 Solo l'ADMIN**
   1. Come `operatore.cc` apri `/utenti`. **Atteso:** «Pagina non consentita»; la voce Utenti non è nel menu.
+
+- [ ] **T-20.5 Progetti di un Tutor (US-104)**
+  1. Come `admin`, in **Utenti**: la colonna **Progetti** mostra i progetti dei Tutor (`tutor2`: GOL, POLIS) e
+     «Tutti» per Call Center e ADMIN; il pulsante **Progetti** c'è solo sui Tutor.
+  2. **Progetti** sul Tutor creato in T-20.1 (o su `tutor1`): seleziona POLIS e salva. **Atteso:** torni all'elenco con
+     «Progetti di … aggiornati» e POLIS nella colonna.
+  3. Entra con quel Tutor. **Atteso:** in **Nuova segnalazione** il progetto POLIS è tra quelli scelti; nella vista
+     dei ticket del progetto compaiono quelli di POLIS, in sola lettura.
+  4. Togli POLIS e salva; il Tutor ricarica la pagina. **Atteso:** i ticket di POLIS degli altri Tutor non si vedono
+     più; i suoi restano.
+  5. Disattiva un progetto nei **Cataloghi** e apri i progetti di un Tutor che non lo ha. **Atteso:** il progetto
+     disattivato non compare; su un Tutor che lo ha, compare come «disattivato» e si può solo togliere.

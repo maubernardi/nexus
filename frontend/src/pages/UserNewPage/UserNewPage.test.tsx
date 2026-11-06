@@ -33,6 +33,7 @@ const created = (invitationSent: boolean) => ({
     email: 'mario@example.org',
     role: 'CALL_CENTER' as const,
     active: true,
+    projects: [],
   },
   invitationSent,
 });

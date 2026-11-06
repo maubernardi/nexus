@@ -9,21 +9,24 @@ import { apiError } from '@/config/api/errors';
 import type { AdminUser } from '@/config/api/userAdminApi';
 import { useResendInvitation, useUsers } from '@/config/hooks/useUsers';
 
-/** Esito della creazione, passato da «Nuovo utente» con la navigazione. */
-export type UserCreatedState = { created?: { name: string; email: string; invitationSent: boolean } };
+/** Esito passato con la navigazione da «Nuovo utente» o da «Progetti dell'utente» (nome dell'utente). */
+export type UsersPageState = {
+  created?: { name: string; email: string; invitationSent: boolean };
+  projectsSaved?: string;
+};
 
 type Feedback = { kind: 'status' | 'alert'; text: string };
 
 /**
  * Utenti di NEXUS per l'ADMIN (US-103): elenco, nuovo utente e nuovo invito per impostare la password, senza la
- * console di Keycloak.
+ * console di Keycloak; progetti dei Tutor (US-104).
  */
 export const UsersPage = () => {
   const { t } = useTranslation();
   const users = useUsers();
   const resend = useResendInvitation();
   const location = useLocation();
-  const created = (location.state as UserCreatedState | null)?.created;
+  const { created, projectsSaved } = (location.state as UsersPageState | null) ?? {};
   const [feedback, setFeedback] = useState<Feedback | null>(() =>
     created
       ? {
@@ -33,7 +36,9 @@ export const UsersPage = () => {
             email: created.email,
           }),
         }
-      : null,
+      : projectsSaved
+        ? { kind: 'status', text: t('users.projects.saved', { name: projectsSaved }) }
+        : null,
   );
   const feedbackRef = useRef<HTMLParagraphElement>(null);
 
@@ -122,6 +127,9 @@ export const UsersPage = () => {
                   {t('users.fields.role')}
                 </th>
                 <th scope="col" className={th}>
+                  {t('users.fields.projects')}
+                </th>
+                <th scope="col" className={th}>
                   {t('users.fields.status')}
                 </th>
                 <th scope="col" className={th}>
@@ -140,8 +148,25 @@ export const UsersPage = () => {
                     <td className={td}>{u.username}</td>
                     <td className={`${td} break-all`}>{u.email}</td>
                     <td className={td}>{t(`roles.${u.role}`)}</td>
-                    <td className={td}>{t(u.active ? 'users.active' : 'users.inactive')}</td>
                     <td className={td}>
+                      {u.role !== 'TUTOR'
+                        ? t('users.projects.all')
+                        : u.projects.length > 0
+                          ? u.projects.map((p) => p.name).join(', ')
+                          : t('users.projects.none')}
+                    </td>
+                    <td className={td}>{t(u.active ? 'users.active' : 'users.inactive')}</td>
+                    <td className={`${td} space-x-2 whitespace-nowrap`}>
+                      {u.role === 'TUTOR' && (
+                        <Button asChild variant="outline" size="sm">
+                          <Link
+                            to={`/utenti/${u.id}/progetti`}
+                            aria-label={t('users.projects.editFor', { name })}
+                          >
+                            {t('users.projects.edit')}
+                          </Link>
+                        </Button>
+                      )}
                       {u.active && (
                         <Button
                           type="button"
