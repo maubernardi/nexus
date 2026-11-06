@@ -175,8 +175,12 @@ Le ho segnate da confermare:
 
 *Proposta:* confermarle così come sono.
 
+> ✅ **Deciso (PO, 06/11): proposta accettata.**
+
 ### 8.2 Chiusura dello Sprint 9
 *Proposta:* Sprint 9 chiuso con velocity **25**, US-111 e US-112 comprese (entrate con la ripianificazione).
+
+> ✅ **Deciso (PO, 06/11): proposta accettata.** Sprint 9 chiuso con velocity 25.
 
 ### 8.3 Il ripristino automatico (A16)
 I log del 05/11 potrebbero non esserci più. *Proposta:* riprodurre il problema **di proposito**, in un orario che
@@ -185,6 +189,9 @@ La demo resterebbe giù al massimo qualche minuto; se il ripristino non riparte,
 versione buona.
 
 *Alternativa:* cercare la causa solo leggendo lo script, senza provarlo sul server.
+
+> ✅ **Deciso (PO, 06/11): proposta accettata**, a qualunque ora (la demo non è ancora usata): è il primo passo dello
+> Sprint 10.
 
 ### 8.4 Registro degli accessi (US-113)
 Decisioni già prese (06/11): data, ora, IP ed esito, anche i tentativi falliti; lo vedono l'ADMIN e l'utente;
@@ -195,10 +202,16 @@ conservazione 12 mesi. *Proposta tecnica:*
 - i tentativi con uno **username inesistente** non appartengono a nessun utente: non compaiono nei registri dei
   singoli. Se vuoi vederli, una pagina dell'ADMIN con tutti gli accessi falliti costerebbe circa 2 punti in più.
 
+> ✅ **Deciso (PO, 06/11): proposta accettata, con la pagina dell'ADMIN dei tentativi falliti.** US-113 sale a
+> **7 punti**.
+
 ### 8.5 Il collaudo arretrato
 Sono aperte: T-13.4, sezioni 16–17, T-19.2, T-20.2–T-20.8, US-1301. *Proposta:* nello Sprint 10 dai la precedenza
 alla sezione 20 (la gestione degli utenti serve per andare in produzione), poi alle 16–17. Se qualche prova è già
 fatta, basta l'elenco e la spunto.
+
+> ✅ **Deciso (PO, 06/11): proposta accettata.** Le prove sono in
+> [docs/test/collaudo.md](https://github.com/maubernardi/nexus/blob/main/docs/test/collaudo.md), sezione 20.
 
 ### 8.6 Backup fuori dal server (US-1302)
 Il backup deve stare **fuori dal server**. Serve una destinazione:
@@ -209,6 +222,8 @@ Il backup deve stare **fuori dal server**. Serve una destinazione:
 *Proposta:* IONOS, per avere un solo fornitore e un solo contratto. Le credenziali le metti tu nel `.env` del server,
 mai nel repository. Conservazione proposta: 30 backup giornalieri, cifrati.
 
+> ✅ **Deciso (PO, 06/11): US-1302 resta nel backlog**, fuori dallo Sprint 10.
+
 ### 8.7 Monitoraggio (US-1307)
 Per l'avviso quando la demo non risponde:
 - **un controllo dalla CI di GitHub** ogni 10 minuti, con un'email a te se fallisce: gratuito, nessun nuovo account;
@@ -217,32 +232,34 @@ Per l'avviso quando la demo non risponde:
 *Proposta:* il controllo dalla CI di GitHub. La revisione di sicurezza (OWASP ASVS livello 1) la faccio io, con un
 documento di esito.
 
+> ✅ **Deciso (PO, 06/11): proposta accettata**, con il controllo **solo dalle 8 alle 20**.
+
 ## 9. Proposta per lo Sprint 10 (3 giorni, ~20 punti)
 
-**Obiettivo proposto:** *NEXUS è pronto per i dati reali: chi dimentica la password la reimposta da solo, gli accessi
-sono registrati, i dati hanno un backup fuori dal server e si anonimizzano alla scadenza, e un avviso dice se l'app non
-risponde.*
+**Obiettivo proposto:** *NEXUS è più sicuro per i dati reali: il deploy si ripristina da solo se una release non parte,
+chi dimentica la password la reimposta da solo, gli accessi sono registrati, i dati si anonimizzano alla scadenza e un
+avviso dice se l'app non risponde.*
 
 | Ordine | ID | Storia | Punti | Release |
 |---|---|---|---|---|
-| 1 | A16 | Ripristino del deploy (azione, §8.3) | — | — |
+| 1 | A16 | Ripristino del deploy, provato di proposito (azione, §8.3) | — | — |
 | 2 | US-1308 | Recupero password | 2 | R4 |
-| 3 | US-113 | Registro degli accessi (§8.4) | 5 | R4 |
-| 4 | US-1302 | Backup del database (§8.6) | 5 | R4 |
-| 5 | US-1303 | Anonimizzazione a scadenza | 5 | R4 |
-| 6 | US-1307 | Monitoraggio e revisione di sicurezza (§8.7) | 5 | R4 |
-| | | **Totale** | **22** | |
+| 3 | US-113 | Registro degli accessi, con la pagina dei tentativi falliti (§8.4) | 7 | R4 |
+| 4 | US-1303 | Anonimizzazione a scadenza | 5 | R4 |
+| 5 | US-1307 | Monitoraggio (8–20) e revisione di sicurezza (§8.7) | 5 | R4 |
+| | | **Totale** | **19** | |
 
 **Extra**, nell'ordine: US-205 *Curriculum del beneficiario* (5).
 
-US-1308 è poco più di una configurazione di Keycloak, che già manda le email con l'SMTP di IONOS. US-1302 e US-113
-richiedono passi sul server: te li do come lista completa (A15). Restano per lo Sprint 11 US-1305 (revisione UX/UI, da
-raffinare insieme in una sessione dedicata) e US-1306 (passaggio in produzione).
+US-1308 è poco più di una configurazione di Keycloak, che già manda le email con l'SMTP di IONOS. US-113 richiede un
+passo sul server: te lo do come lista completa (A15). US-1302 (backup) resta nel backlog (§8.6). Restano per lo Sprint
+11 US-1305 (revisione UX/UI, da raffinare insieme in una sessione dedicata) e US-1306 (passaggio in produzione), che
+dipende dal backup.
 
 ## 10. Azioni a carico del PO
 
-- [ ] Decidere i punti §8.1–§8.7 e confermare il planning (§9).
+- [x] Decidere i punti §8.1–§8.7 (06/11).
+- [ ] Confermare il planning (§9).
 - [ ] Collaudo sulla versione `e30269f`: sezione 20 (T-20.2–T-20.8), poi T-13.4, sezioni 16–17, T-19.2.
 - [ ] US-1301: PWA su Android e iOS (collaudo T-10.1).
-- [ ] Credenziali della destinazione dei backup nel `.env` del server, quando arriva US-1302.
 - [x] Prova del primo utente creato da NEXUS (T-20.1, 06/11).
