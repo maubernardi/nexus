@@ -35,24 +35,26 @@ class FlywayRollbackIT {
     void laReleasePrecedenteRipartesConUnaMigrazioneDelFuturo(String profile) {
         Properties config = config(profile);
         List<String> locations = Arrays.asList(config.getProperty("spring.flyway.locations").split(",\\s*"));
-        String schema = profile + "_rollback";
+        // le migrazioni usano lo schema "nexus" per nome: ogni caso riparte da uno schema vuoto
+        flyway(config, locations).clean();
 
         // la release nuova: le migrazioni di oggi più una che la precedente non ha
         List<String> newer = new ArrayList<>(locations);
         newer.add("classpath:db/future");
-        flyway(config, schema, newer).migrate();
+        flyway(config, newer).migrate();
 
         // la release precedente: stesse impostazioni del profilo, senza la migrazione nuova
-        assertThat(flyway(config, schema, locations).validateWithResult().validationSuccessful)
+        assertThat(flyway(config, locations).validateWithResult().validationSuccessful)
                 .as("la release precedente deve ignorare le migrazioni del futuro")
                 .isTrue();
     }
 
-    private static Flyway flyway(Properties config, String schema, List<String> locations) {
+    private static Flyway flyway(Properties config, List<String> locations) {
         FluentConfiguration fluent = Flyway.configure()
                 .dataSource(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword())
-                .schemas(schema)
-                .defaultSchema(schema)
+                .schemas(config.getProperty("spring.flyway.schemas"))
+                .defaultSchema(config.getProperty("spring.flyway.default-schema"))
+                .cleanDisabled(false)
                 .locations(locations.toArray(String[]::new));
         String patterns = config.getProperty("spring.flyway.ignore-migration-patterns");
         if (patterns != null) {
