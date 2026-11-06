@@ -163,7 +163,7 @@ class CatalogResourceIT {
         mockMvc.perform(get(ZONES).header(USER, "operatore.cc")).andExpect(status().isForbidden());
         mockMvc.perform(post(CATEGORIES).header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
                 .content("{\"name\": \"Prova\"}")).andExpect(status().isForbidden());
-        mockMvc.perform(get("/api/v1/catalogs/projects").header(USER, "admin")).andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/v1/catalogs/non-esiste").header(USER, "admin")).andExpect(status().isNotFound());
     }
 
     @Test
