@@ -858,6 +858,7 @@ export const it = {
       TAKE_CHARGE: 'Presa in carico',
       TAKE_OVER: 'Passata a un altro operatore',
       TRANSFER: 'Passata a un altro Tutor',
+      RELEASE: 'Tornata in coda',
       MATCH: 'Proposta all’azienda',
       FAST_TRACK_APPROVE: 'Corsia veloce approvata: proposta all’azienda',
       FAST_TRACK_REJECT: 'Corsia veloce rifiutata',
@@ -1029,6 +1030,37 @@ export const it = {
       noneInCatalog: 'Non ci sono progetti attivi.',
       toCatalogs: 'Aggiungili nei Cataloghi',
       loadError: 'Impossibile caricare l’utente o i progetti. Controlla la connessione e riprova.',
+    },
+    account: {
+      heading: 'Accesso e ruolo di {{name}}',
+      edit: 'Accesso e ruolo',
+      editFor: 'Accesso e ruolo di {{name}}',
+      self: 'Questo è il tuo utente: lo stato e il ruolo li cambia un altro ADMIN, così non resti mai senza accesso.',
+      blocked_one:
+        'Ha {{count}} segnalazione aperta come Tutor: prima di disattivarlo o cambiargli il ruolo spostala su un altro Tutor dello stesso progetto.',
+      blocked_other:
+        'Ha {{count}} segnalazioni aperte come Tutor: prima di disattivarlo o cambiargli il ruolo spostale su un altro Tutor dello stesso progetto.',
+      toTickets: 'Sposta le segnalazioni',
+      statusHeading: 'Accesso',
+      isActive: 'L’utente è attivo.',
+      isInactive: 'L’utente è disattivato.',
+      deactivateHint:
+        'Se lo disattivi non può più entrare in NEXUS e le sue sessioni si chiudono; i suoi ticket restano consultabili e lo storico resta.',
+      reactivateHint: 'Se lo riattivi può di nuovo entrare con la sua password.',
+      inCharge_one:
+        'Ha {{count}} ticket in carico come operatore: tornerà in coda e un collega potrà riprenderlo.',
+      inCharge_other:
+        'Ha {{count}} ticket in carico come operatore: torneranno in coda e un collega potrà riprenderli.',
+      deactivate: 'Disattiva l’utente',
+      reactivate: 'Riattiva l’utente',
+      roleHeading: 'Ruolo',
+      roleHint: 'Il nuovo ruolo vale dal prossimo accesso: le sessioni aperte si chiudono.',
+      changeRole: 'Cambia ruolo',
+      becomesTutor: 'Da Tutor vedrà solo i progetti assegnati: assegnaglieli dopo il cambio.',
+      deactivated: '{{name}} è disattivato: non può più accedere.',
+      reactivated: '{{name}} è di nuovo attivo.',
+      roleChanged: 'Il ruolo di {{name}} ora è {{role}}: vale dal prossimo accesso.',
+      loadError: 'Impossibile caricare l’utente. Controlla la connessione e riprova.',
     },
     tickets: {
       heading: 'Segnalazioni di {{name}}',
@@ -1350,6 +1382,9 @@ export const it = {
     },
     userTickets: {
       title: 'Segnalazioni dell’utente',
+    },
+    userAccount: {
+      title: 'Accesso e ruolo dell’utente',
     },
     tickets: {
       title: 'Segnalazioni',

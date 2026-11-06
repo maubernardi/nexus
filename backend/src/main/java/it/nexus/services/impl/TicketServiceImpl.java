@@ -5,7 +5,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,7 +113,6 @@ public class TicketServiceImpl implements TicketService {
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     /** Stati della coda: nuove segnalazioni e speciali non ancora prese in carico. */
-    private static final Set<TicketStatus> QUEUE_STATUSES = EnumSet.of(TicketStatus.NUOVA, TicketStatus.IN_LAVORAZIONE);
 
     private final TicketRepository ticketRepository;
     private final BeneficiaryRepository beneficiaryRepository;
@@ -251,6 +249,10 @@ public class TicketServiceImpl implements TicketService {
                 .flatMap(ticketRepository::findById)
                 .orElseThrow(() -> new NotFoundException("Segnalazione non trovata"));
         AppUser me = currentAppUserService.getCurrentAppUser();
+        if (ticket.getStatus() != TicketStatus.CLOSED && ticket.getStatus() != TicketStatus.IN_ATTESA_APPROVAZIONE
+                && !TicketTransitions.TAKE_CHARGE.from().contains(ticket.getStatus())) {
+            return mapper.toListItem(takeBack(ticket, expectedVersion, me));
+        }
         Ticket saved = stateMachine.apply(ticket, TicketTransitions.TAKE_CHARGE, expectedVersion, null, t -> {
             // una speciale in lavorazione può essere già assegnata: la coda mostra solo quelle libere
             if (t.getAssignedCcOperator() != null) {
@@ -260,6 +262,24 @@ public class TicketServiceImpl implements TicketService {
             return AuditChanges.of().value("assignedCcOperatorId", null, TsidMapper.toExternal(me.getId()));
         });
         return mapper.toListItem(saved);
+    }
+
+    /**
+     * Segnalazione più avanti nel percorso, tornata in coda perché l'operatore che l'aveva in carico è uscito (US-105):
+     * chi la prende la segue da dove era, senza cambiare stato.
+     */
+    private Ticket takeBack(Ticket ticket, long expectedVersion, AppUser me) {
+        if (ticket.getVersion() != expectedVersion) {
+            throw new ConflictException("La segnalazione è stata modificata nel frattempo: ricarica la pagina e riprova");
+        }
+        if (ticket.getAssignedCcOperator() != null) {
+            throw new ConflictException("La segnalazione n. %d è già stata presa in carico", ticket.getNumber());
+        }
+        ticket.setAssignedCcOperator(me);
+        Ticket saved = ticketRepository.saveAndFlush(ticket);
+        auditService.record(AuditEntityType.TICKET, saved.getId(), "TAKE_CHARGE",
+                AuditChanges.of().value("assignedCcOperatorId", null, TsidMapper.toExternal(me.getId())), null);
+        return saved;
     }
 
     @Override
@@ -297,7 +317,9 @@ public class TicketServiceImpl implements TicketService {
                 yield oldestFirst;
             }
             case TO_TAKE -> {
-                spec = spec.and(TicketSpecifications.statusIn(QUEUE_STATUSES)).and(TicketSpecifications.unassigned());
+                // libere: nuove, speciali non assegnate e quelle tornate in coda all'uscita dell'operatore (US-105)
+                spec = spec.and(TicketSpecifications.open()).and(TicketSpecifications.unassigned())
+                        .and(Specification.not(TicketSpecifications.status(TicketStatus.IN_ATTESA_APPROVAZIONE)));
                 yield Sort.by(Sort.Order.desc("fastTrack"), Sort.Order.asc("createdAt"), Sort.Order.asc("number"));
             }
             case ASSIGNED_TO_ME -> {
@@ -370,6 +392,9 @@ public class TicketServiceImpl implements TicketService {
                     userName(changed(event, "assignedCcOperatorId", "after")));
             case "TRANSFER" -> "%s → %s".formatted(userName(changed(event, "tutorId", "before")),
                     userName(changed(event, "tutorId", "after")));
+            case "RELEASE" -> Optional.ofNullable(userName(changed(event, "assignedCcOperatorId", "before")))
+                    .map(name -> name + " non è più disponibile: la segnalazione torna libera per un collega")
+                    .orElse(null);
             case "MATCH", "FAST_TRACK_APPROVE" -> Optional
                     .ofNullable(TsidMapper.toInternal(changed(event, "jobSlotId", "after")))
                     .flatMap(jobSlotRepository::findById)

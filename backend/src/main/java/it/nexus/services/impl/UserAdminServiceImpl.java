@@ -17,20 +17,25 @@ import org.springframework.transaction.annotation.Transactional;
 import it.nexus.config.ApplicationProperties;
 import it.nexus.domain.AppUser;
 import it.nexus.domain.Project;
+import it.nexus.domain.Ticket;
 import it.nexus.domain.UserProject;
 import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.UserCreateDTO;
 import it.nexus.domain.dto.UserCreatedDTO;
 import it.nexus.domain.dto.ReferenceItemDTO;
 import it.nexus.domain.dto.UserDTO;
+import it.nexus.domain.dto.UserImpactDTO;
 import it.nexus.domain.dto.UserProjectsDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.Role;
+import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.ProjectRepository;
+import it.nexus.repository.TicketRepository;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
+import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.UserAdminService;
 import it.nexus.services.identity.IdentityProviderException;
 import it.nexus.services.identity.IdentityProviderUsers;
@@ -56,6 +61,8 @@ public class UserAdminServiceImpl implements UserAdminService {
     private final AppUserRepository appUserRepository;
     private final ProjectRepository projectRepository;
     private final UserProjectRepository userProjectRepository;
+    private final TicketRepository ticketRepository;
+    private final CurrentAppUserService currentAppUserService;
     private final IdentityProviderUsers identityProviderUsers;
     private final AuditService auditService;
     private final ApplicationProperties applicationProperties;
@@ -201,6 +208,117 @@ public class UserAdminServiceImpl implements UserAdminService {
             identityProviderUsers.deleteUser(externalId);
         } catch (IdentityProviderException e) {
             log.error("Account Keycloak {} creato ma utente NEXUS non salvato: va rimosso dalla console", externalId);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserImpactDTO impact(String id) {
+        AppUser user = findUser(id);
+        return new UserImpactDTO(
+                ticketRepository.countByTutorIdAndStatusNot(user.getId(), TicketStatus.CLOSED),
+                ticketRepository.findByAssignedCcOperatorIdAndStatusNot(user.getId(), TicketStatus.CLOSED).size(),
+                isMe(user));
+    }
+
+    @Override
+    public UserDTO setActive(String id, boolean active) {
+        AppUser user = findUser(id);
+        if (user.isActive() == active) {
+            return toDto(user, assignedProjects(user));
+        }
+        if (isMe(user)) {
+            throw new BadRequestException("Non puoi disattivare il tuo utente: chiedi a un altro ADMIN");
+        }
+        AuditChanges changes = AuditChanges.of().value("active", !active, active);
+        if (!active) {
+            requireNoOpenTickets(user, "disattivarlo");
+            changes.merge(released(release(user)));
+        }
+        user.setActive(active);
+        appUserRepository.saveAndFlush(user);
+        auditService.record(AuditEntityType.APP_USER, user.getId(), active ? "REACTIVATE" : "DEACTIVATE", changes, null);
+        // Keycloak per ultimo: se non risponde la transazione si annulla e in NEXUS non cambia nulla
+        try {
+            identityProviderUsers.setEnabled(user.getExternalId(), active);
+        } catch (IdentityProviderException e) {
+            throw new ServiceUnavailableException(
+                    "Non è stato possibile aggiornare l'account di accesso: l'utente non è cambiato, riprova più tardi");
+        }
+        if (!active) {
+            logoutQuietly(user);
+        }
+        log.info("Utente {} {}", user, active ? "riattivato" : "disattivato");
+        return toDto(user, assignedProjects(user));
+    }
+
+    @Override
+    public UserDTO changeRole(String id, Role role) {
+        AppUser user = findUser(id);
+        Role before = user.getRole();
+        if (before == role) {
+            return toDto(user, assignedProjects(user));
+        }
+        if (isMe(user)) {
+            throw new BadRequestException("Non puoi cambiare il tuo ruolo: chiedi a un altro ADMIN");
+        }
+        requireNoOpenTickets(user, "cambiargli il ruolo");
+        AuditChanges changes = AuditChanges.of().value("role", before.name(), role.name());
+        // un Tutor non lavora i ticket del Call Center: quelli in carico tornano in coda
+        if (role == Role.TUTOR) {
+            changes.merge(released(release(user)));
+        }
+        user.setRole(role);
+        appUserRepository.saveAndFlush(user);
+        auditService.record(AuditEntityType.APP_USER, user.getId(), "ROLE_CHANGE", changes, null);
+        try {
+            identityProviderUsers.changeRole(user.getExternalId(), role);
+        } catch (IdentityProviderException e) {
+            throw new ServiceUnavailableException(
+                    "Non è stato possibile aggiornare l'account di accesso: il ruolo non è cambiato, riprova più tardi");
+        }
+        logoutQuietly(user);
+        log.info("Ruolo di {} cambiato: {} -> {}", user, before, role);
+        return toDto(user, assignedProjects(user));
+    }
+
+    private boolean isMe(AppUser user) {
+        return user.getId().equals(currentAppUserService.getCurrentAppUser().getId());
+    }
+
+    /** Le segnalazioni aperte di un Tutor non restano senza nessuno: prima si spostano (US-111, decisione del PO). */
+    private void requireNoOpenTickets(AppUser user, String action) {
+        long open = ticketRepository.countByTutorIdAndStatusNot(user.getId(), TicketStatus.CLOSED);
+        if (open > 0) {
+            throw new BadRequestException(("Ha %d segnalazion%s apert%s: prima di %s spostale su un altro Tutor dello "
+                    + "stesso progetto, con il pulsante Segnalazioni dell'elenco").formatted(open,
+                    open == 1 ? "e" : "i", open == 1 ? "a" : "e", action));
+        }
+    }
+
+    /** I ticket aperti in carico all'utente tornano liberi nella coda del Call Center (decisione del PO, 06/11). */
+    private int release(AppUser user) {
+        List<Ticket> inCharge = ticketRepository.findByAssignedCcOperatorIdAndStatusNot(user.getId(), TicketStatus.CLOSED);
+        String operatorId = TsidMapper.toExternal(user.getId());
+        for (Ticket ticket : inCharge) {
+            ticket.setAssignedCcOperator(null);
+            auditService.record(AuditEntityType.TICKET, ticket.getId(), "RELEASE",
+                    AuditChanges.of().value("assignedCcOperatorId", operatorId, null), null);
+        }
+        ticketRepository.saveAll(inCharge);
+        return inCharge.size();
+    }
+
+    private static AuditChanges released(int count) {
+        return count == 0 ? null : AuditChanges.of().value("releasedTickets", null, count);
+    }
+
+    /** Chiudere le sessioni è un di più: l'account è già aggiornato e il token vecchio scade in pochi minuti. */
+    private void logoutQuietly(AppUser user) {
+        try {
+            identityProviderUsers.logout(user.getExternalId());
+        } catch (IdentityProviderException e) {
+            log.warn("Sessioni di {} non chiuse: {}", user, e.getMessage());
         }
     }
 

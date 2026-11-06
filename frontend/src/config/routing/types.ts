@@ -25,5 +25,6 @@ export type RouteHandle = {
     | 'pages.userNew.title'
     | 'pages.userProjects.title'
     | 'pages.userTickets.title'
+    | 'pages.userAccount.title'
     | 'pages.forbidden.title';
 };

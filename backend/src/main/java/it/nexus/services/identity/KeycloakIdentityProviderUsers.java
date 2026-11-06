@@ -4,10 +4,12 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -20,6 +22,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 
 import it.nexus.config.ApplicationProperties;
+import it.nexus.domain.enumeration.Role;
 import it.nexus.services.identity.IdentityProviderException.Conflict;
 import lombok.extern.slf4j.Slf4j;
 
@@ -154,6 +157,92 @@ public class KeycloakIdentityProviderUsers implements IdentityProviderUsers {
                     .retrieve().toBodilessEntity();
             return null;
         });
+    }
+
+    @Override
+    public void setEnabled(String externalId, boolean enabled) {
+        call(enabled ? "riattivazione" : "disattivazione", token -> {
+            Map<String, Object> user = restClient.get().uri(USER, realm(), externalId)
+                    .headers(h -> h.setBearerAuth(token))
+                    .retrieve().body(JSON_OBJECT);
+            if (user == null) {
+                throw new IdentityProviderException("Utente Keycloak senza dati", Conflict.NONE, null);
+            }
+            user.put("enabled", enabled);
+            restClient.put().uri(USER, realm(), externalId)
+                    .headers(h -> h.setBearerAuth(token))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(user)
+                    .retrieve().toBodilessEntity();
+            return null;
+        });
+    }
+
+    @Override
+    public void changeRole(String externalId, Role role) {
+        call("cambio ruolo", token -> {
+            List<Map<String, Object>> assigned = realmRoles(token, externalId, "");
+            List<Map<String, Object>> old = assigned.stream()
+                    .filter(r -> Role.fromName(String.valueOf(r.get("name"))).filter(x -> x != role).isPresent())
+                    .map(KeycloakIdentityProviderUsers::reference)
+                    .toList();
+            boolean alreadyThere = assigned.stream().anyMatch(r -> role.name().equals(r.get("name")));
+            Map<String, Object> added = null;
+            if (!alreadyThere) {
+                added = realmRoles(token, externalId, "/available").stream()
+                        .filter(r -> role.name().equals(r.get("name")))
+                        .findFirst().map(KeycloakIdentityProviderUsers::reference)
+                        .orElseThrow(() -> new IdentityProviderException(
+                                "Ruolo " + role + " assente nel realm", Conflict.NONE, null));
+                roleMappings(HttpMethod.POST, token, externalId, List.of(added));
+            }
+            if (!old.isEmpty()) {
+                try {
+                    roleMappings(HttpMethod.DELETE, token, externalId, old);
+                } catch (RestClientException e) {
+                    // il vecchio ruolo non si toglie: si ritira il nuovo, l'account resta com'era
+                    Optional.ofNullable(added).ifPresent(r -> {
+                        try {
+                            roleMappings(HttpMethod.DELETE, token, externalId, List.of(r));
+                        } catch (RestClientException ignored) {
+                            log.error("Utente Keycloak {} con due ruoli NEXUS: va sistemato dalla console", externalId);
+                        }
+                    });
+                    throw e;
+                }
+            }
+            return null;
+        });
+    }
+
+    @Override
+    public void logout(String externalId) {
+        call("chiusura delle sessioni", token -> {
+            restClient.post().uri(USER + "/logout", realm(), externalId)
+                    .headers(h -> h.setBearerAuth(token))
+                    .retrieve().toBodilessEntity();
+            return null;
+        });
+    }
+
+    private List<Map<String, Object>> realmRoles(String token, String externalId, String suffix) {
+        List<Map<String, Object>> roles = restClient.get()
+                .uri(USER + "/role-mappings/realm" + suffix, realm(), externalId)
+                .headers(h -> h.setBearerAuth(token))
+                .retrieve().body(JSON_ARRAY);
+        return roles == null ? List.of() : roles;
+    }
+
+    private void roleMappings(HttpMethod method, String token, String externalId, List<Map<String, Object>> roles) {
+        restClient.method(method).uri(USER + "/role-mappings/realm", realm(), externalId)
+                .headers(h -> h.setBearerAuth(token))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(roles)
+                .retrieve().toBodilessEntity();
+    }
+
+    private static Map<String, Object> reference(Map<String, Object> role) {
+        return Map.of("id", role.get("id"), "name", role.get("name"));
     }
 
     private void deleteQuietly(String externalId) {

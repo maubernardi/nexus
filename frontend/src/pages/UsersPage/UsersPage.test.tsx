@@ -84,7 +84,16 @@ describe('<UsersPage>', () => {
     );
     // l'invito si reinvia solo agli utenti attivi; progetti e segnalazioni solo per i Tutor
     expect(within(rows[2]).queryByRole('button')).not.toBeInTheDocument();
-    expect(within(rows[2]).queryByRole('link')).not.toBeInTheDocument();
+    expect(
+      within(rows[2])
+        .getAllByRole('link')
+        .map((l) => l.textContent),
+    ).toEqual(['Accesso e ruolo']);
+    // accesso e ruolo per tutti (US-105)
+    expect(within(rows[2]).getByRole('link', { name: 'Accesso e ruolo di Verdi Anna' })).toHaveAttribute(
+      'href',
+      '/utenti/U2/accesso',
+    );
     expect(screen.getByRole('link', { name: 'Nuovo utente' })).toHaveAttribute('href', '/utenti/nuovo');
     await expectNoAxeViolations();
   });
@@ -119,5 +128,10 @@ describe('<UsersPage>', () => {
   it('conferma dopo il salvataggio dei progetti', async () => {
     renderPage({ projectsSaved: 'Mario Rossi' });
     expect(await screen.findByRole('status')).toHaveTextContent('Progetti di Mario Rossi aggiornati.');
+  });
+
+  it('esito di «Accesso e ruolo»', async () => {
+    renderPage({ notice: 'Mario Rossi è disattivato: non può più accedere.' });
+    expect(await screen.findByRole('status')).toHaveTextContent('Mario Rossi è disattivato');
   });
 });

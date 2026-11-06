@@ -28,7 +28,8 @@ public class KeycloakJwtConverter implements Converter<Jwt, AbstractAuthenticati
                 jwt.getClaimAsString("given_name"),
                 jwt.getClaimAsString("family_name"),
                 jwt.getClaimAsString("email"),
-                extractRoles(jwt));
+                extractRoles(jwt),
+                jwt.getIssuedAt());
         return new UserAuthenticationToken(user, jwt);
     }
 

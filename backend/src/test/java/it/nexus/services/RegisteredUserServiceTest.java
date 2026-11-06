@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import it.nexus.config.security.AuthenticatedUser;
 import it.nexus.config.security.UserNotEnabledException;
@@ -80,5 +82,22 @@ class RegisteredUserServiceTest {
         service.verifyAndSyncRole(principal(Set.of()));
 
         assertThat(user.getRole()).isEqualTo(Role.CALL_CENTER);
+    }
+
+    @Test
+    void verify_keepsRole_whenTokenOlderThanLastChangeInNexus() {
+        // l'ADMIN ha cambiato il ruolo (US-105) dopo l'emissione del token: il ruolo vecchio non torna indietro
+        AppUser user = TestEntities.user("tutor1", Role.CALL_CENTER, "sub-1");
+        ReflectionTestUtils.setField(user, "updatedAt", Instant.parse("2026-11-06T10:00:00Z"));
+        when(appUserRepository.findByExternalId("sub-1")).thenReturn(Optional.of(user));
+
+        service.verifyAndSyncRole(new AuthenticatedUser("sub-1", "tutor1", "T", "U", "t@x.it", Set.of(Role.TUTOR),
+                Instant.parse("2026-11-06T09:58:00Z")));
+        assertThat(user.getRole()).isEqualTo(Role.CALL_CENTER);
+
+        // al login successivo il token nuovo riallinea come sempre (es. ruolo cambiato dalla console di Keycloak)
+        service.verifyAndSyncRole(new AuthenticatedUser("sub-1", "tutor1", "T", "U", "t@x.it", Set.of(Role.ADMIN),
+                Instant.parse("2026-11-06T10:05:00Z")));
+        assertThat(user.getRole()).isEqualTo(Role.ADMIN);
     }
 }

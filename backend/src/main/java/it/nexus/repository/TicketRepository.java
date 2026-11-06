@@ -20,6 +20,12 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecif
     /** Segnalazioni del Tutor non chiuse, per lo spostamento (US-111). */
     List<Ticket> findByTutorIdAndStatusNotOrderByNumberAsc(Long tutorId, TicketStatus closed);
 
+    /** Segnalazioni aperte di cui l'utente è il Tutor: bloccano disattivazione e cambio di ruolo (US-105). */
+    long countByTutorIdAndStatusNot(Long tutorId, TicketStatus closed);
+
+    /** Ticket aperti in carico all'operatore: tornano in coda quando esce (US-105). */
+    List<Ticket> findByAssignedCcOperatorIdAndStatusNot(Long operatorId, TicketStatus closed);
+
     /** Segnalazioni non concluse dei beneficiari indicati (al più una per beneficiario). */
     List<Ticket> findByBeneficiaryIdInAndStatusNot(Collection<Long> beneficiaryIds, TicketStatus closed);
 

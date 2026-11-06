@@ -17,8 +17,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.nexus.domain.dto.UserCreateDTO;
 import it.nexus.domain.dto.UserCreatedDTO;
+import it.nexus.domain.dto.UserActiveDTO;
 import it.nexus.domain.dto.UserDTO;
+import it.nexus.domain.dto.UserImpactDTO;
 import it.nexus.domain.dto.UserProjectsDTO;
+import it.nexus.domain.dto.UserRoleDTO;
 import it.nexus.services.UserAdminService;
 import it.nexus.web.rest.PathAPI;
 import jakarta.validation.Valid;
@@ -66,5 +69,26 @@ public class UserResource {
     @Operation(summary = "Sostituisce i progetti assegnati a un Tutor (US-104)")
     public ResponseEntity<UserDTO> updateProjects(@PathVariable String id, @RequestBody @Valid UserProjectsDTO dto) {
         return ResponseEntity.ok(userAdminService.updateProjects(id, dto));
+    }
+
+    @GetMapping("/{id}/impact")
+    @PreAuthorize("hasRole(@requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Segnalazioni aperte e ticket in carico: cosa tocca disattivare l'utente o cambiarne il ruolo")
+    public ResponseEntity<UserImpactDTO> impact(@PathVariable String id) {
+        return ResponseEntity.ok(userAdminService.impact(id));
+    }
+
+    @PutMapping("/{id}/active")
+    @PreAuthorize("hasRole(@requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Disattiva o riattiva l'utente in NEXUS e in Keycloak (US-105)")
+    public ResponseEntity<UserDTO> setActive(@PathVariable String id, @RequestBody @Valid UserActiveDTO dto) {
+        return ResponseEntity.ok(userAdminService.setActive(id, dto.active()));
+    }
+
+    @PutMapping("/{id}/role")
+    @PreAuthorize("hasRole(@requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Cambia il ruolo in NEXUS e in Keycloak; vale dal login successivo (US-105)")
+    public ResponseEntity<UserDTO> changeRole(@PathVariable String id, @RequestBody @Valid UserRoleDTO dto) {
+        return ResponseEntity.ok(userAdminService.changeRole(id, dto.role()));
     }
 }

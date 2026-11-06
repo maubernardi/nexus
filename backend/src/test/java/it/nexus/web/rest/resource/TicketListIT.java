@@ -114,12 +114,13 @@ class TicketListIT {
         special.setBoardPost(post);
         fastTrack = arrivedHoursAgo(tickets.save(special), 1);
 
-        // fuori coda: già assegnato a un operatore, oppure in una fase successiva
+        // fuori coda: già assegnato a un operatore, anche in una fase successiva (un collega la segue)
         Ticket assigned = TestEntities.ticket(tutor, gol, inNorth2, category);
         assigned.setAssignedCcOperator(operator);
         assignedNum = arrivedHoursAgo(tickets.save(assigned), 5);
         Ticket advanced = TestEntities.ticket(tutor, gol, inNorth3, category);
         advanced.setStatus(TicketStatus.PROPOSTA_AZIENDA);
+        advanced.setAssignedCcOperator(users.save(TestEntities.user("operatore.due", Role.CALL_CENTER)));
         advancedNum = arrivedHoursAgo(tickets.save(advanced), 6);
 
         // un collega dello stesso progetto GOL: tutor1 vede le sue segnalazioni nella vista "Del mio progetto"
