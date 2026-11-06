@@ -119,18 +119,19 @@ chi usa un lettore di schermo sa di quale progetto si parla.
 
 **R2, R3** — ✅ complete.
 
-**R4** — *produzione*: con lo Sprint 9 fatta tutta la gestione di utenti e progetti: **36 punti su 71**. Restano:
+**R4** — *produzione*: con lo Sprint 9 fatta tutta la gestione di utenti e progetti: **36 punti su 73** (US-113 a 7
+punti, §8.4). Restano:
 
 | Gruppo | Storie | Punti |
 |---|---|---|
-| Accesso | US-1308 recupero password (2), US-113 registro degli accessi (5) | 7 |
+| Accesso | US-1308 recupero password (2), US-113 registro degli accessi (7) | 9 |
 | Dati | US-1302 backup (5), US-1303 anonimizzazione a scadenza (5) | 10 |
 | Produzione | US-1305 revisione UX/UI (8), US-1306 passaggio in produzione (5), US-1307 monitoraggio e sicurezza (5) | 18 |
 
 Con la velocity media (23) R4 si chiude in **due sprint**: lo Sprint 10 per accesso, dati e monitoraggio, lo Sprint 11
 per la revisione UX/UI e il passaggio in produzione.
 
-**Product backlog:** 73 elementi attivi, 263 punti; completati 64 elementi (222 punti) negli Sprint 1–9.
+**Product backlog:** 73 elementi attivi, 265 punti; completati 64 elementi (222 punti) negli Sprint 1–9.
 
 ## 7. Retrospettiva
 
@@ -192,6 +193,12 @@ versione buona.
 
 > ✅ **Deciso (PO, 06/11): proposta accettata**, a qualunque ora (la demo non è ancora usata): è il primo passo dello
 > Sprint 10.
+>
+> 🎉 **Fatto (06/11):** la causa era il profilo `seed` della demo, che toglieva a Flyway la regola «ignora le migrazioni
+> di una release più nuova»: corretta con un test che la riproduce
+> ([#110](https://github.com/maubernardi/nexus/pull/110)). La prova sul server è riuscita: una release fatta apposta
+> ha applicato la V30 e non è partita, la precedente è ripartita da sola
+> ([#111](https://github.com/maubernardi/nexus/pull/111)).
 
 ### 8.4 Registro degli accessi (US-113)
 Decisioni già prese (06/11): data, ora, IP ed esito, anche i tentativi falliti; lo vedono l'ADMIN e l'utente;
@@ -256,10 +263,13 @@ passo sul server: te lo do come lista completa (A15). US-1302 (backup) resta nel
 11 US-1305 (revisione UX/UI, da raffinare insieme in una sessione dedicata) e US-1306 (passaggio in produzione), che
 dipende dal backup.
 
+> ✅ **Deciso (PO, 06/11): piano confermato** (19 punti; extra US-205). A16 già fatta prima dell'inizio. Sprint 10:
+> [sprint-10.md](sprint-10.md).
+
 ## 10. Azioni a carico del PO
 
 - [x] Decidere i punti §8.1–§8.7 (06/11).
-- [ ] Confermare il planning (§9).
+- [x] Confermare il planning (§9, 06/11).
 - [ ] Collaudo sulla versione `e30269f`: sezione 20 (T-20.2–T-20.8), poi T-13.4, sezioni 16–17, T-19.2.
 - [ ] US-1301: PWA su Android e iOS (collaudo T-10.1).
 - [x] Prova del primo utente creato da NEXUS (T-20.1, 06/11).

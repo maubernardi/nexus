@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 15 | 71 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 15 | 73 |
 
 ## Domande aperte per il Product Owner
 
@@ -69,7 +69,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-110](#us-110) | E1 | Cambio del proprio indirizzo email con codice | Must | 8 | R4 | 🎉 Done (fuori piano, 05/11) |
 | [US-111](#us-111) | E1 | Spostamento delle segnalazioni tra Tutor | Must | 5 | R4 | 🎉 Done (Sprint 9) |
 | [US-112](#us-112) | E1 | Coordinatore di progetto | Must | 3 | R4 | 🎉 Done (Sprint 9) |
-| [US-113](#us-113) | E1 | Registro degli accessi | Must | 5 | R4 | ✅ Ready |
+| [US-113](#us-113) | E1 | Registro degli accessi | Must | 7 | R4 | ✅ Ready (Sprint 10) |
 | [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
@@ -124,11 +124,11 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1301](#us-1301) | E13 | Verifica della PWA online | Must | 1 | R1 | 📋 Backlog |
 | [US-1302](#us-1302) | E13 | Backup del database | Must | 5 | R4 | 📋 Backlog |
-| [US-1303](#us-1303) | E13 | Anonimizzazione a scadenza | Must | 5 | R4 | 📋 Backlog |
+| [US-1303](#us-1303) | E13 | Anonimizzazione a scadenza | Must | 5 | R4 | ✅ Ready (Sprint 10) |
 | [US-1304](#us-1304) | E13 | Tema di Keycloak | Should | 3 | R4 | 🎉 Done (Sprint 7, fuori piano) |
 | [US-1305](#us-1305) | E13 | Revisione UX/UI | Should | 8 | R4 | 📋 Backlog |
 | [US-1306](#us-1306) | E13 | Passaggio in produzione | Must | 5 | R4 | 📋 Backlog |
-| [US-1307](#us-1307) | E13 | Monitoraggio e revisione di sicurezza | Must | 5 | R4 | 📋 Backlog |
+| [US-1307](#us-1307) | E13 | Monitoraggio e revisione di sicurezza | Must | 5 | R4 | ✅ Ready (Sprint 10) |
 | [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | ✅ Ready (Sprint 10) |
 
 ## Dettaglio per epica
@@ -273,7 +273,7 @@ Criteri di accettazione:
 Dipendenze: US-104, US-111
 
 #### US-113
-**Registro degli accessi** · Must · 5 punti · R4 · ✅ Ready
+**Registro degli accessi** · Must · 7 punti · R4 · ✅ Ready (Sprint 10)
 
 Come **ADMIN** voglio vedere, per ogni utente, quando e da dove è entrato in NEXUS per accorgermi di accessi anomali.
 Richiesta del PO del 06/11.
@@ -283,6 +283,8 @@ Criteri di accettazione:
   come «Non riuscito» (decisione del PO, 06/11).
 - L'ADMIN consulta il registro di ogni utente dalla pagina Utenti; ogni utente vede i propri accessi nel Profilo.
 - Gli accessi si conservano 12 mesi, poi si cancellano da soli: l'IP è un dato personale (decisione del PO, 06/11).
+- Una pagina dell'ADMIN mostra tutti i tentativi falliti, anche con uno username inesistente (review dello Sprint 9,
+  §8.4: da 5 a 7 punti).
 - Ipotesi tecnica: eventi di accesso di Keycloak (con IP e scadenza), letti da NEXUS; attivarli nel realm è un passo
   manuale sul server.
 
@@ -960,7 +962,7 @@ Criteri di accettazione:
 - Il ripristino di prova su un ambiente pulito riesce ed è documentato.
 
 #### US-1303
-**Anonimizzazione a scadenza** · Must · 5 punti · R4 · 📋 Backlog
+**Anonimizzazione a scadenza** · Must · 5 punti · R4 · ✅ Ready (Sprint 10)
 
 Come **responsabile della privacy** voglio che i dati identificativi dei beneficiari siano anonimizzati alla scadenza della conservazione per rispettare il GDPR.
 
@@ -997,12 +999,14 @@ Criteri di accettazione:
 Dipendenze: US-102..105, US-1302, US-1307
 
 #### US-1307
-**Monitoraggio e revisione di sicurezza** · Must · 5 punti · R4 · 📋 Backlog
+**Monitoraggio e revisione di sicurezza** · Must · 5 punti · R4 · ✅ Ready (Sprint 10)
 
 Come **ADMIN** voglio essere avvisato se l'app non risponde e avere una revisione di sicurezza prima della produzione per reagire ai problemi prima degli utenti.
 
 Criteri di accettazione:
 - Controllo di disponibilità esterno con avviso; checklist OWASP ASVS di livello 1 verificata.
+- Il controllo gira dalla CI di GitHub ogni 10 minuti, solo dalle 8 alle 20, con un'email al PO se fallisce (review
+  dello Sprint 9, §8.7).
 
 #### US-1308
 **Recupero password** · Should · 2 punti · R4 · ✅ Ready (Sprint 10)
