@@ -1,0 +1,53 @@
+name: Stato del server
+
+# A16: stato dei container e log recenti della demo, in sola lettura, con la stessa chiave del deploy (forced command
+# nexus-deploy). Solo backend e postgres: i log delle Actions di un repository pubblico sono pubblici, Keycloak e Caddy
+# registrano utenti e indirizzi IP.
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: Cosa leggere
+        type: choice
+        options: [status, logs]
+        default: status
+      service:
+        description: Servizio (solo per logs)
+        type: choice
+        options: [backend, postgres]
+        default: backend
+      lines:
+        description: Righe di log (1–2000)
+        type: string
+        default: "200"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: server-status
+  cancel-in-progress: false
+
+jobs:
+  read:
+    name: Lettura dal server
+    runs-on: ubuntu-26.04
+    environment:
+      name: demo
+    steps:
+      - name: Stato o log (sola lettura)
+        env:
+          COMMAND: ${{ inputs.command }}
+          SERVICE: ${{ inputs.service }}
+          LINES: ${{ inputs.lines }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          [[ "$LINES" =~ ^[0-9]{1,4}$ ]] || { echo "Righe non valide"; exit 1; }
+          if [[ "$COMMAND" == logs ]]; then remote="logs $SERVICE $LINES"; else remote="status"; fi
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes "deploy@$DEPLOY_HOST" "$remote" </dev/null
+          rm -f ~/.ssh/deploy
