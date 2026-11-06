@@ -16,8 +16,8 @@ cui erano, senza che lo stato cambi. Il Tutor SHALL NOT accedere a questa vista.
 - **WHEN** la coda contiene un ticket fast-track arrivato dopo alcuni ticket normali
 - **THEN** il fast-track è il primo e ha un badge con il testo "Fast-track"
 
-#### Scenario: Ticket assegnati
-- **WHEN** un ticket è assegnato a un operatore, in qualunque fase
+#### Scenario: Ticket assegnati o avanzati
+- **WHEN** un ticket è assegnato a un operatore, in qualunque fase, oppure è in attesa di approvazione della tipologia
 - **THEN** non compare in "Da prendere in carico"
 
 #### Scenario: Ticket tornato in coda

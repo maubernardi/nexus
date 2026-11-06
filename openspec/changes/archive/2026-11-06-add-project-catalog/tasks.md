@@ -10,4 +10,4 @@
 ## 3. Consegna
 
 - [x] 3.1 Collaudo T-13.5
-- [ ] 3.2 PR con CI verde
+- [x] 3.2 PR con CI verde

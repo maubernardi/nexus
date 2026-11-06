@@ -14,5 +14,5 @@
 
 ## 4. Consegna
 
-- [ ] 4.1 PR con CI verde
-- [ ] 4.2 Sul server: `keycloak-email.sh` dopo il deploy, poi prova reale con un nuovo utente
+- [x] 4.1 PR con CI verde
+- [x] 4.2 Sul server: `keycloak-email.sh` dopo il deploy, poi prova reale con un nuovo utente

@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 14 | 66 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 15 | 71 |
 
 ## Domande aperte per il Product Owner
 
@@ -59,16 +59,17 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [EN-1](#en-1) | E3 | Motore delle transizioni del ticket | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [EN-2](#en-2) | E13 | Audit di ogni cambio di stato e scelta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-101](#us-101) | E1 | Messaggio "utente non abilitato" | Should | 1 | R1 | 🎉 Done (Sprint 1) |
-| [US-102](#us-102) | E1 | Gestione progetti | Must | 3 | R4 | ✅ Ready (Sprint 9) |
-| [US-103](#us-103) | E1 | Creazione utente | Must | 8 | R4 | ✅ Ready (Sprint 9) |
-| [US-104](#us-104) | E1 | Assegnazione utenti ai progetti | Must | 3 | R4 | ✅ Ready (Sprint 9) |
-| [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | ✅ Ready (Sprint 9) |
+| [US-102](#us-102) | E1 | Gestione progetti | Must | 3 | R4 | 🎉 Done (Sprint 9) |
+| [US-103](#us-103) | E1 | Creazione utente | Must | 8 | R4 | 🎉 Done (Sprint 9) |
+| [US-104](#us-104) | E1 | Assegnazione utenti ai progetti | Must | 3 | R4 | 🎉 Done (Sprint 9) |
+| [US-105](#us-105) | E1 | Disattivazione e cambio ruolo | Must | 3 | R4 | 🎉 Done (Sprint 9) |
 | [US-106](#us-106) | E1 | Cataloghi di zone e tipologie di mansione | Must | 3 | R2 | 🎉 Done (Sprint 7) |
 | [US-108](#us-108) | E1 | Tipi di tirocinio | Must | 1 | R3 | 🎉 Done (Sprint 7) |
 | [US-109](#us-109) | E1 | Cataloghi del report di restituzione | Must | 2 | R3 | 🎉 Done (Sprint 8) |
 | [US-110](#us-110) | E1 | Cambio del proprio indirizzo email con codice | Must | 8 | R4 | 🎉 Done (fuori piano, 05/11) |
-| [US-111](#us-111) | E1 | Spostamento delle segnalazioni tra Tutor | Must | 5 | R4 | ✅ Ready (Sprint 9) |
-| [US-112](#us-112) | E1 | Coordinatore di progetto | Must | 3 | R4 | ✅ Ready (Sprint 9) |
+| [US-111](#us-111) | E1 | Spostamento delle segnalazioni tra Tutor | Must | 5 | R4 | 🎉 Done (Sprint 9) |
+| [US-112](#us-112) | E1 | Coordinatore di progetto | Must | 3 | R4 | 🎉 Done (Sprint 9) |
+| [US-113](#us-113) | E1 | Registro degli accessi | Must | 5 | R4 | ✅ Ready |
 | [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
@@ -145,7 +146,7 @@ Criteri di accettazione:
 - Dato un utente che riceve 403 "Utente non abilitato a NEXUS", quando apre l'app, allora vede un messaggio dedicato con l'indicazione di contattare l'amministratore e il pulsante Esci, senza "Riprova".
 
 #### US-102
-**Gestione progetti** · Must · 3 punti · R4 · ✅ Ready (Sprint 9)
+**Gestione progetti** · Must · 3 punti · R4 · 🎉 Done (Sprint 9)
 
 Come **ADMIN** voglio creare, modificare e disattivare i progetti (es. GOL, POLIS) per abilitare nuovi finanziamenti senza interventi tecnici.
 
@@ -154,7 +155,7 @@ Criteri di accettazione:
 - Quando disattivo un progetto, allora non è più selezionabile per nuove segnalazioni ma lo storico resta consultabile.
 
 #### US-103
-**Creazione utente** · Must · 8 punti · R4 · ✅ Ready (Sprint 9)
+**Creazione utente** · Must · 8 punti · R4 · 🎉 Done (Sprint 9)
 
 Come **ADMIN** voglio creare un utente con ruolo in NEXUS e in Keycloak in un'unica operazione per abilitare nuovi tutor e operatori senza usare la console di Keycloak.
 
@@ -169,7 +170,7 @@ Decisioni del PO (review dello Sprint 8, §8.7–§8.8): l'email per impostare l
 stesso SMTP di IONOS (password inserita dal PO); lo username lo scrive l'ADMIN, con il suggerimento `nome.cognome`.
 
 #### US-104
-**Assegnazione utenti ai progetti** · Must · 3 punti · R4 · ✅ Ready (Sprint 9)
+**Assegnazione utenti ai progetti** · Must · 3 punti · R4 · 🎉 Done (Sprint 9)
 
 Come **ADMIN** voglio assegnare e rimuovere progetti a un utente per regolare la visibilità dei ticket tra tutor.
 
@@ -177,7 +178,7 @@ Criteri di accettazione:
 - Quando assegno un progetto a un tutor, allora vede in sola lettura i ticket di quel progetto (US-304).
 
 #### US-105
-**Disattivazione e cambio ruolo** · Must · 3 punti · R4 · ✅ Ready (Sprint 9)
+**Disattivazione e cambio ruolo** · Must · 3 punti · R4 · 🎉 Done (Sprint 9)
 
 Come **ADMIN** voglio disattivare/riattivare un utente e cambiarne il ruolo per gestire uscite e cambi di mansione senza perdere lo storico.
 
@@ -245,7 +246,7 @@ Criteri di accettazione:
 - Un indirizzo già usato da un altro utente è rifiutato. Il cambio si registra nell'audit, senza gli indirizzi.
 
 #### US-111
-**Spostamento delle segnalazioni tra Tutor** · Must · 5 punti · R4 · ✅ Ready (Sprint 9)
+**Spostamento delle segnalazioni tra Tutor** · Must · 5 punti · R4 · 🎉 Done (Sprint 9)
 
 Come **ADMIN** voglio spostare le segnalazioni aperte di un Tutor su un altro Tutor dello stesso progetto per non
 lasciarle senza nessuno quando un Tutor esce o cambia mansione. Richiesta del PO del 06/11, nel definire US-105.
@@ -258,7 +259,7 @@ Criteri di accettazione:
 - Il nuovo Tutor riceve una notifica; lo spostamento si registra nell'audit e nella cronologia della segnalazione.
 
 #### US-112
-**Coordinatore di progetto** · Must · 3 punti · R4 · ✅ Ready (Sprint 9)
+**Coordinatore di progetto** · Must · 3 punti · R4 · 🎉 Done (Sprint 9)
 
 Come **Coordinatore** di un progetto (un Tutor con un permesso in più) voglio spostare le segnalazioni tra i Tutor del
 mio progetto per riorganizzare il lavoro senza passare dall'ADMIN. Richiesta del PO del 06/11.
@@ -270,6 +271,22 @@ Criteri di accettazione:
 - Un progetto può avere più Coordinatori; non serve un nuovo ruolo in Keycloak.
 
 Dipendenze: US-104, US-111
+
+#### US-113
+**Registro degli accessi** · Must · 5 punti · R4 · ✅ Ready
+
+Come **ADMIN** voglio vedere, per ogni utente, quando e da dove è entrato in NEXUS per accorgermi di accessi anomali.
+Richiesta del PO del 06/11.
+
+Criteri di accettazione:
+- Ogni accesso registra data, ora, indirizzo IP ed esito; anche i tentativi falliti (es. password sbagliata), distinti
+  come «Non riuscito» (decisione del PO, 06/11).
+- L'ADMIN consulta il registro di ogni utente dalla pagina Utenti; ogni utente vede i propri accessi nel Profilo.
+- Gli accessi si conservano 12 mesi, poi si cancellano da soli: l'IP è un dato personale (decisione del PO, 06/11).
+- Ipotesi tecnica: eventi di accesso di Keycloak (con IP e scadenza), letti da NEXUS; attivarli nel realm è un passo
+  manuale sul server.
+
+Dipendenze: US-103
 
 #### EN-3
 **Zone iniziali: Firenze e hinterland** · Must · 2 punti · R1 · 🎉 Done (Sprint 2)
