@@ -7,5 +7,5 @@
 ## 2. Consegna
 
 - [x] 2.1 Collaudo
-- [ ] 2.2 PR con CI verde
+- [x] 2.2 PR con CI verde
 - [ ] 2.3 Sul server: deploy, poi `keycloak-password-reset.sh`
