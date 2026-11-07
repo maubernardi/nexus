@@ -29,8 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class EmailChangeMailer {
 
-    static final String CODE_SUBJECT = "NEXUS · codice per confermare il nuovo indirizzo email";
-    static final String NOTICE_SUBJECT = "NEXUS · il tuo indirizzo email è stato cambiato";
+    static final String CODE_SUBJECT = EmailSignature.SUBJECT_PREFIX + "Codice per confermare il nuovo indirizzo email";
+    static final String NOTICE_SUBJECT = EmailSignature.SUBJECT_PREFIX + "Il tuo indirizzo email è stato cambiato";
     private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm").withZone(TimeConfig.ZONE);
     private static final String FOOTER = """
 

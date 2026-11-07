@@ -69,7 +69,9 @@ def body(message: email.message.EmailMessage) -> str:
 
 
 def signed(message: email.message.EmailMessage) -> None:
-    """Firma «Portale Nexus» in fondo, nel testo semplice e nell'HTML (richiesta del PO del 07/11)."""
+    """Oggetto con «PORTALE NEXUS - » e firma «Portale Nexus» in fondo, nel testo e nell'HTML (PO, 07/11)."""
+    if not str(message["Subject"]).startswith("PORTALE NEXUS - "):
+        sys.exit(f"Oggetto senza «PORTALE NEXUS - »: «{message['Subject']}»")
     for kind in ("plain", "html"):
         part = message.get_body(preferencelist=(kind,))
         if part is None or "Portale Nexus" not in part.get_content().strip()[-60:]:

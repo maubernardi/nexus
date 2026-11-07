@@ -47,6 +47,6 @@ public record NotificationEmail(String subject, String body) {
                 Messaggio automatico di NEXUS, non rispondere. Trovi tutte le notifiche anche nell'app, alla voce \
                 Notifiche.
                 """.formatted(text, appUrl, ticketId) + EmailSignature.BLOCK;
-        return new NotificationEmail("NEXUS · segnalazione n. %d".formatted(ticketNumber), body);
+        return new NotificationEmail(EmailSignature.SUBJECT_PREFIX + "Segnalazione n. %d".formatted(ticketNumber), body);
     }
 }
