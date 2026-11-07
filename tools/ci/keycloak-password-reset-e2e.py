@@ -1,10 +1,11 @@
 """Prova completa del recupero della password con un Keycloak vero (US-1308), per la CI.
 
 Fa da server di posta (SMTP minimo, solo libreria standard) e da utente:
-«Password dimenticata?» -> email con il collegamento -> nuova password -> email di sicurezza.
-Verifica che arrivino esattamente due email, e che il cambio non ne mandi altre.
+«Password dimenticata?» -> email con il collegamento; password sbagliata -> nessuna email;
+accesso con aggiornamento della password -> email di sicurezza. Esattamente due email in tutto.
 
-Uso: python3 -I keycloak-password-reset-e2e.py <url keycloak> <username> <email>
+Uso: python3 -I keycloak-password-reset-e2e.py <url keycloak> <username> <email> <password attuale>
+L'utente deve avere l'azione richiesta UPDATE_PASSWORD (la imposta la CI).
 Keycloak deve inviare la posta a questo host sulla porta 2525.
 """
 
@@ -16,6 +17,7 @@ import socketserver
 import sys
 import threading
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from http.cookiejar import CookieJar, DefaultCookiePolicy
@@ -72,7 +74,7 @@ def form(page: str) -> str:
 
 
 def main() -> None:
-    base, username, address = sys.argv[1:4]
+    base, username, address, old_password = sys.argv[1:5]
     server = socketserver.ThreadingTCPServer(("0.0.0.0", SMTP_PORT), SmtpSink)
     server.daemon_threads = True
     threading.Thread(target=server.serve_forever, daemon=True).start()
@@ -123,28 +125,35 @@ def main() -> None:
         sys.exit("Nessun collegamento nell'email:\n" + body(first))
     print(f"1. Email del collegamento: «{first['Subject']}»")
 
-    # 2. il collegamento porta alla nuova password (a volte dopo una pagina «procedi»)
-    # l'host nel collegamento è quello visto da Keycloak: si tiene il percorso, sull'indirizzo della prova
-    target = urllib.parse.urlsplit(html.unescape(action.group(1)))
-    print(f"   collegamento verso {target.scheme}://{target.netloc}")
-    page = get(urllib.parse.urljoin(base, target.path + "?" + target.query))
+    # 2. una password sbagliata non manda email (il filtro dell'immagine lascia passare solo il cambio di password)
+    jar.clear()
+    page = get(auth)
+    post(urllib.parse.urljoin(base, form(page)), {"username": username, "password": "sbagliata"})
+    time.sleep(5)
+    if len(MESSAGES) != 1:
+        sys.exit("Una password sbagliata ha mandato un'email: " + str(MESSAGES[-1]["Subject"]))
+    print("2. Password sbagliata: nessuna email")
+
+    # 3. cambio della password: la CI ha chiesto a Keycloak di farla aggiornare al prossimo accesso
+    jar.clear()
+    page = post(urllib.parse.urljoin(base, form(get(auth))), {"username": username, "password": old_password})
     if 'name="password-new"' not in page:
-        proceed = re.search(r'href="([^"]*login-actions/[^"]+)"', page)
-        if not proceed:
-            sys.exit("Il collegamento non porta alla nuova password:\n" + page[:2000])
-        page = get(urllib.parse.urljoin(base, html.unescape(proceed.group(1))))
+        sys.exit("Dopo l'accesso manca la pagina della nuova password:\n" + page[:2000])
     if 'class="nexus-header"' not in page:
         sys.exit("La pagina della nuova password non usa il tema di NEXUS")
-    post(urllib.parse.urljoin(base, form(page)),
-         {"password-new": NEW_PASSWORD, "password-confirm": NEW_PASSWORD})
+    try:
+        post(urllib.parse.urljoin(base, form(page)),
+             {"password-new": NEW_PASSWORD, "password-confirm": NEW_PASSWORD})
+    except urllib.error.URLError:
+        pass  # accesso completato: Keycloak rimanda alla PWA, che nella CI non c'è
 
-    # 3. l'email di sicurezza, una sola
+    # 4. l'email di sicurezza, una sola
     wait_for_messages(2)
     time.sleep(5)
     second = MESSAGES[1]
     if address not in second["To"]:
         sys.exit(f"Email di sicurezza al destinatario sbagliato: {second['To']}")
-    print(f"2. Email di sicurezza: «{second['Subject']}»")
+    print(f"3. Email di sicurezza: «{second['Subject']}»")
     if len(MESSAGES) != 2:
         sys.exit(f"Attese 2 email, arrivate {len(MESSAGES)}: " + ", ".join(str(m["Subject"]) for m in MESSAGES))
     print("Recupero della password ed email di sicurezza: OK")

@@ -106,7 +106,9 @@ jobs:
           # la posta di Keycloak va al server SMTP di prova dello script, su questo host
           kcadm update realms/nexus -s smtpServer.host=host.docker.internal -s smtpServer.port=2525 \
             -s smtpServer.from=noreply@nexus.local -s smtpServer.fromDisplayName=NEXUS
-          python3 -I tools/ci/keycloak-password-reset-e2e.py http://localhost:8080 tutor1 tutor1@nexus.local
+          # al prossimo accesso tutor1 deve aggiornare la password: è il cambio che fa partire l'email di sicurezza
+          kcadm update users/00000000-0000-4000-8000-000000000001 -r nexus -s 'requiredActions=["UPDATE_PASSWORD"]'
+          python3 -I tools/ci/keycloak-password-reset-e2e.py http://localhost:8080 tutor1 tutor1@nexus.local password
       - name: Log di Keycloak
         if: failure()
         run: docker logs kc
