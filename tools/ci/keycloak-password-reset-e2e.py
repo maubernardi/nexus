@@ -77,15 +77,25 @@ def main() -> None:
     server.daemon_threads = True
     threading.Thread(target=server.serve_forever, daemon=True).start()
 
-    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(CookieJar()))
+    jar = CookieJar()
+    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+
+    def insecure_cookies() -> None:
+        # Keycloak marca i cookie della sessione come Secure: su http://localhost la CookieJar non li rimanderebbe
+        for cookie in jar:
+            cookie.secure = False
 
     def get(url: str) -> str:
         with opener.open(url) as response:
-            return response.read().decode()
+            page = response.read().decode()
+        insecure_cookies()
+        return page
 
     def post(url: str, fields: dict[str, str]) -> str:
         with opener.open(url, urllib.parse.urlencode(fields).encode()) as response:
-            return response.read().decode()
+            page = response.read().decode()
+        insecure_cookies()
+        return page
 
     auth = (f"{base}/realms/nexus/protocol/openid-connect/auth?client_id=nexus-frontend"
             "&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2F&response_type=code&scope=openid"
