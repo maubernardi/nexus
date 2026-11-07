@@ -10,4 +10,4 @@
 ## 3. Consegna
 
 - [x] 3.1 Dati demo e collaudo
-- [ ] 3.2 PR con CI verde
+- [x] 3.2 PR con CI verde
