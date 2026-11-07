@@ -42,7 +42,7 @@ class NotificationEmailSenderTest {
         verify(mailSender).send(message.capture());
         assertThat(message.getValue().getFrom()).isEqualTo("NEXUS <noreply@portalenexus.it>");
         assertThat(message.getValue().getTo()).containsExactly("operatore@nexus.local");
-        assertThat(message.getValue().getSubject()).isEqualTo("NEXUS · segnalazione n. 34");
+        assertThat(message.getValue().getSubject()).isEqualTo("PORTALE NEXUS - Segnalazione n. 34");
         assertThat(message.getValue().getText())
                 .startsWith("Il Tutor ha inviato il report di restituzione della segnalazione n. 34")
                 .contains("https://portalenexus.it/segnalazioni/T1");

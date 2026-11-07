@@ -47,7 +47,7 @@ class EmailChangeMailerTest {
         SimpleMailMessage message = sent();
         assertThat(message.getTo()).containsExactly("nuovo@example.org");
         assertThat(message.getFrom()).isEqualTo("NEXUS <noreply@portalenexus.it>");
-        assertThat(message.getSubject()).isEqualTo("NEXUS · codice per confermare il nuovo indirizzo email");
+        assertThat(message.getSubject()).isEqualTo("PORTALE NEXUS - Codice per confermare il nuovo indirizzo email");
         assertThat(message.getText()).contains("    123456").contains("fino alle 11:30 (30 minuti)")
                 .contains("ignora questa email").endsWith("non rispondere.\n\nPortale Nexus\n");
     }
@@ -74,7 +74,7 @@ class EmailChangeMailerTest {
 
         SimpleMailMessage message = sent();
         assertThat(message.getTo()).containsExactly("vecchio@example.org");
-        assertThat(message.getSubject()).isEqualTo("NEXUS · il tuo indirizzo email è stato cambiato");
+        assertThat(message.getSubject()).isEqualTo("PORTALE NEXUS - Il tuo indirizzo email è stato cambiato");
         assertThat(message.getText()).contains("Se non sei stato tu, contatta subito l'amministratore")
                 .doesNotContain("@").endsWith("\n\nPortale Nexus\n");
     }

@@ -3,7 +3,9 @@
 Richiesta del PO del 07/11, dopo la prova del recupero della password (US-1308):
 - l'avviso di cambio password di Keycloak era poco chiaro: «Le tue credenziali password sono state cambiate su
   07/11/26, 11:46 da …», con l'ora UTC;
-- **tutte** le email devono chiudersi con la firma «Portale Nexus».
+- **tutte** le email devono chiudersi con la firma «Portale Nexus»;
+- **tutte** le email devono avere l'oggetto che inizia con «PORTALE NEXUS - » (es. «PORTALE NEXUS - Reimposta la
+  password»).
 
 ## What Changes
 
@@ -13,6 +15,8 @@ Richiesta del PO del 07/11, dopo la prova del recupero della password (US-1308):
   - firma «Portale Nexus» in fondo a ogni email di Keycloak: invito, recupero della password, avviso di cambio, prova
     SMTP; in testo semplice e in HTML.
 - **Email del backend** (notifiche, codice e avviso del cambio di indirizzo): firma «Portale Nexus» in fondo.
+- **Oggetto** di ogni email, di Keycloak (tutti gli oggetti del tema, anche delle email non usate) e del backend:
+  «PORTALE NEXUS - …».
 
 ## Capabilities
 

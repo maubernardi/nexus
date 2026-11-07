@@ -16,7 +16,7 @@ class NotificationEmailTest {
     void ogniTipoHaIlSuoTesto_conNumeroECollegamento(NotificationType type) {
         NotificationEmail email = NotificationEmail.of(type, "0S2CB3NATG1AY", 34L, "https://portalenexus.it");
 
-        assertThat(email.subject()).isEqualTo("NEXUS · segnalazione n. 34");
+        assertThat(email.subject()).isEqualTo("PORTALE NEXUS - Segnalazione n. 34");
         assertThat(email.body())
                 .contains("segnalazione n. 34")
                 .contains("Apri la segnalazione: https://portalenexus.it/segnalazioni/0S2CB3NATG1AY")

@@ -611,8 +611,8 @@ Servono la password SMTP nel `.env` del server e un indirizzo vero per un utente
 
 - [x] **T-18.1 Email ricevuta (US-1202)**
   1. Dai il tuo indirizzo a `operatore.cc` dal suo profilo (T-19.1). Come `tutor1` fai un passaggio che lo notifica
-     (per esempio accetta una proposta). **Atteso:** entro pochi secondi arriva un'email da `noreply@portalenexus.it` con oggetto «NEXUS ·
-     segnalazione n. N», lo stesso testo della notifica in app e il collegamento alla segnalazione.
+     (per esempio accetta una proposta). **Atteso:** entro pochi secondi arriva un'email da `noreply@portalenexus.it` con oggetto
+     «PORTALE NEXUS - Segnalazione n. N», lo stesso testo della notifica in app e il collegamento alla segnalazione.
   2. **Atteso:** nell'email non ci sono nomi né altri dati del beneficiario.
   3. Il collegamento apre la segnalazione (dopo l'accesso).
 
@@ -644,7 +644,7 @@ vero; per l'avviso al vecchio indirizzo, parti da un utente che ha già un indir
 
 - [x] **T-19.3 Avviso al vecchio indirizzo**
   1. Cambia di nuovo l'indirizzo di un utente che ne ha già uno vero. **Atteso:** al vecchio indirizzo arriva
-     «NEXUS · il tuo indirizzo email è stato cambiato», senza il nuovo indirizzo.
+     «PORTALE NEXUS - Il tuo indirizzo email è stato cambiato», senza il nuovo indirizzo.
 
 - [x] **T-19.4 Indirizzo già usato**
   1. Come `tutor1`, prova a passare all'indirizzo che hai dato a `operatore.cc`. **Atteso:** errore sul campo
@@ -727,7 +727,7 @@ nuovo utente, per esempio un alias.
 Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycloak-password-reset.sh` (README,
 «Demo online»).
 
-- [ ] **T-21.1 Password dimenticata (US-1308)**
+- [x] **T-21.1 Password dimenticata (US-1308)**
   1. Esci da NEXUS. Nella pagina di accesso **Atteso:** sotto il modulo c'è **Password dimenticata?**, con l'aspetto di
      NEXUS.
   2. Aprilo, scrivi l'email di un tuo utente (es. quello creato in T-20.1) e invia. **Atteso:** il messaggio che
@@ -738,7 +738,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   4. Nella casella **Atteso:** un'altra email di NEXUS: «<tuo username>, le tue credenziali sono state cambiate il
      <data> alle <ora italiana> da questo indirizzo IP: …», con l'invito a contattare l'amministratore. Una password
      sbagliata all'accesso invece non manda email.
-  5. **Atteso:** tutte le email ricevute (collegamento, avviso, e anche le notifiche di NEXUS) finiscono con la firma
-     «Portale Nexus».
+  5. **Atteso:** tutte le email ricevute (collegamento, avviso, e anche le notifiche di NEXUS) hanno l'oggetto che inizia
+     con «PORTALE NEXUS - » (es. «PORTALE NEXUS - Reimposta la password») e finiscono con la firma «Portale Nexus».
   6. Chiedi un altro collegamento e aprilo dopo più di 30 minuti. **Atteso:** Keycloak dice che è scaduto e propone di
      chiederne uno nuovo.
