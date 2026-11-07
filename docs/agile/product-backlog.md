@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 15 | 73 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 15 | 76 |
 
 ## Domande aperte per il Product Owner
 
@@ -124,7 +124,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1301](#us-1301) | E13 | Verifica della PWA online | Must | 1 | R1 | 📋 Backlog |
 | [US-1302](#us-1302) | E13 | Backup del database | Must | 5 | R4 | 📋 Backlog |
-| [US-1303](#us-1303) | E13 | Anonimizzazione a scadenza | Must | 5 | R4 | ✅ Ready (Sprint 10) |
+| [US-1303](#us-1303) | E13 | Anonimizzazione a scadenza | Must | 8 | R4 | ✅ Ready (Sprint 10) |
 | [US-1304](#us-1304) | E13 | Tema di Keycloak | Should | 3 | R4 | 🎉 Done (Sprint 7, fuori piano) |
 | [US-1305](#us-1305) | E13 | Revisione UX/UI | Should | 8 | R4 | 📋 Backlog |
 | [US-1306](#us-1306) | E13 | Passaggio in produzione | Must | 5 | R4 | 📋 Backlog |
@@ -962,13 +962,20 @@ Criteri di accettazione:
 - Il ripristino di prova su un ambiente pulito riesce ed è documentato.
 
 #### US-1303
-**Anonimizzazione a scadenza** · Must · 5 punti · R4 · ✅ Ready (Sprint 10)
+**Anonimizzazione a scadenza** · Must · 8 punti · R4 · ✅ Ready (Sprint 10)
 
 Come **responsabile della privacy** voglio che i dati identificativi dei beneficiari siano anonimizzati alla scadenza della conservazione per rispettare il GDPR.
 
-Criteri di accettazione:
-- La durata di conservazione è un parametro (per ora 2 anni dalla conclusione del percorso).
-- Restano solo i dati statistici; l'operazione è registrata.
+Criteri di accettazione (aggiornati con le decisioni del PO del 07/11; stima da 5 a 8 punti):
+- La durata di conservazione è un parametro: per ora 2 anni dall'**ultima attività** sul beneficiario o sulle sue
+  segnalazioni, così nessuno resta per sempre.
+- Ogni notte un controllo segna «Da anonimizzare» chi è scaduto; una nuova attività toglie il segno.
+- Il Tutor (nei suoi beneficiari) e l'ADMIN (in una pagina con tutti) li vedono evidenziati, li filtrano e decidono:
+  - **anonimizzare**, con conferma: di nome e cognome restano le iniziali (Mauro Bernardi → M B); si cancellano CV,
+    vincoli e, dalle schede dei tirocini, codice fiscale, data e luogo di nascita, residenza e note; restano anno di
+    nascita, genere, cittadinanza, zona, titolo di studio, patente, lingue ed esiti;
+  - **tenere i dati per sempre**, con un motivo obbligatorio.
+- Ogni passaggio è registrato nell'audit, senza valori personali.
 
 #### US-1304
 **Tema di Keycloak** · Should · 3 punti · R4 · 🎉 Done (Sprint 7, fuori piano)

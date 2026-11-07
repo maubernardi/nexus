@@ -35,6 +35,7 @@ import it.nexus.repository.ZoneRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BeneficiaryService;
 import it.nexus.services.CurrentAppUserService;
+import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.FieldValidationException;
 import it.nexus.web.errors.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -72,6 +73,11 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
         if (!isOwner(beneficiary)) {
             throw new AccessDeniedException("Solo il Tutor proprietario può modificare il beneficiario");
         }
+        if (beneficiary.getAnonymizedAt() != null) {
+            throw new BadRequestException("Il beneficiario è anonimizzato: i suoi dati non si modificano più");
+        }
+        // nuova attività: non è più da anonimizzare (US-1303)
+        beneficiary.clearAnonymizationDue();
         Zone zone = beneficiary.getResidenceZone().getId().equals(TsidMapper.toInternal(dto.residenceZoneId()))
                 // la zona già assegnata resta valida anche se nel frattempo è stata disattivata
                 ? beneficiary.getResidenceZone()
@@ -110,7 +116,8 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
     @Transactional(readOnly = true)
     public BeneficiaryDTO getById(String id) {
         Beneficiary beneficiary = findVisible(id);
-        return mapper.toDto(beneficiary, isOwner(beneficiary));
+        // un beneficiario anonimizzato non si modifica più (US-1303)
+        return mapper.toDto(beneficiary, isOwner(beneficiary) && beneficiary.getAnonymizedAt() == null);
     }
 
     /** Stessa risposta per inesistente e non autorizzato: non si rivela l'esistenza del beneficiario. */

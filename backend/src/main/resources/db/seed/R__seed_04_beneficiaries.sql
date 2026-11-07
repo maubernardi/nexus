@@ -32,7 +32,11 @@ INSERT INTO beneficiary (id, owner_tutor_id, first_name, last_name, birth_year, 
     -- k7 (come k6)
     (892398395576324401, (SELECT id FROM app_user WHERE username = 'tutor2'), 'Beneficiario', 'Demo Sette', 1988, 'M', 'IT', 'IT', (SELECT id FROM zone WHERE code = 'ISOLOTTO'),
      false, '{}', false, 'BICICLETTA', false, 'LICENZA_MEDIA', NULL,
-     now(), 'seed', now(), 'seed')
+     now(), 'seed', now(), 'seed'),
+    -- k8: fermo da 3 anni, per provare l'anonimizzazione (US-1303): il controllo notturno lo segna «da anonimizzare»
+    (892398395576324402, (SELECT id FROM app_user WHERE username = 'tutor1'), 'Beneficiaria', 'Demo Otto', 1985, 'F', 'IT', 'IT', (SELECT id FROM zone WHERE code = 'RIFREDI'),
+     false, '{}', false, 'MEZZI_PUBBLICI', false, 'LAUREA_TRIENNALE', 'Dato fittizio: solo mattina.',
+     now() - interval '3 years', 'seed', now() - interval '3 years', 'seed')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO beneficiary_language (id, beneficiary_id, language, level, created_at, created_by, updated_at, updated_by) VALUES

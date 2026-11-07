@@ -857,10 +857,16 @@ public class TicketServiceImpl implements TicketService {
 
     // inesistente e altrui danno lo stesso errore: non si rivela l'esistenza dei beneficiari degli altri tutor
     private Beneficiary ownBeneficiary(String beneficiaryId, AppUser me) {
-        return Optional.ofNullable(TsidMapper.toInternal(beneficiaryId))
+        Beneficiary beneficiary = Optional.ofNullable(TsidMapper.toInternal(beneficiaryId))
                 .flatMap(beneficiaryRepository::findById)
                 .filter(c -> c.getOwnerTutor().getId().equals(me.getId()))
                 .orElseThrow(() -> new FieldValidationException("beneficiaryId", "Beneficiario non valido"));
+        if (beneficiary.getAnonymizedAt() != null) {
+            throw new FieldValidationException("beneficiaryId", "Il beneficiario è anonimizzato: non si segnala più");
+        }
+        // nuova attività: non è più da anonimizzare (US-1303)
+        beneficiary.clearAnonymizationDue();
+        return beneficiary;
     }
 
     /** Annuncio della bacheca visibile al Tutor: per tutti o riservato a un suo progetto; altrimenti 404. */

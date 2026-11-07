@@ -7,12 +7,16 @@ import {
 } from '@tanstack/react-query';
 
 import {
+  anonymizeBeneficiary,
   createBeneficiary,
+  fetchAllBeneficiaries,
   fetchBeneficiary,
   fetchMyBeneficiaries,
+  keepBeneficiary,
   updateBeneficiary,
   type Beneficiary,
   type BeneficiaryCreate,
+  type BeneficiaryRetentionItem,
   type BeneficiarySummary,
 } from '@/config/api/beneficiaryApi';
 
@@ -21,6 +25,34 @@ export const MY_BENEFICIARIES_KEY = [...BENEFICIARIES_KEY, 'mine'] as const;
 
 export const useMyBeneficiaries = (): UseQueryResult<BeneficiarySummary[]> =>
   useQuery({ queryKey: MY_BENEFICIARIES_KEY, queryFn: fetchMyBeneficiaries });
+
+/** I miei beneficiari che si possono ancora segnalare: un anonimizzato no (US-1303). */
+export const useReportableBeneficiaries = (): UseQueryResult<BeneficiarySummary[]> =>
+  useQuery({
+    queryKey: MY_BENEFICIARIES_KEY,
+    queryFn: fetchMyBeneficiaries,
+    select: (list) => list.filter((b) => b.retention !== 'ANONYMIZED'),
+  });
+
+/** Tutti i beneficiari, per l'ADMIN (US-1303). */
+export const useAllBeneficiaries = (): UseQueryResult<BeneficiaryRetentionItem[]> =>
+  useQuery({ queryKey: [...BENEFICIARIES_KEY, 'all'], queryFn: fetchAllBeneficiaries });
+
+export const useAnonymizeBeneficiary = (): UseMutationResult<void, unknown, string> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => anonymizeBeneficiary(id),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: BENEFICIARIES_KEY }),
+  });
+};
+
+export const useKeepBeneficiary = (): UseMutationResult<void, unknown, { id: string; reason: string }> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (vars: { id: string; reason: string }) => keepBeneficiary(vars),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: BENEFICIARIES_KEY }),
+  });
+};
 
 export const useCreateBeneficiary = (): UseMutationResult<Beneficiary, unknown, BeneficiaryCreate> => {
   const queryClient = useQueryClient();

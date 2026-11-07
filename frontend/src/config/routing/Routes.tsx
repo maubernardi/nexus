@@ -14,6 +14,7 @@ import { BeneficiaryPage } from '@/pages/BeneficiaryPage/BeneficiaryPage';
 import { ClosureReportPage } from '@/pages/ClosureReportPage/ClosureReportPage';
 import { DevLoginPage } from '@/pages/DevLoginPage/DevLoginPage';
 import { InternshipPage } from '@/pages/InternshipPage/InternshipPage';
+import { BeneficiariesAdminPage } from '@/pages/BeneficiariesAdminPage/BeneficiariesAdminPage';
 import { CoordinationPage } from '@/pages/CoordinationPage/CoordinationPage';
 import { FailedLoginsPage } from '@/pages/FailedLoginsPage/FailedLoginsPage';
 import { UserAccessLogPage } from '@/pages/UserAccessLogPage/UserAccessLogPage';
@@ -256,6 +257,15 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.userAccount.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'beneficiari/tutti',
+        element: (
+          <RoleRoute roles={['ADMIN']}>
+            <BeneficiariesAdminPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.beneficiariesAdmin.title' } satisfies RouteHandle,
       },
       {
         path: 'coordinamento',

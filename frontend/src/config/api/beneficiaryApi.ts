@@ -40,6 +40,39 @@ export type BeneficiarySummary = {
   residenceZoneName: string;
   /** Solo nell'elenco del Tutor: numero della segnalazione aperta (una sola per beneficiario). */
   openTicketNumber?: number | null;
+  /** Conservazione dei dati (US-1303); assente se normale. */
+  retention?: RetentionStatus;
+};
+
+/** Conservazione dei dati di un beneficiario (US-1303). */
+export type RetentionStatus = 'TO_ANONYMIZE' | 'KEPT' | 'ANONYMIZED';
+
+/** Beneficiario nell'elenco dell'ADMIN, con il suo Tutor e la conservazione dei dati (US-1303). */
+export type BeneficiaryRetentionItem = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  birthYear: number;
+  residenceZoneName: string;
+  ownerTutorName: string;
+  retention?: RetentionStatus;
+  anonymizationDueSince?: string;
+  keptReason?: string;
+};
+
+export const fetchAllBeneficiaries = async (): Promise<BeneficiaryRetentionItem[]> => {
+  const { data } = await axiosInstance.get<BeneficiaryRetentionItem[]>(`${ENDPOINTS.beneficiaries}/all`);
+  return data;
+};
+
+/** Anonimizza un beneficiario da anonimizzare: restano le iniziali e i dati statistici (US-1303). */
+export const anonymizeBeneficiary = async (id: string): Promise<void> => {
+  await axiosInstance.post(`${ENDPOINTS.beneficiaries}/${encodeURIComponent(id)}/anonymize`);
+};
+
+/** Tiene per sempre i dati di un beneficiario da anonimizzare, con il motivo (US-1303). */
+export const keepBeneficiary = async ({ id, reason }: { id: string; reason: string }): Promise<void> => {
+  await axiosInstance.post(`${ENDPOINTS.beneficiaries}/${encodeURIComponent(id)}/keep`, { reason });
 };
 
 export const createBeneficiary = async (payload: BeneficiaryCreate): Promise<Beneficiary> => {
