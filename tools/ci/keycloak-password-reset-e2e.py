@@ -78,7 +78,12 @@ def main() -> None:
     threading.Thread(target=server.serve_forever, daemon=True).start()
 
     jar = CookieJar()
-    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+    class LoggedRedirects(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self, req, fp, code, msg, headers, newurl):  # noqa: N802 (API di urllib)
+            print(f"   {code} -> {urllib.parse.urlsplit(newurl).netloc}{urllib.parse.urlsplit(newurl).path}")
+            return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar), LoggedRedirects())
 
     def insecure_cookies() -> None:
         # Keycloak marca i cookie della sessione come Secure: su http://localhost la CookieJar non li rimanderebbe
