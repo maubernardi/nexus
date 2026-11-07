@@ -11,6 +11,8 @@ US-103 la posta del realm è già impostata, quindi il recupero è soprattutto c
 - Il collegamento vale **30 minuti** (come il codice del cambio di indirizzo, US-110); il valore predefinito di
   Keycloak, 5 minuti, è troppo stretto per un'email.
 - Pagina di recupero ed email in italiano; la pagina usa il tema di NEXUS.
+- **Email di sicurezza** quando la password cambia (richiesta del PO del 07/11): l'ascoltatore «email» degli eventi
+  di Keycloak, limitato al solo cambio di password (di base scriverebbe anche a ogni password sbagliata).
 - La protezione dai tentativi ripetuti del realm resta: dopo 5 password sbagliate l'accesso si blocca per qualche minuto.
 
 ## Capabilities

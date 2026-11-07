@@ -76,6 +76,7 @@ jobs:
       - name: Pagina di accesso con il tema (realm di sviluppo)
         run: |
           docker run -d --name kc -p 8080:8080 -v "$PWD/infra/keycloak:/opt/keycloak/data/import:ro" \
+            --add-host=host.docker.internal:host-gateway \
             -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
             nexus-keycloak:ci start-dev --import-realm
           for i in $(seq 1 60); do
@@ -98,6 +99,14 @@ jobs:
           reset_page=$(curl -fsS -b /tmp/kc-cookies "$reset")
           grep -q 'class="nexus-header"' <<<"$reset_page"
           grep -q 'name="username"' <<<"$reset_page"
+      - name: Recupero della password con email di sicurezza (US-1308)
+        run: |
+          kcadm() { docker exec kc /opt/keycloak/bin/kcadm.sh "$@"; }
+          kcadm config credentials --server http://localhost:8080 --realm master --user admin --password admin
+          # la posta di Keycloak va al server SMTP di prova dello script, su questo host
+          kcadm update realms/nexus -s smtpServer.host=host.docker.internal -s smtpServer.port=2525 \
+            -s smtpServer.from=noreply@nexus.local -s smtpServer.fromDisplayName=NEXUS
+          python3 -I tools/ci/keycloak-password-reset-e2e.py http://localhost:8080 tutor1 tutor1@nexus.local
       - name: Log di Keycloak
         if: failure()
         run: docker logs kc

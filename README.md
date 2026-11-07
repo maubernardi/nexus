@@ -191,8 +191,10 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
   installato, **una volta, dopo `keycloak-email.sh`**:
   ```bash
   curl -fsSLO https://raw.githubusercontent.com/maubernardi/nexus/main/infra/deploy/keycloak-password-reset.sh
-  sudo bash keycloak-password-reset.sh   # nessun segreto: attiva il recupero e la validità di 30 minuti
+  sudo bash keycloak-password-reset.sh   # nessun segreto: recupero, validità di 30 minuti, email di sicurezza
   ```
+  A ogni cambio di password Keycloak manda all'utente un'email di sicurezza; il filtro sugli eventi è nell'immagine
+  `nexus-keycloak`, quindi lo script va eseguito **dopo** il deploy (prima scriverebbe anche a ogni password sbagliata).
 - **Stato e log sul server:**
   `cd /opt/nexus/current && sudo docker compose --env-file ../.env --env-file release.env ps` (oppure `logs -f backend`).
 - **DNS (IONOS):** A `@`, `auth`, `www` → IP del server; CAA `0 issue "letsencrypt.org"`; i record email restano.
