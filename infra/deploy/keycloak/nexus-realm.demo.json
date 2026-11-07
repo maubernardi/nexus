@@ -11,6 +11,10 @@
   "sslRequired": "external",
   "registrationAllowed": false,
   "resetPasswordAllowed": true,
+  "eventsListeners": [
+    "jboss-logging",
+    "email"
+  ],
   "rememberMe": false,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,

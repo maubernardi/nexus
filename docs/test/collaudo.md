@@ -735,5 +735,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      30 minuti.
   3. Apri il collegamento e imposta una nuova password (almeno 12 caratteri). **Atteso:** entri in NEXUS; la vecchia
      password non funziona più.
-  4. Chiedi un altro collegamento e aprilo dopo più di 30 minuti. **Atteso:** Keycloak dice che è scaduto e propone di
+  4. Nella casella **Atteso:** un'altra email di NEXUS che avvisa che la password è cambiata. Una password sbagliata
+     all'accesso invece non manda email.
+  5. Chiedi un altro collegamento e aprilo dopo più di 30 minuti. **Atteso:** Keycloak dice che è scaduto e propone di
      chiederne uno nuovo.

@@ -11,6 +11,10 @@
   "sslRequired": "external",
   "registrationAllowed": false,
   "resetPasswordAllowed": true,
+  "eventsListeners": [
+    "jboss-logging",
+    "email"
+  ],
   "loginWithEmailAllowed": true,
   "accessTokenLifespan": 300,
   "actionTokenGeneratedByUserLifespan": 1800,
