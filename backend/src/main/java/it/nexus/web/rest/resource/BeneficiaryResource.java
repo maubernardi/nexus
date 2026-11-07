@@ -11,13 +11,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.nexus.domain.dto.BeneficiaryDTO;
 import it.nexus.domain.dto.BeneficiaryFormDTO;
+import it.nexus.domain.dto.BeneficiaryKeepDTO;
+import it.nexus.domain.dto.BeneficiaryRetentionItemDTO;
 import it.nexus.domain.dto.BeneficiarySummaryDTO;
+import it.nexus.services.BeneficiaryRetentionService;
 import it.nexus.services.BeneficiaryService;
 import it.nexus.web.rest.PathAPI;
 import jakarta.validation.Valid;
@@ -30,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 public class BeneficiaryResource {
 
     private final BeneficiaryService beneficiaryService;
+    private final BeneficiaryRetentionService beneficiaryRetentionService;
 
     @PostMapping
     @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
@@ -58,5 +63,29 @@ public class BeneficiaryResource {
     @Operation(summary = "Modifica un beneficiario del Tutor corrente")
     public ResponseEntity<BeneficiaryDTO> update(@PathVariable String id, @RequestBody @Valid BeneficiaryFormDTO dto) {
         return ResponseEntity.ok(beneficiaryService.update(id, dto));
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole(@requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Tutti i beneficiari con la conservazione dei dati; solo i da anonimizzare con toAnonymize (US-1303)")
+    public ResponseEntity<List<BeneficiaryRetentionItemDTO>> listAll(
+            @RequestParam(defaultValue = "false") boolean toAnonymize) {
+        return ResponseEntity.ok(beneficiaryRetentionService.listAll(toAnonymize));
+    }
+
+    @PostMapping("/{id}/anonymize")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Anonimizza un beneficiario da anonimizzare: restano le iniziali e i dati statistici (US-1303)")
+    public ResponseEntity<Void> anonymize(@PathVariable String id) {
+        beneficiaryRetentionService.anonymize(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/keep")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Tiene per sempre i dati di un beneficiario da anonimizzare, con il motivo (US-1303)")
+    public ResponseEntity<Void> keep(@PathVariable String id, @RequestBody @Valid BeneficiaryKeepDTO dto) {
+        beneficiaryRetentionService.keep(id, dto.reason());
+        return ResponseEntity.noContent().build();
     }
 }

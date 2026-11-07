@@ -754,3 +754,18 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      **Accessi non riusciti**. **Atteso:** la riga con «Utente inesistente», `nessuno.cosi` nella colonna «Scritto nel
      modulo», data, ora e IP; anche la password sbagliata del punto 1, con il nome dell'utente.
   5. Come Tutor, apri l'indirizzo `/utenti/accessi-falliti`. **Atteso:** la pagina non è disponibile per il tuo ruolo.
+
+- [ ] **T-21.3 Anonimizzazione a scadenza (US-1303)**
+
+  Nei dati demo c'è «Demo Otto Beneficiaria» di `tutor1`, fermo da 3 anni: la notte dopo il deploy (alle 2:30) il
+  controllo lo segna «Da anonimizzare».
+  1. Come `tutor1`, **Beneficiari**. **Atteso:** la riga di «Demo Otto» evidenziata con «Da anonimizzare»; la casella
+     **Solo da anonimizzare (1)** lascia solo lei.
+  2. **Tieni i dati** e conferma senza motivo. **Atteso:** «Scrivi il motivo…». Chiudi con **Annulla**.
+  3. Come `admin`, menu **Beneficiari**. **Atteso:** tutti i beneficiari con il Tutor; «Demo Otto» evidenziata, «Dal
+     …» con la data del segno.
+  4. **Anonimizza** → **Anonimizza definitivamente**. **Atteso:** «… è stato anonimizzato»; la riga ora è «O B»
+     (iniziali) con «Anonimizzato». Come `tutor1`: nella scheda non c'è più **Modifica** e in **Nuova segnalazione**
+     non compare tra i beneficiari.
+  5. (Facoltativo, se c'è un altro beneficiario da anonimizzare) **Tieni i dati** con un motivo. **Atteso:** «Dati
+     tenuti» e, per l'ADMIN, «Motivo: …».

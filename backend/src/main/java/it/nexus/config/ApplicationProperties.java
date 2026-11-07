@@ -1,5 +1,6 @@
 package it.nexus.config;
 
+import java.time.Period;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -20,6 +21,8 @@ public class ApplicationProperties {
     private final Mail mail = new Mail();
 
     private final KeycloakAdmin keycloakAdmin = new KeycloakAdmin();
+
+    private final Retention retention = new Retention();
 
     @Getter
     @Setter
@@ -55,5 +58,13 @@ public class ApplicationProperties {
         private String clientId = "nexus-backend-admin";
         /** Segreto del client: mai nel repository (NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET nel .env del server). */
         private String clientSecret = "";
+    }
+
+    /** Conservazione dei dati dei beneficiari (US-1303, Q7): parametrica, per ora 2 anni dall'ultima attività. */
+    @Getter
+    @Setter
+    public static class Retention {
+
+        private Period period = Period.ofYears(2);
     }
 }

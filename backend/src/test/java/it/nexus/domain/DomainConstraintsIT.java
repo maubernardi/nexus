@@ -692,6 +692,24 @@ class DomainConstraintsIT {
         }
 
         @Test
+        void motivoPerTenereIDatiVuoto() {
+            Graph g = fixtures.graph();
+            assertViolates("ck_beneficiary_kept_reason", () -> jdbc.update(
+                    "UPDATE beneficiary SET kept_reason = '  ' WHERE id = ?", g.beneficiary().getId()));
+        }
+
+        @Test
+        void daAnonimizzareMaGiaTenutoOAnonimizzato() {
+            Graph g = fixtures.graph();
+            assertViolates("ck_beneficiary_retention", () -> jdbc.update(
+                    "UPDATE beneficiary SET anonymization_due_since = now(), kept_reason = 'progetto in corso' WHERE id = ?",
+                    g.beneficiary().getId()));
+            assertViolates("ck_beneficiary_retention", () -> jdbc.update(
+                    "UPDATE beneficiary SET anonymization_due_since = now(), anonymized_at = now() WHERE id = ?",
+                    g.beneficiary().getId()));
+        }
+
+        @Test
         void nazionalitaNonIso() {
             Graph g = fixtures.graph();
             g.beneficiary().setNationality("it");

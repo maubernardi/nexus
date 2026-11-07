@@ -29,5 +29,6 @@ export type RouteHandle = {
     | 'pages.coordination.title'
     | 'pages.userAccessLog.title'
     | 'pages.failedLogins.title'
+    | 'pages.beneficiariesAdmin.title'
     | 'pages.forbidden.title';
 };

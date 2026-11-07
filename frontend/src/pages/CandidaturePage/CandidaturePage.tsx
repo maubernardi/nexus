@@ -10,7 +10,7 @@ import { NativeSelect } from '@/components/ui/native-select';
 import type { TutorBoardPost } from '@/config/api/boardPostApi';
 import { apiError } from '@/config/api/errors';
 import type { Ticket } from '@/config/api/ticketApi';
-import { useMyBeneficiaries } from '@/config/hooks/useBeneficiaries';
+import { useReportableBeneficiaries } from '@/config/hooks/useBeneficiaries';
 import { useTutorBoardPost } from '@/config/hooks/useBoardPosts';
 import { useMyProjects } from '@/config/hooks/useReferenceData';
 import { useSubmitSpecialTicket } from '@/config/hooks/useTickets';
@@ -130,7 +130,7 @@ const CandidatureForm = ({
   onSuccess: (t: Ticket) => void;
 }) => {
   const { t } = useTranslation();
-  const beneficiaries = useMyBeneficiaries();
+  const beneficiaries = useReportableBeneficiaries();
   // annuncio riservato: il progetto è il suo, non si sceglie
   const projects = useMyProjects(!p.project);
 
@@ -192,7 +192,7 @@ const CandidatureForm = ({
 
 type CandidatureFieldsProps = {
   post: TutorBoardPost;
-  beneficiaries: NonNullable<ReturnType<typeof useMyBeneficiaries>['data']>;
+  beneficiaries: NonNullable<ReturnType<typeof useReportableBeneficiaries>['data']>;
   projects: NonNullable<ReturnType<typeof useMyProjects>['data']>;
   onSuccess: (t: Ticket) => void;
 };

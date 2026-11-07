@@ -25,6 +25,7 @@ export const it = {
     loading: 'Caricamento in corso…',
     loadError: 'Impossibile caricare i dati. Controlla la connessione e riprova.',
     retry: 'Riprova',
+    cancel: 'Annulla',
   },
   form: {
     required: 'obbligatorio',
@@ -977,6 +978,42 @@ export const it = {
     loadError: 'Impossibile caricare il profilo utente. Riprova più tardi.',
     retry: 'Riprova',
   },
+  retention: {
+    column: 'Dati',
+    status: {
+      TO_ANONYMIZE: 'Da anonimizzare',
+      KEPT: 'Dati tenuti',
+      ANONYMIZED: 'Anonimizzato',
+    },
+    filter_one: 'Solo da anonimizzare ({{count}})',
+    filter_other: 'Solo da anonimizzare ({{count}})',
+    noneToAnonymize: 'Nessun beneficiario da anonimizzare.',
+    anonymize: 'Anonimizza',
+    anonymizeFor: 'Anonimizza {{name}}',
+    anonymizeTitle: 'Anonimizzare {{name}}?',
+    anonymizeDescription:
+      'Nessuna attività da più di 2 anni. Di nome e cognome restano le iniziali; si cancellano CV, vincoli e, nelle schede dei tirocini, codice fiscale, data e luogo di nascita, residenza e note. Restano i dati per le statistiche (anno di nascita, genere, cittadinanza, zona, titolo di studio, patente, lingue, esiti). Non si torna indietro.',
+    anonymizeConfirm: 'Anonimizza definitivamente',
+    anonymized: '{{name}} è stato anonimizzato.',
+    keep: 'Tieni i dati',
+    keepFor: 'Tieni i dati di {{name}}',
+    keepTitle: 'Tenere i dati di {{name}}?',
+    keepDescription:
+      'I dati restano per sempre e il beneficiario non sarà più segnalato da anonimizzare. Per il GDPR va scritto il motivo: resta nella cronologia.',
+    reason: 'Motivo',
+    reasonRequired: 'Scrivi il motivo per cui i dati si tengono.',
+    keepConfirm: 'Tieni i dati',
+    kept: 'I dati di {{name}} si tengono per sempre.',
+    error: 'Operazione non riuscita. Controlla la connessione e riprova.',
+    adminHeading: 'Beneficiari',
+    adminIntro:
+      'Tutti i beneficiari. Ogni notte quelli senza attività da 2 anni diventano «Da anonimizzare»: decidi tu o il loro Tutor se anonimizzarli o tenerne i dati.',
+    adminCaption_one: 'Beneficiari: {{count}}',
+    adminCaption_other: 'Beneficiari: {{count}}',
+    tutor: 'Tutor',
+    dueSince: 'Dal {{date}}',
+    keptReason: 'Motivo: {{reason}}',
+  },
   accessLog: {
     intro:
       'Ogni accesso a NEXUS, riuscito o no, con data, ora e indirizzo IP, dal più recente. Gli accessi si conservano 12 mesi.',
@@ -1441,6 +1478,9 @@ export const it = {
     },
     failedLogins: {
       title: 'Accessi non riusciti',
+    },
+    beneficiariesAdmin: {
+      title: 'Beneficiari',
     },
     userAccount: {
       title: 'Accesso e ruolo dell’utente',

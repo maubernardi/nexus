@@ -156,4 +156,13 @@ public class Internship extends AbstractTsidEntity {
         suspensions.clear();
         scheduleDays.clear();
     }
+
+    /** Anonimizzazione del beneficiario (US-1303): via i suoi dati identificativi e le note. */
+    public void anonymize() {
+        fiscalCode = null;
+        birthDate = null;
+        birthPlace = null;
+        residence = null;
+        notes = null;
+    }
 }

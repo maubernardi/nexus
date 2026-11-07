@@ -11,7 +11,7 @@ import type { BeneficiarySummary } from '@/config/api/beneficiaryApi';
 import { apiError } from '@/config/api/errors';
 import type { ReferenceItem } from '@/config/api/referenceApi';
 import type { Ticket } from '@/config/api/ticketApi';
-import { useMyBeneficiaries } from '@/config/hooks/useBeneficiaries';
+import { useReportableBeneficiaries } from '@/config/hooks/useBeneficiaries';
 import { useJobCategories, useMyProjects } from '@/config/hooks/useReferenceData';
 import { useSubmitTicket } from '@/config/hooks/useTickets';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
@@ -50,7 +50,7 @@ const Notice = ({ id, heading, children }: { id: string; heading: string; childr
 /** Segnalazione normale di un beneficiario del Tutor (US-301). Carica i dati di scelta prima di mostrare il modulo. */
 export const TicketForm = ({ onSuccess, initialBeneficiaryId = null }: TicketFormProps) => {
   const { t } = useTranslation();
-  const beneficiaries = useMyBeneficiaries();
+  const beneficiaries = useReportableBeneficiaries();
   const projects = useMyProjects();
   const categories = useJobCategories();
 
