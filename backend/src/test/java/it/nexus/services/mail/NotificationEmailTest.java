@@ -20,13 +20,14 @@ class NotificationEmailTest {
         assertThat(email.body())
                 .contains("segnalazione n. 34")
                 .contains("Apri la segnalazione: https://portalenexus.it/segnalazioni/0S2CB3NATG1AY")
-                .doesNotContain("%d", "{{");
+                .doesNotContain("%d", "{{")
+                .endsWith("\n\nPortale Nexus\n");
     }
 
     @Test
     void testoDellaNotificaInApp() {
         assertThat(NotificationEmail.of(NotificationType.PROPOSAL_SENT, "T1", 7L, "https://portalenexus.it").body())
                 .startsWith("C'è una proposta di tirocinio per la segnalazione n. 7: valutala e accettala.\n")
-                .endsWith("Trovi tutte le notifiche anche nell'app, alla voce Notifiche.\n");
+                .endsWith("Trovi tutte le notifiche anche nell'app, alla voce Notifiche.\n\nPortale Nexus\n");
     }
 }
