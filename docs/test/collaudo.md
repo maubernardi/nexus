@@ -769,3 +769,12 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      non compare tra i beneficiari.
   5. (Facoltativo, se c'è un altro beneficiario da anonimizzare) **Tieni i dati** con un motivo. **Atteso:** «Dati
      tenuti» e, per l'ADMIN, «Motivo: …».
+
+- [ ] **T-21.4 Controllo della demo e revisione di sicurezza (US-1307)**
+  1. Su GitHub, **Settings → Notifications → System → Actions**: le notifiche dei workflow falliti arrivano per email
+     (impostazione dell'account).
+  2. **Actions → Controllo della demo → Run workflow** su `main`. **Atteso:** run verde con «Demo online» e i giorni di
+     validità dei certificati. Nelle ore 8–20 compare da solo ogni 10 minuti; fuori orario i run sono verdi e dicono
+     «Fuori dalla fascia 8–20».
+  3. Leggi `docs/security/asvs-l1.md`. Per L2: **Settings → Security → Code security → Dependabot alerts → Enable**
+     (solo avvisi, nessuna PR automatica).
