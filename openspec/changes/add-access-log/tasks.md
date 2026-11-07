@@ -10,5 +10,5 @@
 ## 3. Consegna
 
 - [x] 3.1 Collaudo
-- [ ] 3.2 PR con CI verde
+- [x] 3.2 PR con CI verde
 - [ ] 3.3 Sul server: deploy, poi `keycloak-access-log.sh`
