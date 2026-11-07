@@ -10,8 +10,10 @@
   "loginTheme": "nexus",
   "sslRequired": "external",
   "registrationAllowed": false,
+  "resetPasswordAllowed": true,
   "loginWithEmailAllowed": true,
   "accessTokenLifespan": 300,
+  "actionTokenGeneratedByUserLifespan": 1800,
   "ssoSessionIdleTimeout": 1800,
   "roles": {
     "realm": [

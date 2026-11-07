@@ -721,3 +721,19 @@ nuovo utente, per esempio un alias.
   4. Entra come `tutor2`. **Atteso:** nel menu non c'è **Coordinamento**.
   5. Come `admin`, togli la spunta **Coordinatore** a `tutor1`. **Atteso:** al prossimo accesso di `tutor1` la voce
      **Coordinamento** non c'è più.
+
+## 21. Accesso e sicurezza (Sprint 10)
+
+Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycloak-password-reset.sh` (README,
+«Demo online»).
+
+- [ ] **T-21.1 Password dimenticata (US-1308)**
+  1. Esci da NEXUS. Nella pagina di accesso **Atteso:** sotto il modulo c'è **Password dimenticata?**, con l'aspetto di
+     NEXUS.
+  2. Aprilo, scrivi l'email di un tuo utente (es. quello creato in T-20.1) e invia. **Atteso:** il messaggio che
+     arriverà un'email; nella casella un'email di NEXUS (`noreply@portalenexus.it`) con il collegamento, che scade in
+     30 minuti.
+  3. Apri il collegamento e imposta una nuova password (almeno 12 caratteri). **Atteso:** entri in NEXUS; la vecchia
+     password non funziona più.
+  4. Chiedi un altro collegamento e aprilo dopo più di 30 minuti. **Atteso:** Keycloak dice che è scaduto e propone di
+     chiederne uno nuovo.

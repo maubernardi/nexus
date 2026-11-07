@@ -84,13 +84,20 @@ jobs:
             sleep 3
           done
           # una richiesta di accesso come quella della PWA (PKCE): la pagina deve usare il tema, solo in italiano
-          page=$(curl -fsS "http://localhost:8080/realms/nexus/protocol/openid-connect/auth?client_id=nexus-frontend&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2F&response_type=code&scope=openid&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256")
+          page=$(curl -fsS -c /tmp/kc-cookies "http://localhost:8080/realms/nexus/protocol/openid-connect/auth?client_id=nexus-frontend&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2F&response_type=code&scope=openid&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256")
           grep -q 'lang="it"' <<<"$page"
           grep -q '<title>Accedi a NEXUS</title>' <<<"$page"
           grep -q 'class="nexus-header"' <<<"$page"
           if grep -q 'login-select-toggle' <<<"$page"; then echo "C'è il selettore della lingua"; exit 1; fi
           css=$(grep -oE '/resources/[^"]+/login/nexus/css/nexus\.css' <<<"$page")
           curl -fsS -o /dev/null "http://localhost:8080$css"
+          # US-1308: «Password dimenticata?» porta alla pagina di recupero, anche lei con il tema
+          reset=$(grep -oE 'href="[^"]*login-actions/reset-credentials[^"]*"' <<<"$page" | head -n1 | sed -e 's/^href="//' -e 's/"$//' -e 's/&amp;/\&/g')
+          [ -n "$reset" ] || { echo "Manca il collegamento per il recupero della password"; exit 1; }
+          case $reset in http*) ;; *) reset="http://localhost:8080$reset" ;; esac
+          reset_page=$(curl -fsS -b /tmp/kc-cookies "$reset")
+          grep -q 'class="nexus-header"' <<<"$reset_page"
+          grep -q 'name="username"' <<<"$reset_page"
       - name: Log di Keycloak
         if: failure()
         run: docker logs kc
