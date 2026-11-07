@@ -165,7 +165,8 @@ class BeneficiaryRetentionIT {
         retention.review(Instant.now());
 
         // la sua segnalazione si muove: alla notte dopo il segno si toglie
-        jdbc.update("UPDATE ticket SET updated_at = now() WHERE beneficiary_id = ?", old.getId());
+        // clock_timestamp(): nel test now() è l'inizio della transazione, prima del segno
+        jdbc.update("UPDATE ticket SET updated_at = clock_timestamp() WHERE beneficiary_id = ?", old.getId());
         retention.review(Instant.now());
 
         assertThat(reload(old).getRetention()).isNull();
