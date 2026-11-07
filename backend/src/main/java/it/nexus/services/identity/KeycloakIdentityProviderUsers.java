@@ -2,6 +2,7 @@ package it.nexus.services.identity;
 
 import java.net.URI;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.util.UriBuilder;
 
 import it.nexus.config.ApplicationProperties;
 import it.nexus.domain.enumeration.Role;
@@ -43,6 +45,9 @@ public class KeycloakIdentityProviderUsers implements IdentityProviderUsers {
             };
     private static final String USERS = "/admin/realms/{realm}/users";
     private static final String USER = USERS + "/{id}";
+    private static final String EVENTS = "/admin/realms/{realm}/events";
+    private static final String LOGIN = "LOGIN";
+    private static final String LOGIN_ERROR = "LOGIN_ERROR";
     /** Client della PWA: dopo aver impostato la password, l'utente torna all'app da qui. */
     private static final String APP_CLIENT_ID = "nexus-frontend";
 
@@ -223,6 +228,47 @@ public class KeycloakIdentityProviderUsers implements IdentityProviderUsers {
                     .retrieve().toBodilessEntity();
             return null;
         });
+    }
+
+    @Override
+    public List<LoginEvent> loginEvents(String externalId, int first, int max) {
+        return events("lettura degli accessi", b -> b.queryParam("type", LOGIN, LOGIN_ERROR)
+                .queryParam("user", externalId), first, max);
+    }
+
+    @Override
+    public List<LoginEvent> failedLogins(int first, int max) {
+        return events("lettura degli accessi falliti", b -> b.queryParam("type", LOGIN_ERROR), first, max);
+    }
+
+    /** Registro degli eventi del realm (permesso {@code view-events}), dal più recente. */
+    private List<LoginEvent> events(String operation, Function<UriBuilder, UriBuilder> filter, int first, int max) {
+        return call(operation, token -> {
+            List<Map<String, Object>> events = restClient.get()
+                    .uri(b -> filter.apply(b.path(EVENTS)).queryParam("first", first).queryParam("max", max)
+                            .build(realm()))
+                    .headers(h -> h.setBearerAuth(token))
+                    .retrieve().body(JSON_ARRAY);
+            return events == null ? List.<LoginEvent>of() : events.stream().map(KeycloakIdentityProviderUsers::loginEvent)
+                    .toList();
+        });
+    }
+
+    private static LoginEvent loginEvent(Map<String, Object> event) {
+        Object details = event.get("details");
+        Object username = details instanceof Map<?, ?> map ? map.get("username") : null;
+        Object time = event.get("time");
+        return new LoginEvent(
+                Instant.ofEpochMilli(time instanceof Number n ? n.longValue() : 0L),
+                LOGIN.equals(event.get("type")),
+                text(event.get("userId")),
+                text(username),
+                text(event.get("ipAddress")),
+                text(event.get("error")));
+    }
+
+    private static String text(Object value) {
+        return value instanceof String s && !s.isBlank() ? s : null;
     }
 
     private List<Map<String, Object>> realmRoles(String token, String externalId, String suffix) {

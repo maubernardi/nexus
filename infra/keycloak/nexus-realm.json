@@ -16,6 +16,12 @@
     "jboss-logging",
     "email"
   ],
+  "eventsEnabled": true,
+  "eventsExpiration": 31536000,
+  "enabledEventTypes": [
+    "LOGIN",
+    "LOGIN_ERROR"
+  ],
   "loginWithEmailAllowed": true,
   "accessTokenLifespan": 300,
   "actionTokenGeneratedByUserLifespan": 1800,
@@ -169,7 +175,8 @@
       "clientRoles": {
         "realm-management": [
           "view-users",
-          "manage-users"
+          "manage-users",
+          "view-events"
         ]
       }
     }

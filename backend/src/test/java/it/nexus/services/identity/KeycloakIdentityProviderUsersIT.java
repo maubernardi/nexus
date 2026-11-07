@@ -2,10 +2,21 @@ package it.nexus.services.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -182,5 +193,56 @@ class KeycloakIdentityProviderUsersIT {
         return RestClient.create(baseUrl).get().uri("/admin/realms/nexus/users/{id}", id)
                 .headers(h -> h.setBearerAuth(token))
                 .retrieve().body(JSON);
+    }
+
+    private static final String OPERATOR = "00000000-0000-4000-8000-000000000003";
+
+    @Test
+    void registroDegliAccessi_riuscitiEFalliti_conLIndirizzoIp() throws Exception {
+        // come dietro Caddy: l'indirizzo del browser arriva in X-Forwarded-For
+        login("operatore.cc", "sbagliata", "203.0.113.7");
+        login("nessuno.cosi", "sbagliata", "203.0.113.8");
+        login("operatore.cc", "password", "203.0.113.9");
+
+        List<LoginEvent> mine = users(DEV_SECRET).loginEvents(OPERATOR, 0, 10);
+        assertThat(mine).extracting(LoginEvent::success, LoginEvent::ipAddress, LoginEvent::error)
+                .containsExactly(tuple(true, "203.0.113.9", null),
+                        tuple(false, "203.0.113.7", "invalid_user_credentials"));
+        assertThat(mine).allSatisfy(e -> assertThat(e.userExternalId()).isEqualTo(OPERATOR));
+        assertThat(mine.getFirst().at()).isAfter(Instant.now().minus(Duration.ofMinutes(5)));
+
+        // tra i falliti anche lo username inesistente, senza account
+        assertThat(users(DEV_SECRET).failedLogins(0, 10))
+                .extracting(LoginEvent::userExternalId, LoginEvent::username, LoginEvent::ipAddress, LoginEvent::error)
+                .contains(tuple(null, "nessuno.cosi", "203.0.113.8", "user_not_found"),
+                        tuple(OPERATOR, "operatore.cc", "203.0.113.7", "invalid_user_credentials"));
+        // una pagina alla volta
+        assertThat(users(DEV_SECRET).loginEvents(OPERATOR, 1, 10)).hasSize(1);
+    }
+
+    /** Il modulo di accesso di Keycloak, come un browser: cookie della sessione e indirizzo dietro il proxy. */
+    private static void login(String username, String password, String clientIp) throws Exception {
+        HttpClient http = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NEVER).build();
+        HttpResponse<String> page = http.send(HttpRequest.newBuilder(URI.create(baseUrl
+                + "/realms/nexus/protocol/openid-connect/auth?client_id=nexus-frontend&response_type=code&scope=openid"
+                + "&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2F"
+                + "&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256"))
+                .header("X-Forwarded-For", clientIp).build(), HttpResponse.BodyHandlers.ofString());
+        Matcher action = Pattern.compile("<form[^>]*action=\"([^\"]+)\"").matcher(page.body());
+        assertThat(action.find()).as("modulo di accesso").isTrue();
+        // l'azione usa il dominio pubblico (KC_HOSTNAME): si tiene il percorso, sull'indirizzo del container
+        URI target = URI.create(action.group(1).replace("&amp;", "&"));
+        String cookies = page.headers().allValues("Set-Cookie").stream().map(c -> c.split(";", 2)[0])
+                .collect(Collectors.joining("; "));
+        String form = "username=" + URLEncoder.encode(username, StandardCharsets.UTF_8)
+                + "&password=" + URLEncoder.encode(password, StandardCharsets.UTF_8);
+        HttpResponse<String> result = http.send(HttpRequest.newBuilder(URI.create(baseUrl + target.getRawPath()
+                        + "?" + target.getRawQuery()))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .header("Cookie", cookies)
+                .header("X-Forwarded-For", clientIp)
+                .POST(HttpRequest.BodyPublishers.ofString(form)).build(), HttpResponse.BodyHandlers.ofString());
+        // riuscito: Keycloak rimanda alla PWA; fallito: ripropone il modulo con l'errore
+        assertThat(result.statusCode()).isIn(200, 302);
     }
 }

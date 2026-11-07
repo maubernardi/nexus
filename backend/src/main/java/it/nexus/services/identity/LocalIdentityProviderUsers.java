@@ -1,6 +1,7 @@
 package it.nexus.services.identity;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.context.annotation.Profile;
@@ -52,5 +53,15 @@ public class LocalIdentityProviderUsers implements IdentityProviderUsers {
     @Override
     public void logout(String externalId) {
         // nessuna sessione da chiudere
+    }
+
+    @Override
+    public List<LoginEvent> loginEvents(String externalId, int first, int max) {
+        return List.of(); // gli utenti mock non passano da una pagina di accesso
+    }
+
+    @Override
+    public List<LoginEvent> failedLogins(int first, int max) {
+        return List.of();
     }
 }

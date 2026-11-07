@@ -15,6 +15,8 @@ import { ClosureReportPage } from '@/pages/ClosureReportPage/ClosureReportPage';
 import { DevLoginPage } from '@/pages/DevLoginPage/DevLoginPage';
 import { InternshipPage } from '@/pages/InternshipPage/InternshipPage';
 import { CoordinationPage } from '@/pages/CoordinationPage/CoordinationPage';
+import { FailedLoginsPage } from '@/pages/FailedLoginsPage/FailedLoginsPage';
+import { UserAccessLogPage } from '@/pages/UserAccessLogPage/UserAccessLogPage';
 import { CalendarPage } from '@/pages/CalendarPage/CalendarPage';
 import { CompaniesPage } from '@/pages/CompaniesPage/CompaniesPage';
 import { CompanyEditPage } from '@/pages/CompanyEditPage/CompanyEditPage';
@@ -227,6 +229,24 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.userTickets.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'utenti/accessi-falliti',
+        element: (
+          <RoleRoute roles={['ADMIN']}>
+            <FailedLoginsPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.failedLogins.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'utenti/:id/accessi',
+        element: (
+          <RoleRoute roles={['ADMIN']}>
+            <UserAccessLogPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.userAccessLog.title' } satisfies RouteHandle,
       },
       {
         path: 'utenti/:id/accesso',

@@ -88,7 +88,16 @@ describe('<UsersPage>', () => {
       within(rows[2])
         .getAllByRole('link')
         .map((l) => l.textContent),
-    ).toEqual(['Accesso e ruolo']);
+    ).toEqual(['Accesso e ruolo', 'Accessi']);
+    // registro degli accessi per tutti (US-113)
+    expect(within(rows[2]).getByRole('link', { name: 'Accessi di Verdi Anna' })).toHaveAttribute(
+      'href',
+      '/utenti/U2/accessi',
+    );
+    expect(screen.getByRole('link', { name: 'Accessi non riusciti' })).toHaveAttribute(
+      'href',
+      '/utenti/accessi-falliti',
+    );
     // accesso e ruolo per tutti (US-105)
     expect(within(rows[2]).getByRole('link', { name: 'Accesso e ruolo di Verdi Anna' })).toHaveAttribute(
       'href',

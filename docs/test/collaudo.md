@@ -742,3 +742,15 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      con «PORTALE NEXUS - » (es. «PORTALE NEXUS - Reimposta la password») e finiscono con la firma «Portale Nexus».
   6. Chiedi un altro collegamento e aprilo dopo più di 30 minuti. **Atteso:** Keycloak dice che è scaduto e propone di
      chiederne uno nuovo.
+
+- [ ] **T-21.2 Registro degli accessi (US-113)**
+
+  Serve, una volta dopo il deploy, `keycloak-access-log.sh` (README). Gli accessi di prima non ci sono.
+  1. Esci ed entra come un tuo utente; poi esci e prova con la password sbagliata. Entra di nuovo.
+  2. In **Il mio profilo**, sezione **I miei accessi**. **Atteso:** dal più recente, «Riuscito» e «Non riuscito:
+     password sbagliata», con data, ora italiana e il tuo indirizzo IP.
+  3. Come `admin`, in **Utenti**, pulsante **Accessi** su quell'utente. **Atteso:** le stesse righe.
+  4. Esci e prova ad accedere con uno username che non esiste (es. `nessuno.cosi`). Come `admin`, **Utenti** →
+     **Accessi non riusciti**. **Atteso:** la riga con «Utente inesistente», `nessuno.cosi` nella colonna «Scritto nel
+     modulo», data, ora e IP; anche la password sbagliata del punto 1, con il nome dell'utente.
+  5. Come Tutor, apri l'indirizzo `/utenti/accessi-falliti`. **Atteso:** la pagina non è disponibile per il tuo ruolo.

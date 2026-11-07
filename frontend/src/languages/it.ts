@@ -977,6 +977,42 @@ export const it = {
     loadError: 'Impossibile caricare il profilo utente. Riprova più tardi.',
     retry: 'Riprova',
   },
+  accessLog: {
+    intro:
+      'Ogni accesso a NEXUS, riuscito o no, con data, ora e indirizzo IP, dal più recente. Gli accessi si conservano 12 mesi.',
+    userHeading: 'Accessi di {{name}}',
+    userCaption: 'Accessi di {{name}}, dal più recente',
+    edit: 'Accessi',
+    editFor: 'Accessi di {{name}}',
+    mineHeading: 'I miei accessi',
+    mineIntro:
+      'Quando e da dove sei entrato in NEXUS, e i tentativi non riusciti con il tuo utente. Se ne vedi uno che non hai fatto tu, cambia la password e avvisa l’amministratore.',
+    mineCaption: 'I miei accessi, dal più recente',
+    failedHeading: 'Accessi non riusciti',
+    failedIntro:
+      'I tentativi di accesso non riusciti di tutti, anche con uno username che non esiste: tanti tentativi dallo stesso indirizzo IP possono essere qualcuno che prova a indovinare una password. Si conservano 12 mesi.',
+    failedCaption: 'Accessi non riusciti, dal più recente',
+    none: 'Nessun accesso registrato.',
+    noFailures: 'Nessun accesso non riuscito.',
+    more: 'Mostra accessi più vecchi',
+    success: 'Riuscito',
+    failure: 'Non riuscito',
+    failureWith: 'Non riuscito: {{reason}}',
+    unknownUser: 'Utente inesistente',
+    errors: {
+      invalid_user_credentials: 'password sbagliata',
+      user_not_found: 'utente inesistente',
+      user_disabled: 'utente disattivato',
+      user_temporarily_disabled: 'bloccato per troppi tentativi',
+    },
+    fields: {
+      at: 'Data e ora',
+      user: 'Utente',
+      username: 'Scritto nel modulo',
+      outcome: 'Esito',
+      ip: 'Indirizzo IP',
+    },
+  },
   coordination: {
     heading: 'Coordinamento',
     intro:
@@ -1399,6 +1435,12 @@ export const it = {
     },
     coordination: {
       title: 'Coordinamento',
+    },
+    userAccessLog: {
+      title: 'Accessi dell’utente',
+    },
+    failedLogins: {
+      title: 'Accessi non riusciti',
     },
     userAccount: {
       title: 'Accesso e ruolo dell’utente',

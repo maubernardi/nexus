@@ -27,5 +27,7 @@ export type RouteHandle = {
     | 'pages.userTickets.title'
     | 'pages.userAccount.title'
     | 'pages.coordination.title'
+    | 'pages.userAccessLog.title'
+    | 'pages.failedLogins.title'
     | 'pages.forbidden.title';
 };

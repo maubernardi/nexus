@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiError } from '@/config/api/errors';
 import type { EmailStatus, PendingEmailChange } from '@/config/api/userApi';
+import { useMyAccessLog } from '@/config/hooks/useAccessLog';
 import { useCurrentUser } from '@/config/hooks/useCurrentUser';
 import {
   useCancelEmailChange,
@@ -15,6 +16,7 @@ import {
   useRequestEmailChange,
 } from '@/config/hooks/useMyEmail';
 import { FormField } from '@/molecules/FormField/FormField';
+import { AccessLogTable } from '@/organisms/AccessLogTable/AccessLogTable';
 
 const time = new Intl.DateTimeFormat('it-IT', {
   hour: '2-digit',
@@ -35,12 +37,14 @@ const useFailureText = (): ((error: unknown) => string) => {
 
 /**
  * Il mio profilo (US-110): dati dell'account e cambio dell'indirizzo email in due passi. Il nuovo indirizzo riceve un
- * codice di 6 cifre; solo con il codice l'indirizzo cambia (in NEXUS e nell'account di accesso).
+ * codice di 6 cifre; solo con il codice l'indirizzo cambia (in NEXUS e nell'account di accesso). In fondo i miei
+ * accessi (US-113), per accorgermi di quelli che non ho fatto io.
  */
 export const ProfilePage = () => {
   const { t } = useTranslation();
   const { data: user } = useCurrentUser();
   const email = useMyEmail();
+  const accessLog = useMyAccessLog();
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const feedbackRef = useRef<HTMLParagraphElement>(null);
 
@@ -101,6 +105,17 @@ export const ProfilePage = () => {
           ) : (
             <NewEmailStep current={email.data} onFeedback={setFeedback} />
           ))}
+      </section>
+
+      <section
+        aria-labelledby="profile-access-log"
+        className="space-y-4 rounded-xl border border-border bg-card p-4"
+      >
+        <h2 id="profile-access-log" className="text-lg font-semibold">
+          {t('accessLog.mineHeading')}
+        </h2>
+        <p className="text-muted-foreground">{t('accessLog.mineIntro')}</p>
+        <AccessLogTable query={accessLog} caption={t('accessLog.mineCaption')} />
       </section>
     </div>
   );
