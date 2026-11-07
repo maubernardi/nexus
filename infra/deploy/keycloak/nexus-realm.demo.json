@@ -16,6 +16,12 @@
     "jboss-logging",
     "email"
   ],
+  "eventsEnabled": true,
+  "eventsExpiration": 31536000,
+  "enabledEventTypes": [
+    "LOGIN",
+    "LOGIN_ERROR"
+  ],
   "rememberMe": false,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
@@ -188,7 +194,8 @@
       "clientRoles": {
         "realm-management": [
           "view-users",
-          "manage-users"
+          "manage-users",
+          "view-events"
         ]
       }
     }

@@ -1,6 +1,7 @@
 package it.nexus.services.identity;
 
 import java.time.Duration;
+import java.util.List;
 
 import it.nexus.domain.enumeration.Role;
 
@@ -45,4 +46,14 @@ public interface IdentityProviderUsers {
 
     /** Chiude le sessioni aperte: al prossimo accesso valgono stato e ruolo nuovi (US-105). */
     void logout(String externalId);
+
+    /**
+     * Accessi riusciti e falliti dell'account, dal più recente; Keycloak li conserva 12 mesi (US-113).
+     *
+     * @param first quanti saltarne, per le pagine successive
+     */
+    List<LoginEvent> loginEvents(String externalId, int first, int max);
+
+    /** Tentativi di accesso falliti di tutti, anche con uno username inesistente, dal più recente (US-113). */
+    List<LoginEvent> failedLogins(int first, int max);
 }

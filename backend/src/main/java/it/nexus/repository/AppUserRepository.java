@@ -14,6 +14,9 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
 
     Optional<AppUser> findByExternalId(String externalId);
 
+    /** Utenti dei tentativi di accesso falliti, per mostrarne il nome (US-113). */
+    List<AppUser> findByExternalIdIn(Collection<String> externalIds);
+
     Optional<AppUser> findByUsername(String username);
 
     List<AppUser> findByUsernameIn(Collection<String> usernames);

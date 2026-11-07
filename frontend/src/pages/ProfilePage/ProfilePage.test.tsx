@@ -11,9 +11,16 @@ import {
   requestEmailChange,
   type EmailStatus,
 } from '@/config/api/userApi';
+import { fetchMyAccessLog } from '@/config/api/accessLogApi';
 import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderWithProviders } from '@/tests/renderWithProviders';
+
+vi.mock('@/config/api/accessLogApi', () => ({
+  fetchMyAccessLog: vi.fn(),
+  fetchUserAccessLog: vi.fn(),
+  fetchFailedLogins: vi.fn(),
+}));
 
 vi.mock('@/config/api/userApi', () => ({
   fetchCurrentUser: vi.fn(),
@@ -51,6 +58,7 @@ const renderPage = () =>
 
 describe('<ProfilePage>', () => {
   beforeEach(() => {
+    vi.mocked(fetchMyAccessLog).mockResolvedValue({ entries: [], hasMore: false });
     vi.mocked(fetchCurrentUser).mockResolvedValue({
       id: 'U1',
       username: 'tutor1',
@@ -216,5 +224,42 @@ describe('<ProfilePage>', () => {
     await user.type(await screen.findByLabelText(/Nuovo indirizzo email/), 'mario@example.org');
     await user.click(screen.getByRole('button', { name: 'Invia il codice' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Operazione non riuscita');
+  });
+
+  it('i miei accessi, in ora italiana, con i tentativi non riusciti e le pagine più vecchie (US-113)', async () => {
+    vi.mocked(fetchMyEmail).mockResolvedValue(current);
+    vi.mocked(fetchMyAccessLog)
+      .mockResolvedValueOnce({
+        entries: [
+          // 11:46 UTC = 12:46 a Roma
+          { at: '2026-11-07T11:46:00Z', success: true, ipAddress: '203.0.113.9' },
+          {
+            at: '2026-11-07T11:45:00Z',
+            success: false,
+            ipAddress: '203.0.113.7',
+            error: 'invalid_user_credentials',
+          },
+        ],
+        hasMore: true,
+      })
+      .mockResolvedValueOnce({
+        entries: [{ at: '2026-11-06T08:00:00Z', success: false, error: 'qualcosa_di_nuovo' }],
+        hasMore: false,
+      });
+    const user = userEvent.setup();
+    renderPage();
+
+    const table = await screen.findByRole('table', { name: 'I miei accessi, dal più recente' });
+    expect(table).toHaveTextContent('07/11/2026, 12:46');
+    expect(table).toHaveTextContent('Riuscito');
+    expect(table).toHaveTextContent('Non riuscito: password sbagliata');
+    expect(table).toHaveTextContent('203.0.113.7');
+    await expectNoAxeViolations();
+
+    await user.click(screen.getByRole('button', { name: 'Mostra accessi più vecchi' }));
+    // un motivo senza testo resta «Non riuscito»
+    await waitFor(() => expect(table).toHaveTextContent('06/11/2026'));
+    expect(fetchMyAccessLog).toHaveBeenLastCalledWith(1);
+    expect(screen.queryByRole('button', { name: 'Mostra accessi più vecchi' })).not.toBeInTheDocument();
   });
 });

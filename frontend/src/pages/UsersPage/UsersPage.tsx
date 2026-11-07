@@ -73,12 +73,17 @@ export const UsersPage = () => {
       <PageHeading>{t('users.heading')}</PageHeading>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-muted-foreground">{t('users.intro')}</p>
-        <Button asChild size="lg">
-          <Link to="/utenti/nuovo">
-            <Plus aria-hidden="true" />
-            {t('users.new')}
-          </Link>
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button asChild variant="outline" size="lg">
+            <Link to="/utenti/accessi-falliti">{t('accessLog.failedHeading')}</Link>
+          </Button>
+          <Button asChild size="lg">
+            <Link to="/utenti/nuovo">
+              <Plus aria-hidden="true" />
+              {t('users.new')}
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {feedback && (
@@ -174,6 +179,11 @@ export const UsersPage = () => {
                           aria-label={t('users.account.editFor', { name })}
                         >
                           {t('users.account.edit')}
+                        </Link>
+                      </Button>
+                      <Button asChild variant="outline" size="sm">
+                        <Link to={`/utenti/${u.id}/accessi`} aria-label={t('accessLog.editFor', { name })}>
+                          {t('accessLog.edit')}
                         </Link>
                       </Button>
                       {u.role === 'TUTOR' && (
