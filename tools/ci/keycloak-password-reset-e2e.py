@@ -18,7 +18,7 @@ import threading
 import time
 import urllib.parse
 import urllib.request
-from http.cookiejar import CookieJar
+from http.cookiejar import CookieJar, DefaultCookiePolicy
 
 SMTP_PORT = 2525
 NEW_PASSWORD = "Una-password-nuova-1308"
@@ -77,30 +77,29 @@ def main() -> None:
     server.daemon_threads = True
     threading.Thread(target=server.serve_forever, daemon=True).start()
 
-    jar = CookieJar()
+    class LocalhostPolicy(DefaultCookiePolicy):
+        """Keycloak marca i cookie della sessione come Secure: la prova su http://localhost deve rimandarli comunque,
+        anche durante i redirect."""
+
+        def return_ok_secure(self, cookie, request):  # noqa: D102 (API di http.cookiejar)
+            return True
+
     class LoggedRedirects(urllib.request.HTTPRedirectHandler):
         def redirect_request(self, req, fp, code, msg, headers, newurl):  # noqa: N802 (API di urllib)
-            print(f"   {code} -> {urllib.parse.urlsplit(newurl).netloc}{urllib.parse.urlsplit(newurl).path}")
+            target = urllib.parse.urlsplit(newurl)
+            print(f"   {code} -> {target.netloc}{target.path}")
             return super().redirect_request(req, fp, code, msg, headers, newurl)
 
+    jar = CookieJar(policy=LocalhostPolicy())
     opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar), LoggedRedirects())
-
-    def insecure_cookies() -> None:
-        # Keycloak marca i cookie della sessione come Secure: su http://localhost la CookieJar non li rimanderebbe
-        for cookie in jar:
-            cookie.secure = False
 
     def get(url: str) -> str:
         with opener.open(url) as response:
-            page = response.read().decode()
-        insecure_cookies()
-        return page
+            return response.read().decode()
 
     def post(url: str, fields: dict[str, str]) -> str:
         with opener.open(url, urllib.parse.urlencode(fields).encode()) as response:
-            page = response.read().decode()
-        insecure_cookies()
-        return page
+            return response.read().decode()
 
     auth = (f"{base}/realms/nexus/protocol/openid-connect/auth?client_id=nexus-frontend"
             "&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2F&response_type=code&scope=openid"
