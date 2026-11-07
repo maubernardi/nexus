@@ -87,7 +87,9 @@ def main() -> None:
     class LoggedRedirects(urllib.request.HTTPRedirectHandler):
         def redirect_request(self, req, fp, code, msg, headers, newurl):  # noqa: N802 (API di urllib)
             target = urllib.parse.urlsplit(newurl)
-            print(f"   {code} -> {target.netloc}{target.path}")
+            query = urllib.parse.parse_qs(target.query)
+            detail = {k: v for k, v in query.items() if k in ("error", "error_description", "kc_action_status")}
+            print(f"   {code} -> {target.netloc}{target.path} {detail or ''}")
             return super().redirect_request(req, fp, code, msg, headers, newurl)
 
     jar = CookieJar(policy=LocalhostPolicy())
