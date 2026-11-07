@@ -220,6 +220,23 @@ html.login-pf {
   border-top-right-radius: 0;
 }
 
+/* il contorno del focus gira intorno a campo e pulsante insieme: sul solo campo sbordava sotto il pulsante */
+.login-pf .pf-v5-c-input-group:focus-within {
+  border-radius: calc(var(--nexus-radius) - 2px);
+  outline: 2px solid var(--nexus-ring);
+  outline-offset: 2px;
+}
+
+.login-pf .pf-v5-c-input-group .pf-v5-c-form-control:focus-within {
+  outline: none;
+}
+
+/* con un errore anche il pulsante ha il bordo rosso, dello stesso spessore del campo */
+.login-pf .pf-v5-c-input-group:has(.pf-v5-c-form-control.pf-m-error) .pf-v5-c-button.pf-m-control {
+  border: 2px solid var(--nexus-destructive);
+  border-left: 0;
+}
+
 .login-pf .pf-v5-c-helper-text__item-text.pf-m-error,
 .login-pf .kc-feedback-text.pf-m-error {
   color: var(--nexus-destructive);
