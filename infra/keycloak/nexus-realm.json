@@ -8,6 +8,7 @@
   ],
   "defaultLocale": "it",
   "loginTheme": "nexus",
+  "emailTheme": "nexus",
   "sslRequired": "external",
   "registrationAllowed": false,
   "resetPasswordAllowed": true,

@@ -35,7 +35,7 @@ public class EmailChangeMailer {
     private static final String FOOTER = """
 
             Messaggio automatico di NEXUS, non rispondere.
-            """;
+            """ + EmailSignature.BLOCK;
 
     private final JavaMailSender mailSender;
     private final ApplicationProperties.Mail properties;

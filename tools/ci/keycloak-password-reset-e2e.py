@@ -20,6 +20,8 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from http.cookiejar import CookieJar, DefaultCookiePolicy
 
 SMTP_PORT = 2525
@@ -64,6 +66,14 @@ def wait_for_messages(count: int, timeout: float = 30) -> None:
 def body(message: email.message.EmailMessage) -> str:
     part = message.get_body(preferencelist=("plain", "html"))
     return part.get_content() if part else ""
+
+
+def signed(message: email.message.EmailMessage) -> None:
+    """Firma «Portale Nexus» in fondo, nel testo semplice e nell'HTML (richiesta del PO del 07/11)."""
+    for kind in ("plain", "html"):
+        part = message.get_body(preferencelist=(kind,))
+        if part is None or "Portale Nexus" not in part.get_content().strip()[-60:]:
+            sys.exit(f"Manca la firma «Portale Nexus» in fondo all'email «{message['Subject']}» ({kind})")
 
 
 def form(page: str) -> str:
@@ -123,6 +133,7 @@ def main() -> None:
     action = re.search(r'(https?://[^\s"<>]+login-actions/action-token[^\s"<>]+)', body(first))
     if not action:
         sys.exit("Nessun collegamento nell'email:\n" + body(first))
+    signed(first)
     print(f"1. Email del collegamento: «{first['Subject']}»")
 
     # 2. una password sbagliata non manda email (il filtro dell'immagine lascia passare solo il cambio di password)
@@ -153,7 +164,17 @@ def main() -> None:
     second = MESSAGES[1]
     if address not in second["To"]:
         sys.exit(f"Email di sicurezza al destinatario sbagliato: {second['To']}")
-    print(f"3. Email di sicurezza: «{second['Subject']}»")
+    signed(second)
+    text = body(second)
+    match = re.search(rf"^{re.escape(username)}, le tue credenziali sono state cambiate il (\d{{2}}/\d{{2}}/\d{{4}}) "
+                      r"alle (\d{2}:\d{2}) da questo indirizzo IP: (\S+)\r?\n"
+                      r"Se non sei stato tu, per favore contatta l'amministratore\.", text, re.MULTILINE)
+    if not match:
+        sys.exit("Testo dell'email di sicurezza diverso dal previsto:\n" + text)
+    sent_at = datetime.strptime(f"{match.group(1)} {match.group(2)}", "%d/%m/%Y %H:%M").replace(tzinfo=ZoneInfo("Europe/Rome"))
+    if abs(datetime.now(ZoneInfo("Europe/Rome")) - sent_at) > timedelta(minutes=3):
+        sys.exit(f"Ora dell'email di sicurezza non nel fuso di Roma: {match.group(1)} {match.group(2)}")
+    print(f"3. Email di sicurezza: «{second['Subject']}», {match.group(1)} alle {match.group(2)}, IP {match.group(3)}")
     if len(MESSAGES) != 2:
         sys.exit(f"Attese 2 email, arrivate {len(MESSAGES)}: " + ", ".join(str(m["Subject"]) for m in MESSAGES))
     print("Recupero della password ed email di sicurezza: OK")

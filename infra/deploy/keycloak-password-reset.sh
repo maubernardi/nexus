@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # NEXUS — una tantum, sui server installati prima di US-1308: attiva nel realm "nexus" di Keycloak il recupero della
-# password («Password dimenticata?» nella pagina di accesso) e l'email di sicurezza quando la password cambia. Il collegamento arriva per email con l'SMTP impostato da
+# password («Password dimenticata?» nella pagina di accesso), l'email di sicurezza quando la password cambia e il tema
+# delle email di NEXUS (firma «Portale Nexus»). Il collegamento arriva per email con l'SMTP impostato da
 # keycloak-email.sh (da eseguire prima: è quello che fa arrivare anche gli inviti) ed è valido 30 minuti.
 # Idempotente: si può rieseguire.
 #   curl -fsSLO https://raw.githubusercontent.com/maubernardi/nexus/<ref>/infra/deploy/keycloak-password-reset.sh
@@ -40,8 +41,12 @@ echo "attivo: collegamento valido $((LINK_VALIDITY_SECONDS / 60)) minuti"
 
 step "Email di sicurezza al cambio della password"
 kc "$KCADM update realms/nexus --config $KCCONFIG -s 'eventsListeners=[\"jboss-logging\",\"email\"]'"
-kc "rm -f $KCCONFIG"
 echo "attiva (solo al cambio della password: l'immagine di Keycloak filtra gli altri eventi)"
+
+step "Tema delle email (testi di NEXUS e firma «Portale Nexus»)"
+kc "$KCADM update realms/nexus --config $KCCONFIG -s emailTheme=nexus"
+kc "rm -f $KCCONFIG"
+echo "attivo"
 
 echo
 echo "Fatto: nella pagina di accesso c'è «Password dimenticata?» e a ogni cambio di password parte un'email di"
