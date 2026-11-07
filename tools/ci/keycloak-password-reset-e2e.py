@@ -118,7 +118,10 @@ def main() -> None:
     print(f"1. Email del collegamento: «{first['Subject']}»")
 
     # 2. il collegamento porta alla nuova password (a volte dopo una pagina «procedi»)
-    page = get(html.unescape(action.group(1)))
+    # l'host nel collegamento è quello visto da Keycloak: si tiene il percorso, sull'indirizzo della prova
+    target = urllib.parse.urlsplit(html.unescape(action.group(1)))
+    print(f"   collegamento verso {target.scheme}://{target.netloc}")
+    page = get(urllib.parse.urljoin(base, target.path + "?" + target.query))
     if 'name="password-new"' not in page:
         proceed = re.search(r'href="([^"]*login-actions/[^"]+)"', page)
         if not proceed:
