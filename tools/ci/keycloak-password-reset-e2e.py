@@ -167,7 +167,7 @@ def main() -> None:
     signed(second)
     text = body(second)
     match = re.search(rf"^{re.escape(username)}, le tue credenziali sono state cambiate il (\d{{2}}/\d{{2}}/\d{{4}}) "
-                      r"alle (\d{2}:\d{2}) da questo indirizzo IP: (\S+)\n"
+                      r"alle (\d{2}:\d{2}) da questo indirizzo IP: (\S+)\r?\n"
                       r"Se non sei stato tu, per favore contatta l'amministratore\.", text, re.MULTILINE)
     if not match:
         sys.exit("Testo dell'email di sicurezza diverso dal previsto:\n" + text)
