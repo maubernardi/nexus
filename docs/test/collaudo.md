@@ -778,3 +778,11 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      «Fuori dalla fascia 8–20».
   3. Leggi `docs/security/asvs-l1.md`. Per L2: **Settings → Security → Code security → Dependabot alerts → Enable**
      (solo avvisi, nessuna PR automatica).
+
+- [ ] **T-21.5 Menu dell'ADMIN (08/11)**
+  1. Come `admin`, su un computer. **Atteso:** in alto Segnalazioni, Beneficiari, Aziende, Bacheca e **Amministrazione
+     ▾**; niente si sovrappone a campanella, nome ed Esci.
+  2. Apri **Amministrazione**. **Atteso:** Utenti, Cataloghi e Calendario; Esc o un clic fuori lo chiudono. Su una
+     pagina di Utenti, Cataloghi o Calendario la voce Amministrazione è evidenziata.
+  3. Restringi la finestra sotto i 1024 px (o da tablet). **Atteso:** il menu passa al pulsante ☰, con il gruppo
+     «Amministrazione» già aperto.

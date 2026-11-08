@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -48,5 +48,33 @@ describe('<MainNav>', () => {
     );
     expect(panel).toHaveTextContent('Tutor Uno');
     await expectNoAxeViolations();
+  });
+
+  it('ADMIN: Utenti, Cataloghi e Calendario nel sottomenu «Amministrazione», che si chiude con Esc', async () => {
+    renderWithProviders(<MainNav roles={['ADMIN']} />);
+    const user = userEvent.setup();
+    const toggle = screen.getByRole('button', { name: 'Amministrazione' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    // le voci in vista restano quattro, più il sottomenu
+    expect(screen.getByRole('link', { name: 'Beneficiari' })).toHaveAttribute('href', '/beneficiari/tutti');
+
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    const submenu = document.getElementById(toggle.getAttribute('aria-controls') ?? '') as HTMLElement;
+    expect(
+      within(submenu)
+        .getAllByRole('link')
+        .map((l) => l.textContent),
+    ).toEqual(['Utenti', 'Cataloghi', 'Calendario']);
+    await expectNoAxeViolations();
+
+    await user.keyboard('{Escape}');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(toggle).toHaveFocus();
+  });
+
+  it('il Tutor non ha il sottomenu', () => {
+    renderWithProviders(<MainNav roles={['TUTOR']} />);
+    expect(screen.queryByRole('button', { name: 'Amministrazione' })).not.toBeInTheDocument();
   });
 });
