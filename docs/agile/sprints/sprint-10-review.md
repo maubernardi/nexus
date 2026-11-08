@@ -199,10 +199,13 @@ chiedere modifiche al codice, e va configurato Dependabot. Sotto la media (23) p
 US-1305 avrà uno sprint dedicato: se avanza tempo, nessun extra pronto oltre a US-1301 (PO). US-205 introduce il
 caricamento di file: la revisione ASVS (V12) si aggiorna con quella storia.
 
+> ✅ **Deciso (PO, 08/11): piano confermato** (15 punti). Sprint 11: [sprint-11.md](sprint-11.md). In sprint dedicati,
+> più avanti: **revisione UX/UI** (US-1305) e **integrazione dei modelli Word reali** (US-1006, nuova).
+
 ## 10. Azioni a carico del PO
 
 - [x] Decidere i punti §8.1–§8.6 (08/11).
-- [ ] Confermare il planning (§9).
+- [x] Confermare il planning (§9, 08/11).
 - [ ] US-1301: PWA su Android e iOS (collaudo T-10.1).
 - [x] Collaudo dello Sprint 10 (T-21.1–T-21.5, 08/11).
 - [x] Avvisi di Dependabot e notifiche email delle Actions (08/11).
