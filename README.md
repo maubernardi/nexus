@@ -195,6 +195,14 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
   ```
   A ogni cambio di password Keycloak manda all'utente un'email di sicurezza; il filtro sugli eventi è nell'immagine
   `nexus-keycloak`, quindi lo script va eseguito **dopo** il deploy (prima scriverebbe anche a ogni password sbagliata).
+- **Keycloak 26.8 (EN-6).** Da questa versione l'API di amministrazione accetta solo token con lo scope `kc-admin-api`,
+  che va dato al client tecnico `nexus-backend-admin` (nei realm importati c'è già). Sul server già installato, **una
+  volta, subito dopo il deploy di Keycloak 26.8**:
+  ```bash
+  curl -fsSLO https://raw.githubusercontent.com/maubernardi/nexus/main/infra/deploy/keycloak-admin-api-scope.sh
+  sudo bash keycloak-admin-api-scope.sh   # nessun segreto
+  ```
+  Finché manca, creazione degli utenti, cambio email, disattivazione e registro degli accessi sono «non disponibili».
 - **Registro degli accessi (US-113).** Keycloak registra gli accessi riusciti e falliti (data, ora, IP) e li cancella
   dopo 12 mesi; NEXUS li mostra in «Utenti → Accessi», «Accessi non riusciti» e nel profilo. Il client tecnico
   `nexus-backend-admin` ha anche `view-events`. Sul server già installato, **una volta, dopo il deploy di US-113**:

@@ -103,6 +103,15 @@
       "publicClient": false,
       "clientAuthenticatorType": "client-secret",
       "secret": "${NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET}",
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "roles",
+        "profile",
+        "basic",
+        "email",
+        "kc-admin-api"
+      ],
       "serviceAccountsEnabled": true,
       "standardFlowEnabled": false,
       "directAccessGrantsEnabled": false,
