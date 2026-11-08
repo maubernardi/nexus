@@ -10,4 +10,4 @@
 
 - [x] 3.1 Collaudo
 - [x] 3.2 PR con CI verde
-- [ ] 3.3 Il PO attiva le notifiche email delle Actions e gli avvisi di Dependabot
+- [x] 3.3 Il PO attiva le notifiche email delle Actions e gli avvisi di Dependabot (08/11)
