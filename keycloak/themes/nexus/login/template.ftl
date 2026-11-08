@@ -1,5 +1,5 @@
 <#--
-  NEXUS: copia di keycloak.v2/login/template.ftl di Keycloak 26.7.4. Cambiano solo le parti segnate «NEXUS»:
+  NEXUS: copia di keycloak.v2/login/template.ftl di Keycloak 26.8.2. Cambiano solo le parti segnate «NEXUS»:
   favicon, intestazione verde con logo (fuori dal riquadro, come nel sito) e piè di pagina. Al cambio di versione di
   Keycloak si riparte dal nuovo template e si riapplicano queste parti.
 -->
