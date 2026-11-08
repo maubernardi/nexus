@@ -117,7 +117,7 @@ Legenda: ✅ soddisfatto · ⚠️ lacuna, con azione proposta · — non applic
 | # | Lacuna | Proposta | Chi | Quando |
 |---|---|---|---|---|
 | L1 | Password comuni accettate (2.1.7) | Policy `passwordBlacklist` di Keycloak con un elenco pubblico di password comuni (es. le 100 000 più usate), nel tema/immagine e attivata da uno script | Team | prima di US-1306 |
-| L2 | Nessun avviso per dipendenze vulnerabili (14.2.1) | Attivare gli **avvisi di sicurezza di Dependabot** del repository (solo avvisi, senza PR automatiche: le versioni restano congelate e si aggiorna solo su decisione) | PO (impostazione di GitHub) | subito |
+| L2 | Nessun avviso per dipendenze vulnerabili (14.2.1) | Attivare gli **avvisi di sicurezza di Dependabot** del repository (solo avvisi, senza PR automatiche: le versioni restano congelate e si aggiorna solo su decisione) | PO (impostazione di GitHub) | ✅ fatto l'08/11 |
 
 Da rivedere quando cambiano: caricamento dei file (US-205), passaggio in produzione (US-1306: utenti demo eliminati,
 backup, questa revisione aggiornata).

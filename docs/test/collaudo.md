@@ -770,7 +770,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   5. (Facoltativo, se c'è un altro beneficiario da anonimizzare) **Tieni i dati** con un motivo. **Atteso:** «Dati
      tenuti» e, per l'ADMIN, «Motivo: …».
 
-- [ ] **T-21.4 Controllo della demo e revisione di sicurezza (US-1307)**
+- [x] **T-21.4 Controllo della demo e revisione di sicurezza (US-1307)**
   1. Su GitHub, **Settings → Notifications → System → Actions**: le notifiche dei workflow falliti arrivano per email
      (impostazione dell'account).
   2. **Actions → Controllo della demo → Run workflow** su `main`. **Atteso:** run verde con «Demo online» e i giorni di
@@ -779,7 +779,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   3. Leggi `docs/security/asvs-l1.md`. Per L2: **Settings → Security → Code security → Dependabot alerts → Enable**
      (solo avvisi, nessuna PR automatica).
 
-- [ ] **T-21.5 Menu dell'ADMIN (08/11)**
+- [x] **T-21.5 Menu dell'ADMIN (08/11)**
   1. Come `admin`, su un computer. **Atteso:** in alto Segnalazioni, Beneficiari, Aziende, Bacheca e **Amministrazione
      ▾**; niente si sovrappone a campanella, nome ed Esci.
   2. Apri **Amministrazione**. **Atteso:** Utenti, Cataloghi e Calendario; Esc o un clic fuori lo chiudono. Su una
