@@ -65,7 +65,6 @@ nel backlog (review dello Sprint 9, §8.6). Prossima migrazione: **V31** (la V30
 
 ## Per il PO durante lo sprint
 
-- collaudo: T-21.2 (registro degli accessi), T-21.3 (anonimizzazione: «Demo Otto» è segnato dalla notte del 07/11),
-  T-21.4 (controllo della demo, notifiche delle Actions e avvisi di Dependabot); poi sezione 20 (T-20.2–T-20.8),
-  T-13.4, sezioni 16–17, T-19.2;
+- collaudo: T-21.2 e T-21.3 superate (08/11); T-21.4 (controllo della demo, notifiche delle Actions e avvisi di
+  Dependabot) e T-21.5 (menu dell'ADMIN); poi sezione 20 (T-20.2–T-20.8), T-13.4, sezioni 16–17, T-19.2;
 - US-1301 (PWA su smartphone, T-10.1).
