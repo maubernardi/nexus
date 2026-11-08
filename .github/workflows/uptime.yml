@@ -1,0 +1,74 @@
+name: Controllo della demo
+
+# US-1307: ogni 10 minuti, dalle 8 alle 20 ora italiana, controlla da fuori che la demo risponda. Se un controllo
+# fallisce, il run fallisce e GitHub manda un'email al PO (notifiche delle Actions dell'account). Nessun segreto: solo
+# richieste pubbliche, come quelle di un browser.
+# Il cron di GitHub è in UTC e non conosce l'ora legale: gira dalle 6 alle 19:50 UTC e il primo passo salta i run fuori
+# dalla fascia 8–20 di Roma. GitHub può ritardare i run pianificati di qualche minuto.
+
+on:
+  schedule:
+    - cron: '*/10 6-19 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+env:
+  NEXUS_DOMAIN: portalenexus.it
+  # avviso se il certificato scade entro questi giorni (Caddy lo rinnova da solo 30 giorni prima)
+  CERT_MIN_DAYS: '14'
+
+jobs:
+  check:
+    name: Sito, accesso e API
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    steps:
+      - name: Solo dalle 8 alle 20, ora italiana
+        id: window
+        run: |
+          hour=$(TZ=Europe/Rome date +%-H)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || { [ "$hour" -ge 8 ] && [ "$hour" -lt 20 ]; }; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Fuori dalla fascia 8–20 (ora italiana: $hour): nessun controllo"
+          fi
+
+      - name: Controlli (3 tentativi a 30 secondi, per non avvisare per un singolo intoppo)
+        if: steps.window.outputs.run == 'true'
+        run: |
+          check() {
+            curl -fsS -o /dev/null --max-time 15 "https://$NEXUS_DOMAIN/" || { echo "La PWA non risponde"; return 1; }
+            curl -fsS --max-time 15 "https://auth.$NEXUS_DOMAIN/realms/nexus/.well-known/openid-configuration" \
+              | grep -q '"issuer"' || { echo "Keycloak non risponde"; return 1; }
+            # senza accesso il backend risponde 401: se risponde altro (502, 503…) il backend è giù
+            code=$(curl -s -o /dev/null --max-time 15 -w '%{http_code}' "https://$NEXUS_DOMAIN/api/v1/me")
+            [ "$code" = 401 ] || { echo "Il backend risponde $code invece di 401"; return 1; }
+          }
+          for attempt in 1 2 3; do
+            if check; then
+              echo "Demo online (tentativo $attempt)"
+              exit 0
+            fi
+            [ "$attempt" -lt 3 ] && sleep 30
+          done
+          echo "::error::La demo https://$NEXUS_DOMAIN non risponde: controlla con il workflow «Stato del server»"
+          exit 1
+
+      - name: Scadenza del certificato
+        if: steps.window.outputs.run == 'true'
+        run: |
+          for host in "$NEXUS_DOMAIN" "auth.$NEXUS_DOMAIN"; do
+            end=$(echo | openssl s_client -connect "$host:443" -servername "$host" 2>/dev/null \
+              | openssl x509 -noout -enddate | cut -d= -f2)
+            days=$(( ($(date -d "$end" +%s) - $(date +%s)) / 86400 ))
+            echo "$host: certificato valido ancora $days giorni"
+            if [ "$days" -lt "$CERT_MIN_DAYS" ]; then
+              echo "::error::Il certificato di $host scade tra $days giorni: Caddy non lo sta rinnovando"
+              exit 1
+            fi
+          done
