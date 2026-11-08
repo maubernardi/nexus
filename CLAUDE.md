@@ -20,9 +20,9 @@ Le regole sono imposte anche tecnicamente da `.claude/hooks/guard-git.sh` (PreTo
 
 - **Versioni sempre aggiornate** (decisione del PO dell'08/11, sostituisce il congelamento del 27/09): le versioni devono
   essere sempre il più aggiornate possibile — ultime **stabili** (mai beta/RC) e, per i runtime con linea LTS (Java,
-  Node), l'ultima **LTS** (dettagli nella review dello Sprint 10, §8.2). Prevalgono sulle versioni indicate dalle skill.
-  Versioni sempre esatte (pnpm ha `saveExact`); gli avvisi di Dependabot si chiudono aggiornando; ogni aggiornamento
-  passa da una PR con la CI verde, le versioni principali in PR separate.
+  Node), l'ultima **LTS** (review dello Sprint 10, §8.2). Prevalgono sulle versioni indicate dalle skill. Versioni
+  sempre esatte (pnpm ha `saveExact`); gli aggiornamenti arrivano con le PR di Dependabot (le unisce il PO) e gli avvisi
+  si chiudono aggiornando; ogni aggiornamento passa da una PR con la CI verde, le versioni principali in PR separate.
 - Brief funzionale: `CLAUDE_CODE_PROMPT.md`. Lo stack indicato nel brief (Next.js/Prisma/NextAuth) è **sostituito** da
   Spring Boot (`backend/`) + React/Vite (`frontend/`); vedi `openspec/config.yaml`.
 - Sviluppo spec-driven con OpenSpec: ogni nuova funzionalità passa da una change (`/opsx:propose` → `/opsx:apply` → `/opsx:archive`).

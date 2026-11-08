@@ -99,11 +99,11 @@ axios, usata solo fuori dal browser). Decisione del PO: aggiornarle **tutte** co
 **R2, R3** — ✅ complete.
 
 **R4** — *produzione*: **58 punti su 76** fatti. Restano US-1302 *Backup* (5), US-1305 *Revisione UX/UI* (8), US-1306
-*Passaggio in produzione* (5); con questa review entrano **EN-6** *Dipendenze aggiornate* (5) e **EN-7** *Password
-comuni bloccate* (2), che portano R4 a 83 punti.
+*Passaggio in produzione* (5); con questa review entrano **EN-6** *Dipendenze aggiornate* (8) e **EN-7** *Password
+comuni rifiutate* (2), che portano R4 a 86 punti.
 
 **Product backlog:** 73 elementi attivi, 268 punti; completati 68 (244 punti) negli Sprint 1–10. Con EN-6 ed EN-7:
-75 elementi, 275 punti.
+75 elementi, 278 punti.
 
 ## 7. Retrospettiva
 
@@ -136,6 +136,8 @@ comuni bloccate* (2), che portano R4 a 83 punti.
 ### 8.1 Chiusura dello Sprint 10
 *Proposta:* Sprint 10 chiuso con velocity **22** (US-1303 a 8 punti).
 
+> ✅ **Deciso (PO, 08/11): proposta accettata.**
+
 ### 8.2 Versioni sempre aggiornate
 Hai deciso (08/11) che le versioni devono essere sempre il più aggiornate possibile. Da precisare:
 - **quali versioni**: *proposta*, l'ultima **stabile** (mai beta o RC) e, per Java e Node, l'ultima **LTS**, come avevi
@@ -149,46 +151,58 @@ Hai deciso (08/11) che le versioni devono essere sempre il più aggiornate possi
 
 La regola va in `CLAUDE.md` al posto di «Versioni congelate»; in questa PR c'è già, da confermare.
 
+> ✅ **Deciso (PO, 08/11):** per Java e Node **l'ultima LTS** (per tutto il resto l'ultima stabile); aggiornamenti con
+> le **PR di Dependabot** (configurate con EN-6, da unire tu); le **versioni principali in PR separate**. Nota: a
+> novembre 2026 l'ultima LTS di Node è la 26 (LTS da ottobre), quella di Java resta la 25.
+
 ### 8.3 Password comuni (L1)
 *Proposta:* EN-7 — Keycloak rifiuta le password comuni con la sua policy `passwordBlacklist` e un elenco pubblico delle
 100 000 password più usate, inserito nell'immagine di Keycloak; uno script la attiva sulla demo.
+
+> ✅ **Deciso (PO, 08/11): proposta accettata.** EN-7 nello Sprint 11.
 
 ### 8.4 Backup (US-1302)
 Nella review dello Sprint 9 è rimasta nel backlog. Serve per la produzione (US-1306): *proposta*, nello Sprint 11 con lo
 spazio di archiviazione **IONOS** (30 backup giornalieri, cifrati); le credenziali le metti tu nel `.env` del server.
 
+> ✅ **Deciso (PO, 08/11): US-1302 resta nel backlog** per il momento.
+
 ### 8.5 Revisione UX/UI (US-1305)
 Va raffinata insieme prima di stimarla davvero. *Proposta:* una sessione in cui mi dici, pagina per pagina, cosa rallenta
 Tutor e Call Center; ne escono storie piccole per lo Sprint 12.
+
+> ✅ **Deciso (PO, 08/11):** la revisione UX/UI si farà più avanti, in **uno sprint dedicato**: non sarà semplice.
 
 ### 8.6 Vedere l'interfaccia (A20)
 Per controllare pagine ed email prima di consegnarle mi serve un browser. *Proposta:* collegare l'estensione di Chrome
 a Claude Code quando lavoriamo (la scelta è tua), oppure installare in locale un browser senza finestra (Chromium di
 Playwright, ~150 MB) solo per gli screenshot.
 
-## 9. Proposta per lo Sprint 11 (3 giorni, ~20 punti)
+> ✅ **Deciso (PO, 08/11): estensione di Chrome.** Verificata collegata l'08/11: la demo si vede (menu dell'ADMIN a
+> 1280 px corretto). Limite: nella demo non inserisco password; per le pagine con l'accesso entra il PO o la prova si fa
+> in locale.
 
-**Obiettivo proposto:** *NEXUS è aggiornato e senza vulnerabilità note, le password comuni sono rifiutate e i dati hanno
-un backup fuori dal server.*
+## 9. Proposta per lo Sprint 11 (3 giorni)
+
+**Obiettivo proposto:** *NEXUS è aggiornato e senza vulnerabilità note, resta aggiornato con le PR di Dependabot, le
+password comuni sono rifiutate e il Tutor allega il curriculum del beneficiario.*
 
 | Ordine | ID | Storia | Punti | Release |
 |---|---|---|---|---|
-| 1 | EN-6 | Dipendenze aggiornate: tutte le vulnerabilità e tutte le versioni all'ultima stabile (§8.2) | 5 | R4 |
-| 2 | EN-7 | Password comuni rifiutate (L1, §8.3) | 2 | R4 |
-| 3 | US-1302 | Backup del database (§8.4) | 5 | R4 |
-| 4 | US-205 | Curriculum del beneficiario | 5 | — |
-| | | **Totale** | **17** | |
+| 1 | EN-6 | Dipendenze aggiornate: tutte le vulnerabilità, tutte le versioni (LTS per Java e Node), PR di Dependabot configurate; versioni principali in PR separate | 8 | R4 |
+| 2 | EN-7 | Password comuni rifiutate (L1) | 2 | R4 |
+| 3 | US-205 | Curriculum del beneficiario | 5 | — |
+| | | **Totale** | **15** | |
 
-**Extra:** la sessione di raffinamento di US-1305 (§8.5).
-
-EN-6 per primo, come hai chiesto; gli aggiornamenti delle versioni principali in PR separate. US-205 introduce il
-caricamento di file: la revisione ASVS (V12) va aggiornata con quella storia. Dopo lo Sprint 11 restano per R4 US-1305 e
-US-1306 (passaggio in produzione).
+EN-6 sale da 5 a 8 punti: con le versioni principali in PR separate (React, Vite, Spring Boot, Node 26…) ognuna può
+chiedere modifiche al codice, e va configurato Dependabot. Sotto la media (23) perché US-1302 resta nel backlog e
+US-1305 avrà uno sprint dedicato: se avanza tempo, nessun extra pronto oltre a US-1301 (PO). US-205 introduce il
+caricamento di file: la revisione ASVS (V12) si aggiorna con quella storia.
 
 ## 10. Azioni a carico del PO
 
-- [ ] Decidere i punti §8.1–§8.6 e confermare il planning (§9).
-- [ ] Credenziali dello spazio di archiviazione dei backup nel `.env` del server, se confermi §8.4.
+- [x] Decidere i punti §8.1–§8.6 (08/11).
+- [ ] Confermare il planning (§9).
 - [ ] US-1301: PWA su Android e iOS (collaudo T-10.1).
 - [x] Collaudo dello Sprint 10 (T-21.1–T-21.5, 08/11).
 - [x] Avvisi di Dependabot e notifiche email delle Actions (08/11).
