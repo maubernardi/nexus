@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.1</version>
+        <version>4.1.2</version>
         <relativePath/>
     </parent>
 
@@ -21,7 +21,7 @@
         <maven.compiler.release>25</maven.compiler.release>
         <mapstruct.version>1.6.3</mapstruct.version>
         <lombok.version>1.18.48</lombok.version>
-        <springdoc.version>3.1.1</springdoc.version>
+        <springdoc.version>3.2.0</springdoc.version>
         <hypersistence-tsid.version>2.1.4</hypersistence-tsid.version>
         <poi.version>6.0.0</poi.version>
     </properties>
@@ -171,12 +171,12 @@
                 </configuration>
             </plugin>
             <plugin>
-                <!-- Versioni congelate: build solo con JDK 25 (LTS) e Maven 3.9.16 (wrapper) -->
+                <!-- Build con il JDK LTS (25) e il Maven del wrapper: le versioni si aggiornano insieme al wrapper (EN-6) -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>enforce-frozen-toolchain</id>
+                        <id>enforce-toolchain</id>
                         <goals>
                             <goal>enforce</goal>
                         </goals>
@@ -186,7 +186,7 @@
                                     <version>[25,26)</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
-                                    <version>[3.9.16]</version>
+                                    <version>[3.10.0]</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>
