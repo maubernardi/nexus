@@ -9,7 +9,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | https://portalenexus.it |
-| **Versione della demo** | `e30269f` (06/11/2026): Sprint 1–9 completi (gestione di progetti e utenti, Coordinatore) e cambio dell'indirizzo email (US-110) |
+| **Versione della demo** | `ed3332b` (08/11/2026): Sprint 1–10 completi (recupero della password, registro degli accessi, anonimizzazione; controllo della demo; sottomenu Amministrazione) |
 | **Ultimo aggiornamento** | 06/11/2026 (T-13.5 progetti e sezione 20 utenti: da provare dopo il deploy) |
 
 ## Come prepararsi
@@ -743,7 +743,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   6. Chiedi un altro collegamento e aprilo dopo più di 30 minuti. **Atteso:** Keycloak dice che è scaduto e propone di
      chiederne uno nuovo.
 
-- [ ] **T-21.2 Registro degli accessi (US-113)**
+- [x] **T-21.2 Registro degli accessi (US-113)**
 
   Serve, una volta dopo il deploy, `keycloak-access-log.sh` (README). Gli accessi di prima non ci sono.
   1. Esci ed entra come un tuo utente; poi esci e prova con la password sbagliata. Entra di nuovo.
@@ -755,7 +755,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      modulo», data, ora e IP; anche la password sbagliata del punto 1, con il nome dell'utente.
   5. Come Tutor, apri l'indirizzo `/utenti/accessi-falliti`. **Atteso:** la pagina non è disponibile per il tuo ruolo.
 
-- [ ] **T-21.3 Anonimizzazione a scadenza (US-1303)**
+- [x] **T-21.3 Anonimizzazione a scadenza (US-1303)**
 
   Nei dati demo c'è «Demo Otto Beneficiaria» di `tutor1`, fermo da 3 anni: la notte dopo il deploy (alle 2:30) il
   controllo lo segna «Da anonimizzare».

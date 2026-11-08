@@ -9,4 +9,4 @@
 
 - [x] 2.1 Collaudo
 - [x] 2.2 PR con CI verde
-- [ ] 2.3 Sul server: deploy, poi `keycloak-password-reset.sh`
+- [x] 2.3 Sul server: deploy, poi `keycloak-password-reset.sh`

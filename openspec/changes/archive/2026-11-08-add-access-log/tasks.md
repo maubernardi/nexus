@@ -11,4 +11,4 @@
 
 - [x] 3.1 Collaudo
 - [x] 3.2 PR con CI verde
-- [ ] 3.3 Sul server: deploy, poi `keycloak-access-log.sh`
+- [x] 3.3 Sul server: deploy, poi `keycloak-access-log.sh`
