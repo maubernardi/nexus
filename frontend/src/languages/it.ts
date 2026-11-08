@@ -20,6 +20,7 @@ export const it = {
     calendar: 'Calendario',
     users: 'Utenti',
     coordination: 'Coordinamento',
+    admin: 'Amministrazione',
   },
   common: {
     loading: 'Caricamento in corso…',
