@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 15 | 76 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 17 | 86 |
 
 ## Domande aperte per il Product Owner
 
@@ -74,11 +74,13 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [EN-5](#en-5) | E13 | Controllo della numerazione delle migrazioni nella CI | Must | 1 | R1 | 🎉 Done (Sprint 3) |
+| [EN-6](#en-6) | E13 | Dipendenze aggiornate e senza vulnerabilità note | Must | 8 | R4 | ✅ Ready (Sprint 11) |
+| [EN-7](#en-7) | E13 | Password comuni rifiutate | Must | 2 | R4 | ✅ Ready (Sprint 11) |
 | [US-201](#us-201) | E2 | Inserimento beneficiario | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 🎉 Done (Sprint 3) |
 | [US-204](#us-204) | E2 | Visibilità dei beneficiari per progetto | Must | 3 | R1 | 🎉 Done (Sprint 3) |
-| [US-205](#us-205) | E2 | Curriculum del beneficiario | Could | 5 | — | 📋 Backlog |
+| [US-205](#us-205) | E2 | Curriculum del beneficiario | Could | 5 | — | ✅ Ready (Sprint 11) |
 | [US-301](#us-301) | E3 | Nuova segnalazione | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-302](#us-302) | E3 | Nuova tipologia di mansione dal Tutor, approvata dal Call Center | Should | 5 | R2 | 🎉 Done (Sprint 4) |
 | [US-303](#us-303) | E3 | Elenco delle segnalazioni (Home) | Must | 5 | R1 | 🎉 Done (Sprint 3) |
@@ -118,6 +120,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1003](#us-1003) | E10 | Avvio del tirocinio | Must | 1 | R3 | 🎉 Done (Sprint 8) |
 | [US-1004](#us-1004) | E10 | Convenzione in Word | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1005](#us-1005) | E10 | Progetto Formativo in Word | Must | 3 | R3 | 🎉 Done (Sprint 8) |
+| [US-1006](#us-1006) | E10 | Integrazione dei modelli Word reali | Must | — | R4 | 📋 Backlog |
 | [US-1101](#us-1101) | E11 | Report di restituzione | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1102](#us-1102) | E11 | Esito sulla mansione e audit trail | Must | 2 | R3 | 🎉 Done (Sprint 8) |
 | [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | 🎉 Done (Sprint 5) |
@@ -349,7 +352,7 @@ Criteri di accettazione:
 - Un tutor di altri progetti non vede né il beneficiario né le sue segnalazioni; il controllo è nelle API, non solo nell'interfaccia.
 
 #### US-205
-**Curriculum del beneficiario** · Could · 5 punti · — · 📋 Backlog
+**Curriculum del beneficiario** · Could · 5 punti · — · ✅ Ready (Sprint 11)
 
 Come **Tutor** voglio allegare il CV (PDF) al beneficiario per metterlo a disposizione del Call Center per l'abbinamento.
 
@@ -862,6 +865,17 @@ Dipendenze: US-1004 · Domande aperte: Q5
 
 _Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda._
 
+#### US-1006
+**Integrazione dei modelli Word reali** · Must · da stimare · R4 · 📋 Backlog
+
+Come **Tutor** voglio scaricare Convenzione e Progetto Formativo sui modelli reali della cooperativa, al posto dei
+segnaposto, per usarli senza ritoccarli (Q5). Decisione del PO dell'08/11: si farà in **uno sprint dedicato**, come la
+revisione UX/UI (US-1305).
+
+Criteri di accettazione (da raffinare con il PO quando arrivano i modelli):
+- I modelli reali, uno per tipo di tirocinio, compilati con i dati della scheda; nessun segnaposto scoperto.
+- Come si modificano i modelli in futuro (Q5, «il PO ci sta pensando»).
+
 #### US-1101
 **Report di restituzione** · Must · 5 punti · R3 · 🎉 Done (Sprint 8)
 
@@ -945,6 +959,32 @@ Criteri di accettazione:
   con un numero duplicato, e il messaggio indica il numero da usare.
 - Le PR senza migrazioni non sono toccate dal controllo.
 
+
+#### EN-6
+**Dipendenze aggiornate e senza vulnerabilità note** · Must · 8 punti · R4 · ✅ Ready (Sprint 11)
+
+Come **PO** voglio che NEXUS usi sempre le versioni più aggiornate delle sue dipendenze per non portare in produzione
+vulnerabilità note. Decisione del PO dell'08/11, dopo i primi 32 avvisi di Dependabot: aggiornarle tutte come prima cosa
+dello Sprint 11 e non congelare più le versioni.
+
+Criteri di accettazione:
+- Nessun avviso di Dependabot aperto.
+- Frontend, backend, immagini (Keycloak, PostgreSQL, Caddy) e action della CI all'ultima versione stabile; per Java e
+  Node l'ultima LTS (review dello Sprint 10, §8.2).
+- Dependabot configurato per aprire le PR di aggiornamento (npm, Maven, Docker, Actions), raggruppate; le unisce il PO.
+- Le versioni principali in PR separate; CI verde e demo deployata e controllata dopo ognuna.
+- La regola è in `CLAUDE.md` («Versioni sempre aggiornate»).
+
+#### EN-7
+**Password comuni rifiutate** · Must · 2 punti · R4 · ✅ Ready (Sprint 11)
+
+Come **responsabile della sicurezza** voglio che Keycloak rifiuti le password comuni per chiudere la lacuna L1 della
+revisione ASVS (2.1.7).
+
+Criteri di accettazione:
+- Una password tra le più usate (es. `Password1234`) è rifiutata con un messaggio in italiano, anche se lunga 12
+  caratteri.
+- L'elenco è nell'immagine di Keycloak; uno script la attiva sul server già installato.
 #### US-1301
 **Verifica della PWA online** · Must · 1 punti · R1 · 📋 Backlog
 
@@ -994,6 +1034,7 @@ Come **utente** voglio un'interfaccia studiata sui flussi reali di Tutor e Call 
 
 Criteri di accettazione:
 - Da raffinare con il PO in una sessione dedicata (probabile suddivisione in più storie).
+- Decisione del PO dell'08/11: si farà in **uno sprint dedicato**, perché non sarà semplice.
 
 #### US-1306
 **Passaggio in produzione** · Must · 5 punti · R4 · 📋 Backlog
