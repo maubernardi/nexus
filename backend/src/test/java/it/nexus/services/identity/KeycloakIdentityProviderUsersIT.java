@@ -52,7 +52,7 @@ class KeycloakIdentityProviderUsersIT {
             };
 
     @Container
-    static final GenericContainer<?> KEYCLOAK = new GenericContainer<>("quay.io/keycloak/keycloak:26.7.4")
+    static final GenericContainer<?> KEYCLOAK = new GenericContainer<>("quay.io/keycloak/keycloak:26.8.2")
             .withCommand("start-dev", "--import-realm")
             .withCopyFileToContainer(MountableFile.forHostPath("../infra/keycloak/nexus-realm.json"),
                     "/opt/keycloak/data/import/nexus-realm.json")
