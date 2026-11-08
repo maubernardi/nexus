@@ -9,7 +9,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | https://portalenexus.it |
-| **Versione della demo** | `e30269f` (06/11/2026): Sprint 1–9 completi (gestione di progetti e utenti, Coordinatore) e cambio dell'indirizzo email (US-110) |
+| **Versione della demo** | `0c42db6` (07/11/2026): Sprint 1–10 completi (recupero della password, registro degli accessi, anonimizzazione; controllo della demo dall'08/11) |
 | **Ultimo aggiornamento** | 06/11/2026 (T-13.5 progetti e sezione 20 utenti: da provare dopo il deploy) |
 
 ## Come prepararsi

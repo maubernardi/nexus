@@ -69,7 +69,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-110](#us-110) | E1 | Cambio del proprio indirizzo email con codice | Must | 8 | R4 | 🎉 Done (fuori piano, 05/11) |
 | [US-111](#us-111) | E1 | Spostamento delle segnalazioni tra Tutor | Must | 5 | R4 | 🎉 Done (Sprint 9) |
 | [US-112](#us-112) | E1 | Coordinatore di progetto | Must | 3 | R4 | 🎉 Done (Sprint 9) |
-| [US-113](#us-113) | E1 | Registro degli accessi | Must | 7 | R4 | ✅ Ready (Sprint 10) |
+| [US-113](#us-113) | E1 | Registro degli accessi | Must | 7 | R4 | 🎉 Done (Sprint 10) |
 | [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
@@ -124,12 +124,12 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1301](#us-1301) | E13 | Verifica della PWA online | Must | 1 | R1 | 📋 Backlog |
 | [US-1302](#us-1302) | E13 | Backup del database | Must | 5 | R4 | 📋 Backlog |
-| [US-1303](#us-1303) | E13 | Anonimizzazione a scadenza | Must | 8 | R4 | ✅ Ready (Sprint 10) |
+| [US-1303](#us-1303) | E13 | Anonimizzazione a scadenza | Must | 8 | R4 | 🎉 Done (Sprint 10) |
 | [US-1304](#us-1304) | E13 | Tema di Keycloak | Should | 3 | R4 | 🎉 Done (Sprint 7, fuori piano) |
 | [US-1305](#us-1305) | E13 | Revisione UX/UI | Should | 8 | R4 | 📋 Backlog |
 | [US-1306](#us-1306) | E13 | Passaggio in produzione | Must | 5 | R4 | 📋 Backlog |
-| [US-1307](#us-1307) | E13 | Monitoraggio e revisione di sicurezza | Must | 5 | R4 | ✅ Ready (Sprint 10) |
-| [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | ✅ Ready (Sprint 10) |
+| [US-1307](#us-1307) | E13 | Monitoraggio e revisione di sicurezza | Must | 5 | R4 | 🎉 Done (Sprint 10) |
+| [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | 🎉 Done (Sprint 10) |
 
 ## Dettaglio per epica
 
@@ -273,7 +273,7 @@ Criteri di accettazione:
 Dipendenze: US-104, US-111
 
 #### US-113
-**Registro degli accessi** · Must · 7 punti · R4 · ✅ Ready (Sprint 10)
+**Registro degli accessi** · Must · 7 punti · R4 · 🎉 Done (Sprint 10)
 
 Come **ADMIN** voglio vedere, per ogni utente, quando e da dove è entrato in NEXUS per accorgermi di accessi anomali.
 Richiesta del PO del 06/11.
@@ -962,7 +962,7 @@ Criteri di accettazione:
 - Il ripristino di prova su un ambiente pulito riesce ed è documentato.
 
 #### US-1303
-**Anonimizzazione a scadenza** · Must · 8 punti · R4 · ✅ Ready (Sprint 10)
+**Anonimizzazione a scadenza** · Must · 8 punti · R4 · 🎉 Done (Sprint 10)
 
 Come **responsabile della privacy** voglio che i dati identificativi dei beneficiari siano anonimizzati alla scadenza della conservazione per rispettare il GDPR.
 
@@ -1006,7 +1006,7 @@ Criteri di accettazione:
 Dipendenze: US-102..105, US-1302, US-1307
 
 #### US-1307
-**Monitoraggio e revisione di sicurezza** · Must · 5 punti · R4 · ✅ Ready (Sprint 10)
+**Monitoraggio e revisione di sicurezza** · Must · 5 punti · R4 · 🎉 Done (Sprint 10)
 
 Come **ADMIN** voglio essere avvisato se l'app non risponde e avere una revisione di sicurezza prima della produzione per reagire ai problemi prima degli utenti.
 
@@ -1016,11 +1016,13 @@ Criteri di accettazione:
   dello Sprint 9, §8.7).
 
 #### US-1308
-**Recupero password** · Should · 2 punti · R4 · ✅ Ready (Sprint 10)
+**Recupero password** · Should · 2 punti · R4 · 🎉 Done (Sprint 10)
 
 Come **utente** voglio reimpostare la password dimenticata per non dipendere dall'amministratore.
 
 Criteri di accettazione:
 - Il link di recupero arriva per email ed è valido per un tempo limitato.
+- Fatto il 07/11: collegamento valido 30 minuti; email di sicurezza a ogni cambio di password (username, data, ora
+  italiana e IP); su richiesta del PO, oggetto «PORTALE NEXUS - …» e firma «Portale Nexus» in **tutte** le email.
 
 Dipendenze: US-1202. Lo fa Keycloak con l'SMTP di IONOS (review dello Sprint 8, §8.7)
