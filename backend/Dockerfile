@@ -1,11 +1,11 @@
 # Immagine di runtime del backend NEXUS. Il jar è costruito prima (CI: ./mvnw package), qui si estrae a layer:
 # dipendenze e codice applicativo in layer separati, così un deploy scarica di solito solo il codice cambiato.
-FROM eclipse-temurin:25.0.4.1_1-jre-alpine AS extract
+FROM eclipse-temurin:25.0.5_8-jre-alpine AS extract
 WORKDIR /build
 COPY target/nexus-backend-*.jar app.jar
 RUN java -Djarmode=tools -jar app.jar extract --layers --launcher --destination extracted
 
-FROM eclipse-temurin:25.0.4.1_1-jre-alpine
+FROM eclipse-temurin:25.0.5_8-jre-alpine
 LABEL org.opencontainers.image.source="https://github.com/maubernardi/nexus" \
       org.opencontainers.image.title="nexus-backend" \
       org.opencontainers.image.description="NEXUS — API Spring Boot"

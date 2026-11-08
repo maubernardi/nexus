@@ -31,7 +31,7 @@ nexus/
 
 ## Prerequisiti
 
-- **JDK 25** (LTS, es. Temurin 25.0.4.1). Il wrapper Maven (3.9.16) è incluso e la build rifiuta altre versioni di JDK
+- **JDK 25** (LTS, es. Temurin 25.0.5). Il wrapper Maven (3.10.0) è incluso e la build rifiuta altre versioni di JDK
 - **Node.js 24.21.0** (LTS, vedi `.nvmrc`: `nvm use`) e **pnpm 12.6.0** (`npm i -g pnpm@12.6.0`); pnpm rifiuta altre versioni di Node
 - Docker
 
@@ -116,14 +116,15 @@ Variabili principali: `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `KEYCLOAK_ISSUER_U
 
 ## Versioni congelate
 
-Il progetto è partito il 2026-09-27 con le **ultime versioni stabili** (LTS per Java, Node e Ubuntu), ora
-**congelate**: versioni esatte in `pom.xml`, `package.json` e tag Docker; action della CI fissate per SHA. Non si
-aggiornano senza una decisione esplicita, che passa da una change OpenSpec. La matrice completa e le motivazioni sono in
+Dall'08/11/2026 le versioni sono **sempre le più aggiornate possibile** (decisione del PO, EN-6): ultime stabili, LTS
+per Java, Node e Ubuntu; versioni esatte in `pom.xml`, `package.json` e tag Docker; action della CI fissate per SHA.
+Gli aggiornamenti arrivano con le PR di Dependabot, le versioni principali in PR separate. Il congelamento iniziale del
+2026-09-27 è in
 [`openspec/changes/archive/2026-09-27-upgrade-latest-versions/design.md`](openspec/changes/archive/2026-09-27-upgrade-latest-versions/design.md).
 
 | Java | Spring Boot | Node | pnpm | React | Vite | TypeScript | PostgreSQL | Keycloak |
 |---|---|---|---|---|---|---|---|---|
-| 25.0.4.1 | 4.1.1 | 24.21.0 | 12.6.0 | 19.3.0 | 8.3.1 | 6.0.3 | 18.6 | 26.7.4 |
+| 25.0.5 | 4.1.2 | 24.21.0 | 12.6.0 | 19.3.1 | 8.3.6 | 6.0.3 | 18.6 | 26.7.4 |
 
 ## Demo online
 
