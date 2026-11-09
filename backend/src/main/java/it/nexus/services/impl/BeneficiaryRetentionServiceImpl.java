@@ -21,6 +21,7 @@ import it.nexus.domain.enumeration.Role;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.InternshipRepository;
+import it.nexus.repository.StoredFileContentRepository;
 import it.nexus.repository.StoredFileRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BeneficiaryRetentionService;
@@ -41,6 +42,7 @@ public class BeneficiaryRetentionServiceImpl implements BeneficiaryRetentionServ
     private final BeneficiaryRepository beneficiaryRepository;
     private final InternshipRepository internshipRepository;
     private final StoredFileRepository storedFileRepository;
+    private final StoredFileContentRepository storedFileContentRepository;
     private final CurrentAppUserService currentAppUserService;
     private final AuditService auditService;
     private final ApplicationProperties applicationProperties;
@@ -88,7 +90,9 @@ public class BeneficiaryRetentionServiceImpl implements BeneficiaryRetentionServ
         beneficiaryRepository.saveAndFlush(beneficiary);
         // il CV (US-205) si cancella del tutto: file e contenuto
         if (cv != null) {
+            storedFileContentRepository.deleteById(cv.getId());
             storedFileRepository.delete(cv);
+            storedFileRepository.flush();
         }
         // dati personali: nell'audit solo che sono stati cancellati, mai i valori (GDPR)
         auditService.record(AuditEntityType.BENEFICIARY, beneficiary.getId(), "ANONYMIZE", AuditChanges.of()

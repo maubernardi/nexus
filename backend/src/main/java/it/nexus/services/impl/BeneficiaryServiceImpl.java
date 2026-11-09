@@ -207,7 +207,10 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
         if (old != null) {
             beneficiary.setCvFile(null);
             beneficiaryRepository.flush();
+            // prima il contenuto, che può essere ancora nella sessione, poi il file
+            storedFileContentRepository.deleteById(old.getId());
             storedFileRepository.delete(old);
+            storedFileRepository.flush();
         }
     }
 
