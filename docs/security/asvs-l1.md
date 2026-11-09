@@ -15,7 +15,7 @@ Legenda: ✅ soddisfatto · ⚠️ lacuna, con azione proposta · — non applic
 | | |
 |---|---|
 | **Soddisfatti** | autenticazione delegata a Keycloak con protezione dai tentativi ripetuti, password lunghe, recupero sicuro e avviso a ogni cambio; sessioni brevi; ogni endpoint autorizzato per ruolo e per oggetto; intestazioni di sicurezza complete (CSP rigida, HSTS, `nosniff`, `frame-ancestors 'none'`); API mai in cache; errori senza dettagli interni; log e audit senza dati personali; conservazione limitata (registro accessi 12 mesi, anonimizzazione dei beneficiari) |
-| **Lacune** | **L1** password comuni o compromesse non bloccate (2.1.7); **L2** nessun avviso automatico per le dipendenze vulnerabili (14.2.1) |
+| **Lacune** | Nessuna aperta: **L1** password comuni (2.1.7) chiusa con EN-7; **L2** avvisi sulle dipendenze (14.2.1) chiusa l'08/11 |
 | **Giudizio** | nessuna lacuna bloccante per la demo; L1 e L2 vanno chiuse prima della produzione (US-1306) |
 
 ## V1 — Architettura
@@ -31,7 +31,7 @@ Legenda: ✅ soddisfatto · ⚠️ lacuna, con azione proposta · — non applic
 |---|---|---|
 | 2.1.1 Password di almeno 12 caratteri | ✅ | `passwordPolicy: length(12) and notUsername and notEmail` |
 | 2.1.2 Password lunghe ammesse (≥ 64) | ✅ | Nessun limite massimo nella policy |
-| 2.1.7 Password comuni o compromesse rifiutate | ⚠️ **L1** | Keycloak non controlla le password note; la policy `passwordBlacklist` non è configurata |
+| 2.1.7 Password comuni o compromesse rifiutate | ✅ (L1 chiusa con EN-7) | Policy `passwordBlacklist` con le 46 146 password da 12 caratteri in su tra il milione più usate (SecLists); messaggio «Password troppo comune» |
 | 2.1.9 Nessuna regola di composizione | ✅ | Solo la lunghezza, come chiede ASVS |
 | 2.1.12 Mostrare la password digitata | ✅ | Pulsante «mostra» nel tema |
 | 2.2.1 Protezione dai tentativi ripetuti | ✅ | `bruteForceProtected`: dopo 5 errori attesa crescente fino a 15 minuti; i tentativi si vedono in «Accessi non riusciti» (US-113) |
@@ -116,7 +116,7 @@ Legenda: ✅ soddisfatto · ⚠️ lacuna, con azione proposta · — non applic
 
 | # | Lacuna | Proposta | Chi | Quando |
 |---|---|---|---|---|
-| L1 | Password comuni accettate (2.1.7) | Policy `passwordBlacklist` di Keycloak con un elenco pubblico di password comuni (es. le 100 000 più usate), nel tema/immagine e attivata da uno script | Team | prima di US-1306 |
+| L1 | Password comuni accettate (2.1.7) | Policy `passwordBlacklist` di Keycloak con un elenco pubblico di password comuni (es. le 100 000 più usate), nel tema/immagine e attivata da uno script | Team | ✅ fatto con EN-7 (Sprint 11) |
 | L2 | Nessun avviso per dipendenze vulnerabili (14.2.1) | Attivare gli **avvisi di sicurezza di Dependabot** del repository (solo avvisi, senza PR automatiche: le versioni restano congelate e si aggiorna solo su decisione) | PO (impostazione di GitHub) | ✅ fatto l'08/11 |
 
 Da rivedere quando cambiano: caricamento dei file (US-205), passaggio in produzione (US-1306: utenti demo eliminati,

@@ -792,3 +792,11 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   2. Il lunedì dopo il merge, **Pull requests**. **Atteso:** le PR di Dependabot («chore(deps): …»), le versioni minori
      raggruppate per ecosistema; ognuna con la CI verde prima del merge.
   3. Dopo ogni merge di Dependabot: deploy e controllo della demo, come per le altre PR.
+
+- [ ] **T-21.7 Password comuni rifiutate (EN-7)**
+
+  Dopo il deploy e `keycloak-password-policy.sh` (README).
+  1. Esci; nella pagina di accesso **Password dimenticata?** per un tuo utente e apri il collegamento dell'email.
+  2. Come nuova password scrivi `Password1234` (due volte). **Atteso:** «Password troppo comune: è tra quelle più
+     usate e facili da indovinare. Scegline un'altra.» e la pagina resta aperta.
+  3. Scegli una password tua, lunga e non banale. **Atteso:** accettata, entri in NEXUS e arriva l'email di sicurezza.
