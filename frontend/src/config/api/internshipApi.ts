@@ -30,6 +30,8 @@ export type Internship = {
   legalRepresentative?: LegalRepresentative | null;
   atecoCodes: AtecoCode[];
   internshipType?: ReferenceItem | null;
+  /** Tipi che si possono scegliere: attivi e ammessi dal progetto della segnalazione, più quello scelto (US-115). */
+  internshipTypes?: ReferenceItem[];
   startDate?: string | null;
   expectedEndDate?: string | null;
   site?: string | null;

@@ -125,6 +125,40 @@ class InternshipIT {
     }
 
     @Test
+    void tipiAmmessiDalProgetto_soloQuelliOQuelloGiaScelto() throws Exception {
+        InternshipType other = internshipTypes.save(new InternshipType("T_OK_" + ticket.getId(),
+                "Tipo ammesso " + ticket.getId()));
+        String otherId = TsidMapper.toExternal(other.getId());
+        // progetto senza limitazioni: tutti i tipi attivi
+        mockMvc.perform(get(base).header(USER, "tutor1"))
+                .andExpect(jsonPath("$.internshipTypes[?(@.id == '%s')]".formatted(typeId)).exists());
+
+        save("tutor1", form("\"internshipTypeId\": \"%s\", \"version\": null".formatted(typeId)))
+                .andExpect(status().isOk());
+        ticket.getProject().getAllowedInternshipTypes().add(other);
+        em.flush();
+
+        // il tipo già scelto resta valido e proposto, anche se il progetto ora non lo ammette
+        mockMvc.perform(get(base).header(USER, "tutor1"))
+                .andExpect(jsonPath("$.internshipTypes.length()").value(2))
+                .andExpect(jsonPath("$.internshipTypes[?(@.id == '%s')]".formatted(typeId)).exists())
+                .andExpect(jsonPath("$.internshipTypes[?(@.id == '%s')]".formatted(otherId)).exists());
+        save("tutor1", form("\"internshipTypeId\": \"%s\", \"version\": %d".formatted(typeId, version())))
+                .andExpect(status().isOk());
+        save("tutor1", form("\"internshipTypeId\": \"%s\", \"version\": %d".formatted(otherId, version())))
+                .andExpect(status().isOk());
+
+        // cambiato tipo, quello non ammesso non si può più scegliere
+        save("tutor1", form("\"internshipTypeId\": \"%s\", \"version\": %d".formatted(typeId, version())))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("internshipTypeId"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value(org.hamcrest.Matchers.containsString(
+                        "non è ammesso dal progetto")));
+        mockMvc.perform(get(base).header(USER, "tutor1"))
+                .andExpect(jsonPath("$.internshipTypes.length()").value(1));
+    }
+
+    @Test
     void schedaVuota_salvataggioParziale_rilettura_auditECronologia() throws Exception {
         mockMvc.perform(get(base).header(USER, "tutor1"))
                 .andExpect(status().isOk())

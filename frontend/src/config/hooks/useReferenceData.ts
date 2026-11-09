@@ -2,7 +2,6 @@ import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 
 import {
   fetchHiringFormulas,
-  fetchInternshipTypes,
   fetchJobCategories,
   fetchMyProjects,
   fetchNoHireReasons,
@@ -19,9 +18,6 @@ export const useZones = (): UseQueryResult<ReferenceItem[]> =>
 
 export const useJobCategories = (): UseQueryResult<ReferenceItem[]> =>
   useQuery({ queryKey: ['reference', 'jobCategories'], queryFn: fetchJobCategories, staleTime: STALE });
-
-export const useInternshipTypes = (): UseQueryResult<ReferenceItem[]> =>
-  useQuery({ queryKey: ['reference', 'internshipTypes'], queryFn: fetchInternshipTypes, staleTime: STALE });
 
 export const useHiringFormulas = (): UseQueryResult<ReferenceItem[]> =>
   useQuery({ queryKey: ['reference', 'hiringFormulas'], queryFn: fetchHiringFormulas, staleTime: STALE });

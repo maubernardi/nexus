@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `34d1301` (09/11/2026): Sprint 1–11 completi (dipendenze aggiornate, password comuni rifiutate, curriculum del beneficiario) |
-| **Ultimo aggiornamento** | 10/11/2026 (T-22.1 comuni e province: da provare dopo il deploy) |
+| **Ultimo aggiornamento** | 10/11/2026 (T-22.1 e T-22.2: da provare dopo il deploy) |
 
 ## Come prepararsi
 
@@ -826,3 +826,14 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   5. Se l'anteprima mostra differenze, premi **Conferma il caricamento**. **Atteso:** «Elenco caricato, valido dal …» e
      lo stato aggiornato; i comuni cambiati compaiono nella ricerca con la versione vecchia («valido dal … al …») e
      quella nuova.
+
+- [ ] **T-22.2 Sedi di competenza, tipi per progetto, enti di presa in carico (US-115)**
+  1. Come `admin`, **Amministrazione → Cataloghi**. **Atteso:** le sezioni «Tipi di tirocinio per progetto» (GOL: «Di
+     inclusione, Extracurriculare»; gli altri progetti: «Tutti i tipi»), «Sedi di competenza» (Firenze, Borgo San
+     Lorenzo, Sesto Fiorentino, con GOL) ed «Enti di presa in carico» (i quattro enti con la tipologia).
+  2. Nelle sedi, **Progetti** di «Firenze»: aggiungi POLIS e salva. **Atteso:** «Progetti di «Firenze» salvati.» e
+     POLIS nella colonna Progetti. Aggiungi una sede nuova, poi disattivala.
+  3. Negli enti, **Dati** di un ente: compila il referente con una mail sbagliata e salva. **Atteso:** l'errore sul
+     campo. Correggi e salva. **Atteso:** «Dati di «…» salvati.»
+  4. Come `tutor1`, apri la scheda del tirocinio di una segnalazione di GOL (ad esempio quella in tirocinio). **Atteso:**
+     nel tipo di tirocinio solo «Di inclusione» ed «Extracurriculare», più il tipo già scelto se era un altro.

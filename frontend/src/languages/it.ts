@@ -1001,6 +1001,70 @@ export const it = {
       size: 'Il CV supera i 5 MB.',
     },
   },
+  documentCatalogs: {
+    sites: {
+      projects: 'Progetti',
+      none: 'Nessun progetto',
+      action: 'Progetti',
+      heading: 'Progetti di «{{name}}»',
+      legend: 'Progetti della sede',
+      hint: 'Il Tutor vede la sede solo nelle segnalazioni di questi progetti. Si aggiungono solo progetti attivi.',
+      saved: 'Progetti di «{{name}}» salvati.',
+    },
+    projectTypes: {
+      heading: 'Tipi di tirocinio per progetto',
+      intro:
+        'Per ogni progetto, i tipi che il Tutor può scegliere nella scheda del tirocinio. Un progetto senza tipi indicati li ammette tutti.',
+      caption: 'Tipi di tirocinio ammessi per progetto',
+      project: 'Progetto',
+      types: 'Tipi ammessi',
+      all: 'Tutti i tipi',
+      inactive: '(disattivato)',
+      action: 'Modifica i tipi',
+      editHeading: 'Tipi ammessi da «{{name}}»',
+      legend: 'Tipi di tirocinio ammessi',
+      hint: 'Nessuna casella scelta = tutti i tipi. Un tipo tolto resta sulle schede che già lo usano.',
+      saved: 'Tipi ammessi da «{{name}}» salvati.',
+    },
+    agencies: {
+      kind: 'Tipologia',
+      action: 'Dati',
+      heading: 'Dati di «{{name}}»',
+      saved: 'Dati di «{{name}}» salvati.',
+      privacy:
+        'Tutti i dati sono facoltativi. Quelli delle persone non compaiono nell’audit: si registra solo che sono cambiati.',
+      sections: {
+        agency: 'Ente',
+        representative: 'Legale rappresentante',
+        referent: 'Referente per la convenzione',
+      },
+      fields: {
+        kind: 'Tipologia',
+        fiscalCode: 'Codice fiscale o partita IVA',
+        legalAddress: 'Sede legale',
+        representativeName: 'Nome e cognome del legale rappresentante',
+        representativeRole: 'Qualifica',
+        representativeBirthPlace: 'Luogo di nascita',
+        representativeBirthDate: 'Data di nascita',
+        referentName: 'Nome e cognome del referente',
+        referentPhone: 'Telefono del referente',
+        referentEmail: 'Mail del referente',
+      },
+      hints: {
+        fiscalCode: 'Partita IVA di 11 cifre o codice fiscale di 16 caratteri.',
+        birth: 'Solo se l’ente li indica nella convenzione.',
+      },
+      kinds: {
+        COMUNE: 'Comune',
+        UNIONE_COMUNI: 'Unione dei Comuni',
+        COMUNITA_MONTANA: 'Comunità montana',
+        SOCIETA_DELLA_SALUTE: 'Società della Salute',
+        AZIENDA_SANITARIA: 'Azienda sanitaria',
+        UIEPE: 'Ufficio interdistrettuale di esecuzione penale esterna',
+        ALTRO: 'Altro',
+      },
+    },
+  },
   municipalities: {
     heading: 'Comuni e province',
     intro:
@@ -1385,6 +1449,24 @@ export const it = {
       caption_one: 'Motivi della mancata assunzione: {{count}} voce',
       caption_other: 'Motivi della mancata assunzione: {{count}} voci',
     },
+    'competence-sites': {
+      heading: 'Sedi di competenza',
+      intro:
+        'Il luogo dei documenti di fine tirocinio. Una sede copre più comuni e può valere per più progetti: il Tutor la sceglie quando crea la segnalazione.',
+      add: 'Aggiungi sede',
+      newHeading: 'Nuova sede di competenza',
+      caption_one: 'Sedi di competenza: {{count}} voce',
+      caption_other: 'Sedi di competenza: {{count}} voci',
+    },
+    'care-agencies': {
+      heading: 'Enti di presa in carico',
+      intro:
+        'Gli enti che hanno in carico i beneficiari dei tirocini di inclusione. I loro dati compaiono nella convenzione e nel progetto personalizzato.',
+      add: 'Aggiungi ente',
+      newHeading: 'Nuovo ente di presa in carico',
+      caption_one: 'Enti di presa in carico: {{count}} voce',
+      caption_other: 'Enti di presa in carico: {{count}} voci',
+    },
     columns: { name: 'Nome', code: 'Codice', status: 'Stato', actions: 'Azioni' },
     active: 'Attiva',
     inactive: 'Disattivata',
@@ -1583,7 +1665,7 @@ export const it = {
       title: 'Cataloghi',
       heading: 'Cataloghi',
       intro:
-        'Le voci usate in tutta l’applicazione: progetti, zone, tipologie di mansione, tipi di tirocinio, le scelte del report di restituzione e l’elenco dei comuni. Le voci non si cancellano: una voce disattivata non si può più scegliere, ma resta sui dati che la usano.',
+        'Le voci usate in tutta l’applicazione: progetti, zone, tipologie di mansione, tipi di tirocinio, sedi di competenza, enti di presa in carico, le scelte del report di restituzione e l’elenco dei comuni. Le voci non si cancellano: una voce disattivata non si può più scegliere, ma resta sui dati che la usano.',
     },
     calendar: {
       title: 'Calendario',

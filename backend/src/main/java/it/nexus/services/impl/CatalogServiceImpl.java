@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.domain.AbstractReferenceEntity;
+import it.nexus.domain.CareAgency;
+import it.nexus.domain.CompetenceSite;
 import it.nexus.domain.HiringFormula;
 import it.nexus.domain.InternshipType;
 import it.nexus.domain.NoHireReason;
@@ -24,6 +26,8 @@ import it.nexus.domain.dto.CatalogFormDTO;
 import it.nexus.domain.dto.CatalogItemDTO;
 import it.nexus.domain.enumeration.CatalogKind;
 import it.nexus.mapper.TsidMapper;
+import it.nexus.repository.CareAgencyRepository;
+import it.nexus.repository.CompetenceSiteRepository;
 import it.nexus.repository.HiringFormulaRepository;
 import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.repository.NoHireReasonRepository;
@@ -48,6 +52,8 @@ public class CatalogServiceImpl implements CatalogService {
     private final HiringFormulaRepository hiringFormulaRepository;
     private final NoHireReasonRepository noHireReasonRepository;
     private final ProjectRepository projectRepository;
+    private final CompetenceSiteRepository competenceSiteRepository;
+    private final CareAgencyRepository careAgencyRepository;
     private final AuditService auditService;
 
     /** Le operazioni che servono su un catalogo: i due repository hanno metodi omonimi ma tipi diversi. */
@@ -84,6 +90,14 @@ public class CatalogServiceImpl implements CatalogService {
             case PROJECTS -> new Store(projectRepository::findAllByOrderByActiveDescNameAsc, projectRepository::findById,
                     projectRepository::findFirstByNameIgnoreCaseAndActiveTrue, projectRepository::existsByCode,
                     Project::new, e -> projectRepository.saveAndFlush((Project) e));
+            case COMPETENCE_SITES -> new Store(competenceSiteRepository::findAllByOrderByActiveDescNameAsc,
+                    competenceSiteRepository::findById, competenceSiteRepository::findFirstByNameIgnoreCaseAndActiveTrue,
+                    competenceSiteRepository::existsByCode, CompetenceSite::new,
+                    e -> competenceSiteRepository.saveAndFlush((CompetenceSite) e));
+            case CARE_AGENCIES -> new Store(careAgencyRepository::findAllByOrderByActiveDescNameAsc,
+                    careAgencyRepository::findById, careAgencyRepository::findFirstByNameIgnoreCaseAndActiveTrue,
+                    careAgencyRepository::existsByCode, CareAgency::new,
+                    e -> careAgencyRepository.saveAndFlush((CareAgency) e));
         };
     }
 

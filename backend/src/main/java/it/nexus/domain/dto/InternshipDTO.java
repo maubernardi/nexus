@@ -15,6 +15,8 @@ public record InternshipDTO(
         LegalRepresentativeDTO legalRepresentative,
         List<AtecoCodeDTO> atecoCodes,
         ReferenceItemDTO internshipType,
+        /** Tipi che si possono scegliere: attivi e ammessi dal progetto della segnalazione, più quello scelto (US-115). */
+        List<ReferenceItemDTO> internshipTypes,
         LocalDate startDate,
         LocalDate expectedEndDate,
         String site,

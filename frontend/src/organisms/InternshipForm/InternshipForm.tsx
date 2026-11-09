@@ -10,7 +10,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { apiError, toFormPath } from '@/config/api/errors';
 import type { Internship, InternshipForm as InternshipPayload } from '@/config/api/internshipApi';
 import type { ReferenceItem } from '@/config/api/referenceApi';
-import { useInternshipTypes } from '@/config/hooks/useReferenceData';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
 import { FormField } from '@/molecules/FormField/FormField';
@@ -156,7 +155,6 @@ type InternshipFormProps = {
  */
 export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: InternshipFormProps) => {
   const { t } = useTranslation();
-  const types = useInternshipTypes();
   const [genericError, setGenericError] = useState(false);
   const {
     register,
@@ -348,9 +346,9 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
             error={errors.internshipTypeId?.message}
           >
             {(p) => (
-              <NativeSelect {...p} disabled={!types.data} {...register('internshipTypeId')}>
+              <NativeSelect {...p} {...register('internshipTypeId')}>
                 <option value="">{t('form.select')}</option>
-                {withCurrent(types.data, internship.internshipType).map((type) => (
+                {withCurrent(internship.internshipTypes, internship.internshipType).map((type) => (
                   <option key={type.id} value={type.id}>
                     {type.name}
                   </option>

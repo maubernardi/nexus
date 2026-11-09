@@ -32,6 +32,7 @@ const useCatalogMutation = <V extends { kind: CatalogKind }>(
         queryClient.invalidateQueries({ queryKey: catalogKey(vars.kind) }),
         queryClient.invalidateQueries({ queryKey: ['reference'] }),
         queryClient.invalidateQueries({ queryKey: ['me', 'projects'] }),
+        queryClient.invalidateQueries({ queryKey: ['document-catalogs'] }),
       ]),
   });
 };

@@ -12,7 +12,10 @@ public enum CatalogKind {
     HIRING_FORMULAS("hiring-formulas", AuditEntityType.HIRING_FORMULA, "FORMULA"),
     NO_HIRE_REASONS("no-hire-reasons", AuditEntityType.NO_HIRE_REASON, "MOTIVO"),
     /** Progetti finanziati (US-102). */
-    PROJECTS("projects", AuditEntityType.PROJECT, "PROGETTO");
+    PROJECTS("projects", AuditEntityType.PROJECT, "PROGETTO"),
+    /** Sedi di competenza e enti di presa in carico (US-115). */
+    COMPETENCE_SITES("competence-sites", AuditEntityType.COMPETENCE_SITE, "SEDE"),
+    CARE_AGENCIES("care-agencies", AuditEntityType.CARE_AGENCY, "ENTE");
 
     private final String path;
     private final AuditEntityType auditType;

@@ -11,7 +11,6 @@ import {
   saveInternship,
   type Internship,
 } from '@/config/api/internshipApi';
-import { fetchInternshipTypes } from '@/config/api/referenceApi';
 import { fetchTicket, startInternship, type TicketDetail } from '@/config/api/ticketApi';
 import { InternshipPage } from '@/pages/InternshipPage/InternshipPage';
 import { expectNoAxeViolations } from '@/tests/axe';
@@ -24,7 +23,6 @@ vi.mock('@/config/api/internshipApi', () => ({
   addInternshipLegalRepresentative: vi.fn(),
   addInternshipAtecoCode: vi.fn(),
 }));
-vi.mock('@/config/api/referenceApi', () => ({ fetchInternshipTypes: vi.fn() }));
 vi.mock('@/config/api/ticketApi', () => ({ fetchTicket: vi.fn(), startInternship: vi.fn() }));
 
 const error = (status: number, body: Record<string, unknown>) =>
@@ -55,6 +53,7 @@ const ticket = {
 const internship = (overrides: Partial<Internship> = {}): Internship => ({
   companyName: 'Demo Ristorazione',
   atecoCodes: [],
+  internshipTypes: [{ id: 'T1', code: 'CURRICULARE', name: 'Curriculare' }],
   companyTutors: [],
   suspensions: [],
   firstSlotStart: '09:00:00',
@@ -85,9 +84,6 @@ const renderPage = () =>
 describe('<InternshipPage>', () => {
   beforeEach(() => {
     vi.mocked(fetchTicket).mockResolvedValue(ticket);
-    vi.mocked(fetchInternshipTypes).mockResolvedValue([
-      { id: 'T1', code: 'CURRICULARE', name: 'Curriculare' },
-    ]);
     vi.mocked(saveInternship).mockReset();
     vi.mocked(addInternshipLegalRepresentative).mockReset();
     vi.mocked(addInternshipAtecoCode).mockReset();

@@ -1,15 +1,12 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AxiosError, AxiosHeaders } from 'axios';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import type { Internship } from '@/config/api/internshipApi';
-import { fetchInternshipTypes } from '@/config/api/referenceApi';
 import { InternshipForm } from '@/organisms/InternshipForm/InternshipForm';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderWithProviders } from '@/tests/renderWithProviders';
-
-vi.mock('@/config/api/referenceApi', () => ({ fetchInternshipTypes: vi.fn() }));
 
 const error = (status: number, body: Record<string, unknown>) =>
   new AxiosError(String(status), String(status), undefined, undefined, {
@@ -24,6 +21,11 @@ const error = (status: number, body: Record<string, unknown>) =>
 const empty: Internship = {
   companyName: 'Demo Ristorazione',
   atecoCodes: [{ id: 'A1', code: '56.10.11', description: 'Ristorazione con somministrazione' }],
+  // i tipi ammessi dal progetto della segnalazione (US-115)
+  internshipTypes: [
+    { id: 'T1', code: 'CURRICULARE', name: 'Curriculare' },
+    { id: 'T3', code: 'INCLUSIONE', name: 'Di inclusione' },
+  ],
   companyTutors: [],
   suspensions: [],
   firstSlotStart: '09:00:00',
@@ -54,13 +56,6 @@ const renderForm = (internship: Internship = empty) => {
 };
 
 describe('<InternshipForm>', () => {
-  beforeEach(() => {
-    vi.mocked(fetchInternshipTypes).mockResolvedValue([
-      { id: 'T1', code: 'CURRICULARE', name: 'Curriculare' },
-      { id: 'T3', code: 'INCLUSIONE', name: 'Di inclusione' },
-    ]);
-  });
-
   it('scheda vuota: si salva anche una parte, con righe ripetibili', async () => {
     const user = userEvent.setup();
     const { onSubmit, onSuccess } = renderForm();
