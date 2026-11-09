@@ -1,0 +1,81 @@
+# Aggiornamenti delle dipendenze (EN-6; review dello Sprint 10, §8.2): versioni sempre le più aggiornate.
+# Ogni lunedì Dependabot apre le PR; le unisce il PO, dopo la CI verde, poi si fa il deploy.
+# - versioni minori e di correzione: una PR per ecosistema (gruppo);
+# - versioni principali: una PR ciascuna, come chiede la regola del progetto;
+# - Java e Node: solo LTS, quindi le versioni principali del JDK e di @types/node si aggiornano a mano.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Rome
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: chore(deps)
+    groups:
+      frontend-minori:
+        update-types: [minor, patch]
+    ignore:
+      # i tipi seguono la LTS di Node (.nvmrc): la versione principale si cambia insieme a Node
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: maven
+    directory: /backend
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Rome
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: chore(deps)
+    groups:
+      backend-minori:
+        update-types: [minor, patch]
+
+  - package-ecosystem: docker
+    directories: [/backend, /frontend, /keycloak]
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Rome
+    commit-message:
+      prefix: chore(deps)
+    groups:
+      immagini-minori:
+        update-types: [minor, patch]
+    ignore:
+      # Java: solo LTS (la 25 fino alla prossima LTS)
+      - dependency-name: eclipse-temurin
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: docker-compose
+    directories: [/infra, /infra/deploy]
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Rome
+    commit-message:
+      prefix: chore(deps)
+    groups:
+      compose-minori:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Rome
+    commit-message:
+      prefix: chore(ci)
+    groups:
+      action-minori:
+        update-types: [minor, patch]
