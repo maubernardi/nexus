@@ -9,7 +9,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | https://portalenexus.it |
-| **Versione della demo** | `ed3332b` (08/11/2026): Sprint 1–10 completi (recupero della password, registro degli accessi, anonimizzazione; controllo della demo; sottomenu Amministrazione) |
+| **Versione della demo** | `34d1301` (09/11/2026): Sprint 1–11 completi (dipendenze aggiornate, password comuni rifiutate, curriculum del beneficiario) |
 | **Ultimo aggiornamento** | 06/11/2026 (T-13.5 progetti e sezione 20 utenti: da provare dopo il deploy) |
 
 ## Come prepararsi
@@ -793,7 +793,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      raggruppate per ecosistema; ognuna con la CI verde prima del merge.
   3. Dopo ogni merge di Dependabot: deploy e controllo della demo, come per le altre PR.
 
-- [ ] **T-21.7 Password comuni rifiutate (EN-7)**
+- [x] **T-21.7 Password comuni rifiutate (EN-7)**
 
   Dopo il deploy e `keycloak-password-policy.sh` (README).
   1. Esci; nella pagina di accesso **Password dimenticata?** per un tuo utente e apri il collegamento dell'email.
@@ -801,7 +801,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      usate e facili da indovinare. Scegline un'altra.» e la pagina resta aperta.
   3. Scegli una password tua, lunga e non banale. **Atteso:** accettata, entri in NEXUS e arriva l'email di sicurezza.
 
-- [ ] **T-21.8 Curriculum del beneficiario (US-205)**
+- [x] **T-21.8 Curriculum del beneficiario (US-205)**
   1. Come `tutor1`, apri un tuo beneficiario. **Atteso:** la sezione **Curriculum** con «Nessun CV caricato.» e
      **Carica il CV** (solo PDF, al massimo 5 MB).
   2. Prova con un file che non è un PDF (es. una foto). **Atteso:** «Il CV deve essere un file PDF.»

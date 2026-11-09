@@ -74,13 +74,13 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [EN-5](#en-5) | E13 | Controllo della numerazione delle migrazioni nella CI | Must | 1 | R1 | 🎉 Done (Sprint 3) |
-| [EN-6](#en-6) | E13 | Dipendenze aggiornate e senza vulnerabilità note | Must | 8 | R4 | ✅ Ready (Sprint 11) |
-| [EN-7](#en-7) | E13 | Password comuni rifiutate | Must | 2 | R4 | ✅ Ready (Sprint 11) |
+| [EN-6](#en-6) | E13 | Dipendenze aggiornate e senza vulnerabilità note | Must | 8 | R4 | 🎉 Done (Sprint 11) |
+| [EN-7](#en-7) | E13 | Password comuni rifiutate | Must | 2 | R4 | 🎉 Done (Sprint 11) |
 | [US-201](#us-201) | E2 | Inserimento beneficiario | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 🎉 Done (Sprint 3) |
 | [US-204](#us-204) | E2 | Visibilità dei beneficiari per progetto | Must | 3 | R1 | 🎉 Done (Sprint 3) |
-| [US-205](#us-205) | E2 | Curriculum del beneficiario | Could | 5 | — | ✅ Ready (Sprint 11) |
+| [US-205](#us-205) | E2 | Curriculum del beneficiario | Could | 5 | — | 🎉 Done (Sprint 11) |
 | [US-301](#us-301) | E3 | Nuova segnalazione | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-302](#us-302) | E3 | Nuova tipologia di mansione dal Tutor, approvata dal Call Center | Should | 5 | R2 | 🎉 Done (Sprint 4) |
 | [US-303](#us-303) | E3 | Elenco delle segnalazioni (Home) | Must | 5 | R1 | 🎉 Done (Sprint 3) |
@@ -352,13 +352,15 @@ Criteri di accettazione:
 - Un tutor di altri progetti non vede né il beneficiario né le sue segnalazioni; il controllo è nelle API, non solo nell'interfaccia.
 
 #### US-205
-**Curriculum del beneficiario** · Could · 5 punti · — · ✅ Ready (Sprint 11)
+**Curriculum del beneficiario** · Could · 5 punti · — · 🎉 Done (Sprint 11)
 
 Come **Tutor** voglio allegare il CV (PDF) al beneficiario per metterlo a disposizione del Call Center per l'abbinamento.
 
 Criteri di accettazione:
 - Accetta solo PDF fino a 5 MB; il file non è accessibile senza autorizzazione.
 - Il CV si scarica solo da utenti autorizzati a vedere il beneficiario.
+- Fatto il 09/11: PDF riconosciuto dal contenuto, CV nel database (il backup lo copre), cancellato con l'anonimizzazione
+  (US-1303).
 
 ### E3 — Segnalazioni (fase 1)
 
@@ -961,7 +963,7 @@ Criteri di accettazione:
 
 
 #### EN-6
-**Dipendenze aggiornate e senza vulnerabilità note** · Must · 8 punti · R4 · ✅ Ready (Sprint 11)
+**Dipendenze aggiornate e senza vulnerabilità note** · Must · 8 punti · R4 · 🎉 Done (Sprint 11)
 
 Come **PO** voglio che NEXUS usi sempre le versioni più aggiornate delle sue dipendenze per non portare in produzione
 vulnerabilità note. Decisione del PO dell'08/11, dopo i primi 32 avvisi di Dependabot: aggiornarle tutte come prima cosa
@@ -976,7 +978,7 @@ Criteri di accettazione:
 - La regola è in `CLAUDE.md` («Versioni sempre aggiornate»).
 
 #### EN-7
-**Password comuni rifiutate** · Must · 2 punti · R4 · ✅ Ready (Sprint 11)
+**Password comuni rifiutate** · Must · 2 punti · R4 · 🎉 Done (Sprint 11)
 
 Come **responsabile della sicurezza** voglio che Keycloak rifiuti le password comuni per chiudere la lacuna L1 della
 revisione ASVS (2.1.7).
