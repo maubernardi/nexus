@@ -129,13 +129,22 @@ chiusa con EN-7, L2 l'08/11); capitolo V12 (caricamento di file) rivisto con US-
 ### 8.1 Chiusura dello Sprint 11
 *Proposta:* Sprint 11 chiuso con velocity **15**.
 
+> ✅ **Deciso (PO, 09/11): proposta accettata.**
+
 ### 8.2 Elenco delle password comuni (EN-7)
 Invece delle 100 000 password più usate (solo 488 da 12 caratteri in su, le altre già bloccate dalla lunghezza) ho preso
 le 46 146 da 12 caratteri in su tra il milione più usate. *Proposta:* confermare.
 
+> ✅ **Deciso (PO, 09/11): confermato.**
+
 ### 8.3 Dove stanno i file (US-205)
 Il contenuto dei CV è nel database, accanto ai metadati: il backup lo copre e il server non ha nulla da configurare.
 *Proposta:* confermare; da rivedere solo se i file diventassero molti o grandi.
+
+> ❓ **In discussione (PO, 09/11):** il PO chiede se salvarli sul disco, perché non ha chiari spazi e diritti su IONOS.
+> Precisazione del team: il database è **già sul disco del server** (volume di PostgreSQL), quindi CV nel database e CV
+> in una cartella usano lo **stesso disco** e lo stesso spazio; IONOS non c'entra, finché non si sceglie un backup
+> esterno (§8.5). La differenza è solo che nel database il backup e la cancellazione vanno insieme ai dati.
 
 ### 8.4 Cosa fare nello Sprint 12
 Restano quattro blocchi per chiudere R4. *Proposta del team:* **Sprint 12 = backup e preparazione della produzione**
@@ -143,15 +152,25 @@ Restano quattro blocchi per chiudere R4. *Proposta del team:* **Sprint 12 = back
 UX/UI e ai modelli Word. *Alternative:* sprint UX/UI subito; oppure modelli Word, se i modelli della cooperativa sono
 pronti.
 
+> ⏸️ **Deciso (PO, 09/11): per ora ci fermiamo.** Il contenuto dello Sprint 12 lo valuta il PO più avanti.
+
 ### 8.5 Backup (US-1302), se si fa nello Sprint 12
 Serve una destinazione fuori dal server. *Proposta* (dalla review dello Sprint 9): spazio di archiviazione **IONOS**
 (S3), 30 backup giornalieri cifrati; le credenziali le metti tu nel `.env` del server. *Alternative:* un altro server o
 un NAS via SSH; un servizio esterno (es. Backblaze B2).
 
+> ❓ **Domanda del PO (09/11): ha un costo aggiuntivo?** Sì, ma piccolo: lo spazio di archiviazione S3 di IONOS si
+> paga a consumo, per GB e per ora di conservazione, e i caricamenti sono gratuiti (si paga il traffico in uscita, cioè
+> solo i ripristini). Con il database di oggi (decine di MB) anche 30 copie restano sotto qualche GB: **pochi centesimi
+> al mese**. Il prezzo esatto va letto sul listino IONOS del contratto. Resta da capire se il contratto IONOS attuale
+> comprende lo spazio di archiviazione S3: da verificare quando si riprende US-1302.
+
 ### 8.6 Data del passaggio in produzione
 *Domanda:* c'è una data indicativa con la cooperativa per usare NEXUS con dati reali? Serve per ordinare gli sprint.
 
-## 9. Proposta per lo Sprint 12 (se §8.4 è accettata)
+> ✅ **Risposta (PO, 09/11): nessuna data**; servono ancora giri di discussione con la cooperativa.
+
+## 9. Proposta per lo Sprint 12 (sospesa, §8.4)
 
 **Obiettivo proposto:** *i dati di NEXUS hanno un backup giornaliero fuori dal server, provato con un ripristino, e la
 demo è pronta a diventare produzione.*
@@ -168,7 +187,8 @@ sceglie un'alternativa, la proposta cambia di conseguenza.
 
 ## 10. Azioni a carico del PO
 
-- [ ] Decidere i punti §8.1–§8.6 e confermare il planning (§9).
+- [x] Decidere i punti §8.1, §8.2, §8.4, §8.6 (09/11).
+- [ ] §8.3 (dove stanno i file) e §8.5 (backup) quando si riprende; planning dello Sprint 12 più avanti.
 - [ ] T-21.6: lunedì prossimo, le prime PR di Dependabot.
 - [ ] US-1301: PWA su Android e iOS (collaudo T-10.1).
 - [x] Collaudo dello Sprint 11 (T-21.7, T-21.8).
