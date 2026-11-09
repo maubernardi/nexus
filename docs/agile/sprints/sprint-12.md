@@ -9,11 +9,11 @@ cooperativa (Q5).
 > hanno in carico i beneficiari; il Tutor indica la sede di competenza della segnalazione e i contatti, l'ente e il
 > case manager del beneficiario. Sono le fondamenta dei documenti reali (Sprint 13 e 14).
 
-## Impegno (18 punti)
+## Impegno (21 punti)
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-114 | Comuni e province, temporizzati | 5 | ✅ Ready | — | — |
+| US-114 | Comuni e province, temporizzati, caricati dall'ADMIN dal file ISTAT | 8 | ✅ Ready | — | — |
 | US-115 | Sedi di competenza, tipi di tirocinio per progetto, enti di presa in carico | 5 | ✅ Ready | — | — |
 | US-206 | Contatti, ente di presa in carico e case manager del beneficiario | 5 | ✅ Ready | — | — |
 | US-308 | Sede di competenza della segnalazione | 3 | ✅ Ready | — | — |
@@ -31,7 +31,10 @@ non curricolare) e per l'**Inclusione** (Comune di Firenze e tre Società della 
   repository: `documenti_base/` è in `.gitignore`.
 - **Inclusione**: un solo modello per documento per tutti e quattro gli enti (i testi sono identici); i dati dell'ente
   (tipologia, denominazione, codice fiscale, sede, legale rappresentante, referente) vanno nel catalogo degli enti.
-- **Comuni e province** italiani, tutti, temporizzati; il luogo di nascita resta testo libero.
+- **Comuni e province** italiani, tutti, temporizzati; li carica l'ADMIN dal file dell'ISTAT, con l'anteprima delle
+  differenze (US-114 da 5 a 8 punti); il luogo di nascita resta testo libero.
+- **Privacy**: l'ente di presa in carico è un dato delicato come la L. 68/99 (visibilità del beneficiario, mai nei log,
+  anonimizzazione con email, telefono e case manager).
 - **Sede di competenza** (non «APL»): copre più comuni, vale per uno o più progetti; obbligatoria alla creazione della
   segnalazione, poi bloccata; la correggono ADMIN e Coordinatore.
 - **Tipi di tirocinio per progetto**: GOL ammette Extracurriculare e Inclusione; gli altri progetti tutti, fino al
@@ -58,7 +61,7 @@ non curricolare) e per l'**Inclusione** (Comune di Firenze e tre Società della 
 
 | Momento | Punti residui |
 |---|---|
-| Inizio (12/11) | 18 |
+| Inizio (12/11) | 21 |
 
 ## Per il PO durante lo sprint
 

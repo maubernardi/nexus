@@ -3,13 +3,13 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 85 elementi, 328 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint: [sprint-11](sprints/sprint-11.md), concluso il 09/11; prossimo: [sprint-12](sprints/sprint-12.md).
+**Totale: 85 elementi, 331 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint: [sprint-11](sprints/sprint-11.md), concluso il 09/11; prossimo: [sprint-12](sprints/sprint-12.md).
 
 ## Epiche
 
 | Epica | Titolo | Obiettivo | Storie | Punti |
 |---|---|---|---|---|
-| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, il calendario e i cataloghi senza passare dalla console di Keycloak. | 16 | 62 |
+| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, il calendario e i cataloghi senza passare dalla console di Keycloak. | 16 | 65 |
 | E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 6 | 23 |
 | E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 8 | 31 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 5 | 17 |
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 27 | 136 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 27 | 139 |
 
 ## Domande aperte per il Product Owner
 
@@ -70,7 +70,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-111](#us-111) | E1 | Spostamento delle segnalazioni tra Tutor | Must | 5 | R4 | 🎉 Done (Sprint 9) |
 | [US-112](#us-112) | E1 | Coordinatore di progetto | Must | 3 | R4 | 🎉 Done (Sprint 9) |
 | [US-113](#us-113) | E1 | Registro degli accessi | Must | 7 | R4 | 🎉 Done (Sprint 10) |
-| [US-114](#us-114) | E1 | Comuni e province | Must | 5 | R4 | ✅ Ready (Sprint 12) |
+| [US-114](#us-114) | E1 | Comuni e province | Must | 8 | R4 | ✅ Ready (Sprint 12) |
 | [US-115](#us-115) | E1 | Sedi di competenza, tipi di tirocinio per progetto, enti di presa in carico | Must | 5 | R4 | ✅ Ready (Sprint 12) |
 | [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
@@ -323,7 +323,7 @@ Criteri di accettazione:
   modifiche registrate nell'audit.
 - Un solo calendario, valido per tutti i progetti e per tutte le segnalazioni.
 #### US-114
-**Comuni e province** · Must · 5 punti · R4 · ✅ Ready (Sprint 12)
+**Comuni e province** · Must · 8 punti · R4 · ✅ Ready (Sprint 12)
 
 Come **ADMIN** voglio in NEXUS l'elenco ufficiale dei comuni e delle province italiane per avere indirizzi uniformi nei
 documenti (planning del 09/11).
@@ -335,7 +335,11 @@ Criteri di accettazione:
 - Un comune non più valido non si propone nei nuovi inserimenti, ma resta visibile dove è già usato.
 - Scelta con ricerca per nome (suggerimenti dalla seconda lettera), mostrata come «Sesto Fiorentino (FI)»; accessibile
   da tastiera e con lo screen reader (axe).
-- L'ADMIN vede l'elenco nei Cataloghi; le variazioni dell'ISTAT (poche all'anno) le carica il team con una migrazione.
+- **L'ADMIN carica il file dell'ISTAT** dai Cataloghi (PO, 09/11), sia la prima volta sia a ogni variazione (poche
+  all'anno). Prima di confermare vede l'anteprima delle differenze: comuni nuovi, soppressi, rinominati, passati a
+  un'altra provincia. Alla conferma i comuni soppressi o cambiati chiudono la loro validità e le nuove versioni la
+  aprono; nulla si cancella. Un file non riconosciuto è rifiutato con il motivo. Il caricamento è nell'audit.
+- Nella demo il seed carica l'elenco attuale.
 - Il luogo di nascita resta testo libero: può essere ovunque nel mondo (PO, 09/11).
 
 Usato da: US-1007 (sedi e residenza).
