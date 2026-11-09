@@ -8,4 +8,4 @@
 
 - [x] 2.1 Revisione ASVS (L1) e collaudo
 - [x] 2.2 PR con CI verde
-- [ ] 2.3 Sul server: deploy, poi `keycloak-password-policy.sh`
+- [x] 2.3 Sul server: deploy, poi `keycloak-password-policy.sh`
