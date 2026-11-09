@@ -32,7 +32,7 @@ nexus/
 ## Prerequisiti
 
 - **JDK 25** (LTS, es. Temurin 25.0.5). Il wrapper Maven (3.10.0) è incluso e la build rifiuta altre versioni di JDK
-- **Node.js 24.21.0** (LTS, vedi `.nvmrc`: `nvm use`) e **pnpm 12.6.0** (`npm i -g pnpm@12.6.0`); pnpm rifiuta altre versioni di Node
+- **Node.js 26.13.0** (LTS, vedi `.nvmrc`: `nvm use`) e **pnpm 12.18.0** (`npm i -g pnpm@12.18.0`); pnpm rifiuta altre versioni di Node
 - Docker
 
 ## Avvio in locale
@@ -124,7 +124,7 @@ Gli aggiornamenti arrivano con le PR di Dependabot, le versioni principali in PR
 
 | Java | Spring Boot | Node | pnpm | React | Vite | TypeScript | PostgreSQL | Keycloak |
 |---|---|---|---|---|---|---|---|---|
-| 25.0.5 | 4.1.2 | 24.21.0 | 12.6.0 | 19.3.1 | 8.3.6 | 7.0.2 (API 6.0 per typescript-eslint) | 18.6 | 26.8.2 |
+| 25.0.5 | 4.1.2 | 26.13.0 | 12.18.0 | 19.3.1 | 8.3.6 | 7.0.2 (API 6.0 per typescript-eslint) | 18.6 | 26.8.2 |
 
 ## Demo online
 
