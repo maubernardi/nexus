@@ -138,7 +138,7 @@ export const JobSlotsSection = ({ companyId, companyActive }: JobSlotsSectionPro
               : 'rounded-md border-l-4 border-primary bg-card p-4 font-medium'
           }
         >
-          {t(outcome.key, outcome.params)}
+          {t(outcome.key, outcome.params ?? {})}
         </div>
       )}
 
