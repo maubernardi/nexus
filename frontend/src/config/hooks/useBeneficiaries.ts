@@ -9,11 +9,14 @@ import {
 import {
   anonymizeBeneficiary,
   createBeneficiary,
+  deleteBeneficiaryCv,
+  downloadBeneficiaryCv,
   fetchAllBeneficiaries,
   fetchBeneficiary,
   fetchMyBeneficiaries,
   keepBeneficiary,
   updateBeneficiary,
+  uploadBeneficiaryCv,
   type Beneficiary,
   type BeneficiaryCreate,
   type BeneficiaryRetentionItem,
@@ -79,3 +82,28 @@ export const useUpdateBeneficiary = (): UseMutationResult<
     },
   });
 };
+
+/** CV del beneficiario (US-205): la scheda si aggiorna con la risposta. */
+const useCvMutation = <V>(
+  fn: (vars: V) => Promise<Beneficiary>,
+): UseMutationResult<Beneficiary, unknown, V> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (vars: V) => fn(vars),
+    onSuccess: (beneficiary) => {
+      queryClient.setQueryData([...BENEFICIARIES_KEY, beneficiary.id], beneficiary);
+    },
+  });
+};
+
+export const useUploadBeneficiaryCv = (): UseMutationResult<
+  Beneficiary,
+  unknown,
+  { id: string; file: File }
+> => useCvMutation(uploadBeneficiaryCv);
+
+export const useDeleteBeneficiaryCv = (): UseMutationResult<Beneficiary, unknown, string> =>
+  useCvMutation(deleteBeneficiaryCv);
+
+export const useDownloadBeneficiaryCv = (): UseMutationResult<Blob, unknown, string> =>
+  useMutation({ mutationFn: (id: string) => downloadBeneficiaryCv(id) });

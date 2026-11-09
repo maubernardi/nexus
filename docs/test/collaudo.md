@@ -800,3 +800,13 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   2. Come nuova password scrivi `Password1234` (due volte). **Atteso:** «Password troppo comune: è tra quelle più
      usate e facili da indovinare. Scegline un'altra.» e la pagina resta aperta.
   3. Scegli una password tua, lunga e non banale. **Atteso:** accettata, entri in NEXUS e arriva l'email di sicurezza.
+
+- [ ] **T-21.8 Curriculum del beneficiario (US-205)**
+  1. Come `tutor1`, apri un tuo beneficiario. **Atteso:** la sezione **Curriculum** con «Nessun CV caricato.» e
+     **Carica il CV** (solo PDF, al massimo 5 MB).
+  2. Prova con un file che non è un PDF (es. una foto). **Atteso:** «Il CV deve essere un file PDF.»
+  3. Carica un PDF. **Atteso:** «CV caricato.», nome e dimensione del file; **Scarica il CV** scarica lo stesso file.
+  4. Come `operatore.cc` (o `admin`) apri lo stesso beneficiario. **Atteso:** il CV si scarica, ma non si carica né si
+     toglie.
+  5. Come `tutor1`, **Sostituisci** con un altro PDF, poi **Togli il CV**. **Atteso:** «CV sostituito.», poi «CV
+     tolto.» e di nuovo «Nessun CV caricato.»

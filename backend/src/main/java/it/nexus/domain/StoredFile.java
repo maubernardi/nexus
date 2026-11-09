@@ -39,4 +39,12 @@ public class StoredFile extends AbstractTsidEntity {
 
     @Column(name = "storage_key", nullable = false, unique = true, length = 500)
     private String storageKey;
+
+    public StoredFile(String originalName, String contentType, long sizeBytes, String checksumSha256, String storageKey) {
+        this.originalName = originalName;
+        this.contentType = contentType;
+        this.sizeBytes = sizeBytes;
+        this.checksumSha256 = checksumSha256;
+        this.storageKey = storageKey;
+    }
 }

@@ -30,6 +30,9 @@ export type Beneficiary = Omit<BeneficiaryCreate, 'residenceZoneId'> & {
   ownerTutorName: string;
   /** L'utente corrente può modificarlo: solo il Tutor proprietario (US-203). */
   editable: boolean;
+  /** CV caricato (US-205); assenti se non c'è. */
+  cvFileName?: string;
+  cvSizeBytes?: number;
 };
 
 export type BeneficiarySummary = {
@@ -103,5 +106,32 @@ export const updateBeneficiary = async ({
     `${ENDPOINTS.beneficiaries}/${encodeURIComponent(id)}`,
     payload,
   );
+  return data;
+};
+
+/** CV del beneficiario (US-205): solo PDF fino a 5 MB, lo carica il Tutor proprietario. */
+export const CV_MAX_BYTES = 5 * 1024 * 1024;
+
+export const uploadBeneficiaryCv = async ({ id, file }: { id: string; file: File }): Promise<Beneficiary> => {
+  const body = new FormData();
+  body.append('file', file);
+  const { data } = await axiosInstance.put<Beneficiary>(
+    `${ENDPOINTS.beneficiaries}/${encodeURIComponent(id)}/cv`,
+    body,
+  );
+  return data;
+};
+
+export const deleteBeneficiaryCv = async (id: string): Promise<Beneficiary> => {
+  const { data } = await axiosInstance.delete<Beneficiary>(
+    `${ENDPOINTS.beneficiaries}/${encodeURIComponent(id)}/cv`,
+  );
+  return data;
+};
+
+export const downloadBeneficiaryCv = async (id: string): Promise<Blob> => {
+  const { data } = await axiosInstance.get<Blob>(`${ENDPOINTS.beneficiaries}/${encodeURIComponent(id)}/cv`, {
+    responseType: 'blob',
+  });
   return data;
 };

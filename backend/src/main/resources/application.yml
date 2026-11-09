@@ -10,6 +10,11 @@ spring:
   threads:
     virtual:
       enabled: true
+  # CV del beneficiario (US-205): PDF fino a 5 MB; il margine lascia al servizio il messaggio sul campo
+  servlet:
+    multipart:
+      max-file-size: 6MB
+      max-request-size: 6MB
   datasource:
     hikari:
       # schema applicativo anche per le query SQL native (non solo per Hibernate)

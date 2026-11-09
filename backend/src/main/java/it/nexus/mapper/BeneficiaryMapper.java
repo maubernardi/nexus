@@ -22,6 +22,10 @@ public interface BeneficiaryMapper {
     @Mapping(target = "hasLaw68", source = "beneficiary.hasLaw68")
     @Mapping(target = "ownerTutorName",
             expression = "java(beneficiary.getOwnerTutor().getFirstName() + \" \" + beneficiary.getOwnerTutor().getLastName())")
+    @Mapping(target = "cvFileName",
+            expression = "java(beneficiary.getCvFile() == null ? null : beneficiary.getCvFile().getOriginalName())")
+    @Mapping(target = "cvSizeBytes",
+            expression = "java(beneficiary.getCvFile() == null ? null : beneficiary.getCvFile().getSizeBytes())")
     BeneficiaryDTO toDto(Beneficiary beneficiary, boolean editable);
 
     @Mapping(target = "id", expression = "java(TsidMapper.toExternal(beneficiary.getId()))")

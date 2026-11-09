@@ -15,6 +15,10 @@ vi.mock('@/config/api/beneficiaryApi', () => ({
   updateBeneficiary: vi.fn(),
   createBeneficiary: vi.fn(),
   fetchMyBeneficiaries: vi.fn(),
+  uploadBeneficiaryCv: vi.fn(),
+  deleteBeneficiaryCv: vi.fn(),
+  downloadBeneficiaryCv: vi.fn(),
+  CV_MAX_BYTES: 5 * 1024 * 1024,
 }));
 
 const mario: Beneficiary = {
