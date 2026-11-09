@@ -124,7 +124,7 @@ Gli aggiornamenti arrivano con le PR di Dependabot, le versioni principali in PR
 
 | Java | Spring Boot | Node | pnpm | React | Vite | TypeScript | PostgreSQL | Keycloak |
 |---|---|---|---|---|---|---|---|---|
-| 25.0.5 | 4.1.2 | 24.21.0 | 12.6.0 | 19.3.1 | 8.3.6 | 6.0.3 | 18.6 | 26.7.4 |
+| 25.0.5 | 4.1.2 | 24.21.0 | 12.6.0 | 19.3.1 | 8.3.6 | 7.0.2 (API 6.0 per typescript-eslint) | 18.6 | 26.8.2 |
 
 ## Demo online
 
