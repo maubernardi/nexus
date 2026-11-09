@@ -10,4 +10,4 @@
 ## 3. Consegna
 
 - [x] 3.1 Revisione ASVS (V12) e collaudo
-- [ ] 3.2 PR con CI verde
+- [x] 3.2 PR con CI verde
