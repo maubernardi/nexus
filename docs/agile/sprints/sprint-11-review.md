@@ -75,8 +75,8 @@ chiusa con EN-7, L2 l'08/11); capitolo V12 (caricamento di file) rivisto con US-
 | D1 | Aggiornamenti di EN-6 una PR alla volta, ognuna con il suo deploy e controllo | PO e team | EN-6 |
 | D2 | `deepmerge` (nessuna correzione esistente, solo build) archiviato | PO (08/11) | EN-6 |
 | D3 | TypeScript 7 affiancato all'API di TypeScript 6 finché typescript-eslint non lo supporta | Team | EN-6 |
-| D4 | Elenco delle password: le 46 146 da 12 caratteri in su tra il milione più usate, invece delle 100 000 | Team, **da confermare** (§8.2) | EN-7 |
-| D5 | Contenuto dei file nel database, non su disco | Team, **da confermare** (§8.3) | US-205 |
+| D4 | Elenco delle password: le 46 146 da 12 caratteri in su tra il milione più usate, invece delle 100 000 | Team, confermato dal PO (§8.2) | EN-7 |
+| D5 | Contenuto dei file nel database, non su disco | Team, confermato dal PO (§8.3) | US-205 |
 | D6 | Windows Terminal: `experimental.detectURLs: false` (un solo link per Ctrl+clic) | PO | Ambiente del PO |
 
 ## 6. Stato del prodotto rispetto alla roadmap
@@ -141,7 +141,7 @@ le 46 146 da 12 caratteri in su tra il milione più usate. *Proposta:* confermar
 Il contenuto dei CV è nel database, accanto ai metadati: il backup lo copre e il server non ha nulla da configurare.
 *Proposta:* confermare; da rivedere solo se i file diventassero molti o grandi.
 
-> ❓ **In discussione (PO, 09/11):** il PO chiede se salvarli sul disco, perché non ha chiari spazi e diritti su IONOS.
+> ✅ **Deciso (PO, 09/11): i CV restano nel database.** Prima il PO aveva chiesto se salvarli sul disco, perché non ha chiari spazi e diritti su IONOS.
 > Precisazione del team: il database è **già sul disco del server** (volume di PostgreSQL), quindi CV nel database e CV
 > in una cartella usano lo **stesso disco** e lo stesso spazio; IONOS non c'entra, finché non si sceglie un backup
 > esterno (§8.5). La differenza è solo che nel database il backup e la cancellazione vanno insieme ai dati.
@@ -188,7 +188,8 @@ sceglie un'alternativa, la proposta cambia di conseguenza.
 ## 10. Azioni a carico del PO
 
 - [x] Decidere i punti §8.1, §8.2, §8.4, §8.6 (09/11).
-- [ ] §8.3 (dove stanno i file) e §8.5 (backup) quando si riprende; planning dello Sprint 12 più avanti.
+- [x] §8.3: i CV restano nel database (09/11).
+- [ ] §8.5 (backup) quando si riprende US-1302; planning dello Sprint 12 più avanti.
 - [ ] T-21.6: lunedì prossimo, le prime PR di Dependabot.
 - [ ] US-1301: PWA su Android e iOS (collaudo T-10.1).
 - [x] Collaudo dello Sprint 11 (T-21.7, T-21.8).
