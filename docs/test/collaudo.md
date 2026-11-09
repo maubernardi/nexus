@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `34d1301` (09/11/2026): Sprint 1–11 completi (dipendenze aggiornate, password comuni rifiutate, curriculum del beneficiario) |
-| **Ultimo aggiornamento** | 06/11/2026 (T-13.5 progetti e sezione 20 utenti: da provare dopo il deploy) |
+| **Ultimo aggiornamento** | 10/11/2026 (T-22.1 comuni e province: da provare dopo il deploy) |
 
 ## Come prepararsi
 
@@ -810,3 +810,19 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      toglie.
   5. Come `tutor1`, **Sostituisci** con un altro PDF, poi **Togli il CV**. **Atteso:** «CV sostituito.», poi «CV
      tolto.» e di nuovo «Nessun CV caricato.»
+
+## 22. Cataloghi per i documenti reali (Sprint 12)
+
+- [ ] **T-22.1 Comuni e province (US-114)**
+  1. Come `admin`, **Amministrazione → Cataloghi**, sezione **Comuni e province**. **Atteso:** nella demo l'elenco è
+     già caricato: circa 7900 comuni e 107 province validi oggi, ultimo caricamento valido dal 01/01/2026.
+  2. In **Cerca un comune** scrivi `sesto f`. **Atteso:** «Sesto Fiorentino (FI) — Firenze, codice ISTAT 048043, valido
+     dal 01/01/2026».
+  3. Scarica dal sito dell'ISTAT il file «Elenco dei comuni italiani» (CSV) con il collegamento della sezione. Sceglilo,
+     lascia la data di oggi e premi **Controlla il file**. **Atteso:** l'anteprima con i comuni del file e le
+     differenze (se l'ISTAT non ha pubblicato variazioni dal 09/11: «Nessuna differenza»).
+  4. Prova con un altro file CSV (es. un elenco qualsiasi). **Atteso:** il motivo del rifiuto, per esempio «Il file non
+     è l'elenco dei comuni dell'ISTAT: manca la colonna …»; l'elenco non cambia.
+  5. Se l'anteprima mostra differenze, premi **Conferma il caricamento**. **Atteso:** «Elenco caricato, valido dal …» e
+     lo stato aggiornato; i comuni cambiati compaiono nella ricerca con la versione vecchia («valido dal … al …») e
+     quella nuova.

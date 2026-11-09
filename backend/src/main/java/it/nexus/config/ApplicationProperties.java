@@ -24,6 +24,8 @@ public class ApplicationProperties {
 
     private final Retention retention = new Retention();
 
+    private final Municipalities municipalities = new Municipalities();
+
     @Getter
     @Setter
     public static class Cors {
@@ -66,5 +68,14 @@ public class ApplicationProperties {
     public static class Retention {
 
         private Period period = Period.ofYears(2);
+    }
+
+    /** Elenco dei comuni dell'ISTAT (US-114). */
+    @Getter
+    @Setter
+    public static class Municipalities {
+
+        /** Comuni minimi perché un file sia l'elenco completo (in Italia sono quasi 7 900): protegge da file parziali. */
+        private int minRows = 7000;
     }
 }
