@@ -109,7 +109,7 @@ class BeneficiaryCvIT {
                     .andExpect(content().bytes(PDF));
         }
         // nell'audit solo la dimensione, non il nome del file (può contenere il nome della persona)
-        assertThat(actions()).containsExactly("CREATE", "CV_UPLOADED");
+        assertThat(actions()).containsExactly("CV_UPLOADED");
         assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.BENEFICIARY,
                 beneficiary.getId()).getLast().getChanges().toString()).doesNotContain("Mario");
     }
@@ -157,7 +157,7 @@ class BeneficiaryCvIT {
                 .andExpect(jsonPath("$.cvFileName").doesNotExist());
         assertThat(files()).isZero();
         mockMvc.perform(get(url()).header(USER, "tutor1")).andExpect(status().isNotFound());
-        assertThat(actions()).containsExactly("CREATE", "CV_UPLOADED", "CV_REPLACED", "CV_REMOVED");
+        assertThat(actions()).containsExactly("CV_UPLOADED", "CV_REPLACED", "CV_REMOVED");
     }
 
     @Test
