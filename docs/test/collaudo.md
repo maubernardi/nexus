@@ -786,3 +786,9 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      pagina di Utenti, Cataloghi o Calendario la voce Amministrazione è evidenziata.
   3. Restringi la finestra sotto i 1024 px (o da tablet). **Atteso:** il menu passa al pulsante ☰, con il gruppo
      «Amministrazione» già aperto.
+
+- [ ] **T-21.6 Dipendenze aggiornate (EN-6)**
+  1. Su GitHub, **Security → Dependabot**. **Atteso:** nessun avviso aperto (`deepmerge` archiviato).
+  2. Il lunedì dopo il merge, **Pull requests**. **Atteso:** le PR di Dependabot («chore(deps): …»), le versioni minori
+     raggruppate per ecosistema; ognuna con la CI verde prima del merge.
+  3. Dopo ogni merge di Dependabot: deploy e controllo della demo, come per le altre PR.
