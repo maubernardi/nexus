@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { apiError } from '@/config/api/errors';
 import { useBeneficiary } from '@/config/hooks/useBeneficiaries';
 import { isoName } from '@/lib/isoNames';
+import { BeneficiaryCvSection } from '@/organisms/BeneficiaryCvSection/BeneficiaryCvSection';
 
 type Row = { label: string; value: ReactNode };
 
@@ -153,6 +154,7 @@ export const BeneficiaryPage = () => {
           { label: t('beneficiary.fields.constraints'), value: b.constraints ?? t('beneficiary.none') },
         ]}
       />
+      <BeneficiaryCvSection beneficiary={b} />
 
       {fromTicket ? (
         <Link

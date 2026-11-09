@@ -1,14 +1,27 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { AxiosError, AxiosHeaders } from 'axios';
 import type { InitialEntry } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fetchBeneficiary, type Beneficiary } from '@/config/api/beneficiaryApi';
+import {
+  deleteBeneficiaryCv,
+  downloadBeneficiaryCv,
+  fetchBeneficiary,
+  uploadBeneficiaryCv,
+  type Beneficiary,
+} from '@/config/api/beneficiaryApi';
 import { BeneficiaryPage } from '@/pages/BeneficiaryPage/BeneficiaryPage';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderRoutes } from '@/tests/renderWithProviders';
 
-vi.mock('@/config/api/beneficiaryApi', () => ({ fetchBeneficiary: vi.fn() }));
+vi.mock('@/config/api/beneficiaryApi', () => ({
+  fetchBeneficiary: vi.fn(),
+  uploadBeneficiaryCv: vi.fn(),
+  deleteBeneficiaryCv: vi.fn(),
+  downloadBeneficiaryCv: vi.fn(),
+  CV_MAX_BYTES: 5 * 1024 * 1024,
+}));
 
 const mario: Beneficiary = {
   id: 'B1',
@@ -100,5 +113,62 @@ describe('<BeneficiaryPage>', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Beneficiario non trovato' }),
     ).toBeInTheDocument();
+  });
+
+  describe('curriculum (US-205)', () => {
+    const pdf = new File(['%PDF-1.7'], 'CV Mario.pdf', { type: 'application/pdf' });
+
+    it('il proprietario carica un PDF; un altro file è rifiutato prima di inviarlo', async () => {
+      vi.mocked(fetchBeneficiary).mockResolvedValue(mario);
+      vi.mocked(uploadBeneficiaryCv).mockResolvedValue({
+        ...mario,
+        cvFileName: 'CV Mario.pdf',
+        cvSizeBytes: 245_000,
+      });
+      const user = userEvent.setup({ applyAccept: false });
+      renderPage();
+
+      const section = await screen.findByRole('region', { name: 'Curriculum' });
+      expect(within(section).getByText('Nessun CV caricato.')).toBeInTheDocument();
+      await expectNoAxeViolations();
+
+      await user.upload(
+        within(section).getByLabelText('Carica il CV'),
+        new File(['x'], 'foto.png', { type: 'image/png' }),
+      );
+      await user.click(within(section).getByRole('button', { name: 'Carica' }));
+      expect(await within(section).findByRole('alert')).toHaveTextContent('Il CV deve essere un file PDF.');
+      expect(uploadBeneficiaryCv).not.toHaveBeenCalled();
+
+      await user.upload(within(section).getByLabelText('Carica il CV'), pdf);
+      await user.click(within(section).getByRole('button', { name: 'Carica' }));
+      expect(uploadBeneficiaryCv).toHaveBeenCalledWith({ id: 'B1', file: pdf });
+      expect(await within(section).findByRole('status')).toHaveTextContent('CV caricato.');
+      expect(within(section).getByText('CV Mario.pdf (239 KB)')).toBeInTheDocument();
+      expect(within(section).getByLabelText('Sostituisci il CV')).toBeInTheDocument();
+    });
+
+    it('chi non è proprietario lo scarica, senza caricarlo né toglierlo', async () => {
+      vi.mocked(fetchBeneficiary).mockResolvedValue({
+        ...mario,
+        editable: false,
+        cvFileName: 'CV Mario.pdf',
+        cvSizeBytes: 2_500_000,
+      });
+      vi.mocked(downloadBeneficiaryCv).mockResolvedValue(new Blob(['%PDF-1.7'], { type: 'application/pdf' }));
+      URL.createObjectURL = vi.fn(() => 'blob:cv');
+      URL.revokeObjectURL = vi.fn();
+      const user = userEvent.setup();
+      renderPage();
+
+      const section = await screen.findByRole('region', { name: 'Curriculum' });
+      expect(within(section).getByText('CV Mario.pdf (2,4 MB)')).toBeInTheDocument();
+      expect(within(section).queryByLabelText(/Carica il CV|Sostituisci il CV/)).not.toBeInTheDocument();
+      expect(within(section).queryByRole('button', { name: 'Togli il CV' })).not.toBeInTheDocument();
+      await user.click(within(section).getByRole('button', { name: 'Scarica il CV' }));
+      expect(downloadBeneficiaryCv).toHaveBeenCalledWith('B1');
+      expect(deleteBeneficiaryCv).not.toHaveBeenCalled();
+      await expectNoAxeViolations();
+    });
   });
 });

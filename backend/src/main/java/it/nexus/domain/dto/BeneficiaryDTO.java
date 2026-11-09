@@ -30,5 +30,8 @@ public record BeneficiaryDTO(
         List<BeneficiaryLanguageDTO> languages,
         Instant createdAt,
         String ownerTutorName,
-        boolean editable) {
+        boolean editable,
+        /** Nome del CV caricato (US-205), assente se non c'è. */
+        String cvFileName,
+        Long cvSizeBytes) {
 }

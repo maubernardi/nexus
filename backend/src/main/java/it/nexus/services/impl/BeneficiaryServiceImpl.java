@@ -1,11 +1,18 @@
 package it.nexus.services.impl;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.security.access.AccessDeniedException;
@@ -15,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import it.nexus.domain.AppUser;
 import it.nexus.domain.Beneficiary;
 import it.nexus.domain.BeneficiaryLanguage;
+import it.nexus.domain.StoredFile;
+import it.nexus.domain.StoredFileContent;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.Zone;
 import it.nexus.domain.audit.AuditChanges;
@@ -29,12 +38,15 @@ import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.mapper.BeneficiaryMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.BeneficiaryRepository;
+import it.nexus.repository.StoredFileContentRepository;
+import it.nexus.repository.StoredFileRepository;
 import it.nexus.repository.TicketRepository;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.repository.ZoneRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BeneficiaryService;
 import it.nexus.services.CurrentAppUserService;
+import it.nexus.services.DownloadedFile;
 import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.FieldValidationException;
 import it.nexus.web.errors.NotFoundException;
@@ -45,6 +57,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BeneficiaryServiceImpl implements BeneficiaryService {
 
+    /** CV: solo PDF fino a 5 MB (US-205), come il vincolo ck_stored_file_content_size. */
+    static final int CV_MAX_BYTES = 5 * 1024 * 1024;
+    private static final String PDF = "application/pdf";
+    private static final byte[] PDF_MAGIC = "%PDF-".getBytes(StandardCharsets.US_ASCII);
+
     private final BeneficiaryRepository beneficiaryRepository;
     private final TicketRepository ticketRepository;
     private final UserProjectRepository userProjectRepository;
@@ -52,6 +69,8 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
     private final ZoneRepository zoneRepository;
     private final CurrentAppUserService currentAppUserService;
     private final BeneficiaryMapper mapper;
+    private final StoredFileRepository storedFileRepository;
+    private final StoredFileContentRepository storedFileContentRepository;
 
     @Override
     public BeneficiaryDTO register(BeneficiaryFormDTO dto) {
@@ -121,6 +140,102 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
     }
 
     /** Stessa risposta per inesistente e non autorizzato: non si rivela l'esistenza del beneficiario. */
+    @Override
+    public BeneficiaryDTO uploadCv(String id, String fileName, byte[] content) {
+        Beneficiary beneficiary = ownForCv(id);
+        if (content == null || content.length == 0) {
+            throw new FieldValidationException("file", "Scegli il file del CV");
+        }
+        if (content.length > CV_MAX_BYTES) {
+            throw new FieldValidationException("file", "Il CV supera i 5 MB");
+        }
+        // il tipo si riconosce dal contenuto, non dal nome o da quello che dichiara il browser
+        if (!isPdf(content)) {
+            throw new FieldValidationException("file", "Il CV deve essere un file PDF");
+        }
+        boolean replaced = beneficiary.getCvFile() != null;
+        removeCvFile(beneficiary);
+        StoredFile file = storedFileRepository.save(new StoredFile(cvName(fileName), PDF, content.length,
+                sha256(content), "db:" + UUID.randomUUID()));
+        storedFileContentRepository.save(new StoredFileContent(file, content));
+        beneficiary.setCvFile(file);
+        Beneficiary saved = beneficiaryRepository.saveAndFlush(beneficiary);
+        // il nome del file può contenere il nome della persona: nell'audit solo la dimensione
+        auditService.record(AuditEntityType.BENEFICIARY, saved.getId(), replaced ? "CV_REPLACED" : "CV_UPLOADED",
+                AuditChanges.of().value("cvSizeBytes", null, content.length), null);
+        return mapper.toDto(saved, true);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DownloadedFile downloadCv(String id) {
+        Beneficiary beneficiary = findVisible(id);
+        StoredFile file = Optional.ofNullable(beneficiary.getCvFile())
+                .orElseThrow(() -> new NotFoundException("Il beneficiario non ha un CV"));
+        byte[] content = storedFileContentRepository.findById(file.getId())
+                .orElseThrow(() -> new NotFoundException("Il beneficiario non ha un CV")).getContent();
+        return new DownloadedFile(file.getOriginalName(), file.getContentType(), content);
+    }
+
+    @Override
+    public BeneficiaryDTO deleteCv(String id) {
+        Beneficiary beneficiary = ownForCv(id);
+        if (beneficiary.getCvFile() == null) {
+            return mapper.toDto(beneficiary, true);
+        }
+        removeCvFile(beneficiary);
+        Beneficiary saved = beneficiaryRepository.saveAndFlush(beneficiary);
+        auditService.record(AuditEntityType.BENEFICIARY, saved.getId(), "CV_REMOVED", AuditChanges.none(), null);
+        return mapper.toDto(saved, true);
+    }
+
+    /** Beneficiario del Tutor corrente, non anonimizzato: solo lui gestisce il CV (come la scheda, US-203). */
+    private Beneficiary ownForCv(String id) {
+        Beneficiary beneficiary = findVisible(id);
+        if (!isOwner(beneficiary)) {
+            throw new AccessDeniedException("Solo il Tutor proprietario gestisce il CV del beneficiario");
+        }
+        if (beneficiary.getAnonymizedAt() != null) {
+            throw new BadRequestException("Il beneficiario è anonimizzato: non ha più un CV");
+        }
+        return beneficiary;
+    }
+
+    /** Toglie il CV dal beneficiario e cancella il file (il contenuto se ne va con il file). */
+    private void removeCvFile(Beneficiary beneficiary) {
+        StoredFile old = beneficiary.getCvFile();
+        if (old != null) {
+            beneficiary.setCvFile(null);
+            beneficiaryRepository.flush();
+            storedFileRepository.delete(old);
+        }
+    }
+
+    private static boolean isPdf(byte[] content) {
+        return content.length >= PDF_MAGIC.length && Arrays.equals(Arrays.copyOf(content, PDF_MAGIC.length), PDF_MAGIC);
+    }
+
+    /** Nome del file come lo ha caricato il Tutor, senza percorso e senza caratteri di controllo. */
+    private static String cvName(String fileName) {
+        String name = fileName == null ? "" : fileName.replace('\\', '/');
+        name = name.substring(name.lastIndexOf('/') + 1).replaceAll("[\\p{Cntrl}\"]", "").strip();
+        if (name.isEmpty()) {
+            name = "CV.pdf";
+        }
+        if (!name.toLowerCase(Locale.ROOT).endsWith(".pdf")) {
+            name += ".pdf";
+        }
+        return name.length() > 200 ? name.substring(name.length() - 200) : name;
+    }
+
+    private static String sha256(byte[] content) {
+        try {
+            return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(content));
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     private Beneficiary findVisible(String id) {
         return Optional.ofNullable(TsidMapper.toInternal(id))
                 .flatMap(beneficiaryRepository::findById)

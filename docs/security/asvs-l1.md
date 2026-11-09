@@ -109,7 +109,12 @@ Legenda: ✅ soddisfatto · ⚠️ lacuna, con azione proposta · — non applic
 
 | Req. | Esito | Evidenza |
 |---|---|---|
-| 12.x Caricamento di file | — | Non ancora presente (il CV arriverà con US-205: va rivista allora) |
+| 12.1.1 Limite di dimensione | ✅ (US-205) | CV fino a 5 MB: controllo nel servizio, vincolo `ck_stored_file_content_size` nel database, limite del server a 6 MB |
+| 12.2.1 Tipo verificato dal contenuto | ✅ (US-205) | Si accetta solo un file che inizia con `%PDF-`, non conta il nome né il tipo dichiarato dal browser |
+| 12.3.1 Nome del file non usato come percorso | ✅ (US-205) | Il contenuto è nel database (`stored_file_content`), mai su disco; il nome caricato è solo un'etichetta, ripulita da percorsi e caratteri di controllo |
+| 12.4.1 File fuori dalla radice web | ✅ (US-205) | Il CV si scarica solo dall'API, con i permessi del beneficiario (proprietario, Tutor dei progetti, Call Center, ADMIN) |
+| 12.5.1 / 12.5.2 Download sicuro | ✅ (US-205) | Sempre come allegato (`Content-Disposition: attachment`), `application/pdf`, `nosniff`, `Cache-Control: no-store`; il service worker non lo mette in cache (API) |
+| 12.4.2 Antivirus | — | Non richiesto al livello 1; i PDF li caricano solo i Tutor autenticati |
 | 13.1.x API autenticate | ✅ | Bearer token su ogni chiamata; CSRF non necessario con token nell'intestazione |
 
 ## Azioni proposte

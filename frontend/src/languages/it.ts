@@ -979,6 +979,28 @@ export const it = {
     loadError: 'Impossibile caricare il profilo utente. Riprova più tardi.',
     retry: 'Riprova',
   },
+  cv: {
+    heading: 'Curriculum',
+    none: 'Nessun CV caricato.',
+    download: 'Scarica il CV',
+    downloading: 'Download in corso…',
+    uploadLabel: 'Carica il CV',
+    replaceLabel: 'Sostituisci il CV',
+    hint: 'Solo PDF, al massimo 5 MB. Lo vedono il Call Center, l’ADMIN e i Tutor dei progetti delle sue segnalazioni.',
+    upload: 'Carica',
+    replace: 'Sostituisci',
+    uploading: 'Caricamento in corso…',
+    remove: 'Togli il CV',
+    uploaded: 'CV caricato.',
+    replaced: 'CV sostituito.',
+    removed: 'CV tolto.',
+    error: 'Operazione non riuscita. Controlla la connessione e riprova.',
+    errors: {
+      none: 'Scegli il file del CV.',
+      type: 'Il CV deve essere un file PDF.',
+      size: 'Il CV supera i 5 MB.',
+    },
+  },
   retention: {
     column: 'Dati',
     status: {

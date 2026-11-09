@@ -12,6 +12,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
@@ -33,6 +34,13 @@ public class GlobalExceptionHandler {
     ResponseEntity<ApiErrorResponseDTO> handleFieldValidation(FieldValidationException ex, HttpServletRequest request) {
         return ResponseEntity.badRequest().body(ApiErrorResponseDTO.of(HttpStatus.BAD_REQUEST, "Dati non validi",
                 request.getRequestURI(), List.of(new ApiErrorResponseDTO.FieldErrorDTO(ex.getField(), ex.getMessage()))));
+    }
+
+    /** File oltre il limite del server (US-205): lo stesso errore sul campo dei file un po' oltre i 5 MB. */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    ResponseEntity<ApiErrorResponseDTO> handleTooLarge(MaxUploadSizeExceededException ex, HttpServletRequest request) {
+        return ResponseEntity.badRequest().body(ApiErrorResponseDTO.of(HttpStatus.BAD_REQUEST, "Dati non validi",
+                request.getRequestURI(), List.of(new ApiErrorResponseDTO.FieldErrorDTO("file", "Il file supera i 5 MB"))));
     }
 
     @ExceptionHandler(AbstractDomainException.class)

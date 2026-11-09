@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import it.nexus.config.ApplicationProperties;
 import it.nexus.domain.AppUser;
 import it.nexus.domain.Beneficiary;
+import it.nexus.domain.StoredFile;
 import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.BeneficiaryRetentionItemDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
@@ -20,6 +21,7 @@ import it.nexus.domain.enumeration.Role;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.InternshipRepository;
+import it.nexus.repository.StoredFileRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BeneficiaryRetentionService;
 import it.nexus.services.CurrentAppUserService;
@@ -38,6 +40,7 @@ public class BeneficiaryRetentionServiceImpl implements BeneficiaryRetentionServ
 
     private final BeneficiaryRepository beneficiaryRepository;
     private final InternshipRepository internshipRepository;
+    private final StoredFileRepository storedFileRepository;
     private final CurrentAppUserService currentAppUserService;
     private final AuditService auditService;
     private final ApplicationProperties applicationProperties;
@@ -79,13 +82,19 @@ public class BeneficiaryRetentionServiceImpl implements BeneficiaryRetentionServ
     @Override
     public void anonymize(String id) {
         Beneficiary beneficiary = toDecide(id);
+        StoredFile cv = beneficiary.getCvFile();
         beneficiary.anonymize(Instant.now());
         internshipRepository.findByBeneficiaryId(beneficiary.getId()).forEach(i -> i.anonymize());
         beneficiaryRepository.saveAndFlush(beneficiary);
+        // il CV (US-205) si cancella del tutto: file e contenuto
+        if (cv != null) {
+            storedFileRepository.delete(cv);
+        }
         // dati personali: nell'audit solo che sono stati cancellati, mai i valori (GDPR)
         auditService.record(AuditEntityType.BENEFICIARY, beneficiary.getId(), "ANONYMIZE", AuditChanges.of()
                 .value("retention", RetentionStatus.TO_ANONYMIZE.name(), RetentionStatus.ANONYMIZED.name())
-                .redacted("firstName").redacted("lastName").redacted("constraints").redacted("internships"), null);
+                .redacted("firstName").redacted("lastName").redacted("constraints").redacted("internships")
+                .redacted("cv"), null);
         log.info("Beneficiario {} anonimizzato", beneficiary.getId());
     }
 

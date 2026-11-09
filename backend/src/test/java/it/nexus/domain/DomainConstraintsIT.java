@@ -692,6 +692,15 @@ class DomainConstraintsIT {
         }
 
         @Test
+        void contenutoDelFileVuoto() {
+            jdbc.update("INSERT INTO stored_file (id, original_name, content_type, size_bytes, checksum_sha256, storage_key,"
+                    + " created_at, created_by, updated_at, updated_by) VALUES (1, 'cv.pdf', 'application/pdf', 0, ?, 'db:t',"
+                    + " now(), 't', now(), 't')", "0".repeat(64));
+            assertViolates("ck_stored_file_content_size", () -> jdbc.update(
+                    "INSERT INTO stored_file_content (file_id, content) VALUES (1, ''::bytea)"));
+        }
+
+        @Test
         void motivoPerTenereIDatiVuoto() {
             Graph g = fixtures.graph();
             assertViolates("ck_beneficiary_kept_reason", () -> jdbc.update(
