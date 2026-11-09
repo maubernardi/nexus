@@ -26,6 +26,8 @@ from http.cookiejar import CookieJar, DefaultCookiePolicy
 
 SMTP_PORT = 2525
 NEW_PASSWORD = "Una-password-nuova-1308"
+# nell'elenco delle password comuni (EN-7), lunga 12 caratteri: la rifiuta solo la policy passwordBlacklist
+COMMON_PASSWORD = "password1234"
 MESSAGES: list[email.message.EmailMessage] = []
 
 
@@ -154,6 +156,12 @@ def main() -> None:
         sys.exit("Dopo l'accesso manca la pagina della nuova password:\n" + page[:2000])
     if 'class="nexus-header"' not in page:
         sys.exit("La pagina della nuova password non usa il tema di NEXUS")
+    # EN-7: una password tra le più comuni è rifiutata, con il messaggio in italiano
+    page = post(urllib.parse.urljoin(base, form(page)),
+                {"password-new": COMMON_PASSWORD, "password-confirm": COMMON_PASSWORD})
+    if "Password troppo comune" not in html.unescape(page) or 'name="password-new"' not in page:
+        sys.exit(f"La password comune «{COMMON_PASSWORD}» non è stata rifiutata:\n" + page[:2000])
+    print(f"3a. Password comune «{COMMON_PASSWORD}» rifiutata: «Password troppo comune»")
     try:
         post(urllib.parse.urljoin(base, form(page)),
              {"password-new": NEW_PASSWORD, "password-confirm": NEW_PASSWORD})

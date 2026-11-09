@@ -30,7 +30,7 @@
   "waitIncrementSeconds": 60,
   "maxFailureWaitSeconds": 900,
   "permanentLockout": false,
-  "passwordPolicy": "length(12) and notUsername and notEmail",
+  "passwordPolicy": "length(12) and notUsername and notEmail and passwordBlacklist(nexus-common-passwords.txt)",
   "accessTokenLifespan": 300,
   "actionTokenGeneratedByUserLifespan": 1800,
   "ssoSessionIdleTimeout": 1800,

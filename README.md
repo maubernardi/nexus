@@ -196,6 +196,13 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
   ```
   A ogni cambio di password Keycloak manda all'utente un'email di sicurezza; il filtro sugli eventi è nell'immagine
   `nexus-keycloak`, quindi lo script va eseguito **dopo** il deploy (prima scriverebbe anche a ogni password sbagliata).
+- **Password comuni (EN-7).** Keycloak rifiuta le password tra le più usate (elenco in
+  `keycloak/password-blacklists/`, rigenerato con `tools/keycloak/update-password-blacklist.sh`). Sulle nuove
+  installazioni la policy è nel realm importato; sul server già installato, **una volta, dopo il deploy di EN-7**:
+  ```bash
+  curl -fsSLO https://raw.githubusercontent.com/maubernardi/nexus/main/infra/deploy/keycloak-password-policy.sh
+  sudo bash keycloak-password-policy.sh   # nessun segreto
+  ```
 - **Keycloak 26.8 (EN-6).** Da questa versione l'API di amministrazione accetta solo token con lo scope `kc-admin-api`,
   che va dato al client tecnico `nexus-backend-admin` (nei realm importati c'è già). Sul server già installato, **una
   volta, subito dopo il deploy di Keycloak 26.8**:
