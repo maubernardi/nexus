@@ -14,5 +14,6 @@ public enum AuditEntityType {
     HIRING_FORMULA,
     NO_HIRE_REASON,
     APP_USER,
-    CALENDAR
+    CALENDAR,
+    MUNICIPALITY_IMPORT
 }

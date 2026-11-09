@@ -1001,6 +1001,69 @@ export const it = {
       size: 'Il CV supera i 5 MB.',
     },
   },
+  municipalities: {
+    heading: 'Comuni e province',
+    intro:
+      'L’elenco ufficiale dei comuni italiani dell’ISTAT, usato per gli indirizzi dei documenti. Quando l’ISTAT pubblica un elenco nuovo, caricalo qui: i comuni cambiati o soppressi conservano la loro storia, così i dati già inseriti non cambiano.',
+    status: {
+      empty: 'L’elenco è vuoto: carica il file dell’ISTAT.',
+      counts: '{{municipalities}} comuni e {{provinces}} province validi oggi.',
+      lastImport:
+        'Ultimo caricamento: elenco valido dal {{validFrom}}, caricato il {{importedAt}} da {{by}}.',
+      error: 'Impossibile leggere lo stato dell’elenco. Riprova più tardi.',
+    },
+    upload: {
+      heading: 'Carica l’elenco dell’ISTAT',
+      hint: 'Scarica dal sito dell’ISTAT il file «Elenco dei comuni italiani» in formato CSV e sceglilo qui. Prima di salvare vedi le differenze rispetto all’elenco attuale.',
+      link: 'Pagina dell’ISTAT con l’elenco dei comuni',
+      newTab: '(si apre in una nuova scheda)',
+      file: 'File dell’ISTAT (CSV)',
+      validFrom: 'Valido dal',
+      validFromHint: 'Il giorno da cui vale il nuovo elenco: dopo l’ultimo caricamento e non nel futuro.',
+      check: 'Controlla il file',
+      checking: 'Controllo in corso…',
+    },
+    errors: {
+      file: 'Scegli il file dell’ISTAT.',
+      type: 'Il file deve essere in formato CSV.',
+      size: 'Il file è troppo grande per essere l’elenco dell’ISTAT.',
+      date: 'Indica la data da cui vale l’elenco.',
+      generic: 'Operazione non riuscita. Controlla la connessione e riprova.',
+    },
+    preview: {
+      heading: 'Differenze rispetto all’elenco attuale',
+      rows: 'Il file contiene {{count}} comuni.',
+      municipalities: 'Comuni: {{added}} nuovi, {{removed}} soppressi, {{changed}} cambiati.',
+      provinces: 'Province: {{added}} nuove, {{removed}} soppresse, {{changed}} cambiate.',
+      none: 'Nessuna differenza: l’elenco è già aggiornato.',
+      groups: {
+        addedMunicipalities: 'Comuni nuovi ({{count}})',
+        removedMunicipalities: 'Comuni soppressi ({{count}})',
+        changedMunicipalities: 'Comuni cambiati ({{count}})',
+        addedProvinces: 'Province nuove ({{count}})',
+        removedProvinces: 'Province soppresse ({{count}})',
+        changedProvinces: 'Province cambiate ({{count}})',
+      },
+      more_one: 'e un altro',
+      more_other: 'e altri {{count}}',
+      confirm: 'Conferma il caricamento',
+      confirming: 'Caricamento in corso…',
+      cancel: 'Annulla',
+    },
+    done: 'Elenco caricato, valido dal {{validFrom}}: {{added}} comuni nuovi, {{removed}} soppressi, {{changed}} cambiati.',
+    search: {
+      heading: 'Cerca un comune',
+      label: 'Nome del comune',
+      hint: 'Almeno due lettere. Compaiono anche le versioni passate.',
+      results_one: '1 risultato',
+      results_other: '{{count}} risultati',
+      none: 'Nessun comune trovato.',
+      error: 'Ricerca non riuscita. Riprova.',
+      istat: 'codice ISTAT {{code}}',
+      since: 'valido dal {{from}}',
+      between: 'valido dal {{from}} al {{to}}',
+    },
+  },
   retention: {
     column: 'Dati',
     status: {
@@ -1520,7 +1583,7 @@ export const it = {
       title: 'Cataloghi',
       heading: 'Cataloghi',
       intro:
-        'Le voci usate in tutta l’applicazione: progetti, zone, tipologie di mansione, tipi di tirocinio e le scelte del report di restituzione. Le voci non si cancellano: una voce disattivata non si può più scegliere, ma resta sui dati che la usano.',
+        'Le voci usate in tutta l’applicazione: progetti, zone, tipologie di mansione, tipi di tirocinio, le scelte del report di restituzione e l’elenco dei comuni. Le voci non si cancellano: una voce disattivata non si può più scegliere, ma resta sui dati che la usano.',
     },
     calendar: {
       title: 'Calendario',

@@ -2,10 +2,11 @@ import { useTranslation } from 'react-i18next';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { CatalogSection } from '@/organisms/CatalogSection/CatalogSection';
+import { MunicipalitiesSection } from '@/organisms/MunicipalitiesSection/MunicipalitiesSection';
 
 /**
  * Cataloghi per l'ADMIN: progetti (US-102), zone e tipologie di mansione (US-106), tipi di tirocinio (US-108), formule di assunzione e
- * motivi della mancata assunzione del report di restituzione (US-109). I valori reali della cooperativa senza rilasci.
+ * motivi della mancata assunzione del report di restituzione (US-109), comuni e province dell'ISTAT (US-114). I valori reali della cooperativa senza rilasci.
  */
 export const CatalogsPage = () => {
   const { t } = useTranslation();
@@ -19,6 +20,7 @@ export const CatalogsPage = () => {
       <CatalogSection kind="internship-types" />
       <CatalogSection kind="hiring-formulas" />
       <CatalogSection kind="no-hire-reasons" />
+      <MunicipalitiesSection />
     </div>
   );
 };

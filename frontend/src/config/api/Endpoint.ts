@@ -24,4 +24,5 @@ export const ENDPOINTS = {
   internshipTypes: '/reference/internship-types',
   hiringFormulas: '/reference/hiring-formulas',
   noHireReasons: '/reference/no-hire-reasons',
+  municipalities: '/municipalities',
 } as const;
