@@ -7,5 +7,5 @@
 ## 2. Consegna
 
 - [x] 2.1 Revisione ASVS (L1) e collaudo
-- [ ] 2.2 PR con CI verde
+- [x] 2.2 PR con CI verde
 - [ ] 2.3 Sul server: deploy, poi `keycloak-password-policy.sh`
