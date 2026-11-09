@@ -35,3 +35,6 @@ pnpm-debug.log*
 
 # Claude Code locale
 .claude/settings.local.json
+
+# Documenti reali della cooperativa: mai in git (i modelli si caricano dalla pagina dell'ADMIN)
+documenti_base/

@@ -153,6 +153,9 @@ UX/UI e ai modelli Word. *Alternative:* sprint UX/UI subito; oppure modelli Word
 pronti.
 
 > ⏸️ **Deciso (PO, 09/11): per ora ci fermiamo.** Il contenuto dello Sprint 12 lo valuta il PO più avanti.
+>
+> ✅ **Deciso (PO, 09/11, sera):** arrivati i modelli Word reali, lo Sprint 12 prepara i documenti reali (cataloghi,
+> comuni, beneficiario, sede di competenza); backup e produzione vanno in fondo. Vedi [sprint-12](sprint-12.md).
 
 ### 8.5 Backup (US-1302), se si fa nello Sprint 12
 Serve una destinazione fuori dal server. *Proposta* (dalla review dello Sprint 9): spazio di archiviazione **IONOS**

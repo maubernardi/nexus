@@ -3,25 +3,25 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 69 elementi, 242 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint: [sprint-08](sprints/sprint-08.md), concluso il 04/11 (le storie Must di R3 sono tutte fatte).
+**Totale: 85 elementi, 331 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint: [sprint-11](sprints/sprint-11.md), concluso il 09/11; prossimo: [sprint-12](sprints/sprint-12.md).
 
 ## Epiche
 
 | Epica | Titolo | Obiettivo | Storie | Punti |
 |---|---|---|---|---|
-| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, il calendario e i cataloghi senza passare dalla console di Keycloak. | 11 | 37 |
-| E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 5 | 18 |
-| E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 7 | 28 |
+| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, il calendario e i cataloghi senza passare dalla console di Keycloak. | 16 | 65 |
+| E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 6 | 23 |
+| E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 8 | 31 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 5 | 17 |
 | E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 6 | 15 |
 | E6 | Abbinamento (fase 4) | Il Call Center abbina il beneficiario a una mansione libera e la blocca. | 4 | 17 |
 | E7 | Proposta e timer (fase 5) | Il Tutor valuta la proposta; i tempi di risposta sono presidiati da un timer di 7 giorni lavorativi. | 5 | 15 |
-| E8 | Appuntamento e rilancio (fase 6) | Il Tutor registra l'esito dell'appuntamento; se fallisce, la mansione può essere rilanciata in bacheca. | 3 | 9 |
+| E8 | Appuntamento e rilancio (fase 6) | Il Tutor registra l'esito dell'appuntamento; se fallisce, la mansione può essere rilanciata in bacheca. | 3 | 10 |
 | E9 | Bacheca opportunità | Le mansioni disponibili sono visibili ai Tutor in forma anonima e gestite dal Call Center. | 4 | 13 |
-| E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione e Progetto Formativo in Word. | 5 | 22 |
+| E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione, Progetto Formativo e Relazione finale sui modelli reali in Word. | 11 | 54 |
 | E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 2 | 7 |
 | E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 2 | 10 |
-| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 11 | 41 |
+| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 13 | 54 |
 
 ## Release
 
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 17 | 86 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 27 | 139 |
 
 ## Domande aperte per il Product Owner
 
@@ -42,7 +42,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | Q2 | Scadenza del timer: il ticket torna in IN_LAVORAZIONE o in RIAPERTO? | US-705 | **RIAPERTO** (PO, 01/10). |
 | Q3 | Il Tutor può rifiutare una proposta? Con quali effetti (es. azienda esclusa automaticamente)? | US-702 | **Sì, con motivo obbligatorio**: ticket al Call Center (RIAPERTO), mansione LIBERA, azienda esclusa per quel ticket (PO, 01/10). |
 | Q4 | Festività da escludere: solo nazionali o anche il patrono locale? Chiusure della cooperativa? | US-703, US-107 | Festività nazionali + **patrono configurabile per progetto** (24 giugno per l'attuale) + chiusure; vale il calendario del progetto del ticket (PO, 01/10). **Aggiornata il 24/10 (review dello Sprint 3):** il calendario è **unico per tutti** i progetti: festività nazionali (senza il 4 ottobre), patrono del 24 giugno e chiusure, impostati dall'ADMIN. |
-| Q5 | Campi della scheda amministrativa e template Word reali di Convenzione e Progetto Formativo. | US-1001..1005 | Per ora **segnaposto**; i documenti reali arriveranno più avanti. I modelli dovranno essere modificabili (modalità da definire: il PO ci sta pensando) (PO, 01/10). |
+| Q5 | Campi della scheda amministrativa e template Word reali di Convenzione e Progetto Formativo. | US-1001..1005 | Per ora **segnaposto**; i documenti reali arriveranno più avanti. I modelli dovranno essere modificabili (modalità da definire: il PO ci sta pensando) (PO, 01/10). **Risolta il 09/11:** arrivati i modelli reali di GOL (Extracurriculare e Inclusione); li carica l'ADMIN da una pagina di NEXUS, con le condizioni (documento, progetto, tipo di tirocinio, ente): US-1007…US-1011, EN-8. |
 | Q6 | Voci esatte dei gradimenti 1–5 del report di restituzione. | US-1101 | Soddisfazione dell'azienda (1–5), soddisfazione del beneficiario (1–5), obiettivi raggiunti (testo), difficoltà riscontrate (testo); assunto sì → formula (menu), no → motivo (menu). Voci dei menu provvisorie, definitive più avanti (PO, 01/10). Le voci si gestiscono come cataloghi dell'ADMIN, US-109 (review dello Sprint 7, §8.4). |
 | Q7 | Durata di conservazione dei dati dei beneficiari (decisione della cooperativa/DPO). | US-1303 | **Parametrica**, per ora 2 anni (PO, 01/10). |
 | Q8 | Chi approva la mansione a testo libero (ADMIN?) e se, approvata, entra nel catalogo. | US-302 | **ADMIN**; non entra da sola nel catalogo, l'ADMIN può aggiungerla con un clic; se respinta il Tutor vede il motivo (PO, 01/10). **Aggiornata il 24/10:** approva un **operatore** del Call Center (o l'ADMIN) e la tipologia approvata **entra nel catalogo**; se respinta, l'operatore sceglie la tipologia corretta e il Tutor riceve una notifica. |
@@ -70,6 +70,8 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-111](#us-111) | E1 | Spostamento delle segnalazioni tra Tutor | Must | 5 | R4 | 🎉 Done (Sprint 9) |
 | [US-112](#us-112) | E1 | Coordinatore di progetto | Must | 3 | R4 | 🎉 Done (Sprint 9) |
 | [US-113](#us-113) | E1 | Registro degli accessi | Must | 7 | R4 | 🎉 Done (Sprint 10) |
+| [US-114](#us-114) | E1 | Comuni e province | Must | 8 | R4 | ✅ Ready (Sprint 12) |
+| [US-115](#us-115) | E1 | Sedi di competenza, tipi di tirocinio per progetto, enti di presa in carico | Must | 5 | R4 | ✅ Ready (Sprint 12) |
 | [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
@@ -81,6 +83,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 🎉 Done (Sprint 3) |
 | [US-204](#us-204) | E2 | Visibilità dei beneficiari per progetto | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-205](#us-205) | E2 | Curriculum del beneficiario | Could | 5 | — | 🎉 Done (Sprint 11) |
+| [US-206](#us-206) | E2 | Contatti, ente di presa in carico e case manager del beneficiario | Must | 5 | R4 | ✅ Ready (Sprint 12) |
 | [US-301](#us-301) | E3 | Nuova segnalazione | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-302](#us-302) | E3 | Nuova tipologia di mansione dal Tutor, approvata dal Call Center | Should | 5 | R2 | 🎉 Done (Sprint 4) |
 | [US-303](#us-303) | E3 | Elenco delle segnalazioni (Home) | Must | 5 | R1 | 🎉 Done (Sprint 3) |
@@ -88,6 +91,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-305](#us-305) | E3 | Dettaglio e cronologia del ticket | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-306](#us-306) | E3 | Segnalazione speciale dalla bacheca | Must | 3 | R2 | 🎉 Done (Sprint 7) |
 | [US-307](#us-307) | E3 | Scadenza nella Home del Tutor | Must | 2 | R2 | 🎉 Done (Sprint 6) |
+| [US-308](#us-308) | E3 | Sede di competenza della segnalazione | Must | 3 | R4 | ✅ Ready (Sprint 12) |
 | [US-401](#us-401) | E4 | Coda FIFO | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | 🎉 Done (Sprint 7) |
@@ -120,7 +124,13 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1003](#us-1003) | E10 | Avvio del tirocinio | Must | 1 | R3 | 🎉 Done (Sprint 8) |
 | [US-1004](#us-1004) | E10 | Convenzione in Word | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1005](#us-1005) | E10 | Progetto Formativo in Word | Must | 3 | R3 | 🎉 Done (Sprint 8) |
-| [US-1006](#us-1006) | E10 | Integrazione dei modelli Word reali | Must | — | R4 | 📋 Backlog |
+| [US-1006](#us-1006) | E10 | Integrazione dei modelli Word reali | Must | 0 | R4 | ↪️ Sostituita da US-1007…US-1011 e EN-8 |
+| [US-1007](#us-1007) | E10 | Indirizzi con il comune | Must | 3 | R4 | ✅ Ready (Sprint 13) |
+| [US-1008](#us-1008) | E10 | Convenzione e progetti formativi | Must | 8 | R4 | ✅ Ready (Sprint 13) |
+| [US-1009](#us-1009) | E10 | Fine effettiva del tirocinio e ruolo del tutor aziendale | Must | 2 | R4 | ✅ Ready (Sprint 13) |
+| [US-1010](#us-1010) | E10 | Modelli dei documenti caricati dall'ADMIN | Must | 8 | R4 | ✅ Ready (Sprint 13) |
+| [US-1011](#us-1011) | E10 | Documenti sui modelli reali (GOL) | Must | 8 | R4 | ✅ Ready (Sprint 14) |
+| [EN-8](#en-8) | E10 | Preparazione dei modelli reali | Must | 3 | R4 | ✅ Ready (Sprint 14) |
 | [US-1101](#us-1101) | E11 | Report di restituzione | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1102](#us-1102) | E11 | Esito sulla mansione e audit trail | Must | 2 | R3 | 🎉 Done (Sprint 8) |
 | [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | 🎉 Done (Sprint 5) |
@@ -312,6 +322,51 @@ Criteri di accettazione:
 - Pagina "Calendario" per l'ADMIN: patrono (24 giugno) e chiusure, come date singole o periodi, con descrizione;
   modifiche registrate nell'audit.
 - Un solo calendario, valido per tutti i progetti e per tutte le segnalazioni.
+#### US-114
+**Comuni e province** · Must · 8 punti · R4 · ✅ Ready (Sprint 12)
+
+Come **ADMIN** voglio in NEXUS l'elenco ufficiale dei comuni e delle province italiane per avere indirizzi uniformi nei
+documenti (planning del 09/11).
+
+Criteri di accettazione:
+- Tutti i comuni e le province d'Italia dall'elenco ISTAT: codice, nome, provincia con sigla.
+- **Temporizzati** (PO, 09/11): ogni comune e ogni provincia ha un periodo di validità (dal–al), così fusioni, cambi di
+  nome e di provincia non cambiano i dati già inseriti né i documenti già prodotti.
+- Un comune non più valido non si propone nei nuovi inserimenti, ma resta visibile dove è già usato.
+- Scelta con ricerca per nome (suggerimenti dalla seconda lettera), mostrata come «Sesto Fiorentino (FI)»; accessibile
+  da tastiera e con lo screen reader (axe).
+- **L'ADMIN carica il file dell'ISTAT** dai Cataloghi (PO, 09/11), sia la prima volta sia a ogni variazione (poche
+  all'anno). Prima di confermare vede l'anteprima delle differenze: comuni nuovi, soppressi, rinominati, passati a
+  un'altra provincia. Alla conferma i comuni soppressi o cambiati chiudono la loro validità e le nuove versioni la
+  aprono; nulla si cancella. Un file non riconosciuto è rifiutato con il motivo. Il caricamento è nell'audit.
+- Nella demo il seed carica l'elenco attuale.
+- Il luogo di nascita resta testo libero: può essere ovunque nel mondo (PO, 09/11).
+
+Usato da: US-1007 (sedi e residenza).
+
+#### US-115
+**Sedi di competenza, tipi di tirocinio per progetto, enti di presa in carico** · Must · 5 punti · R4 · ✅ Ready (Sprint 12)
+
+Come **ADMIN** voglio gestire nei Cataloghi le sedi di competenza, i tipi di tirocinio ammessi per ogni progetto e gli
+enti che hanno in carico i beneficiari, per far scegliere ai Tutor solo valori validi (planning del 09/11).
+
+Criteri di accettazione:
+- **Sedi di competenza**: nome e uno o più progetti (una sede può valere per più progetti). Non sono legate a un comune:
+  coprono più comuni. Per GOL: Firenze, Borgo San Lorenzo, Sesto Fiorentino.
+- **Tipi di tirocinio per progetto** (molti a molti): per ogni progetto i tipi ammessi; GOL ammette Extracurriculare e
+  Inclusione; gli altri progetti, fino al censimento, tutti i tipi (PO, 09/11). Nella scheda del tirocinio si scelgono
+  solo i tipi ammessi dal progetto della segnalazione; il server rifiuta gli altri.
+- **Enti di presa in carico**: tipologia (Comune, Unione dei Comuni, Comunità montana, Società della Salute, Azienda
+  Sanitaria, Ufficio interdistrettuale esecuzione penale esterna, Altro), denominazione, codice fiscale o partita IVA,
+  sede legale; legale rappresentante (nome, qualifica; luogo e data di nascita facoltativi); referente per la
+  convenzione (nome, telefono, mail), che può essere una persona diversa dal legale rappresentante. Enti iniziali, con
+  i nomi ufficiali: Comune di Firenze, Società della Salute di Firenze, Società della Salute Mugello, Società della
+  Salute Fiorentina Nord Ovest. I dati delle persone li inserisce l'ADMIN: non sono nel codice (nella demo, dati
+  inventati).
+- Disattivare una sede, un ente o togliere un tipo a un progetto vale solo per i nuovi inserimenti: i dati già inseriti
+  restano (PO, 09/11).
+- Ogni modifica è registrata nell'audit (EN-2).
+
 ### E2 — Anagrafica beneficiari
 
 _Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR._
@@ -361,6 +416,27 @@ Criteri di accettazione:
 - Il CV si scarica solo da utenti autorizzati a vedere il beneficiario.
 - Fatto il 09/11: PDF riconosciuto dal contenuto, CV nel database (il backup lo copre), cancellato con l'anonimizzazione
   (US-1303).
+
+#### US-206
+**Contatti, ente di presa in carico e case manager del beneficiario** · Must · 5 punti · R4 · ✅ Ready (Sprint 12)
+
+Come **Tutor** voglio registrare i contatti del beneficiario e l'ente che lo ha in carico, con il suo case manager, per
+compilare i documenti e poter attivare i tirocini di inclusione (planning del 09/11).
+
+Criteri di accettazione:
+- **Email e telefono** del beneficiario, facoltativi e validati.
+- **Ente che ha in carico** il beneficiario: facoltativo, dal catalogo (US-115). Non si può cambiare mentre il
+  beneficiario ha un tirocinio aperto, cioè una segnalazione con il tirocinio non ancora in FORM_RESTITUZIONE (PO,
+  09/11): il campo è bloccato con la spiegazione e il server rifiuta la modifica.
+- **Case manager**: nome, sede operativa, telefono, mail, tutti facoltativi nella scheda; si può sostituire anche durante
+  il tirocinio (i documenti generati dopo mostrano quello nuovo).
+- **Tirocinio di inclusione**: si può scegliere il tipo Inclusione solo se il beneficiario ha l'ente e il case manager
+  con **nome, mail e telefono** (PO, 09/11). Altrimenti l'opzione è disattivata con l'elenco dei dati mancanti e il
+  server rifiuta il salvataggio. Durante un tirocinio di inclusione aperto nome, mail e telefono del case manager non
+  si possono svuotare.
+- Privacy: la presa in carico da parte dei servizi sociali o sanitari è un dato delicato, come la L. 68/99. Si vede
+  solo dove si vede il beneficiario (US-204), mai nei log; ente, case manager, email e telefono rientrano
+  nell'anonimizzazione (US-1303).
 
 ### E3 — Segnalazioni (fase 1)
 
@@ -463,6 +539,19 @@ Criteri di accettazione:
 Origine: note operative del PO, review dello Sprint 5 §8.3 (28/10).
 
 Dipendenze: US-704
+
+#### US-308
+**Sede di competenza della segnalazione** · Must · 3 punti · R4 · ✅ Ready (Sprint 12)
+
+Come **Tutor** voglio indicare la sede di competenza quando creo la segnalazione, perché è il luogo dei documenti di
+fine tirocinio (planning del 09/11).
+
+Criteri di accettazione:
+- Alla creazione si sceglie tra le sedi attive del progetto della segnalazione (US-115). È **obbligatoria** se il
+  progetto ha almeno una sede; se non ne ha, il campo non compare (PO, 09/11).
+- Dopo l'inserimento il Tutor non la può cambiare; la correggono l'ADMIN e il Coordinatore, quest'ultimo solo nei
+  progetti che coordina (US-112), con l'audit (prima, dopo, autore) (PO, 09/11).
+- Si vede nel dettaglio della segnalazione. Le segnalazioni già esistenti restano senza sede.
 
 ### E4 — Coda Call Center e fast-track (fase 3)
 
@@ -863,20 +952,117 @@ Criteri di accettazione:
 
 Dipendenze: US-1004 · Domande aperte: Q5
 
-### E11 — Chiusura e restituzione
-
-_Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda._
-
 #### US-1006
-**Integrazione dei modelli Word reali** · Must · da stimare · R4 · 📋 Backlog
+**Integrazione dei modelli Word reali** · Must · — · R4 · ↪️ Sostituita
 
 Come **Tutor** voglio scaricare Convenzione e Progetto Formativo sui modelli reali della cooperativa, al posto dei
 segnaposto, per usarli senza ritoccarli (Q5). Decisione del PO dell'08/11: si farà in **uno sprint dedicato**, come la
 revisione UX/UI (US-1305).
 
-Criteri di accettazione (da raffinare con il PO quando arrivano i modelli):
-- I modelli reali, uno per tipo di tirocinio, compilati con i dati della scheda; nessun segnaposto scoperto.
-- Come si modificano i modelli in futuro (Q5, «il PO ci sta pensando»).
+↪️ **Sostituita il 09/11** (planning dello Sprint 12): con i modelli reali arrivati, la storia è divisa in US-1007,
+US-1008, US-1009, US-1010, US-1011 ed EN-8.
+
+#### US-1007
+**Indirizzi con il comune** · Must · 3 punti · R4 · ✅ Ready (Sprint 13)
+
+Come **Tutor** voglio che sede legale dell'azienda, sede del tirocinio e residenza del beneficiario abbiano il comune
+dall'elenco ufficiale (US-114), per avere città e provincia corrette nei documenti (planning del 09/11).
+
+Criteri di accettazione:
+- Sede legale dell'azienda: indirizzo e comune. Sede del tirocinio: indirizzo e comune; la provincia del soggetto
+  promotore nella convenzione è quella della sede del tirocinio.
+- Residenza del beneficiario (nella scheda del tirocinio, come oggi): comune, via, numero civico (PO, 09/11).
+- I dati già inseriti come testo libero si ripassano a mano (nella demo si rigenerano).
+
+Dipendenze: US-114
+
+#### US-1008
+**Convenzione e progetti formativi** · Must · 8 punti · R4 · ✅ Ready (Sprint 13)
+
+Come **Tutor** voglio registrare la convenzione del tirocinio e uno o più progetti formativi, per riformulare il
+progetto quando serve senza rifare la convenzione (planning del 09/11).
+
+Criteri di accettazione:
+- Una segnalazione ha **un** tirocinio e **una** convenzione: numero, data e data di stipula, inseriti dal Tutor. La
+  durata della convenzione coincide con le date del tirocinio; la convenzione è per «n. 1 tirocini».
+- La convenzione ha **uno o più progetti formativi**, numerati 1, 2, 3… al suo interno. Ognuno prende tutti i dati
+  dalla convenzione e dal tirocinio tranne: data di inizio, data di fine, mansione e dettaglio della mansione (testo).
+  L'orario è sempre quello del tirocinio (PO, 09/11).
+- Le date di un progetto formativo stanno dentro quelle del tirocinio; i progetti della stessa convenzione non si
+  sovrappongono, neanche di un giorno. Altrimenti il salvataggio è rifiutato con la spiegazione.
+- Durata del progetto formativo in mesi e monte ore calcolati sulle sue date.
+- Il motivo della riformulazione non si registra e non compare nei documenti (PO, 09/11).
+- Ogni modifica nell'audit (EN-2).
+
+#### US-1009
+**Fine effettiva del tirocinio e ruolo del tutor aziendale** · Must · 2 punti · R4 · ✅ Ready (Sprint 13)
+
+Come **Tutor** voglio indicare quando il tirocinio è finito davvero e il ruolo del tutor aziendale, per la relazione
+finale e il progetto formativo (planning del 09/11).
+
+Criteri di accettazione:
+- Nel report di restituzione (US-1101) la **data di fine effettiva**, obbligatoria, precompilata con la fine prevista,
+  non prima dell'inizio. Vale solo per la relazione finale: i progetti formativi restano com'erano (PO, 09/11).
+- Per ogni tutor aziendale, la **funzione/ruolo** come testo libero facoltativo.
+
+#### US-1010
+**Modelli dei documenti caricati dall'ADMIN** · Must · 8 punti · R4 · ✅ Ready (Sprint 13)
+
+Come **ADMIN** voglio caricare i modelli Word con le condizioni in cui valgono, per aggiungerli e cambiarli senza un
+rilascio (planning del 09/11).
+
+Criteri di accettazione:
+- Pagina «Modelli dei documenti»: caricamento di un file Word con documento (convenzione, progetto formativo,
+  relazione finale), progetto, tipo di tirocinio e, facoltativo, ente di presa in carico. Il file è salvato nel
+  database (come il CV, US-205), quindi è nel backup e fuori dal repository.
+- Al caricamento NEXUS controlla che il file sia un Word valido e che usi solo segnaposto noti: altrimenti lo rifiuta
+  con l'elenco dei segnaposto sconosciuti.
+- Scelta del modello al momento della generazione: tra i modelli attivi che soddisfano le condizioni (quello con l'ente
+  vale più di quello senza); **uno** → si usa; **più di uno** → l'utente sceglie da un elenco; **nessuno** → il modello
+  generico di ripiego, che resta nel codice (PO, 09/11).
+- Disattivare o sostituire un modello non cambia i documenti già scaricati. Ogni operazione nell'audit.
+
+Dipendenze: US-115
+
+#### US-1011
+**Documenti sui modelli reali (GOL)** · Must · 8 punti · R4 · ✅ Ready (Sprint 14)
+
+Come **Tutor** voglio scaricare convenzione, progetto formativo e relazione finale compilati sui modelli reali della
+cooperativa, per usarli senza ritoccarli (Q5, planning del 09/11).
+
+Criteri di accettazione:
+- Due pulsanti come oggi (convenzione, progetto formativo: uno per ogni progetto formativo) più **relazione finale**,
+  attiva solo a tirocinio chiuso.
+- Dati del soggetto promotore (denominazione, sede, codice fiscale, legale rappresentante con nascita, contatti,
+  posizione INAIL, polizza RC con scadenza) nel `.env` del server, non nei modelli (PO, 09/11).
+- Per ogni progetto, modificabili dall'ADMIN: riferimento all'avviso (con un testo predefinito) e riga di intestazione
+  con codice e CUP (es. «Firenze in Rete 2 – Codice 9014358 – CUP B81D24000440006»).
+- Nuovi segnaposto: dati dell'ente e del case manager, contatti e titolo di studio e cittadinanza del beneficiario,
+  cognome e nome separati, sesso (M/F, altrimenti caselle vuote), comune e provincia, numero e date della convenzione,
+  numero e date del progetto formativo, mansione, contatti dell'azienda, ATECO, orario (giorni, fasce, ore), tutor
+  aziendale con ruolo, sede di competenza, date effettive, mesi arrotondati al mese più vicino (da 15 giorni per
+  eccesso, sospensioni comprese).
+- Relazione finale: «Al» = fine effettiva; luogo = sede di competenza; data = data di chiusura.
+- Restano da compilare a mano: CCNL, numero di dipendenti, ADA/ISTAT, obiettivi, attività, permesso di soggiorno.
+
+Dipendenze: US-1007, US-1008, US-1009, US-1010, US-206, US-308
+
+#### EN-8
+**Preparazione dei modelli reali** · Must · 3 punti · R4 · ✅ Ready (Sprint 14)
+
+Il team prepara i 6 modelli di GOL partendo dai file della cooperativa: 3 per l'Extracurriculare e 3 per l'Inclusione,
+uno solo per tutti e quattro gli enti perché i testi sono identici (PO, 09/11).
+
+Criteri di accettazione:
+- Segnaposto in tutti i campi che NEXUS conosce, anche dove il file originale aveva solo righe vuote; dati del
+  promotore e degli enti sostituiti dai segnaposto; bollo tolto; firma «Il Tirocinante» in tutti i progetti
+  personalizzati; «Legale rappresentante» per l'ospitante; polizza RC con scadenza 22/07/2027 (PO, 09/11).
+- I modelli restano **fuori dal repository** (`documenti_base/` è in `.gitignore`); li carica l'ADMIN (US-1010). Nei
+  test si usano modelli finti con gli stessi segnaposto.
+
+### E11 — Chiusura e restituzione
+
+_Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda._
 
 #### US-1101
 **Report di restituzione** · Must · 5 punti · R3 · 🎉 Done (Sprint 8)
