@@ -26,4 +26,8 @@ public interface CompetenceSiteRepository extends JpaRepository<CompetenceSite, 
     @Query("select s from CompetenceSite s join s.projects p where p.id = :projectId and s.active = true "
             + "order by s.name")
     List<CompetenceSite> findActiveForProject(@Param("projectId") Long projectId);
+
+    /** Il progetto ha almeno una sede attiva: senza, la correzione non avrebbe nulla da proporre (US-308). */
+    @Query("select count(s) > 0 from CompetenceSite s join s.projects p where p.id = :projectId and s.active = true")
+    boolean existsActiveForProject(@Param("projectId") Long projectId);
 }

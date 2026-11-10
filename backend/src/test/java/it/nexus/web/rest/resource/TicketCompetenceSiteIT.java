@@ -118,6 +118,23 @@ class TicketCompetenceSiteIT {
                 .andReturn().getResponse().getContentAsString();
         mockMvc.perform(get("/api/v1/tickets/" + JsonPath.read(body, "$.id")).header(USER, "tutor1"))
                 .andExpect(jsonPath("$.competenceSite").doesNotExist());
+        // l'ADMIN non ha nulla da proporre: niente comando di correzione
+        mockMvc.perform(get("/api/v1/tickets/" + JsonPath.read(body, "$.id")).header(USER, "admin"))
+                .andExpect(jsonPath("$.canChangeCompetenceSite").value(false));
+    }
+
+    @Test
+    void sediTutteDisattivate_nessunaCorrezione() throws Exception {
+        String ticketId = JsonPath.read(submit(gol, id(firenze)).andReturn().getResponse().getContentAsString(),
+                "$.id");
+        mockMvc.perform(get("/api/v1/tickets/" + ticketId).header(USER, "admin"))
+                .andExpect(jsonPath("$.canChangeCompetenceSite").value(true));
+        firenze.setActive(false);
+        sesto.setActive(false);
+        em.flush();
+        mockMvc.perform(get("/api/v1/tickets/" + ticketId).header(USER, "admin"))
+                .andExpect(jsonPath("$.competenceSite.id").value(id(firenze)))
+                .andExpect(jsonPath("$.canChangeCompetenceSite").value(false));
     }
 
     @Test
