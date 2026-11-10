@@ -55,3 +55,7 @@ Ogni correzione SHALL essere nell'audit della segnalazione, con la sede prima e 
 - **WHEN** il Tutor della segnalazione prova a cambiare la sede
 - **THEN** la risposta è `403`
 
+#### Scenario: Progetto senza sedi attive
+- **WHEN** l'ADMIN apre una segnalazione di un progetto senza sedi attive
+- **THEN** il dettaglio mostra «Non indicata» e non propone la correzione
+

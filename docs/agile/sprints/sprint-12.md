@@ -42,9 +42,14 @@ nuove sezioni nel bundle; nei log del backend le quattro migrazioni applicate e 
   - «Di inclusione» resta visibile ma disattivato, con l'elenco dei dati mancanti.
 - **US-308**: la sede si sceglie anche nella candidatura dalla bacheca; con una sola sede nel progetto è già
   selezionata.
-- **Controllo in browser reale** (punto 3 della Definition of Done): US-114 e US-115 controllate in Chrome in locale;
-  per US-206 e US-308 l'estensione di Chrome era scollegata. Le coprono i test dei componenti con axe; il controllo a
-  vista si fa con il collaudo (T-22.3, T-22.4).
+- **Controllo in browser reale** (punto 3 della Definition of Done): US-114 e US-115 controllate in Chrome in locale
+  durante lo sviluppo; US-206 e US-308 il 10/11, prima di chiudere lo sprint (l'estensione era scollegata). Axe con il
+  contrasto, tema chiaro e scuro, smartphone a 390 px: nessuna violazione. Due difetti, corretti in
+  [#144](https://github.com/maubernardi/nexus/pull/144):
+  - US-206: la spiegazione di «Di inclusione» non disponibile non era collegata al campo del tipo (lo screen reader
+    non la leggeva);
+  - US-308: l'ADMIN vedeva «Correggi la sede di competenza» anche nei progetti senza sedi, con una tendina vuota; la
+    sede resta «Non indicata» (PO, 10/11).
 
 ## Decisioni del planning (09/11)
 
@@ -94,6 +99,8 @@ non curricolare) e per l'**Inclusione** (Comune di Firenze e tre Società della 
 
 ## Per il PO durante lo sprint
 
-- Collaudo T-22.1 … T-22.4 sulla demo: è anche il primo controllo a vista di US-206 e US-308.
+- Unire prima [#144](https://github.com/maubernardi/nexus/pull/144) (correzioni) e poi questa chiusura; il deploy
+  di #144 su richiesta.
+- Collaudo T-22.1 … T-22.4 sulla demo.
 - I dati reali degli enti (referenti, legali rappresentanti) si inseriscono dai Cataloghi: US-115 è online.
 - T-21.6: le PR di Dependabot del lunedì, una alla volta, con il deploy.
