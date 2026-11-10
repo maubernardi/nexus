@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -22,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import it.nexus.domain.AppUser;
 import it.nexus.domain.Beneficiary;
 import it.nexus.domain.BeneficiaryLanguage;
+import it.nexus.domain.CareAgency;
+import it.nexus.domain.Internship;
 import it.nexus.domain.StoredFile;
 import it.nexus.domain.StoredFileContent;
 import it.nexus.domain.Ticket;
@@ -38,6 +41,8 @@ import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.mapper.BeneficiaryMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.BeneficiaryRepository;
+import it.nexus.repository.CareAgencyRepository;
+import it.nexus.repository.InternshipRepository;
 import it.nexus.repository.StoredFileContentRepository;
 import it.nexus.repository.StoredFileRepository;
 import it.nexus.repository.TicketRepository;
@@ -71,6 +76,8 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
     private final BeneficiaryMapper mapper;
     private final StoredFileRepository storedFileRepository;
     private final StoredFileContentRepository storedFileContentRepository;
+    private final InternshipRepository internshipRepository;
+    private final CareAgencyRepository careAgencyRepository;
 
     @Override
     public BeneficiaryDTO register(BeneficiaryFormDTO dto) {
@@ -78,12 +85,12 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
         requireDistinctLanguages(dto);
 
         Beneficiary beneficiary = new Beneficiary(currentAppUserService.getCurrentAppUser());
-        apply(beneficiary, dto, zone);
+        apply(beneficiary, dto, zone, careAgency(dto.careAgencyId(), null));
 
         Beneficiary saved = beneficiaryRepository.save(beneficiary);
         // dati personali: nell'audit solo l'azione, mai i valori (GDPR)
         auditService.record(AuditEntityType.BENEFICIARY, saved.getId(), "CREATE", AuditChanges.none(), null);
-        return mapper.toDto(saved, true);
+        return toDto(saved, true);
     }
 
     @Override
@@ -102,9 +109,11 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
                 ? beneficiary.getResidenceZone()
                 : activeZone(dto.residenceZoneId());
         requireDistinctLanguages(dto);
+        CareAgency agency = careAgency(dto.careAgencyId(), beneficiary.getCareAgency());
+        requireCareRules(beneficiary, dto, agency);
 
         Map<String, Object> before = snapshot(beneficiary);
-        apply(beneficiary, dto, zone);
+        apply(beneficiary, dto, zone, agency);
         Map<String, Object> after = snapshot(beneficiary);
         // dati personali: nell'audit solo quali campi sono cambiati, mai i valori (GDPR)
         AuditChanges changes = AuditChanges.of();
@@ -114,7 +123,7 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
         if (!changes.asMap().isEmpty()) {
             auditService.record(AuditEntityType.BENEFICIARY, saved.getId(), "UPDATE", changes, null);
         }
-        return mapper.toDto(saved, true);
+        return toDto(saved, true);
     }
 
     @Override
@@ -136,7 +145,7 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
     public BeneficiaryDTO getById(String id) {
         Beneficiary beneficiary = findVisible(id);
         // un beneficiario anonimizzato non si modifica più (US-1303)
-        return mapper.toDto(beneficiary, isOwner(beneficiary) && beneficiary.getAnonymizedAt() == null);
+        return toDto(beneficiary, isOwner(beneficiary) && beneficiary.getAnonymizedAt() == null);
     }
 
     /** Stessa risposta per inesistente e non autorizzato: non si rivela l'esistenza del beneficiario. */
@@ -163,7 +172,7 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
         // il nome del file può contenere il nome della persona: nell'audit solo la dimensione
         auditService.record(AuditEntityType.BENEFICIARY, saved.getId(), replaced ? "CV_REPLACED" : "CV_UPLOADED",
                 AuditChanges.of().value("cvSizeBytes", null, content.length), null);
-        return mapper.toDto(saved, true);
+        return toDto(saved, true);
     }
 
     @Override
@@ -181,12 +190,12 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
     public BeneficiaryDTO deleteCv(String id) {
         Beneficiary beneficiary = ownForCv(id);
         if (beneficiary.getCvFile() == null) {
-            return mapper.toDto(beneficiary, true);
+            return toDto(beneficiary, true);
         }
         removeCvFile(beneficiary);
         Beneficiary saved = beneficiaryRepository.saveAndFlush(beneficiary);
         auditService.record(AuditEntityType.BENEFICIARY, saved.getId(), "CV_REMOVED", AuditChanges.none(), null);
-        return mapper.toDto(saved, true);
+        return toDto(saved, true);
     }
 
     /** Beneficiario del Tutor corrente, non anonimizzato: solo lui gestisce il CV (come la scheda, US-203). */
@@ -239,6 +248,65 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
         }
     }
 
+    /** Scheda con i blocchi dovuti al tirocinio aperto (US-206). */
+    private BeneficiaryDTO toDto(Beneficiary beneficiary, boolean editable) {
+        Optional<Internship> open = openInternship(beneficiary);
+        return mapper.toDto(beneficiary, editable, open.isPresent(), open.map(BeneficiaryServiceImpl::isInclusion)
+                .orElse(false));
+    }
+
+    /** Tirocinio aperto: la scheda del tirocinio di una segnalazione non ancora chiusa (PO, 09/11). */
+    private Optional<Internship> openInternship(Beneficiary beneficiary) {
+        if (beneficiary.getId() == null) {
+            return Optional.empty();
+        }
+        return internshipRepository.findByBeneficiaryId(beneficiary.getId()).stream()
+                .filter(i -> i.getTicket().getStatus() != TicketStatus.CLOSED)
+                .findFirst();
+    }
+
+    private static boolean isInclusion(Internship internship) {
+        return internship.getInternshipType() != null && internship.getInternshipType().isInclusion();
+    }
+
+    /**
+     * Con un tirocinio aperto l'ente non cambia; con un tirocinio di inclusione aperto nome, mail e telefono del case
+     * manager restano (US-206).
+     */
+    private void requireCareRules(Beneficiary beneficiary, BeneficiaryFormDTO dto, CareAgency agency) {
+        Optional<Internship> open = openInternship(beneficiary);
+        if (open.isEmpty()) {
+            return;
+        }
+        if (!Objects.equals(agency, beneficiary.getCareAgency())) {
+            throw new FieldValidationException("careAgencyId",
+                    "L'ente non si può cambiare mentre il beneficiario ha un tirocinio aperto");
+        }
+        if (isInclusion(open.get())) {
+            String required = "Obbligatorio durante il tirocinio di inclusione";
+            if (blankToNull(dto.caseManagerName()) == null) {
+                throw new FieldValidationException("caseManagerName", required);
+            }
+            if (blankToNull(dto.caseManagerEmail()) == null) {
+                throw new FieldValidationException("caseManagerEmail", required);
+            }
+            if (blankToNull(dto.caseManagerPhone()) == null) {
+                throw new FieldValidationException("caseManagerPhone", required);
+            }
+        }
+    }
+
+    /** Ente attivo del catalogo, oppure quello già indicato anche se nel frattempo disattivato. */
+    private CareAgency careAgency(String id, CareAgency current) {
+        if (id == null || id.isBlank()) {
+            return null;
+        }
+        return Optional.ofNullable(TsidMapper.toInternal(id))
+                .flatMap(careAgencyRepository::findById)
+                .filter(a -> a.isActive() || a.equals(current))
+                .orElseThrow(() -> new FieldValidationException("careAgencyId", "Ente non valido"));
+    }
+
     private Beneficiary findVisible(String id) {
         return Optional.ofNullable(TsidMapper.toInternal(id))
                 .flatMap(beneficiaryRepository::findById)
@@ -271,7 +339,7 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
         }
     }
 
-    private static void apply(Beneficiary beneficiary, BeneficiaryFormDTO dto, Zone zone) {
+    private static void apply(Beneficiary beneficiary, BeneficiaryFormDTO dto, Zone zone, CareAgency agency) {
         beneficiary.setFirstName(dto.firstName().strip());
         beneficiary.setLastName(dto.lastName().strip());
         beneficiary.setBirthYear(dto.birthYear());
@@ -286,6 +354,13 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
         beneficiary.setEducationLevel(dto.educationLevel());
         beneficiary.setConstraints(blankToNull(dto.constraints()));
         applyLanguages(beneficiary, dto.languages());
+        beneficiary.setEmail(blankToNull(dto.email()));
+        beneficiary.setPhone(blankToNull(dto.phone()));
+        beneficiary.setCareAgency(agency);
+        beneficiary.setCaseManagerName(blankToNull(dto.caseManagerName()));
+        beneficiary.setCaseManagerOffice(blankToNull(dto.caseManagerOffice()));
+        beneficiary.setCaseManagerPhone(blankToNull(dto.caseManagerPhone()));
+        beneficiary.setCaseManagerEmail(blankToNull(dto.caseManagerEmail()));
     }
 
     /**
@@ -318,6 +393,13 @@ public class BeneficiaryServiceImpl implements BeneficiaryService {
         values.put("constraints", b.getConstraints());
         values.put("languages", b.getLanguages().stream()
                 .collect(Collectors.toMap(BeneficiaryLanguage::getLanguage, BeneficiaryLanguage::getLevel)));
+        values.put("email", b.getEmail());
+        values.put("phone", b.getPhone());
+        values.put("careAgency", b.getCareAgency() == null ? null : b.getCareAgency().getId());
+        values.put("caseManagerName", b.getCaseManagerName());
+        values.put("caseManagerOffice", b.getCaseManagerOffice());
+        values.put("caseManagerPhone", b.getCaseManagerPhone());
+        values.put("caseManagerEmail", b.getCaseManagerEmail());
         return values;
     }
 

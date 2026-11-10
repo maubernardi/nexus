@@ -38,3 +38,9 @@ export const fetchNoHireReasons = async (): Promise<ReferenceItem[]> => {
   const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.noHireReasons);
   return data;
 };
+
+/** Enti di presa in carico attivi (US-206). */
+export const fetchCareAgencies = async (): Promise<ReferenceItem[]> => {
+  const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.careAgencies);
+  return data;
+};

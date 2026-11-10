@@ -43,6 +43,8 @@ const mario: Beneficiary = {
   createdAt: '2026-10-01T08:00:00Z',
   ownerTutorName: 'Tutor Uno',
   editable: true,
+  careAgencyLocked: false,
+  caseManagerRequired: false,
 };
 
 const renderPage = (initialPath: InitialEntry = '/beneficiari/B1') =>

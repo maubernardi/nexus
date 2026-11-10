@@ -23,6 +23,7 @@ export const ENDPOINTS = {
   jobCategories: '/reference/job-categories',
   hiringFormulas: '/reference/hiring-formulas',
   noHireReasons: '/reference/no-hire-reasons',
+  careAgencies: '/reference/care-agencies',
   municipalities: '/municipalities',
   documentCatalogs: '/document-catalogs',
 } as const;

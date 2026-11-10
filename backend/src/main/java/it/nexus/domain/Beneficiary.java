@@ -107,6 +107,34 @@ public class Beneficiary extends AbstractTsidEntity {
     @JoinColumn(name = "cv_file_id")
     private StoredFile cvFile;
 
+    /** Contatti (US-206): per i documenti del tirocinio. */
+    @Column(name = "email", length = 254)
+    private String email;
+
+    @Column(name = "phone", length = 30)
+    private String phone;
+
+    /**
+     * Ente che ha in carico il beneficiario (US-206): serve ai tirocini di inclusione. Rivela che la persona è seguita
+     * dai servizi sociali o sanitari: dato delicato, come la L. 68/99.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "care_agency_id")
+    private CareAgency careAgency;
+
+    /** Case manager dell'ente (US-206). */
+    @Column(name = "case_manager_name", length = 200)
+    private String caseManagerName;
+
+    @Column(name = "case_manager_office", length = 300)
+    private String caseManagerOffice;
+
+    @Column(name = "case_manager_phone", length = 30)
+    private String caseManagerPhone;
+
+    @Column(name = "case_manager_email", length = 254)
+    private String caseManagerEmail;
+
     @Column(name = "anonymized_at")
     private Instant anonymizedAt;
 
@@ -154,6 +182,13 @@ public class Beneficiary extends AbstractTsidEntity {
         lastName = initial(lastName);
         constraints = null;
         cvFile = null;
+        email = null;
+        phone = null;
+        careAgency = null;
+        caseManagerName = null;
+        caseManagerOffice = null;
+        caseManagerPhone = null;
+        caseManagerEmail = null;
         anonymizedAt = now;
         anonymizationDueSince = null;
     }

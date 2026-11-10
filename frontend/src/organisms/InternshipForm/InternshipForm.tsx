@@ -142,6 +142,9 @@ const withCurrent = (items: ReferenceItem[] | undefined, current?: ReferenceItem
   return current && !list.some((i) => i.id === current.id) ? [current, ...list] : list;
 };
 
+const INCLUSION_ITEMS = ['careAgency', 'caseManagerName', 'caseManagerEmail', 'caseManagerPhone'] as const;
+type InclusionItem = (typeof INCLUSION_ITEMS)[number];
+
 type InternshipFormProps = {
   internship: Internship;
   onSubmit: (payload: InternshipPayload) => Promise<Internship>;
@@ -156,6 +159,14 @@ type InternshipFormProps = {
 export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: InternshipFormProps) => {
   const { t } = useTranslation();
   const [genericError, setGenericError] = useState(false);
+  // il tipo «Di inclusione» richiede ente e case manager del beneficiario (US-206), salvo se è già quello scelto
+  const typeOptions = withCurrent(internship.internshipTypes, internship.internshipType);
+  const inclusionMissing = (internship.inclusionMissing ?? []).filter((m): m is InclusionItem =>
+    (INCLUSION_ITEMS as readonly string[]).includes(m),
+  );
+  const isUnavailable = (type: ReferenceItem): boolean =>
+    type.code === 'INCLUSIONE' && inclusionMissing.length > 0 && type.id !== internship.internshipType?.id;
+  const inclusionType = typeOptions.find(isUnavailable);
   const {
     register,
     control,
@@ -348,14 +359,25 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
             {(p) => (
               <NativeSelect {...p} {...register('internshipTypeId')}>
                 <option value="">{t('form.select')}</option>
-                {withCurrent(internship.internshipTypes, internship.internshipType).map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
-                ))}
+                {typeOptions.map((type) => {
+                  const unavailable = isUnavailable(type);
+                  return (
+                    <option key={type.id} value={type.id} disabled={unavailable}>
+                      {unavailable ? `${type.name} ${t('internship.inclusionUnavailableSuffix')}` : type.name}
+                    </option>
+                  );
+                })}
               </NativeSelect>
             )}
           </FormField>
+          {inclusionType && (
+            <p className="text-sm text-muted-foreground md:col-span-2">
+              {t('internship.inclusionUnavailable', {
+                type: inclusionType.name,
+                items: inclusionMissing.map((m) => t(`internship.inclusionItems.${m}`)).join(', '),
+              })}
+            </p>
+          )}
           <FormField id={fieldId('startDate')} label={labels.startDate} error={errors.startDate?.message}>
             {(p) => <Input {...p} type="date" className="max-w-48" {...register('startDate')} />}
           </FormField>

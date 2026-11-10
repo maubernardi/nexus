@@ -56,6 +56,28 @@ const renderForm = (internship: Internship = empty) => {
 };
 
 describe('<InternshipForm>', () => {
+  it('«Di inclusione» non disponibile senza ente e case manager (US-206)', async () => {
+    renderForm({ ...empty, inclusionMissing: ['careAgency', 'caseManagerEmail'] });
+
+    const option = await screen.findByRole('option', { name: 'Di inclusione (non disponibile)' });
+    expect(option).toBeDisabled();
+    expect(screen.getByRole('option', { name: 'Curriculare' })).toBeEnabled();
+    expect(
+      screen.getByText(
+        'Per scegliere «Di inclusione» completa nella scheda del beneficiario: l’ente che lo ha in carico, la mail del case manager.',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('«Di inclusione» già scelta resta disponibile', async () => {
+    renderForm({
+      ...empty,
+      internshipType: { id: 'T3', code: 'INCLUSIONE', name: 'Di inclusione' },
+      inclusionMissing: ['careAgency'],
+    });
+    expect(await screen.findByRole('option', { name: 'Di inclusione' })).toBeEnabled();
+  });
+
   it('scheda vuota: si salva anche una parte, con righe ripetibili', async () => {
     const user = userEvent.setup();
     const { onSubmit, onSuccess } = renderForm();

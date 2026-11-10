@@ -96,7 +96,9 @@ export const it = {
       personal: 'Dati anagrafici',
       mobility: 'Mobilità',
       education: 'Formazione e lingue',
+      contacts: 'Contatti',
       confidential: 'Informazioni riservate',
+      care: 'Presa in carico',
     },
     confidentialNote:
       'Dati riservati: li vedono solo tu, i tutor dei progetti in cui lo segnali, il Call Center e l’amministrazione. Inserisci solo quanto necessario al tirocinio.',
@@ -123,6 +125,24 @@ export const it = {
       hasLaw68: 'Iscritto al collocamento mirato (L. 68/99)',
       constraints: 'Vincoli ed esigenze',
       constraintsHint: 'Barriere, allergie o altre esigenze rilevanti per il tirocinio.',
+      email: 'Mail',
+      phone: 'Telefono',
+      careAgency: 'Ente che lo ha in carico',
+      careAgencyHint: 'Serve per i tirocini di inclusione.',
+      careAgencyLocked: 'L’ente non si può cambiare mentre il beneficiario ha un tirocinio aperto.',
+      caseManager: 'Case manager dell’ente',
+      caseManagerName: 'Nome e cognome del case manager',
+      caseManagerOffice: 'Sede operativa del case manager',
+      caseManagerPhone: 'Telefono del case manager',
+      caseManagerEmail: 'Mail del case manager',
+    },
+    careNote:
+      'Per un tirocinio di inclusione servono l’ente e il nome, la mail e il telefono del case manager. Il case manager si può sostituire anche durante il tirocinio.',
+    caseManagerRequiredNote:
+      'Il beneficiario ha un tirocinio di inclusione aperto: nome, mail e telefono del case manager sono obbligatori.',
+    errors: {
+      email: 'Inserisci un indirizzo email valido, ad esempio nome@dominio.it',
+      phone: 'Usa solo cifre, spazi e i simboli + ( ) . - /',
     },
     submit: 'Registra beneficiario',
     submitting: 'Registrazione in corso…',
@@ -396,6 +416,14 @@ export const it = {
     errors: { code: 'Formato: 56, 56.10 oppure 56.10.11' },
   },
   internship: {
+    inclusionUnavailable: 'Per scegliere «{{type}}» completa nella scheda del beneficiario: {{items}}.',
+    inclusionUnavailableSuffix: '(non disponibile)',
+    inclusionItems: {
+      careAgency: 'l’ente che lo ha in carico',
+      caseManagerName: 'il nome del case manager',
+      caseManagerEmail: 'la mail del case manager',
+      caseManagerPhone: 'il telefono del case manager',
+    },
     heading: 'Scheda del tirocinio · segnalazione n. {{number}}',
     intro:
       'I dati per Convenzione e Progetto Formativo. Puoi salvarne anche una parte e correggerla in qualunque momento, anche a tirocinio avviato.',

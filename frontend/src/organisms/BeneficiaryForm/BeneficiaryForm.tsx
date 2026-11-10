@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import type { Beneficiary, BeneficiaryCreate } from '@/config/api/beneficiaryApi';
 import { apiError, toFormPath } from '@/config/api/errors';
 import { useCreateBeneficiary } from '@/config/hooks/useBeneficiaries';
-import { useZones } from '@/config/hooks/useReferenceData';
+import { useActiveCareAgencies, useZones } from '@/config/hooks/useReferenceData';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import {
   EDUCATION_LEVELS,
@@ -45,6 +45,13 @@ export type BeneficiaryFormValues = {
   hasLaw68: boolean;
   constraints: string;
   languages: { language: string; level: LanguageLevel | '' }[];
+  email: string;
+  phone: string;
+  careAgencyId: string;
+  caseManagerName: string;
+  caseManagerOffice: string;
+  caseManagerPhone: string;
+  caseManagerEmail: string;
 };
 
 const EMPTY: BeneficiaryFormValues = {
@@ -62,7 +69,18 @@ const EMPTY: BeneficiaryFormValues = {
   hasLaw68: false,
   constraints: '',
   languages: [],
+  email: '',
+  phone: '',
+  careAgencyId: '',
+  caseManagerName: '',
+  caseManagerOffice: '',
+  caseManagerPhone: '',
+  caseManagerEmail: '',
 };
+
+const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const PHONE = /^[0-9 +./()-]*$/;
+const orNull = (value: string): string | null => value.trim() || null;
 
 const fieldId = (path: string): string => `beneficiary-${path.replace(/\./g, '-')}`;
 
@@ -81,6 +99,13 @@ const toPayload = (v: BeneficiaryFormValues): BeneficiaryCreate => ({
   educationLevel: v.educationLevel || null,
   constraints: v.constraints.trim() || null,
   languages: v.languages.map((l) => ({ language: l.language, level: l.level as LanguageLevel })),
+  email: orNull(v.email),
+  phone: orNull(v.phone),
+  careAgencyId: v.careAgencyId || null,
+  caseManagerName: orNull(v.caseManagerName),
+  caseManagerOffice: orNull(v.caseManagerOffice),
+  caseManagerPhone: orNull(v.caseManagerPhone),
+  caseManagerEmail: orNull(v.caseManagerEmail),
 });
 
 const toValues = (b: Beneficiary): BeneficiaryFormValues => ({
@@ -98,6 +123,13 @@ const toValues = (b: Beneficiary): BeneficiaryFormValues => ({
   hasLaw68: b.hasLaw68,
   constraints: b.constraints ?? '',
   languages: b.languages.map((l) => ({ language: l.language, level: l.level })),
+  email: b.email ?? '',
+  phone: b.phone ?? '',
+  careAgencyId: b.careAgency?.id ?? '',
+  caseManagerName: b.caseManagerName ?? '',
+  caseManagerOffice: b.caseManagerOffice ?? '',
+  caseManagerPhone: b.caseManagerPhone ?? '',
+  caseManagerEmail: b.caseManagerEmail ?? '',
 });
 
 type BeneficiaryFormProps = {
@@ -131,6 +163,15 @@ export const BeneficiaryForm = ({
     const current = beneficiary?.residenceZone;
     return current && !active.some((z) => z.id === current.id) ? [current, ...active] : active;
   }, [zones.data, beneficiary]);
+  const careAgencies = useActiveCareAgencies();
+  // l'ente già indicato resta tra le opzioni anche se nel frattempo è stato disattivato
+  const careAgencyOptions = useMemo(() => {
+    const active = careAgencies.data ?? [];
+    const current = beneficiary?.careAgency;
+    return current && !active.some((a) => a.id === current.id) ? [current, ...active] : active;
+  }, [careAgencies.data, beneficiary]);
+  const careAgencyLocked = beneficiary?.careAgencyLocked === true;
+  const caseManagerRequired = beneficiary?.caseManagerRequired === true;
   const [genericError, setGenericError] = useState(false);
   const countries = useMemo(() => countryOptions(), []);
   const languages = useMemo(() => languageOptions(), []);
@@ -168,6 +209,13 @@ export const BeneficiaryForm = ({
     educationLevel: t('beneficiary.fields.educationLevel'),
     languages: t('beneficiary.fields.languages'),
     constraints: t('beneficiary.fields.constraints'),
+    email: t('beneficiary.fields.email'),
+    phone: t('beneficiary.fields.phone'),
+    careAgencyId: t('beneficiary.fields.careAgency'),
+    caseManagerName: t('beneficiary.fields.caseManagerName'),
+    caseManagerOffice: t('beneficiary.fields.caseManagerOffice'),
+    caseManagerPhone: t('beneficiary.fields.caseManagerPhone'),
+    caseManagerEmail: t('beneficiary.fields.caseManagerEmail'),
   };
 
   const summary: SummaryError[] = [];
@@ -210,7 +258,13 @@ export const BeneficiaryForm = ({
       return;
     }
     try {
-      onSuccess(await save(toPayload(values)));
+      const payload = toPayload(values);
+      // con un tirocinio aperto l'ente non si cambia: resta quello registrato
+      onSuccess(
+        await save(
+          careAgencyLocked ? { ...payload, careAgencyId: beneficiary?.careAgency?.id ?? null } : payload,
+        ),
+      );
     } catch (error) {
       const fieldErrors = apiError(error)?.fieldErrors ?? [];
       if (fieldErrors.length > 0) {
@@ -349,6 +403,40 @@ export const BeneficiaryForm = ({
                   </option>
                 ))}
               </NativeSelect>
+            )}
+          </FormField>
+        </div>
+      </section>
+
+      <section aria-labelledby="beneficiary-section-contacts" className="space-y-4">
+        <h2 id="beneficiary-section-contacts" className="text-lg font-semibold text-primary">
+          {t('beneficiary.sections.contacts')}
+        </h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          <FormField id={fieldId('email')} label={labels.email} error={errorOf('email')}>
+            {(p) => (
+              <Input
+                {...p}
+                type="email"
+                autoComplete="off"
+                {...register('email', {
+                  maxLength: { value: 254, message: t('form.errors.maxLength', { max: 254 }) },
+                  validate: (v) => v.trim() === '' || EMAIL.test(v.trim()) || t('beneficiary.errors.email'),
+                })}
+              />
+            )}
+          </FormField>
+          <FormField id={fieldId('phone')} label={labels.phone} error={errorOf('phone')}>
+            {(p) => (
+              <Input
+                {...p}
+                type="tel"
+                autoComplete="off"
+                {...register('phone', {
+                  maxLength: { value: 30, message: t('form.errors.maxLength', { max: 30 }) },
+                  pattern: { value: PHONE, message: t('beneficiary.errors.phone') },
+                })}
+              />
             )}
           </FormField>
         </div>
@@ -526,6 +614,115 @@ export const BeneficiaryForm = ({
             />
           )}
         </FormField>
+        <fieldset className="space-y-4 border-t border-border pt-4">
+          <legend className="text-base font-semibold">{t('beneficiary.sections.care')}</legend>
+          <p className="text-sm text-muted-foreground">{t('beneficiary.careNote')}</p>
+          {careAgencyLocked ? (
+            <div className="space-y-1">
+              <p className="text-sm font-medium">{labels.careAgencyId}</p>
+              <p>{beneficiary?.careAgency?.name ?? t('beneficiary.notSpecified')}</p>
+              <p className="text-sm text-muted-foreground">{t('beneficiary.fields.careAgencyLocked')}</p>
+            </div>
+          ) : (
+            <FormField
+              id={fieldId('careAgencyId')}
+              label={labels.careAgencyId}
+              hint={t('beneficiary.fields.careAgencyHint')}
+              error={errorOf('careAgencyId')}
+              className="max-w-md"
+            >
+              {(p) => (
+                <NativeSelect {...p} {...register('careAgencyId')}>
+                  <option value="">{t('form.select')}</option>
+                  {careAgencyOptions.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.name}
+                    </option>
+                  ))}
+                </NativeSelect>
+              )}
+            </FormField>
+          )}
+          {caseManagerRequired && (
+            <p className="rounded-md border-l-4 border-primary bg-card p-3 text-sm font-medium">
+              {t('beneficiary.caseManagerRequiredNote')}
+            </p>
+          )}
+          <div className="grid gap-4 md:grid-cols-2">
+            <FormField
+              id={fieldId('caseManagerName')}
+              label={labels.caseManagerName}
+              required={caseManagerRequired}
+              error={errorOf('caseManagerName')}
+            >
+              {(p) => (
+                <Input
+                  {...p}
+                  autoComplete="off"
+                  {...register('caseManagerName', {
+                    maxLength: { value: 200, message: t('form.errors.maxLength', { max: 200 }) },
+                    validate: (v) => !caseManagerRequired || notBlank(v),
+                  })}
+                />
+              )}
+            </FormField>
+            <FormField
+              id={fieldId('caseManagerOffice')}
+              label={labels.caseManagerOffice}
+              error={errorOf('caseManagerOffice')}
+            >
+              {(p) => (
+                <Input
+                  {...p}
+                  autoComplete="off"
+                  {...register('caseManagerOffice', {
+                    maxLength: { value: 300, message: t('form.errors.maxLength', { max: 300 }) },
+                  })}
+                />
+              )}
+            </FormField>
+            <FormField
+              id={fieldId('caseManagerPhone')}
+              label={labels.caseManagerPhone}
+              required={caseManagerRequired}
+              error={errorOf('caseManagerPhone')}
+            >
+              {(p) => (
+                <Input
+                  {...p}
+                  type="tel"
+                  autoComplete="off"
+                  {...register('caseManagerPhone', {
+                    maxLength: { value: 30, message: t('form.errors.maxLength', { max: 30 }) },
+                    pattern: { value: PHONE, message: t('beneficiary.errors.phone') },
+                    validate: (v) => !caseManagerRequired || notBlank(v),
+                  })}
+                />
+              )}
+            </FormField>
+            <FormField
+              id={fieldId('caseManagerEmail')}
+              label={labels.caseManagerEmail}
+              required={caseManagerRequired}
+              error={errorOf('caseManagerEmail')}
+            >
+              {(p) => (
+                <Input
+                  {...p}
+                  type="email"
+                  autoComplete="off"
+                  {...register('caseManagerEmail', {
+                    maxLength: { value: 254, message: t('form.errors.maxLength', { max: 254 }) },
+                    validate: (v) =>
+                      v.trim() === ''
+                        ? !caseManagerRequired || t('form.errors.required')
+                        : EMAIL.test(v.trim()) || t('beneficiary.errors.email'),
+                  })}
+                />
+              )}
+            </FormField>
+          </div>
+        </fieldset>
       </section>
 
       <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={isSubmitting}>

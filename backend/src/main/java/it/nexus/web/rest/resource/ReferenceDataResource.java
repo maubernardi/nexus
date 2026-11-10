@@ -44,6 +44,13 @@ public class ReferenceDataResource {
         return ResponseEntity.ok(referenceDataService.activeInternshipTypes());
     }
 
+    @GetMapping("/care-agencies")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Enti di presa in carico attivi (US-206)")
+    public ResponseEntity<List<ReferenceItemDTO>> careAgencies() {
+        return ResponseEntity.ok(referenceDataService.activeCareAgencies());
+    }
+
     @GetMapping("/hiring-formulas")
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
     @Operation(summary = "Formule di assunzione attive, per il report di restituzione (US-109)")

@@ -33,5 +33,17 @@ public record BeneficiaryDTO(
         boolean editable,
         /** Nome del CV caricato (US-205), assente se non c'è. */
         String cvFileName,
-        Long cvSizeBytes) {
+        Long cvSizeBytes,
+        /* contatti e presa in carico (US-206) */
+        String email,
+        String phone,
+        ReferenceItemDTO careAgency,
+        String caseManagerName,
+        String caseManagerOffice,
+        String caseManagerPhone,
+        String caseManagerEmail,
+        /** Ha un tirocinio aperto: l'ente non si cambia. */
+        boolean careAgencyLocked,
+        /** Ha un tirocinio di inclusione aperto: nome, mail e telefono del case manager non si svuotano. */
+        boolean caseManagerRequired) {
 }

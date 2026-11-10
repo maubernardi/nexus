@@ -37,5 +37,10 @@ public record InternshipDTO(
         Integer weeklyMinutes,
         Integer totalMinutes,
         /** Dati che mancano per avviare il tirocinio (US-1003), in base alla scheda salvata; vuoto = completa. */
-        List<String> missingForStart) {
+        List<String> missingForStart,
+        /**
+         * Dati del beneficiario che mancano per scegliere il tipo «Di inclusione» (US-206): {@code careAgency},
+         * {@code caseManagerName}, {@code caseManagerEmail}, {@code caseManagerPhone}; vuoto = si può scegliere.
+         */
+        List<String> inclusionMissing) {
 }
