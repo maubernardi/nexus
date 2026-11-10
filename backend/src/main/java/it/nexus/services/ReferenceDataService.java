@@ -13,6 +13,9 @@ public interface ReferenceDataService {
     /** Tipi di tirocinio attivi, per la scheda del tirocinio (US-108). */
     List<ReferenceItemDTO> activeInternshipTypes();
 
+    /** Sedi di competenza attive di un progetto (US-308). */
+    List<ReferenceItemDTO> activeCompetenceSites(String projectId);
+
     /** Enti di presa in carico attivi (US-206). */
     List<ReferenceItemDTO> activeCareAgencies();
 

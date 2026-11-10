@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `34d1301` (09/11/2026): Sprint 1–11 completi (dipendenze aggiornate, password comuni rifiutate, curriculum del beneficiario) |
-| **Ultimo aggiornamento** | 10/11/2026 (T-22.1, T-22.2 e T-22.3: da provare dopo il deploy) |
+| **Ultimo aggiornamento** | 10/11/2026 (T-22.1 … T-22.4: da provare dopo il deploy) |
 
 ## Come prepararsi
 
@@ -848,3 +848,13 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   4. Con il beneficiario del punto 2, scegli «Di inclusione» nella scheda del tirocinio e salva. **Atteso:** salvata.
      Torna a modificare il beneficiario. **Atteso:** l'ente non si cambia («L'ente non si può cambiare mentre il
      beneficiario ha un tirocinio aperto.») e nome, mail e telefono del case manager sono obbligatori.
+
+- [ ] **T-22.4 Sede di competenza della segnalazione (US-308)**
+  1. Come `tutor1`, **Nuova segnalazione** con il progetto GOL. **Atteso:** il campo «Sede di competenza» (Firenze,
+     Borgo San Lorenzo, Sesto Fiorentino), obbligatorio: senza sede la segnalazione non parte.
+  2. Scegli una sede e invia. **Atteso:** nel dettaglio della segnalazione «Sede di competenza» con la sede scelta e
+     nessun comando per cambiarla.
+  3. Come `admin` apri la stessa segnalazione. **Atteso:** «Correggi la sede di competenza»; scegli un'altra sede e
+     salva. **Atteso:** «Sede di competenza corretta: …» e nella cronologia «Sede di competenza corretta» con la sede
+     prima e dopo.
+  4. Facoltativo: rendi `tutor2` Coordinatore di GOL (Utenti → progetti) e prova anche come lui.

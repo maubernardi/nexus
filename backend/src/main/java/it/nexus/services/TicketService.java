@@ -8,17 +8,18 @@ import it.nexus.domain.dto.ApproveCategoryDTO;
 import it.nexus.domain.dto.ClosureReportFormDTO;
 import it.nexus.domain.dto.CompanyExclusionDTO;
 import it.nexus.domain.dto.CompanyExclusionFormDTO;
+import it.nexus.domain.dto.CompetenceSiteChangeDTO;
+import it.nexus.domain.dto.FastTrackRejectDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
 import it.nexus.domain.dto.ProposalRejectDTO;
 import it.nexus.domain.dto.RejectCategoryDTO;
-import it.nexus.domain.dto.TicketListItemDTO;
-import it.nexus.domain.dto.FastTrackRejectDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
-import it.nexus.domain.dto.TicketSpecialCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
 import it.nexus.domain.dto.TicketEventDTO;
+import it.nexus.domain.dto.TicketListItemDTO;
+import it.nexus.domain.dto.TicketSpecialCreateDTO;
 import it.nexus.domain.enumeration.TicketListView;
 import it.nexus.domain.enumeration.TicketStatus;
 
@@ -32,6 +33,9 @@ public interface TicketService {
      * e visibile al Tutor, non già bloccato da un'altra candidatura (409).
      */
     TicketDTO submitSpecial(TicketSpecialCreateDTO dto);
+
+    /** Corregge la sede di competenza (US-308): solo l'ADMIN e il Coordinatore del progetto, con l'audit. */
+    TicketDetailDTO changeCompetenceSite(String ticketId, CompetenceSiteChangeDTO dto);
 
 
     /** Presa in carico da parte dell'operatore corrente (US-402); 409 se un collega l'ha già presa. */

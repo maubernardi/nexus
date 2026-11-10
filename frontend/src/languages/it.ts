@@ -186,6 +186,7 @@ export const it = {
     fields: {
       beneficiary: 'Beneficiario',
       project: 'Progetto',
+      competenceSite: 'Sede di competenza',
       jobCategory: 'Mansione richiesta',
       newCategory: 'La mansione non è nell’elenco: la descrivo io',
       jobFreeText: 'Nuova tipologia di mansione',
@@ -196,6 +197,8 @@ export const it = {
       beneficiary:
         'Solo i beneficiari che hai registrato. Chi ha già una segnalazione aperta non è selezionabile: ne è ammessa una alla volta.',
       project: 'Solo i progetti a cui sei assegnato.',
+      competenceSite:
+        'Il luogo dei documenti di fine tirocinio. Dopo l’invio la correggono solo l’amministrazione e il Coordinatore del progetto.',
       jobCategory: 'Il tipo di lavoro che il beneficiario desidera svolgere.',
     },
     beneficiaryOption: '{{lastName}} {{firstName}} ({{birthYear}})',
@@ -732,6 +735,15 @@ export const it = {
     },
   },
   work: {
+    competenceSite: {
+      none: 'Non indicata',
+      change: 'Correggi la sede di competenza',
+      label: 'Sede di competenza',
+      hint: 'Tra le sedi del progetto della segnalazione. La correzione resta nella cronologia.',
+      save: 'Salva la sede',
+      cancel: 'Annulla',
+      saved: 'Sede di competenza corretta: {{name}}.',
+    },
     status: 'Stato: {{status}}',
     assignedToYou: 'in carico a te',
     assignedTo: 'in carico a {{name}}',
@@ -754,6 +766,7 @@ export const it = {
       jobSlot: 'Mansione',
       jobCategory: 'Tipologia',
       boardPost: 'Candidatura dalla bacheca',
+      competenceSite: 'Sede di competenza',
     },
     normal: 'Normale',
     boardPostTutor: 'Annuncio #{{number}}',
@@ -905,6 +918,7 @@ export const it = {
       START: 'Tirocinio avviato',
       CLOSE: 'Report di restituzione inviato',
       DOCUMENT_GENERATED: 'Documento scaricato',
+      COMPETENCE_SITE_CHANGED: 'Sede di competenza corretta',
       CATEGORY_APPROVE: 'Nuova tipologia approvata',
       CATEGORY_REJECT: 'Tipologia cambiata dal Call Center',
       STATUS: 'Cambio di stato',

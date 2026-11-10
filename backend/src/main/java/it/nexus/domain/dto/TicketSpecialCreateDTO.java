@@ -9,5 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 public record TicketSpecialCreateDTO(
         @NotBlank(message = "Seleziona l'annuncio") String boardPostId,
         @NotBlank(message = "Seleziona il beneficiario") String beneficiaryId,
-        String projectId) {
+        String projectId,
+        /** Sede di competenza (US-308): obbligatoria se il progetto ne ha. */
+        String competenceSiteId) {
 }

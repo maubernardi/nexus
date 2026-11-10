@@ -26,6 +26,7 @@ import {
   appointmentFailed,
   appointmentSet,
   approveCategory,
+  changeCompetenceSite,
   rejectCategory,
   rejectProposal,
   startInternship,
@@ -290,6 +291,18 @@ export const useExcludeCompany = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: excludeCompany,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+  });
+};
+
+export const useChangeCompetenceSite = (): UseMutationResult<
+  TicketDetail,
+  unknown,
+  { id: string; competenceSiteId: string }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: changeCompetenceSite,
     onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
   });
 };

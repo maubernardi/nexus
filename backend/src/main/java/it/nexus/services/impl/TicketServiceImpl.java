@@ -28,6 +28,7 @@ import it.nexus.domain.Beneficiary;
 import it.nexus.domain.BoardPost;
 import it.nexus.domain.Company;
 import it.nexus.domain.CompanyAuditEvent;
+import it.nexus.domain.CompetenceSite;
 import it.nexus.domain.JobCategory;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Project;
@@ -44,17 +45,18 @@ import it.nexus.domain.dto.ClosureReportDTO;
 import it.nexus.domain.dto.ClosureReportFormDTO;
 import it.nexus.domain.dto.CompanyExclusionDTO;
 import it.nexus.domain.dto.CompanyExclusionFormDTO;
+import it.nexus.domain.dto.CompetenceSiteChangeDTO;
+import it.nexus.domain.dto.FastTrackRejectDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
 import it.nexus.domain.dto.ProposalRejectDTO;
 import it.nexus.domain.dto.RejectCategoryDTO;
-import it.nexus.domain.dto.FastTrackRejectDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
-import it.nexus.domain.dto.TicketSpecialCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
 import it.nexus.domain.dto.TicketEventDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
+import it.nexus.domain.dto.TicketSpecialCreateDTO;
 import it.nexus.domain.enumeration.AppointmentFailureCause;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.BoardPostStatus;
@@ -78,6 +80,7 @@ import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyRepository;
+import it.nexus.repository.CompetenceSiteRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ProjectRepository;
@@ -89,9 +92,9 @@ import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BoardPostService;
 import it.nexus.services.ClosureReportService;
+import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.FastTrackService;
 import it.nexus.services.InternshipService;
-import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.NotificationService;
 import it.nexus.services.TicketService;
 import it.nexus.services.TicketStateMachine;
@@ -142,6 +145,7 @@ public class TicketServiceImpl implements TicketService {
     private final JobSlotMapper jobSlotMapper;
     private final BeneficiaryMapper beneficiaryMapper;
     private final ReferenceMapper referenceMapper;
+    private final CompetenceSiteRepository competenceSiteRepository;
 
     @Override
     public TicketDTO submit(TicketCreateDTO dto) {
@@ -153,6 +157,7 @@ public class TicketServiceImpl implements TicketService {
         });
         Project project = assignedProject(dto.projectId(), me);
         Ticket ticket = new Ticket(me, project, beneficiary, TicketType.NORMAL);
+        ticket.setCompetenceSite(competenceSite(project, dto.competenceSiteId()));
         // esattamente una delle due è garantito da @JobChoice sul DTO
         if (!isBlank(dto.jobCategoryId())) {
             ticket.setRequestedJobCategory(activeJobCategory(dto.jobCategoryId()));
@@ -187,10 +192,60 @@ public class TicketServiceImpl implements TicketService {
         // annuncio riservato: vale il suo progetto; aperto a tutti: uno dei progetti del Tutor
         Project project = post.getProject() != null ? post.getProject() : assignedProject(dto.projectId(), me);
         Ticket ticket = new Ticket(me, project, beneficiary, TicketType.SPECIAL);
+        ticket.setCompetenceSite(competenceSite(project, dto.competenceSiteId()));
         ticket.setFastTrack(true);
         ticket.setBoardPost(post);
         ticket.setRequestedJobCategory(post.getJobSlot().getJobCategory());
         return mapper.toDto(stateMachine.create(ticket, TicketTransitions.SUBMIT_SPECIAL, null));
+    }
+
+    @Override
+    public TicketDetailDTO changeCompetenceSite(String ticketId, CompetenceSiteChangeDTO dto) {
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        Ticket ticket = visibleTicket(ticketId, me);
+        if (!canChangeCompetenceSite(ticket, me)) {
+            throw new AccessDeniedException(
+                    "La sede di competenza la correggono solo l'amministrazione e il Coordinatore del progetto");
+        }
+        CompetenceSite before = ticket.getCompetenceSite();
+        CompetenceSite site = competenceSiteRepository.findActiveForProject(ticket.getProject().getId()).stream()
+                .filter(s -> s.getId().equals(TsidMapper.toInternal(dto.competenceSiteId())))
+                .findFirst()
+                .orElseThrow(() -> new FieldValidationException("competenceSiteId",
+                        "Scegli una sede di competenza del progetto %s".formatted(ticket.getProject().getName())));
+        if (!site.equals(before)) {
+            ticket.setCompetenceSite(site);
+            ticketRepository.saveAndFlush(ticket);
+            auditService.record(AuditEntityType.TICKET, ticket.getId(), "COMPETENCE_SITE_CHANGED", AuditChanges.of()
+                    .value("competenceSite", before == null ? null : before.getName(), site.getName()), null);
+        }
+        return detail(ticket, me);
+    }
+
+    /**
+     * Sede di competenza scelta alla creazione (US-308): tra le sedi attive del progetto, obbligatoria se ce ne sono;
+     * un progetto senza sedi non ne ha.
+     */
+    private CompetenceSite competenceSite(Project project, String siteId) {
+        List<CompetenceSite> sites = competenceSiteRepository.findActiveForProject(project.getId());
+        if (isBlank(siteId)) {
+            if (!sites.isEmpty()) {
+                throw new FieldValidationException("competenceSiteId", "Scegli la sede di competenza");
+            }
+            return null;
+        }
+        Long id = TsidMapper.toInternal(siteId);
+        return sites.stream().filter(s -> s.getId().equals(id)).findFirst()
+                .orElseThrow(() -> new FieldValidationException("competenceSiteId",
+                        "Scegli una sede di competenza del progetto %s".formatted(project.getName())));
+    }
+
+    /** ADMIN, oppure Tutor Coordinatore del progetto della segnalazione (US-112). */
+    private boolean canChangeCompetenceSite(Ticket ticket, AppUser me) {
+        return me.getRole() == Role.ADMIN || me.getRole() == Role.TUTOR && userProjectRepository
+                .findById(new UserProject.Id(me.getId(), ticket.getProject().getId()))
+                .map(UserProject::isCoordinator)
+                .orElse(false);
     }
 
     @Override
@@ -392,6 +447,9 @@ public class TicketServiceImpl implements TicketService {
                     userName(changed(event, "assignedCcOperatorId", "after")));
             case "TRANSFER" -> "%s → %s".formatted(userName(changed(event, "tutorId", "before")),
                     userName(changed(event, "tutorId", "after")));
+            case "COMPETENCE_SITE_CHANGED" -> Optional.ofNullable(changed(event, "competenceSite", "before"))
+                    .map(before -> before + " → " + changed(event, "competenceSite", "after"))
+                    .orElse(changed(event, "competenceSite", "after"));
             case "RELEASE" -> Optional.ofNullable(userName(changed(event, "assignedCcOperatorId", "before")))
                     .map(name -> name + " non è più disponibile: la segnalazione torna libera per un collega")
                     .orElse(null);
@@ -837,7 +895,9 @@ public class TicketServiceImpl implements TicketService {
                 relaunch.map(BoardPost::getStatus).orElse(null),
                 t.getBoardPost() == null ? null : TsidMapper.toExternal(t.getBoardPost().getId()),
                 t.getBoardPost() == null ? null : t.getBoardPost().getNumber(),
-                t.getStatus() == TicketStatus.FORM_RESTITUZIONE ? closureReportService.find(t).orElse(null) : null);
+                t.getStatus() == TicketStatus.FORM_RESTITUZIONE ? closureReportService.find(t).orElse(null) : null,
+                referenceMapper.toDto(t.getCompetenceSite()),
+                canChangeCompetenceSite(t, me));
     }
 
     private static String fullName(AppUser user) {

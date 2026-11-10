@@ -76,6 +76,11 @@ public class Ticket extends AbstractTsidEntity {
     @JoinColumn(name = "board_post_id")
     private BoardPost boardPost;
 
+    /** Sede di competenza (US-308): il luogo dei documenti di fine tirocinio; assente se il progetto non ne ha. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "competence_site_id")
+    private CompetenceSite competenceSite;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_cc_operator_id")
     private AppUser assignedCcOperator;

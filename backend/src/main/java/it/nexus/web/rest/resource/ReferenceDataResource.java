@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,6 +43,13 @@ public class ReferenceDataResource {
     @Operation(summary = "Tipi di tirocinio attivi (US-108)")
     public ResponseEntity<List<ReferenceItemDTO>> internshipTypes() {
         return ResponseEntity.ok(referenceDataService.activeInternshipTypes());
+    }
+
+    @GetMapping("/competence-sites")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Sedi di competenza attive di un progetto (US-308)")
+    public ResponseEntity<List<ReferenceItemDTO>> competenceSites(@RequestParam("projectId") String projectId) {
+        return ResponseEntity.ok(referenceDataService.activeCompetenceSites(projectId));
     }
 
     @GetMapping("/care-agencies")

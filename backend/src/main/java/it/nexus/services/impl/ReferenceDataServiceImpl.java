@@ -7,7 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.domain.dto.ReferenceItemDTO;
 import it.nexus.mapper.ReferenceMapper;
+import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.CareAgencyRepository;
+import it.nexus.repository.CompetenceSiteRepository;
 import it.nexus.repository.HiringFormulaRepository;
 import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.repository.NoHireReasonRepository;
@@ -30,6 +32,7 @@ public class ReferenceDataServiceImpl implements ReferenceDataService {
     private final NoHireReasonRepository noHireReasonRepository;
     private final ProjectRepository projectRepository;
     private final CareAgencyRepository careAgencyRepository;
+    private final CompetenceSiteRepository competenceSiteRepository;
     private final CurrentAppUserService currentAppUserService;
     private final ReferenceMapper mapper;
 
@@ -46,6 +49,13 @@ public class ReferenceDataServiceImpl implements ReferenceDataService {
     @Override
     public List<ReferenceItemDTO> activeInternshipTypes() {
         return internshipTypeRepository.findByActiveTrueOrderByNameAsc().stream().map(mapper::toDto).toList();
+    }
+
+    @Override
+    public List<ReferenceItemDTO> activeCompetenceSites(String projectId) {
+        Long id = TsidMapper.toInternal(projectId);
+        return id == null ? List.of()
+                : competenceSiteRepository.findActiveForProject(id).stream().map(mapper::toDto).toList();
     }
 
     @Override

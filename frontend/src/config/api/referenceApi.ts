@@ -44,3 +44,11 @@ export const fetchCareAgencies = async (): Promise<ReferenceItem[]> => {
   const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.careAgencies);
   return data;
 };
+
+/** Sedi di competenza attive di un progetto (US-308). */
+export const fetchCompetenceSites = async (projectId: string): Promise<ReferenceItem[]> => {
+  const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.competenceSites, {
+    params: { projectId },
+  });
+  return data;
+};
