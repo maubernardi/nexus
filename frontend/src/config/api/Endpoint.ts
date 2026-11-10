@@ -24,6 +24,7 @@ export const ENDPOINTS = {
   hiringFormulas: '/reference/hiring-formulas',
   noHireReasons: '/reference/no-hire-reasons',
   careAgencies: '/reference/care-agencies',
+  competenceSites: '/reference/competence-sites',
   municipalities: '/municipalities',
   documentCatalogs: '/document-catalogs',
 } as const;

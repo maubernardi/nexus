@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useForm, useWatch, type FieldPath } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -12,7 +12,7 @@ import { apiError } from '@/config/api/errors';
 import type { ReferenceItem } from '@/config/api/referenceApi';
 import type { Ticket } from '@/config/api/ticketApi';
 import { useReportableBeneficiaries } from '@/config/hooks/useBeneficiaries';
-import { useJobCategories, useMyProjects } from '@/config/hooks/useReferenceData';
+import { useJobCategories, useMyProjects, useProjectCompetenceSites } from '@/config/hooks/useReferenceData';
 import { useSubmitTicket } from '@/config/hooks/useTickets';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
@@ -25,9 +25,11 @@ type TicketFormValues = {
   /** La mansione non è nell'elenco: il Tutor descrive una nuova tipologia (US-302). */
   newCategory: boolean;
   jobFreeText: string;
+  /** Sede di competenza del progetto (US-308). */
+  competenceSiteId: string;
 };
 
-const FIELDS = ['beneficiaryId', 'projectId', 'jobCategoryId', 'jobFreeText'] as const;
+const FIELDS = ['beneficiaryId', 'projectId', 'competenceSiteId', 'jobCategoryId', 'jobFreeText'] as const;
 
 const fieldId = (field: keyof TicketFormValues): string => `ticket-${field}`;
 
@@ -140,6 +142,7 @@ const TicketFormFields = ({
     register,
     handleSubmit,
     setError,
+    setValue,
     control,
     formState: { errors, isSubmitting, submitCount },
   } = useForm<TicketFormValues>({
@@ -151,6 +154,7 @@ const TicketFormFields = ({
       jobCategoryId: '',
       newCategory: false,
       jobFreeText: '',
+      competenceSiteId: '',
     },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
@@ -163,10 +167,20 @@ const TicketFormFields = ({
   const labels: Record<(typeof FIELDS)[number], string> = {
     beneficiaryId: t('ticket.fields.beneficiary'),
     projectId: t('ticket.fields.project'),
+    competenceSiteId: t('ticket.fields.competenceSite'),
     jobCategoryId: t('ticket.fields.jobCategory'),
     jobFreeText: t('ticket.fields.jobFreeText'),
   };
   const newCategory = useWatch({ control, name: 'newCategory' });
+  // sedi di competenza del progetto scelto (US-308): il campo c'è solo se il progetto ne ha
+  const projectId = useWatch({ control, name: 'projectId' });
+  const sites = useProjectCompetenceSites(projectId);
+  const siteOptions = projectId === '' ? [] : (sites.data ?? []);
+  const onlySiteId = siteOptions.length === 1 ? siteOptions[0].id : '';
+  useEffect(() => {
+    // cambiando progetto la sede si sceglie di nuovo; con una sola sede è già scelta
+    setValue('competenceSiteId', onlySiteId);
+  }, [projectId, onlySiteId, setValue]);
   const summary: SummaryError[] = FIELDS.flatMap((field) => {
     const message = errors[field]?.message;
     return message ? [{ fieldId: fieldId(field), message: `${labels[field]}: ${message}` }] : [];
@@ -181,6 +195,7 @@ const TicketFormFields = ({
           projectId: values.projectId,
           jobCategoryId: values.newCategory ? null : values.jobCategoryId,
           jobFreeText: values.newCategory ? values.jobFreeText.trim() : null,
+          competenceSiteId: siteOptions.length > 0 ? values.competenceSiteId : null,
         }),
       );
     } catch (error) {
@@ -252,6 +267,31 @@ const TicketFormFields = ({
             </NativeSelect>
           )}
         </FormField>
+        {siteOptions.length > 0 && (
+          <FormField
+            id={fieldId('competenceSiteId')}
+            label={labels.competenceSiteId}
+            hint={t('ticket.hints.competenceSite')}
+            required
+            error={errors.competenceSiteId?.message}
+          >
+            {(p) => (
+              <NativeSelect
+                {...p}
+                {...register('competenceSiteId', {
+                  validate: (v) => siteOptions.length === 0 || v !== '' || t('form.errors.required'),
+                })}
+              >
+                <option value="">{t('form.select')}</option>
+                {siteOptions.map((site) => (
+                  <option key={site.id} value={site.id}>
+                    {site.name}
+                  </option>
+                ))}
+              </NativeSelect>
+            )}
+          </FormField>
+        )}
         {!newCategory && (
           <FormField
             id={fieldId('jobCategoryId')}

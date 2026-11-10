@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +28,7 @@ import it.nexus.domain.dto.ProposalRejectDTO;
 import it.nexus.domain.dto.RejectCategoryDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.dto.FastTrackRejectDTO;
+import it.nexus.domain.dto.CompetenceSiteChangeDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketSpecialCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
@@ -127,6 +129,14 @@ public class TicketResource {
     @Operation(summary = "Sposta su di sé una segnalazione in carico a un collega")
     public ResponseEntity<TicketDetailDTO> takeOver(@PathVariable String id, @RequestBody @Valid VersionDTO body) {
         return ResponseEntity.ok(ticketService.takeOver(id, body.version()));
+    }
+
+    @PutMapping("/{id}/competence-site")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Corregge la sede di competenza (US-308): ADMIN o Coordinatore del progetto")
+    public ResponseEntity<TicketDetailDTO> changeCompetenceSite(@PathVariable String id,
+            @RequestBody @Valid CompetenceSiteChangeDTO body) {
+        return ResponseEntity.ok(ticketService.changeCompetenceSite(id, body));
     }
 
     @PostMapping("/{id}/category/approve")

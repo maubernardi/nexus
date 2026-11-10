@@ -18,6 +18,7 @@ import {
   fetchCompatibleJobSlots,
   fetchTicket,
   fetchTicketHistory,
+  changeCompetenceSite,
   matchTicket,
   takeOverTicket,
   type JobSlotMatch,
@@ -48,6 +49,7 @@ vi.mock('@/config/api/ticketApi', () => ({
   rejectProposal: vi.fn(),
   approveFastTrack: vi.fn(),
   rejectFastTrack: vi.fn(),
+  changeCompetenceSite: vi.fn(),
 }));
 vi.mock('@/config/api/boardPostApi', () => ({ fetchBoardPost: vi.fn() }));
 vi.mock('@/config/api/referenceApi', () => ({
@@ -55,6 +57,10 @@ vi.mock('@/config/api/referenceApi', () => ({
   fetchJobCategories: vi.fn(),
   fetchMyProjects: vi.fn(),
   fetchProjects: vi.fn(),
+  fetchCompetenceSites: vi.fn(async () => [
+    { id: 'S1', code: 'FIRENZE', name: 'Firenze' },
+    { id: 'S2', code: 'SESTO_FIORENTINO', name: 'Sesto Fiorentino' },
+  ]),
 }));
 vi.mock('@/config/api/userApi', () => ({ fetchCurrentUser: vi.fn() }));
 vi.mock('@/config/api/companyApi', () => ({
@@ -128,6 +134,7 @@ const detail = (overrides: Partial<TicketDetail> = {}): TicketDetail => ({
   createdAt: '2026-10-01T08:00:00Z',
   myTicket: false,
   timerDeadline: null,
+  canChangeCompetenceSite: false,
   ...overrides,
 });
 
@@ -192,6 +199,35 @@ describe('<TicketPage>', () => {
     vi.mocked(fetchCompatibleJobSlots).mockReset();
     vi.mocked(fetchCompatibleJobSlots).mockResolvedValue([alfa]);
     vi.mocked(matchTicket).mockReset();
+  });
+
+  it('sede di competenza: la vede chiunque, la corregge solo chi può (US-308)', async () => {
+    const user = userEvent.setup();
+    const firenze = { id: 'S1', code: 'FIRENZE', name: 'Firenze' };
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({ competenceSite: firenze, canChangeCompetenceSite: true }),
+    );
+    vi.mocked(changeCompetenceSite).mockResolvedValue(
+      detail({ competenceSite: { id: 'S2', code: 'SESTO_FIORENTINO', name: 'Sesto Fiorentino' } }),
+    );
+    renderPage();
+
+    expect(await screen.findByText('Firenze')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Correggi la sede di competenza' }));
+    const select = screen.getByLabelText(/^Sede di competenza/);
+    await waitFor(() => expect(select).toHaveFocus());
+    await user.selectOptions(select, 'S2');
+    await user.click(screen.getByRole('button', { name: 'Salva la sede' }));
+    expect(vi.mocked(changeCompetenceSite).mock.calls[0][0]).toEqual({ id: 'T9', competenceSiteId: 'S2' });
+    const outcome = await screen.findByText('Sede di competenza corretta: Sesto Fiorentino.');
+    await waitFor(() => expect(outcome).toHaveFocus());
+  });
+
+  it('sede di competenza: senza permesso nessun comando', async () => {
+    vi.mocked(fetchTicket).mockResolvedValue(detail());
+    renderPage();
+    expect(await screen.findByText('Non indicata')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Correggi la sede di competenza' })).not.toBeInTheDocument();
   });
 
   it('cerca di default per zona del beneficiario e mansione richiesta; i filtri si allargano', async () => {

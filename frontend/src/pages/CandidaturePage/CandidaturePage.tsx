@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { CircleCheck } from 'lucide-react';
-import { useForm, type FieldPath } from 'react-hook-form';
+import { useForm, useWatch, type FieldPath } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 
@@ -12,7 +12,7 @@ import { apiError } from '@/config/api/errors';
 import type { Ticket } from '@/config/api/ticketApi';
 import { useReportableBeneficiaries } from '@/config/hooks/useBeneficiaries';
 import { useTutorBoardPost } from '@/config/hooks/useBoardPosts';
-import { useMyProjects } from '@/config/hooks/useReferenceData';
+import { useMyProjects, useProjectCompetenceSites } from '@/config/hooks/useReferenceData';
 import { useSubmitSpecialTicket } from '@/config/hooks/useTickets';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
@@ -116,9 +116,9 @@ const Notice = ({ id, heading, children }: { id: string; heading: string; childr
   </section>
 );
 
-type Values = { beneficiaryId: string; projectId: string };
+type Values = { beneficiaryId: string; projectId: string; competenceSiteId: string };
 
-const FIELDS = ['beneficiaryId', 'projectId'] as const;
+const FIELDS = ['beneficiaryId', 'projectId', 'competenceSiteId'] as const;
 const fieldId = (field: keyof Values): string => `candidature-${field}`;
 
 /** Scelta del beneficiario e, per un annuncio aperto a tutti, del progetto della segnalazione. */
@@ -208,14 +208,29 @@ const CandidatureFields = ({ post: p, beneficiaries, projects, onSuccess }: Cand
     register,
     handleSubmit,
     setError,
+    setValue,
+    control,
     formState: { errors, isSubmitting, submitCount },
   } = useForm<Values>({
-    defaultValues: { beneficiaryId: onlyOption(available), projectId: onlyOption(projects) },
+    defaultValues: {
+      beneficiaryId: onlyOption(available),
+      projectId: onlyOption(projects),
+      competenceSiteId: '',
+    },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
     shouldFocusError: false,
   });
   const { summaryRef, requestSummaryFocus } = useErrorSummaryFocus(submitCount, errors);
+  // sedi di competenza del progetto della segnalazione (US-308): quello dell'annuncio o quello scelto
+  const chosenProject = useWatch({ control, name: 'projectId' });
+  const projectId = p.project?.id ?? chosenProject;
+  const sites = useProjectCompetenceSites(projectId);
+  const siteOptions = projectId === '' ? [] : (sites.data ?? []);
+  const onlySiteId = siteOptions.length === 1 ? siteOptions[0].id : '';
+  useEffect(() => {
+    setValue('competenceSiteId', onlySiteId);
+  }, [projectId, onlySiteId, setValue]);
 
   useEffect(() => {
     if (refused) refusedRef.current?.focus();
@@ -225,6 +240,7 @@ const CandidatureFields = ({ post: p, beneficiaries, projects, onSuccess }: Cand
   const labels: Record<keyof Values, string> = {
     beneficiaryId: t('ticket.fields.beneficiary'),
     projectId: t('ticket.fields.project'),
+    competenceSiteId: t('ticket.fields.competenceSite'),
   };
   const summary: SummaryError[] = FIELDS.flatMap((field) => {
     const message = errors[field]?.message;
@@ -239,6 +255,7 @@ const CandidatureFields = ({ post: p, beneficiaries, projects, onSuccess }: Cand
           boardPostId: p.id,
           beneficiaryId: v.beneficiaryId,
           projectId: p.project ? null : v.projectId,
+          competenceSiteId: siteOptions.length > 0 ? v.competenceSiteId : null,
         }),
       );
     } catch (error) {
@@ -314,6 +331,31 @@ const CandidatureFields = ({ post: p, beneficiaries, projects, onSuccess }: Cand
                   {projects.map((project) => (
                     <option key={project.id} value={project.id}>
                       {project.name}
+                    </option>
+                  ))}
+                </NativeSelect>
+              )}
+            </FormField>
+          )}
+          {siteOptions.length > 0 && (
+            <FormField
+              id={fieldId('competenceSiteId')}
+              label={labels.competenceSiteId}
+              hint={t('ticket.hints.competenceSite')}
+              required
+              error={errors.competenceSiteId?.message}
+            >
+              {(f) => (
+                <NativeSelect
+                  {...f}
+                  {...register('competenceSiteId', {
+                    validate: (v) => siteOptions.length === 0 || v !== '' || t('form.errors.required'),
+                  })}
+                >
+                  <option value="">{t('form.select')}</option>
+                  {siteOptions.map((site) => (
+                    <option key={site.id} value={site.id}>
+                      {site.name}
                     </option>
                   ))}
                 </NativeSelect>

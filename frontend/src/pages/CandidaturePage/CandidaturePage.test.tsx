@@ -18,6 +18,7 @@ vi.mock('@/config/api/referenceApi', () => ({
   fetchJobCategories: vi.fn(),
   fetchMyProjects: vi.fn(),
   fetchProjects: vi.fn(),
+  fetchCompetenceSites: vi.fn(async () => []),
 }));
 vi.mock('@/config/api/ticketApi', () => ({ submitSpecialTicket: vi.fn() }));
 
@@ -122,6 +123,7 @@ describe('<CandidaturePage>', () => {
       boardPostId: 'P4',
       beneficiaryId: 'B2',
       projectId: null,
+      competenceSiteId: null,
     });
     expect(screen.getByRole('link', { name: 'Apri la segnalazione' })).toHaveAttribute(
       'href',

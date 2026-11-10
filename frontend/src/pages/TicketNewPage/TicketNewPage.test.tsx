@@ -14,6 +14,7 @@ vi.mock('@/config/api/referenceApi', () => ({
   fetchZones: vi.fn(),
   fetchJobCategories: vi.fn(),
   fetchMyProjects: vi.fn(),
+  fetchCompetenceSites: vi.fn(async () => []),
 }));
 vi.mock('@/config/api/ticketApi', () => ({ submitTicket: vi.fn() }));
 

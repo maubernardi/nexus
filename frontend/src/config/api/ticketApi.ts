@@ -11,6 +11,8 @@ export type TicketCreate = {
   projectId: string;
   jobCategoryId: string | null;
   jobFreeText: string | null;
+  /** Sede di competenza (US-308): obbligatoria se il progetto ne ha. */
+  competenceSiteId: string | null;
 };
 
 export type Ticket = {
@@ -39,6 +41,8 @@ export type TicketSpecialCreate = {
   beneficiaryId: string;
   /** Solo per un annuncio aperto a tutti: per uno riservato vale il progetto dell'annuncio. */
   projectId: string | null;
+  /** Sede di competenza (US-308): obbligatoria se il progetto ne ha. */
+  competenceSiteId: string | null;
 };
 
 export const submitSpecialTicket = async (payload: TicketSpecialCreate): Promise<Ticket> => {
@@ -126,6 +130,10 @@ export type TicketDetail = {
   boardPostNumber?: number | null;
   /** Report di restituzione inviato (US-1101), solo in FORM_RESTITUZIONE. */
   closureReport?: ClosureReport;
+  /** Sede di competenza (US-308), se c'è. */
+  competenceSite?: ReferenceItem;
+  /** L'utente corrente può correggere la sede: ADMIN o Coordinatore del progetto. */
+  canChangeCompetenceSite: boolean;
 };
 
 /**
@@ -412,5 +420,20 @@ export const excludeCompany = async ({
     companyId,
     reason,
   });
+  return data;
+};
+
+/** Corregge la sede di competenza (US-308): solo ADMIN e Coordinatore del progetto. */
+export const changeCompetenceSite = async ({
+  id,
+  competenceSiteId,
+}: {
+  id: string;
+  competenceSiteId: string;
+}): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.put<TicketDetail>(
+    `${ENDPOINTS.tickets}/${encodeURIComponent(id)}/competence-site`,
+    { competenceSiteId },
+  );
   return data;
 };

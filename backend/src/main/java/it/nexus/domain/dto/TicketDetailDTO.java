@@ -39,5 +39,9 @@ public record TicketDetailDTO(
         String boardPostId,
         Long boardPostNumber,
         /** Report di restituzione inviato (US-1101), se c'è. */
-        ClosureReportDTO closureReport) {
+        ClosureReportDTO closureReport,
+        /** Sede di competenza (US-308), se c'è. */
+        ReferenceItemDTO competenceSite,
+        /** L'utente corrente può correggere la sede: ADMIN o Coordinatore del progetto. */
+        boolean canChangeCompetenceSite) {
 }

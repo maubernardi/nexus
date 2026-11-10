@@ -2,6 +2,7 @@ import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 
 import {
   fetchCareAgencies,
+  fetchCompetenceSites,
   fetchHiringFormulas,
   fetchJobCategories,
   fetchMyProjects,
@@ -37,3 +38,12 @@ export const useProjects = (enabled = true): UseQueryResult<ReferenceItem[]> =>
 // le assegnazioni ai progetti le cambia l'ADMIN: niente cache lunga
 export const useMyProjects = (enabled = true): UseQueryResult<ReferenceItem[]> =>
   useQuery({ queryKey: ['me', 'projects'], queryFn: fetchMyProjects, enabled });
+
+/** Sedi di competenza attive del progetto scelto (US-308); nessuna richiesta senza progetto. */
+export const useProjectCompetenceSites = (projectId: string): UseQueryResult<ReferenceItem[]> =>
+  useQuery({
+    queryKey: ['reference', 'competenceSites', projectId],
+    queryFn: () => fetchCompetenceSites(projectId),
+    enabled: projectId !== '',
+    staleTime: STALE,
+  });

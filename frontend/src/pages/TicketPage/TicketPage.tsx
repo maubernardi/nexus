@@ -41,6 +41,7 @@ import {
 } from '@/lib/domainValues';
 import { FormField } from '@/molecules/FormField/FormField';
 import { ClosureReportView } from '@/organisms/ClosureReportView/ClosureReportView';
+import { CompetenceSiteCorrection } from '@/organisms/CompetenceSiteCorrection/CompetenceSiteCorrection';
 import { MatchDetailsDialog } from '@/organisms/MatchDetailsDialog/MatchDetailsDialog';
 import type { BeneficiaryLinkState } from '@/pages/BeneficiaryPage/BeneficiaryPage';
 
@@ -503,6 +504,7 @@ const KNOWN_ACTIONS = [
   'START',
   'CLOSE',
   'DOCUMENT_GENERATED',
+  'COMPETENCE_SITE_CHANGED',
   'STATUS',
 ] as const;
 
@@ -1151,6 +1153,8 @@ const TicketData = ({ ticket: d, manage }: { ticket: TicketDetail; manage: boole
         <dd>{d.beneficiaryZone.name}</dd>
         <dt className="font-medium">{t('work.fields.project')}</dt>
         <dd>{d.project.name}</dd>
+        <dt className="font-medium">{t('work.fields.competenceSite')}</dt>
+        <dd>{d.competenceSite?.name ?? t('work.competenceSite.none')}</dd>
         <dt className="font-medium">{t('work.fields.requestedJob')}</dt>
         <dd>{d.requestedJobCategory?.name ?? d.requestedJobFreeText ?? '—'}</dd>
         <dt className="font-medium">{t('work.fields.tutor')}</dt>
@@ -1188,6 +1192,7 @@ const TicketData = ({ ticket: d, manage }: { ticket: TicketDetail; manage: boole
           </>
         )}
       </dl>
+      {d.canChangeCompetenceSite && <CompetenceSiteCorrection ticket={d} />}
     </section>
   );
 };

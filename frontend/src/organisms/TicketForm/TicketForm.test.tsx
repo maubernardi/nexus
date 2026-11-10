@@ -15,6 +15,15 @@ vi.mock('@/config/api/referenceApi', () => ({
   fetchZones: vi.fn(),
   fetchJobCategories: vi.fn(),
   fetchMyProjects: vi.fn(),
+  // sedi di competenza (US-308): GOL ne ha due, gli altri progetti nessuna
+  fetchCompetenceSites: vi.fn(async (projectId: string) =>
+    projectId === 'P1'
+      ? [
+          { id: 'S1', code: 'FIRENZE', name: 'Firenze' },
+          { id: 'S2', code: 'SESTO_FIORENTINO', name: 'Sesto Fiorentino' },
+        ]
+      : [],
+  ),
 }));
 vi.mock('@/config/api/ticketApi', () => ({ submitTicket: vi.fn() }));
 
@@ -58,7 +67,7 @@ describe('<TicketForm>', () => {
     renderForm();
 
     await user.selectOptions(await screen.findByLabelText(/^Beneficiario/), 'C1');
-    await user.selectOptions(screen.getByLabelText(/^Progetto/), 'P1');
+    await user.selectOptions(screen.getByLabelText(/^Progetto/), 'P2');
     await user.click(screen.getByLabelText('La mansione non è nell’elenco: la descrivo io'));
     expect(screen.queryByLabelText(/^Mansione richiesta/)).not.toBeInTheDocument();
     await expectNoAxeViolations();
@@ -73,9 +82,10 @@ describe('<TicketForm>', () => {
     await waitFor(() =>
       expect(vi.mocked(submitTicket).mock.calls[0][0]).toEqual({
         beneficiaryId: 'C1',
-        projectId: 'P1',
+        projectId: 'P2',
         jobCategoryId: null,
         jobFreeText: 'Tecnico del suono',
+        competenceSiteId: null,
       }),
     );
   });
@@ -110,6 +120,12 @@ describe('<TicketForm>', () => {
     expect(screen.getByRole('option', { name: 'Rossi Mario (1998)' })).toBeInTheDocument();
     expect(screen.getByLabelText(/^Progetto/)).toHaveValue('P1');
     await user.selectOptions(screen.getByLabelText(/^Mansione richiesta/), 'J1');
+    // GOL ha due sedi di competenza (US-308): la sede è obbligatoria
+    await user.click(screen.getByRole('button', { name: 'Invia segnalazione' }));
+    expect(
+      await screen.findByRole('link', { name: 'Sede di competenza: Campo obbligatorio' }),
+    ).toBeInTheDocument();
+    await user.selectOptions(screen.getByLabelText(/^Sede di competenza/), 'S2');
     await user.click(screen.getByRole('button', { name: 'Invia segnalazione' }));
 
     await waitFor(() => expect(onSuccess).toHaveBeenCalledWith(ticket));
@@ -118,6 +134,7 @@ describe('<TicketForm>', () => {
       projectId: 'P1',
       jobCategoryId: 'J1',
       jobFreeText: null,
+      competenceSiteId: 'S2',
     });
   });
 

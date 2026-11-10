@@ -13,5 +13,7 @@ public record TicketCreateDTO(
         @NotBlank(message = "Seleziona il beneficiario") String beneficiaryId,
         @NotBlank(message = "Seleziona il progetto") String projectId,
         String jobCategoryId,
-        @Size(max = 200) String jobFreeText) {
+        @Size(max = 200) String jobFreeText,
+        /** Sede di competenza (US-308): obbligatoria se il progetto ne ha. */
+        String competenceSiteId) {
 }
