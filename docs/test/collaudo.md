@@ -9,7 +9,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | https://portalenexus.it |
-| **Versione della demo** | `c8e810d` (10/11/2026): Sprint 1–12 completi (comuni e province, cataloghi dei documenti, contatti e presa in carico del beneficiario, sede di competenza) |
+| **Versione della demo** | `ed260ad` (10/11/2026): Sprint 1–12 completi (comuni e province, cataloghi dei documenti, contatti e presa in carico del beneficiario, sede di competenza), con le correzioni del controllo in Chrome |
 | **Ultimo aggiornamento** | 10/11/2026 (T-22.1 … T-22.4: da provare, la demo è aggiornata) |
 
 ## Come prepararsi

@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 85 elementi, 331 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint: [sprint-12](sprints/sprint-12.md), concluso il 10/11; prossimo: lo Sprint 13, da confermare nella review.
+**Totale: 86 elementi, 332 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-12](sprints/sprint-12.md), il 10/11 ([review](sprints/sprint-12-review.md)); in corso: [sprint-13](sprints/sprint-13.md), dall'11/11.
 
 ## Epiche
 
@@ -21,7 +21,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione, Progetto Formativo e Relazione finale sui modelli reali in Word. | 11 | 54 |
 | E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 2 | 7 |
 | E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 2 | 10 |
-| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 13 | 54 |
+| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 14 | 55 |
 
 ## Release
 
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 27 | 139 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 28 | 140 |
 
 ## Domande aperte per il Product Owner
 
@@ -78,6 +78,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [EN-5](#en-5) | E13 | Controllo della numerazione delle migrazioni nella CI | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [EN-6](#en-6) | E13 | Dipendenze aggiornate e senza vulnerabilità note | Must | 8 | R4 | 🎉 Done (Sprint 11) |
 | [EN-7](#en-7) | E13 | Password comuni rifiutate | Must | 2 | R4 | 🎉 Done (Sprint 11) |
+| [EN-9](#en-9) | E13 | Test del frontend stabili | Must | 1 | R4 | ✅ Ready (Sprint 13) |
 | [US-201](#us-201) | E2 | Inserimento beneficiario | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 🎉 Done (Sprint 3) |
@@ -1029,6 +1030,8 @@ Criteri di accettazione:
   vale più di quello senza); **uno** → si usa; **più di uno** → l'utente sceglie da un elenco; **nessuno** → il modello
   generico di ripiego, che resta nel codice (PO, 09/11).
 - Disattivare o sostituire un modello non cambia i documenti già scaricati. Ogni operazione nell'audit.
+- Segnaposto noti = quelli che NEXUS sa compilare: i nuovi arrivano con US-1011, quindi i modelli reali di GOL (EN-8)
+  si caricano nello Sprint 14 (PO, review dello Sprint 12, 10/11).
 
 Dipendenze: US-115
 
@@ -1181,6 +1184,19 @@ Criteri di accettazione:
 - Una password tra le più usate (es. `Password1234`) è rifiutata con un messaggio in italiano, anche se lunga 12
   caratteri.
 - L'elenco è nell'immagine di Keycloak; uno script la attiva sul server già installato.
+
+#### EN-9
+**Test del frontend stabili** · Must · 1 punti · R4 · ✅ Ready (Sprint 13)
+
+Come **team** voglio che i test del frontend falliscano solo per un difetto vero, per non dover rilanciare la CI e
+indagare sui falsi rossi. Decisione del PO nella review dello Sprint 12 (10/11).
+
+Criteri di accettazione:
+- `UserProjectsPage` (il focus sul messaggio dopo un errore) e `MunicipalitiesSection`, falliti una volta ciascuno
+  senza un difetto, passano sempre: la causa è trovata e corretta, non nascosta da un timeout più lungo o da
+  ripetizioni automatiche.
+- L'intera suite del frontend passa 10 volte di seguito in locale; la CI è verde.
+- Gli altri test con la stessa causa sono corretti allo stesso modo.
 #### US-1301
 **Verifica della PWA online** · Must · 1 punti · R1 · 📋 Backlog
 
