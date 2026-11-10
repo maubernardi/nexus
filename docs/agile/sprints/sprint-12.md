@@ -1,7 +1,7 @@
 # Sprint 12 — 12 – 14 novembre 2026
 
-**Stato:** 🎉 concluso il 10/11, prima delle date previste: impegno di 21 punti completato, demo a `c8e810d`; collaudo
-T-22.1 … T-22.4 da fare. **Planning:** 09/11, con il Product Owner, dopo la raccolta dei modelli Word reali della
+**Stato:** 🎉 concluso il 10/11, prima delle date previste: impegno di 21 punti completato, demo a `ed260ad` (con le
+correzioni di #144); collaudo T-22.1 … T-22.4 da fare. **Review:** [sprint-12-review](sprint-12-review.md). **Planning:** 09/11, con il Product Owner, dopo la raccolta dei modelli Word reali della
 cooperativa (Q5).
 
 ## Obiettivo
@@ -99,8 +99,8 @@ non curricolare) e per l'**Inclusione** (Comune di Firenze e tre Società della 
 
 ## Per il PO durante lo sprint
 
-- Unire prima [#144](https://github.com/maubernardi/nexus/pull/144) (correzioni) e poi questa chiusura; il deploy
-  di #144 su richiesta.
+- ~~Unire [#144](https://github.com/maubernardi/nexus/pull/144) (correzioni) e questa chiusura~~: unite il 10/11;
+  deploy di `ed260ad` il 10/11, riuscito e controllato online.
 - Collaudo T-22.1 … T-22.4 sulla demo.
 - I dati reali degli enti (referenti, legali rappresentanti) si inseriscono dai Cataloghi: US-115 è online.
 - T-21.6: le PR di Dependabot del lunedì, una alla volta, con il deploy.
