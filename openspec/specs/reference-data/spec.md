@@ -101,3 +101,84 @@ filtri; le segnalazioni che già lo usano MUST restare consultabili con il loro 
 - **THEN** il Tutor non lo trova più tra i progetti della nuova segnalazione e una segnalazione con quel progetto è
   rifiutata, ma le segnalazioni esistenti restano consultabili con il loro progetto
 
+### Requirement: Comuni e province
+Il sistema SHALL conoscere i comuni e le province italiane con il loro periodo di validità. L'ADMIN SHALL caricarli dal
+file dell'ISTAT «Elenco dei comuni italiani», indicando la data da cui il file vale, e SHALL vedere l'anteprima delle
+differenze (comuni e province nuovi, soppressi, cambiati di nome, codice o provincia) prima di confermare. Alla conferma
+ogni versione soppressa o cambiata MUST chiudersi alla data indicata e la nuova versione MUST aprirsi da quella data;
+nessuna versione MUST essere cancellata. Il comune MUST essere identificato dal codice catastale. Un file non
+riconosciuto o incompleto, o una data non successiva all'ultimo caricamento, MUST essere rifiutato con il motivo. Ogni
+caricamento SHALL essere registrato nell'audit. Gli utenti autenticati SHALL poter cercare i comuni validi per nome,
+dalla seconda lettera, con la sigla della provincia.
+
+#### Scenario: Primo caricamento
+- **WHEN** l'ADMIN controlla il file ISTAT su un elenco vuoto
+- **THEN** l'anteprima indica tutti i comuni e le province come nuovi e, alla conferma, la ricerca «sesto f» trova
+  «Sesto Fiorentino (FI)»
+
+#### Scenario: Comune cambiato
+- **WHEN** l'ADMIN carica un file in cui un comune ha un nuovo nome o una nuova provincia
+- **THEN** l'anteprima lo indica tra i cambiati; dopo la conferma la versione precedente vale fino alla data del
+  caricamento e la ricerca trova solo il nuovo nome
+
+#### Scenario: Comune soppresso
+- **WHEN** l'ADMIN carica un file senza un comune presente nell'elenco
+- **THEN** il comune è tra i soppressi e, dopo la conferma, non compare più nella ricerca ma la sua versione resta
+
+#### Scenario: File sbagliato
+- **WHEN** l'ADMIN carica un file che non è l'elenco dell'ISTAT, oppure un elenco con pochi comuni
+- **THEN** il caricamento è rifiutato con il motivo e l'elenco non cambia
+
+#### Scenario: Data non valida
+- **WHEN** l'ADMIN indica una data non successiva a quella dell'ultimo caricamento
+- **THEN** il caricamento è rifiutato
+
+#### Scenario: Solo l'ADMIN carica
+- **WHEN** un Tutor chiede di caricare il file
+- **THEN** la risposta è `403`; la ricerca invece gli è permessa
+
+### Requirement: Sedi di competenza
+L'ADMIN SHALL gestire il catalogo delle sedi di competenza con le regole degli altri cataloghi (aggiunta, nuovo nome,
+disattivazione e riattivazione, audit, nessuna cancellazione) e SHALL indicare per ogni sede uno o più progetti. Una
+sede MUST NOT essere legata a un comune. Le voci iniziali SHALL essere Firenze, Borgo San Lorenzo e Sesto Fiorentino,
+del progetto GOL.
+
+#### Scenario: Sede per più progetti
+- **WHEN** l'ADMIN assegna la sede «Firenze» ai progetti GOL e POLIS
+- **THEN** la sede vale per entrambi i progetti e la modifica è nell'audit
+
+#### Scenario: Sede disattivata
+- **WHEN** l'ADMIN disattiva una sede
+- **THEN** non si può più scegliere, ma resta dove è già usata
+
+### Requirement: Tipi di tirocinio per progetto
+L'ADMIN SHALL indicare per ogni progetto i tipi di tirocinio ammessi; un progetto senza tipi indicati SHALL ammettere
+tutti i tipi attivi. GOL SHALL partire con Extracurriculare e Di inclusione. Ogni modifica SHALL essere nell'audit.
+
+#### Scenario: GOL
+- **WHEN** l'ADMIN apre i tipi ammessi di GOL
+- **THEN** sono Extracurriculare e Di inclusione
+
+#### Scenario: Nessuna limitazione
+- **WHEN** l'ADMIN toglie tutti i tipi a un progetto
+- **THEN** il progetto ammette tutti i tipi attivi
+
+### Requirement: Enti di presa in carico
+L'ADMIN SHALL gestire il catalogo degli enti che hanno in carico i beneficiari con le regole degli altri cataloghi e,
+per ogni ente, SHALL poter indicare tipologia, codice fiscale o partita IVA, sede legale, legale rappresentante (nome,
+qualifica, luogo e data di nascita) e referente per la convenzione (nome, telefono, mail); i dati sono facoltativi. Le
+voci iniziali SHALL essere Comune di Firenze, Società della Salute di Firenze, Società della Salute Mugello e Società
+della Salute Fiorentina Nord Ovest, senza dati di persone. Ogni modifica SHALL essere nell'audit.
+
+#### Scenario: Dati dell'ente
+- **WHEN** l'ADMIN indica il referente per la convenzione di un ente
+- **THEN** i dati sono salvati e la modifica è nell'audit
+
+#### Scenario: Dati non validi
+- **WHEN** l'ADMIN indica una mail del referente non valida o una data di nascita futura
+- **THEN** il campo segnala l'errore e nulla è salvato
+
+#### Scenario: Solo l'ADMIN
+- **WHEN** un Tutor chiede di modificare un ente o i tipi di un progetto
+- **THEN** la risposta è `403`
+

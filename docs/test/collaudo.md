@@ -9,8 +9,8 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | https://portalenexus.it |
-| **Versione della demo** | `34d1301` (09/11/2026): Sprint 1–11 completi (dipendenze aggiornate, password comuni rifiutate, curriculum del beneficiario) |
-| **Ultimo aggiornamento** | 10/11/2026 (T-22.1 … T-22.4: da provare dopo il deploy) |
+| **Versione della demo** | `c8e810d` (10/11/2026): Sprint 1–12 completi (comuni e province, cataloghi dei documenti, contatti e presa in carico del beneficiario, sede di competenza) |
+| **Ultimo aggiornamento** | 10/11/2026 (T-22.1 … T-22.4: da provare, la demo è aggiornata) |
 
 ## Come prepararsi
 
