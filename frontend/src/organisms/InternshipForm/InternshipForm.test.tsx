@@ -62,11 +62,11 @@ describe('<InternshipForm>', () => {
     const option = await screen.findByRole('option', { name: 'Di inclusione (non disponibile)' });
     expect(option).toBeDisabled();
     expect(screen.getByRole('option', { name: 'Curriculare' })).toBeEnabled();
-    expect(
-      screen.getByText(
-        'Per scegliere «Di inclusione» completa nella scheda del beneficiario: l’ente che lo ha in carico, la mail del case manager.',
-      ),
-    ).toBeInTheDocument();
+    const note =
+      'Per scegliere «Di inclusione» completa nella scheda del beneficiario: l’ente che lo ha in carico, la mail del case manager.';
+    expect(screen.getByText(note)).toBeInTheDocument();
+    // la spiegazione è collegata al campo: lo screen reader la legge insieme al tipo
+    expect(screen.getByRole('combobox', { name: 'Tipo di tirocinio' })).toHaveAccessibleDescription(note);
   });
 
   it('«Di inclusione» già scelta resta disponibile', async () => {
@@ -76,6 +76,7 @@ describe('<InternshipForm>', () => {
       inclusionMissing: ['careAgency'],
     });
     expect(await screen.findByRole('option', { name: 'Di inclusione' })).toBeEnabled();
+    expect(screen.getByRole('combobox', { name: 'Tipo di tirocinio' })).not.toHaveAccessibleDescription();
   });
 
   it('scheda vuota: si salva anche una parte, con righe ripetibili', async () => {

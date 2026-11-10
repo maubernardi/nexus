@@ -331,6 +331,7 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
   };
 
   const atecoError = errors.atecoCodeId?.message;
+  const inclusionNoteId = `${fieldId('internshipTypeId')}-inclusion`;
   const atecoHintId = `${fieldId('atecoCodeId')}-hint`;
   const atecoErrorId = `${fieldId('atecoCodeId')}-error`;
 
@@ -357,7 +358,15 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
             error={errors.internshipTypeId?.message}
           >
             {(p) => (
-              <NativeSelect {...p} {...register('internshipTypeId')}>
+              <NativeSelect
+                {...p}
+                // la spiegazione dell'inclusione non disponibile si legge anche con lo screen reader
+                aria-describedby={
+                  [p['aria-describedby'], inclusionType ? inclusionNoteId : null].filter(Boolean).join(' ') ||
+                  undefined
+                }
+                {...register('internshipTypeId')}
+              >
                 <option value="">{t('form.select')}</option>
                 {typeOptions.map((type) => {
                   const unavailable = isUnavailable(type);
@@ -371,7 +380,7 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
             )}
           </FormField>
           {inclusionType && (
-            <p className="text-sm text-muted-foreground md:col-span-2">
+            <p id={inclusionNoteId} className="text-sm text-muted-foreground md:col-span-2">
               {t('internship.inclusionUnavailable', {
                 type: inclusionType.name,
                 items: inclusionMissing.map((m) => t(`internship.inclusionItems.${m}`)).join(', '),

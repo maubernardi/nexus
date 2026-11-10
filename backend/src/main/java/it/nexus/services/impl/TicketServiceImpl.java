@@ -897,7 +897,9 @@ public class TicketServiceImpl implements TicketService {
                 t.getBoardPost() == null ? null : t.getBoardPost().getNumber(),
                 t.getStatus() == TicketStatus.FORM_RESTITUZIONE ? closureReportService.find(t).orElse(null) : null,
                 referenceMapper.toDto(t.getCompetenceSite()),
-                canChangeCompetenceSite(t, me));
+                // il comando si propone solo se c'è una sede da scegliere (controllo in Chrome, 10/11)
+                canChangeCompetenceSite(t, me)
+                        && competenceSiteRepository.existsActiveForProject(t.getProject().getId()));
     }
 
     private static String fullName(AppUser user) {

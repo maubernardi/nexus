@@ -844,7 +844,8 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   2. Scrivi una mail sbagliata nel case manager e salva. **Atteso:** l'errore sul campo. Correggi, scegli «Comune di
      Firenze», compila nome, mail e telefono del case manager e salva. **Atteso:** la scheda li mostra.
   3. Apri la scheda del tirocinio di una segnalazione di GOL di un beneficiario **senza** ente. **Atteso:** «Di
-     inclusione (non disponibile)» non si può scegliere e sotto c'è l'elenco dei dati mancanti.
+     inclusione (non disponibile)» non si può scegliere e sotto c'è l'elenco dei dati mancanti. Facoltativo, con lo
+     screen reader: sul campo «Tipo di tirocinio» si sente anche l'elenco dei dati mancanti.
   4. Con il beneficiario del punto 2, scegli «Di inclusione» nella scheda del tirocinio e salva. **Atteso:** salvata.
      Torna a modificare il beneficiario. **Atteso:** l'ente non si cambia («L'ente non si può cambiare mentre il
      beneficiario ha un tirocinio aperto.») e nome, mail e telefono del case manager sono obbligatori.
@@ -858,3 +859,5 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      salva. **Atteso:** «Sede di competenza corretta: …» e nella cronologia «Sede di competenza corretta» con la sede
      prima e dopo.
   4. Facoltativo: rendi `tutor2` Coordinatore di GOL (Utenti → progetti) e prova anche come lui.
+  5. In **Cataloghi → Sedi di competenza** togli POLIS da «Firenze» (l'avevi aggiunto in T-22.2), poi come `admin`
+     apri una segnalazione di POLIS. **Atteso:** «Sede di competenza: Non indicata» e nessun comando per correggerla.
