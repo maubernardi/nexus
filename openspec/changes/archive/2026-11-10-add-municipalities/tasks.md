@@ -13,4 +13,4 @@
 ## 3. Consegna
 
 - [x] 3.1 Collaudo (`docs/test/collaudo.md`) e backlog
-- [ ] 3.2 PR con CI verde
+- [x] 3.2 PR con CI verde
