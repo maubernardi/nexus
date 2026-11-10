@@ -1,6 +1,7 @@
 # Sprint 12 — 12 – 14 novembre 2026
 
-**Stato:** 📋 pianificato. **Planning:** 09/11, con il Product Owner, dopo la raccolta dei modelli Word reali della
+**Stato:** 🎉 concluso il 10/11, prima delle date previste: impegno di 21 punti completato, demo a `c8e810d`; collaudo
+T-22.1 … T-22.4 da fare. **Planning:** 09/11, con il Product Owner, dopo la raccolta dei modelli Word reali della
 cooperativa (Q5).
 
 ## Obiettivo
@@ -13,13 +14,42 @@ cooperativa (Q5).
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-114 | Comuni e province, temporizzati, caricati dall'ADMIN dal file ISTAT | 8 | ✅ Ready | — | — |
-| US-115 | Sedi di competenza, tipi di tirocinio per progetto, enti di presa in carico | 5 | ✅ Ready | — | — |
-| US-206 | Contatti, ente di presa in carico e case manager del beneficiario | 5 | ✅ Ready | — | — |
-| US-308 | Sede di competenza della segnalazione | 3 | ✅ Ready | — | — |
+| US-114 | Comuni e province, temporizzati, caricati dall'ADMIN dal file ISTAT | 8 | 🎉 Done | `add-municipalities` | [#139](https://github.com/maubernardi/nexus/pull/139) |
+| US-115 | Sedi di competenza, tipi di tirocinio per progetto, enti di presa in carico | 5 | 🎉 Done | `add-document-catalogs` | [#140](https://github.com/maubernardi/nexus/pull/140) |
+| US-206 | Contatti, ente di presa in carico e case manager del beneficiario | 5 | 🎉 Done | `add-beneficiary-care` | [#141](https://github.com/maubernardi/nexus/pull/141) |
+| US-308 | Sede di competenza della segnalazione | 3 | 🎉 Done | `add-ticket-competence-site` | [#142](https://github.com/maubernardi/nexus/pull/142) |
 
 Ordine: US-114 → US-115 → US-206 → US-308 (US-206 e US-308 usano i cataloghi di US-115). Una PR per storia; gli stati
 del backlog si aggiornano nella PR di documentazione dopo i merge. Prossima migrazione: **V33**.
+
+**Velocità:** 21 punti. Migrazioni V33–V36. Un deploy alla fine, su richiesta del PO, riuscito e controllato online:
+nuove sezioni nel bundle; nei log del backend le quattro migrazioni applicate e l'elenco ISTAT caricato (7896 comuni,
+107 province). Prossima migrazione: **V37**.
+
+## Decisioni durante lo sprint
+
+- **US-114**:
+  - il comune è identificato dal codice catastale, che non cambia quando passa a un'altra provincia (il codice ISTAT sì);
+  - file ISTAT riconosciuto dai nomi delle colonne (CSV con `;`, Latin-1 o UTF-8); rifiutato se ha meno di 7000
+    comuni o una data non successiva all'ultimo caricamento;
+  - ricerca dalla seconda lettera, prima i nomi che iniziano con il testo;
+  - nella demo l'elenco si carica da solo se le tabelle sono vuote; in produzione lo carica l'ADMIN la prima volta.
+- **US-115**: un progetto senza tipi indicati ammette tutti i tipi; la scheda del tirocinio propone i tipi ammessi più
+  quello già scelto.
+- **US-206**:
+  - tirocinio aperto = segnalazione non ancora in FORM_RESTITUZIONE con la scheda del tirocinio;
+  - nell'audit solo quali campi cambiano, senza i valori;
+  - «Di inclusione» resta visibile ma disattivato, con l'elenco dei dati mancanti.
+- **US-308**: la sede si sceglie anche nella candidatura dalla bacheca; con una sola sede nel progetto è già
+  selezionata.
+- **Controllo in browser reale** (punto 3 della Definition of Done): US-114 e US-115 controllate in Chrome in locale
+  durante lo sviluppo; US-206 e US-308 il 10/11, prima di chiudere lo sprint (l'estensione era scollegata). Axe con il
+  contrasto, tema chiaro e scuro, smartphone a 390 px: nessuna violazione. Due difetti, corretti in
+  [#144](https://github.com/maubernardi/nexus/pull/144):
+  - US-206: la spiegazione di «Di inclusione» non disponibile non era collegata al campo del tipo (lo screen reader
+    non la leggeva);
+  - US-308: l'ADMIN vedeva «Correggi la sede di competenza» anche nei progetti senza sedi, con una tendina vuota; la
+    sede resta «Non indicata» (PO, 10/11).
 
 ## Decisioni del planning (09/11)
 
@@ -61,9 +91,16 @@ non curricolare) e per l'**Inclusione** (Comune di Firenze e tre Società della 
 
 | Momento | Punti residui |
 |---|---|
-| Inizio (12/11) | 21 |
+| Inizio (09/11, dopo il planning) | 21 |
+| US-114 unita (10/11) | 13 |
+| US-115 unita (10/11) | 8 |
+| US-206 unita (10/11) | 3 |
+| US-308 unita (10/11) | 0 |
 
 ## Per il PO durante lo sprint
 
+- Unire prima [#144](https://github.com/maubernardi/nexus/pull/144) (correzioni) e poi questa chiusura; il deploy
+  di #144 su richiesta.
+- Collaudo T-22.1 … T-22.4 sulla demo.
+- I dati reali degli enti (referenti, legali rappresentanti) si inseriscono dai Cataloghi: US-115 è online.
 - T-21.6: le PR di Dependabot del lunedì, una alla volta, con il deploy.
-- I dati reali degli enti (referenti, legali rappresentanti) si inseriscono dai Cataloghi quando US-115 è online.

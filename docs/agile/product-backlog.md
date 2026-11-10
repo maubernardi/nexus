@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 85 elementi, 331 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint: [sprint-11](sprints/sprint-11.md), concluso il 09/11; prossimo: [sprint-12](sprints/sprint-12.md).
+**Totale: 85 elementi, 331 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint: [sprint-12](sprints/sprint-12.md), concluso il 10/11; prossimo: lo Sprint 13, da confermare nella review.
 
 ## Epiche
 
@@ -70,8 +70,8 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-111](#us-111) | E1 | Spostamento delle segnalazioni tra Tutor | Must | 5 | R4 | 🎉 Done (Sprint 9) |
 | [US-112](#us-112) | E1 | Coordinatore di progetto | Must | 3 | R4 | 🎉 Done (Sprint 9) |
 | [US-113](#us-113) | E1 | Registro degli accessi | Must | 7 | R4 | 🎉 Done (Sprint 10) |
-| [US-114](#us-114) | E1 | Comuni e province | Must | 8 | R4 | ✅ Ready (Sprint 12) |
-| [US-115](#us-115) | E1 | Sedi di competenza, tipi di tirocinio per progetto, enti di presa in carico | Must | 5 | R4 | ✅ Ready (Sprint 12) |
+| [US-114](#us-114) | E1 | Comuni e province | Must | 8 | R4 | 🎉 Done (Sprint 12) |
+| [US-115](#us-115) | E1 | Sedi di competenza, tipi di tirocinio per progetto, enti di presa in carico | Must | 5 | R4 | 🎉 Done (Sprint 12) |
 | [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
@@ -83,7 +83,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 🎉 Done (Sprint 3) |
 | [US-204](#us-204) | E2 | Visibilità dei beneficiari per progetto | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-205](#us-205) | E2 | Curriculum del beneficiario | Could | 5 | — | 🎉 Done (Sprint 11) |
-| [US-206](#us-206) | E2 | Contatti, ente di presa in carico e case manager del beneficiario | Must | 5 | R4 | ✅ Ready (Sprint 12) |
+| [US-206](#us-206) | E2 | Contatti, ente di presa in carico e case manager del beneficiario | Must | 5 | R4 | 🎉 Done (Sprint 12) |
 | [US-301](#us-301) | E3 | Nuova segnalazione | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-302](#us-302) | E3 | Nuova tipologia di mansione dal Tutor, approvata dal Call Center | Should | 5 | R2 | 🎉 Done (Sprint 4) |
 | [US-303](#us-303) | E3 | Elenco delle segnalazioni (Home) | Must | 5 | R1 | 🎉 Done (Sprint 3) |
@@ -91,7 +91,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-305](#us-305) | E3 | Dettaglio e cronologia del ticket | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-306](#us-306) | E3 | Segnalazione speciale dalla bacheca | Must | 3 | R2 | 🎉 Done (Sprint 7) |
 | [US-307](#us-307) | E3 | Scadenza nella Home del Tutor | Must | 2 | R2 | 🎉 Done (Sprint 6) |
-| [US-308](#us-308) | E3 | Sede di competenza della segnalazione | Must | 3 | R4 | ✅ Ready (Sprint 12) |
+| [US-308](#us-308) | E3 | Sede di competenza della segnalazione | Must | 3 | R4 | 🎉 Done (Sprint 12) |
 | [US-401](#us-401) | E4 | Coda FIFO | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | 🎉 Done (Sprint 7) |
@@ -323,7 +323,7 @@ Criteri di accettazione:
   modifiche registrate nell'audit.
 - Un solo calendario, valido per tutti i progetti e per tutte le segnalazioni.
 #### US-114
-**Comuni e province** · Must · 8 punti · R4 · ✅ Ready (Sprint 12)
+**Comuni e province** · Must · 8 punti · R4 · 🎉 Done (Sprint 12)
 
 Come **ADMIN** voglio in NEXUS l'elenco ufficiale dei comuni e delle province italiane per avere indirizzi uniformi nei
 documenti (planning del 09/11).
@@ -341,11 +341,14 @@ Criteri di accettazione:
   aprono; nulla si cancella. Un file non riconosciuto è rifiutato con il motivo. Il caricamento è nell'audit.
 - Nella demo il seed carica l'elenco attuale.
 - Il luogo di nascita resta testo libero: può essere ovunque nel mondo (PO, 09/11).
+- Fatto il 10/11: chiave del comune il codice catastale (non cambia con la provincia); nella demo 7896 comuni e 107
+  province dal file ISTAT nel codice (licenza CC BY 4.0). In produzione l'ADMIN carica il file la prima volta. La
+  scelta del comune nei moduli arriva con US-1007.
 
 Usato da: US-1007 (sedi e residenza).
 
 #### US-115
-**Sedi di competenza, tipi di tirocinio per progetto, enti di presa in carico** · Must · 5 punti · R4 · ✅ Ready (Sprint 12)
+**Sedi di competenza, tipi di tirocinio per progetto, enti di presa in carico** · Must · 5 punti · R4 · 🎉 Done (Sprint 12)
 
 Come **ADMIN** voglio gestire nei Cataloghi le sedi di competenza, i tipi di tirocinio ammessi per ogni progetto e gli
 enti che hanno in carico i beneficiari, per far scegliere ai Tutor solo valori validi (planning del 09/11).
@@ -366,6 +369,8 @@ Criteri di accettazione:
 - Disattivare una sede, un ente o togliere un tipo a un progetto vale solo per i nuovi inserimenti: i dati già inseriti
   restano (PO, 09/11).
 - Ogni modifica è registrata nell'audit (EN-2).
+- Fatto il 10/11: un progetto senza tipi indicati ammette tutti i tipi; la scheda del tirocinio propone i tipi ammessi
+  più quello già scelto. I dati reali degli enti li inserisce l'ADMIN dai Cataloghi.
 
 ### E2 — Anagrafica beneficiari
 
@@ -418,7 +423,7 @@ Criteri di accettazione:
   (US-1303).
 
 #### US-206
-**Contatti, ente di presa in carico e case manager del beneficiario** · Must · 5 punti · R4 · ✅ Ready (Sprint 12)
+**Contatti, ente di presa in carico e case manager del beneficiario** · Must · 5 punti · R4 · 🎉 Done (Sprint 12)
 
 Come **Tutor** voglio registrare i contatti del beneficiario e l'ente che lo ha in carico, con il suo case manager, per
 compilare i documenti e poter attivare i tirocini di inclusione (planning del 09/11).
@@ -437,6 +442,8 @@ Criteri di accettazione:
 - Privacy: la presa in carico da parte dei servizi sociali o sanitari è un dato delicato, come la L. 68/99. Si vede
   solo dove si vede il beneficiario (US-204), mai nei log; ente, case manager, email e telefono rientrano
   nell'anonimizzazione (US-1303).
+- Fatto il 10/11: tirocinio aperto = segnalazione non ancora in FORM_RESTITUZIONE con la scheda del tirocinio;
+  nell'audit solo quali campi cambiano, senza i valori.
 
 ### E3 — Segnalazioni (fase 1)
 
@@ -541,7 +548,7 @@ Origine: note operative del PO, review dello Sprint 5 §8.3 (28/10).
 Dipendenze: US-704
 
 #### US-308
-**Sede di competenza della segnalazione** · Must · 3 punti · R4 · ✅ Ready (Sprint 12)
+**Sede di competenza della segnalazione** · Must · 3 punti · R4 · 🎉 Done (Sprint 12)
 
 Come **Tutor** voglio indicare la sede di competenza quando creo la segnalazione, perché è il luogo dei documenti di
 fine tirocinio (planning del 09/11).
@@ -552,6 +559,7 @@ Criteri di accettazione:
 - Dopo l'inserimento il Tutor non la può cambiare; la correggono l'ADMIN e il Coordinatore, quest'ultimo solo nei
   progetti che coordina (US-112), con l'audit (prima, dopo, autore) (PO, 09/11).
 - Si vede nel dettaglio della segnalazione. Le segnalazioni già esistenti restano senza sede.
+- Fatto il 10/11: vale anche per la candidatura dalla bacheca; con una sola sede nel progetto è già selezionata.
 
 ### E4 — Coda Call Center e fast-track (fase 3)
 
