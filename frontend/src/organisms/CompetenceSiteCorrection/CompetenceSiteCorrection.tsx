@@ -7,6 +7,7 @@ import { apiError } from '@/config/api/errors';
 import type { TicketDetail } from '@/config/api/ticketApi';
 import { useProjectCompetenceSites } from '@/config/hooks/useReferenceData';
 import { useChangeCompetenceSite } from '@/config/hooks/useTickets';
+import { useFocusAfterRender } from '@/hooks/useFocusAfterRender';
 import { FormField } from '@/molecules/FormField/FormField';
 
 type Feedback = { kind: 'status' | 'alert'; text: string };
@@ -26,7 +27,8 @@ export const CompetenceSiteCorrection = ({ ticket }: { ticket: TicketDetail }) =
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const feedbackRef = useRef<HTMLParagraphElement>(null);
   const selectRef = useRef<HTMLSelectElement>(null);
-  const toggleRef = useRef<HTMLButtonElement>(null);
+  // il pulsante torna con la chiusura del modulo: il focus ci va dopo il render
+  const { ref: toggleRef, requestFocus: focusToggle } = useFocusAfterRender<HTMLButtonElement>();
 
   useEffect(() => {
     if (open) selectRef.current?.focus();
@@ -38,7 +40,7 @@ export const CompetenceSiteCorrection = ({ ticket }: { ticket: TicketDetail }) =
   const close = (): void => {
     setOpen(false);
     setError(undefined);
-    requestAnimationFrame(() => toggleRef.current?.focus());
+    focusToggle();
   };
 
   const submit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {

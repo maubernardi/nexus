@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router';
 
@@ -9,6 +9,7 @@ import { apiError } from '@/config/api/errors';
 import type { AdminUser, UserImpact } from '@/config/api/userAdminApi';
 import type { Role } from '@/config/auth/types';
 import { useChangeUserRole, useSetUserActive, useUser, useUserImpact } from '@/config/hooks/useUsers';
+import { useFocusAfterRender } from '@/hooks/useFocusAfterRender';
 import type { UsersPageState } from '@/pages/UsersPage/UsersPage';
 
 const ROLES: readonly Role[] = ['TUTOR', 'CALL_CENTER', 'ADMIN'];
@@ -69,7 +70,7 @@ const AccountForms = ({ user, impact }: AccountFormsProps) => {
   const changeRole = useChangeUserRole();
   const [role, setRole] = useState<Role>(user.role);
   const [error, setError] = useState<string | null>(null);
-  const errorRef = useRef<HTMLParagraphElement>(null);
+  const { ref: errorRef, requestFocus: focusError } = useFocusAfterRender<HTMLParagraphElement>();
   const name = `${user.firstName} ${user.lastName}`;
   const busy = setActive.isPending || changeRole.isPending;
   // un Tutor con segnalazioni aperte non si disattiva né cambia ruolo (decisione del PO, 06/11)
@@ -83,7 +84,7 @@ const AccountForms = ({ user, impact }: AccountFormsProps) => {
   const fail = (e: unknown): void => {
     const body = apiError(e);
     setError(body && [400, 503].includes(body.status) && body.message ? body.message : t('users.error'));
-    requestAnimationFrame(() => errorRef.current?.focus());
+    focusError();
   };
 
   const onToggle = async (): Promise<void> => {

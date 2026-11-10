@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AxiosError, AxiosHeaders } from 'axios';
 import type { InitialEntry } from 'react-router';
@@ -139,13 +139,17 @@ describe('<BeneficiaryPage>', () => {
         new File(['x'], 'foto.png', { type: 'image/png' }),
       );
       await user.click(within(section).getByRole('button', { name: 'Carica' }));
-      expect(await within(section).findByRole('alert')).toHaveTextContent('Il CV deve essere un file PDF.');
+      const rejected = await within(section).findByRole('alert');
+      expect(rejected).toHaveTextContent('Il CV deve essere un file PDF.');
+      expect(rejected).toHaveFocus();
       expect(uploadBeneficiaryCv).not.toHaveBeenCalled();
 
       await user.upload(within(section).getByLabelText('Carica il CV'), pdf);
       await user.click(within(section).getByRole('button', { name: 'Carica' }));
       expect(uploadBeneficiaryCv).toHaveBeenCalledWith({ id: 'B1', file: pdf });
-      expect(await within(section).findByRole('status')).toHaveTextContent('CV caricato.');
+      const uploaded = await within(section).findByRole('status');
+      expect(uploaded).toHaveTextContent('CV caricato.');
+      await waitFor(() => expect(uploaded).toHaveFocus());
       expect(within(section).getByText('CV Mario.pdf (239 KB)')).toBeInTheDocument();
       expect(within(section).getByLabelText('Sostituisci il CV')).toBeInTheDocument();
     });
