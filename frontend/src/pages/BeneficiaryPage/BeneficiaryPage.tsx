@@ -113,6 +113,14 @@ export const BeneficiaryPage = () => {
         ]}
       />
       <Section
+        id="beneficiary-contacts"
+        title={t('beneficiary.sections.contacts')}
+        rows={[
+          { label: t('beneficiary.fields.email'), value: b.email ?? notSpecified },
+          { label: t('beneficiary.fields.phone'), value: b.phone ?? notSpecified },
+        ]}
+      />
+      <Section
         id="beneficiary-mobility"
         title={t('beneficiary.sections.mobility')}
         rows={[
@@ -152,6 +160,15 @@ export const BeneficiaryPage = () => {
         rows={[
           { label: t('beneficiary.fields.hasLaw68'), value: yesNo(b.hasLaw68) },
           { label: t('beneficiary.fields.constraints'), value: b.constraints ?? t('beneficiary.none') },
+          { label: t('beneficiary.fields.careAgency'), value: b.careAgency?.name ?? notSpecified },
+          {
+            label: t('beneficiary.fields.caseManager'),
+            value: b.caseManagerName
+              ? [b.caseManagerName, b.caseManagerOffice, b.caseManagerPhone, b.caseManagerEmail]
+                  .filter(Boolean)
+                  .join('\n')
+              : notSpecified,
+          },
         ]}
       />
       <BeneficiaryCvSection beneficiary={b} />

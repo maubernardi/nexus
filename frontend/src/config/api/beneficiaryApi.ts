@@ -20,11 +20,41 @@ export type BeneficiaryCreate = {
   educationLevel: EducationLevel | null;
   constraints: string | null;
   languages: BeneficiaryLanguage[];
+  /** Contatti e presa in carico (US-206), tutti facoltativi. */
+  email: string | null;
+  phone: string | null;
+  careAgencyId: string | null;
+  caseManagerName: string | null;
+  caseManagerOffice: string | null;
+  caseManagerPhone: string | null;
+  caseManagerEmail: string | null;
 };
 
-export type Beneficiary = Omit<BeneficiaryCreate, 'residenceZoneId'> & {
+export type Beneficiary = Omit<
+  BeneficiaryCreate,
+  | 'residenceZoneId'
+  | 'careAgencyId'
+  | 'email'
+  | 'phone'
+  | 'caseManagerName'
+  | 'caseManagerOffice'
+  | 'caseManagerPhone'
+  | 'caseManagerEmail'
+> & {
   id: string;
   residenceZone: ReferenceItem;
+  /** L'API omette i campi vuoti. */
+  email?: string;
+  phone?: string;
+  careAgency?: ReferenceItem;
+  caseManagerName?: string;
+  caseManagerOffice?: string;
+  caseManagerPhone?: string;
+  caseManagerEmail?: string;
+  /** Ha un tirocinio aperto: l'ente non si cambia (US-206). */
+  careAgencyLocked: boolean;
+  /** Ha un tirocinio di inclusione aperto: nome, mail e telefono del case manager obbligatori. */
+  caseManagerRequired: boolean;
   hasDrivingLicense: boolean;
   createdAt: string;
   ownerTutorName: string;

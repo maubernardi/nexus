@@ -1,6 +1,7 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 
 import {
+  fetchCareAgencies,
   fetchHiringFormulas,
   fetchJobCategories,
   fetchMyProjects,
@@ -21,6 +22,10 @@ export const useJobCategories = (): UseQueryResult<ReferenceItem[]> =>
 
 export const useHiringFormulas = (): UseQueryResult<ReferenceItem[]> =>
   useQuery({ queryKey: ['reference', 'hiringFormulas'], queryFn: fetchHiringFormulas, staleTime: STALE });
+
+/** Enti di presa in carico attivi (US-206). */
+export const useActiveCareAgencies = (): UseQueryResult<ReferenceItem[]> =>
+  useQuery({ queryKey: ['reference', 'careAgencies'], queryFn: fetchCareAgencies, staleTime: STALE });
 
 export const useNoHireReasons = (): UseQueryResult<ReferenceItem[]> =>
   useQuery({ queryKey: ['reference', 'noHireReasons'], queryFn: fetchNoHireReasons, staleTime: STALE });

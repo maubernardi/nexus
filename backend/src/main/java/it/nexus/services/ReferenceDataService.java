@@ -13,6 +13,9 @@ public interface ReferenceDataService {
     /** Tipi di tirocinio attivi, per la scheda del tirocinio (US-108). */
     List<ReferenceItemDTO> activeInternshipTypes();
 
+    /** Enti di presa in carico attivi (US-206). */
+    List<ReferenceItemDTO> activeCareAgencies();
+
     /** Formule di assunzione attive, per il report di restituzione (US-109). */
     List<ReferenceItemDTO> activeHiringFormulas();
 

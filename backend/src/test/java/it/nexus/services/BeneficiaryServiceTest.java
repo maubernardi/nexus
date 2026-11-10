@@ -31,6 +31,8 @@ import it.nexus.domain.enumeration.Role;
 import it.nexus.mapper.BeneficiaryMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.BeneficiaryRepository;
+import it.nexus.repository.CareAgencyRepository;
+import it.nexus.repository.InternshipRepository;
 import it.nexus.repository.TicketRepository;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.repository.ZoneRepository;
@@ -48,13 +50,16 @@ class BeneficiaryServiceTest {
     @Mock AuditService audit;
     @Mock CurrentAppUserService currentUser;
     @Mock BeneficiaryMapper mapper;
+    @Mock InternshipRepository internships;
+    @Mock CareAgencyRepository careAgencies;
     @InjectMocks BeneficiaryServiceImpl service;
 
     private static final String ZONE_ID = TsidMapper.toExternal(123L);
 
     private static BeneficiaryFormDTO dto(List<BeneficiaryLanguageDTO> languages) {
         return new BeneficiaryFormDTO(" Mario ", "Rossi", 1998, Gender.M, "IT", "IT", ZONE_ID,
-                Set.of(LicenseType.CQC, LicenseType.B), false, null, false, null, "", languages);
+                Set.of(LicenseType.CQC, LicenseType.B), false, null, false, null, "", languages, null, null, null,
+                null, null, null, null);
     }
 
     @Test

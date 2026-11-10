@@ -9,11 +9,15 @@ import { BeneficiaryForm } from '@/organisms/BeneficiaryForm/BeneficiaryForm';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderWithProviders } from '@/tests/renderWithProviders';
 
-vi.mock('@/config/api/referenceApi', () => ({ fetchZones: vi.fn(), fetchJobCategories: vi.fn() }));
+vi.mock('@/config/api/referenceApi', () => ({
+  fetchZones: vi.fn(),
+  fetchJobCategories: vi.fn(),
+  fetchCareAgencies: vi.fn(async () => [{ id: 'E1', code: 'COMUNE_DI_FIRENZE', name: 'Comune di Firenze' }]),
+}));
 vi.mock('@/config/api/beneficiaryApi', () => ({ createBeneficiary: vi.fn(), fetchMyBeneficiaries: vi.fn() }));
 
 const fillRequired = async (user: ReturnType<typeof userEvent.setup>): Promise<void> => {
-  await user.type(screen.getByLabelText(/^Nome/), 'Mario');
+  await user.type(screen.getByLabelText(/^Nome \(obbligatorio\)/), 'Mario');
   await user.type(screen.getByLabelText(/^Cognome/), 'Rossi');
   await user.type(screen.getByLabelText(/^Anno di nascita/), '1998');
   await user.selectOptions(screen.getByLabelText(/^Genere/), 'M');
@@ -71,6 +75,17 @@ describe('<BeneficiaryForm>', () => {
     await user.click(screen.getByRole('button', { name: 'Aggiungi lingua' }));
     await user.selectOptions(screen.getByLabelText(/^Lingua 1/), 'it');
     await user.selectOptions(screen.getByLabelText(/^Livello lingua 1/), 'MADRELINGUA');
+    // contatti e presa in carico (US-206)
+    await user.type(screen.getByLabelText('Mail'), 'mario@esempio.it');
+    await user.type(screen.getByLabelText('Telefono'), '333 1234567');
+    await user.selectOptions(await screen.findByLabelText('Ente che lo ha in carico'), 'E1');
+    await user.type(screen.getByLabelText('Nome e cognome del case manager'), 'Lucia Prova');
+    await user.type(screen.getByLabelText('Mail del case manager'), 'lucia@');
+    await user.click(screen.getByRole('button', { name: 'Registra beneficiario' }));
+    expect(
+      await screen.findByText(/Mail del case manager: Inserisci un indirizzo email valido/),
+    ).toBeInTheDocument();
+    await user.type(screen.getByLabelText('Mail del case manager'), 'esempio.it');
     await user.click(screen.getByRole('button', { name: 'Registra beneficiario' }));
 
     await waitFor(() => expect(onSuccess).toHaveBeenCalledWith(created));
@@ -89,6 +104,13 @@ describe('<BeneficiaryForm>', () => {
       educationLevel: null,
       constraints: null,
       languages: [{ language: 'it', level: 'MADRELINGUA' }],
+      email: 'mario@esempio.it',
+      phone: '333 1234567',
+      careAgencyId: 'E1',
+      caseManagerName: 'Lucia Prova',
+      caseManagerOffice: null,
+      caseManagerPhone: null,
+      caseManagerEmail: 'lucia@esempio.it',
     });
   });
 

@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `34d1301` (09/11/2026): Sprint 1–11 completi (dipendenze aggiornate, password comuni rifiutate, curriculum del beneficiario) |
-| **Ultimo aggiornamento** | 10/11/2026 (T-22.1 e T-22.2: da provare dopo il deploy) |
+| **Ultimo aggiornamento** | 10/11/2026 (T-22.1, T-22.2 e T-22.3: da provare dopo il deploy) |
 
 ## Come prepararsi
 
@@ -837,3 +837,14 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      campo. Correggi e salva. **Atteso:** «Dati di «…» salvati.»
   4. Come `tutor1`, apri la scheda del tirocinio di una segnalazione di GOL (ad esempio quella in tirocinio). **Atteso:**
      nel tipo di tirocinio solo «Di inclusione» ed «Extracurriculare», più il tipo già scelto se era un altro.
+
+- [ ] **T-22.3 Contatti, ente di presa in carico e case manager (US-206)**
+  1. Come `tutor1`, **Modifica** di un tuo beneficiario. **Atteso:** la sezione «Contatti» (mail, telefono) e, nelle
+     informazioni riservate, «Presa in carico» con l'ente e i quattro dati del case manager, tutti facoltativi.
+  2. Scrivi una mail sbagliata nel case manager e salva. **Atteso:** l'errore sul campo. Correggi, scegli «Comune di
+     Firenze», compila nome, mail e telefono del case manager e salva. **Atteso:** la scheda li mostra.
+  3. Apri la scheda del tirocinio di una segnalazione di GOL di un beneficiario **senza** ente. **Atteso:** «Di
+     inclusione (non disponibile)» non si può scegliere e sotto c'è l'elenco dei dati mancanti.
+  4. Con il beneficiario del punto 2, scegli «Di inclusione» nella scheda del tirocinio e salva. **Atteso:** salvata.
+     Torna a modificare il beneficiario. **Atteso:** l'ente non si cambia («L'ente non si può cambiare mentre il
+     beneficiario ha un tirocinio aperto.») e nome, mail e telefono del case manager sono obbligatori.

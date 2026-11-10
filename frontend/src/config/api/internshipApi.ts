@@ -55,6 +55,11 @@ export type Internship = {
   totalMinutes?: number | null;
   /** Dati che mancano per avviare il tirocinio (US-1003), in base alla scheda salvata; vuoto = completa. */
   missingForStart: StartRequirement[];
+  /**
+   * Dati del beneficiario che mancano per il tipo «Di inclusione» (US-206): careAgency, caseManagerName,
+   * caseManagerEmail, caseManagerPhone; vuoto o assente = si può scegliere.
+   */
+  inclusionMissing?: string[];
 };
 
 /** Codici dei dati richiesti per l'avvio (review dello Sprint 7, §8.2). */

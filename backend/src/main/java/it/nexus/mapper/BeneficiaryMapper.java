@@ -26,7 +26,8 @@ public interface BeneficiaryMapper {
             expression = "java(beneficiary.getCvFile() == null ? null : beneficiary.getCvFile().getOriginalName())")
     @Mapping(target = "cvSizeBytes",
             expression = "java(beneficiary.getCvFile() == null ? null : beneficiary.getCvFile().getSizeBytes())")
-    BeneficiaryDTO toDto(Beneficiary beneficiary, boolean editable);
+    BeneficiaryDTO toDto(Beneficiary beneficiary, boolean editable, boolean careAgencyLocked,
+            boolean caseManagerRequired);
 
     @Mapping(target = "id", expression = "java(TsidMapper.toExternal(beneficiary.getId()))")
     @Mapping(target = "residenceZoneName", source = "residenceZone.name")

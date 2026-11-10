@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.domain.AppUser;
+import it.nexus.domain.Beneficiary;
 import it.nexus.domain.Company;
 import it.nexus.domain.CompanyAtecoCode;
 import it.nexus.domain.Internship;
@@ -89,6 +90,13 @@ public class InternshipServiceImpl implements InternshipService {
             Map.entry("legalRepresentative", "il legale rappresentante dell'azienda"),
             Map.entry("legalRepresentativeData", "codice fiscale, nascita e residenza del legale rappresentante"));
 
+    /** Come chiamare i dati mancanti per l'inclusione nel messaggio d'errore (US-206). */
+    private static final Map<String, String> INCLUSION_LABELS = Map.of(
+            "careAgency", "l'ente che lo ha in carico",
+            "caseManagerName", "il nome del case manager",
+            "caseManagerEmail", "la mail del case manager",
+            "caseManagerPhone", "il telefono del case manager");
+
     private final InternshipRepository internshipRepository;
     private final TicketRepository ticketRepository;
     private final UserProjectRepository userProjectRepository;
@@ -120,6 +128,14 @@ public class InternshipServiceImpl implements InternshipService {
         Internship internship = existing.orElseGet(() -> new Internship(ticket));
         InternshipType type = internshipType(dto.internshipTypeId(), internship.getInternshipType(),
                 ticket.getProject());
+        if (type != null && type.isInclusion() && !type.equals(internship.getInternshipType())) {
+            List<String> missing = inclusionMissing(ticket.getBeneficiary());
+            if (!missing.isEmpty()) {
+                throw new FieldValidationException("internshipTypeId",
+                        "Per un tirocinio di inclusione completa nella scheda del beneficiario: "
+                                + missing.stream().map(INCLUSION_LABELS::get).collect(Collectors.joining(", ")));
+            }
+        }
         CompanyAtecoCode ateco = atecoCode(dto.atecoCodeId(), company(ticket));
         if (dto.startDate() != null && dto.expectedEndDate() != null
                 && dto.expectedEndDate().isBefore(dto.startDate())) {
@@ -281,6 +297,24 @@ public class InternshipServiceImpl implements InternshipService {
         return type;
     }
 
+    /** Cosa manca al beneficiario per un tirocinio di inclusione (US-206), nell'ordine del modulo. */
+    private static List<String> inclusionMissing(Beneficiary b) {
+        List<String> missing = new ArrayList<>();
+        if (b.getCareAgency() == null) {
+            missing.add("careAgency");
+        }
+        if (b.getCaseManagerName() == null) {
+            missing.add("caseManagerName");
+        }
+        if (b.getCaseManagerEmail() == null) {
+            missing.add("caseManagerEmail");
+        }
+        if (b.getCaseManagerPhone() == null) {
+            missing.add("caseManagerPhone");
+        }
+        return missing;
+    }
+
     /** Un progetto senza tipi indicati li ammette tutti (fino al censimento dei progetti). */
     private static boolean allowed(Project project, InternshipType type) {
         return project.getAllowedInternshipTypes().isEmpty() || project.getAllowedInternshipTypes().contains(type);
@@ -434,7 +468,7 @@ public class InternshipServiceImpl implements InternshipService {
                 i.getFiscalCode(), i.getBirthDate(), i.getBirthPlace(), i.getResidence(), suspensions(i), i.getNotes(),
                 i.getFirstSlotStart(), i.getFirstSlotEnd(), i.getSecondSlotStart(), i.getSecondSlotEnd(),
                 i.isExcludeHolidays(), schedule, InternshipHours.weeklyMinutes(slots, days), total,
-                missingForStart(i, rep));
+                missingForStart(i, rep), inclusionMissing(ticket.getBeneficiary()));
     }
 
     private LegalRepresentativeDTO legalRepresentative(Company company) {
