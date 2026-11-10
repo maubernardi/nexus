@@ -15,5 +15,7 @@ public enum AuditEntityType {
     NO_HIRE_REASON,
     APP_USER,
     CALENDAR,
-    MUNICIPALITY_IMPORT
+    MUNICIPALITY_IMPORT,
+    COMPETENCE_SITE,
+    CARE_AGENCY
 }

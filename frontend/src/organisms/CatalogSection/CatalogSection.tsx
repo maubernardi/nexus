@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Plus } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -19,19 +19,35 @@ import { FormField } from '@/molecules/FormField/FormField';
 
 type Outcome = { text: string; error?: boolean };
 
+/**
+ * Dati in più di una voce (US-115: progetti di una sede, dati di un ente): una colonna nella tabella e un comando che
+ * apre il modulo per modificarli.
+ */
+export type CatalogDetails = {
+  header: string;
+  cell: (item: CatalogItem) => ReactNode;
+  /** Testo del comando; il nome della voce si aggiunge per gli screen reader. */
+  action: string;
+  heading: (item: CatalogItem) => string;
+  editor: (item: CatalogItem, onDone: (text: string) => void, onCancel: () => void) => ReactNode;
+};
+
 type CatalogSectionProps = {
   kind: CatalogKind;
+  details?: CatalogDetails;
 };
 
 /**
  * Un catalogo per l'ADMIN (US-106): elenco con stato in testo, aggiunta, nuovo nome, disattivazione e riattivazione.
  * Le voci non si cancellano: disattivate non sono più selezionabili ma restano sui dati esistenti.
  */
-export const CatalogSection = ({ kind }: CatalogSectionProps) => {
+export const CatalogSection = ({ kind, details }: CatalogSectionProps) => {
   const { t } = useTranslation();
   const items = useCatalog(kind);
   const setActive = useSetCatalogItemActive();
   const [editing, setEditing] = useState<CatalogItem | 'new' | null>(null);
+  const [detailing, setDetailing] = useState<CatalogItem | null>(null);
+  const detailsHeadingRef = useRef<HTMLHeadingElement>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const formHeadingRef = useRef<HTMLHeadingElement>(null);
   const outcomeRef = useRef<HTMLDivElement>(null);
@@ -43,17 +59,28 @@ export const CatalogSection = ({ kind }: CatalogSectionProps) => {
     if (editing) formHeadingRef.current?.focus();
   }, [editing]);
   useEffect(() => {
+    if (detailing) detailsHeadingRef.current?.focus();
+  }, [detailing]);
+  useEffect(() => {
     if (outcome) outcomeRef.current?.focus();
   }, [outcome]);
 
   const open = (target: CatalogItem | 'new'): void => {
     setOutcome(null);
+    setDetailing(null);
     setEditing(target);
   };
   const close = (result: Outcome): void => {
     setEditing(null);
+    setDetailing(null);
     setOutcome(result);
   };
+  const openDetails = (item: CatalogItem): void => {
+    setOutcome(null);
+    setEditing(null);
+    setDetailing(item);
+  };
+  const busy = editing !== null || detailing !== null;
 
   const toggle = (item: CatalogItem): void => {
     setOutcome(null);
@@ -87,7 +114,7 @@ export const CatalogSection = ({ kind }: CatalogSectionProps) => {
         <h2 id={headingId} className="text-lg font-semibold text-primary">
           {t(`catalog.${kind}.heading`)}
         </h2>
-        {editing === null && (
+        {!busy && (
           <Button size="lg" onClick={() => open('new')}>
             <Plus aria-hidden="true" />
             {t(`catalog.${kind}.add`)}
@@ -134,6 +161,19 @@ export const CatalogSection = ({ kind }: CatalogSectionProps) => {
         </div>
       )}
 
+      {details && detailing && (
+        <div className="space-y-4 rounded-xl border border-border bg-card p-4">
+          <h3 ref={detailsHeadingRef} tabIndex={-1} className="text-base font-semibold">
+            {details.heading(detailing)}
+          </h3>
+          {details.editor(
+            detailing,
+            (text) => close({ text }),
+            () => setDetailing(null),
+          )}
+        </div>
+      )}
+
       {items.isError && !items.data ? (
         <p
           role="alert"
@@ -163,6 +203,11 @@ export const CatalogSection = ({ kind }: CatalogSectionProps) => {
                 <th scope="col" className={th}>
                   {t('catalog.columns.code')}
                 </th>
+                {details && (
+                  <th scope="col" className={th}>
+                    {details.header}
+                  </th>
+                )}
                 <th scope="col" className={th}>
                   {t('catalog.columns.status')}
                 </th>
@@ -178,19 +223,20 @@ export const CatalogSection = ({ kind }: CatalogSectionProps) => {
                     {item.name}
                   </th>
                   <td className={`${td} font-mono text-xs`}>{item.code}</td>
+                  {details && <td className={td}>{details.cell(item)}</td>}
                   <td className={td}>{t(item.active ? 'catalog.active' : 'catalog.inactive')}</td>
                   <td className={`${td} whitespace-nowrap`}>
                     <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => open(item)}
-                        disabled={editing !== null}
-                      >
+                      <Button size="sm" variant="outline" onClick={() => open(item)} disabled={busy}>
                         {t('catalog.rename')}
                         {/* testo nascosto dopo uno spazio a sé: nome accessibile "Rinomina Firenze Nord" */}{' '}
                         <span className="sr-only">{item.name}</span>
                       </Button>
+                      {details && (
+                        <Button size="sm" variant="outline" onClick={() => openDetails(item)} disabled={busy}>
+                          {details.action} <span className="sr-only">{item.name}</span>
+                        </Button>
+                      )}
                       <Button
                         size="sm"
                         variant="outline"

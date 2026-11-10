@@ -12,10 +12,20 @@ type CheckboxGroupProps = {
   value: readonly string[];
   onChange: (value: string[]) => void;
   className?: string;
+  /** Colonne delle caselle: di default fitte, per etichette brevi (es. le patenti). */
+  gridClassName?: string;
 };
 
 /** Scelta multipla come fieldset/legend (il gruppo viene annunciato con il suo titolo). */
-export const CheckboxGroup = ({ legend, hint, options, value, onChange, className }: CheckboxGroupProps) => {
+export const CheckboxGroup = ({
+  legend,
+  hint,
+  options,
+  value,
+  onChange,
+  className,
+  gridClassName = 'grid-cols-3 sm:grid-cols-4 md:grid-cols-6',
+}: CheckboxGroupProps) => {
   const baseId = useId();
   const hintId = hint ? `${baseId}-hint` : undefined;
 
@@ -31,7 +41,7 @@ export const CheckboxGroup = ({ legend, hint, options, value, onChange, classNam
           {hint}
         </p>
       )}
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+      <div className={cn('grid gap-2', gridClassName)}>
         {options.map((option) => {
           const id = `${baseId}-${option.value}`;
           return (

@@ -21,8 +21,8 @@ export const ENDPOINTS = {
   beneficiaries: '/beneficiaries',
   zones: '/reference/zones',
   jobCategories: '/reference/job-categories',
-  internshipTypes: '/reference/internship-types',
   hiringFormulas: '/reference/hiring-formulas',
   noHireReasons: '/reference/no-hire-reasons',
   municipalities: '/municipalities',
+  documentCatalogs: '/document-catalogs',
 } as const;
