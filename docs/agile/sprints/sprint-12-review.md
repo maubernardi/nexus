@@ -148,16 +148,22 @@ telefono e case manager. Dependabot: 0 avvisi.
 ### 8.1 Chiusura dello Sprint 12
 *Proposta:* Sprint 12 chiuso con velocity **21**.
 
+> ✅ **Deciso (PO, 10/11): proposta accettata.**
+
 ### 8.2 Quando un tirocinio è «aperto» (US-206)
 Al planning: l'ente di presa in carico si blocca con un tirocinio aperto, cioè una segnalazione non ancora in
 FORM_RESTITUZIONE. Ho aggiunto una condizione: la segnalazione deve avere già la **scheda del tirocinio**. Così, finché
 la segnalazione è in coda o in abbinamento, il Tutor può ancora correggere l'ente; dalla compilazione della scheda alla
 restituzione resta bloccato. *Proposta:* confermare.
 
+> ✅ **Deciso (PO, 10/11): confermato.**
+
 ### 8.3 Test instabili
 Due test del frontend falliscono ogni tanto senza un difetto vero (§4). *Proposta:* una piccola attività tecnica
 nello Sprint 13 (**1 punto**) per renderli stabili, all'inizio dello sprint. *Alternativa:* lasciarli e rilanciarli
 quando capita.
+
+> ✅ **Deciso (PO, 10/11): attività nello Sprint 13**, nel backlog come **EN-9** (1 punto).
 
 ### 8.4 I segnaposto dei modelli caricati (US-1010)
 Al caricamento NEXUS rifiuta i modelli con segnaposto che non conosce. I segnaposto nuovi dei documenti reali (dati
@@ -166,9 +172,14 @@ Sprint 13 la pagina «Modelli dei documenti» accetta i segnaposto di oggi, e i 
 nello Sprint 14, dopo US-1011. *Proposta:* confermare questo ordine. *Alternativa:* nello Sprint 13 accettare già
 tutti i segnaposto di US-1011, che però resterebbero vuoti nei documenti fino allo Sprint 14.
 
+> ✅ **Deciso (PO, 10/11): ordine confermato.** I modelli reali si caricano nello Sprint 14; il criterio è aggiunto a
+> US-1010 nel backlog.
+
 ### 8.5 Cosa fare nello Sprint 13
 *Proposta:* quanto deciso al planning del 09/11, cioè US-1007, US-1008, US-1009 e US-1010 (21 punti), più l'attività
 del §8.3 se la approvi. Dettaglio al §9.
+
+> ✅ **Deciso (PO, 10/11): proposta accettata**, con EN-9 (22 punti). Sprint 13: [sprint-13.md](sprint-13.md).
 
 ## 9. Proposta per lo Sprint 13
 
@@ -179,7 +190,7 @@ reali sono pronti.*
 
 | Ordine | ID | Storia | Punti |
 |---|---|---|---|
-| 0 | — | Test instabili del frontend (se approvato, §8.3) | 1 |
+| 0 | EN-9 | Test instabili del frontend (§8.3) | 1 |
 | 1 | US-1007 | Indirizzi con il comune: sede legale e sede del tirocinio dell'azienda, residenza del beneficiario | 3 |
 | 2 | US-1009 | Fine effettiva del tirocinio nel report di restituzione e ruolo del tutor aziendale | 2 |
 | 3 | US-1008 | Convenzione e progetti formativi numerati, con date dentro il tirocinio e senza sovrapposizioni | 8 |
@@ -189,12 +200,14 @@ reali sono pronti.*
 Prima le due storie piccole, che aggiungono dati ai moduli esistenti; poi US-1008, il cambiamento più grande del
 modello dei dati; per ultima US-1010, che non dipende dalle altre. Una PR per storia; prima migrazione: **V37**.
 
+> ✅ **Deciso (PO, 10/11): piano confermato** (22 punti), dall'11 al 13 novembre.
+
 Da sapere per il collaudo: con US-1007 indirizzo e comune diventano campi separati. Come dice la storia, gli indirizzi
 già inseriti come testo libero si ripassano a mano scegliendo il comune; nella demo i dati di prova si rigenerano.
 
 ## 10. Azioni a carico del PO
 
-- [ ] Decidere i punti §8.1 … §8.5.
+- [x] Decidere i punti §8.1 … §8.5 e confermare il planning (10/11).
 - [ ] Collaudo dello Sprint 12 sulla demo `ed260ad` (T-22.1 … T-22.4).
 - [ ] Quando vuoi, i dati reali degli enti (referenti, legali rappresentanti) dai Cataloghi: servono ai documenti dello
       Sprint 14.
