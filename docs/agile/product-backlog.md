@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 86 elementi, 332 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-12](sprints/sprint-12.md), il 10/11 ([review](sprints/sprint-12-review.md)); in corso: [sprint-13](sprints/sprint-13.md), dall'11/11.
+**Totale: 86 elementi, 332 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-13](sprints/sprint-13.md), l'11/11 (review da fare); prossimo: Sprint 14, da confermare nella review.
 
 ## Epiche
 
@@ -78,7 +78,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [EN-5](#en-5) | E13 | Controllo della numerazione delle migrazioni nella CI | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [EN-6](#en-6) | E13 | Dipendenze aggiornate e senza vulnerabilità note | Must | 8 | R4 | 🎉 Done (Sprint 11) |
 | [EN-7](#en-7) | E13 | Password comuni rifiutate | Must | 2 | R4 | 🎉 Done (Sprint 11) |
-| [EN-9](#en-9) | E13 | Test del frontend stabili | Must | 1 | R4 | ✅ Ready (Sprint 13) |
+| [EN-9](#en-9) | E13 | Test del frontend stabili | Must | 1 | R4 | 🎉 Done (Sprint 13) |
 | [US-201](#us-201) | E2 | Inserimento beneficiario | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 🎉 Done (Sprint 3) |
@@ -126,10 +126,10 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1004](#us-1004) | E10 | Convenzione in Word | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1005](#us-1005) | E10 | Progetto Formativo in Word | Must | 3 | R3 | 🎉 Done (Sprint 8) |
 | [US-1006](#us-1006) | E10 | Integrazione dei modelli Word reali | Must | 0 | R4 | ↪️ Sostituita da US-1007…US-1011 e EN-8 |
-| [US-1007](#us-1007) | E10 | Indirizzi con il comune | Must | 3 | R4 | ✅ Ready (Sprint 13) |
-| [US-1008](#us-1008) | E10 | Convenzione e progetti formativi | Must | 8 | R4 | ✅ Ready (Sprint 13) |
-| [US-1009](#us-1009) | E10 | Fine effettiva del tirocinio e ruolo del tutor aziendale | Must | 2 | R4 | ✅ Ready (Sprint 13) |
-| [US-1010](#us-1010) | E10 | Modelli dei documenti caricati dall'ADMIN | Must | 8 | R4 | ✅ Ready (Sprint 13) |
+| [US-1007](#us-1007) | E10 | Indirizzi con il comune | Must | 3 | R4 | 🎉 Done (Sprint 13) |
+| [US-1008](#us-1008) | E10 | Convenzione e progetti formativi | Must | 8 | R4 | 🎉 Done (Sprint 13) |
+| [US-1009](#us-1009) | E10 | Fine effettiva del tirocinio e ruolo del tutor aziendale | Must | 2 | R4 | 🎉 Done (Sprint 13) |
+| [US-1010](#us-1010) | E10 | Modelli dei documenti caricati dall'ADMIN | Must | 8 | R4 | 🎉 Done (Sprint 13) |
 | [US-1011](#us-1011) | E10 | Documenti sui modelli reali (GOL) | Must | 8 | R4 | ✅ Ready (Sprint 14) |
 | [EN-8](#en-8) | E10 | Preparazione dei modelli reali | Must | 3 | R4 | ✅ Ready (Sprint 14) |
 | [US-1101](#us-1101) | E11 | Report di restituzione | Must | 5 | R3 | 🎉 Done (Sprint 8) |
@@ -972,7 +972,7 @@ revisione UX/UI (US-1305).
 US-1008, US-1009, US-1010, US-1011 ed EN-8.
 
 #### US-1007
-**Indirizzi con il comune** · Must · 3 punti · R4 · ✅ Ready (Sprint 13)
+**Indirizzi con il comune** · Must · 3 punti · R4 · 🎉 Done (Sprint 13)
 
 Come **Tutor** voglio che sede legale dell'azienda, sede del tirocinio e residenza del beneficiario abbiano il comune
 dall'elenco ufficiale (US-114), per avere città e provincia corrette nei documenti (planning del 09/11).
@@ -986,7 +986,7 @@ Criteri di accettazione:
 Dipendenze: US-114
 
 #### US-1008
-**Convenzione e progetti formativi** · Must · 8 punti · R4 · ✅ Ready (Sprint 13)
+**Convenzione e progetti formativi** · Must · 8 punti · R4 · 🎉 Done (Sprint 13)
 
 Come **Tutor** voglio registrare la convenzione del tirocinio e uno o più progetti formativi, per riformulare il
 progetto quando serve senza rifare la convenzione (planning del 09/11).
@@ -1002,9 +1002,11 @@ Criteri di accettazione:
 - Durata del progetto formativo in mesi e monte ore calcolati sulle sue date.
 - Il motivo della riformulazione non si registra e non compare nei documenti (PO, 09/11).
 - Ogni modifica nell'audit (EN-2).
+- Per avviare il tirocinio servono la convenzione completa (numero, data e data di stipula) e almeno un progetto
+  formativo (PO, 11/11).
 
 #### US-1009
-**Fine effettiva del tirocinio e ruolo del tutor aziendale** · Must · 2 punti · R4 · ✅ Ready (Sprint 13)
+**Fine effettiva del tirocinio e ruolo del tutor aziendale** · Must · 2 punti · R4 · 🎉 Done (Sprint 13)
 
 Come **Tutor** voglio indicare quando il tirocinio è finito davvero e il ruolo del tutor aziendale, per la relazione
 finale e il progetto formativo (planning del 09/11).
@@ -1015,7 +1017,7 @@ Criteri di accettazione:
 - Per ogni tutor aziendale, la **funzione/ruolo** come testo libero facoltativo.
 
 #### US-1010
-**Modelli dei documenti caricati dall'ADMIN** · Must · 8 punti · R4 · ✅ Ready (Sprint 13)
+**Modelli dei documenti caricati dall'ADMIN** · Must · 8 punti · R4 · 🎉 Done (Sprint 13)
 
 Come **ADMIN** voglio caricare i modelli Word con le condizioni in cui valgono, per aggiungerli e cambiarli senza un
 rilascio (planning del 09/11).
@@ -1186,7 +1188,7 @@ Criteri di accettazione:
 - L'elenco è nell'immagine di Keycloak; uno script la attiva sul server già installato.
 
 #### EN-9
-**Test del frontend stabili** · Must · 1 punti · R4 · ✅ Ready (Sprint 13)
+**Test del frontend stabili** · Must · 1 punti · R4 · 🎉 Done (Sprint 13)
 
 Come **team** voglio che i test del frontend falliscano solo per un difetto vero, per non dover rilanciare la CI e
 indagare sui falsi rossi. Decisione del PO nella review dello Sprint 12 (10/11).
