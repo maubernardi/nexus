@@ -97,7 +97,7 @@ class BeneficiaryCareIT {
                 Long.class, typeCode));
         return mockMvc.perform(put(internshipUrl()).header(USER, "tutor1").contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                        {"internshipTypeId": "%s", "companyTutors": [], "suspensions": [], "schedule": [],
+                        {"internshipTypeId": "%s", "companyTutors": [], "suspensions": [], "trainingProjects": [], "schedule": [],
                          "firstSlotStart": "09:00", "firstSlotEnd": "13:00", "secondSlotStart": "14:00",
                          "secondSlotEnd": "18:00", "excludeHolidays": true, "version": %s}"""
                         .formatted(typeId, version)));

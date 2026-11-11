@@ -113,7 +113,7 @@ class InternshipStartIT {
                  "companyTutors": [{"fullName": "Anna Verdi"}],
                  "fiscalCode": "RSSMRA85T10A562S", "birthDate": "1985-12-10", "birthPlace": "Firenze",
                  "residenceMunicipalityId": "%s", "residenceStreet": "Via Dante", "residenceStreetNumber": "2",
-                 "suspensions": [],
+                 "suspensions": [], "trainingProjects": [],
                  "firstSlotStart": "09:00", "firstSlotEnd": "13:00", "secondSlotStart": "14:00", "secondSlotEnd": "18:00",
                  "excludeHolidays": true, "schedule": [{"dayOfWeek": 1, "firstSlot": true, "secondSlot": false}],
                  "version": null}""".formatted(typeId, firenzeId, atecoId, firenzeId);

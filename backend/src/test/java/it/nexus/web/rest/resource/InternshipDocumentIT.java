@@ -114,7 +114,7 @@ class InternshipDocumentIT {
                  "companyTutors": [{"fullName": "Anna Verdi", "role": "Responsabile di sala", "contact": "055 123456"}],
                  "fiscalCode": "RSSMRA85T10A562S", "birthDate": "1985-12-10", "birthPlace": "Firenze",
                  "residenceMunicipalityId": "%s", "residenceStreet": "Via Gramsci", "residenceStreetNumber": "12",
-                 "suspensions": [{"from": "2026-12-22", "to": "2027-01-06"}],
+                 "suspensions": [{"from": "2026-12-22", "to": "2027-01-06"}], "trainingProjects": [],
                  "firstSlotStart": "09:00", "firstSlotEnd": "13:00", "secondSlotStart": "14:00", "secondSlotEnd": "18:00",
                  "excludeHolidays": true,
                  "schedule": [{"dayOfWeek": 1, "firstSlot": true, "secondSlot": false},

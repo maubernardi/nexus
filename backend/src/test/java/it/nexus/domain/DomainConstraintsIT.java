@@ -595,6 +595,42 @@ class DomainConstraintsIT {
         }
 
         @Test
+        void numeroDellaConvenzioneVuoto() {
+            Internship i = internship();
+            i.setAgreementNumber("  ");
+            assertViolates("ck_internship_agreement_number", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void progettoFormativoConFinePrimaDellInizio() {
+            Internship i = internship();
+            i.addTrainingProject(LocalDate.of(2027, 3, 1), LocalDate.of(2027, 2, 28), "Cuoco", null);
+            assertViolates("ck_internship_training_project_dates", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void progettoFormativoSenzaMansione() {
+            Internship i = internship();
+            i.addTrainingProject(LocalDate.of(2026, 12, 1), LocalDate.of(2027, 2, 28), " ", null);
+            assertViolates("ck_internship_training_project_job_title", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void progettoFormativoConDettaglioVuoto() {
+            Internship i = internship();
+            i.addTrainingProject(LocalDate.of(2026, 12, 1), LocalDate.of(2027, 2, 28), "Cuoco", "  ");
+            assertViolates("ck_internship_training_project_job_details", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void progettiFormativiSovrapposti_ancheDiUnGiorno() {
+            Internship i = internship();
+            i.addTrainingProject(LocalDate.of(2026, 12, 1), LocalDate.of(2027, 2, 28), "Aiuto cuoco", null);
+            i.addTrainingProject(LocalDate.of(2027, 2, 28), LocalDate.of(2027, 5, 31), "Cuoco", null);
+            assertViolates("ex_internship_training_project_overlap", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
         void sospensioneConFinePrimaDellInizio() {
             Internship i = internship();
             i.addSuspension(LocalDate.of(2027, 1, 6), LocalDate.of(2027, 1, 5));

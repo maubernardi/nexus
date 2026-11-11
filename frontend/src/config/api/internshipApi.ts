@@ -11,6 +11,20 @@ import type { ReferenceItem } from '@/config/api/referenceApi';
 /** Tutor aziendale: funzione o ruolo in azienda (US-1009) e recapito facoltativi. */
 export type CompanyTutor = { fullName: string; role?: string | null; contact?: string | null };
 
+/**
+ * Progetto formativo salvato (US-1008): il numero è la posizione nell'ordine delle date; mesi arrotondati e monte ore
+ * (minuti, assente senza griglia) sono calcolati sulle sue date.
+ */
+export type TrainingProject = {
+  number: number;
+  from: string;
+  to: string;
+  jobTitle: string;
+  jobDetails?: string | null;
+  months: number;
+  totalMinutes?: number | null;
+};
+
 /** Periodo di sospensione, estremi compresi (aaaa-mm-gg). */
 export type Suspension = { from: string; to: string };
 
@@ -50,6 +64,13 @@ export type Internship = {
   residenceStreetNumber?: string | null;
   suspensions: Suspension[];
   notes?: string | null;
+  /** Mansione della segnalazione, proposta per il primo progetto formativo (US-1008). */
+  jobSlotTitle?: string | null;
+  /** Convenzione (US-1008): la durata è quella del tirocinio. */
+  agreementNumber?: string | null;
+  agreementDate?: string | null;
+  agreementSignedDate?: string | null;
+  trainingProjects: TrainingProject[];
   /** Fasce orarie, "hh:mm:ss" (US-1002). */
   firstSlotStart: string;
   firstSlotEnd: string;
@@ -101,6 +122,11 @@ export type InternshipForm = {
   residenceStreetNumber: string | null;
   suspensions: Suspension[];
   notes: string | null;
+  agreementNumber: string | null;
+  agreementDate: string | null;
+  agreementSignedDate: string | null;
+  /** Nell'ordine delle date: la posizione è il numero del progetto (US-1008). */
+  trainingProjects: { from: string; to: string; jobTitle: string; jobDetails: string | null }[];
   /** "hh:mm" */
   firstSlotStart: string;
   firstSlotEnd: string;

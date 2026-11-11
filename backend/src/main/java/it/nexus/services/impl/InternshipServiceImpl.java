@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -42,9 +43,12 @@ import it.nexus.domain.dto.LegalRepresentativeFormDTO;
 import it.nexus.domain.dto.ReferenceItemDTO;
 import it.nexus.domain.dto.ScheduleDayDTO;
 import it.nexus.domain.dto.SuspensionDTO;
+import it.nexus.domain.dto.TrainingProjectDTO;
+import it.nexus.domain.dto.TrainingProjectFormDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.domain.workflow.InternshipHours;
+import it.nexus.domain.workflow.InternshipMonths;
 import it.nexus.mapper.MunicipalityMapper;
 import it.nexus.mapper.ReferenceMapper;
 import it.nexus.mapper.TsidMapper;
@@ -76,6 +80,8 @@ public class InternshipServiceImpl implements InternshipService {
     private static final Set<TicketStatus> WITH_INTERNSHIP = EnumSet.of(TicketStatus.APPUNTAMENTO, TicketStatus.IN_TIROCINIO,
             TicketStatus.FORM_RESTITUZIONE);
     private static final DateTimeFormatter DAY = DateTimeFormatter.ofPattern("d/M/yyyy", Locale.ITALIAN);
+    /** Date dei messaggi sui progetti formativi, come le scrive il modulo (US-1008). */
+    private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ITALIAN);
     /** Totale settimanale massimo, segnaposto da confermare con i moduli ufficiali (Q5). */
     private static final int MAX_WEEKLY_MINUTES = 40 * 60;
     /** Dati richiesti per l'avvio (review dello Sprint 7, §8.2) e come si chiamano nel messaggio di rifiuto. */
@@ -153,6 +159,7 @@ public class InternshipServiceImpl implements InternshipService {
             throw new FieldValidationException("expectedEndDate", "La fine prevista non può precedere l'inizio");
         }
         checkSuspensions(dto);
+        checkTrainingProjects(dto);
         checkSchedule(dto);
         String fiscalCode = blankToNull(dto.fiscalCode());
         fiscalCode = fiscalCode == null ? null : fiscalCode.toUpperCase(Locale.ROOT);
@@ -169,6 +176,11 @@ public class InternshipServiceImpl implements InternshipService {
         List<ScheduleDayDTO> schedule = dto.schedule().stream()
                 .sorted(Comparator.comparing(ScheduleDayDTO::dayOfWeek))
                 .toList();
+        // già nell'ordine delle date (controllato): la posizione è il numero
+        List<TrainingProjectFormDTO> projects = dto.trainingProjects().stream()
+                .map(p -> new TrainingProjectFormDTO(p.from(), p.to(), p.jobTitle().strip(), blankToNull(p.jobDetails())))
+                .toList();
+        String agreementNumber = blankToNull(dto.agreementNumber());
 
         // dati del tirocinio con i valori; dati personali (beneficiario, tutor aziendali, note) solo come "cambiato"
         AuditChanges changes = AuditChanges.of()
@@ -185,6 +197,14 @@ public class InternshipServiceImpl implements InternshipService {
                         MunicipalityMapper.label(siteMunicipality))
                 .value("atecoCode", atecoText(internship.getAtecoCode()), atecoText(ateco))
                 .value("suspensions", periods(suspensions(internship)), periods(suspensions))
+                // convenzione e progetti formativi con i valori, il dettaglio della mansione solo come "cambiato" (US-1008)
+                .value("agreementNumber", internship.getAgreementNumber(), agreementNumber)
+                .value("agreementDate", text(internship.getAgreementDate()), text(dto.agreementDate()))
+                .value("agreementSignedDate", text(internship.getAgreementSignedDate()), text(dto.agreementSignedDate()))
+                .value("trainingProjects", projectsText(trainingProjects(internship)), projectsText(projects))
+                .redactedIfChanged("trainingProjectDetails",
+                        trainingProjects(internship).stream().map(TrainingProjectFormDTO::jobDetails).toList(),
+                        projects.stream().map(TrainingProjectFormDTO::jobDetails).toList())
                 .redactedIfChanged("companyTutors", tutors(internship), tutors)
                 .redactedIfChanged("fiscalCode", internship.getFiscalCode(), fiscalCode)
                 .redactedIfChanged("birthDate", internship.getBirthDate(), dto.birthDate())
@@ -213,7 +233,10 @@ public class InternshipServiceImpl implements InternshipService {
         internship.setResidenceStreet(residenceStreet);
         internship.setResidenceStreetNumber(residenceStreetNumber);
         internship.setNotes(blankToNull(dto.notes()));
-        replaceRows(internship, tutors, suspensions, schedule);
+        internship.setAgreementNumber(agreementNumber);
+        internship.setAgreementDate(dto.agreementDate());
+        internship.setAgreementSignedDate(dto.agreementSignedDate());
+        replaceRows(internship, tutors, suspensions, schedule, projects);
         Internship saved = internshipRepository.saveAndFlush(internship);
         if (!changes.asMap().isEmpty()) {
             auditService.record(AuditEntityType.TICKET, ticket.getId(), "INTERNSHIP_SAVE", changes, null);
@@ -258,7 +281,10 @@ public class InternshipServiceImpl implements InternshipService {
                         || i.getSite() != null || i.getSiteMunicipality() != null || i.getAtecoCode() != null
                         || i.getNotes() != null
                         || !i.getCompanyTutors().isEmpty() || !i.getSuspensions().isEmpty()
-                        || !i.getScheduleDays().isEmpty())
+                        || !i.getScheduleDays().isEmpty()
+                        // convenzione e progetti formativi (US-1008)
+                        || i.getAgreementNumber() != null || i.getAgreementDate() != null
+                        || i.getAgreementSignedDate() != null || !i.getTrainingProjects().isEmpty())
                 .map(i -> {
                     i.clearCompanyData();
                     internshipRepository.saveAndFlush(i);
@@ -364,6 +390,46 @@ public class InternshipServiceImpl implements InternshipService {
     }
 
     /** Sospensioni nell'ordine giusto, dentro il periodo del tirocinio (se noto) e senza sovrapposizioni. */
+    /**
+     * Progetti formativi (US-1008): servono le date del tirocinio; ognuno sta dentro di esse e inizia dopo la fine del
+     * precedente, quindi l'elenco è nell'ordine delle date e senza sovrapposizioni, neanche di un giorno.
+     */
+    private static void checkTrainingProjects(InternshipFormDTO dto) {
+        List<TrainingProjectFormDTO> rows = dto.trainingProjects();
+        if (rows.isEmpty()) {
+            return;
+        }
+        if (dto.startDate() == null) {
+            throw new FieldValidationException("startDate",
+                    "Indica la data di inizio: i progetti formativi stanno dentro le date del tirocinio");
+        }
+        if (dto.expectedEndDate() == null) {
+            throw new FieldValidationException("expectedEndDate",
+                    "Indica la fine prevista: i progetti formativi stanno dentro le date del tirocinio");
+        }
+        for (int i = 0; i < rows.size(); i++) {
+            TrainingProjectFormDTO row = rows.get(i);
+            if (row.to().isBefore(row.from())) {
+                throw new FieldValidationException("trainingProjects[%d].to".formatted(i),
+                        "La fine non può precedere l'inizio");
+            }
+            if (row.from().isBefore(dto.startDate())) {
+                throw new FieldValidationException("trainingProjects[%d].from".formatted(i),
+                        "Il progetto inizia prima del tirocinio (%s)".formatted(DATE.format(dto.startDate())));
+            }
+            if (row.to().isAfter(dto.expectedEndDate())) {
+                throw new FieldValidationException("trainingProjects[%d].to".formatted(i),
+                        "Il progetto finisce dopo la fine prevista del tirocinio (%s)"
+                                .formatted(DATE.format(dto.expectedEndDate())));
+            }
+            if (i > 0 && !row.from().isAfter(rows.get(i - 1).to())) {
+                throw new FieldValidationException("trainingProjects[%d].from".formatted(i),
+                        "Deve iniziare dopo la fine del progetto formativo %d (%s)"
+                                .formatted(i, DATE.format(rows.get(i - 1).to())));
+            }
+        }
+    }
+
     private static void checkSuspensions(InternshipFormDTO dto) {
         List<SuspensionDTO> rows = dto.suspensions();
         for (int i = 0; i < rows.size(); i++) {
@@ -433,15 +499,16 @@ public class InternshipServiceImpl implements InternshipService {
 
     /**
      * Righe figlie sostituite in blocco, solo se cambiate. Prima si cancellano le vecchie con un flush: Hibernate
-     * inserisce prima di cancellare e un periodo spostato violerebbe {@code ex_internship_suspension_overlap}, un giorno
-     * ripetuto {@code uq_internship_schedule_day}.
+     * inserisce prima di cancellare e un periodo spostato violerebbe {@code ex_internship_suspension_overlap} (o
+     * {@code ex_internship_training_project_overlap}), un giorno ripetuto {@code uq_internship_schedule_day}.
      */
     private void replaceRows(Internship internship, List<CompanyTutorDTO> tutors, List<SuspensionDTO> suspensions,
-            List<ScheduleDayDTO> schedule) {
+            List<ScheduleDayDTO> schedule, List<TrainingProjectFormDTO> projects) {
         boolean tutorsChanged = !tutors.equals(tutors(internship));
         boolean suspensionsChanged = !suspensions.equals(suspensions(internship));
         boolean scheduleChanged = !schedule.equals(schedule(internship));
-        if (!tutorsChanged && !suspensionsChanged && !scheduleChanged) {
+        boolean projectsChanged = !projects.equals(trainingProjects(internship));
+        if (!tutorsChanged && !suspensionsChanged && !scheduleChanged && !projectsChanged) {
             return;
         }
         if (tutorsChanged) {
@@ -452,6 +519,9 @@ public class InternshipServiceImpl implements InternshipService {
         }
         if (scheduleChanged) {
             internship.getScheduleDays().clear();
+        }
+        if (projectsChanged) {
+            internship.getTrainingProjects().clear();
         }
         if (internship.getId() != null) {
             internshipRepository.flush();
@@ -465,6 +535,9 @@ public class InternshipServiceImpl implements InternshipService {
         if (scheduleChanged) {
             schedule.forEach(d -> internship.addScheduleDay(d.dayOfWeek(), d.firstSlot(), d.secondSlot(), d.minutes()));
         }
+        if (projectsChanged) {
+            projects.forEach(p -> internship.addTrainingProject(p.from(), p.to(), p.jobTitle(), p.jobDetails()));
+        }
     }
 
     /** Scheda per il Tutor; versione nulla se non ancora salvata. Totale settimanale e monte ore calcolati qui. */
@@ -477,9 +550,21 @@ public class InternshipServiceImpl implements InternshipService {
         InternshipHours.Slots slots = new InternshipHours.Slots(i.getFirstSlotStart(), i.getFirstSlotEnd(),
                 i.getSecondSlotStart(), i.getSecondSlotEnd());
         List<InternshipHours.Day> days = schedule.stream().map(InternshipServiceImpl::hoursDay).toList();
-        Integer total = InternshipHours.totalMinutes(slots, days, i.getStartDate(), i.getExpectedEndDate(),
-                suspensions(i).stream().map(s -> new InternshipHours.Period(s.from(), s.to())).toList(),
+        List<InternshipHours.Period> periods = suspensions(i).stream()
+                .map(s -> new InternshipHours.Period(s.from(), s.to()))
+                .toList();
+        Integer total = InternshipHours.totalMinutes(slots, days, i.getStartDate(), i.getExpectedEndDate(), periods,
                 i.isExcludeHolidays());
+        // progetti formativi (US-1008): numero, mesi arrotondati e monte ore sulle loro date
+        List<TrainingProjectFormDTO> rows = trainingProjects(i);
+        List<TrainingProjectDTO> projects = IntStream.range(0, rows.size())
+                .mapToObj(k -> {
+                    TrainingProjectFormDTO p = rows.get(k);
+                    return new TrainingProjectDTO(k + 1, p.from(), p.to(), p.jobTitle(), p.jobDetails(),
+                            InternshipMonths.rounded(p.from(), p.to()),
+                            InternshipHours.totalMinutes(slots, days, p.from(), p.to(), periods, i.isExcludeHolidays()));
+                })
+                .toList();
         return new InternshipDTO(i.getId() == null ? null : i.getVersion(),
                 company == null ? null : company.getName(), rep, codes,
                 referenceMapper.toDto(i.getInternshipType()),
@@ -489,6 +574,8 @@ public class InternshipServiceImpl implements InternshipService {
                 i.getFiscalCode(), i.getBirthDate(), i.getBirthPlace(),
                 MunicipalityMapper.toDto(i.getResidenceMunicipality()), i.getResidenceStreet(),
                 i.getResidenceStreetNumber(), suspensions(i), i.getNotes(),
+                ticket.getJobSlot() == null ? null : ticket.getJobSlot().getTitle(),
+                i.getAgreementNumber(), i.getAgreementDate(), i.getAgreementSignedDate(), projects,
                 i.getFirstSlotStart(), i.getFirstSlotEnd(), i.getSecondSlotStart(), i.getSecondSlotEnd(),
                 i.isExcludeHolidays(), schedule, InternshipHours.weeklyMinutes(slots, days), total,
                 missingForStart(i, rep), inclusionMissing(ticket.getBeneficiary()));
@@ -599,6 +686,22 @@ public class InternshipServiceImpl implements InternshipService {
         return i.getSuspensions().stream()
                 .map(s -> new SuspensionDTO(s.getDateFrom(), s.getDateTo()))
                 .sorted(Comparator.comparing(SuspensionDTO::from))
+                .toList();
+    }
+
+    /** Progetti formativi salvati nell'ordine delle date, nella forma del modulo per i confronti. */
+    private static List<TrainingProjectFormDTO> trainingProjects(Internship i) {
+        return i.getTrainingProjects().stream()
+                .map(p -> new TrainingProjectFormDTO(p.getDateFrom(), p.getDateTo(), p.getJobTitle(), p.getJobDetails()))
+                .sorted(Comparator.comparing(TrainingProjectFormDTO::from))
+                .toList();
+    }
+
+    /** Progetti per l'audit: numero, date e mansione, es. "1 2026-12-01/2027-02-28 Aiuto cuoco". */
+    private static List<String> projectsText(List<TrainingProjectFormDTO> projects) {
+        return IntStream.range(0, projects.size())
+                .mapToObj(k -> "%d %s/%s %s".formatted(k + 1, projects.get(k).from(), projects.get(k).to(),
+                        projects.get(k).jobTitle()))
                 .toList();
     }
 

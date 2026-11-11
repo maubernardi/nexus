@@ -56,6 +56,7 @@ const internship = (overrides: Partial<Internship> = {}): Internship => ({
   internshipTypes: [{ id: 'T1', code: 'CURRICULARE', name: 'Curriculare' }],
   companyTutors: [],
   suspensions: [],
+  trainingProjects: [],
   firstSlotStart: '09:00:00',
   firstSlotEnd: '13:00:00',
   secondSlotStart: '14:00:00',
