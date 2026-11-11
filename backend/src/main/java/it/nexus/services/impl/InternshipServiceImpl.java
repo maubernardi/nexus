@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -26,6 +27,7 @@ import it.nexus.domain.Company;
 import it.nexus.domain.CompanyAtecoCode;
 import it.nexus.domain.Internship;
 import it.nexus.domain.InternshipType;
+import it.nexus.domain.Municipality;
 import it.nexus.domain.Project;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.UserProject;
@@ -43,6 +45,7 @@ import it.nexus.domain.dto.SuspensionDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.domain.workflow.InternshipHours;
+import it.nexus.mapper.MunicipalityMapper;
 import it.nexus.mapper.ReferenceMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.CompanyAtecoCodeRepository;
@@ -54,6 +57,7 @@ import it.nexus.services.AuditService;
 import it.nexus.services.CompanyLegalDataService;
 import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.InternshipService;
+import it.nexus.services.MunicipalityService;
 import it.nexus.validation.FiscalCodes;
 import it.nexus.web.errors.ConflictException;
 import it.nexus.web.errors.FieldValidationException;
@@ -79,14 +83,14 @@ public class InternshipServiceImpl implements InternshipService {
             Map.entry("internshipType", "il tipo di tirocinio"),
             Map.entry("startDate", "la data di inizio"),
             Map.entry("expectedEndDate", "la data di fine prevista"),
-            Map.entry("site", "la sede"),
+            Map.entry("site", "la sede con il comune"),
             Map.entry("atecoCode", "il codice ATECO"),
             Map.entry("companyTutors", "almeno un tutor aziendale"),
             Map.entry("schedule", "la griglia oraria"),
             Map.entry("fiscalCode", "il codice fiscale del beneficiario"),
             Map.entry("birthDate", "la data di nascita del beneficiario"),
             Map.entry("birthPlace", "il luogo di nascita del beneficiario"),
-            Map.entry("residence", "la residenza del beneficiario"),
+            Map.entry("residence", "la residenza del beneficiario (comune, via e numero civico)"),
             Map.entry("legalRepresentative", "il legale rappresentante dell'azienda"),
             Map.entry("legalRepresentativeData", "codice fiscale, nascita e residenza del legale rappresentante"));
 
@@ -106,6 +110,7 @@ public class InternshipServiceImpl implements InternshipService {
     private final CurrentAppUserService currentAppUserService;
     private final AuditService auditService;
     private final ReferenceMapper referenceMapper;
+    private final MunicipalityService municipalityService;
 
     @Override
     @Transactional(readOnly = true)
@@ -137,6 +142,12 @@ public class InternshipServiceImpl implements InternshipService {
             }
         }
         CompanyAtecoCode ateco = atecoCode(dto.atecoCodeId(), company(ticket));
+        Municipality siteMunicipality = municipalityService.forAddress(dto.siteMunicipalityId(),
+                internship.getSiteMunicipality(), "siteMunicipalityId");
+        Municipality residenceMunicipality = municipalityService.forAddress(dto.residenceMunicipalityId(),
+                internship.getResidenceMunicipality(), "residenceMunicipalityId");
+        String residenceStreet = blankToNull(dto.residenceStreet());
+        String residenceStreetNumber = blankToNull(dto.residenceStreetNumber());
         if (dto.startDate() != null && dto.expectedEndDate() != null
                 && dto.expectedEndDate().isBefore(dto.startDate())) {
             throw new FieldValidationException("expectedEndDate", "La fine prevista non può precedere l'inizio");
@@ -169,13 +180,18 @@ public class InternshipServiceImpl implements InternshipService {
                 .value("schedule", scheduleText(schedule(internship)), scheduleText(schedule))
                 .value("excludeHolidays", internship.isExcludeHolidays(), dto.excludeHolidays())
                 .value("site", internship.getSite(), blankToNull(dto.site()))
+                .value("siteMunicipality", MunicipalityMapper.label(internship.getSiteMunicipality()),
+                        MunicipalityMapper.label(siteMunicipality))
                 .value("atecoCode", atecoText(internship.getAtecoCode()), atecoText(ateco))
                 .value("suspensions", periods(suspensions(internship)), periods(suspensions))
                 .redactedIfChanged("companyTutors", tutors(internship), tutors)
                 .redactedIfChanged("fiscalCode", internship.getFiscalCode(), fiscalCode)
                 .redactedIfChanged("birthDate", internship.getBirthDate(), dto.birthDate())
                 .redactedIfChanged("birthPlace", internship.getBirthPlace(), blankToNull(dto.birthPlace()))
-                .redactedIfChanged("residence", internship.getResidence(), blankToNull(dto.residence()))
+                // la residenza è una voce sola, cambiata se cambia una delle sue parti (US-1007)
+                .redactedIfChanged("residence", residence(internship.getResidenceMunicipality(),
+                        internship.getResidenceStreet(), internship.getResidenceStreetNumber()),
+                        residence(residenceMunicipality, residenceStreet, residenceStreetNumber))
                 .redactedIfChanged("notes", internship.getNotes(), blankToNull(dto.notes()));
 
         internship.setInternshipType(type);
@@ -187,11 +203,14 @@ public class InternshipServiceImpl implements InternshipService {
         internship.setSecondSlotEnd(dto.secondSlotEnd());
         internship.setExcludeHolidays(dto.excludeHolidays());
         internship.setSite(blankToNull(dto.site()));
+        internship.setSiteMunicipality(siteMunicipality);
         internship.setAtecoCode(ateco);
         internship.setFiscalCode(fiscalCode);
         internship.setBirthDate(dto.birthDate());
         internship.setBirthPlace(blankToNull(dto.birthPlace()));
-        internship.setResidence(blankToNull(dto.residence()));
+        internship.setResidenceMunicipality(residenceMunicipality);
+        internship.setResidenceStreet(residenceStreet);
+        internship.setResidenceStreetNumber(residenceStreetNumber);
         internship.setNotes(blankToNull(dto.notes()));
         replaceRows(internship, tutors, suspensions, schedule);
         Internship saved = internshipRepository.saveAndFlush(internship);
@@ -235,7 +254,8 @@ public class InternshipServiceImpl implements InternshipService {
     public boolean clearCompanyData(Ticket ticket) {
         return internshipRepository.findByTicketId(ticket.getId())
                 .filter(i -> i.getInternshipType() != null || i.getStartDate() != null || i.getExpectedEndDate() != null
-                        || i.getSite() != null || i.getAtecoCode() != null || i.getNotes() != null
+                        || i.getSite() != null || i.getSiteMunicipality() != null || i.getAtecoCode() != null
+                        || i.getNotes() != null
                         || !i.getCompanyTutors().isEmpty() || !i.getSuspensions().isEmpty()
                         || !i.getScheduleDays().isEmpty())
                 .map(i -> {
@@ -463,9 +483,11 @@ public class InternshipServiceImpl implements InternshipService {
                 company == null ? null : company.getName(), rep, codes,
                 referenceMapper.toDto(i.getInternshipType()),
                 choosableTypes(ticket.getProject(), i.getInternshipType()), i.getStartDate(), i.getExpectedEndDate(),
-                i.getSite(),
+                i.getSite(), MunicipalityMapper.toDto(i.getSiteMunicipality()),
                 i.getAtecoCode() == null ? null : TsidMapper.toExternal(i.getAtecoCode().getId()), tutors(i),
-                i.getFiscalCode(), i.getBirthDate(), i.getBirthPlace(), i.getResidence(), suspensions(i), i.getNotes(),
+                i.getFiscalCode(), i.getBirthDate(), i.getBirthPlace(),
+                MunicipalityMapper.toDto(i.getResidenceMunicipality()), i.getResidenceStreet(),
+                i.getResidenceStreetNumber(), suspensions(i), i.getNotes(),
                 i.getFirstSlotStart(), i.getFirstSlotEnd(), i.getSecondSlotStart(), i.getSecondSlotEnd(),
                 i.isExcludeHolidays(), schedule, InternshipHours.weeklyMinutes(slots, days), total,
                 missingForStart(i, rep), inclusionMissing(ticket.getBeneficiary()));
@@ -491,7 +513,8 @@ public class InternshipServiceImpl implements InternshipService {
         if (i.getExpectedEndDate() == null) {
             missing.add("expectedEndDate");
         }
-        if (i.getSite() == null) {
+        // sede e residenza complete solo con il comune (US-1007)
+        if (i.getSite() == null || i.getSiteMunicipality() == null) {
             missing.add("site");
         }
         if (i.getAtecoCode() == null) {
@@ -512,7 +535,8 @@ public class InternshipServiceImpl implements InternshipService {
         if (i.getBirthPlace() == null) {
             missing.add("birthPlace");
         }
-        if (i.getResidence() == null) {
+        if (i.getResidenceMunicipality() == null || i.getResidenceStreet() == null
+                || i.getResidenceStreetNumber() == null) {
             missing.add("residence");
         }
         if (rep == null) {
@@ -522,6 +546,11 @@ public class InternshipServiceImpl implements InternshipService {
             missing.add("legalRepresentativeData");
         }
         return missing;
+    }
+
+    /** Le parti della residenza da confrontare per l'audit: il comune per id, non per istanza. */
+    private static List<Object> residence(Municipality municipality, String street, String number) {
+        return Arrays.asList(municipality == null ? null : municipality.getId(), street, number);
     }
 
     private static List<ScheduleDayDTO> schedule(Internship i) {

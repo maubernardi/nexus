@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ import it.nexus.domain.dto.MunicipalityDTO;
 import it.nexus.domain.dto.MunicipalityImportPreviewDTO;
 import it.nexus.domain.dto.MunicipalityStatusDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
+import it.nexus.mapper.MunicipalityMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.MunicipalityImportRepository;
 import it.nexus.repository.MunicipalityRepository;
@@ -40,6 +42,7 @@ import it.nexus.services.UserDisplayNameService;
 import it.nexus.services.municipalities.IstatMunicipalityFile;
 import it.nexus.services.municipalities.IstatMunicipalityFile.Row;
 import it.nexus.web.errors.BadRequestException;
+import it.nexus.web.errors.FieldValidationException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -49,6 +52,7 @@ public class MunicipalityServiceImpl implements MunicipalityService {
 
     /** Esempi per gruppo nell'anteprima: bastano a capire che file è; i conteggi dicono il resto. */
     static final int EXAMPLES = 100;
+    /** Il frontend (MunicipalityField) avvisa quando l'elenco arriva a questo limite: cambiarli insieme. */
     private static final int SEARCH_LIMIT = 20;
     private static final int HISTORY_LIMIT = 50;
     private static final DateTimeFormatter DAY = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ITALIAN);
@@ -81,7 +85,7 @@ public class MunicipalityServiceImpl implements MunicipalityService {
         String escaped = q.replace("!", "!!").replace("%", "!%").replace("_", "!_");
         return municipalities.search(escaped, history, PageRequest.of(0, history ? HISTORY_LIMIT : SEARCH_LIMIT))
                 .stream()
-                .map(MunicipalityServiceImpl::toDto)
+                .map(MunicipalityMapper::toDto)
                 .toList();
     }
 
@@ -135,14 +139,25 @@ public class MunicipalityServiceImpl implements MunicipalityService {
                 index(municipalities.findByValidToIsNull(), Municipality::getCadastralCode));
     }
 
-    private static <T> Map<String, T> index(Collection<T> items, Function<T, String> key) {
-        return items.stream().collect(Collectors.toMap(key, Function.identity()));
+    @Override
+    public Municipality forAddress(String id, Municipality current, String field) {
+        if (id == null || id.isBlank()) {
+            return null;
+        }
+        Municipality chosen = Optional.ofNullable(TsidMapper.toInternal(id))
+                .flatMap(municipalities::findById)
+                .orElseThrow(() -> new FieldValidationException(field, "Comune non valido: sceglilo dall'elenco"));
+        // per id: il comune già salvato arriva spesso come proxy di Hibernate (relazione LAZY)
+        boolean saved = current != null && chosen.getId().equals(current.getId());
+        if (!saved && chosen.getValidTo() != null) {
+            throw new FieldValidationException(field,
+                    "Il comune %s non è più valido: sceglilo di nuovo dall'elenco".formatted(chosen.getName()));
+        }
+        return chosen;
     }
 
-    private static MunicipalityDTO toDto(Municipality m) {
-        return new MunicipalityDTO(TsidMapper.toExternal(m.getId()), m.getName(), m.getIstatCode(),
-                m.getCadastralCode(), m.getProvince().getName(), m.getProvince().getAbbreviation(), m.getValidFrom(),
-                m.getValidTo());
+    private static <T> Map<String, T> index(Collection<T> items, Function<T, String> key) {
+        return items.stream().collect(Collectors.toMap(key, Function.identity()));
     }
 
     /** Il file confrontato con le versioni attuali: cosa si aggiunge, si sopprime, cambia. */

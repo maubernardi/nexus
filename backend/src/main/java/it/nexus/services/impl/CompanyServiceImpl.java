@@ -9,17 +9,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.domain.Company;
 import it.nexus.domain.JobSlot;
+import it.nexus.domain.Municipality;
 import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.CompanyDTO;
 import it.nexus.domain.dto.CompanyFormDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.mapper.CompanyMapper;
+import it.nexus.mapper.MunicipalityMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BoardPostService;
 import it.nexus.services.CompanyService;
+import it.nexus.services.MunicipalityService;
 import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.ConflictException;
 import it.nexus.web.errors.FieldValidationException;
@@ -32,12 +35,14 @@ import lombok.RequiredArgsConstructor;
 public class CompanyServiceImpl implements CompanyService {
 
     private static final String DUPLICATE_VAT = "Esiste già un'azienda con questa partita IVA";
+    private static final String LEGAL_MUNICIPALITY = "legalMunicipalityId";
 
     private final CompanyRepository repository;
     private final JobSlotRepository jobSlotRepository;
     private final BoardPostService boardPostService;
     private final AuditService auditService;
     private final CompanyMapper mapper;
+    private final MunicipalityService municipalityService;
 
     @Override
     @Transactional(readOnly = true)
@@ -59,12 +64,13 @@ public class CompanyServiceImpl implements CompanyService {
             throw new FieldValidationException("vatCode", DUPLICATE_VAT);
         }
         Company company = new Company(dto.name().strip(), vatCode);
-        apply(company, dto);
+        apply(company, dto, municipalityService.forAddress(dto.legalMunicipalityId(), null, LEGAL_MUNICIPALITY));
         Company saved = repository.saveAndFlush(company);
         auditService.record(AuditEntityType.COMPANY, saved.getId(), "CREATE", AuditChanges.of()
                 .value("name", null, saved.getName())
                 .value("vatCode", null, saved.getVatCode())
                 .value("legalAddress", null, saved.getLegalAddress())
+                .value("legalMunicipality", null, MunicipalityMapper.label(saved.getLegalMunicipality()))
                 // contatti del referente: dati personali, nell'audit senza valori (EN-4)
                 .redactedIfChanged("contactPerson", null, saved.getContactPerson())
                 .redactedIfChanged("phone", null, saved.getPhone())
@@ -84,16 +90,20 @@ public class CompanyServiceImpl implements CompanyService {
             throw new FieldValidationException("vatCode", DUPLICATE_VAT);
         });
 
+        Municipality municipality = municipalityService.forAddress(dto.legalMunicipalityId(),
+                company.getLegalMunicipality(), LEGAL_MUNICIPALITY);
         AuditChanges changes = AuditChanges.of()
                 .value("name", company.getName(), dto.name().strip())
                 .value("vatCode", company.getVatCode(), vatCode)
                 .value("legalAddress", company.getLegalAddress(), blankToNull(dto.legalAddress()))
+                .value("legalMunicipality", MunicipalityMapper.label(company.getLegalMunicipality()),
+                        MunicipalityMapper.label(municipality))
                 .redactedIfChanged("contactPerson", company.getContactPerson(), blankToNull(dto.contactPerson()))
                 .redactedIfChanged("phone", company.getPhone(), blankToNull(dto.phone()))
                 .redactedIfChanged("email", company.getEmail(), blankToNull(dto.email()));
         company.setName(dto.name().strip());
         company.setVatCode(vatCode);
-        apply(company, dto);
+        apply(company, dto, municipality);
         Company saved = repository.saveAndFlush(company);
         if (!changes.asMap().isEmpty()) {
             auditService.record(AuditEntityType.COMPANY, saved.getId(), "UPDATE", changes, null);
@@ -142,8 +152,9 @@ public class CompanyServiceImpl implements CompanyService {
         }
     }
 
-    private static void apply(Company company, CompanyFormDTO dto) {
+    private static void apply(Company company, CompanyFormDTO dto, Municipality legalMunicipality) {
         company.setLegalAddress(blankToNull(dto.legalAddress()));
+        company.setLegalMunicipality(legalMunicipality);
         company.setContactPerson(blankToNull(dto.contactPerson()));
         company.setPhone(blankToNull(dto.phone()));
         company.setEmail(blankToNull(dto.email()));

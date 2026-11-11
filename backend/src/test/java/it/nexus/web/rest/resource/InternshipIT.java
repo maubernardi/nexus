@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,7 @@ import it.nexus.domain.CompanyAtecoCode;
 import it.nexus.domain.Internship;
 import it.nexus.domain.InternshipType;
 import it.nexus.domain.JobSlot;
+import it.nexus.domain.Municipality;
 import it.nexus.domain.Project;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.enumeration.AuditEntityType;
@@ -72,6 +74,7 @@ class InternshipIT {
     private Ticket ticket;
     private String base;
     private String typeId;
+    private Municipality firenze;
 
     @BeforeEach
     void setUp() {
@@ -83,6 +86,7 @@ class InternshipIT {
         base = "/api/v1/tickets/" + TsidMapper.toExternal(ticket.getId()) + "/internship";
         typeId = TsidMapper.toExternal(internshipTypes.save(new InternshipType("T_IT_" + ticket.getId(),
                 "Tipo di prova " + ticket.getId())).getId());
+        firenze = scenarios.municipality("Firenze", "FI");
         em.flush();
     }
 
@@ -107,13 +111,18 @@ class InternshipIT {
     private String full(Long version) {
         return form("""
                 "internshipTypeId": "%s", "startDate": "2026-12-01", "expectedEndDate": "2027-05-31",
-                "site": "Via Roma 1, Firenze", "schedule": [{"dayOfWeek": 1, "firstSlot": true, "secondSlot": false}],
+                "site": "Via Roma 1", "siteMunicipalityId": "%s",
+                "schedule": [{"dayOfWeek": 1, "firstSlot": true, "secondSlot": false}],
                 "companyTutors": [{"fullName": "Anna Verdi", "contact": "055 123456"}, {"fullName": "Luca Neri"}],
                 "fiscalCode": "rssmra85t10a562s", "birthDate": "1985-12-10", "birthPlace": "Firenze",
-                "residence": "Via Dante 2, Firenze",
+                "residenceMunicipalityId": "%s", "residenceStreet": "Via Dante", "residenceStreetNumber": "2",
                 "suspensions": [{"from": "2026-12-22", "to": "2027-01-06"}, {"from": "2026-12-08", "to": "2026-12-08"}],
                 "notes": "Turni concordati", "version": %s
-                """.formatted(typeId, version));
+                """.formatted(typeId, id(firenze), id(firenze), version));
+    }
+
+    private static String id(Municipality m) {
+        return TsidMapper.toExternal(m.getId());
     }
 
     private long version() {
@@ -414,6 +423,45 @@ class InternshipIT {
     }
 
     @Test
+    void sedeEResidenzaConIlComune_auditEVersioniDelComune() throws Exception {
+        save("tutor1", full(null))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.site").value("Via Roma 1"))
+                .andExpect(jsonPath("$.siteMunicipality.name").value("Firenze"))
+                .andExpect(jsonPath("$.siteMunicipality.provinceAbbreviation").value("FI"))
+                .andExpect(jsonPath("$.residenceMunicipality.id").value(id(firenze)))
+                .andExpect(jsonPath("$.residenceStreet").value("Via Dante"))
+                .andExpect(jsonPath("$.residenceStreetNumber").value("2"));
+        Map<String, Object> created = ticketAudit().getLast().getChanges();
+        assertThat(created.get("siteMunicipality")).extracting("after").isEqualTo("Firenze (FI)");
+        assertThat(created).containsEntry("residence", Map.of("redacted", true));
+
+        // solo il numero civico cambia: la residenza risulta cambiata, senza valori
+        save("tutor1", full(version()).replace("\"residenceStreetNumber\": \"2\"", "\"residenceStreetNumber\": \"2/A\""))
+                .andExpect(status().isOk());
+        assertThat(ticketAudit().getLast().getChanges()).containsOnlyKeys("residence");
+
+        // la versione salvata resta anche se nel frattempo è stata chiusa
+        firenze.close(LocalDate.of(2026, 6, 1));
+        em.flush();
+        save("tutor1", full(version())).andExpect(status().isOk());
+
+        // una versione chiusa non si sceglie di nuovo, un id sconosciuto nemmeno
+        Municipality prato = scenarios.municipality("Prato", "PO");
+        prato.close(LocalDate.of(2026, 6, 1));
+        em.flush();
+        save("tutor1", full(version()).replaceFirst(id(firenze), id(prato)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("siteMunicipalityId"))
+                .andExpect(jsonPath("$.fieldErrors[0].message")
+                        .value("Il comune Prato non è più valido: sceglilo di nuovo dall'elenco"));
+        save("tutor1", full(version()).replace("\"residenceMunicipalityId\": \"" + id(firenze),
+                        "\"residenceMunicipalityId\": \"0ABCDEFGHJKMN"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("residenceMunicipalityId"));
+    }
+
+    @Test
     void appuntamentoFallito_restanoSoloIDatiDelBeneficiario() throws Exception {
         save("tutor1", full(null)).andExpect(status().isOk());
         em.flush();
@@ -431,7 +479,10 @@ class InternshipIT {
         Internship left = internships.findByTicketId(ticket.getId()).orElseThrow();
         assertThat(left.getFiscalCode()).isEqualTo("RSSMRA85T10A562S");
         assertThat(left.getBirthPlace()).isEqualTo("Firenze");
-        assertThat(left.getResidence()).isEqualTo("Via Dante 2, Firenze");
+        assertThat(left.getResidenceStreet()).isEqualTo("Via Dante");
+        assertThat(left.getResidenceStreetNumber()).isEqualTo("2");
+        assertThat(left.getResidenceMunicipality().getId()).isEqualTo(firenze.getId());
+        assertThat(left.getSiteMunicipality()).isNull();
         assertThat(left.getInternshipType()).isNull();
         assertThat(left.getStartDate()).isNull();
         assertThat(left.getSite()).isNull();

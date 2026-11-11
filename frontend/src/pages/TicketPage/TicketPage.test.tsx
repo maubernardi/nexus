@@ -68,7 +68,16 @@ vi.mock('@/config/api/companyApi', () => ({
     id: 'C1',
     name: 'Alfa Logistica',
     vatCode: '12345678901',
-    legalAddress: 'Via Roma 1, Firenze',
+    legalAddress: 'Via Roma 1',
+    legalMunicipality: {
+      id: 'M1',
+      name: 'Firenze',
+      istatCode: '048017',
+      cadastralCode: 'D612',
+      provinceName: 'Firenze',
+      provinceAbbreviation: 'FI',
+      validFrom: '2026-01-01',
+    },
     contactPerson: 'Paola Neri',
     phone: null,
     email: 'info@alfa.test',
@@ -300,6 +309,8 @@ describe('<TicketPage>', () => {
 
     const dialog = await screen.findByRole('dialog', { name: '«Magazziniere» presso Alfa Logistica' });
     expect(await within(dialog).findByText('Paola Neri')).toBeInTheDocument();
+    // sede legale con il comune (US-1007)
+    expect(within(dialog).getByText('Via Roma 1, Firenze (FI)')).toBeInTheDocument();
     expect(within(dialog).getByRole('heading', { level: 3, name: 'Mansione' })).toBeInTheDocument();
     expect(await within(dialog).findByText('Contattare al mattino')).toBeInTheDocument();
     expect(await within(dialog).findByText('Proposte')).toBeInTheDocument();

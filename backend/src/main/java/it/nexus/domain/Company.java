@@ -7,6 +7,9 @@ import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.AccessLevel;
@@ -33,8 +36,14 @@ public class Company extends AbstractTsidEntity {
     @Column(name = "vat_code", nullable = false, unique = true, length = 11)
     private String vatCode;
 
+    /** Indirizzo della sede legale (via e numero civico); il comune è a parte (US-1007). */
     @Column(name = "legal_address", length = 300)
     private String legalAddress;
+
+    /** Versione del comune della sede legale scelta dall'elenco ufficiale (US-1007). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "legal_municipality_id")
+    private Municipality legalMunicipality;
 
     @Column(name = "contact_person", length = 200)
     private String contactPerson;

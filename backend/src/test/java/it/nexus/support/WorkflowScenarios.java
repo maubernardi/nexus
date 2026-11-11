@@ -1,6 +1,7 @@
 package it.nexus.support;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.boot.test.context.TestComponent;
@@ -11,7 +12,9 @@ import it.nexus.domain.BoardPost;
 import it.nexus.domain.Company;
 import it.nexus.domain.JobCategory;
 import it.nexus.domain.JobSlot;
+import it.nexus.domain.Municipality;
 import it.nexus.domain.Project;
+import it.nexus.domain.Province;
 import it.nexus.domain.TestEntities;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.UserProject;
@@ -26,7 +29,9 @@ import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.JobSlotRepository;
+import it.nexus.repository.MunicipalityRepository;
 import it.nexus.repository.ProjectRepository;
+import it.nexus.repository.ProvinceRepository;
 import it.nexus.repository.TicketRepository;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.repository.ZoneRepository;
@@ -53,6 +58,8 @@ public class WorkflowScenarios {
     private final BeneficiaryRepository beneficiaries;
     private final BoardPostRepository boardPosts;
     private final TicketRepository tickets;
+    private final ProvinceRepository provinces;
+    private final MunicipalityRepository municipalities;
 
     /** Gli utenti della sicurezza mock (header {@code X-USER-ID}), con gli stessi id esterni della configurazione. */
     public record Actors(AppUser tutor1, AppUser tutor2, AppUser operator, AppUser admin) {
@@ -77,6 +84,17 @@ public class WorkflowScenarios {
             userProjects.save(new UserProject(member, project));
         }
         return project;
+    }
+
+    /**
+     * Comune valido dal 01/01/2026 con una provincia sua (US-1007). Codici fuori dall'elenco dell'ISTAT (provincia 9xx,
+     * codice catastale Z9xx), così non si scontrano con un elenco vero caricato nello stesso database.
+     */
+    public Municipality municipality(String name, String provinceAbbreviation) {
+        String n = "%02d".formatted(SEQ.incrementAndGet() % 100);
+        LocalDate from = LocalDate.of(2026, 1, 1);
+        Province province = provinces.save(new Province("9" + n, "Provincia di " + name, provinceAbbreviation, from));
+        return municipalities.save(new Municipality("Z9" + n, "999" + "9" + n, name, province, from));
     }
 
     public Place place() {

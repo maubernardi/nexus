@@ -1,11 +1,14 @@
 import { axiosInstance } from '@/config/api/axiosInstance';
 import { ENDPOINTS } from '@/config/api/Endpoint';
+import type { Municipality } from '@/config/api/municipalityApi';
 
 export type Company = {
   id: string;
   name: string;
   vatCode: string;
   legalAddress: string | null;
+  /** Comune della sede legale (US-1007), con la provincia della versione scelta. */
+  legalMunicipality?: Municipality | null;
   contactPerson: string | null;
   phone: string | null;
   email: string | null;
@@ -18,6 +21,7 @@ export type CompanyForm = {
   name: string;
   vatCode: string;
   legalAddress: string | null;
+  legalMunicipalityId: string | null;
   contactPerson: string | null;
   phone: string | null;
   email: string | null;

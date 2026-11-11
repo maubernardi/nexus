@@ -21,12 +21,17 @@ public record InternshipFormDTO(
         LocalDate startDate,
         LocalDate expectedEndDate,
         @Size(max = 300, message = "Massimo 300 caratteri") String site,
+        /** Versione del comune della sede (US-1007). */
+        String siteMunicipalityId,
         String atecoCodeId,
         @NotNull @Size(max = 10, message = "Massimo 10 tutor aziendali") List<@Valid CompanyTutorDTO> companyTutors,
         @FiscalCode String fiscalCode,
         @Past(message = "La data di nascita deve essere passata") LocalDate birthDate,
         @Size(max = 200, message = "Massimo 200 caratteri") String birthPlace,
-        @Size(max = 300, message = "Massimo 300 caratteri") String residence,
+        /** Residenza del beneficiario (US-1007): versione del comune, via e numero civico. */
+        String residenceMunicipalityId,
+        @Size(max = 300, message = "Massimo 300 caratteri") String residenceStreet,
+        @Size(max = 20, message = "Massimo 20 caratteri") String residenceStreetNumber,
         @NotNull @Size(max = 20, message = "Massimo 20 periodi") List<@Valid SuspensionDTO> suspensions,
         @Size(max = 2000, message = "Massimo 2000 caratteri") String notes,
         @NotNull(message = "Indica l'inizio della fascia") LocalTime firstSlotStart,

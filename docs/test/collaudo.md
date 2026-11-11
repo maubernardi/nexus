@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `ed260ad` (10/11/2026): Sprint 1–12 completi (comuni e province, cataloghi dei documenti, contatti e presa in carico del beneficiario, sede di competenza), con le correzioni del controllo in Chrome |
-| **Ultimo aggiornamento** | 10/11/2026 (T-22.1 … T-22.4: da provare, la demo è aggiornata) |
+| **Ultimo aggiornamento** | 11/11/2026 (T-23.1: da provare dopo il deploy di US-1007; T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -861,3 +861,23 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   4. Facoltativo: rendi `tutor2` Coordinatore di GOL (Utenti → progetti) e prova anche come lui.
   5. In **Cataloghi → Sedi di competenza** togli POLIS da «Firenze» (l'avevi aggiunto in T-22.2), poi come `admin`
      apri una segnalazione di POLIS. **Atteso:** «Sede di competenza: Non indicata» e nessun comando per correggerla.
+
+## 23. Indirizzi e documenti reali (Sprint 13)
+
+- [ ] **T-23.1 Indirizzi con il comune (US-1007)**
+  1. Come `operatore.cc` apri **Aziende** e modifica «Demo Logistica S.r.l.». **Atteso:** «Indirizzo della sede
+     legale» con «Via dell'Esempio 1» (senza «Città Demo») e «Comune della sede legale» con «Sesto Fiorentino (FI)».
+  2. Nel comune scrivi `pra`. **Atteso:** dalla seconda lettera compare l'elenco dei comuni e in fondo «Solo i primi
+     20 comuni: scrivi altre lettere per trovare quello giusto.». Continua fino a `prato`: **Atteso:** «Prato (PO)» in
+     cima. Con la **freccia giù** evidenzia un comune, con **Invio** sceglilo; prova anche **Esc** (chiude l'elenco,
+     la seconda volta svuota la casella) e la scelta con il mouse. Facoltativo, con lo screen reader: si sente quanti
+     comuni ci sono e quale è evidenziato.
+  3. Scrivi un nome senza sceglierlo dall'elenco e salva. **Atteso:** «Comune della sede legale: Scegli il comune
+     dall'elenco» e nulla è salvato. Scegli un comune e salva. **Atteso:** salvato; nella cronologia dell'azienda il
+     comune prima e dopo.
+  4. Come `tutor1` apri la scheda del tirocinio di una segnalazione con l'appuntamento fissato. **Atteso:** la sede ha
+     «Indirizzo della sede del tirocinio» e «Comune della sede del tirocinio»; la residenza ha «Comune di residenza»,
+     «Via di residenza» e «Numero civico». Una residenza scritta prima come testo libero è nella via, con comune e
+     numero civico vuoti, e la residenza compare tra i dati che mancano per l'avvio.
+  5. Compila comune, via e numero civico della residenza e il comune della sede, salva e scarica la Convenzione.
+     **Atteso:** «residente in Via … 12, Comune (PR)» e la sede del tirocinio «Via …, Comune (PR)».

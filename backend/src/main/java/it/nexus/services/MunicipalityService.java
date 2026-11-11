@@ -3,6 +3,7 @@ package it.nexus.services;
 import java.time.LocalDate;
 import java.util.List;
 
+import it.nexus.domain.Municipality;
 import it.nexus.domain.dto.MunicipalityDTO;
 import it.nexus.domain.dto.MunicipalityImportPreviewDTO;
 import it.nexus.domain.dto.MunicipalityStatusDTO;
@@ -27,4 +28,11 @@ public interface MunicipalityService {
      * essere successiva all'ultimo caricamento e non nel futuro.
      */
     MunicipalityImportPreviewDTO importFile(byte[] file, LocalDate validFrom);
+
+    /**
+     * Comune di un indirizzo dal modulo (US-1007): {@code null} se non indicato; quello già salvato anche se nel
+     * frattempo la sua versione è stata chiusa; altrimenti una versione valida oggi. Un id sconosciuto o una versione
+     * chiusa scelta di nuovo sono un errore sul campo {@code field}.
+     */
+    Municipality forAddress(String id, Municipality current, String field);
 }

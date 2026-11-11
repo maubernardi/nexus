@@ -28,6 +28,7 @@ import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.CompanyAtecoCode;
 import it.nexus.domain.CompanyLegalRepresentative;
+import it.nexus.domain.Internship;
 import it.nexus.domain.InternshipType;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Project;
@@ -38,6 +39,7 @@ import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.CompanyAtecoCodeRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyLegalRepresentativeRepository;
+import it.nexus.repository.InternshipRepository;
 import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.TicketRepository;
@@ -65,6 +67,7 @@ class InternshipStartIT {
     @Autowired CompanyAuditEventRepository companyAudit;
     @Autowired TicketRepository tickets;
     @Autowired JobSlotRepository jobSlots;
+    @Autowired InternshipRepository internships;
 
     private Place place;
     private JobSlot slot;
@@ -72,6 +75,7 @@ class InternshipStartIT {
     private String ticketPath;
     private String typeId;
     private String atecoId;
+    private String firenzeId;
 
     @BeforeEach
     void setUp() {
@@ -84,6 +88,7 @@ class InternshipStartIT {
         typeId = TsidMapper.toExternal(internshipTypes.save(new InternshipType("T_START_" + ticket.getId(),
                 "Tipo di avvio " + ticket.getId())).getId());
         atecoId = TsidMapper.toExternal(atecoCodes.save(new CompanyAtecoCode(place.company(), "56.10.11", null)).getId());
+        firenzeId = TsidMapper.toExternal(scenarios.municipality("Firenze", "FI").getId());
         em.flush();
     }
 
@@ -104,13 +109,14 @@ class InternshipStartIT {
     private ResultActions saveInternship(boolean complete) throws Exception {
         String json = """
                 {"internshipTypeId": "%s", "startDate": "2026-12-01", "expectedEndDate": "2027-05-31",
-                 "site": "Via Roma 1, Firenze", "atecoCodeId": "%s",
+                 "site": "Via Roma 1", "siteMunicipalityId": "%s", "atecoCodeId": "%s",
                  "companyTutors": [{"fullName": "Anna Verdi"}],
                  "fiscalCode": "RSSMRA85T10A562S", "birthDate": "1985-12-10", "birthPlace": "Firenze",
-                 "residence": "Via Dante 2, Firenze", "suspensions": [],
+                 "residenceMunicipalityId": "%s", "residenceStreet": "Via Dante", "residenceStreetNumber": "2",
+                 "suspensions": [],
                  "firstSlotStart": "09:00", "firstSlotEnd": "13:00", "secondSlotStart": "14:00", "secondSlotEnd": "18:00",
                  "excludeHolidays": true, "schedule": [{"dayOfWeek": 1, "firstSlot": true, "secondSlot": false}],
-                 "version": null}""".formatted(typeId, atecoId);
+                 "version": null}""".formatted(typeId, firenzeId, atecoId, firenzeId);
         if (!complete) {
             json = json.replace("\"fiscalCode\": \"RSSMRA85T10A562S\", ", "")
                     .replace("\"companyTutors\": [{\"fullName\": \"Anna Verdi\"}]", "\"companyTutors\": []");
@@ -146,6 +152,23 @@ class InternshipStartIT {
                 .andExpect(jsonPath("$.message").value("Per avviare il tirocinio la scheda deve essere completa; "
                         + "mancano: almeno un tutor aziendale, il codice fiscale del beneficiario"));
         assertThat(tickets.findById(ticket.getId()).orElseThrow().getStatus()).isEqualTo(TicketStatus.APPUNTAMENTO);
+    }
+
+    @Test
+    void sedeSenzaComuneEResidenzaSenzaCivico_traIDatiMancanti() throws Exception {
+        legalRepresentative(true);
+        saveInternship(true).andExpect(jsonPath("$.missingForStart").isEmpty());
+        Internship internship = internships.findByTicketId(ticket.getId()).orElseThrow();
+        internship.setSiteMunicipality(null);
+        internship.setResidenceStreetNumber(null);
+        em.flush();
+
+        mockMvc.perform(get(ticketPath + "/internship").header(USER, "tutor1"))
+                .andExpect(jsonPath("$.missingForStart", contains("site", "residence")));
+        start("tutor1", ticketVersion())
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Per avviare il tirocinio la scheda deve essere completa; "
+                        + "mancano: la sede con il comune, la residenza del beneficiario (comune, via e numero civico)"));
     }
 
     @Test

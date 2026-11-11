@@ -38,7 +38,7 @@ const START_TARGETS: Record<StartRequirement, string> = {
   fiscalCode: 'internship-fiscalCode',
   birthDate: 'internship-birthDate',
   birthPlace: 'internship-birthPlace',
-  residence: 'internship-residence',
+  residence: 'internship-residenceMunicipality',
   legalRepresentative: 'internship-company',
   legalRepresentativeData: 'internship-company',
 };

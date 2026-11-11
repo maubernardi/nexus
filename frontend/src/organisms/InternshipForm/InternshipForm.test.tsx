@@ -4,9 +4,22 @@ import { AxiosError, AxiosHeaders } from 'axios';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { Internship } from '@/config/api/internshipApi';
+import { searchMunicipalities, type Municipality } from '@/config/api/municipalityApi';
 import { InternshipForm } from '@/organisms/InternshipForm/InternshipForm';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderWithProviders } from '@/tests/renderWithProviders';
+
+vi.mock('@/config/api/municipalityApi', () => ({ searchMunicipalities: vi.fn() }));
+
+const municipality = (id: string, name: string, provinceAbbreviation: string): Municipality => ({
+  id,
+  name,
+  istatCode: '048017',
+  cadastralCode: 'D612',
+  provinceName: name,
+  provinceAbbreviation,
+  validFrom: '2026-01-01',
+});
 
 const error = (status: number, body: Record<string, unknown>) =>
   new AxiosError(String(status), String(status), undefined, undefined, {
@@ -106,12 +119,15 @@ describe('<InternshipForm>', () => {
       startDate: '2026-12-01',
       expectedEndDate: null,
       site: null,
+      siteMunicipalityId: null,
       atecoCodeId: 'A1',
       companyTutors: [{ fullName: 'Anna Verdi', contact: null }],
       fiscalCode: 'RSSMRA85T10A562S',
       birthDate: null,
       birthPlace: null,
-      residence: null,
+      residenceMunicipalityId: null,
+      residenceStreet: null,
+      residenceStreetNumber: null,
       suspensions: [{ from: '2026-12-22', to: '2027-01-06' }],
       notes: null,
       firstSlotStart: '09:00',
@@ -297,5 +313,68 @@ describe('<InternshipForm>', () => {
 
     expect(await screen.findByText('L’azienda non ha ancora codici ATECO.')).toBeInTheDocument();
     expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+  });
+
+  it('sede e residenza con il comune dall’elenco (US-1007)', async () => {
+    const firenze = municipality('M1', 'Firenze', 'FI');
+    vi.mocked(searchMunicipalities).mockResolvedValue([municipality('M2', 'Sesto Fiorentino', 'FI')]);
+    const { onSubmit } = renderForm({
+      ...empty,
+      version: 3,
+      site: 'Via Roma 1',
+      siteMunicipality: firenze,
+      residenceStreet: 'Via Dante, Firenze',
+    });
+    const user = userEvent.setup();
+    expect(screen.getByRole('combobox', { name: /^Comune della sede del tirocinio/ })).toHaveValue(
+      'Firenze (FI)',
+    );
+    // la residenza scritta prima come testo libero resta nella via, il comune è da scegliere
+    expect(screen.getByLabelText(/^Via di residenza/)).toHaveValue('Via Dante, Firenze');
+    const residence = screen.getByRole('combobox', { name: /^Comune di residenza/ });
+    expect(residence).toHaveValue('');
+
+    await user.type(residence, 'sesto');
+    await screen.findByRole('option', { name: 'Sesto Fiorentino (FI)' });
+    await user.keyboard('{ArrowDown}{Enter}');
+    expect(residence).toHaveValue('Sesto Fiorentino (FI)');
+    await user.clear(screen.getByLabelText(/^Via di residenza/));
+    await user.type(screen.getByLabelText(/^Via di residenza/), 'Via Gramsci');
+    await user.type(screen.getByLabelText(/^Numero civico/), '12');
+    await expectNoAxeViolations();
+    await user.click(screen.getByRole('button', { name: 'Salva la scheda' }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(onSubmit.mock.calls[0][0]).toMatchObject({
+      site: 'Via Roma 1',
+      siteMunicipalityId: 'M1',
+      residenceMunicipalityId: 'M2',
+      residenceStreet: 'Via Gramsci',
+      residenceStreetNumber: '12',
+      version: 3,
+    });
+  });
+
+  it('l’errore del server sul comune va sul suo campo', async () => {
+    const { onSubmit } = renderForm({ ...empty, siteMunicipality: municipality('M1', 'Firenze', 'FI') });
+    onSubmit.mockRejectedValue(
+      error(400, {
+        fieldErrors: [
+          { field: 'siteMunicipalityId', message: 'Il comune Firenze non è più valido: sceglilo di nuovo' },
+        ],
+      }),
+    );
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Salva la scheda' }));
+
+    expect(
+      await screen.findByRole('link', {
+        name: 'Comune della sede del tirocinio: Il comune Firenze non è più valido: sceglilo di nuovo',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /^Comune della sede del tirocinio/ })).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
   });
 });

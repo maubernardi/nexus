@@ -12,6 +12,8 @@ public record CompanyFormDTO(
         @NotBlank(message = "Inserisci la partita IVA")
         @Pattern(regexp = "\\s*[0-9]{11}\\s*", message = "La partita IVA è composta da 11 cifre") String vatCode,
         @Size(max = 300, message = "Massimo 300 caratteri") String legalAddress,
+        /** Versione del comune della sede legale (US-1007); vuoto = non indicato. */
+        String legalMunicipalityId,
         @Size(max = 200, message = "Massimo 200 caratteri") String contactPerson,
         @Size(max = 30, message = "Massimo 30 caratteri")
         @Pattern(regexp = "[0-9 +().\\-/]*", message = "Usa solo cifre, spazi e i simboli + ( ) . - /") String phone,

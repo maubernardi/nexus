@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
-import { useFieldArray, useForm, type FieldPath } from 'react-hook-form';
+import { Controller, useFieldArray, useForm, type FieldPath } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,12 @@ import type { ReferenceItem } from '@/config/api/referenceApi';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
 import { FormField } from '@/molecules/FormField/FormField';
+import { MunicipalityField } from '@/molecules/MunicipalityField/MunicipalityField';
+import {
+  isUnchosen,
+  toMunicipalityValue,
+  type MunicipalityValue,
+} from '@/molecules/MunicipalityField/municipalityValue';
 import {
   DAYS,
   minutesToHoursText,
@@ -29,12 +35,15 @@ type Values = {
   startDate: string;
   expectedEndDate: string;
   site: string;
+  siteMunicipality: MunicipalityValue;
   atecoCodeId: string;
   companyTutors: { fullName: string; contact: string }[];
   fiscalCode: string;
   birthDate: string;
   birthPlace: string;
-  residence: string;
+  residenceMunicipality: MunicipalityValue;
+  residenceStreet: string;
+  residenceStreetNumber: string;
   suspensions: { from: string; to: string }[];
   notes: string;
   /** Griglia oraria (US-1002): fasce "hh:mm" e i sette giorni da lunedì. */
@@ -71,12 +80,15 @@ const toValues = (i: Internship): Values => ({
   startDate: i.startDate ?? '',
   expectedEndDate: i.expectedEndDate ?? '',
   site: i.site ?? '',
+  siteMunicipality: toMunicipalityValue(i.siteMunicipality ?? undefined),
   atecoCodeId: i.atecoCodeId ?? '',
   companyTutors: i.companyTutors.map((c) => ({ fullName: c.fullName, contact: c.contact ?? '' })),
   fiscalCode: i.fiscalCode ?? '',
   birthDate: i.birthDate ?? '',
   birthPlace: i.birthPlace ?? '',
-  residence: i.residence ?? '',
+  residenceMunicipality: toMunicipalityValue(i.residenceMunicipality ?? undefined),
+  residenceStreet: i.residenceStreet ?? '',
+  residenceStreetNumber: i.residenceStreetNumber ?? '',
   suspensions: i.suspensions.map((s) => ({ from: s.from, to: s.to })),
   notes: i.notes ?? '',
   // l'API manda "hh:mm:ss", il campo orario vuole "hh:mm"
@@ -100,6 +112,7 @@ const toPayload = (v: Values, version: number | null): InternshipPayload => ({
   startDate: v.startDate || null,
   expectedEndDate: v.expectedEndDate || null,
   site: v.site.trim() || null,
+  siteMunicipalityId: v.siteMunicipality.municipality?.id ?? null,
   atecoCodeId: v.atecoCodeId || null,
   companyTutors: v.companyTutors.map((c) => ({
     fullName: c.fullName.trim(),
@@ -108,7 +121,9 @@ const toPayload = (v: Values, version: number | null): InternshipPayload => ({
   fiscalCode: v.fiscalCode.trim().toUpperCase() || null,
   birthDate: v.birthDate || null,
   birthPlace: v.birthPlace.trim() || null,
-  residence: v.residence.trim() || null,
+  residenceMunicipalityId: v.residenceMunicipality.municipality?.id ?? null,
+  residenceStreet: v.residenceStreet.trim() || null,
+  residenceStreetNumber: v.residenceStreetNumber.trim() || null,
   suspensions: v.suspensions.map((s) => ({ from: s.from, to: s.to })),
   notes: v.notes.trim() || null,
   firstSlotStart: v.firstSlotStart,
@@ -130,6 +145,10 @@ const toPayload = (v: Values, version: number | null): InternshipPayload => ({
  * riporta al giorno della settimana.
  */
 const toFieldPath = (field: string, payload: InternshipPayload): FieldPath<Values> => {
+  // il server parla dell'id del comune, il modulo del campo del comune (US-1007)
+  if (field === 'siteMunicipalityId' || field === 'residenceMunicipalityId') {
+    return field.replace(/Id$/, '') as FieldPath<Values>;
+  }
   const match = /^schedule(?:\[(\d+)\](\.minutes)?)?/.exec(field);
   if (!match) return toFormPath(field) as FieldPath<Values>;
   const day = match[1] === undefined ? undefined : payload.schedule[Number(match[1])];
@@ -186,17 +205,21 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
   const today = new Date().toISOString().slice(0, 10);
   const max = (n: number) => ({ value: n, message: t('form.errors.maxLength', { max: n }) });
   const required = (v: string) => v.trim() !== '' || t('form.errors.required');
+  const chosen = (v: MunicipalityValue) => !isUnchosen(v) || t('municipalityField.choose');
 
   const labels: Record<Scalar, string> = {
     internshipTypeId: t('internship.fields.internshipType'),
     startDate: t('internship.fields.startDate'),
     expectedEndDate: t('internship.fields.expectedEndDate'),
     site: t('internship.fields.site'),
+    siteMunicipality: t('internship.fields.siteMunicipality'),
     atecoCodeId: t('internship.fields.atecoCode'),
     fiscalCode: t('internship.fields.fiscalCode'),
     birthDate: t('internship.fields.birthDate'),
     birthPlace: t('internship.fields.birthPlace'),
-    residence: t('internship.fields.residence'),
+    residenceMunicipality: t('internship.fields.residenceMunicipality'),
+    residenceStreet: t('internship.fields.residenceStreet'),
+    residenceStreetNumber: t('internship.fields.residenceStreetNumber'),
     notes: t('internship.fields.notes'),
   };
 
@@ -205,9 +228,9 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
   const push = (path: string, label: string, message?: string): void => {
     if (message) summary.push({ fieldId: fieldId(path), message: `${label}: ${message}` });
   };
-  (['internshipTypeId', 'startDate', 'expectedEndDate', 'site', 'atecoCodeId'] as const).forEach((f) =>
-    push(f, labels[f], errors[f]?.message),
-  );
+  (
+    ['internshipTypeId', 'startDate', 'expectedEndDate', 'site', 'siteMunicipality', 'atecoCodeId'] as const
+  ).forEach((f) => push(f, labels[f], errors[f]?.message));
   const first = t('internship.schedule.first');
   const second = t('internship.schedule.second');
   push('firstSlotStart', t('internship.schedule.start', { slot: first }), errors.firstSlotStart?.message);
@@ -240,9 +263,17 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
     push(`suspensions.${i}.from`, t('internship.fields.from', { n }), errors.suspensions?.[i]?.from?.message);
     push(`suspensions.${i}.to`, t('internship.fields.to', { n }), errors.suspensions?.[i]?.to?.message);
   });
-  (['fiscalCode', 'birthDate', 'birthPlace', 'residence', 'notes'] as const).forEach((f) =>
-    push(f, labels[f], errors[f]?.message),
-  );
+  (
+    [
+      'fiscalCode',
+      'birthDate',
+      'birthPlace',
+      'residenceMunicipality',
+      'residenceStreet',
+      'residenceStreetNumber',
+      'notes',
+    ] as const
+  ).forEach((f) => push(f, labels[f], errors[f]?.message));
 
   /** Dal: obbligatorio, non prima dell'inizio del tirocinio, senza sovrapporsi ai periodi precedenti. */
   const validateFrom = (i: number) => (from: string) => {
@@ -414,9 +445,31 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
             label={labels.site}
             hint={t('internship.hints.site')}
             error={errors.site?.message}
-            className="md:col-span-2"
           >
             {(p) => <Input {...p} autoComplete="off" {...register('site', { maxLength: max(300) })} />}
+          </FormField>
+          <FormField
+            id={fieldId('siteMunicipality')}
+            label={labels.siteMunicipality}
+            hint={t('municipalityField.hint')}
+            error={errors.siteMunicipality?.message}
+          >
+            {(p) => (
+              <Controller
+                control={control}
+                name="siteMunicipality"
+                rules={{ validate: chosen }}
+                render={({ field }) => (
+                  <MunicipalityField
+                    {...p}
+                    ref={field.ref}
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              />
+            )}
           </FormField>
         </div>
 
@@ -635,12 +688,51 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
             {(p) => <Input {...p} autoComplete="off" {...register('birthPlace', { maxLength: max(200) })} />}
           </FormField>
           <FormField
-            id={fieldId('residence')}
-            label={labels.residence}
-            hint={t('internship.hints.residence')}
-            error={errors.residence?.message}
+            id={fieldId('residenceMunicipality')}
+            label={labels.residenceMunicipality}
+            hint={t('municipalityField.hint')}
+            error={errors.residenceMunicipality?.message}
           >
-            {(p) => <Input {...p} autoComplete="off" {...register('residence', { maxLength: max(300) })} />}
+            {(p) => (
+              <Controller
+                control={control}
+                name="residenceMunicipality"
+                rules={{ validate: chosen }}
+                render={({ field }) => (
+                  <MunicipalityField
+                    {...p}
+                    ref={field.ref}
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              />
+            )}
+          </FormField>
+          <FormField
+            id={fieldId('residenceStreet')}
+            label={labels.residenceStreet}
+            error={errors.residenceStreet?.message}
+          >
+            {(p) => (
+              <Input {...p} autoComplete="off" {...register('residenceStreet', { maxLength: max(300) })} />
+            )}
+          </FormField>
+          <FormField
+            id={fieldId('residenceStreetNumber')}
+            label={labels.residenceStreetNumber}
+            hint={t('internship.hints.residenceStreetNumber')}
+            error={errors.residenceStreetNumber?.message}
+          >
+            {(p) => (
+              <Input
+                {...p}
+                autoComplete="off"
+                className="max-w-32"
+                {...register('residenceStreetNumber', { maxLength: max(20) })}
+              />
+            )}
           </FormField>
         </div>
       </section>
