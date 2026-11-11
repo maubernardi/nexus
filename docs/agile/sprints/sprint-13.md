@@ -1,7 +1,7 @@
 # Sprint 13 — 11 – 13 novembre 2026
 
-**Stato:** 🎉 concluso l'11/11, prima delle date previste: impegno di 22 punti completato; deploy della demo e
-collaudo T-23.1 … T-23.4 su richiesta del PO. **Planning:** 10/11, nella [review dello Sprint 12](sprint-12-review.md)
+**Stato:** 🎉 concluso l'11/11, prima delle date previste: impegno di 22 punti completato, demo a `8d43ad3`; collaudo
+T-23.1 … T-23.4 da fare; [review](sprint-13-review.md). **Planning:** 10/11, nella [review dello Sprint 12](sprint-12-review.md)
 (§9); proposta del team confermata dal Product Owner, con EN-9 (§8.3).
 
 ## Obiettivo
@@ -28,8 +28,9 @@ indicativi; gli stati del backlog si aggiornano nella PR di documentazione dopo 
 Ogni storia con interfaccia nuova si controlla in Chrome **prima** del merge (A26): se l'estensione è scollegata, lo
 segnalo prima di aprire la PR.
 
-**Velocità:** 22 punti in un giorno. Migrazioni V37–V40, tutte solo additive (A16). Nessun deploy durante lo sprint:
-la demo è ancora a `ed260ad`. Prossima migrazione: **V41**.
+**Velocità:** 22 punti in un giorno. Migrazioni V37–V40, tutte solo additive (A16). Un deploy alla fine, su richiesta
+del PO, riuscito e controllato online (`8d43ad3`: `/api/v1/me` → 401, bundle nuovo con le pagine dello sprint). Prossima
+migrazione: **V41**.
 
 ## Decisioni durante lo sprint
 
@@ -93,6 +94,6 @@ la demo è ancora a `ed260ad`. Prossima migrazione: **V41**.
 
 ## Per il PO dopo lo sprint
 
-- Deploy dello Sprint 13 quando vuoi, poi il collaudo T-23.1 … T-23.4.
+- Collaudo T-23.1 … T-23.4 sulla demo `8d43ad3`.
 - Collaudo dello Sprint 12 sulla demo `ed260ad` (T-22.1 … T-22.4), se non è già fatto.
 - T-21.6: lunedì 16/11, le prime PR di Dependabot, una alla volta, con il deploy.

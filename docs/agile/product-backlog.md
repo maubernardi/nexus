@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 86 elementi, 332 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-13](sprints/sprint-13.md), l'11/11 (review da fare); prossimo: Sprint 14, da confermare nella review.
+**Totale: 86 elementi, 332 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-13](sprints/sprint-13.md), l'11/11 ([review](sprints/sprint-13-review.md)); prossimo: Sprint 14, da confermare nella review.
 
 ## Epiche
 

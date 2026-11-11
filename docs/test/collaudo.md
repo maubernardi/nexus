@@ -9,8 +9,8 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | https://portalenexus.it |
-| **Versione della demo** | `ed260ad` (10/11/2026): Sprint 1–12 completi (comuni e province, cataloghi dei documenti, contatti e presa in carico del beneficiario, sede di competenza), con le correzioni del controllo in Chrome |
-| **Ultimo aggiornamento** | 11/11/2026 (T-23.1 … T-23.4: da provare dopo il deploy dello Sprint 13; T-22.1 … T-22.4 da provare) |
+| **Versione della demo** | `8d43ad3` (11/11/2026): Sprint 1–13 completi (indirizzi con il comune, fine effettiva e ruolo del tutor aziendale, convenzione e progetti formativi, modelli dei documenti caricati dall'ADMIN) |
+| **Ultimo aggiornamento** | 11/11/2026 (T-23.1 … T-23.4 da provare; T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
