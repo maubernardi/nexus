@@ -8,7 +8,8 @@ import { ENDPOINTS } from '@/config/api/Endpoint';
 import type { Municipality } from '@/config/api/municipalityApi';
 import type { ReferenceItem } from '@/config/api/referenceApi';
 
-export type CompanyTutor = { fullName: string; contact?: string | null };
+/** Tutor aziendale: funzione o ruolo in azienda (US-1009) e recapito facoltativi. */
+export type CompanyTutor = { fullName: string; role?: string | null; contact?: string | null };
 
 /** Periodo di sospensione, estremi compresi (aaaa-mm-gg). */
 export type Suspension = { from: string; to: string };
@@ -91,7 +92,7 @@ export type InternshipForm = {
   site: string | null;
   siteMunicipalityId: string | null;
   atecoCodeId: string | null;
-  companyTutors: { fullName: string; contact: string | null }[];
+  companyTutors: { fullName: string; role: string | null; contact: string | null }[];
   fiscalCode: string | null;
   birthDate: string | null;
   birthPlace: string | null;

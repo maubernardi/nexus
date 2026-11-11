@@ -40,12 +40,17 @@ public class InternshipCompanyTutor extends AbstractCreationAuditingEntity {
     @Column(name = "full_name", nullable = false, updatable = false, length = 200)
     private String fullName;
 
+    /** Funzione o ruolo in azienda (US-1009), facoltativo. */
+    @Column(name = "role", updatable = false, length = 200)
+    private String role;
+
     @Column(name = "contact", updatable = false, length = 200)
     private String contact;
 
-    InternshipCompanyTutor(Internship internship, String fullName, String contact) {
+    InternshipCompanyTutor(Internship internship, String fullName, String role, String contact) {
         this.internship = internship;
         this.fullName = fullName;
+        this.role = role;
         this.contact = contact;
     }
 

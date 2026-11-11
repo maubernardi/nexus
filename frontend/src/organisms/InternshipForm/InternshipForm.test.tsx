@@ -106,6 +106,10 @@ describe('<InternshipForm>', () => {
     await user.click(screen.getByRole('radio', { name: /56\.10\.11/ }));
     await user.click(screen.getByRole('button', { name: 'Aggiungi tutor aziendale' }));
     await user.type(screen.getByLabelText(/^Nome e cognome del tutor aziendale 1/), ' Anna Verdi ');
+    // funzione o ruolo (US-1009): facoltativo, con un esempio
+    const role = screen.getByLabelText(/^Funzione o ruolo del tutor aziendale 1/);
+    expect(role).toHaveAccessibleDescription('Facoltativo, per esempio «Responsabile di produzione».');
+    await user.type(role, ' Responsabile di sala ');
     await user.click(screen.getByRole('button', { name: 'Aggiungi periodo' }));
     await user.type(screen.getByLabelText(/^Periodo 1: dal/), '2026-12-22');
     await user.type(screen.getByLabelText(/^Periodo 1: al/), '2027-01-06');
@@ -121,7 +125,7 @@ describe('<InternshipForm>', () => {
       site: null,
       siteMunicipalityId: null,
       atecoCodeId: 'A1',
-      companyTutors: [{ fullName: 'Anna Verdi', contact: null }],
+      companyTutors: [{ fullName: 'Anna Verdi', role: 'Responsabile di sala', contact: null }],
       fiscalCode: 'RSSMRA85T10A562S',
       birthDate: null,
       birthPlace: null,
@@ -306,6 +310,34 @@ describe('<InternshipForm>', () => {
       expect(onConflict).toHaveBeenCalledWith('La scheda è stata modificata nel frattempo'),
     );
     expect(onSubmit.mock.calls[2][0]).toMatchObject({ version: 1 });
+  });
+
+  it('ruolo del tutor aziendale salvato; l’errore del server va sul suo campo (US-1009)', async () => {
+    const user = userEvent.setup();
+    const { onSubmit } = renderForm({
+      ...empty,
+      version: 2,
+      companyTutors: [{ fullName: 'Anna Verdi', role: 'Capo sala' }],
+    });
+    onSubmit.mockRejectedValueOnce(
+      error(400, { fieldErrors: [{ field: 'companyTutors[0].role', message: 'Massimo 200 caratteri' }] }),
+    );
+
+    expect(await screen.findByLabelText(/^Funzione o ruolo del tutor aziendale 1/)).toHaveValue('Capo sala');
+    await user.click(screen.getByRole('button', { name: 'Salva la scheda' }));
+
+    expect(
+      await screen.findByRole('link', {
+        name: 'Funzione o ruolo del tutor aziendale 1: Massimo 200 caratteri',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Funzione o ruolo del tutor aziendale 1/)).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
+    expect(onSubmit.mock.calls[0][0].companyTutors).toEqual([
+      { fullName: 'Anna Verdi', role: 'Capo sala', contact: null },
+    ]);
   });
 
   it('azienda senza codici ATECO: lo dice al posto della scelta', async () => {

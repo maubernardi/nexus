@@ -142,8 +142,8 @@ public class Internship extends AbstractTsidEntity {
         this.ticket = ticket;
     }
 
-    public void addCompanyTutor(String fullName, String contact) {
-        companyTutors.add(new InternshipCompanyTutor(this, fullName, contact));
+    public void addCompanyTutor(String fullName, String role, String contact) {
+        companyTutors.add(new InternshipCompanyTutor(this, fullName, role, contact));
     }
 
     public void addSuspension(LocalDate from, LocalDate to) {

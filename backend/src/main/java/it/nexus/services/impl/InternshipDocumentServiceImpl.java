@@ -39,6 +39,7 @@ import it.nexus.services.AuditService;
 import it.nexus.services.InternshipDocumentService;
 import it.nexus.services.InternshipService;
 import it.nexus.services.documents.AddressLine;
+import it.nexus.services.documents.CompanyTutorLine;
 import it.nexus.services.documents.DocxTemplate;
 import it.nexus.web.errors.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -137,7 +138,7 @@ public class InternshipDocumentServiceImpl implements InternshipDocumentService 
                 .map(p -> "dal %s al %s".formatted(DAY.format(p.from()), DAY.format(p.to())))
                 .collect(Collectors.joining("; ")));
         values.put("TUTOR_AZIENDALI", s.companyTutors().isEmpty() ? null : s.companyTutors().stream()
-                .map(t -> t.contact() == null ? t.fullName() : "%s (%s)".formatted(t.fullName(), t.contact()))
+                .map(CompanyTutorLine::of)
                 .collect(Collectors.joining("; ")));
         values.put("ORE_SETTIMANALI", s.weeklyMinutes() == null ? null : hours(s.weeklyMinutes()));
         values.put("MONTE_ORE_TOTALE", s.totalMinutes() == null ? null : hours(s.totalMinutes()));

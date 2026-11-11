@@ -137,10 +137,13 @@ export type TicketDetail = {
 };
 
 /**
- * Report di restituzione inviato (US-1101), non più modificabile. L'API omette i campi vuoti: testi non scritti e la
- * voce dell'esito non scelto (formula se non assunto, motivo se assunto).
+ * Report di restituzione inviato (US-1101), non più modificabile. L'API omette i campi vuoti: testi non scritti, la
+ * voce dell'esito non scelto (formula se non assunto, motivo se assunto) e la fine effettiva nei report inviati prima
+ * di US-1009.
  */
 export type ClosureReport = {
+  /** Fine effettiva del tirocinio (aaaa-mm-gg), per la relazione finale. */
+  actualEndDate?: string;
   companySatisfaction: number;
   beneficiarySatisfaction: number;
   objectives?: string;
@@ -155,6 +158,7 @@ export type ClosureReport = {
 
 /** Report di restituzione dal modulo (US-1101): conta la formula se assunto, il motivo se non assunto. */
 export type ClosureReportForm = {
+  actualEndDate: string;
   companySatisfaction: number;
   beneficiarySatisfaction: number;
   objectives: string | null;

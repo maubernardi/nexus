@@ -111,7 +111,7 @@ class InternshipDocumentIT {
         String json = """
                 {"internshipTypeId": "%s", "startDate": "2026-12-01", "expectedEndDate": "2027-05-31",
                  "site": "Via Roma 1", "siteMunicipalityId": "%s", "atecoCodeId": "%s",
-                 "companyTutors": [{"fullName": "Anna Verdi", "contact": "055 123456"}],
+                 "companyTutors": [{"fullName": "Anna Verdi", "role": "Responsabile di sala", "contact": "055 123456"}],
                  "fiscalCode": "RSSMRA85T10A562S", "birthDate": "1985-12-10", "birthPlace": "Firenze",
                  "residenceMunicipalityId": "%s", "residenceStreet": "Via Gramsci", "residenceStreetNumber": "12",
                  "suspensions": [{"from": "2026-12-22", "to": "2027-01-06"}],
@@ -123,7 +123,8 @@ class InternshipDocumentIT {
                 TsidMapper.toExternal(sesto.getId()));
         if (!complete) {
             json = json.replace("\"fiscalCode\": \"RSSMRA85T10A562S\", ", "")
-                    .replace("[{\"fullName\": \"Anna Verdi\", \"contact\": \"055 123456\"}]", "[]");
+                    .replace("[{\"fullName\": \"Anna Verdi\", \"role\": \"Responsabile di sala\", "
+                            + "\"contact\": \"055 123456\"}]", "[]");
         }
         String body = mockMvc.perform(put(internshipPath).header(USER, "tutor1")
                         .contentType(MediaType.APPLICATION_JSON).content(json))
@@ -164,7 +165,7 @@ class InternshipDocumentIT {
                 .contains("dal 22/12/2026 al 06/01/2027")
                 .contains("10 ore settimanali, per un monte ore complessivo di " + totalHours + " ore.")
                 .contains("Lunedì: 09:00–13:00 (4 ore)\nMercoledì: 09:00–13:00 e 14:00–18:00 (6 ore)")
-                .contains("Tutor del soggetto ospitante: Anna Verdi (055 123456).")
+                .contains("Tutor del soggetto ospitante: Anna Verdi, Responsabile di sala (055 123456).")
                 .contains("segnalazione n. " + ticket.getNumber())
                 .doesNotContain("{");
         // nessun dato mancante: le sole righe da completare a mano sono quelle delle firme
@@ -194,7 +195,7 @@ class InternshipDocumentIT {
         assertThat(text(result))
                 .startsWith("PROGETTO FORMATIVO DEL TIROCINIO DI INSERIMENTO SOCIO-TERAPEUTICO\n")
                 .contains("Mario Rossi, nato/a a Firenze il 10/12/1985")
-                .contains("Tutor aziendali: Anna Verdi (055 123456).")
+                .contains("Tutor aziendali: Anna Verdi, Responsabile di sala (055 123456).")
                 .contains("Monte ore complessivo\n" + totalHours)
                 .contains("Lunedì: 09:00–13:00 (4 ore)\nMercoledì: 09:00–13:00 e 14:00–18:00 (6 ore)")
                 .doesNotContain("{");

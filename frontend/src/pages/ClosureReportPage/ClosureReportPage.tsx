@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { CircleAlert } from 'lucide-react';
 import { useForm, useWatch, type UseFormRegisterReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -6,13 +6,16 @@ import { Link, useParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Textarea } from '@/components/ui/textarea';
 import { apiError } from '@/config/api/errors';
 import type { ClosureReportForm, TicketDetail } from '@/config/api/ticketApi';
+import { useInternship } from '@/config/hooks/useInternship';
 import { useHiringFormulas, useNoHireReasons } from '@/config/hooks/useReferenceData';
 import { useSubmitClosureReport, useTicket } from '@/config/hooks/useTickets';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
+import { formatIsoDate } from '@/lib/isoDate';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
 import { FormField } from '@/molecules/FormField/FormField';
 import { ClosureReportView } from '@/organisms/ClosureReportView/ClosureReportView';
@@ -20,6 +23,7 @@ import { ClosureReportView } from '@/organisms/ClosureReportView/ClosureReportVi
 type YesNo = '' | 'yes' | 'no';
 
 type ReportValues = {
+  actualEndDate: string;
   companySatisfaction: string;
   beneficiarySatisfaction: string;
   objectives: string;
@@ -31,6 +35,7 @@ type ReportValues = {
 };
 
 const EMPTY: ReportValues = {
+  actualEndDate: '',
   companySatisfaction: '',
   beneficiarySatisfaction: '',
   objectives: '',
@@ -42,6 +47,7 @@ const EMPTY: ReportValues = {
 };
 
 const FIELDS = [
+  'actualEndDate',
   'companySatisfaction',
   'beneficiarySatisfaction',
   'hired',
@@ -67,6 +73,7 @@ const focusId = (name: keyof ReportValues): string =>
   RADIO_FIELDS.includes(name) ? `${fieldId(name)}-0` : fieldId(name);
 
 const toPayload = (v: ReportValues): ClosureReportForm => ({
+  actualEndDate: v.actualEndDate,
   companySatisfaction: Number(v.companySatisfaction),
   beneficiarySatisfaction: Number(v.beneficiarySatisfaction),
   objectives: v.objectives.trim() || null,
@@ -157,18 +164,45 @@ export const ClosureReportPage = () => {
         })}
       </p>
       <p>{t('closureReport.intro')}</p>
-      <ReportForm ticket={d} onSent={setSent} />
+      <InternshipDates ticketId={d.id}>
+        {(dates) => <ReportForm ticket={d} dates={dates} onSent={setSent} />}
+      </InternshipDates>
       {backLink}
     </div>
   );
 };
 
+/** Date della scheda del tirocinio: l'inizio per il controllo, la fine prevista per precompilare la fine effettiva. */
+type InternshipDatesValue = { startDate?: string; expectedEndDate?: string };
+
+type InternshipDatesProps = {
+  ticketId: string;
+  children: (dates: InternshipDatesValue) => ReactNode;
+};
+
+/**
+ * Legge la scheda prima di mostrare il modulo, così la fine effettiva parte precompilata (US-1009). Se la scheda non si
+ * legge il modulo parte comunque, con la data vuota: il controllo sull'inizio lo fa il server.
+ */
+const InternshipDates = ({ ticketId, children }: InternshipDatesProps) => {
+  const { t } = useTranslation();
+  const internship = useInternship(ticketId);
+  if (internship.isPending) {
+    return <p role="status">{t('common.loading')}</p>;
+  }
+  return children({
+    startDate: internship.data?.startDate ?? undefined,
+    expectedEndDate: internship.data?.expectedEndDate ?? undefined,
+  });
+};
+
 type ReportFormProps = {
   ticket: TicketDetail;
+  dates: InternshipDatesValue;
   onSent: (ticket: TicketDetail) => void;
 };
 
-const ReportForm = ({ ticket: d, onSent }: ReportFormProps) => {
+const ReportForm = ({ ticket: d, dates, onSent }: ReportFormProps) => {
   const { t } = useTranslation();
   const formulas = useHiringFormulas();
   const reasons = useNoHireReasons();
@@ -185,7 +219,7 @@ const ReportForm = ({ ticket: d, onSent }: ReportFormProps) => {
     control,
     formState: { errors, submitCount },
   } = useForm<ReportValues>({
-    defaultValues: EMPTY,
+    defaultValues: { ...EMPTY, actualEndDate: dates.expectedEndDate ?? '' },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
     // il focus va al riepilogo degli errori (non al primo campo): lo gestisce useErrorSummaryFocus
@@ -268,6 +302,33 @@ const ReportForm = ({ ticket: d, onSent }: ReportFormProps) => {
 
       {/* durante la conferma i campi non si cambiano: si invia ciò che è stato controllato */}
       <fieldset disabled={pending !== null} className="space-y-6">
+        <FormField
+          id={fieldId('actualEndDate')}
+          label={t('closureReport.fields.actualEndDate')}
+          required
+          hint={t(
+            dates.expectedEndDate
+              ? 'closureReport.hints.actualEndDatePrefilled'
+              : 'closureReport.hints.actualEndDate',
+          )}
+          error={errors.actualEndDate?.message}
+        >
+          {(p) => (
+            <Input
+              {...p}
+              type="date"
+              className="max-w-48"
+              {...register('actualEndDate', {
+                required,
+                // stesso controllo del server; le date ISO si confrontano come testo
+                validate: (v) =>
+                  !dates.startDate ||
+                  v >= dates.startDate ||
+                  t('closureReport.beforeStart', { date: formatIsoDate(dates.startDate) }),
+              })}
+            />
+          )}
+        </FormField>
         <RadioField
           name="companySatisfaction"
           legend={t('closureReport.fields.companySatisfaction')}

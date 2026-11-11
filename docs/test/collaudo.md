@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `ed260ad` (10/11/2026): Sprint 1–12 completi (comuni e province, cataloghi dei documenti, contatti e presa in carico del beneficiario, sede di competenza), con le correzioni del controllo in Chrome |
-| **Ultimo aggiornamento** | 11/11/2026 (T-23.1: da provare dopo il deploy di US-1007; T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 11/11/2026 (T-23.1 e T-23.2: da provare dopo il deploy di US-1007 e US-1009; T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -881,3 +881,18 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      numero civico vuoti, e la residenza compare tra i dati che mancano per l'avvio.
   5. Compila comune, via e numero civico della residenza e il comune della sede, salva e scarica la Convenzione.
      **Atteso:** «residente in Via … 12, Comune (PR)» e la sede del tirocinio «Via …, Comune (PR)».
+
+- [ ] **T-23.2 Fine effettiva del tirocinio e ruolo del tutor aziendale (US-1009)**
+  1. Come `tutor1` apri la scheda del tirocinio di una segnalazione con l'appuntamento fissato e aggiungi un tutor
+     aziendale. **Atteso:** tra nome e recapito c'è «Funzione o ruolo del tutor aziendale 1», facoltativo, con
+     l'esempio «Responsabile di produzione». Scrivi un ruolo e salva. **Atteso:** salvato; riaprendo la scheda il ruolo
+     c'è.
+  2. Scarica la Convenzione. **Atteso:** «Tutor del soggetto ospitante: Nome, ruolo (recapito).»; senza il ruolo
+     «Nome (recapito)».
+  3. Avvia il tirocinio e apri **Compila il report di restituzione**. **Atteso:** il primo campo è «Fine effettiva del
+     tirocinio», obbligatorio, già compilato con la fine prevista della scheda.
+  4. Metti una data prima dell'inizio del tirocinio e invia. **Atteso:** «Fine effettiva del tirocinio: La fine
+     effettiva non può precedere l'inizio del tirocinio (gg/mm/aaaa)» nel riepilogo degli errori. Svuota il campo e
+     invia. **Atteso:** «Campo obbligatorio».
+  5. Metti una data prima della fine prevista, compila il resto e invia. **Atteso:** il report inviato mostra per prima
+     la «Fine effettiva del tirocinio» con quella data; la scheda del tirocinio ha ancora la fine prevista di prima.
