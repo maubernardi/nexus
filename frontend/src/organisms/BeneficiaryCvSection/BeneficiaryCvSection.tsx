@@ -9,6 +9,7 @@ import {
   useDownloadBeneficiaryCv,
   useUploadBeneficiaryCv,
 } from '@/config/hooks/useBeneficiaries';
+import { useFocusAfterRender } from '@/hooks/useFocusAfterRender';
 import { saveBlob } from '@/lib/download';
 
 type Feedback = { kind: 'status' | 'alert'; text: string };
@@ -32,14 +33,14 @@ export const BeneficiaryCvSection = ({ beneficiary }: { beneficiary: Beneficiary
   const download = useDownloadBeneficiaryCv();
   const [file, setFile] = useState<File | null>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const feedbackRef = useRef<HTMLParagraphElement>(null);
+  const { ref: feedbackRef, requestFocus: focusFeedback } = useFocusAfterRender<HTMLParagraphElement>();
   const inputRef = useRef<HTMLInputElement>(null);
   const hasCv = Boolean(beneficiary.cvFileName);
   const busy = upload.isPending || remove.isPending;
 
   const show = (next: Feedback): void => {
     setFeedback(next);
-    requestAnimationFrame(() => feedbackRef.current?.focus());
+    focusFeedback();
   };
 
   const failure = (e: unknown): string => {

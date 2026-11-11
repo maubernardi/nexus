@@ -11,6 +11,7 @@ import {
   useMunicipalityStatus,
   usePreviewMunicipalityImport,
 } from '@/config/hooks/useMunicipalities';
+import { useFocusAfterRender } from '@/hooks/useFocusAfterRender';
 import { dayBefore, formatIsoDate, todayIso } from '@/lib/isoDate';
 
 const ISTAT_PAGE = 'https://www.istat.it/classificazione/codici-dei-comuni-delle-province-e-delle-regioni/';
@@ -85,13 +86,13 @@ const ImportForm = () => {
   const [validFrom, setValidFrom] = useState(todayIso);
   const [result, setResult] = useState<MunicipalityImportResult | null>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const feedbackRef = useRef<HTMLParagraphElement>(null);
-  const previewRef = useRef<HTMLHeadingElement>(null);
+  const { ref: feedbackRef, requestFocus: focusFeedback } = useFocusAfterRender<HTMLParagraphElement>();
+  const { ref: previewRef, requestFocus: focusPreview } = useFocusAfterRender<HTMLHeadingElement>();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const show = (next: Feedback): void => {
     setFeedback(next);
-    requestAnimationFrame(() => feedbackRef.current?.focus());
+    focusFeedback();
   };
 
   const failure = (e: unknown): string => {
@@ -116,7 +117,7 @@ const ImportForm = () => {
     if (!validFrom) return show({ kind: 'alert', text: t('municipalities.errors.date') });
     try {
       setResult(await preview.mutateAsync(file));
-      requestAnimationFrame(() => previewRef.current?.focus());
+      focusPreview();
     } catch (e) {
       show({ kind: 'alert', text: failure(e) });
     }

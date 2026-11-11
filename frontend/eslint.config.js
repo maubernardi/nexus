@@ -25,6 +25,14 @@ export default defineConfig([
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/consistent-type-imports': 'error',
       'no-console': ['error', { allow: ['warn', 'error'] }],
+      'no-restricted-globals': [
+        'error',
+        {
+          // il fotogramma può arrivare prima che React scriva il DOM: il focus si perde (EN-9)
+          name: 'requestAnimationFrame',
+          message: 'Per spostare il focus usare useFocusAfterRender (@/hooks/useFocusAfterRender).',
+        },
+      ],
       'no-restricted-syntax': [
         'error',
         { selector: 'ExportDefaultDeclaration', message: 'Usare named export.' },

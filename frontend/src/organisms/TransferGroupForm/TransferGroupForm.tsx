@@ -1,4 +1,4 @@
-import { useId, useRef, useState, type FormEvent } from 'react';
+import { useId, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
@@ -8,6 +8,7 @@ import { NativeSelect } from '@/components/ui/native-select';
 import { apiError } from '@/config/api/errors';
 import type { TransferGroup, TransferResult } from '@/config/api/ticketTransferApi';
 import { useTransferTickets } from '@/config/hooks/useTicketTransfer';
+import { useFocusAfterRender } from '@/hooks/useFocusAfterRender';
 
 const link = 'font-medium text-primary underline underline-offset-4';
 
@@ -29,13 +30,13 @@ export const TransferGroupForm = ({ group, onMoved, showTutor = false }: Transfe
   const [selected, setSelected] = useState<string[]>(() => (showTutor ? [] : group.tickets.map((x) => x.id)));
   const [tutorId, setTutorId] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const errorRef = useRef<HTMLParagraphElement>(null);
+  const { ref: errorRef, requestFocus: focusError } = useFocusAfterRender<HTMLParagraphElement>();
   const headingId = `${baseId}-heading`;
   const selectId = `${baseId}-tutor`;
 
   const showError = (message: string): void => {
     setError(message);
-    requestAnimationFrame(() => errorRef.current?.focus());
+    focusError();
   };
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {

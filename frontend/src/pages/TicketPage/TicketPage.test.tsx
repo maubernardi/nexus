@@ -223,6 +223,21 @@ describe('<TicketPage>', () => {
     await waitFor(() => expect(outcome).toHaveFocus());
   });
 
+  it('sede di competenza: annullando, il focus torna sul comando', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({
+        competenceSite: { id: 'S1', code: 'FIRENZE', name: 'Firenze' },
+        canChangeCompetenceSite: true,
+      }),
+    );
+    renderPage();
+
+    await user.click(await screen.findByRole('button', { name: 'Correggi la sede di competenza' }));
+    await user.click(screen.getByRole('button', { name: 'Annulla' }));
+    expect(screen.getByRole('button', { name: 'Correggi la sede di competenza' })).toHaveFocus();
+  });
+
   it('sede di competenza: senza permesso nessun comando', async () => {
     vi.mocked(fetchTicket).mockResolvedValue(detail());
     renderPage();

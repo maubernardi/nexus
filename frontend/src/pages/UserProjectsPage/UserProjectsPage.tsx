@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router';
 
@@ -10,6 +10,7 @@ import { apiError } from '@/config/api/errors';
 import type { AdminUser } from '@/config/api/userAdminApi';
 import { useCatalog } from '@/config/hooks/useCatalogs';
 import { useUpdateUserProjects, useUser } from '@/config/hooks/useUsers';
+import { useFocusAfterRender } from '@/hooks/useFocusAfterRender';
 import type { UsersPageState } from '@/pages/UsersPage/UsersPage';
 
 const backLink = 'font-medium text-primary underline underline-offset-4';
@@ -74,7 +75,7 @@ const ProjectsForm = ({ user, catalog }: ProjectsFormProps) => {
     (user.coordinatedProjects ?? []).map((p) => p.id),
   );
   const [error, setError] = useState<string | null>(null);
-  const errorRef = useRef<HTMLParagraphElement>(null);
+  const { ref: errorRef, requestFocus: focusError } = useFocusAfterRender<HTMLParagraphElement>();
 
   const assigned = new Set(user.projects.map((p) => p.id));
   // attivi, più i disattivati ancora assegnati (si possono solo togliere); il catalogo è già in ordine
@@ -105,7 +106,7 @@ const ProjectsForm = ({ user, catalog }: ProjectsFormProps) => {
         body?.fieldErrors?.[0]?.message ??
           (body?.status === 400 && body.message ? body.message : t('users.error')),
       );
-      requestAnimationFrame(() => errorRef.current?.focus());
+      focusError();
     }
   };
 
