@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +33,7 @@ import it.nexus.domain.AppUser;
 import it.nexus.domain.Company;
 import it.nexus.domain.JobCategory;
 import it.nexus.domain.JobSlot;
+import it.nexus.domain.Municipality;
 import it.nexus.domain.TestEntities;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.Zone;
@@ -47,13 +49,14 @@ import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ProjectRepository;
 import it.nexus.repository.TicketRepository;
 import it.nexus.repository.ZoneRepository;
+import it.nexus.support.WorkflowScenarios;
 import jakarta.persistence.EntityManager;
 
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import(TestcontainersConfiguration.class)
+@Import({TestcontainersConfiguration.class, WorkflowScenarios.class})
 class CompanyResourceIT {
 
     private static final String USER = MockHeaderAuthenticationFilter.HEADER;
@@ -70,6 +73,7 @@ class CompanyResourceIT {
     @Autowired TicketRepository tickets;
     @Autowired JobSlotRepository jobSlots;
     @Autowired EntityManager em;
+    @Autowired WorkflowScenarios scenarios;
 
     @BeforeEach
     void setUp() {
@@ -114,6 +118,48 @@ class CompanyResourceIT {
                             .containsEntry("email", Map.of("redacted", true));
                     assertThat(e.getChanges().toString()).doesNotContain("Paola Neri", "055 123456", "info@azienda.test");
                 });
+    }
+
+    @Test
+    void sedeLegaleConIlComune_auditConIValori_versioneChiusaNonSiSceglie() throws Exception {
+        Municipality firenze = scenarios.municipality("Firenze", "FI");
+        Municipality sesto = scenarios.municipality("Sesto Fiorentino", "FI");
+        em.flush();
+        String firenzeId = TsidMapper.toExternal(firenze.getId());
+        String id = JsonPath.read(create("operatore.cc", body("Officina Rossi", "12345678901",
+                        ", \"legalMunicipalityId\": \"%s\"".formatted(firenzeId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.legalMunicipality.name").value("Firenze"))
+                .andExpect(jsonPath("$.legalMunicipality.provinceAbbreviation").value("FI"))
+                .andReturn().getResponse().getContentAsString(), "$.id");
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.COMPANY,
+                TsidMapper.toInternal(id)).getFirst().getChanges().get("legalMunicipality"))
+                .extracting("after").isEqualTo("Firenze (FI)");
+        mockMvc.perform(get(API).header(USER, "operatore.cc").param("search", "Officina"))
+                .andExpect(jsonPath("$[0].legalMunicipality.name").value("Firenze"));
+
+        // la versione salvata resta anche se chiusa; una versione chiusa non si sceglie di nuovo
+        firenze.close(LocalDate.of(2026, 6, 1));
+        sesto.close(LocalDate.of(2026, 6, 1));
+        em.flush();
+        mockMvc.perform(put(API + "/" + id).header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
+                        .content(body("Officina Rossi", "12345678901",
+                                ", \"legalMunicipalityId\": \"%s\", \"version\": 0".formatted(firenzeId))))
+                .andExpect(status().isOk());
+        mockMvc.perform(put(API + "/" + id).header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
+                        .content(body("Officina Rossi", "12345678901", ", \"legalMunicipalityId\": \"%s\", \"version\": 0"
+                                .formatted(TsidMapper.toExternal(sesto.getId())))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("legalMunicipalityId"));
+
+        // senza comune: tolto, e l'audit registra il cambio
+        mockMvc.perform(put(API + "/" + id).header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
+                        .content(body("Officina Rossi", "12345678901", ", \"version\": 0")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.legalMunicipality").doesNotExist());
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.COMPANY,
+                TsidMapper.toInternal(id)).getLast().getChanges())
+                .containsOnlyKeys("legalMunicipality");
     }
 
     @Test

@@ -32,6 +32,7 @@ import it.nexus.domain.CompanyAtecoCode;
 import it.nexus.domain.CompanyLegalRepresentative;
 import it.nexus.domain.InternshipType;
 import it.nexus.domain.JobSlot;
+import it.nexus.domain.Municipality;
 import it.nexus.domain.Project;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.enumeration.AuditEntityType;
@@ -71,12 +72,15 @@ class InternshipDocumentIT {
     private Ticket ticket;
     private String internshipPath;
     private String atecoId;
+    private Municipality sesto;
 
     @BeforeEach
     void setUp() {
         Actors a = scenarios.actors();
         place = scenarios.place();
-        place.company().setLegalAddress("Via Garibaldi 3, 50123 Firenze");
+        place.company().setLegalAddress("Via Garibaldi 3");
+        place.company().setLegalMunicipality(scenarios.municipality("Firenze", "FI"));
+        sesto = scenarios.municipality("Sesto Fiorentino", "FI");
         Project project = scenarios.project("GOL", a.tutor1(), a.tutor2());
         JobSlot slot = scenarios.freeSlot(place, "Aiuto cuoco");
         ticket = scenarios.appointmentTicket(a.tutor1(), project, slot, a.operator());
@@ -106,16 +110,17 @@ class InternshipDocumentIT {
     private String save(String typeId, boolean complete) throws Exception {
         String json = """
                 {"internshipTypeId": "%s", "startDate": "2026-12-01", "expectedEndDate": "2027-05-31",
-                 "site": "Via Roma 1, Firenze", "atecoCodeId": "%s",
+                 "site": "Via Roma 1", "siteMunicipalityId": "%s", "atecoCodeId": "%s",
                  "companyTutors": [{"fullName": "Anna Verdi", "contact": "055 123456"}],
                  "fiscalCode": "RSSMRA85T10A562S", "birthDate": "1985-12-10", "birthPlace": "Firenze",
-                 "residence": "Via Dante 2, Firenze",
+                 "residenceMunicipalityId": "%s", "residenceStreet": "Via Gramsci", "residenceStreetNumber": "12",
                  "suspensions": [{"from": "2026-12-22", "to": "2027-01-06"}],
                  "firstSlotStart": "09:00", "firstSlotEnd": "13:00", "secondSlotStart": "14:00", "secondSlotEnd": "18:00",
                  "excludeHolidays": true,
                  "schedule": [{"dayOfWeek": 1, "firstSlot": true, "secondSlot": false},
                               {"dayOfWeek": 3, "firstSlot": true, "secondSlot": true, "minutes": 360}],
-                 "version": null}""".formatted(typeId, atecoId);
+                 "version": null}""".formatted(typeId, TsidMapper.toExternal(sesto.getId()), atecoId,
+                TsidMapper.toExternal(sesto.getId()));
         if (!complete) {
             json = json.replace("\"fiscalCode\": \"RSSMRA85T10A562S\", ", "")
                     .replace("[{\"fullName\": \"Anna Verdi\", \"contact\": \"055 123456\"}]", "[]");
@@ -147,11 +152,13 @@ class InternshipDocumentIT {
         assertThat(text)
                 .contains("CONVENZIONE DI TIROCINIO CURRICULARE")
                 .contains(place.company().getName() + ", partita IVA " + place.company().getVatCode()
-                        + ", con sede legale in Via Garibaldi 3, 50123 Firenze")
+                        + ", con sede legale in Via Garibaldi 3, Firenze (FI)")
                 .contains("codice ATECO 56.10.11 – Ristorazione con somministrazione")
                 .contains("legale rappresentante Laura Bianchi, nato/a a Roma il 01/01/1980, codice fiscale "
                         + "BNCLRA80A41H501D, residente in Via Dante 2, Firenze")
-                .contains("Mario Rossi, nato/a a Firenze il 10/12/1985, codice fiscale RSSMRA85T10A562S")
+                .contains("Mario Rossi, nato/a a Firenze il 10/12/1985, codice fiscale RSSMRA85T10A562S, residente in "
+                        + "Via Gramsci 12, Sesto Fiorentino (FI).")
+                .contains("Sede del tirocinio\nVia Roma 1, Sesto Fiorentino (FI)")
                 .contains("Aiuto cuoco")
                 .contains("dal 01/12/2026 al 31/05/2027")
                 .contains("dal 22/12/2026 al 06/01/2027")
@@ -209,7 +216,8 @@ class InternshipDocumentIT {
         assertThat(text)
                 .startsWith("CONVENZIONE DI TIROCINIO\n")
                 .contains("Tipo nuovo " + ticket.getId())
-                .contains("codice fiscale " + InternshipDocumentServiceImpl.BLANK + ", residente in Via Dante 2")
+                .contains("codice fiscale " + InternshipDocumentServiceImpl.BLANK
+                        + ", residente in Via Gramsci 12, Sesto Fiorentino (FI)")
                 .contains("Tutor del soggetto ospitante: " + InternshipDocumentServiceImpl.BLANK + ".")
                 .doesNotContain("{");
     }

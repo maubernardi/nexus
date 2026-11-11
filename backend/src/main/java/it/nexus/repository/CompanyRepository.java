@@ -3,6 +3,7 @@ package it.nexus.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,7 +16,11 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 
     Optional<Company> findByVatCode(String vatCode);
 
-    /** Ricerca per ragione sociale (senza distinzione di maiuscole) o partita IVA, ordinata per nome. */
+    /**
+     * Ricerca per ragione sociale (senza distinzione di maiuscole) o partita IVA, ordinata per nome; con il comune della
+     * sede legale (US-1007) già caricato.
+     */
+    @EntityGraph(attributePaths = {"legalMunicipality", "legalMunicipality.province"})
     @Query("""
             select c from Company c
             where (:includeInactive = true or c.active = true)

@@ -59,8 +59,14 @@ public class Internship extends AbstractTsidEntity {
     @Column(name = "expected_end_date")
     private LocalDate expectedEndDate;
 
+    /** Indirizzo della sede del tirocinio; il comune è a parte (US-1007). */
     @Column(name = "site", length = 300)
     private String site;
+
+    /** Versione del comune della sede scelta dall'elenco ufficiale (US-1007). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "site_municipality_id")
+    private Municipality siteMunicipality;
 
     /** Codice scelto tra quelli dell'azienda della segnalazione (US-506). */
     @ManyToOne(fetch = FetchType.LAZY)
@@ -76,8 +82,20 @@ public class Internship extends AbstractTsidEntity {
     @Column(name = "birth_place", length = 200)
     private String birthPlace;
 
+    /** Residenza del beneficiario (US-1007): versione del comune, via e numero civico. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "residence_municipality_id")
+    private Municipality residenceMunicipality;
+
+    /**
+     * Via della residenza. La colonna è quella della residenza in testo libero di prima: i testi già inseriti restano
+     * qui e la migrazione resta solo additiva (A16).
+     */
     @Column(name = "residence", length = 300)
-    private String residence;
+    private String residenceStreet;
+
+    @Column(name = "residence_street_number", length = 20)
+    private String residenceStreetNumber;
 
     @Column(name = "notes", length = 2000)
     private String notes;
@@ -145,6 +163,7 @@ public class Internship extends AbstractTsidEntity {
         startDate = null;
         expectedEndDate = null;
         site = null;
+        siteMunicipality = null;
         atecoCode = null;
         notes = null;
         firstSlotStart = DEFAULT_FIRST_START;
@@ -162,7 +181,9 @@ public class Internship extends AbstractTsidEntity {
         fiscalCode = null;
         birthDate = null;
         birthPlace = null;
-        residence = null;
+        residenceMunicipality = null;
+        residenceStreet = null;
+        residenceStreetNumber = null;
         notes = null;
     }
 }

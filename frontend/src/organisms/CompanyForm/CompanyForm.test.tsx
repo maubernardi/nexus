@@ -4,9 +4,22 @@ import { AxiosError, AxiosHeaders } from 'axios';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { Company } from '@/config/api/companyApi';
+import { searchMunicipalities } from '@/config/api/municipalityApi';
 import { CompanyForm } from '@/organisms/CompanyForm/CompanyForm';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderWithProviders } from '@/tests/renderWithProviders';
+
+vi.mock('@/config/api/municipalityApi', () => ({ searchMunicipalities: vi.fn() }));
+
+const FIRENZE = {
+  id: 'M1',
+  name: 'Firenze',
+  istatCode: '048017',
+  cadastralCode: 'D612',
+  provinceName: 'Firenze',
+  provinceAbbreviation: 'FI',
+  validFrom: '2026-01-01',
+};
 
 const saved: Company = {
   id: 'C1',
@@ -62,6 +75,7 @@ describe('<CompanyForm>', () => {
       name: 'Officina Rossi',
       vatCode: '12345678901',
       legalAddress: null,
+      legalMunicipalityId: null,
       contactPerson: null,
       phone: null,
       email: null,
@@ -94,5 +108,77 @@ describe('<CompanyForm>', () => {
       await screen.findByRole('link', { name: "Partita IVA: Esiste già un'azienda con questa partita IVA" }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/^Partita IVA/)).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('sede legale: indirizzo e comune scelto dall’elenco (US-1007)', async () => {
+    vi.mocked(searchMunicipalities).mockResolvedValue([FIRENZE]);
+    const user = userEvent.setup();
+    const { onSubmit } = renderForm();
+    await user.type(screen.getByLabelText(/^Ragione sociale/), 'Officina Rossi');
+    await user.type(screen.getByLabelText(/^Partita IVA/), '12345678901');
+    await user.type(screen.getByLabelText(/^Indirizzo della sede legale/), 'Via Roma 1');
+    const municipality = screen.getByRole('combobox', { name: /^Comune della sede legale/ });
+
+    // testo senza scelta: errore sul campo, nulla inviato
+    await user.type(municipality, 'fire');
+    await user.click(screen.getByRole('button', { name: 'Registra azienda' }));
+    expect(
+      await screen.findByRole('link', { name: 'Comune della sede legale: Scegli il comune dall’elenco' }),
+    ).toBeInTheDocument();
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    await user.click(municipality);
+    await user.keyboard('{Backspace}');
+    await user.click(await screen.findByRole('option', { name: 'Firenze (FI)' }));
+    await expectNoAxeViolations();
+    await user.click(screen.getByRole('button', { name: 'Registra azienda' }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(onSubmit.mock.calls[0][0]).toMatchObject({
+      legalAddress: 'Via Roma 1',
+      legalMunicipalityId: 'M1',
+    });
+  });
+
+  it('modifica: il comune salvato è già scelto; l’errore del server va sul suo campo', async () => {
+    const onSubmit = vi.fn().mockRejectedValue(
+      new AxiosError('Bad Request', '400', undefined, undefined, {
+        status: 400,
+        statusText: 'Bad Request',
+        headers: {},
+        config: { headers: new AxiosHeaders() },
+        data: {
+          status: 400,
+          fieldErrors: [
+            {
+              field: 'legalMunicipalityId',
+              message: 'Il comune Firenze non è più valido: sceglilo di nuovo',
+            },
+          ],
+        },
+      }),
+    );
+    const user = userEvent.setup();
+    renderWithProviders(
+      <main>
+        <CompanyForm
+          company={{ ...saved, legalAddress: 'Via Roma 1', legalMunicipality: FIRENZE }}
+          submitLabel="Salva modifiche"
+          onSubmit={onSubmit}
+          onSuccess={vi.fn()}
+        />
+      </main>,
+    );
+    const municipality = screen.getByRole('combobox', { name: /^Comune della sede legale/ });
+    expect(municipality).toHaveValue('Firenze (FI)');
+
+    await user.click(screen.getByRole('button', { name: 'Salva modifiche' }));
+    expect(onSubmit.mock.calls[0][0]).toMatchObject({ legalMunicipalityId: 'M1', version: 0 });
+    expect(
+      await screen.findByRole('link', {
+        name: 'Comune della sede legale: Il comune Firenze non è più valido: sceglilo di nuovo',
+      }),
+    ).toBeInTheDocument();
+    expect(municipality).toHaveAttribute('aria-invalid', 'true');
   });
 });

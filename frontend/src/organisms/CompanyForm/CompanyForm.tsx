@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useForm, type FieldPath } from 'react-hook-form';
+import { Controller, useForm, type FieldPath } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
@@ -9,17 +9,32 @@ import { apiError } from '@/config/api/errors';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
 import { FormField } from '@/molecules/FormField/FormField';
+import { MunicipalityField } from '@/molecules/MunicipalityField/MunicipalityField';
+import {
+  isUnchosen,
+  toMunicipalityValue,
+  type MunicipalityValue,
+} from '@/molecules/MunicipalityField/municipalityValue';
 
 type CompanyFormValues = {
   name: string;
   vatCode: string;
   legalAddress: string;
+  legalMunicipality: MunicipalityValue;
   contactPerson: string;
   phone: string;
   email: string;
 };
 
-const FIELDS = ['name', 'vatCode', 'legalAddress', 'contactPerson', 'phone', 'email'] as const;
+const FIELDS = [
+  'name',
+  'vatCode',
+  'contactPerson',
+  'legalAddress',
+  'legalMunicipality',
+  'phone',
+  'email',
+] as const;
 
 const fieldId = (field: keyof CompanyFormValues): string => `company-${field}`;
 
@@ -27,6 +42,7 @@ const toValues = (company?: Company): CompanyFormValues => ({
   name: company?.name ?? '',
   vatCode: company?.vatCode ?? '',
   legalAddress: company?.legalAddress ?? '',
+  legalMunicipality: toMunicipalityValue(company?.legalMunicipality ?? undefined),
   contactPerson: company?.contactPerson ?? '',
   phone: company?.phone ?? '',
   email: company?.email ?? '',
@@ -36,6 +52,7 @@ const toPayload = (v: CompanyFormValues): CompanyPayload => ({
   name: v.name.trim(),
   vatCode: v.vatCode.trim(),
   legalAddress: v.legalAddress.trim() || null,
+  legalMunicipalityId: v.legalMunicipality.municipality?.id ?? null,
   contactPerson: v.contactPerson.trim() || null,
   phone: v.phone.trim() || null,
   email: v.email.trim() || null,
@@ -55,6 +72,7 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
   const [formError, setFormError] = useState<'generic' | 'conflict' | null>(null);
   const {
     register,
+    control,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting, submitCount },
@@ -71,6 +89,7 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
     name: t('company.fields.name'),
     vatCode: t('company.fields.vatCode'),
     legalAddress: t('company.fields.legalAddress'),
+    legalMunicipality: t('company.fields.legalMunicipality'),
     contactPerson: t('company.fields.contactPerson'),
     phone: t('company.fields.phone'),
     email: t('company.fields.email'),
@@ -88,9 +107,10 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
       onSuccess(await onSubmit({ ...toPayload(values), version: company?.version }));
     } catch (error) {
       const body = apiError(error);
-      const fieldErrors = (body?.fieldErrors ?? []).filter((fe) =>
-        (FIELDS as readonly string[]).includes(fe.field),
-      );
+      // il server parla dell'id del comune, il modulo del campo del comune (US-1007)
+      const fieldErrors = (body?.fieldErrors ?? [])
+        .map((fe) => (fe.field === 'legalMunicipalityId' ? { ...fe, field: 'legalMunicipality' } : fe))
+        .filter((fe) => (FIELDS as readonly string[]).includes(fe.field));
       if (fieldErrors.length > 0) {
         fieldErrors.forEach((fe) =>
           setError(fe.field as FieldPath<CompanyFormValues>, { type: 'server', message: fe.message }),
@@ -163,10 +183,33 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
         <FormField
           id={fieldId('legalAddress')}
           label={labels.legalAddress}
+          hint={t('company.hints.legalAddress')}
           error={errors.legalAddress?.message}
-          className="md:col-span-2"
         >
           {(p) => <Input {...p} autoComplete="off" {...register('legalAddress', { maxLength: max(300) })} />}
+        </FormField>
+        <FormField
+          id={fieldId('legalMunicipality')}
+          label={labels.legalMunicipality}
+          hint={t('municipalityField.hint')}
+          error={errors.legalMunicipality?.message}
+        >
+          {(p) => (
+            <Controller
+              control={control}
+              name="legalMunicipality"
+              rules={{ validate: (v) => !isUnchosen(v) || t('municipalityField.choose') }}
+              render={({ field }) => (
+                <MunicipalityField
+                  {...p}
+                  ref={field.ref}
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                />
+              )}
+            />
+          )}
         </FormField>
         <FormField id={fieldId('phone')} label={labels.phone} error={errors.phone?.message}>
           {(p) => (

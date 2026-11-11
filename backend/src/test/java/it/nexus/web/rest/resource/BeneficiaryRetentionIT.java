@@ -90,7 +90,9 @@ class BeneficiaryRetentionIT {
         internship.setFiscalCode("RSSMRA95A01D612X");
         internship.setBirthDate(LocalDate.of(1995, 1, 1));
         internship.setBirthPlace("Firenze");
-        internship.setResidence("Via Roma 1, Firenze");
+        internship.setResidenceMunicipality(scenarios.municipality("Firenze", "FI"));
+        internship.setResidenceStreet("Via Roma");
+        internship.setResidenceStreetNumber("1");
         internship.setNotes("Note del Tutor");
         internships.saveAndFlush(internship);
         Instant old = Instant.now().minus(25 * 31L, ChronoUnit.DAYS);
@@ -193,7 +195,9 @@ class BeneficiaryRetentionIT {
         assertThat(internship.getFiscalCode()).isNull();
         assertThat(internship.getBirthDate()).isNull();
         assertThat(internship.getBirthPlace()).isNull();
-        assertThat(internship.getResidence()).isNull();
+        assertThat(internship.getResidenceMunicipality()).isNull();
+        assertThat(internship.getResidenceStreet()).isNull();
+        assertThat(internship.getResidenceStreetNumber()).isNull();
         assertThat(internship.getNotes()).isNull();
         assertThat(actions(old)).containsExactly("ANONYMIZATION_DUE", "ANONYMIZE");
         // nell'audit nessun valore personale

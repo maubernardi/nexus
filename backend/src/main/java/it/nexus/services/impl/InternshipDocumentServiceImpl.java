@@ -32,11 +32,13 @@ import it.nexus.domain.dto.ScheduleDayDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.InternshipDocumentKind;
 import it.nexus.domain.workflow.InternshipHours;
+import it.nexus.mapper.MunicipalityMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.TicketRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.InternshipDocumentService;
 import it.nexus.services.InternshipService;
+import it.nexus.services.documents.AddressLine;
 import it.nexus.services.documents.DocxTemplate;
 import it.nexus.web.errors.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -108,7 +110,8 @@ public class InternshipDocumentServiceImpl implements InternshipDocumentService 
         values.put("TUTOR_PROMOTORE", fullName(ticket.getTutor()));
         values.put("RAGIONE_SOCIALE", company == null ? null : company.getName());
         values.put("PARTITA_IVA", company == null ? null : company.getVatCode());
-        values.put("SEDE_LEGALE", company == null ? null : company.getLegalAddress());
+        values.put("SEDE_LEGALE", company == null ? null
+                : AddressLine.of(company.getLegalAddress(), MunicipalityMapper.toDto(company.getLegalMunicipality())));
         values.put("CODICE_ATECO", s.atecoCodes().stream()
                 .filter(a -> a.id().equals(s.atecoCodeId()))
                 .findFirst()
@@ -124,9 +127,10 @@ public class InternshipDocumentServiceImpl implements InternshipDocumentService 
         values.put("CODICE_FISCALE_TIROCINANTE", s.fiscalCode());
         values.put("DATA_NASCITA_TIROCINANTE", day(s.birthDate()));
         values.put("LUOGO_NASCITA_TIROCINANTE", s.birthPlace());
-        values.put("RESIDENZA_TIROCINANTE", s.residence());
+        values.put("RESIDENZA_TIROCINANTE",
+                AddressLine.of(s.residenceStreet(), s.residenceStreetNumber(), s.residenceMunicipality()));
         values.put("MANSIONE", ticket.getJobSlot() == null ? null : ticket.getJobSlot().getTitle());
-        values.put("SEDE_TIROCINIO", s.site());
+        values.put("SEDE_TIROCINIO", AddressLine.of(s.site(), s.siteMunicipality()));
         values.put("DATA_INIZIO", day(s.startDate()));
         values.put("DATA_FINE", day(s.expectedEndDate()));
         values.put("SOSPENSIONI", s.suspensions().isEmpty() ? "nessuno" : s.suspensions().stream()

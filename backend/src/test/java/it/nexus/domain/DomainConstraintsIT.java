@@ -19,6 +19,8 @@ import java.util.Map;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -544,6 +546,31 @@ class DomainConstraintsIT {
             Internship i = internship();
             i.addScheduleDay(1, true, false, 0);
             assertViolates("ck_internship_schedule_day_minutes", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void numeroCivicoVuoto() {
+            Internship i = internship();
+            i.setResidenceStreetNumber("  ");
+            assertViolates("ck_internship_residence_street_number", () -> internships.saveAndFlush(i));
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "site_municipality_id, fk_internship_site_municipality",
+            "residence_municipality_id, fk_internship_residence_municipality",
+        })
+        void comuneInesistente(String column, String constraint) {
+            Long id = internships.saveAndFlush(internship()).getId();
+            assertViolates(constraint,
+                    () -> jdbc.update("UPDATE internship SET " + column + " = 1 WHERE id = ?", id));
+        }
+
+        @Test
+        void comuneDellaSedeLegaleInesistente() {
+            Long id = fixtures.graph().company().getId();
+            assertViolates("fk_company_legal_municipality",
+                    () -> jdbc.update("UPDATE company SET legal_municipality_id = 1 WHERE id = ?", id));
         }
 
         @Test

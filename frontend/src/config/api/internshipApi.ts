@@ -5,6 +5,7 @@ import type {
   LegalRepresentativeForm,
 } from '@/config/api/companyLegalDataApi';
 import { ENDPOINTS } from '@/config/api/Endpoint';
+import type { Municipality } from '@/config/api/municipalityApi';
 import type { ReferenceItem } from '@/config/api/referenceApi';
 
 export type CompanyTutor = { fullName: string; contact?: string | null };
@@ -34,13 +35,18 @@ export type Internship = {
   internshipTypes?: ReferenceItem[];
   startDate?: string | null;
   expectedEndDate?: string | null;
+  /** Indirizzo della sede e versione del suo comune (US-1007). */
   site?: string | null;
+  siteMunicipality?: Municipality | null;
   atecoCodeId?: string | null;
   companyTutors: CompanyTutor[];
   fiscalCode?: string | null;
   birthDate?: string | null;
   birthPlace?: string | null;
-  residence?: string | null;
+  /** Residenza del beneficiario (US-1007): versione del comune, via e numero civico. */
+  residenceMunicipality?: Municipality | null;
+  residenceStreet?: string | null;
+  residenceStreetNumber?: string | null;
   suspensions: Suspension[];
   notes?: string | null;
   /** Fasce orarie, "hh:mm:ss" (US-1002). */
@@ -83,12 +89,15 @@ export type InternshipForm = {
   startDate: string | null;
   expectedEndDate: string | null;
   site: string | null;
+  siteMunicipalityId: string | null;
   atecoCodeId: string | null;
   companyTutors: { fullName: string; contact: string | null }[];
   fiscalCode: string | null;
   birthDate: string | null;
   birthPlace: string | null;
-  residence: string | null;
+  residenceMunicipalityId: string | null;
+  residenceStreet: string | null;
+  residenceStreetNumber: string | null;
   suspensions: Suspension[];
   notes: string | null;
   /** "hh:mm" */
