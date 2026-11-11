@@ -190,6 +190,23 @@ describe('<InternshipPage>', () => {
     expect(screen.getByRole('heading', { name: 'Dati dell’azienda per i documenti' })).toHaveFocus();
   });
 
+  it('convenzione e progetti formativi tra i dati per l’avvio: i collegamenti portano alle sezioni', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchInternship).mockResolvedValue(
+      internship({ missingForStart: ['agreement', 'trainingProjects'] }),
+    );
+    renderPage();
+
+    const section = await screen.findByRole('region', { name: 'Avvio del tirocinio' });
+    await user.click(
+      within(section).getByRole('link', { name: 'La convenzione (numero, data e data di stipula)' }),
+    );
+    expect(screen.getByRole('heading', { level: 2, name: 'Convenzione' })).toHaveFocus();
+    await user.click(within(section).getByRole('link', { name: 'Almeno un progetto formativo' }));
+    expect(screen.getByRole('heading', { level: 2, name: 'Progetti formativi' })).toHaveFocus();
+    await expectNoAxeViolations();
+  });
+
   it('avvio con la scheda completa: conferma con il focus, annulla e poi avvia', async () => {
     const user = userEvent.setup();
     vi.mocked(fetchInternship).mockResolvedValue(internship({ version: 3 }));

@@ -99,6 +99,8 @@ export type StartRequirement =
   | 'atecoCode'
   | 'companyTutors'
   | 'schedule'
+  | 'agreement'
+  | 'trainingProjects'
   | 'fiscalCode'
   | 'birthDate'
   | 'birthPlace'

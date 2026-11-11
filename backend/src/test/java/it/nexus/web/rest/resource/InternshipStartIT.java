@@ -105,7 +105,10 @@ class InternshipStartIT {
         legalRepresentatives.saveAndFlush(rep);
     }
 
-    /** Scheda completa (senza sospensioni né note, facoltative); incompleta = senza codice fiscale né tutor aziendali. */
+    /**
+     * Scheda completa (senza sospensioni né note, facoltative), con convenzione e un progetto formativo (US-1008);
+     * incompleta = senza codice fiscale né tutor aziendali.
+     */
     private ResultActions saveInternship(boolean complete) throws Exception {
         String json = """
                 {"internshipTypeId": "%s", "startDate": "2026-12-01", "expectedEndDate": "2027-05-31",
@@ -113,7 +116,9 @@ class InternshipStartIT {
                  "companyTutors": [{"fullName": "Anna Verdi"}],
                  "fiscalCode": "RSSMRA85T10A562S", "birthDate": "1985-12-10", "birthPlace": "Firenze",
                  "residenceMunicipalityId": "%s", "residenceStreet": "Via Dante", "residenceStreetNumber": "2",
-                 "suspensions": [], "trainingProjects": [],
+                 "suspensions": [], "agreementNumber": "2026/145", "agreementDate": "2026-11-20",
+                 "agreementSignedDate": "2026-11-25",
+                 "trainingProjects": [{"from": "2026-12-01", "to": "2027-05-31", "jobTitle": "Aiuto cuoco"}],
                  "firstSlotStart": "09:00", "firstSlotEnd": "13:00", "secondSlotStart": "14:00", "secondSlotEnd": "18:00",
                  "excludeHolidays": true, "schedule": [{"dayOfWeek": 1, "firstSlot": true, "secondSlot": false}],
                  "version": null}""".formatted(typeId, firenzeId, atecoId, firenzeId);
@@ -140,8 +145,8 @@ class InternshipStartIT {
     void schedaIncompleta_elencoDiCioCheMancaEAvvioRifiutato() throws Exception {
         mockMvc.perform(get(ticketPath + "/internship").header(USER, "tutor1"))
                 .andExpect(jsonPath("$.missingForStart", contains("internshipType", "startDate", "expectedEndDate",
-                        "site", "atecoCode", "companyTutors", "schedule", "fiscalCode", "birthDate", "birthPlace",
-                        "residence", "legalRepresentative")));
+                        "site", "atecoCode", "companyTutors", "schedule", "agreement", "trainingProjects", "fiscalCode",
+                        "birthDate", "birthPlace", "residence", "legalRepresentative")));
 
         legalRepresentative(true);
         saveInternship(false).andExpect(status().isOk())
@@ -169,6 +174,25 @@ class InternshipStartIT {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("Per avviare il tirocinio la scheda deve essere completa; "
                         + "mancano: la sede con il comune, la residenza del beneficiario (comune, via e numero civico)"));
+    }
+
+    @Test
+    void convenzioneEProgettiFormativi_richiestiPerLAvvio() throws Exception {
+        // decisione del PO dell'11/11
+        legalRepresentative(true);
+        saveInternship(true).andExpect(jsonPath("$.missingForStart").isEmpty());
+        Internship internship = internships.findByTicketId(ticket.getId()).orElseThrow();
+        internship.setAgreementSignedDate(null);
+        internship.getTrainingProjects().clear();
+        em.flush();
+
+        mockMvc.perform(get(ticketPath + "/internship").header(USER, "tutor1"))
+                .andExpect(jsonPath("$.missingForStart", contains("agreement", "trainingProjects")));
+        start("tutor1", ticketVersion())
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Per avviare il tirocinio la scheda deve essere completa; "
+                        + "mancano: la convenzione (numero, data e data di stipula), almeno un progetto formativo"));
+        assertThat(tickets.findById(ticket.getId()).orElseThrow().getStatus()).isEqualTo(TicketStatus.APPUNTAMENTO);
     }
 
     @Test

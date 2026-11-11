@@ -93,6 +93,9 @@ public class InternshipServiceImpl implements InternshipService {
             Map.entry("atecoCode", "il codice ATECO"),
             Map.entry("companyTutors", "almeno un tutor aziendale"),
             Map.entry("schedule", "la griglia oraria"),
+            // convenzione e progetti formativi obbligatori per l'avvio (PO, 11/11)
+            Map.entry("agreement", "la convenzione (numero, data e data di stipula)"),
+            Map.entry("trainingProjects", "almeno un progetto formativo"),
             Map.entry("fiscalCode", "il codice fiscale del beneficiario"),
             Map.entry("birthDate", "la data di nascita del beneficiario"),
             Map.entry("birthPlace", "il luogo di nascita del beneficiario"),
@@ -613,6 +616,12 @@ public class InternshipServiceImpl implements InternshipService {
         }
         if (i.getScheduleDays().isEmpty()) {
             missing.add("schedule");
+        }
+        if (i.getAgreementNumber() == null || i.getAgreementDate() == null || i.getAgreementSignedDate() == null) {
+            missing.add("agreement");
+        }
+        if (i.getTrainingProjects().isEmpty()) {
+            missing.add("trainingProjects");
         }
         if (i.getFiscalCode() == null) {
             missing.add("fiscalCode");

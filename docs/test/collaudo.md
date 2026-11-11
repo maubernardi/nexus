@@ -914,3 +914,6 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      finisce dopo la fine prevista del tirocinio (30/04/2027)». Rimetti la data di prima.
   5. Apri la segnalazione. **Atteso:** nella cronologia «Scheda del tirocinio aggiornata» per ogni salvataggio. (L'audit
      con convenzione e progetti, e il dettaglio della mansione solo come «cambiato», è verificato dai test.)
+  6. Su un'altra segnalazione con l'appuntamento fissato e la scheda senza convenzione né progetti formativi.
+     **Atteso:** in «Avvio del tirocinio» tra i dati mancanti ci sono «La convenzione (numero, data e data di stipula)» e
+     «Almeno un progetto formativo»; i collegamenti portano alle due sezioni (decisione del PO dell'11/11).
