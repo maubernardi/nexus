@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 86 elementi, 332 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-13](sprints/sprint-13.md), l'11/11 ([review](sprints/sprint-13-review.md)); prossimo: Sprint 14, da confermare nella review.
+**Totale: 86 elementi, 332 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-13](sprints/sprint-13.md), l'11/11 ([review](sprints/sprint-13-review.md)); prossimo: [sprint-14](sprints/sprint-14.md), dal 12/11.
 
 ## Epiche
 
@@ -1211,6 +1211,7 @@ Criteri di accettazione:
 **Backup del database** · Must · 5 punti · R4 · 📋 Backlog
 
 Come **ADMIN** voglio backup automatici giornalieri fuori dal server, con prova di ripristino per non perdere dati.
+Rinviato dal PO l'11/11 (review dello Sprint 13, §8.2), insieme alla scelta della destinazione.
 
 Criteri di accettazione:
 - Il ripristino di prova su un ambiente pulito riesce ed è documentato.

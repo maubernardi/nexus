@@ -146,6 +146,8 @@ Da segnalare:
 ### 8.1 Chiusura dello Sprint 13
 *Proposta:* Sprint 13 chiuso con velocity **22**.
 
+> ✅ **Deciso (PO, 11/11): proposta accettata.**
+
 ### 8.2 Contenuto dello Sprint 14
 Al planning del 09/11 lo Sprint 14 era **US-1011 + EN-8 (11 punti)**, metà della velocity media. *Proposta:* aggiungere
 **US-1302 Backup del database (5 punti)**, se scegli la destinazione (§8.3). Il backup sblocca il passaggio in
@@ -154,10 +156,15 @@ morti. *Alternative:*
 - solo US-1011 + EN-8, sprint più corto;
 - iniziare la revisione UX/UI (US-1305), che però va prima raffinata con te in una sessione dedicata.
 
+> ✅ **Deciso (PO, 11/11): niente backup per ora.** Lo Sprint 14 parte con US-1011 + EN-8 (11 punti). Dopo la chiusura
+> dello Sprint 13 il PO propone delle **modifiche funzionali**, da valutare come alternative per completarlo.
+
 ### 8.3 Destinazione del backup (US-1302)
 Riprende la domanda della review dello Sprint 11 (§8.5). *Proposta:* spazio di archiviazione **IONOS** (S3), 30 backup
 giornalieri cifrati, costo piccolo a consumo; le credenziali le metti tu nel `.env` del server. *Alternative:* un altro
 server o un NAS via SSH; un servizio esterno (es. Backblaze B2).
+
+> ⏸️ **Non deciso (PO, 11/11):** il backup è rinviato insieme a US-1302.
 
 ### 8.4 Dati che servono per i documenti reali (US-1011)
 Per compilare i documenti senza righe vuote servono, prima o durante lo Sprint 14:
@@ -169,6 +176,9 @@ Per compilare i documenti senza righe vuote servono, prima o durante lo Sprint 1
   US-1011.
 
 *Proposta:* li prepari mentre sviluppo US-1011; i modelli reali (EN-8) li carichiamo quando sono pronti.
+
+> ✅ **Deciso (PO, 11/11): d'accordo.** L'elenco dei dati e delle variabili è in [sprint-14.md](sprint-14.md), «Dati da
+> preparare».
 
 ## 9. Proposta per lo Sprint 14
 
@@ -183,14 +193,18 @@ hanno un backup giornaliero fuori dal server.*
 | 3 | US-1302 | Backup giornaliero fuori dal server, con prova di ripristino documentata (se decidi il §8.3) | 5 |
 | | | **Totale** | **11** (16 con US-1302) |
 
+> ✅ **Deciso (PO, 11/11): Sprint 14 = US-1011 + EN-8 (11 punti)**, senza il backup; si completa con le modifiche
+> funzionali che il PO propone dopo questa review. Sprint 14: [sprint-14.md](sprint-14.md).
+
 Prima US-1011, perché EN-8 usa i suoi segnaposto (§8.4 della review dello Sprint 12); il backup è indipendente e può
 andare in parallelo mentre aspettiamo i dati del §8.4. Prossima migrazione: **V41**.
 
 ## 10. Azioni a carico del PO
 
-- [ ] Decidere i punti §8.1 … §8.4 e confermare il planning.
+- [x] Decidere i punti §8.1 … §8.4 e confermare il planning (11/11).
+- [ ] Proporre le modifiche funzionali per completare lo Sprint 14.
 - [ ] Collaudo dello Sprint 13 sulla demo `8d43ad3` (T-23.1 … T-23.4).
 - [ ] Collaudo dello Sprint 12 (T-22.1 … T-22.4), se non è già fatto.
-- [ ] I dati del §8.4 per i documenti reali.
+- [ ] I dati del §8.4 per i documenti reali (elenco in [sprint-14.md](sprint-14.md)).
 - [ ] T-21.6: lunedì 16/11, le prime PR di Dependabot.
 - [ ] US-1301: PWA su Android e iOS (collaudo T-10.1).
