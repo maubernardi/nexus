@@ -15,8 +15,10 @@ import {
   addInternshipAtecoCode,
   addInternshipLegalRepresentative,
   downloadInternshipDocument,
+  fetchDocumentTemplateChoices,
   fetchInternship,
   saveInternship,
+  type DocumentTemplateChoice,
   type Internship,
   type InternshipDocumentKind,
   type InternshipForm,
@@ -43,10 +45,21 @@ export const useSaveInternship = (): UseMutationResult<
 };
 
 /** Download di un documento: il server lo registra in cronologia, che quindi si aggiorna. */
+/** Modelli caricati da scegliere per un documento (US-1010). */
+export const useDocumentTemplateChoices = (
+  ticketId: string,
+  kind: InternshipDocumentKind,
+): UseQueryResult<DocumentTemplateChoice[]> =>
+  useQuery({
+    queryKey: [...internshipKey(ticketId), 'templates', kind],
+    queryFn: () => fetchDocumentTemplateChoices(ticketId, kind),
+    retry: false,
+  });
+
 export const useDownloadInternshipDocument = (): UseMutationResult<
   Blob,
   unknown,
-  { ticketId: string; kind: InternshipDocumentKind }
+  { ticketId: string; kind: InternshipDocumentKind; template?: string }
 > => {
   const queryClient = useQueryClient();
   return useMutation({

@@ -27,4 +27,5 @@ export const ENDPOINTS = {
   competenceSites: '/reference/competence-sites',
   municipalities: '/municipalities',
   documentCatalogs: '/document-catalogs',
+  documentTemplates: '/document-templates',
 } as const;

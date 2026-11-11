@@ -13,6 +13,7 @@ import { BeneficiaryNewPage } from '@/pages/BeneficiaryNewPage/BeneficiaryNewPag
 import { BeneficiaryPage } from '@/pages/BeneficiaryPage/BeneficiaryPage';
 import { ClosureReportPage } from '@/pages/ClosureReportPage/ClosureReportPage';
 import { DevLoginPage } from '@/pages/DevLoginPage/DevLoginPage';
+import { DocumentTemplatesPage } from '@/pages/DocumentTemplatesPage/DocumentTemplatesPage';
 import { InternshipPage } from '@/pages/InternshipPage/InternshipPage';
 import { BeneficiariesAdminPage } from '@/pages/BeneficiariesAdminPage/BeneficiariesAdminPage';
 import { CoordinationPage } from '@/pages/CoordinationPage/CoordinationPage';
@@ -194,6 +195,15 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.catalogs.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'modelli',
+        element: (
+          <RoleRoute roles={['ADMIN']}>
+            <DocumentTemplatesPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.documentTemplates.title' } satisfies RouteHandle,
       },
       {
         path: 'utenti',

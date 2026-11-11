@@ -1,8 +1,10 @@
 package it.nexus.web.rest.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -19,6 +21,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -40,10 +44,12 @@ import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.CompanyAtecoCodeRepository;
+import it.nexus.repository.CareAgencyRepository;
 import it.nexus.repository.CompanyLegalRepresentativeRepository;
 import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.services.documents.DocxTemplate;
 import it.nexus.services.impl.InternshipDocumentServiceImpl;
+import it.nexus.support.TestDocx;
 import it.nexus.support.WorkflowScenarios;
 import it.nexus.support.WorkflowScenarios.Actors;
 import it.nexus.support.WorkflowScenarios.Place;
@@ -67,12 +73,15 @@ class InternshipDocumentIT {
     @Autowired CompanyAtecoCodeRepository atecoCodes;
     @Autowired CompanyLegalRepresentativeRepository legalRepresentatives;
     @Autowired AuditEventRepository audit;
+    @Autowired CareAgencyRepository careAgencies;
+    @Autowired JdbcTemplate jdbc;
 
     private Place place;
     private Ticket ticket;
     private String internshipPath;
     private String atecoId;
     private Municipality sesto;
+    private Project project;
 
     @BeforeEach
     void setUp() {
@@ -81,7 +90,7 @@ class InternshipDocumentIT {
         place.company().setLegalAddress("Via Garibaldi 3");
         place.company().setLegalMunicipality(scenarios.municipality("Firenze", "FI"));
         sesto = scenarios.municipality("Sesto Fiorentino", "FI");
-        Project project = scenarios.project("GOL", a.tutor1(), a.tutor2());
+        project = scenarios.project("GOL", a.tutor1(), a.tutor2());
         JobSlot slot = scenarios.freeSlot(place, "Aiuto cuoco");
         ticket = scenarios.appointmentTicket(a.tutor1(), project, slot, a.operator());
         internshipPath = "/api/v1/tickets/" + TsidMapper.toExternal(ticket.getId()) + "/internship";
@@ -221,6 +230,91 @@ class InternshipDocumentIT {
                         + ", residente in Via Gramsci 12, Sesto Fiorentino (FI)")
                 .contains("Tutor del soggetto ospitante: " + InternshipDocumentServiceImpl.BLANK + ".")
                 .doesNotContain("{");
+    }
+
+    /** Carica un modello finto come l'ADMIN (US-1010) e ne restituisce l'id. */
+    private String uploadTemplate(String name, String typeId, String careAgencyId, String text) throws Exception {
+        var request = multipart("/api/v1/document-templates")
+                .file(new MockMultipartFile("file", "modello.docx", DOCX, TestDocx.of(text, "{NOME_TIROCINANTE}")))
+                .param("document", "CONVENZIONE")
+                .param("projectId", TsidMapper.toExternal(project.getId()))
+                .param("internshipTypeId", typeId)
+                .param("name", name)
+                .header(USER, "admin");
+        if (careAgencyId != null) {
+            request.param("careAgencyId", careAgencyId);
+        }
+        return JsonPath.read(mockMvc.perform(request).andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString(), "$.id");
+    }
+
+    private String convenzione(String template) throws Exception {
+        var request = get(internshipPath + "/documents/convenzione").header(USER, "tutor1");
+        if (template != null) {
+            request.param("template", template);
+        }
+        return text(mockMvc.perform(request).andExpect(status().isOk()).andReturn());
+    }
+
+    @Test
+    void modelliCaricati_conLEnte_piuModelliDaScegliere_eRipiego() throws Exception {
+        String typeId = typeId("CURRICULARE");
+        save(typeId, true);
+        String choices = internshipPath + "/documents/convenzione/templates";
+        mockMvc.perform(get(choices).header(USER, "tutor1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+
+        // un modello senza ente: si usa quello, e la cronologia lo ricorda
+        String general = uploadTemplate("Convenzione GOL", typeId, null, "CONVENZIONE CARICATA");
+        assertThat(convenzione(null)).contains("CONVENZIONE CARICATA", "Mario Rossi").doesNotContain("{");
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.TICKET, ticket.getId())
+                .getLast().getChanges().get("template")).extracting("after").isEqualTo("Convenzione GOL");
+
+        // il modello dell'ente del beneficiario vale più di quello senza ente
+        String comune = TsidMapper.toExternal(893700000000000351L);
+        ticket.getBeneficiary().setCareAgency(careAgencies.findById(893700000000000351L).orElseThrow());
+        em.flush();
+        uploadTemplate("Convenzione Comune", typeId, comune, "CONVENZIONE DEL COMUNE");
+        mockMvc.perform(get(choices).header(USER, "tutor1"))
+                .andExpect(jsonPath("$[*].name").value(contains("Convenzione Comune")));
+        assertThat(convenzione(null)).contains("CONVENZIONE DEL COMUNE").doesNotContain("CARICATA");
+
+        // due modelli per l'ente: il Tutor sceglie
+        String bis = uploadTemplate("Convenzione Comune bis", typeId, comune, "CONVENZIONE DEL COMUNE BIS");
+        mockMvc.perform(get(choices).header(USER, "tutor1"))
+                .andExpect(jsonPath("$[*].name").value(
+                        contains("Convenzione Comune", "Convenzione Comune bis")));
+        mockMvc.perform(get(internshipPath + "/documents/convenzione").header(USER, "tutor1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("template"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value("Scegli il modello"));
+        assertThat(convenzione(bis)).contains("CONVENZIONE DEL COMUNE BIS");
+        // un modello che non vale per questa segnalazione
+        mockMvc.perform(get(internshipPath + "/documents/convenzione").param("template", general)
+                        .header(USER, "tutor1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("template"));
+
+        // disattivati i modelli, il documento torna al modello generico del tipo
+        for (var row : jdbc.queryForList("SELECT id, version FROM document_template")) {
+            mockMvc.perform(put("/api/v1/document-templates/" + TsidMapper.toExternal((Long) row.get("id")) + "/active")
+                            .header(USER, "admin").contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"active\": false, \"version\": %d}".formatted((Long) row.get("version"))))
+                    .andExpect(status().isOk());
+        }
+        assertThat(convenzione(null)).contains("CONVENZIONE DI TIROCINIO CURRICULARE").doesNotContain("CARICATA");
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.TICKET, ticket.getId())
+                .getLast().getChanges().get("template")).extracting("after").isEqualTo("modello generico");
+    }
+
+    @Test
+    void relazioneFinale_siScaricaConUs1011() throws Exception {
+        save(typeId("CURRICULARE"), true);
+        mockMvc.perform(get(internshipPath + "/documents/relazione-finale").header(USER, "tutor1"))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(get(internshipPath + "/documents/relazione-finale/templates").header(USER, "tutor1"))
+                .andExpect(status().isNotFound());
     }
 
     @Test

@@ -9,8 +9,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.core.io.ClassPathResource;
 
-import it.nexus.services.impl.InternshipDocumentServiceImpl;
-
 /** I modelli segnaposto forniti (US-1004, US-1005) usano solo segnaposto che il servizio sa compilare. */
 class InternshipTemplatesTest {
 
@@ -25,7 +23,7 @@ class InternshipTemplatesTest {
                 .getInputStream()) {
             assertThat(DocxTemplate.placeholders(template))
                     .isNotEmpty()
-                    .isSubsetOf(InternshipDocumentServiceImpl.PLACEHOLDERS)
+                    .isSubsetOf(DocumentPlaceholders.KNOWN)
                     .contains("NOME_TIROCINANTE", "GRIGLIA_ORARIA", "MONTE_ORE_TOTALE", "TIPO_TIROCINIO");
         }
     }

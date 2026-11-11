@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `ed260ad` (10/11/2026): Sprint 1–12 completi (comuni e province, cataloghi dei documenti, contatti e presa in carico del beneficiario, sede di competenza), con le correzioni del controllo in Chrome |
-| **Ultimo aggiornamento** | 11/11/2026 (T-23.1 … T-23.3: da provare dopo il deploy di US-1007, US-1009 e US-1008; T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 11/11/2026 (T-23.1 … T-23.4: da provare dopo il deploy dello Sprint 13; T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -917,3 +917,22 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   6. Su un'altra segnalazione con l'appuntamento fissato e la scheda senza convenzione né progetti formativi.
      **Atteso:** in «Avvio del tirocinio» tra i dati mancanti ci sono «La convenzione (numero, data e data di stipula)» e
      «Almeno un progetto formativo»; i collegamenti portano alle due sezioni (decisione del PO dell'11/11).
+
+- [ ] **T-23.4 Modelli dei documenti caricati dall'ADMIN (US-1010)**
+  Prepara due file Word di prova: una copia della convenzione scaricata da una scheda con `{NOME_TIROCINANTE}` e una
+  riga di testo riconoscibile (per esempio «MODELLO DI PROVA»), e un'altra copia con anche `{CUP}`.
+  1. Come `admin` apri **Modelli dei documenti** nel menu «Amministrazione». **Atteso:** la pagina con i segnaposto
+     che si possono usare (elenco a scomparsa), il modulo «Carica un modello» e l'elenco «Modelli caricati», vuoto.
+  2. Carica il file con `{CUP}` come convenzione del progetto e del tipo di tirocinio di una segnalazione di prova.
+     **Atteso:** «File Word (.docx): Il modello usa segnaposto che NEXUS non conosce: {CUP}» e nulla è caricato. Prova
+     anche un PDF: **Atteso:** «Il file deve essere un documento Word .docx…».
+  3. Carica il file giusto con il nome «Convenzione di prova» e «Tutti gli enti». **Atteso:** «Modello «Convenzione di
+     prova» caricato.» e il modello nell'elenco come «Attivo», con progetto, tipo e «Tutti gli enti»; il tipo si sceglie
+     solo tra quelli ammessi dal progetto.
+  4. Come `tutor1` scarica la convenzione della segnalazione. **Atteso:** il documento ha «MODELLO DI PROVA» e il nome
+     del tirocinante.
+  5. Come `admin` carica un secondo modello con le stesse condizioni («Convenzione di prova bis»). Come `tutor1`
+     **Atteso:** sopra il pulsante della convenzione compare «Modello della convenzione»; senza scegliere, «Scegli
+     prima il modello…»; scelto un modello, il download parte con quello.
+  6. Come `admin` disattiva i due modelli. Come `tutor1` **Atteso:** la tendina sparisce e la convenzione torna al
+     modello generico. Prova anche «Sostituisci il file» e «Scarica il file» su un modello.

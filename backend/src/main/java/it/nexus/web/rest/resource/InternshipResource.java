@@ -1,5 +1,7 @@
 package it.nexus.web.rest.resource;
 
+import java.util.List;
+
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,12 +14,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.nexus.domain.dto.AtecoCodeDTO;
 import it.nexus.domain.dto.AtecoCodeFormDTO;
+import it.nexus.domain.dto.DocumentTemplateChoiceDTO;
 import it.nexus.domain.dto.InternshipDTO;
 import it.nexus.domain.dto.InternshipFormDTO;
 import it.nexus.domain.dto.LegalRepresentativeDTO;
@@ -68,16 +72,28 @@ public class InternshipResource {
 
     @GetMapping("/documents/{kind}")
     @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
-    @Operation(summary = "Documento del tirocinio compilato dalla scheda (.docx), es. la Convenzione")
-    public ResponseEntity<byte[]> document(@PathVariable String ticketId, @PathVariable String kind) {
+    @Operation(summary = "Documento del tirocinio compilato dalla scheda (.docx), es. la Convenzione; con più modelli "
+            + "caricati, quello scelto ({@code template})")
+    public ResponseEntity<byte[]> document(@PathVariable String ticketId, @PathVariable String kind,
+            @RequestParam(value = "template", required = false) String template) {
         InternshipDocumentKind documentKind = InternshipDocumentKind.fromSlug(kind)
                 .orElseThrow(() -> new NotFoundException("Documento non trovato"));
-        GeneratedDocument document = documentService.generate(ticketId, documentKind);
+        GeneratedDocument document = documentService.generate(ticketId, documentKind, template);
         return ResponseEntity.ok()
                 .contentType(DOCX)
                 .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
                         .filename(document.filename()).build().toString())
                 .body(document.content());
+    }
+
+    @GetMapping("/documents/{kind}/templates")
+    @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
+    @Operation(summary = "Modelli caricati validi per il documento: più di uno = il Tutor sceglie (US-1010)")
+    public ResponseEntity<List<DocumentTemplateChoiceDTO>> documentTemplates(@PathVariable String ticketId,
+            @PathVariable String kind) {
+        InternshipDocumentKind documentKind = InternshipDocumentKind.fromSlug(kind)
+                .orElseThrow(() -> new NotFoundException("Documento non trovato"));
+        return ResponseEntity.ok(documentService.templates(ticketId, documentKind));
     }
 
     @PostMapping("/ateco-codes")

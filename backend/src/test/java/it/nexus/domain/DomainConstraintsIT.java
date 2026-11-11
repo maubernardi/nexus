@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
+import java.util.UUID;
 
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.Nested;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import it.nexus.TestcontainersConfiguration;
 import it.nexus.domain.DomainFixtures.Graph;
 import it.nexus.domain.enumeration.BoardPostStatus;
+import it.nexus.domain.enumeration.InternshipDocumentKind;
 import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.domain.enumeration.LanguageLevel;
 import it.nexus.domain.enumeration.LicenseType;
@@ -50,6 +52,7 @@ import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.CompanyAtecoCodeRepository;
 import it.nexus.repository.InternshipRepository;
 import it.nexus.repository.CompanyLegalRepresentativeRepository;
+import it.nexus.repository.DocumentTemplateRepository;
 import it.nexus.repository.EmailChangeRequestRepository;
 import it.nexus.repository.HiringFormulaRepository;
 import it.nexus.repository.InternshipTypeRepository;
@@ -57,6 +60,7 @@ import it.nexus.repository.NoHireReasonRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ProjectRepository;
+import it.nexus.repository.StoredFileRepository;
 import it.nexus.repository.TicketCompanyBlacklistRepository;
 import it.nexus.repository.TicketRepository;
 import it.nexus.repository.UserProjectRepository;
@@ -99,6 +103,8 @@ class DomainConstraintsIT {
     @Autowired ClosureReportRepository closureReports;
     @Autowired AuditEventRepository auditLog;
     @Autowired EmailChangeRequestRepository emailChanges;
+    @Autowired DocumentTemplateRepository documentTemplates;
+    @Autowired StoredFileRepository storedFiles;
 
     private static CompanyLegalRepresentative legalRepresentative(Company company, String fiscalCode) {
         CompanyLegalRepresentative rep = new CompanyLegalRepresentative(company);
@@ -1131,6 +1137,40 @@ class DomainConstraintsIT {
             Long id = emailChanges.saveAndFlush(request(newUser("email.quattro"), "d@example.org")).getId();
             assertViolates("ck_email_change_request_expiry",
                     () -> jdbc.update("UPDATE email_change_request SET expires_at = sent_at WHERE id = ?", id));
+        }
+    }
+
+    @Nested
+    class ModelliDeiDocumenti {
+
+        private DocumentTemplate template(String name) {
+            Graph g = fixtures.graph();
+            InternshipType type = internshipTypes.findByActiveTrueOrderByNameAsc().getFirst();
+            StoredFile file = storedFiles.save(new StoredFile("modello.docx", "application/octet-stream", 1, "0".repeat(64),
+                    "db:" + UUID.randomUUID()));
+            return new DocumentTemplate(InternshipDocumentKind.CONVENZIONE, g.project(), type, null, name, file);
+        }
+
+        @Test
+        void nomeVuoto() {
+            DocumentTemplate t = template("  ");
+            assertViolates("ck_document_template_name", () -> documentTemplates.saveAndFlush(t));
+        }
+
+        @Test
+        void documentoSconosciuto() {
+            Long id = documentTemplates.saveAndFlush(template("Convenzione")).getId();
+            assertViolates("ck_document_template_kind", () -> jdbc.update(
+                    "UPDATE document_template SET document_kind = 'LETTERA' WHERE id = ?", id));
+        }
+
+        @Test
+        void stessoFileInDueModelli() {
+            DocumentTemplate first = documentTemplates.saveAndFlush(template("Convenzione"));
+            Long fileId = first.getFile().getId();
+            Long second = documentTemplates.saveAndFlush(template("Convenzione bis")).getId();
+            assertViolates("uq_document_template_file", () -> jdbc.update(
+                    "UPDATE document_template SET file_id = ? WHERE id = ?", fileId, second));
         }
     }
 }
