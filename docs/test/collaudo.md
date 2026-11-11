@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `ed260ad` (10/11/2026): Sprint 1–12 completi (comuni e province, cataloghi dei documenti, contatti e presa in carico del beneficiario, sede di competenza), con le correzioni del controllo in Chrome |
-| **Ultimo aggiornamento** | 11/11/2026 (T-23.1 e T-23.2: da provare dopo il deploy di US-1007 e US-1009; T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 11/11/2026 (T-23.1 … T-23.3: da provare dopo il deploy di US-1007, US-1009 e US-1008; T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -896,3 +896,21 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      invia. **Atteso:** «Campo obbligatorio».
   5. Metti una data prima della fine prevista, compila il resto e invia. **Atteso:** il report inviato mostra per prima
      la «Fine effettiva del tirocinio» con quella data; la scheda del tirocinio ha ancora la fine prevista di prima.
+
+- [ ] **T-23.3 Convenzione e progetti formativi (US-1008)**
+  1. Come `tutor1` apri la scheda del tirocinio di una segnalazione con l'appuntamento fissato, con le date del
+     tirocinio (per esempio dal 01/12/2026 al 31/05/2027) e una griglia oraria. **Atteso:** dopo le sospensioni ci sono
+     le sezioni «Convenzione» e «Progetti formativi»; sotto la convenzione «Durata: dal 01/12/2026 al 31/05/2027, come
+     il tirocinio. La convenzione è per n. 1 tirocinio.».
+  2. Scrivi numero, data e data di stipula della convenzione. Premi **Aggiungi progetto formativo**. **Atteso:**
+     «Progetto formativo 1» dal 01/12/2026 al 31/05/2027, con la mansione della segnalazione. Cambia la fine al
+     28/02/2027, scrivi un dettaglio della mansione e salva. **Atteso:** salvato; sotto il progetto «Durata: 3 mesi.
+     Monte ore: … ore.».
+  3. Aggiungi un secondo progetto. **Atteso:** «Progetto formativo 2» dal 01/03/2027 al 31/05/2027 con la mansione del
+     primo. Metti come inizio il 28/02/2027 e salva. **Atteso:** «Progetto formativo 2: dal: Deve iniziare dopo la fine
+     del progetto formativo 1 (28/02/2027)» nel riepilogo degli errori. Rimetti il 01/03/2027, cambia la mansione e
+     salva. **Atteso:** salvato, con i due progetti.
+  4. Anticipa la fine prevista del tirocinio al 30/04/2027 e salva. **Atteso:** «Progetto formativo 2: al: Il progetto
+     finisce dopo la fine prevista del tirocinio (30/04/2027)». Rimetti la data di prima.
+  5. Apri la segnalazione. **Atteso:** nella cronologia «Scheda del tirocinio aggiornata» per ogni salvataggio. (L'audit
+     con convenzione e progetti, e il dettaglio della mansione solo come «cambiato», è verificato dai test.)

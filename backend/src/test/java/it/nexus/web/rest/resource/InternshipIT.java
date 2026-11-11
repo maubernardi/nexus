@@ -98,7 +98,8 @@ class InternshipIT {
     /** Modulo con i campi indicati (JSON senza graffe); liste vuote, fasce precompilate e festività escluse se mancano. */
     private static String form(String fields) {
         String json = "{" + fields + "}";
-        Map<String, String> defaults = Map.of("companyTutors", "[]", "suspensions", "[]", "schedule", "[]",
+        Map<String, String> defaults = Map.of("companyTutors", "[]", "suspensions", "[]", "trainingProjects", "[]",
+                "schedule", "[]",
                 "firstSlotStart", "\"09:00\"", "firstSlotEnd", "\"13:00\"", "secondSlotStart", "\"14:00\"",
                 "secondSlotEnd", "\"18:00\"", "excludeHolidays", "true");
         for (Map.Entry<String, String> d : defaults.entrySet()) {
@@ -277,6 +278,109 @@ class InternshipIT {
                 .andExpect(jsonPath("$.fieldErrors[0].field").value("internshipTypeId"));
 
         assertThat(internships.findByTicketId(ticket.getId())).isEmpty();
+    }
+
+    /** Due progetti formativi dentro il tirocinio di {@link #full}: 1 mese e 15 giorni, poi 1 mese e 13 giorni. */
+    private static final String TWO_PROJECTS = """
+            [{"from": "2026-12-01", "to": "2027-01-15", "jobTitle": " Aiuto cuoco ",
+              "jobDetails": "Preparazione dei piatti freddi"},
+             {"from": "2027-01-16", "to": "2027-02-28", "jobTitle": "Cuoco", "jobDetails": "  "}]""";
+
+    /** La scheda con la convenzione e i progetti formativi indicati (US-1008). */
+    private static String withAgreementAndProjects(String json, String projects) {
+        return json.replace("\"trainingProjects\": [], ", "").replace("\"notes\": \"Turni concordati\",",
+                "\"notes\": \"Turni concordati\", \"agreementNumber\": \" 2026/145 \", \"agreementDate\": \"2026-11-20\", "
+                        + "\"agreementSignedDate\": \"2026-11-25\", \"trainingProjects\": " + projects + ",");
+    }
+
+    @Test
+    void convenzioneEProgettiFormativi_numeriMesiMonteOreEAudit() throws Exception {
+        save("tutor1", withAgreementAndProjects(full(null), TWO_PROJECTS))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.agreementNumber").value("2026/145"))
+                .andExpect(jsonPath("$.agreementDate").value("2026-11-20"))
+                .andExpect(jsonPath("$.agreementSignedDate").value("2026-11-25"))
+                .andExpect(jsonPath("$.jobSlotTitle").value("Aiuto cuoco"))
+                .andExpect(jsonPath("$.trainingProjects[0].number").value(1))
+                .andExpect(jsonPath("$.trainingProjects[0].jobTitle").value("Aiuto cuoco"))
+                .andExpect(jsonPath("$.trainingProjects[0].jobDetails").value("Preparazione dei piatti freddi"))
+                .andExpect(jsonPath("$.trainingProjects[0].months").value(2))
+                // lunedì 7, 14 e 21 dicembre e 11 gennaio: 28 dicembre e 4 gennaio sono nella sospensione
+                .andExpect(jsonPath("$.trainingProjects[0].totalMinutes").value(4 * 4 * 60))
+                .andExpect(jsonPath("$.trainingProjects[1].number").value(2))
+                .andExpect(jsonPath("$.trainingProjects[1].jobDetails").doesNotExist())
+                .andExpect(jsonPath("$.trainingProjects[1].months").value(1))
+                // sei lunedì dal 18 gennaio al 22 febbraio
+                .andExpect(jsonPath("$.trainingProjects[1].totalMinutes").value(6 * 4 * 60));
+        Map<String, Object> changes = ticketAudit().getLast().getChanges();
+        assertThat(changes.get("agreementNumber")).extracting("after").isEqualTo("2026/145");
+        assertThat(changes.get("agreementSignedDate")).extracting("after").isEqualTo("2026-11-25");
+        assertThat(changes.get("trainingProjects")).extracting("after")
+                .isEqualTo(List.of("1 2026-12-01/2027-01-15 Aiuto cuoco", "2 2027-01-16/2027-02-28 Cuoco"));
+        assertThat(changes).containsEntry("trainingProjectDetails", Map.of("redacted", true));
+
+        // si toglie l'ultimo progetto: cambiano solo i progetti
+        String one = """
+                [{"from": "2026-12-01", "to": "2027-01-15", "jobTitle": "Aiuto cuoco",
+                  "jobDetails": "Preparazione dei piatti freddi"}]""";
+        save("tutor1", withAgreementAndProjects(full(version()), one))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.trainingProjects.length()").value(1));
+        assertThat(ticketAudit().getLast().getChanges())
+                .containsOnlyKeys("trainingProjects", "trainingProjectDetails");
+
+        // stessa scheda: niente audit
+        int events = ticketAudit().size();
+        save("tutor1", withAgreementAndProjects(full(version()), one)).andExpect(status().isOk());
+        assertThat(ticketAudit()).hasSize(events);
+    }
+
+    @Test
+    void progettiFormativi_dentroIlTirocinioEInOrdine_senzaSovrapposizioni() throws Exception {
+        String overlap = """
+                [{"from": "2026-12-01", "to": "2027-02-28", "jobTitle": "Aiuto cuoco"},
+                 {"from": "2027-02-28", "to": "2027-05-31", "jobTitle": "Cuoco"}]""";
+        save("tutor1", withAgreementAndProjects(full(null), overlap))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("trainingProjects[1].from"))
+                .andExpect(jsonPath("$.fieldErrors[0].message")
+                        .value("Deve iniziare dopo la fine del progetto formativo 1 (28/02/2027)"));
+        String reversed = """
+                [{"from": "2027-03-01", "to": "2027-05-31", "jobTitle": "Cuoco"},
+                 {"from": "2026-12-01", "to": "2027-02-28", "jobTitle": "Aiuto cuoco"}]""";
+        save("tutor1", withAgreementAndProjects(full(null), reversed))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("trainingProjects[1].from"));
+        save("tutor1", withAgreementAndProjects(full(null),
+                        "[{\"from\": \"2026-11-30\", \"to\": \"2027-02-28\", \"jobTitle\": \"Aiuto cuoco\"}]"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("trainingProjects[0].from"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value("Il progetto inizia prima del tirocinio (01/12/2026)"));
+        save("tutor1", withAgreementAndProjects(full(null),
+                        "[{\"from\": \"2027-02-01\", \"to\": \"2027-01-31\", \"jobTitle\": \"Aiuto cuoco\"}]"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("trainingProjects[0].to"));
+        save("tutor1", withAgreementAndProjects(full(null),
+                        "[{\"from\": \"2026-12-01\", \"to\": \"2027-02-28\", \"jobTitle\": \"  \"}]"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("trainingProjects[0].jobTitle"));
+        // senza le date del tirocinio i progetti non stanno da nessuna parte
+        save("tutor1", form("""
+                "trainingProjects": [{"from": "2026-12-01", "to": "2027-02-28", "jobTitle": "Aiuto cuoco"}],
+                "version": null"""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("startDate"));
+        assertThat(internships.findByTicketId(ticket.getId())).isEmpty();
+
+        // tirocinio accorciato con il progetto ancora in corso
+        String whole = "[{\"from\": \"2026-12-01\", \"to\": \"2027-05-31\", \"jobTitle\": \"Aiuto cuoco\"}]";
+        save("tutor1", withAgreementAndProjects(full(null), whole)).andExpect(status().isOk());
+        save("tutor1", withAgreementAndProjects(full(version()), whole)
+                        .replace("\"expectedEndDate\": \"2027-05-31\"", "\"expectedEndDate\": \"2027-04-30\""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("trainingProjects[0].to"))
+                .andExpect(jsonPath("$.fieldErrors[0].message")
+                        .value("Il progetto finisce dopo la fine prevista del tirocinio (30/04/2027)"));
     }
 
     /** Lunedì 7 – domenica 13 dicembre 2026; martedì 8 è festivo. */
@@ -492,7 +596,7 @@ class InternshipIT {
 
     @Test
     void appuntamentoFallito_restanoSoloIDatiDelBeneficiario() throws Exception {
-        save("tutor1", full(null)).andExpect(status().isOk());
+        save("tutor1", withAgreementAndProjects(full(null), TWO_PROJECTS)).andExpect(status().isOk());
         em.flush();
         em.clear();
 
@@ -519,6 +623,11 @@ class InternshipIT {
         assertThat(left.getCompanyTutors()).isEmpty();
         assertThat(left.getSuspensions()).isEmpty();
         assertThat(left.getScheduleDays()).isEmpty();
+        // convenzione e progetti formativi riguardavano quell'azienda (US-1008)
+        assertThat(left.getAgreementNumber()).isNull();
+        assertThat(left.getAgreementDate()).isNull();
+        assertThat(left.getAgreementSignedDate()).isNull();
+        assertThat(left.getTrainingProjects()).isEmpty();
         assertThat(left.isExcludeHolidays()).isTrue();
         assertThat(ticketAudit().getLast().getChanges().get("internshipReset")).extracting("after").isEqualTo(true);
     }

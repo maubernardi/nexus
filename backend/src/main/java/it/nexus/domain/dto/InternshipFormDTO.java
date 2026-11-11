@@ -34,6 +34,13 @@ public record InternshipFormDTO(
         @Size(max = 20, message = "Massimo 20 caratteri") String residenceStreetNumber,
         @NotNull @Size(max = 20, message = "Massimo 20 periodi") List<@Valid SuspensionDTO> suspensions,
         @Size(max = 2000, message = "Massimo 2000 caratteri") String notes,
+        /** Convenzione (US-1008): numero, data e data di stipula. */
+        @Size(max = 50, message = "Massimo 50 caratteri") String agreementNumber,
+        LocalDate agreementDate,
+        LocalDate agreementSignedDate,
+        /** Progetti formativi nell'ordine delle date: la posizione è il numero (US-1008). */
+        @NotNull @Size(max = 10, message = "Massimo 10 progetti formativi")
+        List<@Valid TrainingProjectFormDTO> trainingProjects,
         @NotNull(message = "Indica l'inizio della fascia") LocalTime firstSlotStart,
         @NotNull(message = "Indica la fine della fascia") LocalTime firstSlotEnd,
         @NotNull(message = "Indica l'inizio della fascia") LocalTime secondSlotStart,

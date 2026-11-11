@@ -100,6 +100,16 @@ public class Internship extends AbstractTsidEntity {
     @Column(name = "notes", length = 2000)
     private String notes;
 
+    /** Convenzione del tirocinio (US-1008): una sola, con la durata del tirocinio e per un solo tirocinio. */
+    @Column(name = "agreement_number", length = 50)
+    private String agreementNumber;
+
+    @Column(name = "agreement_date")
+    private LocalDate agreementDate;
+
+    @Column(name = "agreement_signed_date")
+    private LocalDate agreementSignedDate;
+
     /** Fasce orarie della griglia (US-1002), precompilate e modificabili; in minuti nel database. */
     @Convert(converter = MinuteOfDayConverter.class)
     @Column(name = "first_slot_start", nullable = false)
@@ -133,6 +143,11 @@ public class Internship extends AbstractTsidEntity {
     @OrderBy("dayOfWeek")
     private List<InternshipScheduleDay> scheduleDays = new ArrayList<>();
 
+    /** Progetti formativi della convenzione (US-1008), nell'ordine delle date: la posizione è il numero. */
+    @OneToMany(mappedBy = "internship", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("dateFrom")
+    private List<InternshipTrainingProject> trainingProjects = new ArrayList<>();
+
     @Version
     @Column(name = "version", nullable = false)
     @Setter(AccessLevel.NONE)
@@ -154,9 +169,13 @@ public class Internship extends AbstractTsidEntity {
         scheduleDays.add(new InternshipScheduleDay(this, dayOfWeek, firstSlot, secondSlot, minutes));
     }
 
+    public void addTrainingProject(LocalDate from, LocalDate to, String jobTitle, String jobDetails) {
+        trainingProjects.add(new InternshipTrainingProject(this, from, to, jobTitle, jobDetails));
+    }
+
     /**
-     * Appuntamento non andato a buon fine (D7): i dati del tirocinio riguardavano quell'azienda e si azzerano; restano
-     * quelli del beneficiario.
+     * Appuntamento non andato a buon fine (D7): i dati del tirocinio riguardavano quell'azienda e si azzerano, convenzione
+     * e progetti formativi compresi (US-1008); restano quelli del beneficiario.
      */
     public void clearCompanyData() {
         internshipType = null;
@@ -171,9 +190,13 @@ public class Internship extends AbstractTsidEntity {
         secondSlotStart = DEFAULT_SECOND_START;
         secondSlotEnd = DEFAULT_SECOND_END;
         excludeHolidays = true;
+        agreementNumber = null;
+        agreementDate = null;
+        agreementSignedDate = null;
         companyTutors.clear();
         suspensions.clear();
         scheduleDays.clear();
+        trainingProjects.clear();
     }
 
     /** Anonimizzazione del beneficiario (US-1303): via i suoi dati identificativi e le note. */

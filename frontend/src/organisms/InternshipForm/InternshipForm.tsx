@@ -29,6 +29,7 @@ import {
   type ScheduleDayValues,
 } from '@/organisms/InternshipForm/schedule';
 import { ScheduleFields } from '@/organisms/InternshipForm/ScheduleFields';
+import { TrainingProjectsFields } from '@/organisms/InternshipForm/TrainingProjectsFields';
 
 type Values = {
   internshipTypeId: string;
@@ -46,6 +47,11 @@ type Values = {
   residenceStreetNumber: string;
   suspensions: { from: string; to: string }[];
   notes: string;
+  /** Convenzione e progetti formativi (US-1008). */
+  agreementNumber: string;
+  agreementDate: string;
+  agreementSignedDate: string;
+  trainingProjects: { from: string; to: string; jobTitle: string; jobDetails: string }[];
   /** Griglia oraria (US-1002): fasce "hh:mm" e i sette giorni da lunedì. */
   firstSlotStart: string;
   firstSlotEnd: string;
@@ -61,6 +67,7 @@ type Scalar = Exclude<
   keyof Values,
   | 'companyTutors'
   | 'suspensions'
+  | 'trainingProjects'
   | 'days'
   | 'excludeHolidays'
   | 'firstSlotStart'
@@ -95,6 +102,15 @@ const toValues = (i: Internship): Values => ({
   residenceStreetNumber: i.residenceStreetNumber ?? '',
   suspensions: i.suspensions.map((s) => ({ from: s.from, to: s.to })),
   notes: i.notes ?? '',
+  agreementNumber: i.agreementNumber ?? '',
+  agreementDate: i.agreementDate ?? '',
+  agreementSignedDate: i.agreementSignedDate ?? '',
+  trainingProjects: i.trainingProjects.map((p) => ({
+    from: p.from,
+    to: p.to,
+    jobTitle: p.jobTitle,
+    jobDetails: p.jobDetails ?? '',
+  })),
   // l'API manda "hh:mm:ss", il campo orario vuole "hh:mm"
   firstSlotStart: i.firstSlotStart.slice(0, 5),
   firstSlotEnd: i.firstSlotEnd.slice(0, 5),
@@ -131,6 +147,15 @@ const toPayload = (v: Values, version: number | null): InternshipPayload => ({
   residenceStreetNumber: v.residenceStreetNumber.trim() || null,
   suspensions: v.suspensions.map((s) => ({ from: s.from, to: s.to })),
   notes: v.notes.trim() || null,
+  agreementNumber: v.agreementNumber.trim() || null,
+  agreementDate: v.agreementDate || null,
+  agreementSignedDate: v.agreementSignedDate || null,
+  trainingProjects: v.trainingProjects.map((p) => ({
+    from: p.from,
+    to: p.to,
+    jobTitle: p.jobTitle.trim(),
+    jobDetails: p.jobDetails.trim() || null,
+  })),
   firstSlotStart: v.firstSlotStart,
   firstSlotEnd: v.firstSlotEnd,
   secondSlotStart: v.secondSlotStart,
@@ -206,11 +231,15 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
   });
   const tutorRows = useFieldArray({ control, name: 'companyTutors' });
   const suspensionRows = useFieldArray({ control, name: 'suspensions' });
+  const projectRows = useFieldArray({ control, name: 'trainingProjects' });
   const { summaryRef, requestSummaryFocus } = useErrorSummaryFocus(submitCount, errors);
   const today = new Date().toISOString().slice(0, 10);
   const max = (n: number) => ({ value: n, message: t('form.errors.maxLength', { max: n }) });
   const required = (v: string) => v.trim() !== '' || t('form.errors.required');
   const chosen = (v: MunicipalityValue) => !isUnchosen(v) || t('municipalityField.choose');
+  /** Con i progetti formativi servono le date del tirocinio, che li contengono (US-1008). */
+  const datesForProjects = (v: string) =>
+    v !== '' || getValues('trainingProjects').length === 0 || t('internship.errors.datesForProjects');
 
   const labels: Record<Scalar, string> = {
     internshipTypeId: t('internship.fields.internshipType'),
@@ -226,6 +255,9 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
     residenceStreet: t('internship.fields.residenceStreet'),
     residenceStreetNumber: t('internship.fields.residenceStreetNumber'),
     notes: t('internship.fields.notes'),
+    agreementNumber: t('internship.fields.agreementNumber'),
+    agreementDate: t('internship.fields.agreementDate'),
+    agreementSignedDate: t('internship.fields.agreementSignedDate'),
   };
 
   // riepilogo nell'ordine della pagina
@@ -272,6 +304,21 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
     const n = i + 1;
     push(`suspensions.${i}.from`, t('internship.fields.from', { n }), errors.suspensions?.[i]?.from?.message);
     push(`suspensions.${i}.to`, t('internship.fields.to', { n }), errors.suspensions?.[i]?.to?.message);
+  });
+  (['agreementNumber', 'agreementDate', 'agreementSignedDate'] as const).forEach((f) =>
+    push(f, labels[f], errors[f]?.message),
+  );
+  projectRows.fields.forEach((_, i) => {
+    const n = i + 1;
+    const row = errors.trainingProjects?.[i];
+    push(`trainingProjects.${i}.from`, t('internship.fields.projectFrom', { n }), row?.from?.message);
+    push(`trainingProjects.${i}.to`, t('internship.fields.projectTo', { n }), row?.to?.message);
+    push(`trainingProjects.${i}.jobTitle`, t('internship.fields.jobTitle', { n }), row?.jobTitle?.message);
+    push(
+      `trainingProjects.${i}.jobDetails`,
+      t('internship.fields.jobDetails', { n }),
+      row?.jobDetails?.message,
+    );
   });
   (
     [
@@ -429,7 +476,14 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
             </p>
           )}
           <FormField id={fieldId('startDate')} label={labels.startDate} error={errors.startDate?.message}>
-            {(p) => <Input {...p} type="date" className="max-w-48" {...register('startDate')} />}
+            {(p) => (
+              <Input
+                {...p}
+                type="date"
+                className="max-w-48"
+                {...register('startDate', { validate: datesForProjects })}
+              />
+            )}
           </FormField>
           <FormField
             id={fieldId('expectedEndDate')}
@@ -444,7 +498,8 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
                 {...register('expectedEndDate', {
                   validate: (v) => {
                     const start = getValues('startDate');
-                    return !v || !start || v >= start || t('internship.errors.endBeforeStart');
+                    if (v && start && v < start) return t('internship.errors.endBeforeStart');
+                    return datesForProjects(v);
                   },
                 })}
               />
@@ -671,6 +726,17 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
           {t('internship.addSuspension')}
         </Button>
       </section>
+
+      <TrainingProjectsFields
+        control={control}
+        register={register}
+        errors={errors}
+        getValues={getValues}
+        rows={projectRows}
+        saved={internship.trainingProjects}
+        jobSlotTitle={internship.jobSlotTitle}
+        fieldId={fieldId}
+      />
 
       <section aria-labelledby="internship-section-beneficiary" className="space-y-4">
         <h2 id="internship-section-beneficiary" className="text-lg font-semibold text-primary">

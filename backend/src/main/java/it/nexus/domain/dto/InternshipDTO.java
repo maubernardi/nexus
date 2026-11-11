@@ -31,6 +31,13 @@ public record InternshipDTO(
         String residenceStreetNumber,
         List<SuspensionDTO> suspensions,
         String notes,
+        /** Mansione abbinata alla segnalazione, proposta per il primo progetto formativo (US-1008). */
+        String jobSlotTitle,
+        /** Convenzione (US-1008): la durata è quella del tirocinio. */
+        String agreementNumber,
+        LocalDate agreementDate,
+        LocalDate agreementSignedDate,
+        List<TrainingProjectDTO> trainingProjects,
         LocalTime firstSlotStart,
         LocalTime firstSlotEnd,
         LocalTime secondSlotStart,

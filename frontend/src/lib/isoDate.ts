@@ -10,6 +10,12 @@ export const formatIsoDate = (iso: string): string => {
   return `${d}/${m}/${y}`;
 };
 
+/** Il giorno dopo una data ISO: per proporre l'inizio del progetto formativo che segue (US-1008). */
+export const dayAfter = (iso: string): string => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d + 1)).toISOString().slice(0, 10);
+};
+
 /** Il giorno prima di una data ISO: per le validità con la fine esclusa, l'ultimo giorno valido. */
 export const dayBefore = (iso: string): string => {
   const [y, m, d] = iso.split('-').map(Number);
