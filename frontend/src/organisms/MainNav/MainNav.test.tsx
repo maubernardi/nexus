@@ -50,7 +50,7 @@ describe('<MainNav>', () => {
     await expectNoAxeViolations();
   });
 
-  it('ADMIN: Utenti, Cataloghi e Calendario nel sottomenu «Amministrazione», che si chiude con Esc', async () => {
+  it('ADMIN: Utenti, Cataloghi, Modelli e Calendario nel sottomenu «Amministrazione», che si chiude con Esc', async () => {
     renderWithProviders(<MainNav roles={['ADMIN']} />);
     const user = userEvent.setup();
     const toggle = screen.getByRole('button', { name: 'Amministrazione' });
@@ -65,7 +65,7 @@ describe('<MainNav>', () => {
       within(submenu)
         .getAllByRole('link')
         .map((l) => l.textContent),
-    ).toEqual(['Utenti', 'Cataloghi', 'Calendario']);
+    ).toEqual(['Utenti', 'Cataloghi', 'Modelli dei documenti', 'Calendario']);
     await expectNoAxeViolations();
 
     await user.keyboard('{Escape}');

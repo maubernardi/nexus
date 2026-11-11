@@ -17,5 +17,6 @@ public enum AuditEntityType {
     CALENDAR,
     MUNICIPALITY_IMPORT,
     COMPETENCE_SITE,
-    CARE_AGENCY
+    CARE_AGENCY,
+    DOCUMENT_TEMPLATE
 }

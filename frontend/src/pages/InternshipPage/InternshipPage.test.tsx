@@ -7,6 +7,7 @@ import {
   addInternshipAtecoCode,
   addInternshipLegalRepresentative,
   downloadInternshipDocument,
+  fetchDocumentTemplateChoices,
   fetchInternship,
   saveInternship,
   type Internship,
@@ -18,6 +19,7 @@ import { renderRoutes } from '@/tests/renderWithProviders';
 
 vi.mock('@/config/api/internshipApi', () => ({
   downloadInternshipDocument: vi.fn(),
+  fetchDocumentTemplateChoices: vi.fn(),
   fetchInternship: vi.fn(),
   saveInternship: vi.fn(),
   addInternshipLegalRepresentative: vi.fn(),
@@ -90,6 +92,8 @@ describe('<InternshipPage>', () => {
     vi.mocked(addInternshipAtecoCode).mockReset();
     vi.mocked(startInternship).mockReset();
     vi.mocked(downloadInternshipDocument).mockReset();
+    // nessun modello caricato: il modello generico, senza scelta (US-1010)
+    vi.mocked(fetchDocumentTemplateChoices).mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -124,6 +128,9 @@ describe('<InternshipPage>', () => {
     await expectNoAxeViolations();
 
     const button = within(section).getByRole('button', { name: 'Scarica la Convenzione (.docx)' });
+    // il pulsante si attiva quando si sa se c'è un modello da scegliere
+    await waitFor(() => expect(button).toBeEnabled());
+    expect(within(section).queryByRole('combobox')).not.toBeInTheDocument();
     await user.click(button);
 
     expect(
@@ -157,11 +164,68 @@ describe('<InternshipPage>', () => {
 
     const section = await screen.findByRole('region', { name: 'Documenti' });
     expect(within(section).queryByText(/non è completa/)).not.toBeInTheDocument();
-    await user.click(within(section).getByRole('button', { name: 'Scarica la Convenzione (.docx)' }));
+    const button = within(section).getByRole('button', { name: 'Scarica la Convenzione (.docx)' });
+    await waitFor(() => expect(button).toBeEnabled());
+    await user.click(button);
 
     expect(
       await within(section).findByText('Download non riuscito. Controlla la connessione e riprova.'),
     ).toBeInTheDocument();
+  });
+
+  it('documenti: con più modelli caricati il Tutor sceglie quale usare (US-1010)', async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal(
+      'URL',
+      class extends URL {
+        static createObjectURL = vi.fn(() => 'blob:convenzione');
+        static revokeObjectURL = vi.fn();
+      },
+    );
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined);
+    vi.mocked(fetchInternship).mockResolvedValue(internship());
+    vi.mocked(fetchDocumentTemplateChoices).mockImplementation(async (_ticketId, kind) =>
+      kind === 'convenzione'
+        ? [
+            { id: 'M1', name: 'Convenzione GOL' },
+            { id: 'M2', name: 'Convenzione Comune' },
+          ]
+        : [{ id: 'M3', name: 'Progetto formativo GOL' }],
+    );
+    vi.mocked(downloadInternshipDocument).mockResolvedValue(new Blob(['docx']));
+    renderPage();
+
+    const section = await screen.findByRole('region', { name: 'Documenti' });
+    const select = await within(section).findByRole('combobox', { name: 'Modello della convenzione' });
+    expect(select).toHaveAccessibleDescription(
+      'Ci sono più modelli per questo documento: scegli quale usare.',
+    );
+    // un solo modello per il progetto formativo: nessuna scelta
+    expect(within(section).getAllByRole('combobox')).toHaveLength(1);
+    await expectNoAxeViolations();
+
+    await user.click(within(section).getByRole('button', { name: 'Scarica la Convenzione (.docx)' }));
+    expect(
+      within(section).getByText('Scegli prima il modello: Modello della convenzione.'),
+    ).toBeInTheDocument();
+    expect(select).toHaveFocus();
+    expect(downloadInternshipDocument).not.toHaveBeenCalled();
+
+    await user.selectOptions(select, 'Convenzione Comune');
+    await user.click(within(section).getByRole('button', { name: 'Scarica la Convenzione (.docx)' }));
+    await waitFor(() => expect(downloadInternshipDocument).toHaveBeenCalled());
+    expect(vi.mocked(downloadInternshipDocument).mock.calls[0][0]).toEqual({
+      ticketId: 'T9',
+      kind: 'convenzione',
+      template: 'M2',
+    });
+
+    await user.click(within(section).getByRole('button', { name: 'Scarica il Progetto Formativo (.docx)' }));
+    await waitFor(() => expect(downloadInternshipDocument).toHaveBeenCalledTimes(2));
+    expect(vi.mocked(downloadInternshipDocument).mock.calls[1][0]).toEqual({
+      ticketId: 'T9',
+      kind: 'progetto-formativo',
+    });
   });
 
   it('avvio con la scheda incompleta: l’elenco di ciò che manca porta ai campi', async () => {

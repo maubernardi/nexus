@@ -1,5 +1,8 @@
 package it.nexus.services;
 
+import java.util.List;
+
+import it.nexus.domain.dto.DocumentTemplateChoiceDTO;
 import it.nexus.domain.enumeration.InternshipDocumentKind;
 
 /**
@@ -12,5 +15,12 @@ public interface InternshipDocumentService {
     record GeneratedDocument(String filename, byte[] content) {
     }
 
-    GeneratedDocument generate(String ticketId, InternshipDocumentKind kind);
+    /**
+     * Il documento compilato con il modello caricato che vale per la segnalazione (US-1010), quello scelto dal Tutor se
+     * ce n'è più di uno ({@code templateId}), oppure il modello generico.
+     */
+    GeneratedDocument generate(String ticketId, InternshipDocumentKind kind, String templateId);
+
+    /** I modelli caricati validi per il documento della segnalazione: più di uno = il Tutor sceglie. */
+    List<DocumentTemplateChoiceDTO> templates(String ticketId, InternshipDocumentKind kind);
 }

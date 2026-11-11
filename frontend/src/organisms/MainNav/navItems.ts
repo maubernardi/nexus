@@ -1,6 +1,7 @@
 import {
   Building2,
   CalendarDays,
+  FileText,
   ArrowLeftRight,
   ListOrdered,
   ListTree,
@@ -21,6 +22,7 @@ export type NavItem = {
     | 'nav.board'
     | 'nav.users'
     | 'nav.catalogs'
+    | 'nav.documentTemplates'
     | 'nav.calendar'
     | 'nav.coordination';
   icon: LucideIcon;
@@ -48,5 +50,6 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { to: '/bacheca', labelKey: 'nav.board', icon: Megaphone, roles: [] },
   { to: '/utenti', labelKey: 'nav.users', icon: UserCog, roles: ['ADMIN'], admin: true },
   { to: '/cataloghi', labelKey: 'nav.catalogs', icon: ListTree, roles: ['ADMIN'], admin: true },
+  { to: '/modelli', labelKey: 'nav.documentTemplates', icon: FileText, roles: ['ADMIN'], admin: true },
   { to: '/calendario', labelKey: 'nav.calendar', icon: CalendarDays, roles: ['ADMIN'], admin: true },
 ];

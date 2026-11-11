@@ -163,15 +163,32 @@ export const saveInternship = async ({
 /** Documenti del tirocinio generati dai modelli Word (US-1004, US-1005). */
 export type InternshipDocumentKind = 'convenzione' | 'progetto-formativo';
 
-/** Documento compilato dalla scheda salvata, come file .docx. */
+/** Modello caricato dall'ADMIN che il Tutor può scegliere per un documento (US-1010). */
+export type DocumentTemplateChoice = { id: string; name: string };
+
+/** Modelli caricati validi per il documento: vuoto = modello generico, uno = automatico, più = si sceglie. */
+export const fetchDocumentTemplateChoices = async (
+  ticketId: string,
+  kind: InternshipDocumentKind,
+): Promise<DocumentTemplateChoice[]> => {
+  const { data } = await axiosInstance.get<DocumentTemplateChoice[]>(
+    `${internshipUrl(ticketId)}/documents/${kind}/templates`,
+  );
+  return data;
+};
+
+/** Documento compilato dalla scheda salvata, come file .docx; con più modelli, quello scelto. */
 export const downloadInternshipDocument = async ({
   ticketId,
   kind,
+  template,
 }: {
   ticketId: string;
   kind: InternshipDocumentKind;
+  template?: string;
 }): Promise<Blob> => {
   const { data } = await axiosInstance.get<Blob>(`${internshipUrl(ticketId)}/documents/${kind}`, {
+    params: template ? { template } : undefined,
     responseType: 'blob',
   });
   return data;
