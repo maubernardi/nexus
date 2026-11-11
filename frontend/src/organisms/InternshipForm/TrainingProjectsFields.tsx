@@ -113,7 +113,8 @@ export const TrainingProjectsFields = ({
   return (
     <>
       <section aria-labelledby="internship-section-agreement" className="space-y-4">
-        <h2 id="internship-section-agreement" className="text-lg font-semibold text-primary">
+        {/* focalizzabili: l'elenco di ciò che manca per l'avvio porta qui */}
+        <h2 id="internship-section-agreement" tabIndex={-1} className="text-lg font-semibold text-primary">
           {t('internship.sections.agreement')}
         </h2>
         <div className="grid gap-4 sm:grid-cols-3">
@@ -153,7 +154,11 @@ export const TrainingProjectsFields = ({
       </section>
 
       <section aria-labelledby="internship-section-trainingProjects" className="space-y-4">
-        <h2 id="internship-section-trainingProjects" className="text-lg font-semibold text-primary">
+        <h2
+          id="internship-section-trainingProjects"
+          tabIndex={-1}
+          className="text-lg font-semibold text-primary"
+        >
           {t('internship.sections.trainingProjects')}
         </h2>
         <p className="text-muted-foreground">{t('internship.trainingProjects.intro')}</p>

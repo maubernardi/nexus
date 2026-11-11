@@ -35,6 +35,8 @@ const START_TARGETS: Record<StartRequirement, string> = {
   atecoCode: 'internship-atecoCodeId',
   companyTutors: 'internship-section-tutors',
   schedule: 'internship-days',
+  agreement: 'internship-section-agreement',
+  trainingProjects: 'internship-section-trainingProjects',
   fiscalCode: 'internship-fiscalCode',
   birthDate: 'internship-birthDate',
   birthPlace: 'internship-birthPlace',

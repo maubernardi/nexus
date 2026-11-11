@@ -540,6 +540,8 @@ export const it = {
         atecoCode: 'Codice ATECO del tirocinio',
         companyTutors: 'Almeno un tutor aziendale',
         schedule: 'La griglia oraria (almeno un giorno)',
+        agreement: 'La convenzione (numero, data e data di stipula)',
+        trainingProjects: 'Almeno un progetto formativo',
         fiscalCode: 'Codice fiscale del beneficiario',
         birthDate: 'Data di nascita del beneficiario',
         birthPlace: 'Luogo di nascita del beneficiario',
