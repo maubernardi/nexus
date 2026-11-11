@@ -7,6 +7,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.HiringFormula;
+import it.nexus.domain.Internship;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.NoHireReason;
 import it.nexus.domain.Project;
@@ -31,6 +34,7 @@ import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.HiringFormulaRepository;
+import it.nexus.repository.InternshipRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.NoHireReasonRepository;
 import it.nexus.repository.TicketRepository;
@@ -44,7 +48,10 @@ import jakarta.persistence.EntityManager;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Import({TestcontainersConfiguration.class, WorkflowScenarios.class})
-/** Report di restituzione (US-1101): lo invia solo il Tutor della segnalazione in tirocinio, una volta sola. */
+/**
+ * Report di restituzione (US-1101): lo invia solo il Tutor della segnalazione in tirocinio, una volta sola; con la fine
+ * effettiva del tirocinio (US-1009).
+ */
 class ClosureReportIT {
 
     private static final String USER = MockHeaderAuthenticationFilter.HEADER;
@@ -57,6 +64,7 @@ class ClosureReportIT {
     @Autowired NoHireReasonRepository noHireReasons;
     @Autowired TicketRepository tickets;
     @Autowired JobSlotRepository jobSlots;
+    @Autowired InternshipRepository internships;
 
     private Ticket ticket;
     private JobSlot slot;
@@ -94,11 +102,17 @@ class ClosureReportIT {
 
     private ResultActions send(String user, long version, Boolean hired, String formulaId, String reasonId,
             boolean jobSlotStillAvailable) throws Exception {
+        return send(user, version, "2027-05-31", hired, formulaId, reasonId, jobSlotStillAvailable);
+    }
+
+    private ResultActions send(String user, long version, String actualEndDate, Boolean hired, String formulaId,
+            String reasonId, boolean jobSlotStillAvailable) throws Exception {
         String json = """
-                {"version": %d, "companySatisfaction": 5, "beneficiarySatisfaction": 4,
+                {"version": %d, "actualEndDate": %s, "companySatisfaction": 5, "beneficiarySatisfaction": 4,
                  "objectives": "Autonomia in cucina raggiunta", "difficulties": "   ",
                  "hired": %s, "hiringFormulaId": %s, "noHireReasonId": %s, "jobSlotStillAvailable": %s}"""
-                .formatted(version, hired, quoted(formulaId), quoted(reasonId), jobSlotStillAvailable);
+                .formatted(version, quoted(actualEndDate), hired, quoted(formulaId), quoted(reasonId),
+                        jobSlotStillAvailable);
         return mockMvc.perform(post(ticketPath + "/closure-report").header(USER, user)
                 .contentType(MediaType.APPLICATION_JSON).content(json));
     }
@@ -121,6 +135,7 @@ class ClosureReportIT {
         send("tutor1", ticketVersion(), true, formulaId(), reasonId())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("FORM_RESTITUZIONE"))
+                .andExpect(jsonPath("$.closureReport.actualEndDate").value("2027-05-31"))
                 .andExpect(jsonPath("$.closureReport.companySatisfaction").value(5))
                 .andExpect(jsonPath("$.closureReport.beneficiarySatisfaction").value(4))
                 .andExpect(jsonPath("$.closureReport.objectives").value("Autonomia in cucina raggiunta"))
@@ -145,11 +160,12 @@ class ClosureReportIT {
         mockMvc.perform(get("/api/v1/notifications").header(USER, "operatore.cc"))
                 .andExpect(jsonPath("$.items[0].type").value("CLOSURE_REPORT_SUBMITTED"));
 
-        // l'audit registra le scelte, mai i testi liberi
+        // l'audit registra le scelte e la fine effettiva, mai i testi liberi
         String changes = jdbc.queryForObject(
                 "SELECT changes::text FROM audit_event WHERE entity_id = ? AND action = 'CLOSE'", String.class,
                 ticket.getId());
-        assertThat(changes).contains("hiringFormula", formula.getCode(), "jobSlotStillAvailable")
+        assertThat(changes).contains("hiringFormula", formula.getCode(), "jobSlotStillAvailable", "actualEndDate",
+                        "2027-05-31")
                 .doesNotContain("Autonomia", "objectives", "noHireReason");
     }
 
@@ -190,9 +206,36 @@ class ClosureReportIT {
                                 .formatted(version, formulaId())))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldErrors[*].field", hasItem("companySatisfaction")))
-                .andExpect(jsonPath("$.fieldErrors[*].field", hasItem("beneficiarySatisfaction")));
+                .andExpect(jsonPath("$.fieldErrors[*].field", hasItem("beneficiarySatisfaction")))
+                .andExpect(jsonPath("$.fieldErrors[*].message", hasItem("Indica la data di fine effettiva")));
 
         assertThat(tickets.findById(ticket.getId()).orElseThrow().getStatus()).isEqualTo(TicketStatus.IN_TIROCINIO);
+    }
+
+    @Test
+    void fineEffettiva_nonPrimaDellInizio_eLaSchedaNonCambia() throws Exception {
+        Internship internship = new Internship(ticket);
+        internship.setStartDate(LocalDate.of(2026, 12, 1));
+        internship.setExpectedEndDate(LocalDate.of(2027, 5, 31));
+        internships.saveAndFlush(internship);
+        long version = ticketVersion();
+
+        send("tutor1", version, "2026-11-30", true, formulaId(), null, false)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("actualEndDate"))
+                .andExpect(jsonPath("$.fieldErrors[0].message")
+                        .value("La fine effettiva non può precedere l'inizio del tirocinio (01/12/2026)"));
+        assertThat(tickets.findById(ticket.getId()).orElseThrow().getStatus()).isEqualTo(TicketStatus.IN_TIROCINIO);
+
+        // fine anticipata, anche lo stesso giorno dell'inizio: vale solo per il report
+        send("tutor1", version, "2026-12-01", true, formulaId(), null, false)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.closureReport.actualEndDate").value("2026-12-01"));
+        em.flush();
+        em.clear();
+        Internship kept = internships.findByTicketId(ticket.getId()).orElseThrow();
+        assertThat(kept.getStartDate()).isEqualTo(LocalDate.of(2026, 12, 1));
+        assertThat(kept.getExpectedEndDate()).isEqualTo(LocalDate.of(2027, 5, 31));
     }
 
     @Test

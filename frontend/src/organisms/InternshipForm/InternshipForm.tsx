@@ -37,7 +37,7 @@ type Values = {
   site: string;
   siteMunicipality: MunicipalityValue;
   atecoCodeId: string;
-  companyTutors: { fullName: string; contact: string }[];
+  companyTutors: { fullName: string; role: string; contact: string }[];
   fiscalCode: string;
   birthDate: string;
   birthPlace: string;
@@ -82,7 +82,11 @@ const toValues = (i: Internship): Values => ({
   site: i.site ?? '',
   siteMunicipality: toMunicipalityValue(i.siteMunicipality ?? undefined),
   atecoCodeId: i.atecoCodeId ?? '',
-  companyTutors: i.companyTutors.map((c) => ({ fullName: c.fullName, contact: c.contact ?? '' })),
+  companyTutors: i.companyTutors.map((c) => ({
+    fullName: c.fullName,
+    role: c.role ?? '',
+    contact: c.contact ?? '',
+  })),
   fiscalCode: i.fiscalCode ?? '',
   birthDate: i.birthDate ?? '',
   birthPlace: i.birthPlace ?? '',
@@ -116,6 +120,7 @@ const toPayload = (v: Values, version: number | null): InternshipPayload => ({
   atecoCodeId: v.atecoCodeId || null,
   companyTutors: v.companyTutors.map((c) => ({
     fullName: c.fullName.trim(),
+    role: c.role.trim() || null,
     contact: c.contact.trim() || null,
   })),
   fiscalCode: v.fiscalCode.trim().toUpperCase() || null,
@@ -251,6 +256,11 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
       `companyTutors.${i}.fullName`,
       t('internship.fields.fullName', { n }),
       errors.companyTutors?.[i]?.fullName?.message,
+    );
+    push(
+      `companyTutors.${i}.role`,
+      t('internship.fields.role', { n }),
+      errors.companyTutors?.[i]?.role?.message,
     );
     push(
       `companyTutors.${i}.contact`,
@@ -534,7 +544,7 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
           <p className="text-muted-foreground">{t('internship.noCompanyTutors')}</p>
         )}
         {tutorRows.fields.map((row, i) => (
-          <div key={row.id} className="grid items-end gap-3 sm:grid-cols-[1fr_1fr_auto]">
+          <div key={row.id} className="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto]">
             <FormField
               id={fieldId(`companyTutors.${i}.fullName`)}
               label={t('internship.fields.fullName', { n: i + 1 })}
@@ -549,6 +559,20 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
                     validate: required,
                     maxLength: max(200),
                   })}
+                />
+              )}
+            </FormField>
+            <FormField
+              id={fieldId(`companyTutors.${i}.role`)}
+              label={t('internship.fields.role', { n: i + 1 })}
+              hint={t('internship.hints.role')}
+              error={errors.companyTutors?.[i]?.role?.message}
+            >
+              {(p) => (
+                <Input
+                  {...p}
+                  autoComplete="off"
+                  {...register(`companyTutors.${i}.role` as const, { maxLength: max(200) })}
                 />
               )}
             </FormField>
@@ -581,7 +605,7 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
           type="button"
           variant="outline"
           disabled={tutorRows.fields.length >= 10}
-          onClick={() => tutorRows.append({ fullName: '', contact: '' })}
+          onClick={() => tutorRows.append({ fullName: '', role: '', contact: '' })}
         >
           <Plus aria-hidden="true" />
           {t('internship.addCompanyTutor')}

@@ -583,8 +583,15 @@ class DomainConstraintsIT {
         @Test
         void tutorAziendaleSenzaNome() {
             Internship i = internship();
-            i.addCompanyTutor("  ", null);
+            i.addCompanyTutor("  ", null, null);
             assertViolates("ck_internship_company_tutor_name", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void ruoloDelTutorAziendaleVuoto() {
+            Internship i = internship();
+            i.addCompanyTutor("Anna Verdi", "  ", null);
+            assertViolates("ck_internship_company_tutor_role", () -> internships.saveAndFlush(i));
         }
 
         @Test
@@ -874,8 +881,8 @@ class DomainConstraintsIT {
         }
 
         private ClosureReport report(Ticket ticket, int companySatisfaction) {
-            return new ClosureReport(ticket, (short) companySatisfaction, (short) 4, "Obiettivi raggiunti", null,
-                    hiringFormulas.findByActiveTrueOrderByNameAsc().getFirst(), null, true);
+            return new ClosureReport(ticket, LocalDate.of(2027, 5, 31), (short) companySatisfaction, (short) 4,
+                    "Obiettivi raggiunti", null, hiringFormulas.findByActiveTrueOrderByNameAsc().getFirst(), null, true);
         }
 
         private Long addReport() {
@@ -904,6 +911,18 @@ class DomainConstraintsIT {
                     INSERT INTO closure_report (id, ticket_id, company_satisfaction, beneficiary_satisfaction,
                         objectives, hired, no_hire_reason_id, job_slot_still_available, created_at, created_by)
                     VALUES (1, ?, 3, 3, '   ', false, 893700000000000301, false, now(), 'test')""", ticketId));
+        }
+
+        @Test
+        void senzaFineEffettiva_comeIReportDiPrimaELaReleasePrecedente() {
+            // A16: la colonna resta facoltativa nel database; l'obbligo è nel servizio (US-1009, D2)
+            Long ticketId = newTicket().getId();
+            jdbc.update("""
+                    INSERT INTO closure_report (id, ticket_id, company_satisfaction, beneficiary_satisfaction, hired,
+                        no_hire_reason_id, job_slot_still_available, created_at, created_by)
+                    VALUES (1, ?, 3, 3, false, 893700000000000301, false, now(), 'test')""", ticketId);
+            assertThat(closureReports.findByTicketId(ticketId)).get()
+                    .extracting(ClosureReport::getActualEndDate).isNull();
         }
 
         @Test

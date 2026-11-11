@@ -22,11 +22,12 @@ const value = (label: string): string | null =>
   screen.getByText(label, { selector: 'dt' }).nextElementSibling?.textContent ?? null;
 
 describe('<ClosureReportView>', () => {
-  it('mostra gradimenti, esito e testi, con chi l’ha inviato', async () => {
-    renderWithProviders(<ClosureReportView report={report} />);
+  it('mostra fine effettiva, gradimenti, esito e testi, con chi l’ha inviato', async () => {
+    renderWithProviders(<ClosureReportView report={{ ...report, actualEndDate: '2027-05-31' }} />);
 
     const section = screen.getByRole('region', { name: 'Report di restituzione' });
     expect(within(section).getByText(/Inviato da Mario Rossi il/)).toBeInTheDocument();
+    expect(value('Fine effettiva del tirocinio')).toBe('31/05/2027');
     expect(value('Soddisfazione dell’azienda')).toBe('5 su 5');
     expect(value('Soddisfazione del beneficiario')).toBe('3 su 5');
     expect(value('Il beneficiario è stato assunto?')).toBe('No: L’azienda non ha risorse');
@@ -38,7 +39,7 @@ describe('<ClosureReportView>', () => {
     await expectNoAxeViolations();
   });
 
-  it('assunto: la formula di assunzione', () => {
+  it('assunto: la formula di assunzione; un report inviato prima, senza la fine effettiva', () => {
     renderWithProviders(
       <ClosureReportView
         report={{
@@ -50,5 +51,6 @@ describe('<ClosureReportView>', () => {
       />,
     );
     expect(value('Il beneficiario è stato assunto?')).toBe('Sì, con Tempo indeterminato');
+    expect(screen.queryByText('Fine effettiva del tirocinio')).not.toBeInTheDocument();
   });
 });

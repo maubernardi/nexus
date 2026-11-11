@@ -3,12 +3,14 @@ import userEvent from '@testing-library/user-event';
 import { AxiosError, AxiosHeaders } from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { fetchInternship, type Internship } from '@/config/api/internshipApi';
 import { fetchHiringFormulas, fetchNoHireReasons } from '@/config/api/referenceApi';
 import { fetchTicket, submitClosureReport, type TicketDetail } from '@/config/api/ticketApi';
 import { ClosureReportPage } from '@/pages/ClosureReportPage/ClosureReportPage';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderRoutes } from '@/tests/renderWithProviders';
 
+vi.mock('@/config/api/internshipApi', () => ({ fetchInternship: vi.fn() }));
 vi.mock('@/config/api/referenceApi', () => ({ fetchHiringFormulas: vi.fn(), fetchNoHireReasons: vi.fn() }));
 vi.mock('@/config/api/ticketApi', () => ({ fetchTicket: vi.fn(), submitClosureReport: vi.fn() }));
 
@@ -36,6 +38,9 @@ const ticket = {
   proposal: { companyName: 'Demo Ristorazione' },
   myTicket: true,
 } as TicketDetail;
+
+/** Scheda del tirocinio: servono solo le date (US-1009). */
+const internship = { startDate: '2026-12-01', expectedEndDate: '2027-05-31' } as Internship;
 
 const closed = {
   ...ticket,
@@ -69,7 +74,8 @@ const renderPage = () =>
 
 /** Compila le scelte obbligatorie: assunto a tempo indeterminato, mansione non più disponibile. */
 const fillRequired = async (user: ReturnType<typeof userEvent.setup>): Promise<void> => {
-  const [companyFour] = screen.getAllByRole('radio', { name: '4' });
+  // il modulo compare dopo la lettura della scheda (US-1009)
+  const [companyFour] = await screen.findAllByRole('radio', { name: '4' });
   await user.click(companyFour);
   await user.click(screen.getAllByRole('radio', { name: '5' })[1]);
   await user.click(screen.getAllByRole('radio', { name: 'Sì' })[0]);
@@ -83,6 +89,8 @@ const fillRequired = async (user: ReturnType<typeof userEvent.setup>): Promise<v
 describe('<ClosureReportPage>', () => {
   beforeEach(() => {
     vi.mocked(fetchTicket).mockResolvedValue(ticket);
+    vi.mocked(fetchInternship).mockReset();
+    vi.mocked(fetchInternship).mockResolvedValue(internship);
     vi.mocked(fetchHiringFormulas).mockResolvedValue([
       { id: 'F1', code: 'TEMPO_DETERMINATO_3_MESI', name: 'Tempo determinato 3 mesi' },
       { id: 'F2', code: 'TEMPO_INDETERMINATO', name: 'Tempo indeterminato' },
@@ -104,9 +112,9 @@ describe('<ClosureReportPage>', () => {
       }),
     ).toBeInTheDocument();
     expect(screen.getByText('Tirocinio di Anna Bianchi presso Demo Ristorazione.')).toBeInTheDocument();
-    expect(screen.getByRole('group', { name: /Soddisfazione dell’azienda/ })).toHaveAccessibleDescription(
-      'Da 1 (per niente soddisfatto) a 5 (molto soddisfatto).',
-    );
+    expect(
+      await screen.findByRole('group', { name: /Soddisfazione dell’azienda/ }),
+    ).toHaveAccessibleDescription('Da 1 (per niente soddisfatto) a 5 (molto soddisfatto).');
     // formula e motivo compaiono solo con la risposta sull'assunzione
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
     await expectNoAxeViolations();
@@ -144,6 +152,7 @@ describe('<ClosureReportPage>', () => {
       id: 'T9',
       version: 7,
       report: {
+        actualEndDate: '2027-05-31',
         companySatisfaction: 4,
         beneficiarySatisfaction: 5,
         objectives: 'Autonomia in cucina',
@@ -160,6 +169,67 @@ describe('<ClosureReportPage>', () => {
     expect(screen.getByRole('region', { name: 'Report di restituzione' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Invia il report' })).not.toBeInTheDocument();
     await expectNoAxeViolations();
+  });
+
+  it('fine effettiva: precompilata con la fine prevista, obbligatoria e non prima dell’inizio', async () => {
+    const user = userEvent.setup();
+    vi.mocked(submitClosureReport).mockResolvedValue(closed);
+    renderPage();
+
+    const date = await screen.findByLabelText(/Fine effettiva del tirocinio/, { selector: 'input' });
+    expect(date).toHaveValue('2027-05-31');
+    expect(date).toHaveAccessibleDescription(/^Precompilata con la fine prevista nella scheda/);
+    await fillRequired(user);
+
+    await user.clear(date);
+    await user.click(screen.getByRole('button', { name: 'Invia il report' }));
+    const summary = await screen.findByRole('alert');
+    expect(summary).toHaveTextContent('Fine effettiva del tirocinio: Campo obbligatorio');
+
+    await user.type(date, '2026-11-30');
+    await user.click(screen.getByRole('button', { name: 'Invia il report' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Fine effettiva del tirocinio: La fine effettiva non può precedere l’inizio del tirocinio (01/12/2026)',
+    );
+    expect(date).toHaveAttribute('aria-invalid', 'true');
+    await expectNoAxeViolations();
+
+    // fine anticipata, lo stesso giorno dell'inizio
+    await user.clear(date);
+    await user.type(date, '2026-12-01');
+    await user.click(screen.getByRole('button', { name: 'Invia il report' }));
+    await user.click(await screen.findByRole('button', { name: 'Sì, invia il report' }));
+    expect(vi.mocked(submitClosureReport).mock.calls[0][0].report.actualEndDate).toBe('2026-12-01');
+  });
+
+  it('senza la scheda la fine effettiva parte vuota; l’errore del server va sul campo', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchInternship).mockRejectedValue(error(403, {}));
+    vi.mocked(submitClosureReport).mockRejectedValue(
+      error(400, {
+        fieldErrors: [
+          {
+            field: 'actualEndDate',
+            message: 'La fine effettiva non può precedere l’inizio del tirocinio (01/12/2026)',
+          },
+        ],
+      }),
+    );
+    renderPage();
+
+    const date = await screen.findByLabelText(/Fine effettiva del tirocinio/, { selector: 'input' });
+    expect(date).toHaveValue('');
+    expect(date).toHaveAccessibleDescription(/^L’ultimo giorno di tirocinio/);
+    await fillRequired(user);
+    await user.type(date, '2026-11-30');
+    await user.click(screen.getByRole('button', { name: 'Invia il report' }));
+    await user.click(await screen.findByRole('button', { name: 'Sì, invia il report' }));
+
+    const summary = await screen.findByRole('alert');
+    expect(summary).toHaveTextContent(
+      'Fine effettiva del tirocinio: La fine effettiva non può precedere l’inizio del tirocinio (01/12/2026)',
+    );
+    expect(date).toHaveAttribute('aria-invalid', 'true');
   });
 
   it('torna al modulo dalla conferma; l’errore di un campo dal server riporta al riepilogo', async () => {

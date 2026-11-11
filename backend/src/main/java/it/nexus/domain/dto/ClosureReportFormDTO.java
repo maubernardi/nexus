@@ -1,5 +1,7 @@
 package it.nexus.domain.dto;
 
+import java.time.LocalDate;
+
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -8,10 +10,12 @@ import jakarta.validation.constraints.Size;
 
 /**
  * Report di restituzione dal modulo (US-1101). Assunto: con {@code hiringFormulaId}; non assunto: con
- * {@code noHireReasonId} (controllo nel servizio, con le sole voci attive). Obiettivi e difficoltà sono facoltativi.
+ * {@code noHireReasonId} (controllo nel servizio, con le sole voci attive). Obiettivi e difficoltà sono facoltativi. La
+ * fine effettiva (US-1009) non precede l'inizio della scheda (controllo nel servizio).
  */
 public record ClosureReportFormDTO(
         @NotNull(message = "Versione mancante") @PositiveOrZero Long version,
+        @NotNull(message = "Indica la data di fine effettiva") LocalDate actualEndDate,
         @NotNull(message = "Indica la soddisfazione dell'azienda")
         @Min(value = 1, message = "Da 1 a 5") @Max(value = 5, message = "Da 1 a 5") Integer companySatisfaction,
         @NotNull(message = "Indica la soddisfazione del beneficiario")

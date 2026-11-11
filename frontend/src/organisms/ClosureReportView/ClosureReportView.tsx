@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import type { ClosureReport } from '@/config/api/ticketApi';
+import { formatIsoDate } from '@/lib/isoDate';
 
 const dateTime = new Intl.DateTimeFormat('it-IT', { dateStyle: 'short', timeStyle: 'short' });
 
@@ -12,6 +13,10 @@ type ClosureReportViewProps = {
 export const ClosureReportView = ({ report }: ClosureReportViewProps) => {
   const { t } = useTranslation();
   const rows: { label: string; value: string }[] = [
+    // assente nei report inviati prima di US-1009
+    ...(report.actualEndDate
+      ? [{ label: t('closureReport.fields.actualEndDate'), value: formatIsoDate(report.actualEndDate) }]
+      : []),
     {
       label: t('closureReport.fields.companySatisfaction'),
       value: t('closureReport.view.score', { value: report.companySatisfaction }),

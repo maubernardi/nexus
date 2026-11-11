@@ -1,6 +1,7 @@
 package it.nexus.domain;
 
 import java.io.Serial;
+import java.time.LocalDate;
 
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Immutable;
@@ -69,10 +70,18 @@ public class ClosureReport extends AbstractCreationAuditingEntity {
     @Column(name = "job_slot_still_available", nullable = false, updatable = false)
     private boolean jobSlotStillAvailable;
 
-    public ClosureReport(Ticket ticket, short companySatisfaction, short beneficiarySatisfaction, String objectives,
-            String difficulties, HiringFormula hiringFormula, NoHireReason noHireReason,
-            boolean jobSlotStillAvailable) {
+    /**
+     * Fine effettiva del tirocinio (US-1009), per la relazione finale: obbligatoria per i report nuovi, assente in quelli
+     * inviati prima. La scheda del tirocinio resta con le sue date.
+     */
+    @Column(name = "actual_end_date", updatable = false)
+    private LocalDate actualEndDate;
+
+    public ClosureReport(Ticket ticket, LocalDate actualEndDate, short companySatisfaction,
+            short beneficiarySatisfaction, String objectives, String difficulties, HiringFormula hiringFormula,
+            NoHireReason noHireReason, boolean jobSlotStillAvailable) {
         this.ticket = ticket;
+        this.actualEndDate = actualEndDate;
         this.companySatisfaction = companySatisfaction;
         this.beneficiarySatisfaction = beneficiarySatisfaction;
         this.objectives = objectives;

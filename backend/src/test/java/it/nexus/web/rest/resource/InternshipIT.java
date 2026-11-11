@@ -2,6 +2,7 @@ package it.nexus.web.rest.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -459,6 +460,34 @@ class InternshipIT {
                         "\"residenceMunicipalityId\": \"0ABCDEFGHJKMN"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldErrors[0].field").value("residenceMunicipalityId"));
+    }
+
+    @Test
+    void ruoloDeiTutorAziendali_facoltativo_auditSenzaValori() throws Exception {
+        String withRoles = full(null).replace("{\"fullName\": \"Anna Verdi\", \"contact\": \"055 123456\"}, "
+                        + "{\"fullName\": \"Luca Neri\"}",
+                "{\"fullName\": \"Anna Verdi\", \"role\": \" Responsabile di sala \", \"contact\": \"055 123456\"}, "
+                        + "{\"fullName\": \"Luca Neri\", \"role\": \"   \"}");
+        assertThat(withRoles).contains("Responsabile di sala");
+        save("tutor1", withRoles)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.companyTutors[0].role").value("Responsabile di sala"))
+                // spazi = ruolo non indicato; il tutor conta comunque per l'avvio
+                .andExpect(jsonPath("$.companyTutors[1].role").doesNotExist())
+                .andExpect(jsonPath("$.missingForStart", not(hasItem("companyTutors"))));
+
+        // cambia solo il ruolo: i tutor risultano cambiati, senza valori
+        save("tutor1", withRoles.replace("\"version\": null", "\"version\": " + version())
+                        .replace(" Responsabile di sala ", "Capo sala"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.companyTutors[0].role").value("Capo sala"));
+        Map<String, Object> changes = ticketAudit().getLast().getChanges();
+        assertThat(changes).containsOnlyKeys("companyTutors").containsEntry("companyTutors", Map.of("redacted", true));
+
+        save("tutor1", withRoles.replace("\"version\": null", "\"version\": " + version())
+                        .replace(" Responsabile di sala ", "x".repeat(201)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("companyTutors[0].role"));
     }
 
     @Test

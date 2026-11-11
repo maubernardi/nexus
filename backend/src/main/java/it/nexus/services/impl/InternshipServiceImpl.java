@@ -160,7 +160,8 @@ public class InternshipServiceImpl implements InternshipService {
             throw new FieldValidationException("fiscalCode", "Il codice fiscale non corrisponde alla data di nascita");
         }
         List<CompanyTutorDTO> tutors = dto.companyTutors().stream()
-                .map(t -> new CompanyTutorDTO(t.fullName().strip(), blankToNull(t.contact())))
+                .map(t -> new CompanyTutorDTO(t.fullName().strip(), blankToNull(t.role()),
+                        blankToNull(t.contact())))
                 .toList();
         List<SuspensionDTO> suspensions = dto.suspensions().stream()
                 .sorted(Comparator.comparing(SuspensionDTO::from))
@@ -456,7 +457,7 @@ public class InternshipServiceImpl implements InternshipService {
             internshipRepository.flush();
         }
         if (tutorsChanged) {
-            tutors.forEach(t -> internship.addCompanyTutor(t.fullName(), t.contact()));
+            tutors.forEach(t -> internship.addCompanyTutor(t.fullName(), t.role(), t.contact()));
         }
         if (suspensionsChanged) {
             suspensions.forEach(s -> internship.addSuspension(s.from(), s.to()));
@@ -589,7 +590,9 @@ public class InternshipServiceImpl implements InternshipService {
     }
 
     private static List<CompanyTutorDTO> tutors(Internship i) {
-        return i.getCompanyTutors().stream().map(t -> new CompanyTutorDTO(t.getFullName(), t.getContact())).toList();
+        return i.getCompanyTutors().stream()
+                .map(t -> new CompanyTutorDTO(t.getFullName(), t.getRole(), t.getContact()))
+                .toList();
     }
 
     private static List<SuspensionDTO> suspensions(Internship i) {

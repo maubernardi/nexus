@@ -460,6 +460,7 @@ export const it = {
       siteMunicipality: 'Comune della sede del tirocinio',
       atecoCode: 'Codice ATECO del tirocinio',
       fullName: 'Nome e cognome del tutor aziendale {{n}}',
+      role: 'Funzione o ruolo del tutor aziendale {{n}}',
       contact: 'Recapito del tutor aziendale {{n}}',
       from: 'Periodo {{n}}: dal',
       to: 'Periodo {{n}}: al',
@@ -474,6 +475,7 @@ export const it = {
     hints: {
       site: 'Via e numero civico del luogo dove si svolge il tirocinio.',
       atecoCode: 'Scegli tra i codici dell’azienda quello dell’attività del tirocinio.',
+      role: 'Facoltativo, per esempio «Responsabile di produzione».',
       contact: 'Telefono o email.',
       suspensions:
         'Per esempio la chiusura per le feste. Le date sono comprese e i periodi non si sovrappongono.',
@@ -602,6 +604,7 @@ export const it = {
     intro:
       'Com’è andato il tirocinio e com’è finito. Con l’invio il percorso si chiude e il report non si può più modificare.',
     fields: {
+      actualEndDate: 'Fine effettiva del tirocinio',
       companySatisfaction: 'Soddisfazione dell’azienda',
       beneficiarySatisfaction: 'Soddisfazione del beneficiario',
       objectives: 'Obiettivi raggiunti',
@@ -612,6 +615,10 @@ export const it = {
       jobSlotStillAvailable: 'La mansione è ancora disponibile?',
     },
     hints: {
+      actualEndDate:
+        'L’ultimo giorno di tirocinio, anche se diverso da quello previsto. Serve per la relazione finale: la scheda del tirocinio non cambia.',
+      actualEndDatePrefilled:
+        'Precompilata con la fine prevista nella scheda: cambiala se il tirocinio è finito in un altro giorno. Serve per la relazione finale: la scheda del tirocinio non cambia.',
       scale: 'Da 1 (per niente soddisfatto) a 5 (molto soddisfatto).',
       texts: 'Facoltativo.',
       jobSlotStillAvailable:
@@ -629,6 +636,7 @@ export const it = {
     notAvailable: 'Il report si compila durante il tirocinio',
     loadError: 'Impossibile caricare la segnalazione. Controlla la connessione e riprova.',
     noOptions: 'Nessuna voce disponibile: chiedi all’amministratore di aggiungerla nei cataloghi.',
+    beforeStart: 'La fine effettiva non può precedere l’inizio del tirocinio ({{date}})',
     backToTicket: 'Torna alla segnalazione',
     view: {
       heading: 'Report di restituzione',
