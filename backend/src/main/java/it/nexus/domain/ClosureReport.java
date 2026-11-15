@@ -85,12 +85,17 @@ public class ClosureReport extends AbstractCreationAuditingEntity {
     @JoinColumn(name = "closure_reason_id", updatable = false)
     private ClosureReason closureReason;
 
-    public ClosureReport(Ticket ticket, LocalDate actualEndDate, ClosureReason closureReason, short companySatisfaction,
-            short beneficiarySatisfaction, String objectives, String difficulties, HiringFormula hiringFormula,
-            NoHireReason noHireReason, boolean jobSlotStillAvailable) {
+    /** Descrizione dell'interruzione anticipata (PO, 16/11): solo con un'interruzione; mai nei log né nell'audit. */
+    @Column(name = "interruption_details", updatable = false, length = 2000)
+    private String interruptionDetails;
+
+    public ClosureReport(Ticket ticket, LocalDate actualEndDate, ClosureReason closureReason, String interruptionDetails,
+            short companySatisfaction, short beneficiarySatisfaction, String objectives, String difficulties,
+            HiringFormula hiringFormula, NoHireReason noHireReason, boolean jobSlotStillAvailable) {
         this.ticket = ticket;
         this.actualEndDate = actualEndDate;
         this.closureReason = closureReason;
+        this.interruptionDetails = interruptionDetails;
         this.companySatisfaction = companySatisfaction;
         this.beneficiarySatisfaction = beneficiarySatisfaction;
         this.objectives = objectives;

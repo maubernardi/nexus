@@ -115,15 +115,24 @@ class ClosureReportIT {
         return send(user, version, actualEndDate, null, hired, formulaId, reasonId, jobSlotStillAvailable);
     }
 
+    /** Con un motivo d'interruzione manda anche la descrizione (PO, 16/11). */
     private ResultActions send(String user, long version, String actualEndDate, String closureReasonId, Boolean hired,
             String formulaId, String reasonId, boolean jobSlotStillAvailable) throws Exception {
+        return send(user, version, actualEndDate, closureReasonId,
+                closureReasonId == null ? null : " L'azienda ha chiuso il reparto ", hired, formulaId, reasonId,
+                jobSlotStillAvailable);
+    }
+
+    private ResultActions send(String user, long version, String actualEndDate, String closureReasonId,
+            String interruptionDetails, Boolean hired, String formulaId, String reasonId,
+            boolean jobSlotStillAvailable) throws Exception {
         String json = """
-                {"version": %d, "actualEndDate": %s, "closureReasonId": %s,
+                {"version": %d, "actualEndDate": %s, "closureReasonId": %s, "interruptionDetails": %s,
                  "companySatisfaction": 5, "beneficiarySatisfaction": 4,
                  "objectives": "Autonomia in cucina raggiunta", "difficulties": "   ",
                  "hired": %s, "hiringFormulaId": %s, "noHireReasonId": %s, "jobSlotStillAvailable": %s}"""
-                .formatted(version, quoted(actualEndDate), quoted(closureReasonId), hired, quoted(formulaId),
-                        quoted(reasonId), jobSlotStillAvailable);
+                .formatted(version, quoted(actualEndDate), quoted(closureReasonId), quoted(interruptionDetails),
+                        hired, quoted(formulaId), quoted(reasonId), jobSlotStillAvailable);
         return mockMvc.perform(post(ticketPath + "/closure-report").header(USER, user)
                 .contentType(MediaType.APPLICATION_JSON).content(json));
     }
@@ -249,14 +258,24 @@ class ClosureReportIT {
         send("tutor1", version, "2026-12-01", REGULAR, true, formulaId(), null, false)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldErrors[0].message").value(early));
+        // il motivo vuole anche la descrizione dell'interruzione (PO, 16/11)
+        send("tutor1", version, "2026-12-01", BY_COMPANY, "   ", true, formulaId(), null, false)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("interruptionDetails"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value("Descrivi l'interruzione"));
         send("tutor1", version, "2026-12-01", BY_COMPANY, true, formulaId(), null, false)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.closureReport.actualEndDate").value("2026-12-01"))
+                .andExpect(jsonPath("$.closureReport.interruptionDetails").value("L'azienda ha chiuso il reparto"))
                 .andExpect(jsonPath("$.closureReport.closureReason.name")
                         .value("Interruzione anticipata per volontà dell'azienda"));
         mockMvc.perform(get(ticketPath + "/history").header(USER, "tutor1"))
                 .andExpect(jsonPath("$[-1].detail").value("Interruzione anticipata per volontà dell'azienda; Assunto: "
                         + formula.getName() + "; mansione non più disponibile"));
+        // la descrizione è testo libero: mai nell'audit
+        assertThat(jdbc.queryForObject(
+                "SELECT changes::text FROM audit_event WHERE entity_id = ? AND action = 'CLOSE'", String.class,
+                ticket.getId())).contains("INTERRUZIONE_AZIENDA").doesNotContain("reparto", "interruptionDetails");
         em.flush();
         em.clear();
         Internship kept = internships.findByTicketId(ticket.getId()).orElseThrow();
@@ -279,10 +298,11 @@ class ClosureReportIT {
                 .andExpect(jsonPath("$.fieldErrors[0].field").value("closureReasonId"))
                 .andExpect(jsonPath("$.fieldErrors[0].message").value("Motivo non valido"));
 
-        // fine come prevista: chiusura regolare, anche se il modulo indica un'interruzione
+        // fine come prevista: chiusura regolare, anche se il modulo indica un'interruzione con la descrizione
         send("tutor1", version, "2027-05-31", BY_COMPANY, false, null, reasonId(), false)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.closureReport.closureReason.name").value("Chiusura regolare"));
+                .andExpect(jsonPath("$.closureReport.closureReason.name").value("Chiusura regolare"))
+                .andExpect(jsonPath("$.closureReport.interruptionDetails").doesNotExist());
     }
 
     @Test

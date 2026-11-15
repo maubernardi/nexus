@@ -650,6 +650,7 @@ export const it = {
     fields: {
       actualEndDate: 'Fine effettiva del tirocinio',
       closureReasonId: 'Motivo dell’interruzione anticipata',
+      interruptionDetails: 'Descrizione dell’interruzione',
       companySatisfaction: 'Soddisfazione dell’azienda',
       beneficiarySatisfaction: 'Soddisfazione del beneficiario',
       objectives: 'Obiettivi raggiunti',
@@ -667,6 +668,7 @@ export const it = {
       closureReasonId:
         'Il tirocinio finisce prima della fine prevista ({{date}}): indica perché. Se finisce alla data prevista il motivo è «Chiusura regolare».',
       closureReasonIdNoDate: 'Il tirocinio finisce prima della fine prevista: indica perché.',
+      interruptionDetails: 'Che cosa è successo e quando: serve alla relazione finale.',
       scale: 'Da 1 (per niente soddisfatto) a 5 (molto soddisfatto).',
       texts: 'Facoltativo.',
       jobSlotStillAvailable:
@@ -689,6 +691,7 @@ export const it = {
     view: {
       heading: 'Report di restituzione',
       closureReason: 'Motivo di chiusura',
+      interruptionDetails: 'Descrizione dell’interruzione',
       submitted: 'Inviato da {{name}} il {{date}}. Il report non si modifica.',
       score: '{{value}} su 5',
       hiredYes: 'Sì, con {{formula}}',

@@ -13,11 +13,11 @@ chiusura regolare (PO, 15/11). Le voci le gestisce l'ADMIN in un catalogo (PO, 1
 
   Le voci si aggiungono, rinominano e disattivano come negli altri cataloghi.
 - **Report di restituzione:**
-  - se la fine effettiva precede la fine prevista della scheda, il Tutor sceglie il motivo tra le interruzioni attive,
-    obbligatorio;
+  - se la fine effettiva precede la fine prevista della scheda, il Tutor sceglie il motivo tra le interruzioni attive
+    e scrive una descrizione dell'interruzione, entrambi obbligatori (descrizione: PO, 16/11);
   - altrimenti il motivo è «Chiusura regolare», assegnato da NEXUS.
-- Il motivo compare nel report inviato e nella cronologia della chiusura, ed entra nell'audit. US-1011 lo userà nella
-  relazione finale.
+- Il motivo compare nel report inviato e nella cronologia della chiusura, ed entra nell'audit; la descrizione compare
+  nel report inviato, fuori dall'audit perché è testo libero. US-1011 li userà nella relazione finale.
 - **Migrazione V41** solo additiva, con i vincoli con nome testati.
 
 ## Non-goals
@@ -38,7 +38,8 @@ chiusura regolare (PO, 15/11). Le voci le gestisce l'ADMIN in un catalogo (PO, 1
 ## Impact
 
 - Migrazione **V41**; nessun passo sul server.
-- API: `ClosureReportFormDTO.closureReasonId`, `ClosureReportDTO.closureReason`; il catalogo `closure-reasons` in
+- API: `ClosureReportFormDTO.closureReasonId` e `interruptionDetails`, `ClosureReportDTO.closureReason` e
+  `interruptionDetails`; il catalogo `closure-reasons` in
   `/catalogs`; `GET /reference/interruption-reasons` (voci attive di interruzione).
 - Frontend: sezione nei Cataloghi; campo del motivo nel report di restituzione e riga nel report inviato.
   Accessibilità: WCAG 2.2 AA (3.3.1, 3.3.2, 4.1.3); test axe. PWA: nessun impatto.

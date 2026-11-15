@@ -28,7 +28,8 @@ describe('<ClosureReportView>', () => {
         report={{
           ...report,
           actualEndDate: '2027-05-31',
-          closureReason: { id: 'C1', code: 'CHIUSURA_REGOLARE', name: 'Chiusura regolare' },
+          closureReason: { id: 'C2', code: 'INTERRUZIONE_AZIENDA', name: 'Interruzione anticipata' },
+          interruptionDetails: 'L’azienda ha chiuso il reparto',
         }}
       />,
     );
@@ -36,7 +37,8 @@ describe('<ClosureReportView>', () => {
     const section = screen.getByRole('region', { name: 'Report di restituzione' });
     expect(within(section).getByText(/Inviato da Mario Rossi il/)).toBeInTheDocument();
     expect(value('Fine effettiva del tirocinio')).toBe('31/05/2027');
-    expect(value('Motivo di chiusura')).toBe('Chiusura regolare');
+    expect(value('Motivo di chiusura')).toBe('Interruzione anticipata');
+    expect(value('Descrizione dell’interruzione')).toBe('L’azienda ha chiuso il reparto');
     expect(value('Soddisfazione dell’azienda')).toBe('5 su 5');
     expect(value('Soddisfazione del beneficiario')).toBe('3 su 5');
     expect(value('Il beneficiario è stato assunto?')).toBe('No: L’azienda non ha risorse');

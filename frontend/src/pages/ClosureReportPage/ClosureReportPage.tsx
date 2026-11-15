@@ -25,6 +25,7 @@ type YesNo = '' | 'yes' | 'no';
 type ReportValues = {
   actualEndDate: string;
   closureReasonId: string;
+  interruptionDetails: string;
   companySatisfaction: string;
   beneficiarySatisfaction: string;
   objectives: string;
@@ -38,6 +39,7 @@ type ReportValues = {
 const EMPTY: ReportValues = {
   actualEndDate: '',
   closureReasonId: '',
+  interruptionDetails: '',
   companySatisfaction: '',
   beneficiarySatisfaction: '',
   objectives: '',
@@ -51,6 +53,7 @@ const EMPTY: ReportValues = {
 const FIELDS = [
   'actualEndDate',
   'closureReasonId',
+  'interruptionDetails',
   'companySatisfaction',
   'beneficiarySatisfaction',
   'hired',
@@ -79,6 +82,7 @@ const toPayload = (v: ReportValues): ClosureReportForm => ({
   actualEndDate: v.actualEndDate,
   // il server lo considera solo con la fine prima di quella prevista; altrimenti chiusura regolare (US-1103)
   closureReasonId: v.closureReasonId || null,
+  interruptionDetails: v.interruptionDetails?.trim() || null,
   companySatisfaction: Number(v.companySatisfaction),
   beneficiarySatisfaction: Number(v.beneficiarySatisfaction),
   objectives: v.objectives.trim() || null,
@@ -238,7 +242,10 @@ const ReportForm = ({ ticket: d, dates, onSent }: ReportFormProps) => {
   const isEarly = (end: string): boolean =>
     Boolean(dates.expectedEndDate) && end !== '' && end < (dates.expectedEndDate ?? '');
   // l'errore del server sul motivo lo mostra anche senza la fine prevista (scheda non letta)
-  const early = isEarly(actualEnd) || errors.closureReasonId?.type === 'server';
+  const early =
+    isEarly(actualEnd) ||
+    errors.closureReasonId?.type === 'server' ||
+    errors.interruptionDetails?.type === 'server';
 
   useEffect(() => {
     if (pending) confirmRef.current?.focus();
@@ -371,6 +378,28 @@ const ReportForm = ({ ticket: d, dates, onSent }: ReportFormProps) => {
                   </option>
                 ))}
               </NativeSelect>
+            )}
+          </FormField>
+        )}
+        {early && (
+          <FormField
+            id={fieldId('interruptionDetails')}
+            label={t('closureReport.fields.interruptionDetails')}
+            required
+            hint={t('closureReport.hints.interruptionDetails')}
+            error={errors.interruptionDetails?.message}
+          >
+            {(p) => (
+              <Textarea
+                {...p}
+                rows={3}
+                {...register('interruptionDetails', {
+                  shouldUnregister: true,
+                  validate: (v, all) =>
+                    !isEarly(all.actualEndDate) || v.trim() !== '' || t('form.errors.required'),
+                  maxLength: maxText,
+                })}
+              />
             )}
           </FormField>
         )}

@@ -32,3 +32,9 @@ ALTER TABLE closure_report ADD COLUMN closure_reason_id bigint;
 ALTER TABLE closure_report
     ADD CONSTRAINT fk_closure_report_closure_reason FOREIGN KEY (closure_reason_id) REFERENCES closure_reason (id);
 CREATE INDEX ix_closure_report_closure_reason ON closure_report (closure_reason_id);
+
+-- Descrizione dell'interruzione anticipata (PO, 16/11): testo libero, obbligatorio nel servizio con un'interruzione;
+-- può contenere dati personali, quindi mai nell'audit né nei log, come obiettivi e difficoltà.
+ALTER TABLE closure_report ADD COLUMN interruption_details varchar(2000);
+ALTER TABLE closure_report ADD CONSTRAINT ck_closure_report_interruption_details
+    CHECK (interruption_details IS NULL OR btrim(interruption_details) <> '');

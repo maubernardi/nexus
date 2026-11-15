@@ -51,6 +51,11 @@ public class ClosureReportServiceImpl implements ClosureReportService {
     public AuditChanges create(Ticket ticket, ClosureReportFormDTO form) {
         checkActualEnd(ticket, form.actualEndDate());
         ClosureReason closureReason = closureReason(ticket, form);
+        // la descrizione vale solo per un'interruzione anticipata (PO, 16/11)
+        String interruptionDetails = closureReason.isRegular() ? null : text(form.interruptionDetails());
+        if (!closureReason.isRegular() && interruptionDetails == null) {
+            throw new FieldValidationException("interruptionDetails", "Descrivi l'interruzione");
+        }
         // conta solo la voce dell'esito scelto: l'altra può essere rimasta nel modulo dopo un ripensamento
         HiringFormula formula = null;
         NoHireReason reason = null;
@@ -62,8 +67,9 @@ public class ClosureReportServiceImpl implements ClosureReportService {
                     "Scegli il motivo della mancata assunzione", "Motivo non valido");
         }
         ClosureReport report = repository.save(new ClosureReport(ticket, form.actualEndDate(), closureReason,
-                form.companySatisfaction().shortValue(), form.beneficiarySatisfaction().shortValue(),
-                text(form.objectives()), text(form.difficulties()), formula, reason, form.jobSlotStillAvailable()));
+                interruptionDetails, form.companySatisfaction().shortValue(),
+                form.beneficiarySatisfaction().shortValue(), text(form.objectives()), text(form.difficulties()), formula,
+                reason, form.jobSlotStillAvailable()));
         return AuditChanges.of()
                 .value("actualEndDate", null, form.actualEndDate().toString())
                 .value("closureReason", null, closureReason.getCode())
@@ -81,6 +87,7 @@ public class ClosureReportServiceImpl implements ClosureReportService {
         return repository.findByTicketId(ticket.getId()).map(r -> new ClosureReportDTO(
                 r.getActualEndDate(),
                 referenceMapper.toDto(r.getClosureReason()),
+                r.getInterruptionDetails(),
                 r.getCompanySatisfaction(),
                 r.getBeneficiarySatisfaction(),
                 r.getObjectives(),

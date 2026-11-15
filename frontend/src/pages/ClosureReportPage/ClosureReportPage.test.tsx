@@ -166,6 +166,7 @@ describe('<ClosureReportPage>', () => {
       report: {
         actualEndDate: '2027-05-31',
         closureReasonId: null,
+        interruptionDetails: null,
         companySatisfaction: 4,
         beneficiarySatisfaction: 5,
         objectives: 'Autonomia in cucina',
@@ -214,11 +215,17 @@ describe('<ClosureReportPage>', () => {
       screen.getByRole('combobox', { name: /Motivo dell’interruzione anticipata/ }),
       'Interruzione anticipata per volontà del destinatario',
     );
+    // con il motivo serve la descrizione (PO, 16/11)
+    await user.type(
+      screen.getByRole('textbox', { name: /Descrizione dell’interruzione/ }),
+      '  Ha trovato un altro lavoro ',
+    );
     await user.click(screen.getByRole('button', { name: 'Invia il report' }));
     await user.click(await screen.findByRole('button', { name: 'Sì, invia il report' }));
     expect(vi.mocked(submitClosureReport).mock.calls[0][0].report).toMatchObject({
       actualEndDate: '2026-12-01',
       closureReasonId: 'C3',
+      interruptionDetails: 'Ha trovato un altro lavoro',
     });
   });
 
@@ -238,15 +245,19 @@ describe('<ClosureReportPage>', () => {
     );
     await expectNoAxeViolations();
     await user.click(screen.getByRole('button', { name: 'Invia il report' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Motivo dell’interruzione anticipata: Campo obbligatorio',
-    );
+    const summary = await screen.findByRole('alert');
+    expect(summary).toHaveTextContent('Motivo dell’interruzione anticipata: Campo obbligatorio');
+    expect(summary).toHaveTextContent('Descrizione dell’interruzione: Campo obbligatorio');
+    expect(
+      screen.getByRole('textbox', { name: /Descrizione dell’interruzione/ }),
+    ).toHaveAccessibleDescription(/^Che cosa è successo e quando: serve alla relazione finale\./);
     expect(submitClosureReport).not.toHaveBeenCalled();
 
     // tornando alla fine prevista il campo sparisce
     await user.clear(date);
     await user.type(date, '2027-05-31');
     expect(screen.queryByRole('combobox', { name: /Motivo dell’interruzione/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('textbox', { name: /Descrizione dell’interruzione/ })).not.toBeInTheDocument();
   });
 
   it('senza la scheda la fine effettiva parte vuota; l’errore del server va sul campo', async () => {

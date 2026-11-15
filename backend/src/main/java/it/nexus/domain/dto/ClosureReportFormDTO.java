@@ -18,6 +18,8 @@ public record ClosureReportFormDTO(
         @NotNull(message = "Indica la data di fine effettiva") LocalDate actualEndDate,
         /** Interruzione anticipata (US-1103), solo se la fine effettiva precede quella prevista; controllo nel servizio. */
         String closureReasonId,
+        /** Descrizione dell'interruzione anticipata, obbligatoria con il motivo (PO, 16/11). */
+        @Size(max = 2000, message = "Massimo 2000 caratteri") String interruptionDetails,
         @NotNull(message = "Indica la soddisfazione dell'azienda")
         @Min(value = 1, message = "Da 1 a 5") @Max(value = 5, message = "Da 1 a 5") Integer companySatisfaction,
         @NotNull(message = "Indica la soddisfazione del beneficiario")

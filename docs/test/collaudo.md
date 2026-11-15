@@ -944,10 +944,11 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      regolare», «Interruzione anticipata per volontà dell'azienda» e «… del destinatario». Prova a disattivare
      «Chiusura regolare». **Atteso:** l'operazione è rifiutata con la spiegazione.
   2. Come `tutor1` apri il report di restituzione di un tirocinio avviato. Metti come fine effettiva una data
-     **prima** della fine prevista. **Atteso:** compare «Motivo dell'interruzione anticipata», obbligatorio, con le
-     interruzioni del catalogo; senza sceglierlo l'invio è rifiutato con il riepilogo degli errori.
-  3. Rimetti la fine prevista. **Atteso:** il campo del motivo sparisce. Torna a una data anticipata, scegli il motivo e
-     invia. **Atteso:** il report inviato mostra il «Motivo di chiusura» scelto; nella cronologia della segnalazione la
-     chiusura comincia con quel motivo.
+     **prima** della fine prevista. **Atteso:** compaiono «Motivo dell'interruzione anticipata», con le interruzioni del
+     catalogo, e «Descrizione dell'interruzione», entrambi obbligatori; senza compilarli l'invio è rifiutato con il
+     riepilogo degli errori.
+  3. Rimetti la fine prevista. **Atteso:** i due campi spariscono. Torna a una data anticipata, scegli il motivo,
+     scrivi la descrizione e invia. **Atteso:** il report inviato mostra il «Motivo di chiusura» e la «Descrizione
+     dell'interruzione»; nella cronologia della segnalazione la chiusura comincia con il motivo.
   4. Su un altro tirocinio invia il report con la fine effettiva uguale alla prevista. **Atteso:** «Motivo di
      chiusura: Chiusura regolare», senza averlo scelto.

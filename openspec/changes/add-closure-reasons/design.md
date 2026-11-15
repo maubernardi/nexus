@@ -30,13 +30,23 @@ La fine prevista è quella della scheda del tirocinio. Con US-1012 diventerà qu
 - **Altrimenti**, o se la scheda non ha la fine prevista: il motivo è la chiusura regolare e il valore del modulo si
   ignora.
 
+### D3b — Descrizione dell'interruzione (PO, 16/11)
+Colonna `closure_report.interruption_details` (2000), facoltativa nel database con
+`ck_closure_report_interruption_details` contro il testo di soli spazi. È obbligatoria nel servizio quando il motivo è
+un'interruzione, mentre con la chiusura regolare non si salva. Può contenere dati personali, quindi resta fuori
+dall'audit e dai log, come obiettivi e difficoltà del report.
+
 ### D4 — Cronologia e audit
 Il dettaglio della chiusura nella cronologia inizia con il motivo: «Chiusura regolare; Assunto: …; mansione …».
 L'audit registra `closureReason` con il codice.
 
 ### D5 — Interfaccia
-- Il modulo del report conosce già la fine prevista (US-1009). Quando la fine effettiva è precedente compare la tendina
-  obbligatoria «Motivo dell'interruzione anticipata», con un aiuto che ricorda la fine prevista.
+- Il modulo del report conosce già la fine prevista (US-1009). Quando la fine effettiva è precedente compaiono due
+  campi obbligatori:
+  - la tendina «Motivo dell'interruzione anticipata», con un aiuto che ricorda la fine prevista;
+  - l'area di testo «Descrizione dell'interruzione».
+
+  Se la data torna alla fine prevista, i due campi spariscono con i loro errori.
 - Se il server segnala l'errore sul motivo, la tendina compare comunque.
 - Il report inviato mostra la riga «Motivo di chiusura».
 
