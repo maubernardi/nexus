@@ -25,6 +25,9 @@ public interface ReferenceDataService {
     /** Motivi della mancata assunzione attivi, per il report di restituzione (US-109). */
     List<ReferenceItemDTO> activeNoHireReasons();
 
+    /** Interruzioni anticipate attive (US-1103): i motivi di chiusura tranne la chiusura regolare. */
+    List<ReferenceItemDTO> activeInterruptionReasons();
+
     List<ReferenceItemDTO> activeProjects();
 
     /** Progetti attivi a cui è assegnato l'utente corrente. */

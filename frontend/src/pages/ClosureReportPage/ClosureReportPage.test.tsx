@@ -4,14 +4,18 @@ import { AxiosError, AxiosHeaders } from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { fetchInternship, type Internship } from '@/config/api/internshipApi';
-import { fetchHiringFormulas, fetchNoHireReasons } from '@/config/api/referenceApi';
+import { fetchHiringFormulas, fetchInterruptionReasons, fetchNoHireReasons } from '@/config/api/referenceApi';
 import { fetchTicket, submitClosureReport, type TicketDetail } from '@/config/api/ticketApi';
 import { ClosureReportPage } from '@/pages/ClosureReportPage/ClosureReportPage';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderRoutes } from '@/tests/renderWithProviders';
 
 vi.mock('@/config/api/internshipApi', () => ({ fetchInternship: vi.fn() }));
-vi.mock('@/config/api/referenceApi', () => ({ fetchHiringFormulas: vi.fn(), fetchNoHireReasons: vi.fn() }));
+vi.mock('@/config/api/referenceApi', () => ({
+  fetchHiringFormulas: vi.fn(),
+  fetchNoHireReasons: vi.fn(),
+  fetchInterruptionReasons: vi.fn(),
+}));
 vi.mock('@/config/api/ticketApi', () => ({ fetchTicket: vi.fn(), submitClosureReport: vi.fn() }));
 
 const error = (status: number, body: Record<string, unknown>) =>
@@ -98,6 +102,14 @@ describe('<ClosureReportPage>', () => {
     vi.mocked(fetchNoHireReasons).mockResolvedValue([
       { id: 'R1', code: 'AZIENDA_SENZA_RISORSE', name: 'L’azienda non ha risorse' },
     ]);
+    vi.mocked(fetchInterruptionReasons).mockResolvedValue([
+      { id: 'C2', code: 'INTERRUZIONE_AZIENDA', name: 'Interruzione anticipata per volontà dell’azienda' },
+      {
+        id: 'C3',
+        code: 'INTERRUZIONE_DESTINATARIO',
+        name: 'Interruzione anticipata per volontà del destinatario',
+      },
+    ]);
     vi.mocked(submitClosureReport).mockReset();
   });
 
@@ -153,6 +165,7 @@ describe('<ClosureReportPage>', () => {
       version: 7,
       report: {
         actualEndDate: '2027-05-31',
+        closureReasonId: null,
         companySatisfaction: 4,
         beneficiarySatisfaction: 5,
         objectives: 'Autonomia in cucina',
@@ -194,12 +207,46 @@ describe('<ClosureReportPage>', () => {
     expect(date).toHaveAttribute('aria-invalid', 'true');
     await expectNoAxeViolations();
 
-    // fine anticipata, lo stesso giorno dell'inizio
+    // fine anticipata, lo stesso giorno dell'inizio: serve il motivo dell'interruzione (US-1103)
     await user.clear(date);
     await user.type(date, '2026-12-01');
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: /Motivo dell’interruzione anticipata/ }),
+      'Interruzione anticipata per volontà del destinatario',
+    );
     await user.click(screen.getByRole('button', { name: 'Invia il report' }));
     await user.click(await screen.findByRole('button', { name: 'Sì, invia il report' }));
-    expect(vi.mocked(submitClosureReport).mock.calls[0][0].report.actualEndDate).toBe('2026-12-01');
+    expect(vi.mocked(submitClosureReport).mock.calls[0][0].report).toMatchObject({
+      actualEndDate: '2026-12-01',
+      closureReasonId: 'C3',
+    });
+  });
+
+  it('motivo dell’interruzione: compare con la fine prima di quella prevista ed è obbligatorio (US-1103)', async () => {
+    const user = userEvent.setup();
+    renderPage();
+    const date = await screen.findByLabelText(/Fine effettiva del tirocinio/, { selector: 'input' });
+    await fillRequired(user);
+    // fine come prevista: nessun motivo da scegliere
+    expect(screen.queryByRole('combobox', { name: /Motivo dell’interruzione/ })).not.toBeInTheDocument();
+
+    await user.clear(date);
+    await user.type(date, '2027-02-15');
+    const reason = screen.getByRole('combobox', { name: /Motivo dell’interruzione anticipata/ });
+    expect(reason).toHaveAccessibleDescription(
+      'Il tirocinio finisce prima della fine prevista (31/05/2027): indica perché. Se finisce alla data prevista il motivo è «Chiusura regolare».',
+    );
+    await expectNoAxeViolations();
+    await user.click(screen.getByRole('button', { name: 'Invia il report' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Motivo dell’interruzione anticipata: Campo obbligatorio',
+    );
+    expect(submitClosureReport).not.toHaveBeenCalled();
+
+    // tornando alla fine prevista il campo sparisce
+    await user.clear(date);
+    await user.type(date, '2027-05-31');
+    expect(screen.queryByRole('combobox', { name: /Motivo dell’interruzione/ })).not.toBeInTheDocument();
   });
 
   it('senza la scheda la fine effettiva parte vuota; l’errore del server va sul campo', async () => {

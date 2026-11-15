@@ -11,6 +11,8 @@ public enum CatalogKind {
     /** Report di restituzione (US-109). */
     HIRING_FORMULAS("hiring-formulas", AuditEntityType.HIRING_FORMULA, "FORMULA"),
     NO_HIRE_REASONS("no-hire-reasons", AuditEntityType.NO_HIRE_REASON, "MOTIVO"),
+    /** Motivi di chiusura del tirocinio (US-1103). */
+    CLOSURE_REASONS("closure-reasons", AuditEntityType.CLOSURE_REASON, "MOTIVO"),
     /** Progetti finanziati (US-102). */
     PROJECTS("projects", AuditEntityType.PROJECT, "PROGETTO"),
     /** Sedi di competenza e enti di presa in carico (US-115). */

@@ -12,6 +12,7 @@ import it.nexus.repository.CareAgencyRepository;
 import it.nexus.repository.CompetenceSiteRepository;
 import it.nexus.repository.HiringFormulaRepository;
 import it.nexus.repository.InternshipTypeRepository;
+import it.nexus.repository.ClosureReasonRepository;
 import it.nexus.repository.NoHireReasonRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.ProjectRepository;
@@ -30,6 +31,7 @@ public class ReferenceDataServiceImpl implements ReferenceDataService {
     private final InternshipTypeRepository internshipTypeRepository;
     private final HiringFormulaRepository hiringFormulaRepository;
     private final NoHireReasonRepository noHireReasonRepository;
+    private final ClosureReasonRepository closureReasonRepository;
     private final ProjectRepository projectRepository;
     private final CareAgencyRepository careAgencyRepository;
     private final CompetenceSiteRepository competenceSiteRepository;
@@ -71,6 +73,14 @@ public class ReferenceDataServiceImpl implements ReferenceDataService {
     @Override
     public List<ReferenceItemDTO> activeNoHireReasons() {
         return noHireReasonRepository.findByActiveTrueOrderByNameAsc().stream().map(mapper::toDto).toList();
+    }
+
+    @Override
+    public List<ReferenceItemDTO> activeInterruptionReasons() {
+        return closureReasonRepository.findByActiveTrueOrderByNameAsc().stream()
+                .filter(r -> !r.isRegular())
+                .map(mapper::toDto)
+                .toList();
     }
 
     @Override

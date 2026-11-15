@@ -28,6 +28,7 @@ export const CatalogsPage = () => {
       <CareAgenciesSection />
       <CatalogSection kind="hiring-formulas" />
       <CatalogSection kind="no-hire-reasons" />
+      <CatalogSection kind="closure-reasons" />
       <MunicipalitiesSection />
     </div>
   );

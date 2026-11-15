@@ -12,6 +12,7 @@ export type CatalogKind =
   | 'internship-types'
   | 'hiring-formulas'
   | 'no-hire-reasons'
+  | 'closure-reasons'
   | 'competence-sites'
   | 'care-agencies';
 

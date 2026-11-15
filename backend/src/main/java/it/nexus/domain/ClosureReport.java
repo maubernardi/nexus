@@ -77,11 +77,20 @@ public class ClosureReport extends AbstractCreationAuditingEntity {
     @Column(name = "actual_end_date", updatable = false)
     private LocalDate actualEndDate;
 
-    public ClosureReport(Ticket ticket, LocalDate actualEndDate, short companySatisfaction,
+    /**
+     * Motivo di chiusura (US-1103): un'interruzione se la fine effettiva precede quella prevista, altrimenti la chiusura
+     * regolare. Assente nei report inviati prima.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "closure_reason_id", updatable = false)
+    private ClosureReason closureReason;
+
+    public ClosureReport(Ticket ticket, LocalDate actualEndDate, ClosureReason closureReason, short companySatisfaction,
             short beneficiarySatisfaction, String objectives, String difficulties, HiringFormula hiringFormula,
             NoHireReason noHireReason, boolean jobSlotStillAvailable) {
         this.ticket = ticket;
         this.actualEndDate = actualEndDate;
+        this.closureReason = closureReason;
         this.companySatisfaction = companySatisfaction;
         this.beneficiarySatisfaction = beneficiarySatisfaction;
         this.objectives = objectives;

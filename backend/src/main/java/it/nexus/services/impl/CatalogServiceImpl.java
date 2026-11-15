@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.domain.AbstractReferenceEntity;
 import it.nexus.domain.CareAgency;
+import it.nexus.domain.ClosureReason;
 import it.nexus.domain.CompetenceSite;
 import it.nexus.domain.HiringFormula;
 import it.nexus.domain.InternshipType;
@@ -27,6 +28,7 @@ import it.nexus.domain.dto.CatalogItemDTO;
 import it.nexus.domain.enumeration.CatalogKind;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.CareAgencyRepository;
+import it.nexus.repository.ClosureReasonRepository;
 import it.nexus.repository.CompetenceSiteRepository;
 import it.nexus.repository.HiringFormulaRepository;
 import it.nexus.repository.InternshipTypeRepository;
@@ -54,6 +56,7 @@ public class CatalogServiceImpl implements CatalogService {
     private final ProjectRepository projectRepository;
     private final CompetenceSiteRepository competenceSiteRepository;
     private final CareAgencyRepository careAgencyRepository;
+    private final ClosureReasonRepository closureReasonRepository;
     private final AuditService auditService;
 
     /** Le operazioni che servono su un catalogo: i due repository hanno metodi omonimi ma tipi diversi. */
@@ -87,6 +90,10 @@ public class CatalogServiceImpl implements CatalogService {
                     noHireReasonRepository::findById, noHireReasonRepository::findFirstByNameIgnoreCaseAndActiveTrue,
                     noHireReasonRepository::existsByCode, NoHireReason::new,
                     e -> noHireReasonRepository.saveAndFlush((NoHireReason) e));
+            case CLOSURE_REASONS -> new Store(closureReasonRepository::findAllByOrderByActiveDescNameAsc,
+                    closureReasonRepository::findById, closureReasonRepository::findFirstByNameIgnoreCaseAndActiveTrue,
+                    closureReasonRepository::existsByCode, ClosureReason::new,
+                    e -> closureReasonRepository.saveAndFlush((ClosureReason) e));
             case PROJECTS -> new Store(projectRepository::findAllByOrderByActiveDescNameAsc, projectRepository::findById,
                     projectRepository::findFirstByNameIgnoreCaseAndActiveTrue, projectRepository::existsByCode,
                     Project::new, e -> projectRepository.saveAndFlush((Project) e));
@@ -144,6 +151,11 @@ public class CatalogServiceImpl implements CatalogService {
         AbstractReferenceEntity item = find(store, id);
         if (item.isActive() == active) {
             return toDto(item);
+        }
+        // la chiusura regolare è il motivo automatico dei tirocini chiusi alla data prevista (US-1103)
+        if (!active && item instanceof ClosureReason reason && reason.isRegular()) {
+            throw new ConflictException("«%s» non si disattiva: è il motivo automatico dei tirocini chiusi alla data "
+                    + "prevista", item.getName());
         }
         if (active) {
             store.activeByName().apply(item.getName()).ifPresent(other -> {

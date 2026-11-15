@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { apiError } from '@/config/api/errors';
 import type { ClosureReportForm, TicketDetail } from '@/config/api/ticketApi';
 import { useInternship } from '@/config/hooks/useInternship';
-import { useHiringFormulas, useNoHireReasons } from '@/config/hooks/useReferenceData';
+import { useHiringFormulas, useInterruptionReasons, useNoHireReasons } from '@/config/hooks/useReferenceData';
 import { useSubmitClosureReport, useTicket } from '@/config/hooks/useTickets';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { formatIsoDate } from '@/lib/isoDate';
@@ -24,6 +24,7 @@ type YesNo = '' | 'yes' | 'no';
 
 type ReportValues = {
   actualEndDate: string;
+  closureReasonId: string;
   companySatisfaction: string;
   beneficiarySatisfaction: string;
   objectives: string;
@@ -36,6 +37,7 @@ type ReportValues = {
 
 const EMPTY: ReportValues = {
   actualEndDate: '',
+  closureReasonId: '',
   companySatisfaction: '',
   beneficiarySatisfaction: '',
   objectives: '',
@@ -48,6 +50,7 @@ const EMPTY: ReportValues = {
 
 const FIELDS = [
   'actualEndDate',
+  'closureReasonId',
   'companySatisfaction',
   'beneficiarySatisfaction',
   'hired',
@@ -74,6 +77,8 @@ const focusId = (name: keyof ReportValues): string =>
 
 const toPayload = (v: ReportValues): ClosureReportForm => ({
   actualEndDate: v.actualEndDate,
+  // il server lo considera solo con la fine prima di quella prevista; altrimenti chiusura regolare (US-1103)
+  closureReasonId: v.closureReasonId || null,
   companySatisfaction: Number(v.companySatisfaction),
   beneficiarySatisfaction: Number(v.beneficiarySatisfaction),
   objectives: v.objectives.trim() || null,
@@ -205,6 +210,7 @@ type ReportFormProps = {
 const ReportForm = ({ ticket: d, dates, onSent }: ReportFormProps) => {
   const { t } = useTranslation();
   const formulas = useHiringFormulas();
+  const interruptions = useInterruptionReasons();
   const reasons = useNoHireReasons();
   const submit = useSubmitClosureReport();
   // valori controllati, in attesa di conferma: durante la conferma i campi sono bloccati
@@ -227,6 +233,12 @@ const ReportForm = ({ ticket: d, dates, onSent }: ReportFormProps) => {
   });
   const { summaryRef, requestSummaryFocus } = useErrorSummaryFocus(submitCount, errors);
   const hired = useWatch({ control, name: 'hired' });
+  const actualEnd = useWatch({ control, name: 'actualEndDate' });
+  // interruzione anticipata (US-1103): la fine effettiva precede la fine prevista della scheda
+  const isEarly = (end: string): boolean =>
+    Boolean(dates.expectedEndDate) && end !== '' && end < (dates.expectedEndDate ?? '');
+  // l'errore del server sul motivo lo mostra anche senza la fine prevista (scheda non letta)
+  const early = isEarly(actualEnd) || errors.closureReasonId?.type === 'server';
 
   useEffect(() => {
     if (pending) confirmRef.current?.focus();
@@ -329,6 +341,39 @@ const ReportForm = ({ ticket: d, dates, onSent }: ReportFormProps) => {
             />
           )}
         </FormField>
+        {early && (
+          <FormField
+            id={fieldId('closureReasonId')}
+            label={t('closureReport.fields.closureReasonId')}
+            required
+            hint={
+              interruptions.data?.length === 0
+                ? t('closureReport.noOptions')
+                : dates.expectedEndDate
+                  ? t('closureReport.hints.closureReasonId', { date: formatIsoDate(dates.expectedEndDate) })
+                  : t('closureReport.hints.closureReasonIdNoDate')
+            }
+            error={errors.closureReasonId?.message}
+          >
+            {(p) => (
+              <NativeSelect
+                {...p}
+                {...register('closureReasonId', {
+                  // nascosto, il campo esce dal modulo con il suo errore
+                  shouldUnregister: true,
+                  validate: (v, all) => !isEarly(all.actualEndDate) || v !== '' || t('form.errors.required'),
+                })}
+              >
+                <option value="">{t('form.select')}</option>
+                {interruptions.data?.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.name}
+                  </option>
+                ))}
+              </NativeSelect>
+            )}
+          </FormField>
+        )}
         <RadioField
           name="companySatisfaction"
           legend={t('closureReport.fields.companySatisfaction')}

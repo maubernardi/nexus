@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.domain.AbstractReferenceEntity;
+import it.nexus.domain.ClosureReason;
 import it.nexus.domain.ClosureReport;
 import it.nexus.domain.HiringFormula;
 import it.nexus.domain.Internship;
@@ -21,6 +22,7 @@ import it.nexus.domain.dto.ClosureReportDTO;
 import it.nexus.domain.dto.ClosureReportFormDTO;
 import it.nexus.mapper.ReferenceMapper;
 import it.nexus.mapper.TsidMapper;
+import it.nexus.repository.ClosureReasonRepository;
 import it.nexus.repository.ClosureReportRepository;
 import it.nexus.repository.HiringFormulaRepository;
 import it.nexus.repository.InternshipRepository;
@@ -41,12 +43,14 @@ public class ClosureReportServiceImpl implements ClosureReportService {
     private final HiringFormulaRepository hiringFormulaRepository;
     private final NoHireReasonRepository noHireReasonRepository;
     private final InternshipRepository internshipRepository;
+    private final ClosureReasonRepository closureReasonRepository;
     private final UserDisplayNameService userDisplayNameService;
     private final ReferenceMapper referenceMapper;
 
     @Override
     public AuditChanges create(Ticket ticket, ClosureReportFormDTO form) {
         checkActualEnd(ticket, form.actualEndDate());
+        ClosureReason closureReason = closureReason(ticket, form);
         // conta solo la voce dell'esito scelto: l'altra può essere rimasta nel modulo dopo un ripensamento
         HiringFormula formula = null;
         NoHireReason reason = null;
@@ -57,11 +61,12 @@ public class ClosureReportServiceImpl implements ClosureReportService {
             reason = activeEntry(form.noHireReasonId(), noHireReasonRepository, "noHireReasonId",
                     "Scegli il motivo della mancata assunzione", "Motivo non valido");
         }
-        ClosureReport report = repository.save(new ClosureReport(ticket, form.actualEndDate(),
+        ClosureReport report = repository.save(new ClosureReport(ticket, form.actualEndDate(), closureReason,
                 form.companySatisfaction().shortValue(), form.beneficiarySatisfaction().shortValue(),
                 text(form.objectives()), text(form.difficulties()), formula, reason, form.jobSlotStillAvailable()));
         return AuditChanges.of()
                 .value("actualEndDate", null, form.actualEndDate().toString())
+                .value("closureReason", null, closureReason.getCode())
                 .value("companySatisfaction", null, form.companySatisfaction())
                 .value("beneficiarySatisfaction", null, form.beneficiarySatisfaction())
                 .value("hired", null, report.isHired())
@@ -75,6 +80,7 @@ public class ClosureReportServiceImpl implements ClosureReportService {
     public Optional<ClosureReportDTO> find(Ticket ticket) {
         return repository.findByTicketId(ticket.getId()).map(r -> new ClosureReportDTO(
                 r.getActualEndDate(),
+                referenceMapper.toDto(r.getClosureReason()),
                 r.getCompanySatisfaction(),
                 r.getBeneficiarySatisfaction(),
                 r.getObjectives(),
@@ -90,7 +96,9 @@ public class ClosureReportServiceImpl implements ClosureReportService {
     @Override
     @Transactional(readOnly = true)
     public Optional<String> outcome(Long ticketId) {
-        return repository.findByTicketId(ticketId).map(r -> "%s; %s".formatted(
+        // il motivo di chiusura in testa (US-1103), se c'è: i report di prima non l'hanno
+        return repository.findByTicketId(ticketId).map(r -> (r.getClosureReason() == null ? ""
+                : r.getClosureReason().getName() + "; ") + "%s; %s".formatted(
                 r.isHired() ? "Assunto: " + r.getHiringFormula().getName()
                         : "Non assunto: " + r.getNoHireReason().getName(),
                 r.isJobSlotStillAvailable() ? "mansione di nuovo libera" : "mansione non più disponibile"));
@@ -107,6 +115,29 @@ public class ClosureReportServiceImpl implements ClosureReportService {
             throw new FieldValidationException("actualEndDate",
                     "La fine effettiva non può precedere l'inizio del tirocinio (%s)".formatted(DAY.format(start)));
         }
+    }
+
+    /**
+     * Motivo di chiusura (US-1103): con la fine effettiva prima di quella prevista della scheda serve un'interruzione
+     * attiva; altrimenti la chiusura regolare, qualunque cosa indichi il modulo (D3).
+     */
+    private ClosureReason closureReason(Ticket ticket, ClosureReportFormDTO form) {
+        LocalDate expectedEnd = internshipRepository.findByTicketId(ticket.getId())
+                .map(Internship::getExpectedEndDate)
+                .orElse(null);
+        if (expectedEnd == null || !form.actualEndDate().isBefore(expectedEnd)) {
+            return closureReasonRepository.findByCode(ClosureReason.REGULAR)
+                    .orElseThrow(() -> new IllegalStateException("Manca la chiusura regolare nel catalogo"));
+        }
+        ClosureReason reason = activeEntry(form.closureReasonId(), closureReasonRepository, "closureReasonId",
+                "Il tirocinio finisce prima del %s: scegli il motivo dell'interruzione".formatted(DAY.format(expectedEnd)),
+                "Motivo non valido");
+        if (reason.isRegular()) {
+            throw new FieldValidationException("closureReasonId",
+                    "Il tirocinio finisce prima del %s: scegli il motivo dell'interruzione".formatted(
+                            DAY.format(expectedEnd)));
+        }
+        return reason;
     }
 
     /** Voce attiva del catalogo: le voci disattivate non si scelgono più (US-109). */

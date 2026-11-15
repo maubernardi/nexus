@@ -1,6 +1,7 @@
 package it.nexus.web.rest.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
@@ -220,6 +221,30 @@ class CatalogResourceIT {
         // gestiti solo dall'ADMIN
         mockMvc.perform(get("/api/v1/catalogs/hiring-formulas").header(USER, "operatore.cc"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void motiviDiChiusura_vociIniziali_chiusuraRegolareNonSiDisattiva() throws Exception {
+        String path = "/api/v1/catalogs/closure-reasons";
+        mockMvc.perform(get(path).header(USER, "admin"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].code", hasItems("CHIUSURA_REGOLARE", "INTERRUZIONE_AZIENDA",
+                        "INTERRUZIONE_DESTINATARIO")));
+        String regular = TsidMapper.toExternal(893700000000000361L);
+        action(path, regular, "deactivate")
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("«Chiusura regolare» non si disattiva: è il motivo automatico "
+                        + "dei tirocini chiusi alla data prevista"));
+        String other = createdId(path, "Interruzione anticipata per assunzione altrove");
+        action(path, TsidMapper.toExternal(893700000000000363L), "deactivate").andExpect(status().isOk());
+
+        // il Tutor sceglie solo le interruzioni attive, senza la chiusura regolare (US-1103)
+        mockMvc.perform(get("/api/v1/reference/interruption-reasons").header(USER, "tutor1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].name", containsInAnyOrder("Interruzione anticipata per volontà dell'azienda",
+                        "Interruzione anticipata per assunzione altrove")));
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.CLOSURE_REASON,
+                TsidMapper.toInternal(other))).extracting(e -> e.getAction()).containsExactly("CREATE");
     }
 
     @Test

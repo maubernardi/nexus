@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `8d43ad3` (11/11/2026): Sprint 1–13 completi (indirizzi con il comune, fine effettiva e ruolo del tutor aziendale, convenzione e progetti formativi, modelli dei documenti caricati dall'ADMIN) |
-| **Ultimo aggiornamento** | 11/11/2026 (T-23.1 … T-23.4 da provare; T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 16/11/2026 (T-24.1: da provare dopo il deploy di US-1103; T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -936,3 +936,18 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      prima il modello…»; scelto un modello, il download parte con quello.
   6. Come `admin` disattiva i due modelli. Come `tutor1` **Atteso:** la tendina sparisce e la convenzione torna al
      modello generico. Prova anche «Sostituisci il file» e «Scarica il file» su un modello.
+
+## 24. Proroghe, motivi di chiusura e documenti reali (Sprint 14)
+
+- [ ] **T-24.1 Motivo di chiusura del tirocinio (US-1103)**
+  1. Come `admin` apri **Cataloghi**. **Atteso:** la sezione «Motivi di chiusura del tirocinio» con «Chiusura
+     regolare», «Interruzione anticipata per volontà dell'azienda» e «… del destinatario». Prova a disattivare
+     «Chiusura regolare». **Atteso:** l'operazione è rifiutata con la spiegazione.
+  2. Come `tutor1` apri il report di restituzione di un tirocinio avviato. Metti come fine effettiva una data
+     **prima** della fine prevista. **Atteso:** compare «Motivo dell'interruzione anticipata», obbligatorio, con le
+     interruzioni del catalogo; senza sceglierlo l'invio è rifiutato con il riepilogo degli errori.
+  3. Rimetti la fine prevista. **Atteso:** il campo del motivo sparisce. Torna a una data anticipata, scegli il motivo e
+     invia. **Atteso:** il report inviato mostra il «Motivo di chiusura» scelto; nella cronologia della segnalazione la
+     chiusura comincia con quel motivo.
+  4. Su un altro tirocinio invia il report con la fine effettiva uguale alla prevista. **Atteso:** «Motivo di
+     chiusura: Chiusura regolare», senza averlo scelto.

@@ -39,6 +39,12 @@ export const fetchNoHireReasons = async (): Promise<ReferenceItem[]> => {
   return data;
 };
 
+/** Motivi di interruzione anticipata attivi (US-1103): il catalogo dei motivi di chiusura senza la chiusura regolare. */
+export const fetchInterruptionReasons = async (): Promise<ReferenceItem[]> => {
+  const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.interruptionReasons);
+  return data;
+};
+
 /** Enti di presa in carico attivi (US-206). */
 export const fetchCareAgencies = async (): Promise<ReferenceItem[]> => {
   const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.careAgencies);

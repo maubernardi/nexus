@@ -649,6 +649,7 @@ export const it = {
       'Com’è andato il tirocinio e com’è finito. Con l’invio il percorso si chiude e il report non si può più modificare.',
     fields: {
       actualEndDate: 'Fine effettiva del tirocinio',
+      closureReasonId: 'Motivo dell’interruzione anticipata',
       companySatisfaction: 'Soddisfazione dell’azienda',
       beneficiarySatisfaction: 'Soddisfazione del beneficiario',
       objectives: 'Obiettivi raggiunti',
@@ -663,6 +664,9 @@ export const it = {
         'L’ultimo giorno di tirocinio, anche se diverso da quello previsto. Serve per la relazione finale: la scheda del tirocinio non cambia.',
       actualEndDatePrefilled:
         'Precompilata con la fine prevista nella scheda: cambiala se il tirocinio è finito in un altro giorno. Serve per la relazione finale: la scheda del tirocinio non cambia.',
+      closureReasonId:
+        'Il tirocinio finisce prima della fine prevista ({{date}}): indica perché. Se finisce alla data prevista il motivo è «Chiusura regolare».',
+      closureReasonIdNoDate: 'Il tirocinio finisce prima della fine prevista: indica perché.',
       scale: 'Da 1 (per niente soddisfatto) a 5 (molto soddisfatto).',
       texts: 'Facoltativo.',
       jobSlotStillAvailable:
@@ -684,6 +688,7 @@ export const it = {
     backToTicket: 'Torna alla segnalazione',
     view: {
       heading: 'Report di restituzione',
+      closureReason: 'Motivo di chiusura',
       submitted: 'Inviato da {{name}} il {{date}}. Il report non si modifica.',
       score: '{{value}} su 5',
       hiredYes: 'Sì, con {{formula}}',
@@ -1625,6 +1630,15 @@ export const it = {
       newHeading: 'Nuovo motivo della mancata assunzione',
       caption_one: 'Motivi della mancata assunzione: {{count}} voce',
       caption_other: 'Motivi della mancata assunzione: {{count}} voci',
+    },
+    'closure-reasons': {
+      heading: 'Motivi di chiusura del tirocinio',
+      intro:
+        'Nel report di restituzione, se il tirocinio finisce prima della data prevista, il Tutor sceglie il motivo dell’interruzione da questo elenco. «Chiusura regolare» è il motivo automatico degli altri tirocini e non si disattiva.',
+      add: 'Aggiungi motivo di chiusura',
+      newHeading: 'Nuovo motivo di chiusura',
+      caption_one: 'Motivi di chiusura del tirocinio: {{count}} voce',
+      caption_other: 'Motivi di chiusura del tirocinio: {{count}} voci',
     },
     'competence-sites': {
       heading: 'Sedi di competenza',

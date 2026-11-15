@@ -923,7 +923,7 @@ class DomainConstraintsIT {
         }
 
         private ClosureReport report(Ticket ticket, int companySatisfaction) {
-            return new ClosureReport(ticket, LocalDate.of(2027, 5, 31), (short) companySatisfaction, (short) 4,
+            return new ClosureReport(ticket, LocalDate.of(2027, 5, 31), null, (short) companySatisfaction, (short) 4,
                     "Obiettivi raggiunti", null, hiringFormulas.findByActiveTrueOrderByNameAsc().getFirst(), null, true);
         }
 
@@ -965,6 +965,14 @@ class DomainConstraintsIT {
                     VALUES (1, ?, 3, 3, false, 893700000000000301, false, now(), 'test')""", ticketId);
             assertThat(closureReports.findByTicketId(ticketId)).get()
                     .extracting(ClosureReport::getActualEndDate).isNull();
+        }
+
+        @Test
+        void motivoDiChiusuraInesistente() {
+            assertViolates("fk_closure_report_closure_reason", () -> jdbc.update("""
+                    INSERT INTO closure_report (id, ticket_id, company_satisfaction, beneficiary_satisfaction, hired,
+                        no_hire_reason_id, job_slot_still_available, closure_reason_id, created_at, created_by)
+                    VALUES (2, ?, 3, 3, false, 893700000000000301, false, 1, now(), 'test')""", newTicket().getId()));
         }
 
         @Test

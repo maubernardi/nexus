@@ -16,6 +16,8 @@ import jakarta.validation.constraints.Size;
 public record ClosureReportFormDTO(
         @NotNull(message = "Versione mancante") @PositiveOrZero Long version,
         @NotNull(message = "Indica la data di fine effettiva") LocalDate actualEndDate,
+        /** Interruzione anticipata (US-1103), solo se la fine effettiva precede quella prevista; controllo nel servizio. */
+        String closureReasonId,
         @NotNull(message = "Indica la soddisfazione dell'azienda")
         @Min(value = 1, message = "Da 1 a 5") @Max(value = 5, message = "Da 1 a 5") Integer companySatisfaction,
         @NotNull(message = "Indica la soddisfazione del beneficiario")
