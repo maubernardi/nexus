@@ -774,7 +774,7 @@ Criteri di accettazione:
   segnalazione.
 - La bacheca resta com'è: l'annuncio si archivia alla prima assegnazione (PO, 15/11).
 - Le segnalazioni già aperte prendono il tipo dalla scheda del tirocinio, se c'è; altrimenti il Call Center vede «tipo
-  non indicato» finché il Tutor non lo indica.
+  non indicato» finché il Tutor non lo indica (PO, 15/11).
 
 Dipendenze: US-301, US-602, US-115, US-206
 
@@ -1116,7 +1116,8 @@ Criteri di accettazione:
 - La data di inizio è **successiva** alla fine della convenzione precedente, non per forza il giorno dopo (PO, 15/11).
   La fine prevista del tirocinio diventa quella dell'ultima convenzione.
 - Ogni convenzione ha i suoi progetti formativi, numerati al suo interno e dentro le sue date: un progetto non passa da
-  una convenzione all'altra (PO, 15/11). Monte ore e mesi contano solo i giorni coperti da una convenzione.
+  una convenzione all'altra (PO, 15/11). Monte ore e mesi contano solo i giorni coperti da una convenzione (PO,
+  15/11).
 - Ogni proroga nell'audit (EN-2).
 - Cambia così il criterio di US-1008 «una segnalazione ha una convenzione»: una convenzione iniziale più le proroghe.
 
