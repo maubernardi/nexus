@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 86 elementi, 332 punti.** La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-13](sprints/sprint-13.md), l'11/11 ([review](sprints/sprint-13-review.md)); prossimo: [sprint-14](sprints/sprint-14.md), dal 12/11.
+**Totale: 90 elementi, 350 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-13](sprints/sprint-13.md), l'11/11 ([review](sprints/sprint-13-review.md)); prossimo: [sprint-14](sprints/sprint-14.md), dal 12/11.
 
 ## Epiche
 
@@ -13,13 +13,13 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 6 | 23 |
 | E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 8 | 31 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 5 | 17 |
-| E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 6 | 15 |
-| E6 | Abbinamento (fase 4) | Il Call Center abbina il beneficiario a una mansione libera e la blocca. | 4 | 17 |
+| E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 7 | 15 (+ US-507 da stimare) |
+| E6 | Abbinamento (fase 4) | Il Call Center abbina il beneficiario a una mansione libera e la blocca. | 5 | 25 |
 | E7 | Proposta e timer (fase 5) | Il Tutor valuta la proposta; i tempi di risposta sono presidiati da un timer di 7 giorni lavorativi. | 5 | 15 |
 | E8 | Appuntamento e rilancio (fase 6) | Il Tutor registra l'esito dell'appuntamento; se fallisce, la mansione può essere rilanciata in bacheca. | 3 | 10 |
 | E9 | Bacheca opportunità | Le mansioni disponibili sono visibili ai Tutor in forma anonima e gestite dal Call Center. | 4 | 13 |
-| E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione, Progetto Formativo e Relazione finale sui modelli reali in Word. | 11 | 54 |
-| E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 2 | 7 |
+| E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione, Progetto Formativo e Relazione finale sui modelli reali in Word. | 12 | 62 |
+| E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 3 | 9 |
 | E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 2 | 10 |
 | E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 14 | 55 |
 
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 28 | 140 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 31 | 158 |
 
 ## Domande aperte per il Product Owner
 
@@ -104,10 +104,12 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-504](#us-504) | E5 | Disattivazione impedita con mansioni bloccate | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [US-505](#us-505) | E5 | Diario delle note dell'azienda | Must | 2 | R1 | 🎉 Done (Sprint 4) |
 | [US-506](#us-506) | E5 | Legale rappresentante e codici ATECO dell'azienda | Must | 3 | R3 | 🎉 Done (Sprint 7) |
+| [US-507](#us-507) | E5 | Richiesta di contatto di un'azienda dal Tutor | Should | ? | — | 📋 Backlog (da analizzare) |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 🎉 Done (Sprint 5) |
 | [US-604](#us-604) | E6 | Dettagli di azienda e mansione durante l'abbinamento | Must | 5 | R1 | 🎉 Done (Sprint 4) |
+| [US-605](#us-605) | E6 | Una mansione per più segnalazioni, una per tipo di tirocinio | Must | 8 | R4 | ✅ Ready (Sprint 15) |
 | [US-701](#us-701) | E7 | Accettazione della proposta | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [US-702](#us-702) | E7 | Rifiuto della proposta | Should | 3 | R2 | 🎉 Done (Sprint 5) |
 | [US-703](#us-703) | E7 | Calendario dei giorni lavorativi | Must | 3 | R2 | 🎉 Done (Sprint 4) |
@@ -131,9 +133,11 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1009](#us-1009) | E10 | Fine effettiva del tirocinio e ruolo del tutor aziendale | Must | 2 | R4 | 🎉 Done (Sprint 13) |
 | [US-1010](#us-1010) | E10 | Modelli dei documenti caricati dall'ADMIN | Must | 8 | R4 | 🎉 Done (Sprint 13) |
 | [US-1011](#us-1011) | E10 | Documenti sui modelli reali (GOL) | Must | 8 | R4 | ✅ Ready (Sprint 14) |
+| [US-1012](#us-1012) | E10 | Proroga del tirocinio | Must | 8 | R4 | ✅ Ready (Sprint 14) |
 | [EN-8](#en-8) | E10 | Preparazione dei modelli reali | Must | 3 | R4 | ✅ Ready (Sprint 14) |
 | [US-1101](#us-1101) | E11 | Report di restituzione | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1102](#us-1102) | E11 | Esito sulla mansione e audit trail | Must | 2 | R3 | 🎉 Done (Sprint 8) |
+| [US-1103](#us-1103) | E11 | Motivo di chiusura del tirocinio | Must | 2 | R4 | ✅ Ready (Sprint 14) |
 | [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | 🎉 Done (Sprint 5) |
 | [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1301](#us-1301) | E13 | Verifica della PWA online | Must | 1 | R1 | 📋 Backlog |
@@ -689,6 +693,15 @@ Criteri di accettazione:
 
 Dipendenze: US-501
 
+#### US-507
+**Richiesta di contatto di un'azienda dal Tutor** · Should · da stimare · release da decidere · 📋 Backlog (da analizzare)
+
+Come **Tutor** voglio chiedere al Call Center di contattare un'azienda che conosco, indicando i dati minimi (nome e
+zona), così che il Call Center prenda in carico la richiesta e contatti l'azienda (PO, 15/11).
+
+Criteri di accettazione: da definire in una **sessione di analisi dedicata**, quando il PO decide di affrontarla
+(PO, 15/11).
+
 ### E6 — Abbinamento (fase 4)
 
 _Il Call Center abbina il beneficiario a una mansione libera e la blocca._
@@ -737,6 +750,33 @@ Criteri di accettazione:
   del focus sul pulsante di partenza; a schermo intero sui dispositivi piccoli.
 
 Dipendenze: US-503, US-505
+
+#### US-605
+**Una mansione per più segnalazioni, una per tipo di tirocinio** · Must · 8 punti · R4 · ✅ Ready (Sprint 15)
+
+Come **Call Center** voglio proporre la stessa mansione a più segnalazioni, una per ogni tipo di tirocinio, sapendo
+sempre se la mansione è già assegnata, per non perdere un posto che l'azienda offre anche per un altro tipo (PO,
+15/11). Esempio: la mansione «Cameriere» dell'azienda Alfa può avere un tirocinio Extracurriculare (cioè non
+curriculare) e uno Di inclusione.
+
+Criteri di accettazione:
+- Il Tutor indica il **tipo di tirocinio** quando crea la segnalazione, anche dalla bacheca: obbligatorio, tra i tipi
+  attivi ammessi dal progetto (US-115); «Di inclusione» solo con l'ente e il case manager del beneficiario (US-206).
+  La scheda del tirocinio parte da quel tipo (PO, 15/11).
+- Una mansione può essere assegnata a più segnalazioni aperte, **al massimo una per tipo di tirocinio**: la proposta
+  di una mansione che ha già una segnalazione aperta dello stesso tipo è rifiutata.
+- Una mansione già assegnata a una segnalazione di un altro tipo compare tra quelle proponibili, con un **avviso ben
+  visibile** («Già assegnata alla segnalazione n. … (tipo)»), anche nei dettagli e nella conferma della proposta (PO,
+  15/11).
+- Il tipo si corregge fino all'avvio del tirocinio, solo verso un tipo che sulla mansione non ha già una segnalazione
+  aperta.
+- Rifiuto, scadenza del timer, appuntamento fallito e report di restituzione liberano la mansione solo per quella
+  segnalazione.
+- La bacheca resta com'è: l'annuncio si archivia alla prima assegnazione (PO, 15/11).
+- Le segnalazioni già aperte prendono il tipo dalla scheda del tirocinio, se c'è; altrimenti il Call Center vede «tipo
+  non indicato» finché il Tutor non lo indica (PO, 15/11).
+
+Dipendenze: US-301, US-602, US-115, US-206
 
 ### E7 — Proposta e timer (fase 5)
 
@@ -1045,7 +1085,8 @@ cooperativa, per usarli senza ritoccarli (Q5, planning del 09/11).
 
 Criteri di accettazione:
 - Due pulsanti come oggi (convenzione, progetto formativo: uno per ogni progetto formativo) più **relazione finale**,
-  attiva solo a tirocinio chiuso.
+  attiva solo a tirocinio chiuso. Con le proroghe (US-1012) una convenzione per ogni convenzione, con lo stesso
+  modello (PO, 15/11).
 - Dati del soggetto promotore (denominazione, sede, codice fiscale, legale rappresentante con nascita, contatti,
   posizione INAIL, polizza RC con scadenza) nel `.env` del server, non nei modelli (PO, 09/11).
 - Per ogni progetto, modificabili dall'ADMIN: riferimento all'avviso (con un testo predefinito) e riga di intestazione
@@ -1055,10 +1096,32 @@ Criteri di accettazione:
   numero e date del progetto formativo, mansione, contatti dell'azienda, ATECO, orario (giorni, fasce, ore), tutor
   aziendale con ruolo, sede di competenza, date effettive, mesi arrotondati al mese più vicino (da 15 giorni per
   eccesso, sospensioni comprese).
-- Relazione finale: «Al» = fine effettiva; luogo = sede di competenza; data = data di chiusura.
+- Relazione finale: «Al» = fine effettiva; luogo = sede di competenza; data = data di chiusura; motivo di chiusura
+  (US-1103).
 - Restano da compilare a mano: CCNL, numero di dipendenti, ADA/ISTAT, obiettivi, attività, permesso di soggiorno.
 
-Dipendenze: US-1007, US-1008, US-1009, US-1010, US-206, US-308
+Dipendenze: US-1007, US-1008, US-1009, US-1010, US-1012, US-1103, US-206, US-308
+
+#### US-1012
+**Proroga del tirocinio** · Must · 8 punti · R4 · ✅ Ready (Sprint 14)
+
+Come **Tutor** voglio prorogare un tirocinio con una nuova convenzione, per continuarlo senza rifare la segnalazione
+né la scheda (PO, 15/11).
+
+Criteri di accettazione:
+- Dalla scheda di un tirocinio avviato e non ancora chiuso il Tutor registra una **proroga**: numero, data e data di
+  stipula di una nuova convenzione, data di inizio e data di fine. Le proroghe possono essere più di una.
+- La proroga è una **convenzione in tutto e per tutto**: tutti gli altri dati sono comuni e i documenti usano gli
+  stessi modelli (PO, 15/11).
+- La data di inizio è **successiva** alla fine della convenzione precedente, non per forza il giorno dopo (PO, 15/11).
+  La fine prevista del tirocinio diventa quella dell'ultima convenzione.
+- Ogni convenzione ha i suoi progetti formativi, numerati al suo interno e dentro le sue date: un progetto non passa da
+  una convenzione all'altra (PO, 15/11). Monte ore e mesi contano solo i giorni coperti da una convenzione (PO,
+  15/11).
+- Ogni proroga nell'audit (EN-2).
+- Cambia così il criterio di US-1008 «una segnalazione ha una convenzione»: una convenzione iniziale più le proroghe.
+
+Dipendenze: US-1008
 
 #### EN-8
 **Preparazione dei modelli reali** · Must · 3 punti · R4 · ✅ Ready (Sprint 14)
@@ -1097,6 +1160,23 @@ Criteri di accettazione:
 - Se la mansione è ancora disponibile torna LIBERA; l'esito entra nell'audit trail immodificabile dell'azienda.
 
 Dipendenze: US-1101
+
+#### US-1103
+**Motivo di chiusura del tirocinio** · Must · 2 punti · R4 · ✅ Ready (Sprint 14)
+
+Come **Tutor** voglio indicare perché un tirocinio è finito prima del previsto, per la relazione finale e le
+statistiche (PO, 15/11).
+
+Criteri di accettazione:
+- Catalogo dell'ADMIN «Motivi di chiusura del tirocinio», con le voci iniziali «Chiusura regolare», «Interruzione
+  anticipata per volontà dell'azienda» e «Interruzione anticipata per volontà del destinatario» (PO, 15/11). Le voci
+  si aggiungono, rinominano e disattivano come gli altri cataloghi; «Chiusura regolare» non si disattiva, perché è
+  quella automatica.
+- Nel report di restituzione, se la fine effettiva (US-1009) precede la fine prevista, il Tutor sceglie il motivo tra
+  le voci attive di interruzione, obbligatorio; altrimenti il motivo è «Chiusura regolare», automatico.
+- Il motivo compare nel report inviato e nella cronologia, entra nell'audit e serve alla relazione finale (US-1011).
+
+Dipendenze: US-1009, US-109
 
 ### E12 — Notifiche
 
