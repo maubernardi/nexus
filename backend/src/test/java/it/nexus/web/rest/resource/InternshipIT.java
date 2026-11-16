@@ -35,6 +35,7 @@ import it.nexus.domain.AuditEvent;
 import it.nexus.domain.Company;
 import it.nexus.domain.CompanyAtecoCode;
 import it.nexus.domain.Internship;
+import it.nexus.domain.InternshipExtension;
 import it.nexus.domain.InternshipType;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Municipality;
@@ -99,7 +100,7 @@ class InternshipIT {
     private static String form(String fields) {
         String json = "{" + fields + "}";
         Map<String, String> defaults = Map.of("companyTutors", "[]", "suspensions", "[]", "trainingProjects", "[]",
-                "schedule", "[]",
+                "extensions", "[]", "schedule", "[]",
                 "firstSlotStart", "\"09:00\"", "firstSlotEnd", "\"13:00\"", "secondSlotStart", "\"14:00\"",
                 "secondSlotEnd", "\"18:00\"", "excludeHolidays", "true");
         for (Map.Entry<String, String> d : defaults.entrySet()) {
@@ -383,6 +384,191 @@ class InternshipIT {
                         .value("Il progetto finisce dopo la fine prevista del tirocinio (30/04/2027)"));
     }
 
+    /** Un progetto formativo per tutta la convenzione iniziale di {@link #full}. */
+    private static final String WHOLE = "[" + project("2026-12-01", "2027-05-31", "Aiuto cuoco") + "]";
+
+    /** Proroga 1 dal 15 giugno al 30 settembre 2027, con un progetto formativo per tutta la sua durata. */
+    private static final String EXTENSION = "[" + extension(" 2027/200 ", "2027-06-15", "2027-09-30", """
+            [{"from": "2027-06-15", "to": "2027-09-30", "jobTitle": " Cuoco ", "jobDetails": "Cucina calda"}]""")
+            + "]";
+
+    private static String project(String from, String to, String jobTitle) {
+        return "{\"from\": \"%s\", \"to\": \"%s\", \"jobTitle\": \"%s\"}".formatted(from, to, jobTitle);
+    }
+
+    private static String extension(String number, String from, String to, String projects) {
+        return """
+                {"agreementNumber": "%s", "agreementDate": "2027-06-01", "agreementSignedDate": "2027-06-10",
+                 "from": "%s", "to": "%s", "trainingProjects": %s}""".formatted(number, from, to, projects);
+    }
+
+    /** La scheda con le proroghe indicate al posto dell'elenco vuoto (US-1012). */
+    private static String withExtensions(String json, String extensions) {
+        return json.replace("\"extensions\": [], ", "\"extensions\": " + extensions + ", ");
+    }
+
+    /** La scheda di {@link #full} con convenzione, un progetto e le proroghe indicate. */
+    private String extended(Long version, String extensions) {
+        return withExtensions(withAgreementAndProjects(full(version), WHOLE), extensions);
+    }
+
+    private void started() {
+        ticket.setStatus(TicketStatus.IN_TIROCINIO);
+        em.flush();
+    }
+
+    @Test
+    void proroghe_soloATirocinioAvviato_conFinePrevistaMonteOreEAudit() throws Exception {
+        // prima dell'avvio le proroghe non si registrano
+        save("tutor1", extended(null, EXTENSION))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("extensions"))
+                .andExpect(jsonPath("$.fieldErrors[0].message")
+                        .value("Le proroghe si registrano a tirocinio avviato e non ancora chiuso"));
+        String initial = save("tutor1", extended(null, "[]"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.extensions.length()").value(0))
+                .andExpect(jsonPath("$.currentEndDate").value("2027-05-31"))
+                .andExpect(jsonPath("$.extensible").value(false))
+                .andReturn().getResponse().getContentAsString();
+        int initialMinutes = JsonPath.read(initial, "$.totalMinutes");
+
+        started();
+        mockMvc.perform(get(base).header(USER, "tutor1")).andExpect(jsonPath("$.extensible").value(true));
+        save("tutor1", extended(version(), EXTENSION))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.extensions[0].number").value(1))
+                .andExpect(jsonPath("$.extensions[0].agreementNumber").value("2027/200"))
+                .andExpect(jsonPath("$.extensions[0].agreementDate").value("2027-06-01"))
+                .andExpect(jsonPath("$.extensions[0].agreementSignedDate").value("2027-06-10"))
+                .andExpect(jsonPath("$.extensions[0].from").value("2027-06-15"))
+                .andExpect(jsonPath("$.extensions[0].to").value("2027-09-30"))
+                .andExpect(jsonPath("$.extensions[0].trainingProjects[0].number").value(1))
+                .andExpect(jsonPath("$.extensions[0].trainingProjects[0].jobTitle").value("Cuoco"))
+                .andExpect(jsonPath("$.extensions[0].trainingProjects[0].jobDetails").value("Cucina calda"))
+                // quindici lunedì dal 21 giugno al 27 settembre
+                .andExpect(jsonPath("$.extensions[0].trainingProjects[0].totalMinutes").value(15 * 240))
+                .andExpect(jsonPath("$.trainingProjects.length()").value(1))
+                .andExpect(jsonPath("$.expectedEndDate").value("2027-05-31"))
+                .andExpect(jsonPath("$.currentEndDate").value("2027-09-30"))
+                // i lunedì 7 e 14 giugno, tra le due convenzioni, non contano
+                .andExpect(jsonPath("$.totalMinutes").value(initialMinutes + 15 * 240));
+        Map<String, Object> changes = ticketAudit().getLast().getChanges();
+        assertThat(changes).containsOnlyKeys("extensions", "extensionTrainingProjects", "trainingProjectDetails");
+        assertThat(changes.get("extensions")).extracting("after")
+                .isEqualTo(List.of("1 2027/200 2027-06-15/2027-09-30 (data 2027-06-01, stipula 2027-06-10)"));
+        assertThat(changes.get("extensionTrainingProjects")).extracting("after")
+                .isEqualTo(List.of("1.1 2027-06-15/2027-09-30 Cuoco"));
+        assertThat(changes).containsEntry("trainingProjectDetails", Map.of("redacted", true));
+        Long internshipId = internships.findByTicketId(ticket.getId()).orElseThrow().getId();
+        assertThat(jdbc.queryForObject("""
+                SELECT count(*) FROM internship_training_project p
+                JOIN internship_extension e ON e.id = p.extension_id WHERE p.internship_id = ?""", Long.class,
+                internshipId)).isEqualTo(1);
+
+        // stessa scheda: niente audit
+        int events = ticketAudit().size();
+        save("tutor1", extended(version(), EXTENSION)).andExpect(status().isOk());
+        assertThat(ticketAudit()).hasSize(events);
+
+        // una sospensione dentro la proroga: un lunedì in meno
+        save("tutor1", extended(version(), EXTENSION).replace("{\"from\": \"2026-12-08\", \"to\": \"2026-12-08\"}",
+                        "{\"from\": \"2026-12-08\", \"to\": \"2026-12-08\"}, {\"from\": \"2027-07-05\", \"to\": \"2027-07-11\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalMinutes").value(initialMinutes + 14 * 240));
+
+        // la proroga si toglie: la fine prevista torna quella della convenzione
+        save("tutor1", extended(version(), "[]"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.extensions.length()").value(0))
+                .andExpect(jsonPath("$.currentEndDate").value("2027-05-31"));
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM internship_extension WHERE internship_id = ?", Long.class,
+                internshipId)).isZero();
+        assertThat(ticketAudit().getLast().getChanges().get("extensions")).extracting("after").isEqualTo(List.of());
+    }
+
+    @Test
+    void proroghe_dopoLaConvenzionePrecedente_conIProgettiDentro_eFermeDopoLaChiusura() throws Exception {
+        started();
+        String noProjects = "[]";
+        // il giorno di fine della convenzione è ancora suo
+        save("tutor1", extended(null, "[" + extension("2027/200", "2027-05-31", "2027-09-30", noProjects) + "]"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("extensions[0].from"))
+                .andExpect(jsonPath("$.fieldErrors[0].message")
+                        .value("Deve iniziare dopo la fine della convenzione (31/05/2027)"));
+        save("tutor1", extended(null, "[" + extension("2027/200", "2027-09-30", "2027-06-15", noProjects) + "]"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("extensions[0].to"));
+        save("tutor1", extended(null, "[" + extension("  ", "2027-06-15", "2027-09-30", noProjects) + "]"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("extensions[0].agreementNumber"));
+        save("tutor1", extended(null, "[" + extension("2027/200", "2027-06-15", "2027-09-30", noProjects) + ", "
+                        + extension("2027/300", "2027-09-30", "2027-12-31", noProjects) + "]"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("extensions[1].from"))
+                .andExpect(jsonPath("$.fieldErrors[0].message")
+                        .value("Deve iniziare dopo la fine della proroga 1 (30/09/2027)"));
+        // progetti della proroga: dentro le sue date e in ordine
+        save("tutor1", extended(null, "[" + extension("2027/200", "2027-06-15", "2027-09-30",
+                        "[" + project("2027-06-14", "2027-09-30", "Cuoco") + "]") + "]"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("extensions[0].trainingProjects[0].from"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value("Il progetto inizia prima della proroga (15/06/2027)"));
+        save("tutor1", extended(null, "[" + extension("2027/200", "2027-06-15", "2027-09-30",
+                        "[" + project("2027-06-15", "2027-10-01", "Cuoco") + "]") + "]"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("extensions[0].trainingProjects[0].to"))
+                .andExpect(jsonPath("$.fieldErrors[0].message")
+                        .value("Il progetto finisce dopo la fine della proroga (30/09/2027)"));
+        save("tutor1", extended(null, "[" + extension("2027/200", "2027-06-15", "2027-09-30",
+                        "[" + project("2027-06-15", "2027-07-31", "Cuoco") + ", "
+                                + project("2027-07-31", "2027-09-30", "Capo partita") + "]") + "]"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("extensions[0].trainingProjects[1].from"))
+                .andExpect(jsonPath("$.fieldErrors[0].message")
+                        .value("Deve iniziare dopo la fine del progetto formativo 1 (31/07/2027)"));
+        // senza la fine prevista le proroghe non hanno un punto di partenza
+        save("tutor1", form("\"trainingProjects\": [], \"extensions\": " + EXTENSION + ", \"version\": null"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("expectedEndDate"));
+        assertThat(internships.findByTicketId(ticket.getId())).isEmpty();
+
+        // due proroghe, la seconda non il giorno dopo la prima: vanno bene
+        String two = "[" + extension("2027/200", "2027-06-15", "2027-09-30", "[" + project("2027-06-15", "2027-07-31",
+                "Cuoco") + ", " + project("2027-08-01", "2027-09-30", "Capo partita") + "]") + ", "
+                + extension("2027/300", "2027-10-11", "2027-12-31", "[" + project("2027-10-11", "2027-12-31",
+                "Chef") + "]") + "]";
+        save("tutor1", extended(null, two))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.extensions[0].trainingProjects[1].number").value(2))
+                .andExpect(jsonPath("$.extensions[1].number").value(2))
+                .andExpect(jsonPath("$.extensions[1].agreementNumber").value("2027/300"))
+                .andExpect(jsonPath("$.extensions[1].trainingProjects[0].number").value(1))
+                .andExpect(jsonPath("$.currentEndDate").value("2027-12-31"));
+        assertThat(ticketAudit().getLast().getChanges().get("extensionTrainingProjects")).extracting("after")
+                .isEqualTo(List.of("1.1 2027-06-15/2027-07-31 Cuoco", "1.2 2027-08-01/2027-09-30 Capo partita",
+                        "2.1 2027-10-11/2027-12-31 Chef"));
+
+        // la convenzione iniziale allungata sopra la proroga: l'errore è sulla fine prevista
+        save("tutor1", extended(version(), two).replace("\"expectedEndDate\": \"2027-05-31\"",
+                        "\"expectedEndDate\": \"2027-06-20\""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("expectedEndDate"))
+                .andExpect(jsonPath("$.fieldErrors[0].message")
+                        .value("Deve finire prima dell'inizio della proroga 1 (15/06/2027)"));
+
+        // dopo la chiusura la scheda si corregge ancora, ma le proroghe restano quelle
+        ticket.setStatus(TicketStatus.FORM_RESTITUZIONE);
+        em.flush();
+        mockMvc.perform(get(base).header(USER, "tutor1")).andExpect(jsonPath("$.extensible").value(false));
+        save("tutor1", extended(version(), two).replace("Turni concordati", "Turni rivisti"))
+                .andExpect(status().isOk());
+        save("tutor1", extended(version(), "[]"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("extensions"));
+    }
+
     /** Lunedì 7 – domenica 13 dicembre 2026; martedì 8 è festivo. */
     private static String week(String schedule, boolean excludeHolidays, String suspensions, Long version) {
         return form("""
@@ -597,6 +783,12 @@ class InternshipIT {
     @Test
     void appuntamentoFallito_restanoSoloIDatiDelBeneficiario() throws Exception {
         save("tutor1", withAgreementAndProjects(full(null), TWO_PROJECTS)).andExpect(status().isOk());
+        // anche una proroga con il suo progetto (US-1012), scritta direttamente: dal modulo serve il tirocinio avviato
+        Internship withExtension = internships.findByTicketId(ticket.getId()).orElseThrow();
+        InternshipExtension extension = withExtension.addExtension("2027/200", LocalDate.of(2027, 6, 1),
+                LocalDate.of(2027, 6, 10), LocalDate.of(2027, 6, 15), LocalDate.of(2027, 9, 30));
+        em.flush();
+        withExtension.addTrainingProject(extension, LocalDate.of(2027, 6, 15), LocalDate.of(2027, 9, 30), "Cuoco", null);
         em.flush();
         em.clear();
 
@@ -628,6 +820,7 @@ class InternshipIT {
         assertThat(left.getAgreementDate()).isNull();
         assertThat(left.getAgreementSignedDate()).isNull();
         assertThat(left.getTrainingProjects()).isEmpty();
+        assertThat(left.getExtensions()).isEmpty();
         assertThat(left.isExcludeHolidays()).isTrue();
         assertThat(ticketAudit().getLast().getChanges().get("internshipReset")).extracting("after").isEqualTo(true);
     }

@@ -25,6 +25,20 @@ export type TrainingProject = {
   totalMinutes?: number | null;
 };
 
+/**
+ * Proroga del tirocinio (US-1012): una convenzione in tutto e per tutto, con i suoi progetti formativi numerati al suo
+ * interno. Il numero è la posizione nell'ordine delle date.
+ */
+export type Extension = {
+  number: number;
+  agreementNumber: string;
+  agreementDate: string;
+  agreementSignedDate: string;
+  from: string;
+  to: string;
+  trainingProjects: TrainingProject[];
+};
+
 /** Periodo di sospensione, estremi compresi (aaaa-mm-gg). */
 export type Suspension = { from: string; to: string };
 
@@ -71,6 +85,12 @@ export type Internship = {
   agreementDate?: string | null;
   agreementSignedDate?: string | null;
   trainingProjects: TrainingProject[];
+  /** Proroghe (US-1012), nell'ordine delle date. */
+  extensions: Extension[];
+  /** Fine dell'ultima convenzione: quella iniziale senza proroghe, altrimenti l'ultima proroga. */
+  currentEndDate?: string | null;
+  /** Le proroghe si registrano solo a tirocinio avviato e non ancora chiuso. */
+  extensible: boolean;
   /** Fasce orarie, "hh:mm:ss" (US-1002). */
   firstSlotStart: string;
   firstSlotEnd: string;
@@ -108,6 +128,8 @@ export type StartRequirement =
   | 'legalRepresentative'
   | 'legalRepresentativeData';
 
+type TrainingProjectPayload = { from: string; to: string; jobTitle: string; jobDetails: string | null };
+
 export type InternshipForm = {
   internshipTypeId: string | null;
   startDate: string | null;
@@ -128,7 +150,16 @@ export type InternshipForm = {
   agreementDate: string | null;
   agreementSignedDate: string | null;
   /** Nell'ordine delle date: la posizione è il numero del progetto (US-1008). */
-  trainingProjects: { from: string; to: string; jobTitle: string; jobDetails: string | null }[];
+  trainingProjects: TrainingProjectPayload[];
+  /** Proroghe nell'ordine delle date, ognuna con i suoi progetti (US-1012). */
+  extensions: {
+    agreementNumber: string;
+    agreementDate: string;
+    agreementSignedDate: string;
+    from: string;
+    to: string;
+    trainingProjects: TrainingProjectPayload[];
+  }[];
   /** "hh:mm" */
   firstSlotStart: string;
   firstSlotEnd: string;

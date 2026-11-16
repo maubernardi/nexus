@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `8d43ad3` (11/11/2026): Sprint 1–13 completi (indirizzi con il comune, fine effettiva e ruolo del tutor aziendale, convenzione e progetti formativi, modelli dei documenti caricati dall'ADMIN) |
-| **Ultimo aggiornamento** | 16/11/2026 (T-24.1: da provare dopo il deploy di US-1103; T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 16/11/2026 (T-24.2: da provare dopo il deploy di US-1012; T-24.1, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -952,3 +952,26 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      dell'interruzione»; nella cronologia della segnalazione la chiusura comincia con il motivo.
   4. Su un altro tirocinio invia il report con la fine effettiva uguale alla prevista. **Atteso:** «Motivo di
      chiusura: Chiusura regolare», senza averlo scelto.
+
+- [ ] **T-24.2 Proroga del tirocinio (US-1012)**
+  1. Come `tutor1` apri la scheda di una segnalazione con l'appuntamento fissato (tirocinio non ancora avviato).
+     **Atteso:** dopo «Progetti formativi» non c'è la sezione «Proroghe».
+  2. Apri la scheda di un tirocinio avviato. **Atteso:** la sezione «Proroghe» con «Nessuna proroga.» e il pulsante
+     «Aggiungi proroga».
+  3. Premi «Aggiungi proroga». **Atteso:** compare «Proroga 1» con la data di inizio già proposta al giorno dopo la
+     fine prevista. Spostala di qualche giorno più avanti, compila numero, data della convenzione, data di stipula e
+     data di fine; con «Aggiungi progetto formativo alla proroga 1» aggiungi un progetto. **Atteso:** il progetto parte
+     con le date della proroga e la mansione della segnalazione; nella sezione «Convenzione» compare «Con le proroghe
+     il tirocinio finisce il …».
+  4. Prova a salvare con la proroga che inizia il giorno di fine della convenzione, oppure con il progetto della
+     proroga che inizia prima della proroga. **Atteso:** il salvataggio è rifiutato e il riepilogo degli errori
+     indica il campo, per esempio «Proroga 1: dal: Deve iniziare dopo la fine della convenzione (…)».
+  5. Correggi e salva. **Atteso:** sotto il progetto della proroga compaiono durata e monte ore; il monte ore del
+     tirocinio non conta i giorni tra la fine della convenzione e l'inizio della proroga. Nella cronologia della
+     segnalazione c'è «Scheda del tirocinio aggiornata». (L'audit con la proroga e i suoi progetti è verificato dai
+     test.)
+  6. Sposta la «Data di fine prevista» dopo l'inizio della proroga e salva. **Atteso:** l'errore è sulla data di fine
+     prevista: «Deve finire prima dell'inizio della proroga 1 (…)».
+  7. Apri il report di restituzione dello stesso tirocinio. **Atteso:** la fine effettiva è precompilata con la fine
+     della proroga; con la fine della convenzione iniziale compare il motivo dell'interruzione anticipata.
+  8. Dopo l'invio del report riapri la scheda. **Atteso:** la proroga si legge ma non si modifica più.

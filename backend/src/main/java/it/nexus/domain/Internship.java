@@ -143,7 +143,15 @@ public class Internship extends AbstractTsidEntity {
     @OrderBy("dayOfWeek")
     private List<InternshipScheduleDay> scheduleDays = new ArrayList<>();
 
-    /** Progetti formativi della convenzione (US-1008), nell'ordine delle date: la posizione è il numero. */
+    /** Proroghe (US-1012), nell'ordine delle date: la posizione è il numero. */
+    @OneToMany(mappedBy = "internship", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("dateFrom")
+    private List<InternshipExtension> extensions = new ArrayList<>();
+
+    /**
+     * Progetti formativi delle convenzioni (US-1008, US-1012), nell'ordine delle date: dentro ogni convenzione la
+     * posizione è il numero.
+     */
     @OneToMany(mappedBy = "internship", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("dateFrom")
     private List<InternshipTrainingProject> trainingProjects = new ArrayList<>();
@@ -169,8 +177,31 @@ public class Internship extends AbstractTsidEntity {
         scheduleDays.add(new InternshipScheduleDay(this, dayOfWeek, firstSlot, secondSlot, minutes));
     }
 
+    /** Progetto della convenzione iniziale. */
     public void addTrainingProject(LocalDate from, LocalDate to, String jobTitle, String jobDetails) {
-        trainingProjects.add(new InternshipTrainingProject(this, from, to, jobTitle, jobDetails));
+        addTrainingProject(null, from, to, jobTitle, jobDetails);
+    }
+
+    /** Progetto di una proroga, oppure della convenzione iniziale se {@code extension} è nullo (US-1012). */
+    public void addTrainingProject(InternshipExtension extension, LocalDate from, LocalDate to, String jobTitle,
+            String jobDetails) {
+        trainingProjects.add(new InternshipTrainingProject(this, extension, from, to, jobTitle, jobDetails));
+    }
+
+    public InternshipExtension addExtension(String agreementNumber, LocalDate agreementDate,
+            LocalDate agreementSignedDate, LocalDate from, LocalDate to) {
+        InternshipExtension extension = new InternshipExtension(this, agreementNumber, agreementDate,
+                agreementSignedDate, from, to);
+        extensions.add(extension);
+        return extension;
+    }
+
+    /** Fine prevista del tirocinio (US-1012): quella dell'ultima proroga, altrimenti quella della convenzione iniziale. */
+    public LocalDate currentEndDate() {
+        return extensions.stream()
+                .map(InternshipExtension::getDateTo)
+                .max(LocalDate::compareTo)
+                .orElse(expectedEndDate);
     }
 
     /**
@@ -196,7 +227,9 @@ public class Internship extends AbstractTsidEntity {
         companyTutors.clear();
         suspensions.clear();
         scheduleDays.clear();
+        // i progetti prima delle proroghe a cui si riferiscono: il servizio fa il flush in mezzo
         trainingProjects.clear();
+        extensions.clear();
     }
 
     /** Anonimizzazione del beneficiario (US-1303): via i suoi dati identificativi e le note. */

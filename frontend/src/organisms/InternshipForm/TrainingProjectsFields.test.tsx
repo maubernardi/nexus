@@ -31,6 +31,8 @@ const base: Internship = {
   companyTutors: [],
   suspensions: [],
   trainingProjects: [],
+  extensions: [],
+  extensible: false,
   firstSlotStart: '09:00:00',
   firstSlotEnd: '13:00:00',
   secondSlotStart: '14:00:00',

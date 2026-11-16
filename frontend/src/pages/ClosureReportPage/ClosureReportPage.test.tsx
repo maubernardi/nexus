@@ -260,6 +260,21 @@ describe('<ClosureReportPage>', () => {
     expect(screen.queryByRole('textbox', { name: /Descrizione dell’interruzione/ })).not.toBeInTheDocument();
   });
 
+  it('con le proroghe la fine prevista è quella dell’ultima: la fine della convenzione iniziale è anticipata (US-1012)', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchInternship).mockResolvedValue({ ...internship, currentEndDate: '2027-09-30' });
+    renderPage();
+
+    const date = await screen.findByLabelText(/Fine effettiva del tirocinio/, { selector: 'input' });
+    expect(date).toHaveValue('2027-09-30');
+    expect(screen.queryByRole('combobox', { name: /Motivo dell’interruzione/ })).not.toBeInTheDocument();
+    await user.clear(date);
+    await user.type(date, '2027-05-31');
+    expect(
+      screen.getByRole('combobox', { name: /Motivo dell’interruzione anticipata/ }),
+    ).toHaveAccessibleDescription(/^Il tirocinio finisce prima della fine prevista \(30\/09\/2027\)/);
+  });
+
   it('senza la scheda la fine effettiva parte vuota; l’errore del server va sul campo', async () => {
     const user = userEvent.setup();
     vi.mocked(fetchInternship).mockRejectedValue(error(403, {}));

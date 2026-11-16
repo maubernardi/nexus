@@ -41,6 +41,8 @@ public record InternshipFormDTO(
         /** Progetti formativi nell'ordine delle date: la posizione è il numero (US-1008). */
         @NotNull @Size(max = 10, message = "Massimo 10 progetti formativi")
         List<@Valid TrainingProjectFormDTO> trainingProjects,
+        /** Proroghe nell'ordine delle date, ognuna con i suoi progetti formativi (US-1012). */
+        @NotNull @Size(max = 10, message = "Massimo 10 proroghe") List<@Valid ExtensionFormDTO> extensions,
         @NotNull(message = "Indica l'inizio della fascia") LocalTime firstSlotStart,
         @NotNull(message = "Indica la fine della fascia") LocalTime firstSlotEnd,
         @NotNull(message = "Indica l'inizio della fascia") LocalTime secondSlotStart,

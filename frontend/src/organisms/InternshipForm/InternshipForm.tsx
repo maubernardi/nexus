@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
-import { Controller, useFieldArray, useForm, type FieldPath } from 'react-hook-form';
+import { Controller, useFieldArray, useForm, useWatch, type FieldPath } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import { apiError, toFormPath } from '@/config/api/errors';
 import type { Internship, InternshipForm as InternshipPayload } from '@/config/api/internshipApi';
 import type { ReferenceItem } from '@/config/api/referenceApi';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
+import { formatIsoDate } from '@/lib/isoDate';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
 import { FormField } from '@/molecules/FormField/FormField';
 import { MunicipalityField } from '@/molecules/MunicipalityField/MunicipalityField';
@@ -28,8 +29,21 @@ import {
   weeklyMinutes,
   type ScheduleDayValues,
 } from '@/organisms/InternshipForm/schedule';
+import { ExtensionsFields } from '@/organisms/InternshipForm/ExtensionsFields';
 import { ScheduleFields } from '@/organisms/InternshipForm/ScheduleFields';
 import { TrainingProjectsFields } from '@/organisms/InternshipForm/TrainingProjectsFields';
+
+type ProjectValues = { from: string; to: string; jobTitle: string; jobDetails: string };
+
+/** Proroga (US-1012): una convenzione con le sue date e i suoi progetti formativi. */
+type ExtensionValues = {
+  agreementNumber: string;
+  agreementDate: string;
+  agreementSignedDate: string;
+  from: string;
+  to: string;
+  trainingProjects: ProjectValues[];
+};
 
 type Values = {
   internshipTypeId: string;
@@ -51,7 +65,8 @@ type Values = {
   agreementNumber: string;
   agreementDate: string;
   agreementSignedDate: string;
-  trainingProjects: { from: string; to: string; jobTitle: string; jobDetails: string }[];
+  trainingProjects: ProjectValues[];
+  extensions: ExtensionValues[];
   /** Griglia oraria (US-1002): fasce "hh:mm" e i sette giorni da lunedì. */
   firstSlotStart: string;
   firstSlotEnd: string;
@@ -68,6 +83,7 @@ type Scalar = Exclude<
   | 'companyTutors'
   | 'suspensions'
   | 'trainingProjects'
+  | 'extensions'
   | 'days'
   | 'excludeHolidays'
   | 'firstSlotStart'
@@ -80,6 +96,17 @@ type Scalar = Exclude<
 const MAX_WEEKLY_MINUTES = 40 * 60;
 
 const fieldId = (path: string): string => `internship-${path.replace(/\./g, '-')}`;
+
+const toProjectValues = (projects: Internship['trainingProjects']): ProjectValues[] =>
+  projects.map((p) => ({ from: p.from, to: p.to, jobTitle: p.jobTitle, jobDetails: p.jobDetails ?? '' }));
+
+const toProjectPayload = (projects: ProjectValues[]): InternshipPayload['trainingProjects'] =>
+  projects.map((p) => ({
+    from: p.from,
+    to: p.to,
+    jobTitle: p.jobTitle.trim(),
+    jobDetails: p.jobDetails.trim() || null,
+  }));
 
 // l'API omette i campi vuoti: null e assente valgono uguale
 const toValues = (i: Internship): Values => ({
@@ -105,11 +132,14 @@ const toValues = (i: Internship): Values => ({
   agreementNumber: i.agreementNumber ?? '',
   agreementDate: i.agreementDate ?? '',
   agreementSignedDate: i.agreementSignedDate ?? '',
-  trainingProjects: i.trainingProjects.map((p) => ({
-    from: p.from,
-    to: p.to,
-    jobTitle: p.jobTitle,
-    jobDetails: p.jobDetails ?? '',
+  trainingProjects: toProjectValues(i.trainingProjects),
+  extensions: i.extensions.map((e) => ({
+    agreementNumber: e.agreementNumber,
+    agreementDate: e.agreementDate,
+    agreementSignedDate: e.agreementSignedDate,
+    from: e.from,
+    to: e.to,
+    trainingProjects: toProjectValues(e.trainingProjects),
   })),
   // l'API manda "hh:mm:ss", il campo orario vuole "hh:mm"
   firstSlotStart: i.firstSlotStart.slice(0, 5),
@@ -150,11 +180,14 @@ const toPayload = (v: Values, version: number | null): InternshipPayload => ({
   agreementNumber: v.agreementNumber.trim() || null,
   agreementDate: v.agreementDate || null,
   agreementSignedDate: v.agreementSignedDate || null,
-  trainingProjects: v.trainingProjects.map((p) => ({
-    from: p.from,
-    to: p.to,
-    jobTitle: p.jobTitle.trim(),
-    jobDetails: p.jobDetails.trim() || null,
+  trainingProjects: toProjectPayload(v.trainingProjects),
+  extensions: v.extensions.map((e) => ({
+    agreementNumber: e.agreementNumber.trim(),
+    agreementDate: e.agreementDate,
+    agreementSignedDate: e.agreementSignedDate,
+    from: e.from,
+    to: e.to,
+    trainingProjects: toProjectPayload(e.trainingProjects),
   })),
   firstSlotStart: v.firstSlotStart,
   firstSlotEnd: v.firstSlotEnd,
@@ -232,6 +265,7 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
   const tutorRows = useFieldArray({ control, name: 'companyTutors' });
   const suspensionRows = useFieldArray({ control, name: 'suspensions' });
   const projectRows = useFieldArray({ control, name: 'trainingProjects' });
+  const extensionValues = useWatch({ control, name: 'extensions' });
   const { summaryRef, requestSummaryFocus } = useErrorSummaryFocus(submitCount, errors);
   const today = new Date().toISOString().slice(0, 10);
   const max = (n: number) => ({ value: n, message: t('form.errors.maxLength', { max: n }) });
@@ -240,6 +274,15 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
   /** Con i progetti formativi servono le date del tirocinio, che li contengono (US-1008). */
   const datesForProjects = (v: string) =>
     v !== '' || getValues('trainingProjects').length === 0 || t('internship.errors.datesForProjects');
+  /** Con le proroghe la convenzione iniziale finisce prima della prima di loro (US-1012). */
+  const endBeforeExtensions = (v: string) => {
+    const first = getValues('extensions.0.from');
+    if (getValues('extensions').length > 0 && v === '') return t('internship.errors.endForExtensions');
+    // con la prima proroga cambiata l'errore è sul suo inizio, come nel server
+    if (v && first && v >= first && first === internship.extensions[0]?.from)
+      return t('internship.errors.endAfterExtension', { date: formatIsoDate(first) });
+    return true;
+  };
 
   const labels: Record<Scalar, string> = {
     internshipTypeId: t('internship.fields.internshipType'),
@@ -320,6 +363,41 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
       row?.jobDetails?.message,
     );
   });
+  push('extensions', t('internship.sections.extensions'), errors.extensions?.message);
+  extensionValues.forEach((extension, k) => {
+    const n = k + 1;
+    const ext = errors.extensions?.[k];
+    push(
+      `extensions.${k}.agreementNumber`,
+      t('internship.fields.extensionAgreementNumber', { k: n }),
+      ext?.agreementNumber?.message,
+    );
+    push(
+      `extensions.${k}.agreementDate`,
+      t('internship.fields.extensionAgreementDate', { k: n }),
+      ext?.agreementDate?.message,
+    );
+    push(
+      `extensions.${k}.agreementSignedDate`,
+      t('internship.fields.extensionAgreementSignedDate', { k: n }),
+      ext?.agreementSignedDate?.message,
+    );
+    push(`extensions.${k}.from`, t('internship.fields.extensionFrom', { k: n }), ext?.from?.message);
+    push(`extensions.${k}.to`, t('internship.fields.extensionTo', { k: n }), ext?.to?.message);
+    extension.trainingProjects.forEach((_, i) => {
+      const labels = { k: n, n: i + 1 };
+      const row = ext?.trainingProjects?.[i];
+      const path = `extensions.${k}.trainingProjects.${i}`;
+      push(`${path}.from`, t('internship.fields.extensionProjectFrom', labels), row?.from?.message);
+      push(`${path}.to`, t('internship.fields.extensionProjectTo', labels), row?.to?.message);
+      push(`${path}.jobTitle`, t('internship.fields.extensionJobTitle', labels), row?.jobTitle?.message);
+      push(
+        `${path}.jobDetails`,
+        t('internship.fields.extensionJobDetails', labels),
+        row?.jobDetails?.message,
+      );
+    });
+  });
   (
     [
       'fiscalCode',
@@ -352,7 +430,8 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
     if (to === '') return t('form.errors.required');
     const from = getValues(`suspensions.${i}.from`);
     if (from && to < from) return t('internship.errors.toBeforeFrom');
-    const end = getValues('expectedEndDate');
+    // con le proroghe il tirocinio finisce con l'ultima (US-1012)
+    const end = getValues('extensions').at(-1)?.to || getValues('expectedEndDate');
     if (end && to > end) return t('internship.errors.afterEnd');
     return true;
   };
@@ -499,7 +578,8 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
                   validate: (v) => {
                     const start = getValues('startDate');
                     if (v && start && v < start) return t('internship.errors.endBeforeStart');
-                    return datesForProjects(v);
+                    const projects = datesForProjects(v);
+                    return projects === true ? endBeforeExtensions(v) : projects;
                   },
                 })}
               />
@@ -734,6 +814,17 @@ export const InternshipForm = ({ internship, onSubmit, onSuccess, onConflict }: 
         getValues={getValues}
         rows={projectRows}
         saved={internship.trainingProjects}
+        jobSlotTitle={internship.jobSlotTitle}
+        fieldId={fieldId}
+      />
+
+      <ExtensionsFields
+        control={control}
+        register={register}
+        errors={errors}
+        getValues={getValues}
+        saved={internship.extensions}
+        extensible={internship.extensible}
         jobSlotTitle={internship.jobSlotTitle}
         fieldId={fieldId}
       />

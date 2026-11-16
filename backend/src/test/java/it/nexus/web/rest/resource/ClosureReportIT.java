@@ -284,6 +284,28 @@ class ClosureReportIT {
     }
 
     @Test
+    void conLeProroghe_laFinePrevistaEQuellaDellUltimaConvenzione() throws Exception {
+        Internship internship = new Internship(ticket);
+        internship.setStartDate(LocalDate.of(2026, 12, 1));
+        internship.setExpectedEndDate(LocalDate.of(2027, 5, 31));
+        // proroga 1 (US-1012)
+        internship.addExtension("2027/200", LocalDate.of(2027, 6, 1), LocalDate.of(2027, 6, 10),
+                LocalDate.of(2027, 6, 15), LocalDate.of(2027, 9, 30));
+        internships.saveAndFlush(internship);
+        long version = ticketVersion();
+
+        // alla fine della convenzione iniziale il tirocinio prorogato si interrompe
+        send("tutor1", version, "2027-05-31", true, formulaId(), null, false)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("closureReasonId"))
+                .andExpect(jsonPath("$.fieldErrors[0].message")
+                        .value("Il tirocinio finisce prima del 30/09/2027: scegli il motivo dell'interruzione"));
+        send("tutor1", version, "2027-09-30", true, formulaId(), null, false)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.closureReport.closureReason.name").value("Chiusura regolare"));
+    }
+
+    @Test
     void motivoDiChiusura_fineComePrevista_eInterruzioneDisattivata() throws Exception {
         Internship internship = new Internship(ticket);
         internship.setStartDate(LocalDate.of(2026, 12, 1));
