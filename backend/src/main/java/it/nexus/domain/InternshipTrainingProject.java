@@ -52,9 +52,18 @@ public class InternshipTrainingProject extends AbstractCreationAuditingEntity {
     @Column(name = "job_details", updatable = false, length = 2000)
     private String jobDetails;
 
-    InternshipTrainingProject(Internship internship, LocalDate dateFrom, LocalDate dateTo, String jobTitle,
-            String jobDetails) {
+    /**
+     * Proroga a cui appartiene (US-1012); nullo = convenzione iniziale. La colonna {@code internship_id} è anche nella
+     * chiave esterna composta verso la proroga, che resta così dello stesso tirocinio.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "extension_id", updatable = false)
+    private InternshipExtension extension;
+
+    InternshipTrainingProject(Internship internship, InternshipExtension extension, LocalDate dateFrom,
+            LocalDate dateTo, String jobTitle, String jobDetails) {
         this.internship = internship;
+        this.extension = extension;
         this.dateFrom = dateFrom;
         this.dateTo = dateTo;
         this.jobTitle = jobTitle;

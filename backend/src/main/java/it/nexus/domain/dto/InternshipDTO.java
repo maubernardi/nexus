@@ -38,6 +38,11 @@ public record InternshipDTO(
         LocalDate agreementDate,
         LocalDate agreementSignedDate,
         List<TrainingProjectDTO> trainingProjects,
+        /** Proroghe (US-1012) e fine prevista del tirocinio con le proroghe. */
+        List<ExtensionDTO> extensions,
+        LocalDate currentEndDate,
+        /** Le proroghe si registrano solo a tirocinio avviato e non ancora chiuso. */
+        boolean extensible,
         LocalTime firstSlotStart,
         LocalTime firstSlotEnd,
         LocalTime secondSlotStart,

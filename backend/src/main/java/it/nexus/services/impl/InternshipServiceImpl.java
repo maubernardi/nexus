@@ -15,8 +15,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ import it.nexus.domain.Beneficiary;
 import it.nexus.domain.Company;
 import it.nexus.domain.CompanyAtecoCode;
 import it.nexus.domain.Internship;
+import it.nexus.domain.InternshipExtension;
 import it.nexus.domain.InternshipType;
 import it.nexus.domain.Municipality;
 import it.nexus.domain.Project;
@@ -36,6 +39,8 @@ import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.AtecoCodeDTO;
 import it.nexus.domain.dto.AtecoCodeFormDTO;
 import it.nexus.domain.dto.CompanyTutorDTO;
+import it.nexus.domain.dto.ExtensionDTO;
+import it.nexus.domain.dto.ExtensionFormDTO;
 import it.nexus.domain.dto.InternshipDTO;
 import it.nexus.domain.dto.InternshipFormDTO;
 import it.nexus.domain.dto.LegalRepresentativeDTO;
@@ -180,10 +185,19 @@ public class InternshipServiceImpl implements InternshipService {
                 .sorted(Comparator.comparing(ScheduleDayDTO::dayOfWeek))
                 .toList();
         // già nell'ordine delle date (controllato): la posizione è il numero
-        List<TrainingProjectFormDTO> projects = dto.trainingProjects().stream()
-                .map(p -> new TrainingProjectFormDTO(p.from(), p.to(), p.jobTitle().strip(), blankToNull(p.jobDetails())))
-                .toList();
+        List<TrainingProjectFormDTO> projects = normalized(dto.trainingProjects());
         String agreementNumber = blankToNull(dto.agreementNumber());
+        // proroghe (US-1012): solo a tirocinio avviato e non ancora chiuso
+        List<ExtensionFormDTO> extensions = dto.extensions().stream()
+                .map(e -> new ExtensionFormDTO(e.agreementNumber().strip(), e.agreementDate(), e.agreementSignedDate(),
+                        e.from(), e.to(), normalized(e.trainingProjects())))
+                .toList();
+        boolean extensionsUnchanged = extensions.equals(extensions(internship));
+        if (!extensionsUnchanged && ticket.getStatus() != TicketStatus.IN_TIROCINIO) {
+            throw new FieldValidationException("extensions",
+                    "Le proroghe si registrano a tirocinio avviato e non ancora chiuso");
+        }
+        checkExtensions(dto, extensionsUnchanged);
 
         // dati del tirocinio con i valori; dati personali (beneficiario, tutor aziendali, note) solo come "cambiato"
         AuditChanges changes = AuditChanges.of()
@@ -205,9 +219,12 @@ public class InternshipServiceImpl implements InternshipService {
                 .value("agreementDate", text(internship.getAgreementDate()), text(dto.agreementDate()))
                 .value("agreementSignedDate", text(internship.getAgreementSignedDate()), text(dto.agreementSignedDate()))
                 .value("trainingProjects", projectsText(trainingProjects(internship)), projectsText(projects))
-                .redactedIfChanged("trainingProjectDetails",
-                        trainingProjects(internship).stream().map(TrainingProjectFormDTO::jobDetails).toList(),
-                        projects.stream().map(TrainingProjectFormDTO::jobDetails).toList())
+                // proroghe e loro progetti con i valori (US-1012)
+                .value("extensions", extensionsText(extensions(internship)), extensionsText(extensions))
+                .value("extensionTrainingProjects", extensionProjectsText(extensions(internship)),
+                        extensionProjectsText(extensions))
+                .redactedIfChanged("trainingProjectDetails", projectDetails(trainingProjects(internship),
+                        extensions(internship)), projectDetails(projects, extensions))
                 .redactedIfChanged("companyTutors", tutors(internship), tutors)
                 .redactedIfChanged("fiscalCode", internship.getFiscalCode(), fiscalCode)
                 .redactedIfChanged("birthDate", internship.getBirthDate(), dto.birthDate())
@@ -239,7 +256,7 @@ public class InternshipServiceImpl implements InternshipService {
         internship.setAgreementNumber(agreementNumber);
         internship.setAgreementDate(dto.agreementDate());
         internship.setAgreementSignedDate(dto.agreementSignedDate());
-        replaceRows(internship, tutors, suspensions, schedule, projects);
+        replaceRows(internship, tutors, suspensions, schedule, projects, extensions);
         Internship saved = internshipRepository.saveAndFlush(internship);
         if (!changes.asMap().isEmpty()) {
             auditService.record(AuditEntityType.TICKET, ticket.getId(), "INTERNSHIP_SAVE", changes, null);
@@ -287,8 +304,12 @@ public class InternshipServiceImpl implements InternshipService {
                         || !i.getScheduleDays().isEmpty()
                         // convenzione e progetti formativi (US-1008)
                         || i.getAgreementNumber() != null || i.getAgreementDate() != null
-                        || i.getAgreementSignedDate() != null || !i.getTrainingProjects().isEmpty())
+                        || i.getAgreementSignedDate() != null || !i.getTrainingProjects().isEmpty()
+                        || !i.getExtensions().isEmpty())
                 .map(i -> {
+                    // prima i progetti, che puntano alle proroghe (US-1012)
+                    i.getTrainingProjects().clear();
+                    internshipRepository.flush();
                     i.clearCompanyData();
                     internshipRepository.saveAndFlush(i);
                     return true;
@@ -410,31 +431,76 @@ public class InternshipServiceImpl implements InternshipService {
             throw new FieldValidationException("expectedEndDate",
                     "Indica la fine prevista: i progetti formativi stanno dentro le date del tirocinio");
         }
+        checkProjects(rows, dto.startDate(), dto.expectedEndDate(), "trainingProjects",
+                "Il progetto inizia prima del tirocinio (%s)", "Il progetto finisce dopo la fine prevista del tirocinio (%s)");
+    }
+
+    /**
+     * Progetti di una convenzione: dentro le sue date ({@code start}–{@code end}) e ognuno dopo la fine del precedente.
+     * {@code path} è il campo dell'elenco per gli errori.
+     */
+    private static void checkProjects(List<TrainingProjectFormDTO> rows, LocalDate start, LocalDate end, String path,
+            String beforeStart, String afterEnd) {
         for (int i = 0; i < rows.size(); i++) {
             TrainingProjectFormDTO row = rows.get(i);
             if (row.to().isBefore(row.from())) {
-                throw new FieldValidationException("trainingProjects[%d].to".formatted(i),
-                        "La fine non può precedere l'inizio");
+                throw new FieldValidationException("%s[%d].to".formatted(path, i), "La fine non può precedere l'inizio");
             }
-            if (row.from().isBefore(dto.startDate())) {
-                throw new FieldValidationException("trainingProjects[%d].from".formatted(i),
-                        "Il progetto inizia prima del tirocinio (%s)".formatted(DATE.format(dto.startDate())));
+            if (row.from().isBefore(start)) {
+                throw new FieldValidationException("%s[%d].from".formatted(path, i),
+                        beforeStart.formatted(DATE.format(start)));
             }
-            if (row.to().isAfter(dto.expectedEndDate())) {
-                throw new FieldValidationException("trainingProjects[%d].to".formatted(i),
-                        "Il progetto finisce dopo la fine prevista del tirocinio (%s)"
-                                .formatted(DATE.format(dto.expectedEndDate())));
+            if (row.to().isAfter(end)) {
+                throw new FieldValidationException("%s[%d].to".formatted(path, i), afterEnd.formatted(DATE.format(end)));
             }
             if (i > 0 && !row.from().isAfter(rows.get(i - 1).to())) {
-                throw new FieldValidationException("trainingProjects[%d].from".formatted(i),
+                throw new FieldValidationException("%s[%d].from".formatted(path, i),
                         "Deve iniziare dopo la fine del progetto formativo %d (%s)"
                                 .formatted(i, DATE.format(rows.get(i - 1).to())));
             }
         }
     }
 
+    /**
+     * Proroghe (US-1012): ognuna inizia dopo la fine della convenzione precedente (non per forza il giorno dopo) e ha i
+     * suoi progetti dentro le sue date. Se le proroghe non cambiano, lo scontro con la prima viene dalla fine prevista
+     * della convenzione iniziale, ed è lì l'errore.
+     */
+    private static void checkExtensions(InternshipFormDTO dto, boolean unchanged) {
+        List<ExtensionFormDTO> rows = dto.extensions();
+        if (rows.isEmpty()) {
+            return;
+        }
+        if (dto.expectedEndDate() == null) {
+            throw new FieldValidationException("expectedEndDate",
+                    "Indica la fine prevista: le proroghe vengono dopo la convenzione");
+        }
+        for (int i = 0; i < rows.size(); i++) {
+            ExtensionFormDTO row = rows.get(i);
+            if (row.to().isBefore(row.from())) {
+                throw new FieldValidationException("extensions[%d].to".formatted(i), "La fine non può precedere l'inizio");
+            }
+            LocalDate previous = i == 0 ? dto.expectedEndDate() : rows.get(i - 1).to();
+            if (!row.from().isAfter(previous)) {
+                if (i == 0 && unchanged) {
+                    throw new FieldValidationException("expectedEndDate",
+                            "Deve finire prima dell'inizio della proroga 1 (%s)".formatted(DATE.format(row.from())));
+                }
+                throw new FieldValidationException("extensions[%d].from".formatted(i), i == 0
+                        ? "Deve iniziare dopo la fine della convenzione (%s)".formatted(DATE.format(previous))
+                        : "Deve iniziare dopo la fine della proroga %d (%s)".formatted(i, DATE.format(previous)));
+            }
+            checkProjects(row.trainingProjects(), row.from(), row.to(), "extensions[%d].trainingProjects".formatted(i),
+                    "Il progetto inizia prima della proroga (%s)", "Il progetto finisce dopo la fine della proroga (%s)");
+        }
+    }
+
     private static void checkSuspensions(InternshipFormDTO dto) {
         List<SuspensionDTO> rows = dto.suspensions();
+        // con le proroghe il tirocinio finisce con l'ultima (US-1012)
+        LocalDate end = dto.expectedEndDate() == null ? null : dto.extensions().stream()
+                .map(ExtensionFormDTO::to)
+                .reduce(dto.expectedEndDate(), (a, b) -> b.isAfter(a) ? b : a);
         for (int i = 0; i < rows.size(); i++) {
             SuspensionDTO row = rows.get(i);
             if (row.to().isBefore(row.from())) {
@@ -445,7 +511,7 @@ public class InternshipServiceImpl implements InternshipService {
                 throw new FieldValidationException("suspensions[%d].from".formatted(i),
                         "Il periodo inizia prima del tirocinio");
             }
-            if (dto.expectedEndDate() != null && row.to().isAfter(dto.expectedEndDate())) {
+            if (end != null && row.to().isAfter(end)) {
                 throw new FieldValidationException("suspensions[%d].to".formatted(i),
                         "Il periodo finisce dopo la fine prevista del tirocinio");
             }
@@ -506,11 +572,13 @@ public class InternshipServiceImpl implements InternshipService {
      * {@code ex_internship_training_project_overlap}), un giorno ripetuto {@code uq_internship_schedule_day}.
      */
     private void replaceRows(Internship internship, List<CompanyTutorDTO> tutors, List<SuspensionDTO> suspensions,
-            List<ScheduleDayDTO> schedule, List<TrainingProjectFormDTO> projects) {
+            List<ScheduleDayDTO> schedule, List<TrainingProjectFormDTO> projects, List<ExtensionFormDTO> extensions) {
         boolean tutorsChanged = !tutors.equals(tutors(internship));
         boolean suspensionsChanged = !suspensions.equals(suspensions(internship));
         boolean scheduleChanged = !schedule.equals(schedule(internship));
-        boolean projectsChanged = !projects.equals(trainingProjects(internship));
+        // progetti e proroghe vanno insieme: i progetti puntano alle proroghe (US-1012)
+        boolean projectsChanged = !projects.equals(trainingProjects(internship))
+                || !extensions.equals(extensions(internship));
         if (!tutorsChanged && !suspensionsChanged && !scheduleChanged && !projectsChanged) {
             return;
         }
@@ -529,6 +597,11 @@ public class InternshipServiceImpl implements InternshipService {
         if (internship.getId() != null) {
             internshipRepository.flush();
         }
+        // le proroghe dopo i loro progetti, con un flush a parte
+        if (projectsChanged && !internship.getExtensions().isEmpty()) {
+            internship.getExtensions().clear();
+            internshipRepository.flush();
+        }
         if (tutorsChanged) {
             tutors.forEach(t -> internship.addCompanyTutor(t.fullName(), t.role(), t.contact()));
         }
@@ -539,7 +612,20 @@ public class InternshipServiceImpl implements InternshipService {
             schedule.forEach(d -> internship.addScheduleDay(d.dayOfWeek(), d.firstSlot(), d.secondSlot(), d.minutes()));
         }
         if (projectsChanged) {
+            List<InternshipExtension> added = extensions.stream()
+                    .map(e -> internship.addExtension(e.agreementNumber(), e.agreementDate(), e.agreementSignedDate(),
+                            e.from(), e.to()))
+                    .toList();
+            // le proroghe nel database prima dei progetti che le citano
+            if (!added.isEmpty() && internship.getId() != null) {
+                internshipRepository.flush();
+            }
             projects.forEach(p -> internship.addTrainingProject(p.from(), p.to(), p.jobTitle(), p.jobDetails()));
+            for (int k = 0; k < extensions.size(); k++) {
+                InternshipExtension extension = added.get(k);
+                extensions.get(k).trainingProjects().forEach(p -> internship.addTrainingProject(extension, p.from(),
+                        p.to(), p.jobTitle(), p.jobDetails()));
+            }
         }
     }
 
@@ -556,16 +642,29 @@ public class InternshipServiceImpl implements InternshipService {
         List<InternshipHours.Period> periods = suspensions(i).stream()
                 .map(s -> new InternshipHours.Period(s.from(), s.to()))
                 .toList();
+        // monte ore: solo i giorni coperti da una convenzione, proroghe comprese (US-1012)
+        List<ExtensionFormDTO> savedExtensions = extensions(i);
         Integer total = InternshipHours.totalMinutes(slots, days, i.getStartDate(), i.getExpectedEndDate(), periods,
                 i.isExcludeHolidays());
+        for (ExtensionFormDTO e : savedExtensions) {
+            Integer extra = InternshipHours.totalMinutes(slots, days, e.from(), e.to(), periods, i.isExcludeHolidays());
+            total = total == null || extra == null ? total : total + extra;
+        }
         // progetti formativi (US-1008): numero, mesi arrotondati e monte ore sulle loro date
-        List<TrainingProjectFormDTO> rows = trainingProjects(i);
-        List<TrainingProjectDTO> projects = IntStream.range(0, rows.size())
+        Function<List<TrainingProjectFormDTO>, List<TrainingProjectDTO>> numbered = rows -> IntStream.range(0, rows.size())
                 .mapToObj(k -> {
                     TrainingProjectFormDTO p = rows.get(k);
                     return new TrainingProjectDTO(k + 1, p.from(), p.to(), p.jobTitle(), p.jobDetails(),
                             InternshipMonths.rounded(p.from(), p.to()),
                             InternshipHours.totalMinutes(slots, days, p.from(), p.to(), periods, i.isExcludeHolidays()));
+                })
+                .toList();
+        List<TrainingProjectDTO> projects = numbered.apply(trainingProjects(i));
+        List<ExtensionDTO> extensionDtos = IntStream.range(0, savedExtensions.size())
+                .mapToObj(k -> {
+                    ExtensionFormDTO e = savedExtensions.get(k);
+                    return new ExtensionDTO(k + 1, e.agreementNumber(), e.agreementDate(), e.agreementSignedDate(),
+                            e.from(), e.to(), numbered.apply(e.trainingProjects()));
                 })
                 .toList();
         return new InternshipDTO(i.getId() == null ? null : i.getVersion(),
@@ -579,6 +678,7 @@ public class InternshipServiceImpl implements InternshipService {
                 i.getResidenceStreetNumber(), suspensions(i), i.getNotes(),
                 ticket.getJobSlot() == null ? null : ticket.getJobSlot().getTitle(),
                 i.getAgreementNumber(), i.getAgreementDate(), i.getAgreementSignedDate(), projects,
+                extensionDtos, i.currentEndDate(), ticket.getStatus() == TicketStatus.IN_TIROCINIO,
                 i.getFirstSlotStart(), i.getFirstSlotEnd(), i.getSecondSlotStart(), i.getSecondSlotEnd(),
                 i.isExcludeHolidays(), schedule, InternshipHours.weeklyMinutes(slots, days), total,
                 missingForStart(i, rep), inclusionMissing(ticket.getBeneficiary()));
@@ -698,11 +798,64 @@ public class InternshipServiceImpl implements InternshipService {
                 .toList();
     }
 
-    /** Progetti formativi salvati nell'ordine delle date, nella forma del modulo per i confronti. */
+    /** Progetti della convenzione iniziale nell'ordine delle date, nella forma del modulo per i confronti. */
     private static List<TrainingProjectFormDTO> trainingProjects(Internship i) {
+        return projectsOf(i, null);
+    }
+
+    /** Progetti di una convenzione: {@code extension} nullo = convenzione iniziale (US-1012). */
+    private static List<TrainingProjectFormDTO> projectsOf(Internship i, InternshipExtension extension) {
         return i.getTrainingProjects().stream()
+                .filter(p -> extension == null ? p.getExtension() == null : sameExtension(p.getExtension(), extension))
                 .map(p -> new TrainingProjectFormDTO(p.getDateFrom(), p.getDateTo(), p.getJobTitle(), p.getJobDetails()))
                 .sorted(Comparator.comparing(TrainingProjectFormDTO::from))
+                .toList();
+    }
+
+    /** Per id: la proroga di un progetto arriva spesso come proxy di Hibernate. */
+    private static boolean sameExtension(InternshipExtension a, InternshipExtension b) {
+        return a != null && (a == b || a.getId() != null && a.getId().equals(b.getId()));
+    }
+
+    /** Proroghe salvate nell'ordine delle date, con i loro progetti, nella forma del modulo per i confronti. */
+    private static List<ExtensionFormDTO> extensions(Internship i) {
+        return i.getExtensions().stream()
+                .sorted(Comparator.comparing(InternshipExtension::getDateFrom))
+                .map(e -> new ExtensionFormDTO(e.getAgreementNumber(), e.getAgreementDate(), e.getAgreementSignedDate(),
+                        e.getDateFrom(), e.getDateTo(), projectsOf(i, e)))
+                .toList();
+    }
+
+    private static List<TrainingProjectFormDTO> normalized(List<TrainingProjectFormDTO> projects) {
+        return projects.stream()
+                .map(p -> new TrainingProjectFormDTO(p.from(), p.to(), p.jobTitle().strip(), blankToNull(p.jobDetails())))
+                .toList();
+    }
+
+    /** Proroghe per l'audit, es. "1 2027/200 2027-06-15/2027-09-30 (data 2027-06-01, stipula 2027-06-10)". */
+    private static List<String> extensionsText(List<ExtensionFormDTO> extensions) {
+        return IntStream.range(0, extensions.size())
+                .mapToObj(k -> {
+                    ExtensionFormDTO e = extensions.get(k);
+                    return "%d %s %s/%s (data %s, stipula %s)".formatted(k + 1, e.agreementNumber(), e.from(), e.to(),
+                            e.agreementDate(), e.agreementSignedDate());
+                })
+                .toList();
+    }
+
+    /** Progetti delle proroghe per l'audit, es. "1.1 2027-06-15/2027-09-30 Cuoco". */
+    private static List<String> extensionProjectsText(List<ExtensionFormDTO> extensions) {
+        return IntStream.range(0, extensions.size())
+                .boxed()
+                .flatMap(k -> projectsText(extensions.get(k).trainingProjects()).stream().map(p -> (k + 1) + "." + p))
+                .toList();
+    }
+
+    /** Dettagli della mansione di tutti i progetti, per l'audit solo come «cambiato». */
+    private static List<String> projectDetails(List<TrainingProjectFormDTO> projects, List<ExtensionFormDTO> extensions) {
+        return Stream.concat(projects.stream(),
+                        extensions.stream().flatMap(e -> e.trainingProjects().stream()))
+                .map(TrainingProjectFormDTO::jobDetails)
                 .toList();
     }
 

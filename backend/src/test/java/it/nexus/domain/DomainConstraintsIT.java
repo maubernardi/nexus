@@ -636,6 +636,44 @@ class DomainConstraintsIT {
             assertViolates("ex_internship_training_project_overlap", () -> internships.saveAndFlush(i));
         }
 
+        /** Proroga dal 15/06 al 30/09/2027 (US-1012), con le date indicate se diverse. */
+        private InternshipExtension extension(Internship i, String number, LocalDate from, LocalDate to) {
+            return i.addExtension(number, LocalDate.of(2027, 6, 1), LocalDate.of(2027, 6, 10), from, to);
+        }
+
+        @Test
+        void prorogaConFinePrimaDellInizio() {
+            Internship i = internship();
+            extension(i, "2027/200", LocalDate.of(2027, 9, 30), LocalDate.of(2027, 6, 15));
+            assertViolates("ck_internship_extension_dates", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void prorogaSenzaNumero() {
+            Internship i = internship();
+            extension(i, "  ", LocalDate.of(2027, 6, 15), LocalDate.of(2027, 9, 30));
+            assertViolates("ck_internship_extension_agreement_number", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void prorogheSovrapposte_ancheDiUnGiorno() {
+            Internship i = internship();
+            extension(i, "2027/200", LocalDate.of(2027, 6, 15), LocalDate.of(2027, 9, 30));
+            extension(i, "2027/300", LocalDate.of(2027, 9, 30), LocalDate.of(2027, 12, 31));
+            assertViolates("ex_internship_extension_overlap", () -> internships.saveAndFlush(i));
+        }
+
+        @Test
+        void progettoConLaProrogaDiUnAltroTirocinio() {
+            Internship other = internship();
+            InternshipExtension foreign = extension(other, "2027/200", LocalDate.of(2027, 6, 15),
+                    LocalDate.of(2027, 9, 30));
+            internships.saveAndFlush(other);
+            Internship i = internships.saveAndFlush(internship());
+            i.addTrainingProject(foreign, LocalDate.of(2027, 6, 15), LocalDate.of(2027, 9, 30), "Cuoco", null);
+            assertViolates("fk_internship_training_project_extension", () -> internships.saveAndFlush(i));
+        }
+
         @Test
         void sospensioneConFinePrimaDellInizio() {
             Internship i = internship();

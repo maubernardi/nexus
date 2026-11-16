@@ -129,8 +129,9 @@ public class ClosureReportServiceImpl implements ClosureReportService {
      * attiva; altrimenti la chiusura regolare, qualunque cosa indichi il modulo (D3).
      */
     private ClosureReason closureReason(Ticket ticket, ClosureReportFormDTO form) {
+        // con le proroghe, la fine dell'ultima convenzione (US-1012)
         LocalDate expectedEnd = internshipRepository.findByTicketId(ticket.getId())
-                .map(Internship::getExpectedEndDate)
+                .map(Internship::currentEndDate)
                 .orElse(null);
         if (expectedEnd == null || !form.actualEndDate().isBefore(expectedEnd)) {
             return closureReasonRepository.findByCode(ClosureReason.REGULAR)

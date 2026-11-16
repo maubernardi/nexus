@@ -201,7 +201,8 @@ const InternshipDates = ({ ticketId, children }: InternshipDatesProps) => {
   }
   return children({
     startDate: internship.data?.startDate ?? undefined,
-    expectedEndDate: internship.data?.expectedEndDate ?? undefined,
+    // con le proroghe, la fine dell'ultima convenzione (US-1012)
+    expectedEndDate: internship.data?.currentEndDate ?? internship.data?.expectedEndDate ?? undefined,
   });
 };
 

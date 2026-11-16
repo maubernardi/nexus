@@ -119,6 +119,7 @@ class InternshipStartIT {
                  "suspensions": [], "agreementNumber": "2026/145", "agreementDate": "2026-11-20",
                  "agreementSignedDate": "2026-11-25",
                  "trainingProjects": [{"from": "2026-12-01", "to": "2027-05-31", "jobTitle": "Aiuto cuoco"}],
+                 "extensions": [],
                  "firstSlotStart": "09:00", "firstSlotEnd": "13:00", "secondSlotStart": "14:00", "secondSlotEnd": "18:00",
                  "excludeHolidays": true, "schedule": [{"dayOfWeek": 1, "firstSlot": true, "secondSlot": false}],
                  "version": null}""".formatted(typeId, firenzeId, atecoId, firenzeId);
