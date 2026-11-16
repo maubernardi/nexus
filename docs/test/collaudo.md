@@ -1008,3 +1008,31 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      chiusura (con la descrizione, se l'interruzione è anticipata), la sede di competenza e la data di chiusura.
   6. Usa la tastiera: **Atteso:** ogni pulsante si raggiunge con Tab e l'esito del download si legge sotto i gruppi
      («Documento scaricato: …»), mentre il focus resta sul pulsante.
+
+- [ ] **T-24.5 Modelli reali di GOL (EN-8)**
+
+  Prima della prova: il deploy di EN-8, i dati del promotore nel `.env` (T-24.4) e i 6 modelli preparati in
+  `documenti_base/modelli-nexus/` (fuori dal repository).
+  1. Come `admin` apri **Modelli dei documenti** e il riquadro dei segnaposto. **Atteso:** nel gruppo «Ente di presa
+     in carico» ci sono le sette caselle della tipologia («Casella della tipologia «Comune»…», fino ad «Altro
+     soggetto»).
+  2. Carica i 6 modelli, ognuno con il suo documento, il progetto GOL, il tipo (Extracurriculare o Di inclusione) e
+     nessun ente:
+     - `GOL-Extracurriculare-Convenzione.docx`, `GOL-Extracurriculare-Progetto-formativo.docx`,
+       `GOL-Extracurriculare-Relazione-finale.docx`;
+     - `GOL-Inclusione-Convenzione.docx` (Allegato A), `GOL-Inclusione-Progetto-formativo.docx` (Allegato B),
+       `GOL-Inclusione-Relazione-finale.docx` (Allegato C).
+
+     **Atteso:** tutti accettati, senza segnaposto sconosciuti.
+  3. Come `tutor1` scarica Convenzione e Progetto Formativo di un tirocinio Extracurriculare di GOL. **Atteso:** il
+     modello della Regione con loghi, articoli e formattazione originali (grassetti, elenchi, piè di pagina con
+     l'intestazione del progetto) e i dati compilati: promotore, ospitante, tirocinante, convenzione, progetto
+     formativo, giorni a caselle, fasce per giorno su una riga, polizze INAIL e RC. Il bollo dice solo «non è
+     soggetta».
+  4. Scarica i documenti di un tirocinio Di inclusione. **Atteso:** nell'Allegato B il sesso e la tipologia dell'ente
+     a caselle (☒ su «Comune» per il Comune di Firenze, su «Società della Salute» per una SdS), referente dell'ente e
+     case manager, e in fondo la firma «Il Tirocinante» con il nome; nell'Allegato A l'ente con il suo rappresentante.
+  5. A tirocinio chiuso scarica le due relazioni finali. **Atteso:** nell'Extracurriculare il motivo di chiusura (e la
+     descrizione dell'interruzione) in testa alla «Valutazione complessiva», i mesi e la fine effettiva; nell'Allegato
+     C la durata fino alla fine effettiva, con luogo (sede di competenza) e data di chiusura.
+  6. Apri i documenti in Word. **Atteso:** si aprono senza avvisi di contenuto illeggibile.

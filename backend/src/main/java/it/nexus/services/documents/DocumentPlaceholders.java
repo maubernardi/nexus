@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import it.nexus.domain.enumeration.CareAgencyKind;
+
 /**
- * Segnaposto che NEXUS sa compilare nei documenti del tirocinio (US-1004, US-1007, US-1009, US-1011): i modelli nel
- * codice e quelli caricati dall'ADMIN (US-1010) possono usare solo questi. Ogni voce ha un gruppo e una descrizione,
- * mostrati all'ADMIN nella pagina dei modelli; l'ordine è quello della pagina.
+ * Segnaposto che NEXUS sa compilare nei documenti del tirocinio (US-1004, US-1007, US-1009, US-1011, EN-8): i modelli
+ * nel codice e quelli caricati dall'ADMIN (US-1010) possono usare solo questi. Ogni voce ha un gruppo e una
+ * descrizione, mostrati all'ADMIN nella pagina dei modelli; l'ordine è quello della pagina.
  */
 public final class DocumentPlaceholders {
 
@@ -65,6 +67,10 @@ public final class DocumentPlaceholders {
         g.add("ENTE", "Denominazione dell'ente che ha in carico il beneficiario");
         g.add("SEDE_ENTE", "Sede legale dell'ente");
         g.add("CODICE_FISCALE_ENTE", "Codice fiscale o partita IVA dell'ente");
+        for (CareAgencyKind kind : CareAgencyKind.values()) {
+            g.add(agencyKind(kind), "Casella della tipologia «" + agencyKindName(kind) + "»: ☒ se l'ente è di questa "
+                    + "tipologia, altrimenti ☐");
+        }
         g.add("RAPPRESENTANTE_ENTE", "Nome del rappresentante dell'ente");
         g.add("QUALIFICA_RAPPRESENTANTE_ENTE", "Qualifica del rappresentante dell'ente, es. dirigente");
         g.add("LUOGO_NASCITA_RAPPRESENTANTE_ENTE", "Luogo di nascita del rappresentante dell'ente");
@@ -166,6 +172,24 @@ public final class DocumentPlaceholders {
     }
 
     /** Aggiunge le voci di un gruppo, nell'ordine. */
+    /** Il segnaposto a casella di una tipologia di ente, es. {@code TIPO_ENTE_COMUNE} (EN-8). */
+    public static String agencyKind(CareAgencyKind kind) {
+        return "TIPO_ENTE_" + kind.name();
+    }
+
+    /** Le tipologie come nell'Allegato B dell'Inclusione. */
+    private static String agencyKindName(CareAgencyKind kind) {
+        return switch (kind) {
+            case COMUNE -> "Comune";
+            case UNIONE_COMUNI -> "Unione dei Comuni";
+            case COMUNITA_MONTANA -> "Comunità montana";
+            case SOCIETA_DELLA_SALUTE -> "Società della Salute";
+            case AZIENDA_SANITARIA -> "Azienda Sanitaria";
+            case UIEPE -> "Ufficio interdistrettuale di esecuzione penale esterna";
+            case ALTRO -> "Altro soggetto";
+        };
+    }
+
     private record Group(List<Placeholder> all, String name) {
         void add(String placeholder, String description) {
             all.add(new Placeholder(placeholder, name, description));

@@ -232,6 +232,11 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
   `NEXUS_PROMOTER_PEC`, `NEXUS_PROMOTER_INAIL_POSITION`, `NEXUS_PROMOTER_RC_INSURER` (compagnia),
   `NEXUS_PROMOTER_RC_POLICY` (numero della polizza) e `NEXUS_PROMOTER_RC_EXPIRY` (scadenza, es. `22/07/2027`).
   Un dato che manca resta, nei documenti, una riga da completare a mano.
+- **Modelli reali di GOL (EN-8).** I 6 modelli della Regione (Extracurriculare: convenzione, progetto formativo,
+  relazione finale; Inclusione: Allegati A, B e C) non stanno nel repository: si preparano in
+  `documenti_base/modelli-nexus/` dai file della cooperativa e li carica l'ADMIN da «Modelli dei documenti», con
+  progetto GOL, tipo di tirocinio e nessun ente (un modello per tutti gli enti). Per cambiarli si modifica il `.docx`
+  in Word e lo si ricarica: i segnaposto ammessi sono quelli elencati nella pagina.
 - **Stato e log sul server:**
   `cd /opt/nexus/current && sudo docker compose --env-file ../.env --env-file release.env ps` (oppure `logs -f backend`).
 - **DNS (IONOS):** A `@`, `auth`, `www` → IP del server; CAA `0 issue "letsencrypt.org"`; i record email restano.

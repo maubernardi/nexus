@@ -35,6 +35,7 @@ import it.nexus.domain.dto.LegalRepresentativeDTO;
 import it.nexus.domain.dto.MunicipalityDTO;
 import it.nexus.domain.dto.ScheduleDayDTO;
 import it.nexus.domain.dto.TrainingProjectDTO;
+import it.nexus.domain.enumeration.CareAgencyKind;
 import it.nexus.domain.enumeration.EducationLevel;
 import it.nexus.domain.enumeration.Gender;
 import it.nexus.domain.workflow.InternshipHours;
@@ -139,6 +140,9 @@ public final class DocumentValues {
 
     private static void agencyValues(Map<String, String> v, Beneficiary b) {
         CareAgency a = b.getCareAgency();
+        for (CareAgencyKind kind : CareAgencyKind.values()) {
+            v.put(DocumentPlaceholders.agencyKind(kind), box(a != null && a.getKind() == kind));
+        }
         if (a != null) {
             v.put("ENTE", a.getName());
             v.put("SEDE_ENTE", a.getLegalAddress());
