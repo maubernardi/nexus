@@ -17,6 +17,13 @@ export const ClosureReportView = ({ report }: ClosureReportViewProps) => {
     ...(report.actualEndDate
       ? [{ label: t('closureReport.fields.actualEndDate'), value: formatIsoDate(report.actualEndDate) }]
       : []),
+    // assente nei report inviati prima di US-1103
+    ...(report.closureReason
+      ? [{ label: t('closureReport.view.closureReason'), value: report.closureReason.name }]
+      : []),
+    ...(report.interruptionDetails
+      ? [{ label: t('closureReport.view.interruptionDetails'), value: report.interruptionDetails }]
+      : []),
     {
       label: t('closureReport.fields.companySatisfaction'),
       value: t('closureReport.view.score', { value: report.companySatisfaction }),

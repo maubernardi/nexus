@@ -73,6 +73,13 @@ public class ReferenceDataResource {
         return ResponseEntity.ok(referenceDataService.activeNoHireReasons());
     }
 
+    @GetMapping("/interruption-reasons")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Motivi di interruzione anticipata attivi, per il report di restituzione (US-1103)")
+    public ResponseEntity<List<ReferenceItemDTO>> interruptionReasons() {
+        return ResponseEntity.ok(referenceDataService.activeInterruptionReasons());
+    }
+
     @GetMapping("/job-categories")
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
     @Operation(summary = "Tipologie di mansione attive")

@@ -10,6 +10,10 @@ import java.time.LocalDate;
  */
 public record ClosureReportDTO(
         LocalDate actualEndDate,
+        /** Motivo di chiusura (US-1103); assente nei report inviati prima. */
+        ReferenceItemDTO closureReason,
+        /** Descrizione dell'interruzione anticipata; assente con la chiusura regolare. */
+        String interruptionDetails,
         int companySatisfaction,
         int beneficiarySatisfaction,
         String objectives,

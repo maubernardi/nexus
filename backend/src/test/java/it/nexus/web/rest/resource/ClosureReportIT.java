@@ -66,6 +66,11 @@ class ClosureReportIT {
     @Autowired JobSlotRepository jobSlots;
     @Autowired InternshipRepository internships;
 
+    /** Voci iniziali dei motivi di chiusura (V41). */
+    private static final String REGULAR = TsidMapper.toExternal(893700000000000361L);
+    private static final String BY_COMPANY = TsidMapper.toExternal(893700000000000362L);
+    private static final String BY_BENEFICIARY = TsidMapper.toExternal(893700000000000363L);
+
     private Ticket ticket;
     private JobSlot slot;
     private String ticketPath;
@@ -107,12 +112,27 @@ class ClosureReportIT {
 
     private ResultActions send(String user, long version, String actualEndDate, Boolean hired, String formulaId,
             String reasonId, boolean jobSlotStillAvailable) throws Exception {
+        return send(user, version, actualEndDate, null, hired, formulaId, reasonId, jobSlotStillAvailable);
+    }
+
+    /** Con un motivo d'interruzione manda anche la descrizione (PO, 16/11). */
+    private ResultActions send(String user, long version, String actualEndDate, String closureReasonId, Boolean hired,
+            String formulaId, String reasonId, boolean jobSlotStillAvailable) throws Exception {
+        return send(user, version, actualEndDate, closureReasonId,
+                closureReasonId == null ? null : " L'azienda ha chiuso il reparto ", hired, formulaId, reasonId,
+                jobSlotStillAvailable);
+    }
+
+    private ResultActions send(String user, long version, String actualEndDate, String closureReasonId,
+            String interruptionDetails, Boolean hired, String formulaId, String reasonId,
+            boolean jobSlotStillAvailable) throws Exception {
         String json = """
-                {"version": %d, "actualEndDate": %s, "companySatisfaction": 5, "beneficiarySatisfaction": 4,
+                {"version": %d, "actualEndDate": %s, "closureReasonId": %s, "interruptionDetails": %s,
+                 "companySatisfaction": 5, "beneficiarySatisfaction": 4,
                  "objectives": "Autonomia in cucina raggiunta", "difficulties": "   ",
                  "hired": %s, "hiringFormulaId": %s, "noHireReasonId": %s, "jobSlotStillAvailable": %s}"""
-                .formatted(version, quoted(actualEndDate), hired, quoted(formulaId), quoted(reasonId),
-                        jobSlotStillAvailable);
+                .formatted(version, quoted(actualEndDate), quoted(closureReasonId), quoted(interruptionDetails),
+                        hired, quoted(formulaId), quoted(reasonId), jobSlotStillAvailable);
         return mockMvc.perform(post(ticketPath + "/closure-report").header(USER, user)
                 .contentType(MediaType.APPLICATION_JSON).content(json));
     }
@@ -136,6 +156,8 @@ class ClosureReportIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("FORM_RESTITUZIONE"))
                 .andExpect(jsonPath("$.closureReport.actualEndDate").value("2027-05-31"))
+                // senza scheda non c'è una fine prevista: chiusura regolare (US-1103)
+                .andExpect(jsonPath("$.closureReport.closureReason.name").value("Chiusura regolare"))
                 .andExpect(jsonPath("$.closureReport.companySatisfaction").value(5))
                 .andExpect(jsonPath("$.closureReport.beneficiarySatisfaction").value(4))
                 .andExpect(jsonPath("$.closureReport.objectives").value("Autonomia in cucina raggiunta"))
@@ -156,7 +178,7 @@ class ClosureReportIT {
                 .andExpect(jsonPath("$[*].action", hasItem("CLOSE")))
                 .andExpect(jsonPath("$[-1].toStatus").value("FORM_RESTITUZIONE"))
                 .andExpect(jsonPath("$[-1].detail")
-                        .value("Assunto: " + formula.getName() + "; mansione non più disponibile"));
+                        .value("Chiusura regolare; Assunto: " + formula.getName() + "; mansione non più disponibile"));
         mockMvc.perform(get("/api/v1/notifications").header(USER, "operatore.cc"))
                 .andExpect(jsonPath("$.items[0].type").value("CLOSURE_REPORT_SUBMITTED"));
 
@@ -165,7 +187,7 @@ class ClosureReportIT {
                 "SELECT changes::text FROM audit_event WHERE entity_id = ? AND action = 'CLOSE'", String.class,
                 ticket.getId());
         assertThat(changes).contains("hiringFormula", formula.getCode(), "jobSlotStillAvailable", "actualEndDate",
-                        "2027-05-31")
+                        "2027-05-31", "closureReason", "CHIUSURA_REGOLARE")
                 .doesNotContain("Autonomia", "objectives", "noHireReason");
     }
 
@@ -178,7 +200,7 @@ class ClosureReportIT {
                 .andExpect(jsonPath("$.closureReport.hiringFormula").doesNotExist());
         mockMvc.perform(get(ticketPath + "/history").header(USER, "tutor1"))
                 .andExpect(jsonPath("$[-1].detail")
-                        .value("Non assunto: " + reason.getName() + "; mansione non più disponibile"));
+                        .value("Chiusura regolare; Non assunto: " + reason.getName() + "; mansione non più disponibile"));
     }
 
     @Test
@@ -227,15 +249,60 @@ class ClosureReportIT {
                         .value("La fine effettiva non può precedere l'inizio del tirocinio (01/12/2026)"));
         assertThat(tickets.findById(ticket.getId()).orElseThrow().getStatus()).isEqualTo(TicketStatus.IN_TIROCINIO);
 
-        // fine anticipata, anche lo stesso giorno dell'inizio: vale solo per il report
+        // fine anticipata, anche lo stesso giorno dell'inizio: vale solo per il report, con il motivo (US-1103)
+        String early = "Il tirocinio finisce prima del 31/05/2027: scegli il motivo dell'interruzione";
         send("tutor1", version, "2026-12-01", true, formulaId(), null, false)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("closureReasonId"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value(early));
+        send("tutor1", version, "2026-12-01", REGULAR, true, formulaId(), null, false)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].message").value(early));
+        // il motivo vuole anche la descrizione dell'interruzione (PO, 16/11)
+        send("tutor1", version, "2026-12-01", BY_COMPANY, "   ", true, formulaId(), null, false)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("interruptionDetails"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value("Descrivi l'interruzione"));
+        send("tutor1", version, "2026-12-01", BY_COMPANY, true, formulaId(), null, false)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.closureReport.actualEndDate").value("2026-12-01"));
+                .andExpect(jsonPath("$.closureReport.actualEndDate").value("2026-12-01"))
+                .andExpect(jsonPath("$.closureReport.interruptionDetails").value("L'azienda ha chiuso il reparto"))
+                .andExpect(jsonPath("$.closureReport.closureReason.name")
+                        .value("Interruzione anticipata per volontà dell'azienda"));
+        mockMvc.perform(get(ticketPath + "/history").header(USER, "tutor1"))
+                .andExpect(jsonPath("$[-1].detail").value("Interruzione anticipata per volontà dell'azienda; Assunto: "
+                        + formula.getName() + "; mansione non più disponibile"));
+        // la descrizione è testo libero: mai nell'audit
+        assertThat(jdbc.queryForObject(
+                "SELECT changes::text FROM audit_event WHERE entity_id = ? AND action = 'CLOSE'", String.class,
+                ticket.getId())).contains("INTERRUZIONE_AZIENDA").doesNotContain("reparto", "interruptionDetails");
         em.flush();
         em.clear();
         Internship kept = internships.findByTicketId(ticket.getId()).orElseThrow();
         assertThat(kept.getStartDate()).isEqualTo(LocalDate.of(2026, 12, 1));
         assertThat(kept.getExpectedEndDate()).isEqualTo(LocalDate.of(2027, 5, 31));
+    }
+
+    @Test
+    void motivoDiChiusura_fineComePrevista_eInterruzioneDisattivata() throws Exception {
+        Internship internship = new Internship(ticket);
+        internship.setStartDate(LocalDate.of(2026, 12, 1));
+        internship.setExpectedEndDate(LocalDate.of(2027, 5, 31));
+        internships.saveAndFlush(internship);
+        long version = ticketVersion();
+
+        // un'interruzione disattivata non si sceglie più
+        jdbc.update("UPDATE closure_reason SET active = false WHERE code = 'INTERRUZIONE_DESTINATARIO'");
+        send("tutor1", version, "2027-03-31", BY_BENEFICIARY, false, null, reasonId(), false)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("closureReasonId"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value("Motivo non valido"));
+
+        // fine come prevista: chiusura regolare, anche se il modulo indica un'interruzione con la descrizione
+        send("tutor1", version, "2027-05-31", BY_COMPANY, false, null, reasonId(), false)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.closureReport.closureReason.name").value("Chiusura regolare"))
+                .andExpect(jsonPath("$.closureReport.interruptionDetails").doesNotExist());
     }
 
     @Test
@@ -262,7 +329,7 @@ class ClosureReportIT {
                         .value("Con assunzione: «" + formula.getName() + "»; mansione di nuovo libera"));
         mockMvc.perform(get(ticketPath + "/history").header(USER, "tutor1"))
                 .andExpect(jsonPath("$[-1].detail")
-                        .value("Assunto: " + formula.getName() + "; mansione di nuovo libera"));
+                        .value("Chiusura regolare; Assunto: " + formula.getName() + "; mansione di nuovo libera"));
     }
 
     @Test

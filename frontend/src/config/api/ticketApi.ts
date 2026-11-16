@@ -144,6 +144,10 @@ export type TicketDetail = {
 export type ClosureReport = {
   /** Fine effettiva del tirocinio (aaaa-mm-gg), per la relazione finale. */
   actualEndDate?: string;
+  /** Motivo di chiusura (US-1103): interruzione anticipata o chiusura regolare; assente nei report di prima. */
+  closureReason?: ReferenceItem;
+  /** Descrizione dell'interruzione anticipata; assente con la chiusura regolare. */
+  interruptionDetails?: string;
   companySatisfaction: number;
   beneficiarySatisfaction: number;
   objectives?: string;
@@ -159,6 +163,10 @@ export type ClosureReport = {
 /** Report di restituzione dal modulo (US-1101): conta la formula se assunto, il motivo se non assunto. */
 export type ClosureReportForm = {
   actualEndDate: string;
+  /** Solo con la fine effettiva prima di quella prevista (US-1103); altrimenti il server usa la chiusura regolare. */
+  closureReasonId: string | null;
+  /** Descrizione dell'interruzione anticipata, obbligatoria con il motivo (PO, 16/11). */
+  interruptionDetails: string | null;
   companySatisfaction: number;
   beneficiarySatisfaction: number;
   objectives: string | null;

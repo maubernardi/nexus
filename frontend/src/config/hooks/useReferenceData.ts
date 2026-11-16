@@ -4,6 +4,7 @@ import {
   fetchCareAgencies,
   fetchCompetenceSites,
   fetchHiringFormulas,
+  fetchInterruptionReasons,
   fetchJobCategories,
   fetchMyProjects,
   fetchNoHireReasons,
@@ -30,6 +31,13 @@ export const useActiveCareAgencies = (): UseQueryResult<ReferenceItem[]> =>
 
 export const useNoHireReasons = (): UseQueryResult<ReferenceItem[]> =>
   useQuery({ queryKey: ['reference', 'noHireReasons'], queryFn: fetchNoHireReasons, staleTime: STALE });
+
+export const useInterruptionReasons = (): UseQueryResult<ReferenceItem[]> =>
+  useQuery({
+    queryKey: ['reference', 'interruptionReasons'],
+    queryFn: fetchInterruptionReasons,
+    staleTime: STALE,
+  });
 
 /** Tutti i progetti attivi: solo per Call Center e ADMIN (per il Tutor l'API risponde 403). */
 export const useProjects = (enabled = true): UseQueryResult<ReferenceItem[]> =>

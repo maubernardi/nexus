@@ -68,6 +68,9 @@ describe('<CatalogsPage>', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Aggiungi formula' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Aggiungi motivo' })).toBeInTheDocument();
+    // motivi di chiusura del tirocinio (US-1103)
+    expect(fetchCatalog).toHaveBeenCalledWith('closure-reasons');
+    expect(screen.getByRole('button', { name: 'Aggiungi motivo di chiusura' })).toBeInTheDocument();
     await expectNoAxeViolations();
   });
 });
