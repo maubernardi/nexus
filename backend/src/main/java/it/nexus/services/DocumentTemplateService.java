@@ -5,6 +5,7 @@ import java.util.List;
 import it.nexus.domain.DocumentTemplate;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.dto.DocumentTemplateActiveDTO;
+import it.nexus.domain.dto.DocumentPlaceholderDTO;
 import it.nexus.domain.dto.DocumentTemplateDTO;
 import it.nexus.domain.dto.DocumentTemplateFormDTO;
 import it.nexus.domain.enumeration.InternshipDocumentKind;
@@ -17,8 +18,8 @@ public interface DocumentTemplateService {
 
     List<DocumentTemplateDTO> list();
 
-    /** Segnaposto che i modelli possono usare. */
-    List<String> placeholders();
+    /** Segnaposto che i modelli possono usare, con gruppo e descrizione (US-1011). */
+    List<DocumentPlaceholderDTO> placeholders();
 
     DocumentTemplateDTO upload(DocumentTemplateFormDTO form, String fileName, byte[] content);
 

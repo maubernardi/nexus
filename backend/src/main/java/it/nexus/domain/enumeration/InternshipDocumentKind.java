@@ -6,7 +6,7 @@ import java.util.Optional;
 /**
  * Documenti del tirocinio generati dai modelli Word (US-1004, US-1005). {@code slug} è il nome nell'URL e la cartella dei
  * modelli ({@code templates/documents/<slug>/}); {@code label} va nella cronologia, {@code filePrefix} nel nome del
- * file scaricato. La relazione finale ha già i modelli caricati dall'ADMIN (US-1010); si scarica da US-1011.
+ * file scaricato. La relazione finale si scarica a tirocinio chiuso (US-1011).
  */
 public enum InternshipDocumentKind {
     CONVENZIONE("convenzione", "Convenzione", "Convenzione"),

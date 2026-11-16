@@ -1,9 +1,17 @@
 import { useTranslation } from 'react-i18next';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
+import type { TemplatePlaceholder } from '@/config/api/documentTemplateApi';
 import { useTemplatePlaceholders } from '@/config/hooks/useDocumentTemplates';
 import { DocumentTemplatesList } from '@/organisms/DocumentTemplatesList/DocumentTemplatesList';
 import { DocumentTemplateUploadForm } from '@/organisms/DocumentTemplateUploadForm/DocumentTemplateUploadForm';
+
+/** I segnaposto divisi per gruppo, nell'ordine in cui arrivano (US-1011). */
+const groups = (placeholders: TemplatePlaceholder[]): [string, TemplatePlaceholder[]][] => {
+  const byGroup = new Map<string, TemplatePlaceholder[]>();
+  placeholders.forEach((p) => byGroup.set(p.group, [...(byGroup.get(p.group) ?? []), p]));
+  return [...byGroup.entries()];
+};
 
 /**
  * Modelli Word dei documenti per l'ADMIN (US-1010): i segnaposto che si possono usare, il caricamento con le condizioni
@@ -25,13 +33,21 @@ export const DocumentTemplatesPage = () => {
         <div className="mt-3 space-y-3">
           <p>{t('documentTemplates.placeholders.intro')}</p>
           {placeholders.data ? (
-            <ul className="grid gap-1 sm:grid-cols-2 lg:grid-cols-3">
-              {placeholders.data.map((p) => (
-                <li key={p}>
-                  <code className="rounded bg-muted px-1.5 py-0.5 text-sm">{`{${p}}`}</code>
-                </li>
-              ))}
-            </ul>
+            groups(placeholders.data).map(([group, items]) => (
+              <div key={group} className="space-y-2">
+                <p className="font-semibold">{group}</p>
+                <dl className="grid gap-x-4 gap-y-2 sm:grid-cols-[minmax(0,24rem)_1fr]">
+                  {items.map((p) => (
+                    <div key={p.name} className="contents">
+                      <dt>
+                        <code className="rounded bg-muted px-1.5 py-0.5 text-sm break-all">{`{${p.name}}`}</code>
+                      </dt>
+                      <dd className="text-muted-foreground">{p.description}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ))
           ) : (
             <p role="status">{t('documentTemplates.placeholders.loading')}</p>
           )}

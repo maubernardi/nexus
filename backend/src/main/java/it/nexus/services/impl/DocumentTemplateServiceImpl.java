@@ -27,6 +27,7 @@ import it.nexus.domain.StoredFileContent;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.DocumentTemplateActiveDTO;
+import it.nexus.domain.dto.DocumentPlaceholderDTO;
 import it.nexus.domain.dto.DocumentTemplateDTO;
 import it.nexus.domain.dto.DocumentTemplateFormDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
@@ -78,8 +79,10 @@ public class DocumentTemplateServiceImpl implements DocumentTemplateService {
     }
 
     @Override
-    public List<String> placeholders() {
-        return DocumentPlaceholders.KNOWN;
+    public List<DocumentPlaceholderDTO> placeholders() {
+        return DocumentPlaceholders.ALL.stream()
+                .map(p -> new DocumentPlaceholderDTO(p.name(), p.group(), p.description()))
+                .toList();
     }
 
     @Override

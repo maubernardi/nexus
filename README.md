@@ -219,6 +219,19 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
   sudo bash keycloak-access-log.sh   # nessun segreto: attiva il registro e il permesso di lettura
   ```
   Finché manca, le pagine dicono che il registro non è disponibile.
+- **Soggetto promotore nei documenti (US-1011).** I dati della cooperativa che promuove i tirocini non stanno nel
+  repository né nei modelli: si aggiungono a mano nel `.env` del server, scritti come devono comparire nei documenti
+  (anche le date), poi si rifà il deploy (o si riavvia il backend):
+  ```bash
+  sudo nano /opt/nexus/.env   # una riga per variabile, nella forma NOME="valore"
+  ```
+  Le variabili sono le 14 di `docs/agile/sprints/sprint-14.md`: `NEXUS_PROMOTER_NAME` (denominazione),
+  `NEXUS_PROMOTER_ADDRESS` (sede in una riga), `NEXUS_PROMOTER_FISCAL_CODE`, `NEXUS_PROMOTER_REPRESENTATIVE` (nome e
+  cognome del legale rappresentante), `NEXUS_PROMOTER_REPRESENTATIVE_ROLE`, `NEXUS_PROMOTER_REPRESENTATIVE_BIRTH_PLACE`,
+  `NEXUS_PROMOTER_REPRESENTATIVE_BIRTH_DATE` (es. `01/02/1970`), `NEXUS_PROMOTER_PHONE`, `NEXUS_PROMOTER_EMAIL`,
+  `NEXUS_PROMOTER_PEC`, `NEXUS_PROMOTER_INAIL_POSITION`, `NEXUS_PROMOTER_RC_INSURER` (compagnia),
+  `NEXUS_PROMOTER_RC_POLICY` (numero della polizza) e `NEXUS_PROMOTER_RC_EXPIRY` (scadenza, es. `22/07/2027`).
+  Un dato che manca resta, nei documenti, una riga da completare a mano.
 - **Stato e log sul server:**
   `cd /opt/nexus/current && sudo docker compose --env-file ../.env --env-file release.env ps` (oppure `logs -f backend`).
 - **DNS (IONOS):** A `@`, `auth`, `www` → IP del server; CAA `0 issue "letsencrypt.org"`; i record email restano.

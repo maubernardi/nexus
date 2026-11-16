@@ -27,7 +27,10 @@ import it.nexus.mapper.TsidMapper;
 import it.nexus.support.WorkflowScenarios;
 import jakarta.persistence.EntityManager;
 
-/** Cataloghi per i documenti reali (US-115): sedi di competenza, tipi per progetto, enti di presa in carico. */
+/**
+ * Cataloghi per i documenti reali (US-115, US-1011): sedi di competenza, tipi per progetto, dati dei documenti dei
+ * progetti, enti di presa in carico.
+ */
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
@@ -41,6 +44,7 @@ class DocumentCatalogIT {
     private static final String FIRENZE = TsidMapper.toExternal(893700000000000341L);
     private static final String COMUNE = TsidMapper.toExternal(893700000000000351L);
     private static final String EXTRA = "EXTRACURRICULARE";
+    private static final String HEADER = "Firenze in Rete 2 – Codice 9014358 – CUP B81D24000440006";
 
     @Autowired MockMvc mockMvc;
     @Autowired WorkflowScenarios scenarios;
@@ -130,6 +134,43 @@ class DocumentCatalogIT {
     }
 
     @Test
+    void datiDeiDocumentiDelProgetto_avvisoPredefinitoEIntestazione() throws Exception {
+        String gol = "$[?(@.project.id == '%s')]".formatted(id(this.gol));
+        mockMvc.perform(get(BASE + "/project-documents").header(USER, "admin"))
+                .andExpect(jsonPath(gol + ".defaultNotice").value(true))
+                .andExpect(jsonPath(gol + ".noticeReference").value(Project.DEFAULT_NOTICE_REFERENCE))
+                .andExpect(jsonPath(gol + ".headerLine").isEmpty());
+
+        String path = "/projects/" + id(this.gol) + "/documents";
+        putJson("admin", path, "{\"noticeReference\": \" Avviso pubblico n. 4 \", \"headerLine\": \" %s \"}"
+                .formatted(HEADER))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.noticeReference").value("Avviso pubblico n. 4"))
+                .andExpect(jsonPath("$.defaultNotice").value(false))
+                .andExpect(jsonPath("$.headerLine").value(HEADER));
+        // vuoto (o uguale al predefinito) = di nuovo il testo predefinito
+        putJson("admin", path, "{\"noticeReference\": \"  \", \"headerLine\": \"%s\"}".formatted(HEADER))
+                .andExpect(jsonPath("$.noticeReference").value(Project.DEFAULT_NOTICE_REFERENCE))
+                .andExpect(jsonPath("$.defaultNotice").value(true));
+        putJson("admin", path, "{\"noticeReference\": \"%s\", \"headerLine\": \"%s\"}"
+                .formatted(Project.DEFAULT_NOTICE_REFERENCE, HEADER))
+                .andExpect(jsonPath("$.defaultNotice").value(true));
+        assertThat(jdbc.queryForObject("SELECT notice_reference FROM project WHERE id = ?", String.class,
+                this.gol.getId())).isNull();
+
+        // due modifiche nell'audit del progetto, con i testi; l'ultimo salvataggio non cambiava nulla
+        em.flush();
+        assertThat(jdbc.queryForList("SELECT changes::text FROM audit_event WHERE entity_type = 'PROJECT' "
+                + "AND entity_id = ? AND action = 'UPDATE' ORDER BY created_at, id", String.class, this.gol.getId()))
+                .hasSize(2)
+                .first().asString().contains("Avviso pubblico n. 4", "CUP B81D24000440006");
+
+        putJson("admin", path, "{\"headerLine\": \"%s\"}".formatted("x".repeat(301)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("headerLine"));
+    }
+
+    @Test
     void enti_vociInizialiEDati() throws Exception {
         mockMvc.perform(get(BASE + "/care-agencies").header(USER, "admin"))
                 .andExpect(jsonPath("$[?(@.id == '%s')].kind".formatted(COMUNE)).value("COMUNE"))
@@ -164,6 +205,9 @@ class DocumentCatalogIT {
     void soloLAdmin() throws Exception {
         mockMvc.perform(get(BASE + "/care-agencies").header(USER, "tutor1")).andExpect(status().isForbidden());
         putJson("operatore.cc", "/projects/" + id(gol) + "/internship-types", "{\"ids\": []}")
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get(BASE + "/project-documents").header(USER, "tutor1")).andExpect(status().isForbidden());
+        putJson("tutor1", "/projects/" + id(gol) + "/documents", "{\"headerLine\": \"CUP\"}")
                 .andExpect(status().isForbidden());
         putJson("tutor1", "/care-agencies/" + COMUNE, "{\"kind\": \"COMUNE\", \"version\": 0}")
                 .andExpect(status().isForbidden());

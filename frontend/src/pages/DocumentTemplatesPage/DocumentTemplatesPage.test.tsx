@@ -94,7 +94,15 @@ const renderPage = () =>
 describe('<DocumentTemplatesPage>', () => {
   beforeEach(() => {
     vi.mocked(fetchDocumentTemplates).mockResolvedValue([convenzione, vecchio]);
-    vi.mocked(fetchTemplatePlaceholders).mockResolvedValue(['NOME_TIROCINANTE', 'DATA_INIZIO']);
+    vi.mocked(fetchTemplatePlaceholders).mockResolvedValue([
+      { name: 'NOME_TIROCINANTE', group: 'Tirocinante', description: 'Nome e cognome del tirocinante' },
+      { name: 'NUMERO_CONVENZIONE', group: 'Convenzione', description: 'Numero della convenzione' },
+      {
+        name: 'DATA_STIPULA_CONVENZIONE',
+        group: 'Convenzione',
+        description: 'Data di stipula della convenzione',
+      },
+    ]);
     vi.mocked(fetchCatalog).mockResolvedValue([
       { ...CURRICULARE, active: true },
       { ...EXTRA, active: true },
@@ -121,6 +129,14 @@ describe('<DocumentTemplatesPage>', () => {
     ).toBeInTheDocument();
     await user.click(screen.getByText('Segnaposto che i modelli possono usare'));
     expect(await screen.findByText('{NOME_TIROCINANTE}')).toBeVisible();
+    // per gruppo, con la descrizione
+    const summary = screen.getByText('Segnaposto che i modelli possono usare');
+    const details = within(summary.closest('details') ?? document.body);
+    expect(details.getByText('Convenzione')).toBeVisible();
+    expect(details.getByText('Nome e cognome del tirocinante')).toBeVisible();
+    expect(details.getByText('{DATA_STIPULA_CONVENZIONE}').closest('div')).toHaveTextContent(
+      '{DATA_STIPULA_CONVENZIONE}Data di stipula della convenzione',
+    );
 
     const list = await screen.findByRole('region', { name: 'Modelli caricati' });
     const first = within(list).getByRole('article', { name: 'Convenzione GOL' });

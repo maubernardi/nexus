@@ -2,7 +2,7 @@ import { axiosInstance } from '@/config/api/axiosInstance';
 import { ENDPOINTS } from '@/config/api/Endpoint';
 import type { ReferenceItem } from '@/config/api/referenceApi';
 
-/** Dettagli dei cataloghi per i documenti reali (US-115), solo per l'ADMIN. */
+/** Dettagli dei cataloghi per i documenti reali (US-115, US-1011), solo per l'ADMIN. */
 
 export type CompetenceSite = {
   id: string;
@@ -17,6 +17,18 @@ export type ProjectInternshipTypes = {
   project: ReferenceItem;
   active: boolean;
   internshipTypes: ReferenceItem[];
+};
+
+/**
+ * Dati dei documenti di un progetto (US-1011): il riferimento all'avviso in vigore (`defaultNotice` = è il testo
+ * predefinito) e la riga di intestazione con codice e CUP, omessa se manca.
+ */
+export type ProjectDocuments = {
+  project: ReferenceItem;
+  active: boolean;
+  noticeReference: string;
+  defaultNotice: boolean;
+  headerLine?: string;
 };
 
 export const CARE_AGENCY_KINDS = [
@@ -88,6 +100,31 @@ export const setProjectInternshipTypes = async ({
   const { data } = await axiosInstance.put<ProjectInternshipTypes>(
     `${base}/projects/${encodeURIComponent(id)}/internship-types`,
     { ids },
+  );
+  return data;
+};
+
+export const fetchProjectDocuments = async (): Promise<ProjectDocuments[]> => {
+  const { data } = await axiosInstance.get<ProjectDocuments[]>(`${base}/project-documents`);
+  return data;
+};
+
+/** Testi vuoti = avviso predefinito, nessuna intestazione. */
+export const updateProjectDocuments = async ({
+  id,
+  noticeReference,
+  headerLine,
+}: {
+  id: string;
+  noticeReference: string | null;
+  headerLine: string | null;
+}): Promise<ProjectDocuments> => {
+  const { data } = await axiosInstance.put<ProjectDocuments>(
+    `${base}/projects/${encodeURIComponent(id)}/documents`,
+    {
+      noticeReference,
+      headerLine,
+    },
   );
   return data;
 };

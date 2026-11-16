@@ -39,9 +39,12 @@ export const fetchDocumentTemplates = async (): Promise<DocumentTemplate[]> => {
   return data;
 };
 
-/** Segnaposto che i modelli possono usare. */
-export const fetchTemplatePlaceholders = async (): Promise<string[]> => {
-  const { data } = await axiosInstance.get<string[]>(`${base}/placeholders`);
+/** Un segnaposto dei modelli: si scrive `{name}`; gruppo e descrizione per la pagina (US-1011). */
+export type TemplatePlaceholder = { name: string; group: string; description: string };
+
+/** Segnaposto che i modelli possono usare, nell'ordine della pagina. */
+export const fetchTemplatePlaceholders = async (): Promise<TemplatePlaceholder[]> => {
+  const { data } = await axiosInstance.get<TemplatePlaceholder[]>(`${base}/placeholders`);
   return data;
 };
 

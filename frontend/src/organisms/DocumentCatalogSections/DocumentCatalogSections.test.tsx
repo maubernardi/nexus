@@ -7,15 +7,18 @@ import { fetchCatalog, type CatalogItem, type CatalogKind } from '@/config/api/c
 import {
   fetchCareAgencies,
   fetchCompetenceSites,
+  fetchProjectDocuments,
   fetchProjectInternshipTypes,
   setCompetenceSiteProjects,
   setProjectInternshipTypes,
   updateCareAgency,
+  updateProjectDocuments,
   type CareAgency,
 } from '@/config/api/documentCatalogApi';
 import {
   CareAgenciesSection,
   CompetenceSitesSection,
+  ProjectDocumentsSection,
   ProjectInternshipTypesSection,
 } from '@/organisms/DocumentCatalogSections/DocumentCatalogSections';
 import { expectNoAxeViolations } from '@/tests/axe';
@@ -31,6 +34,8 @@ vi.mock('@/config/api/documentCatalogApi', async (original) => ({
   ...(await original<Record<string, unknown>>()),
   fetchCompetenceSites: vi.fn(),
   fetchProjectInternshipTypes: vi.fn(),
+  fetchProjectDocuments: vi.fn(),
+  updateProjectDocuments: vi.fn(),
   fetchCareAgencies: vi.fn(),
   setCompetenceSiteProjects: vi.fn(),
   setProjectInternshipTypes: vi.fn(),
@@ -58,6 +63,8 @@ const catalogs: Partial<Record<CatalogKind, CatalogItem[]>> = {
   'competence-sites': [item('S1', 'Firenze', 'FIRENZE'), item('S2', 'Empoli', 'EMPOLI')],
   'care-agencies': [item('E1', 'Comune di Firenze', 'COMUNE_DI_FIRENZE')],
 };
+
+const AVVISO = 'Avviso pubblico n. 10 per l’attuazione del Programma Garanzia Occupabilità dei Lavoratori';
 
 const comune: CareAgency = {
   id: 'E1',
@@ -98,6 +105,18 @@ describe('cataloghi dei documenti (US-115)', () => {
       { project: polis, active: true, internshipTypes: [] },
     ]);
     vi.mocked(fetchCareAgencies).mockResolvedValue([comune]);
+    vi.mocked(fetchProjectDocuments).mockResolvedValue([
+      {
+        project: gol,
+        active: true,
+        noticeReference: AVVISO,
+        defaultNotice: true,
+        headerLine: 'Firenze in Rete 2 – Codice 9014358 – CUP B81D24000440006',
+      },
+      // come lo manda l'API: senza intestazione il campo è omesso
+      { project: polis, active: true, noticeReference: 'Avviso POLIS', defaultNotice: false },
+    ]);
+    vi.mocked(updateProjectDocuments).mockReset();
     vi.mocked(setCompetenceSiteProjects).mockReset();
     vi.mocked(setProjectInternshipTypes).mockReset();
     vi.mocked(updateCareAgency).mockReset();
@@ -152,6 +171,47 @@ describe('cataloghi dei documenti (US-115)', () => {
     await user.click(screen.getByRole('button', { name: 'Salva' }));
     expect(vi.mocked(setProjectInternshipTypes).mock.calls[0][0]).toEqual({ id: 'P2', ids: ['T2'] });
     expect(await screen.findByText('Tipi ammessi da «POLIS» salvati.')).toBeInTheDocument();
+  });
+
+  it('intestazione e avviso per progetto (US-1011): tabella, modifica ed errori del server', async () => {
+    vi.mocked(updateProjectDocuments)
+      .mockRejectedValueOnce(badRequest('headerLine', 'Massimo 300 caratteri'))
+      .mockResolvedValueOnce({ project: polis, active: true, noticeReference: AVVISO, defaultNotice: true });
+    const user = userEvent.setup();
+    render(<ProjectDocumentsSection />);
+
+    const table = await screen.findByRole('table', {
+      name: 'Intestazione e avviso dei documenti per progetto',
+    });
+    expect(
+      within(table).getByText('Firenze in Rete 2 – Codice 9014358 – CUP B81D24000440006'),
+    ).toBeInTheDocument();
+    expect(within(table).getByText('Testo predefinito')).toBeInTheDocument();
+    expect(within(table).getByText('Nessuna intestazione')).toBeInTheDocument();
+    expect(within(table).getByText('Testo del progetto')).toBeInTheDocument();
+    await expectNoAxeViolations();
+
+    await user.click(within(table).getByRole('button', { name: 'Modifica POLIS' }));
+    expect(await screen.findByRole('heading', { name: 'Intestazione e avviso di «POLIS»' })).toHaveFocus();
+    const notice = screen.getByLabelText(/^Riferimento all’avviso/);
+    expect(notice).toHaveValue('Avviso POLIS');
+    await user.type(screen.getByLabelText(/^Intestazione dei documenti/), ' POLIS – CUP X ');
+    await user.clear(notice);
+    await expectNoAxeViolations();
+    await user.click(screen.getByRole('button', { name: 'Salva' }));
+
+    expect(
+      await screen.findByRole('link', { name: 'Intestazione dei documenti: Massimo 300 caratteri' }),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Salva' }));
+    await waitFor(() => expect(updateProjectDocuments).toHaveBeenCalledTimes(2));
+    // svuotato, l'avviso torna al testo predefinito
+    expect(vi.mocked(updateProjectDocuments).mock.calls[1][0]).toEqual({
+      id: 'P2',
+      headerLine: 'POLIS – CUP X',
+      noticeReference: null,
+    });
+    expect(await screen.findByText('Intestazione e avviso di «POLIS» salvati.')).toHaveFocus();
   });
 
   it('enti: tipologia in tabella, dati con gli errori del server', async () => {

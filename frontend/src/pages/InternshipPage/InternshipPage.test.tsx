@@ -136,26 +136,147 @@ describe('<InternshipPage>', () => {
     await user.click(button);
 
     expect(
-      await within(section).findByText('Convenzione scaricata: Convenzione-segnalazione-9.docx'),
+      await within(section).findByText('Documento scaricato: Convenzione-segnalazione-9.docx'),
     ).toBeInTheDocument();
     expect(clicked).toEqual(['Convenzione-segnalazione-9.docx']);
     expect(vi.mocked(downloadInternshipDocument).mock.calls[0][0]).toEqual({
       ticketId: 'T9',
       kind: 'convenzione',
+      target: {},
     });
     expect(button).toHaveFocus();
 
     await user.click(within(section).getByRole('button', { name: 'Scarica il Progetto Formativo (.docx)' }));
     expect(
-      await within(section).findByText(
-        'Progetto Formativo scaricato: Progetto-formativo-segnalazione-9.docx',
-      ),
+      await within(section).findByText('Documento scaricato: Progetto-formativo-segnalazione-9.docx'),
     ).toBeInTheDocument();
     expect(clicked).toEqual(['Convenzione-segnalazione-9.docx', 'Progetto-formativo-segnalazione-9.docx']);
     expect(vi.mocked(downloadInternshipDocument).mock.calls[1][0]).toEqual({
       ticketId: 'T9',
       kind: 'progetto-formativo',
+      target: {},
     });
+    // la relazione finale si scarica a tirocinio chiuso
+    const relazione = within(section).getByRole('group', { name: 'Relazione finale' });
+    expect(within(relazione).queryByRole('button')).not.toBeInTheDocument();
+    expect(
+      within(relazione).getByText('Si scarica a tirocinio chiuso, dopo l’invio del report di restituzione.'),
+    ).toBeInTheDocument();
+  });
+
+  it('documenti: una convenzione per proroga, un progetto formativo per progetto, la relazione finale a tirocinio chiuso (US-1011)', async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal(
+      'URL',
+      class extends URL {
+        static createObjectURL = vi.fn(() => 'blob:documento');
+        static revokeObjectURL = vi.fn();
+      },
+    );
+    const clicked: string[] = [];
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {
+      clicked.push(this.download);
+    });
+    vi.mocked(fetchTicket).mockResolvedValue({ ...ticket, status: 'FORM_RESTITUZIONE' });
+    const project = (number: number, jobTitle: string) => ({
+      number,
+      from: '2026-12-01',
+      to: '2027-02-28',
+      jobTitle,
+      months: 3,
+    });
+    vi.mocked(fetchInternship).mockResolvedValue(
+      internship({
+        trainingProjects: [project(1, 'Aiuto cuoco'), project(2, 'Cuoco')],
+        extensions: [
+          {
+            number: 1,
+            agreementNumber: '2027/200',
+            agreementDate: '2027-05-20',
+            agreementSignedDate: '2027-05-25',
+            from: '2027-06-01',
+            to: '2027-07-15',
+            trainingProjects: [project(1, 'Capo partita')],
+          },
+        ],
+      }),
+    );
+    vi.mocked(downloadInternshipDocument).mockResolvedValue(new Blob(['docx']));
+    renderPage();
+
+    const section = await screen.findByRole('region', { name: 'Documenti' });
+    const convenzione = within(section).getByRole('group', { name: 'Convenzione' });
+    const progetti = within(section).getByRole('group', { name: 'Progetti formativi' });
+    expect(
+      within(convenzione)
+        .getAllByRole('button')
+        .map((b) => b.textContent),
+    ).toEqual(['Scarica la Convenzione (.docx)', 'Scarica la Convenzione della proroga 1 (.docx)']);
+    expect(
+      within(progetti)
+        .getAllByRole('button')
+        .map((b) => b.textContent),
+    ).toEqual([
+      'Scarica il Progetto Formativo 1 (.docx)',
+      'Scarica il Progetto Formativo 2 (.docx)',
+      'Proroga 1: scarica il Progetto Formativo 1 (.docx)',
+    ]);
+    await expectNoAxeViolations();
+
+    const extension = within(convenzione).getByRole('button', {
+      name: 'Scarica la Convenzione della proroga 1 (.docx)',
+    });
+    await waitFor(() => expect(extension).toBeEnabled());
+    await user.click(extension);
+    expect(
+      await within(section).findByText('Documento scaricato: Convenzione-proroga-1-segnalazione-9.docx'),
+    ).toBeInTheDocument();
+    expect(vi.mocked(downloadInternshipDocument).mock.calls[0][0]).toMatchObject({
+      kind: 'convenzione',
+      target: { extension: 1 },
+    });
+
+    await user.click(
+      within(progetti).getByRole('button', { name: 'Proroga 1: scarica il Progetto Formativo 1 (.docx)' }),
+    );
+    await waitFor(() => expect(downloadInternshipDocument).toHaveBeenCalledTimes(2));
+    expect(vi.mocked(downloadInternshipDocument).mock.calls[1][0]).toMatchObject({
+      kind: 'progetto-formativo',
+      target: { extension: 1, project: 1 },
+    });
+
+    const relazione = within(section).getByRole('button', { name: 'Scarica la Relazione finale (.docx)' });
+    await waitFor(() => expect(relazione).toBeEnabled());
+    await user.click(relazione);
+    await waitFor(() => expect(downloadInternshipDocument).toHaveBeenCalledTimes(3));
+    expect(vi.mocked(downloadInternshipDocument).mock.calls[2][0]).toMatchObject({
+      kind: 'relazione-finale',
+      target: {},
+    });
+    expect(clicked).toEqual([
+      'Convenzione-proroga-1-segnalazione-9.docx',
+      'Progetto-formativo-proroga-1-progetto-1-segnalazione-9.docx',
+      'Relazione-finale-segnalazione-9.docx',
+    ]);
+  });
+
+  it('documenti: durante il download il pulsante tiene il focus e non ne avvia un altro', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchInternship).mockResolvedValue(internship());
+    vi.mocked(downloadInternshipDocument).mockReturnValue(new Promise(() => undefined));
+    renderPage();
+
+    const section = await screen.findByRole('region', { name: 'Documenti' });
+    const button = within(section).getByRole('button', { name: 'Scarica la Convenzione (.docx)' });
+    await waitFor(() => expect(button).toBeEnabled());
+    await user.click(button);
+
+    expect(await within(section).findByText('Preparazione del documento…')).toBeInTheDocument();
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button).toBeEnabled();
+    expect(button).toHaveFocus();
+    await user.click(button);
+    expect(downloadInternshipDocument).toHaveBeenCalledTimes(1);
   });
 
   it('documenti: download non riuscito', async () => {
@@ -220,6 +341,7 @@ describe('<InternshipPage>', () => {
       ticketId: 'T9',
       kind: 'convenzione',
       template: 'M2',
+      target: {},
     });
 
     await user.click(within(section).getByRole('button', { name: 'Scarica il Progetto Formativo (.docx)' }));
@@ -227,6 +349,7 @@ describe('<InternshipPage>', () => {
     expect(vi.mocked(downloadInternshipDocument).mock.calls[1][0]).toEqual({
       ticketId: 'T9',
       kind: 'progetto-formativo',
+      target: {},
     });
   });
 

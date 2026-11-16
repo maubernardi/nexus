@@ -15,6 +15,7 @@ import {
   uploadDocumentTemplate,
   type DocumentTemplate,
   type DocumentTemplateUpload,
+  type TemplatePlaceholder,
 } from '@/config/api/documentTemplateApi';
 
 const key = ['document-templates'] as const;
@@ -22,7 +23,7 @@ const key = ['document-templates'] as const;
 export const useDocumentTemplates = (): UseQueryResult<DocumentTemplate[]> =>
   useQuery({ queryKey: key, queryFn: fetchDocumentTemplates });
 
-export const useTemplatePlaceholders = (): UseQueryResult<string[]> =>
+export const useTemplatePlaceholders = (): UseQueryResult<TemplatePlaceholder[]> =>
   useQuery({ queryKey: [...key, 'placeholders'], queryFn: fetchTemplatePlaceholders, staleTime: Infinity });
 
 /** Dopo ogni modifica si rilegge l'elenco, anche dopo un conflitto. */

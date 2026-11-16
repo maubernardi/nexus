@@ -26,6 +26,8 @@ public class ApplicationProperties {
 
     private final Municipalities municipalities = new Municipalities();
 
+    private final Promoter promoter = new Promoter();
+
     @Getter
     @Setter
     public static class Cors {
@@ -77,5 +79,34 @@ public class ApplicationProperties {
 
         /** Comuni minimi perché un file sia l'elenco completo (in Italia sono quasi 7 900): protegge da file parziali. */
         private int minRows = 7000;
+    }
+
+    /**
+     * Soggetto promotore dei tirocini nei documenti (US-1011): dati dal {@code .env} del server ({@code
+     * NEXUS_PROMOTER_*}), mai nel repository né nei modelli. Testo libero, scritto come deve comparire nei documenti
+     * (anche le date); vuoto = riga da completare.
+     */
+    @Getter
+    @Setter
+    public static class Promoter {
+
+        private String name = "";
+        /** Sede in una riga, es. «Via Roma 1, Firenze». */
+        private String address = "";
+        private String fiscalCode = "";
+        /** Nome e cognome del legale rappresentante. */
+        private String representative = "";
+        /** Ruolo del legale rappresentante, come lo scrivono le convenzioni di inclusione. */
+        private String representativeRole = "";
+        private String representativeBirthPlace = "";
+        private String representativeBirthDate = "";
+        private String phone = "";
+        private String email = "";
+        private String pec = "";
+        private String inailPosition = "";
+        /** Compagnia della polizza di responsabilità civile verso terzi. */
+        private String rcInsurer = "";
+        private String rcPolicy = "";
+        private String rcExpiry = "";
     }
 }
