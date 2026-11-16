@@ -3,6 +3,7 @@ package it.nexus.services;
 import java.util.List;
 
 import it.nexus.domain.DocumentTemplate;
+import it.nexus.domain.Project;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.dto.DocumentTemplateActiveDTO;
 import it.nexus.domain.dto.DocumentPlaceholderDTO;
@@ -18,7 +19,10 @@ public interface DocumentTemplateService {
 
     List<DocumentTemplateDTO> list();
 
-    /** Segnaposto che i modelli possono usare, con gruppo e descrizione (US-1011). */
+    /**
+     * Segnaposto che i modelli possono usare, con gruppo e descrizione (US-1011): quelli di NEXUS, poi un gruppo per le
+     * variabili di ogni progetto (US-1013).
+     */
     List<DocumentPlaceholderDTO> placeholders();
 
     DocumentTemplateDTO upload(DocumentTemplateFormDTO form, String fileName, byte[] content);
@@ -37,4 +41,7 @@ public interface DocumentTemplateService {
 
     /** Contenuto .docx del modello. */
     byte[] content(DocumentTemplate template);
+
+    /** Nomi dei modelli attivi del progetto che usano il segnaposto (US-1013). */
+    List<String> templatesUsing(Project project, String placeholder);
 }

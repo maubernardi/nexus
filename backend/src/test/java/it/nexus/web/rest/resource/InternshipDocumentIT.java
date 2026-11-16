@@ -39,6 +39,8 @@ import it.nexus.domain.InternshipType;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Municipality;
 import it.nexus.domain.Project;
+import it.nexus.domain.ProjectPromoter;
+import it.nexus.domain.ProjectVariable;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.EducationLevel;
@@ -54,6 +56,7 @@ import it.nexus.repository.CompetenceSiteRepository;
 import it.nexus.repository.NoHireReasonRepository;
 import it.nexus.repository.CompanyLegalRepresentativeRepository;
 import it.nexus.repository.InternshipTypeRepository;
+import it.nexus.repository.ProjectVariableRepository;
 import it.nexus.services.documents.DocxTemplate;
 import it.nexus.services.impl.InternshipDocumentServiceImpl;
 import it.nexus.support.TestDocx;
@@ -89,6 +92,7 @@ class InternshipDocumentIT {
     @Autowired ClosureReasonRepository closureReasons;
     @Autowired NoHireReasonRepository noHireReasons;
     @Autowired CompetenceSiteRepository competenceSites;
+    @Autowired ProjectVariableRepository projectVariables;
 
     private Place place;
     private Ticket ticket;
@@ -106,6 +110,11 @@ class InternshipDocumentIT {
         sesto = scenarios.municipality("Sesto Fiorentino", "FI");
         project = scenarios.project("GOL", a.tutor1(), a.tutor2());
         project.setHeaderLine("Progetto di prova – Codice 1 – CUP X1");
+        // promotore finto del progetto (US-1013): quello vero lo inserisce l'ADMIN dai Cataloghi
+        project.setPromoter(new ProjectPromoter("Cooperativa di prova", "Via della Prova 1, Firenze", "01234567890",
+                "Paola Neri", "Rappresentante Legale", "Prato", LocalDate.of(1970, 2, 1), "055 000000",
+                "info@prova.example", "prova@pec.example", "123456", "Assicurazioni di prova", "RC-1",
+                LocalDate.of(2027, 7, 22)));
         JobSlot slot = scenarios.freeSlot(place, "Aiuto cuoco");
         ticket = scenarios.appointmentTicket(a.tutor1(), project, slot, a.operator());
         internshipPath = "/api/v1/tickets/" + TsidMapper.toExternal(ticket.getId()) + "/internship";
@@ -460,6 +469,7 @@ class InternshipDocumentIT {
         b.setCaseManagerOffice("Servizio sociale Q1");
         place.company().setPhone("055 987654");
         place.company().setEmail("info@azienda.example");
+        projectVariables.save(new ProjectVariable(project, "SEDE_OPERATIVA", "Via Roma 1, Firenze", null));
         em.flush();
         String typeId = typeId("EXTRACURRICULARE");
         upload("PROGETTO_FORMATIVO", "Progetto GOL", typeId, null, TestDocx.of(
@@ -480,6 +490,7 @@ class InternshipDocumentIT {
                 "Mesi {MESI_TIROCINIO}, progetto {MESI_PROGETTO_FORMATIVO} mesi e {ORE_PROGETTO_FORMATIVO} ore",
                 "INAIL {POSIZIONE_INAIL}, RC {COMPAGNIA_RC} {POLIZZA_RC} scadenza {SCADENZA_RC}",
                 "{AVVISO}",
+                "Sede operativa {SEDE_OPERATIVA}",
                 "Chiusura [{DESCRIZIONE_INTERRUZIONE}] {DATA_FINE_EFFETTIVA}"));
 
         String text = text(document("progetto-formativo", "Progetto-formativo-1", "project", "1"));
@@ -500,6 +511,7 @@ class InternshipDocumentIT {
                 .contains("Mesi 8, progetto 3 mesi e ")
                 .contains("INAIL 123456, RC Assicurazioni di prova RC-1 scadenza 22/07/2027")
                 .contains("Avviso pubblico n. 10 per l’attuazione del Programma Garanzia Occupabilità")
+                .contains("Sede operativa Via Roma 1, Firenze")
                 .contains("Chiusura [] " + InternshipDocumentServiceImpl.BLANK);
         assertThat(text).containsPattern("Sede del tirocinio nella provincia di \\S+");
     }

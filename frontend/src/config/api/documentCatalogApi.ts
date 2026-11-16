@@ -23,12 +23,47 @@ export type ProjectInternshipTypes = {
  * Dati dei documenti di un progetto (US-1011): il riferimento all'avviso in vigore (`defaultNotice` = è il testo
  * predefinito) e la riga di intestazione con codice e CUP, omessa se manca.
  */
+/** Dati del soggetto promotore di un progetto (US-1013): tutti facoltativi, le date come aaaa-mm-gg. */
+export const PROMOTER_FIELDS = [
+  'name',
+  'address',
+  'fiscalCode',
+  'representative',
+  'representativeRole',
+  'representativeBirthPlace',
+  'representativeBirthDate',
+  'phone',
+  'email',
+  'pec',
+  'inailPosition',
+  'rcInsurer',
+  'rcPolicy',
+  'rcExpiry',
+] as const;
+
+export type PromoterField = (typeof PROMOTER_FIELDS)[number];
+
+export type ProjectPromoter = Partial<Record<PromoterField, string>>;
+
+/** Variabile libera di un progetto (US-1013): il nome è il segnaposto {NOME} dei suoi modelli. */
+export type ProjectVariable = { name: string; value: string; description?: string };
+
 export type ProjectDocuments = {
   project: ReferenceItem;
   active: boolean;
   noticeReference: string;
   defaultNotice: boolean;
   headerLine?: string;
+  promoter?: ProjectPromoter;
+  variables?: ProjectVariable[];
+};
+
+export type ProjectDocumentsUpdate = {
+  id: string;
+  noticeReference: string | null;
+  headerLine: string | null;
+  promoter: Record<PromoterField, string | null>;
+  variables: { name: string; value: string; description: string | null }[];
 };
 
 export const CARE_AGENCY_KINDS = [
@@ -109,22 +144,17 @@ export const fetchProjectDocuments = async (): Promise<ProjectDocuments[]> => {
   return data;
 };
 
-/** Testi vuoti = avviso predefinito, nessuna intestazione. */
+/**
+ * Testi vuoti = avviso predefinito, nessuna intestazione, dato del promotore assente. Le variabili sono l'elenco
+ * completo: quelle che mancano si tolgono (US-1013).
+ */
 export const updateProjectDocuments = async ({
   id,
-  noticeReference,
-  headerLine,
-}: {
-  id: string;
-  noticeReference: string | null;
-  headerLine: string | null;
-}): Promise<ProjectDocuments> => {
+  ...body
+}: ProjectDocumentsUpdate): Promise<ProjectDocuments> => {
   const { data } = await axiosInstance.put<ProjectDocuments>(
     `${base}/projects/${encodeURIComponent(id)}/documents`,
-    {
-      noticeReference,
-      headerLine,
-    },
+    body,
   );
   return data;
 };

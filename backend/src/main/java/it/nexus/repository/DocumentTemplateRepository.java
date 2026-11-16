@@ -20,4 +20,8 @@ public interface DocumentTemplateRepository extends JpaRepository<DocumentTempla
     @EntityGraph(attributePaths = {"careAgency", "file"})
     List<DocumentTemplate> findByKindAndProjectIdAndInternshipTypeIdAndActiveTrueOrderByNameAsc(
             InternshipDocumentKind kind, Long projectId, Long internshipTypeId);
+
+    /** I modelli attivi di un progetto: per sapere quali usano una variabile (US-1013). */
+    @EntityGraph(attributePaths = {"file"})
+    List<DocumentTemplate> findByProjectIdAndActiveTrueOrderByNameAsc(Long projectId);
 }

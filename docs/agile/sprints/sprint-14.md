@@ -1,6 +1,6 @@
 # Sprint 14 — 12 – 14 novembre 2026
 
-**Stato:** 📋 pianificato, 21 punti. **Planning:** 11/11, nella [review dello Sprint 13](sprint-13-review.md) (§8.2,
+**Stato:** 📋 pianificato, 29 punti (21 al planning, più US-1013 dal 16/11). **Planning:** 11/11, nella [review dello Sprint 13](sprint-13-review.md) (§8.2,
 §9); il 15/11 il PO ha proposto delle variazioni funzionali, e due completano lo sprint (motivo di chiusura e proroga).
 
 ## Obiettivo
@@ -8,7 +8,7 @@
 > Il Tutor indica perché un tirocinio finisce prima del previsto, lo proroga con una nuova convenzione e scarica
 > convenzioni, progetti formativi e relazione finale compilati sui modelli reali della cooperativa, senza ritoccarli.
 
-## Impegno (21 punti)
+## Impegno (29 punti)
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
@@ -16,6 +16,7 @@
 | US-1012 | Proroga del tirocinio | 8 | ✅ Ready | `add-internship-extensions` | |
 | US-1011 | Documenti sui modelli reali (GOL) | 8 | ✅ Ready | `add-real-documents` | |
 | EN-8 | Preparazione dei modelli reali | 3 | ✅ Ready | — (modelli fuori dal repository) | |
+| US-1013 | Dati del promotore e variabili per progetto | 8 | ✅ Ready | `add-project-promoter-variables` | |
 
 Ordine: prima il motivo di chiusura e la proroga, perché cambiano i dati della relazione finale e delle convenzioni,
 così i segnaposto di US-1011 si scrivono una volta sola; poi US-1011; per ultima EN-8, che usa i segnaposto di US-1011
@@ -32,11 +33,12 @@ aver escluso che dipenda dalla simulazione (A29).
 Servono a US-1011 per compilare i documenti senza righe vuote. Li prepara il PO mentre sviluppo; i valori stanno già
 nei modelli reali della cooperativa.
 
-### Soggetto promotore: nel `.env` del server
+### Soggetto promotore: nei Cataloghi, per progetto (US-1013)
 
-Come deciso il 09/11, vanno nel file `/opt/nexus/.env` del server, non nel repository: contengono anche dati personali
-del legale rappresentante. Una variabile per riga, nella forma `NOME="valore"`. Con US-1011 il deploy le passa al
-backend; finché una variabile manca, il documento lascia la riga vuota da completare a mano.
+Il 09/11 si era deciso di metterli nel `.env` del server. Il 16/11 il PO ha scelto il database, **per progetto**,
+perché possono cambiare da un progetto all'altro (US-1013): l'ADMIN li inserisce in «Cataloghi» per GOL, insieme a
+eventuali variabili libere. Le variabili `NEXUS_PROMOTER_*` qui sotto non servono più: la tabella resta come elenco
+dei dati da raccogliere. Finché un dato manca, il documento lascia la riga vuota da completare a mano.
 
 | Variabile | Contenuto | Esempio di forma |
 |---|---|---|

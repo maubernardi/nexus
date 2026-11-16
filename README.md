@@ -219,19 +219,12 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
   sudo bash keycloak-access-log.sh   # nessun segreto: attiva il registro e il permesso di lettura
   ```
   Finché manca, le pagine dicono che il registro non è disponibile.
-- **Soggetto promotore nei documenti (US-1011).** I dati della cooperativa che promuove i tirocini non stanno nel
-  repository né nei modelli: si aggiungono a mano nel `.env` del server, scritti come devono comparire nei documenti
-  (anche le date), poi si rifà il deploy (o si riavvia il backend):
-  ```bash
-  sudo nano /opt/nexus/.env   # una riga per variabile, nella forma NOME="valore"
-  ```
-  Le variabili sono le 14 di `docs/agile/sprints/sprint-14.md`: `NEXUS_PROMOTER_NAME` (denominazione),
-  `NEXUS_PROMOTER_ADDRESS` (sede in una riga), `NEXUS_PROMOTER_FISCAL_CODE`, `NEXUS_PROMOTER_REPRESENTATIVE` (nome e
-  cognome del legale rappresentante), `NEXUS_PROMOTER_REPRESENTATIVE_ROLE`, `NEXUS_PROMOTER_REPRESENTATIVE_BIRTH_PLACE`,
-  `NEXUS_PROMOTER_REPRESENTATIVE_BIRTH_DATE` (es. `01/02/1970`), `NEXUS_PROMOTER_PHONE`, `NEXUS_PROMOTER_EMAIL`,
-  `NEXUS_PROMOTER_PEC`, `NEXUS_PROMOTER_INAIL_POSITION`, `NEXUS_PROMOTER_RC_INSURER` (compagnia),
-  `NEXUS_PROMOTER_RC_POLICY` (numero della polizza) e `NEXUS_PROMOTER_RC_EXPIRY` (scadenza, es. `22/07/2027`).
-  Un dato che manca resta, nei documenti, una riga da completare a mano.
+- **Soggetto promotore e variabili nei documenti (US-1013).** I dati della cooperativa che promuove i tirocini
+  (denominazione, sede, codice fiscale, legale rappresentante, contatti, INAIL, polizza RC) stanno nel database, **per
+  progetto**: li inserisce l'ADMIN in «Cataloghi» → «Dati dei documenti dei progetti», con intestazione e avviso. Lì
+  si aggiungono anche le variabili libere del progetto (es. `SEDE_OPERATIVA`), che diventano segnaposto
+  (`{SEDE_OPERATIVA}`) dei modelli di quel progetto. Nel `.env` non serve niente: le variabili `NEXUS_PROMOTER_*` di
+  US-1011 non ci sono più. Un dato che manca resta, nei documenti, una riga da completare a mano.
 - **Modelli reali di GOL (EN-8).** I 6 modelli della Regione (Extracurriculare: convenzione, progetto formativo,
   relazione finale; Inclusione: Allegati A, B e C) non stanno nel repository: si preparano in
   `documenti_base/modelli-nexus/` dai file della cooperativa e li carica l'ADMIN da «Modelli dei documenti», con

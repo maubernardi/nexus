@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import it.nexus.config.ApplicationProperties;
 import it.nexus.config.TimeConfig;
 import it.nexus.domain.AbstractReferenceEntity;
 import it.nexus.domain.AppUser;
@@ -27,6 +26,7 @@ import it.nexus.domain.CareAgency;
 import it.nexus.domain.ClosureReport;
 import it.nexus.domain.Company;
 import it.nexus.domain.Project;
+import it.nexus.domain.ProjectPromoter;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.dto.AtecoCodeDTO;
 import it.nexus.domain.dto.ExtensionDTO;
@@ -77,10 +77,12 @@ public final class DocumentValues {
 
     /**
      * Da dove vengono i valori. {@code project} è il progetto formativo del documento (nessuno per la convenzione, la
-     * relazione finale e il progetto formativo senza progetti); {@code report} il report di restituzione, se inviato.
+     * relazione finale e il progetto formativo senza progetti); {@code report} il report di restituzione, se inviato;
+     * {@code variables} le variabili libere del progetto della segnalazione, nome → valore (US-1013). Il promotore è
+     * quello del progetto della segnalazione (US-1013).
      */
-    public record Sources(Ticket ticket, InternshipDTO scheda, ApplicationProperties.Promoter promoter,
-            Convention convention, TrainingProjectDTO project, ClosureReport report, LocalDate today) {
+    public record Sources(Ticket ticket, InternshipDTO scheda, Convention convention, TrainingProjectDTO project,
+            ClosureReport report, Map<String, String> variables, LocalDate today) {
     }
 
     private DocumentValues() {
@@ -91,7 +93,7 @@ public final class DocumentValues {
         Ticket ticket = src.ticket();
         InternshipDTO s = src.scheda();
         ticketValues(v, ticket, s, src.today());
-        promoterValues(v, src.promoter());
+        promoterValues(v, ticket.getProject().getPromoter());
         agencyValues(v, ticket.getBeneficiary());
         companyValues(v, ticket, s);
         beneficiaryValues(v, ticket.getBeneficiary(), s);
@@ -106,6 +108,8 @@ public final class DocumentValues {
                 v.put(p.name(), EMPTY_ALLOWED.contains(p.name()) ? "" : BLANK);
             }
         }
+        // i nomi delle variabili non sono mai quelli di NEXUS (US-1013): non coprono nessun valore
+        v.putAll(src.variables());
         return v;
     }
 
@@ -121,21 +125,21 @@ public final class DocumentValues {
         v.put("DATA_DOCUMENTO", DAY.format(today));
     }
 
-    private static void promoterValues(Map<String, String> v, ApplicationProperties.Promoter p) {
-        v.put("PROMOTORE", p.getName());
-        v.put("SEDE_PROMOTORE", p.getAddress());
-        v.put("CODICE_FISCALE_PROMOTORE", p.getFiscalCode());
-        v.put("LEGALE_RAPPRESENTANTE_PROMOTORE", p.getRepresentative());
-        v.put("RUOLO_LEGALE_RAPPRESENTANTE_PROMOTORE", p.getRepresentativeRole());
-        v.put("LUOGO_NASCITA_LEGALE_RAPPRESENTANTE_PROMOTORE", p.getRepresentativeBirthPlace());
-        v.put("DATA_NASCITA_LEGALE_RAPPRESENTANTE_PROMOTORE", p.getRepresentativeBirthDate());
-        v.put("TELEFONO_PROMOTORE", p.getPhone());
-        v.put("EMAIL_PROMOTORE", p.getEmail());
-        v.put("PEC_PROMOTORE", p.getPec());
-        v.put("POSIZIONE_INAIL", p.getInailPosition());
-        v.put("COMPAGNIA_RC", p.getRcInsurer());
-        v.put("POLIZZA_RC", p.getRcPolicy());
-        v.put("SCADENZA_RC", p.getRcExpiry());
+    private static void promoterValues(Map<String, String> v, ProjectPromoter p) {
+        v.put("PROMOTORE", p.name());
+        v.put("SEDE_PROMOTORE", p.address());
+        v.put("CODICE_FISCALE_PROMOTORE", p.fiscalCode());
+        v.put("LEGALE_RAPPRESENTANTE_PROMOTORE", p.representative());
+        v.put("RUOLO_LEGALE_RAPPRESENTANTE_PROMOTORE", p.representativeRole());
+        v.put("LUOGO_NASCITA_LEGALE_RAPPRESENTANTE_PROMOTORE", p.representativeBirthPlace());
+        v.put("DATA_NASCITA_LEGALE_RAPPRESENTANTE_PROMOTORE", day(p.representativeBirthDate()));
+        v.put("TELEFONO_PROMOTORE", p.phone());
+        v.put("EMAIL_PROMOTORE", p.email());
+        v.put("PEC_PROMOTORE", p.pec());
+        v.put("POSIZIONE_INAIL", p.inailPosition());
+        v.put("COMPAGNIA_RC", p.rcInsurer());
+        v.put("POLIZZA_RC", p.rcPolicy());
+        v.put("SCADENZA_RC", day(p.rcExpiry()));
     }
 
     private static void agencyValues(Map<String, String> v, Beneficiary b) {

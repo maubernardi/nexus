@@ -13,6 +13,7 @@ import {
   setProjectInternshipTypes,
   updateCareAgency,
   updateProjectDocuments,
+  PROMOTER_FIELDS,
   type CareAgency,
 } from '@/config/api/documentCatalogApi';
 import {
@@ -112,6 +113,8 @@ describe('cataloghi dei documenti (US-115)', () => {
         noticeReference: AVVISO,
         defaultNotice: true,
         headerLine: 'Firenze in Rete 2 – Codice 9014358 – CUP B81D24000440006',
+        promoter: { name: 'Cooperativa di prova', pec: 'prova@pec.example', rcExpiry: '2027-07-22' },
+        variables: [{ name: 'SEDE_OPERATIVA', value: 'Via Roma 1, Firenze' }],
       },
       // come lo manda l'API: senza intestazione il campo è omesso
       { project: polis, active: true, noticeReference: 'Avviso POLIS', defaultNotice: false },
@@ -180,9 +183,7 @@ describe('cataloghi dei documenti (US-115)', () => {
     const user = userEvent.setup();
     render(<ProjectDocumentsSection />);
 
-    const table = await screen.findByRole('table', {
-      name: 'Intestazione e avviso dei documenti per progetto',
-    });
+    const table = await screen.findByRole('table', { name: 'Dati dei documenti per progetto' });
     expect(
       within(table).getByText('Firenze in Rete 2 – Codice 9014358 – CUP B81D24000440006'),
     ).toBeInTheDocument();
@@ -192,7 +193,7 @@ describe('cataloghi dei documenti (US-115)', () => {
     await expectNoAxeViolations();
 
     await user.click(within(table).getByRole('button', { name: 'Modifica POLIS' }));
-    expect(await screen.findByRole('heading', { name: 'Intestazione e avviso di «POLIS»' })).toHaveFocus();
+    expect(await screen.findByRole('heading', { name: 'Dati dei documenti di «POLIS»' })).toHaveFocus();
     const notice = screen.getByLabelText(/^Riferimento all’avviso/);
     expect(notice).toHaveValue('Avviso POLIS');
     await user.type(screen.getByLabelText(/^Intestazione dei documenti/), ' POLIS – CUP X ');
@@ -210,8 +211,82 @@ describe('cataloghi dei documenti (US-115)', () => {
       id: 'P2',
       headerLine: 'POLIS – CUP X',
       noticeReference: null,
+      promoter: Object.fromEntries(PROMOTER_FIELDS.map((f) => [f, null])),
+      variables: [],
     });
-    expect(await screen.findByText('Intestazione e avviso di «POLIS» salvati.')).toHaveFocus();
+    expect(await screen.findByText('Dati dei documenti di «POLIS» salvati.')).toHaveFocus();
+  });
+
+  it('promotore e variabili per progetto (US-1013): tabella, modifica ed errori', async () => {
+    vi.mocked(updateProjectDocuments)
+      .mockRejectedValueOnce(
+        badRequest('variables', 'La variabile SEDE_OPERATIVA è usata dal modello «Convenzione GOL»'),
+      )
+      .mockResolvedValueOnce({ project: gol, active: true, noticeReference: AVVISO, defaultNotice: true });
+    const user = userEvent.setup();
+    render(<ProjectDocumentsSection />);
+
+    const table = await screen.findByRole('table', { name: 'Dati dei documenti per progetto' });
+    expect(within(table).getByText('Cooperativa di prova')).toBeInTheDocument();
+    expect(within(table).getByText('SEDE_OPERATIVA')).toBeInTheDocument();
+    expect(within(table).getByText('Non indicato')).toBeInTheDocument();
+    expect(within(table).getByText('Nessuna')).toBeInTheDocument();
+
+    await user.click(within(table).getByRole('button', { name: 'Modifica GOL' }));
+    await screen.findByRole('heading', { name: 'Dati dei documenti di «GOL»' });
+    expect(screen.getByLabelText(/^Denominazione/)).toHaveValue('Cooperativa di prova');
+    expect(screen.getByLabelText(/^Scadenza della polizza RC/)).toHaveValue('2027-07-22');
+    // il nome di una variabile salvata non si cambia
+    expect(screen.getByLabelText(/^Nome della variabile 1/)).toHaveAttribute('readonly');
+    await user.type(screen.getByLabelText(/^Numero della polizza RC/), 'RC-1');
+
+    // variabile nuova: nome ripetuto, poi non valido, poi giusto
+    await user.click(screen.getByRole('button', { name: 'Aggiungi una variabile' }));
+    const name = screen.getByLabelText(/^Nome della variabile 2/);
+    expect(name).toHaveFocus();
+    await user.type(name, 'sede_operativa');
+    await user.type(screen.getByLabelText(/^Valore della variabile 2/), 'Via Verdi 2');
+    await expectNoAxeViolations();
+    await user.click(screen.getByRole('button', { name: 'Salva' }));
+    expect(
+      await screen.findByRole('link', {
+        name: 'Nome della variabile 2: C’è già una variabile con questo nome',
+      }),
+    ).toBeInTheDocument();
+    await user.clear(name);
+    await user.type(name, '1codice');
+    expect(
+      await screen.findByText('Usa lettere maiuscole, cifre e trattino basso, cominciando con una lettera'),
+    ).toBeInTheDocument();
+    await user.clear(name);
+    await user.type(name, 'codice_ats');
+    expect(updateProjectDocuments).not.toHaveBeenCalled();
+
+    // la variabile usata da un modello: l'errore del server sulle variabili
+    await user.click(screen.getByRole('button', { name: 'Salva' }));
+    expect(
+      await screen.findByRole('link', {
+        name: 'Variabili del progetto: La variabile SEDE_OPERATIVA è usata dal modello «Convenzione GOL»',
+      }),
+    ).toBeInTheDocument();
+    expect(vi.mocked(updateProjectDocuments).mock.calls[0][0]).toMatchObject({
+      id: 'P1',
+      promoter: { name: 'Cooperativa di prova', rcPolicy: 'RC-1', rcExpiry: '2027-07-22', fiscalCode: null },
+      variables: [
+        { name: 'SEDE_OPERATIVA', value: 'Via Roma 1, Firenze', description: null },
+        { name: 'CODICE_ATS', value: 'Via Verdi 2', description: null },
+      ],
+    });
+
+    // togliere una variabile riporta il focus su «Aggiungi una variabile»
+    await user.click(screen.getByRole('button', { name: 'Togli la variabile 1' }));
+    expect(screen.getByRole('button', { name: 'Aggiungi una variabile' })).toHaveFocus();
+    await user.click(screen.getByRole('button', { name: 'Salva' }));
+    await waitFor(() => expect(updateProjectDocuments).toHaveBeenCalledTimes(2));
+    expect(vi.mocked(updateProjectDocuments).mock.calls[1][0].variables).toEqual([
+      { name: 'CODICE_ATS', value: 'Via Verdi 2', description: null },
+    ]);
+    expect(await screen.findByText('Dati dei documenti di «GOL» salvati.')).toHaveFocus();
   });
 
   it('enti: tipologia in tabella, dati con gli errori del server', async () => {

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -52,6 +53,19 @@ public class Project extends AbstractReferenceEntity {
     @Setter
     @Column(name = "header_line", length = 300)
     private String headerLine;
+
+    /** Dati del soggetto promotore nei documenti (US-1013); {@code null} quando non ce n'è nessuno. */
+    @Embedded
+    private ProjectPromoter promoter;
+
+    /** I dati del promotore, mai {@code null}: senza dati, {@link ProjectPromoter#EMPTY}. */
+    public ProjectPromoter getPromoter() {
+        return promoter == null ? ProjectPromoter.EMPTY : promoter;
+    }
+
+    public void setPromoter(ProjectPromoter promoter) {
+        this.promoter = ProjectPromoter.EMPTY.equals(promoter) ? null : promoter;
+    }
 
     /** Il riferimento all'avviso da usare nei documenti: quello del progetto oppure il predefinito. */
     public String effectiveNoticeReference() {

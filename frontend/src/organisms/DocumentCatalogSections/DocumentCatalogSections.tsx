@@ -170,6 +170,7 @@ const ProjectsSection = <T extends ProjectRow>({ name, rows, columns, editor }: 
   const th = 'px-3 py-2 text-left text-sm font-semibold whitespace-nowrap';
   const td = 'px-3 py-2 align-top';
   const headingId = `catalog-${name === 'projectTypes' ? 'project-types' : 'project-documents'}-heading`;
+  const captionId = `catalog-${name === 'projectTypes' ? 'project-types' : 'project-documents'}-caption`;
 
   useEffect(() => {
     if (editing) headingRef.current?.focus();
@@ -220,9 +221,17 @@ const ProjectsSection = <T extends ProjectRow>({ name, rows, columns, editor }: 
       ) : !rows.data ? (
         <p>{t('common.loading')}</p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-border bg-card">
+        <div
+          role="region"
+          aria-labelledby={captionId}
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- regione scorrevole: deve essere raggiungibile da tastiera
+          tabIndex={0}
+          className="relative overflow-x-auto rounded-xl border border-border bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
           <table className="w-full border-collapse text-sm">
-            <caption className="sr-only">{t(`documentCatalogs.${name}.caption`)}</caption>
+            <caption id={captionId} className="sr-only">
+              {t(`documentCatalogs.${name}.caption`)}
+            </caption>
             <thead className="border-b border-border bg-muted">
               <tr>
                 <th scope="col" className={th}>
@@ -296,7 +305,7 @@ export const ProjectInternshipTypesSection = () => {
   );
 };
 
-/** Intestazione e riferimento all'avviso dei documenti di ogni progetto (US-1011). */
+/** Dati dei documenti di ogni progetto: intestazione e avviso (US-1011), promotore e variabili (US-1013). */
 export const ProjectDocumentsSection = () => {
   const { t } = useTranslation();
   const rows = useProjectDocuments();
@@ -316,6 +325,21 @@ export const ProjectDocumentsSection = () => {
               row.defaultNotice
                 ? 'documentCatalogs.projectDocuments.defaultNotice'
                 : 'documentCatalogs.projectDocuments.customNotice',
+            ),
+        },
+        {
+          header: t('documentCatalogs.projectDocuments.promoter'),
+          cell: (row) => row.promoter?.name ?? t('documentCatalogs.projectDocuments.noPromoter'),
+        },
+        {
+          header: t('documentCatalogs.projectDocuments.variables'),
+          cell: (row) =>
+            row.variables && row.variables.length > 0 ? (
+              <span className="font-mono text-xs break-all">
+                {row.variables.map((v) => v.name).join(', ')}
+              </span>
+            ) : (
+              t('documentCatalogs.projectDocuments.noVariables')
             ),
         },
       ]}

@@ -134,6 +134,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1010](#us-1010) | E10 | Modelli dei documenti caricati dall'ADMIN | Must | 8 | R4 | 🎉 Done (Sprint 13) |
 | [US-1011](#us-1011) | E10 | Documenti sui modelli reali (GOL) | Must | 8 | R4 | ✅ Ready (Sprint 14) |
 | [US-1012](#us-1012) | E10 | Proroga del tirocinio | Must | 8 | R4 | ✅ Ready (Sprint 14) |
+| [US-1013](#us-1013) | E10 | Dati del promotore e variabili per progetto | Must | 8 | R4 | ✅ Ready (Sprint 14) |
 | [EN-8](#en-8) | E10 | Preparazione dei modelli reali | Must | 3 | R4 | ✅ Ready (Sprint 14) |
 | [US-1101](#us-1101) | E11 | Report di restituzione | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1102](#us-1102) | E11 | Esito sulla mansione e audit trail | Must | 2 | R3 | 🎉 Done (Sprint 8) |
@@ -1122,6 +1123,29 @@ Criteri di accettazione:
 - Cambia così il criterio di US-1008 «una segnalazione ha una convenzione»: una convenzione iniziale più le proroghe.
 
 Dipendenze: US-1008
+
+#### US-1013
+**Dati del promotore e variabili per progetto** · Must · 8 punti · R4 · ✅ Ready (Sprint 14)
+
+Come **ADMIN** voglio indicare per ogni progetto i dati del soggetto promotore e altre variabili per i modelli, perché
+possono cambiare da un progetto all'altro (PO, 16/11).
+
+Criteri di accettazione:
+- I **dati del soggetto promotore** (i 14 di US-1011: denominazione, sede, codice fiscale, legale rappresentante con
+  ruolo, luogo e data di nascita, telefono, mail, PEC, posizione INAIL, polizza RC con compagnia, numero e scadenza)
+  stanno nel database, **per progetto**, e l'ADMIN li modifica in «Cataloghi». Sostituiscono le variabili
+  `NEXUS_PROMOTER_*` del `.env`, che non servono più (PO, 16/11).
+- Per ogni progetto l'ADMIN aggiunge anche **variabili libere**: nome, valore e descrizione facoltativa. Il nome
+  (maiuscole, cifre e trattino basso, es. `SEDE_OPERATIVA`) diventa il segnaposto `{SEDE_OPERATIVA}` dei modelli di quel
+  progetto e non può essere quello di un segnaposto di NEXUS (PO, 16/11).
+- Un modello che usa una variabile di un altro progetto è rifiutato; la pagina «Modelli dei documenti» elenca le
+  variabili di ogni progetto.
+- Una variabile usata da un modello attivo non si può togliere: il messaggio dice quale modello la usa. Un modello
+  disattivato si riattiva solo se i suoi segnaposto sono ancora tutti noti.
+- Un dato che manca resta, nei documenti, una riga da completare a mano.
+- Ogni modifica nell'audit (EN-2); per nome, luogo e data di nascita del legale rappresentante solo che sono cambiati.
+
+Dipendenze: US-1011
 
 #### EN-8
 **Preparazione dei modelli reali** · Must · 3 punti · R4 · ✅ Ready (Sprint 14)

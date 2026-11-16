@@ -7,15 +7,17 @@ import java.io.UncheckedIOException;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import it.nexus.config.ApplicationProperties;
 import it.nexus.config.TimeConfig;
 import it.nexus.domain.ClosureReport;
 import it.nexus.domain.DocumentTemplate;
+import it.nexus.domain.ProjectVariable;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.DocumentTemplateChoiceDTO;
@@ -27,6 +29,7 @@ import it.nexus.domain.enumeration.InternshipDocumentKind;
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.ClosureReportRepository;
+import it.nexus.repository.ProjectVariableRepository;
 import it.nexus.repository.TicketRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.DocumentTemplateService;
@@ -52,7 +55,7 @@ public class InternshipDocumentServiceImpl implements InternshipDocumentService 
     private final ClosureReportRepository closureReportRepository;
     private final AuditService auditService;
     private final DocumentTemplateService documentTemplateService;
-    private final ApplicationProperties properties;
+    private final ProjectVariableRepository projectVariables;
     private final Clock clock;
 
     @Override
@@ -77,8 +80,10 @@ public class InternshipDocumentServiceImpl implements InternshipDocumentService 
         byte[] content;
         try (InputStream template = chosen == null ? fallback(kind, scheda)
                 : new ByteArrayInputStream(documentTemplateService.content(chosen))) {
+            Map<String, String> variables = projectVariables.findByProjectOrderByNameAsc(ticket.getProject()).stream()
+                    .collect(Collectors.toMap(ProjectVariable::getName, ProjectVariable::getValue));
             content = DocxTemplate.fill(template, DocumentValues.of(new DocumentValues.Sources(ticket, scheda,
-                    properties.getPromoter(), convention, trainingProject, report, today())));
+                    convention, trainingProject, report, variables, today())));
         } catch (IOException e) {
             throw new UncheckedIOException("Modello " + kind + " non leggibile", e);
         }
