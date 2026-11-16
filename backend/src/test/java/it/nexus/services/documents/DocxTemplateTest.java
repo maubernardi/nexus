@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
@@ -52,10 +53,57 @@ class DocxTemplateTest {
                 // senza valore resta com'è; i caratteri speciali del valore e del testo non si perdono
                 .contains("Resta {SCONOSCIUTO}; prezzo 5$ e \\ barra.");
         try (XWPFDocument doc = new XWPFDocument(new ByteArrayInputStream(filled))) {
-            XWPFParagraph first = doc.getParagraphs().getFirst();
-            // un solo run, con la formattazione del primo
-            assertThat(first.getRuns()).hasSize(1);
-            assertThat(first.getRuns().getFirst().isBold()).isTrue();
+            // i run restano: il segnaposto spezzato prende la formattazione del run in cui comincia
+            List<XWPFRun> runs = doc.getParagraphs().getFirst().getRuns();
+            assertThat(runs).hasSize(2);
+            assertThat(runs.get(0).text()).isEqualTo("Tirocinante: Mario Rossi");
+            assertThat(runs.get(0).isBold()).isTrue();
+            assertThat(runs.get(1).text()).isEqualTo(", CF RSSMRA85T10A562S.");
+            assertThat(runs.get(1).isBold()).isFalse();
+            // l'a capo resta nel run del segnaposto
+            XWPFParagraph cell = doc.getTables().getFirst().getRow(0).getCell(1).getParagraphs().getFirst();
+            assertThat(cell.getRuns()).hasSize(1);
+            assertThat(cell.getRuns().getFirst().getCTR().getBrList()).hasSize(1);
+        }
+    }
+
+    /** Come nei modelli reali (EN-8): tabulazione, simbolo e formattazioni diverse nello stesso paragrafo. */
+    @Test
+    void formattazioneDelParagrafoConservata() throws IOException {
+        byte[] template;
+        try (XWPFDocument doc = new XWPFDocument(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            XWPFParagraph p = doc.createParagraph();
+            XWPFRun label = p.createRun();
+            label.addTab();
+            label.setBold(true);
+            label.setText("Lunedì ");
+            XWPFRun box = p.createRun();
+            box.setText("{GIORNO_LUNEDI}");
+            XWPFRun sym = p.createRun();
+            sym.getCTR().addNewSym().setChar(new byte[] {(byte) 0xF0, (byte) 0xA8});
+            XWPFRun split = p.createRun();
+            split.setItalic(true);
+            split.setText(" {A}-{B} e {C");
+            p.createRun().setText("_");
+            p.createRun().setText("D} fine");
+            doc.write(out);
+            template = out.toByteArray();
+        }
+
+        byte[] filled = DocxTemplate.fill(new ByteArrayInputStream(template),
+                Map.of("GIORNO_LUNEDI", "☒", "A", "uno", "B", "due", "C_D", "tre"));
+
+        try (XWPFDocument doc = new XWPFDocument(new ByteArrayInputStream(filled))) {
+            List<XWPFRun> runs = doc.getParagraphs().getFirst().getRuns();
+            assertThat(runs).hasSize(6);
+            assertThat(runs.get(0).getCTR().getTabList()).hasSize(1);
+            assertThat(runs.get(0).isBold()).isTrue();
+            assertThat(runs.get(1).text()).isEqualTo("☒");
+            assertThat(runs.get(2).getCTR().getSymList()).hasSize(1);
+            assertThat(runs.get(3).text()).isEqualTo(" uno-due e tre");
+            assertThat(runs.get(3).isItalic()).isTrue();
+            assertThat(runs.get(4).text()).isEmpty();
+            assertThat(runs.get(5).text()).isEqualTo(" fine");
         }
     }
 

@@ -470,6 +470,7 @@ class InternshipDocumentIT {
                 "Residenza {VIA_RESIDENZA_TIROCINANTE} n° {CIVICO_RESIDENZA_TIROCINANTE}, "
                         + "{COMUNE_RESIDENZA_TIROCINANTE} ({PROVINCIA_RESIDENZA_TIROCINANTE})",
                 "Ente {ENTE}; case manager {CASE_MANAGER} ({SERVIZIO_CASE_MANAGER}), tel. {TELEFONO_CASE_MANAGER}",
+                "Tipologia {TIPO_ENTE_COMUNE} Comune {TIPO_ENTE_SOCIETA_DELLA_SALUTE} SdS {TIPO_ENTE_ALTRO} Altro",
                 "Azienda {TELEFONO_AZIENDA} {EMAIL_AZIENDA}, sede legale a {COMUNE_SEDE_LEGALE} "
                         + "({PROVINCIA_SEDE_LEGALE})",
                 "Sede del tirocinio nella provincia di {NOME_PROVINCIA_SEDE_TIROCINIO}",
@@ -490,6 +491,7 @@ class InternshipDocumentIT {
                 .contains("Residenza Via Gramsci n° 12, Sesto Fiorentino (FI)")
                 .contains("Ente Comune di Firenze; case manager Giulia Blu (Servizio sociale Q1), tel. "
                         + InternshipDocumentServiceImpl.BLANK)
+                .contains("Tipologia ☒ Comune ☐ SdS ☐ Altro")
                 .contains("Azienda 055 987654 info@azienda.example, sede legale a Firenze (FI)")
                 .contains("Lu ☒ Ma ☐ Me ☒")
                 .contains("Lunedì [09:00–13:00] [] Mercoledì [14:00–18:00]")
