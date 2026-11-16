@@ -1,26 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
-import { FileDown, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
-import { NativeSelect } from '@/components/ui/native-select';
 import { apiError } from '@/config/api/errors';
-import type { Internship, InternshipDocumentKind, StartRequirement } from '@/config/api/internshipApi';
+import type { Internship, StartRequirement } from '@/config/api/internshipApi';
 import type { TicketDetail } from '@/config/api/ticketApi';
 import {
   useAddInternshipAtecoCode,
   useAddInternshipLegalRepresentative,
-  useDocumentTemplateChoices,
-  useDownloadInternshipDocument,
   useInternship,
   useSaveInternship,
 } from '@/config/hooks/useInternship';
 import { useStartInternship, useTicket } from '@/config/hooks/useTickets';
 import { AtecoCodeForm } from '@/organisms/AtecoCodesSection/AtecoCodesSection';
+import { InternshipDocumentsSection } from '@/organisms/InternshipDocumentsSection/InternshipDocumentsSection';
 import { InternshipForm } from '@/organisms/InternshipForm/InternshipForm';
-import { saveBlob } from '@/lib/download';
 import {
   LegalRepresentativeDetails,
   LegalRepresentativeForm,
@@ -128,7 +125,7 @@ export const InternshipPage = () => {
         <StartSection ticket={ticket.data} internship={data} onOutcome={setOutcome} />
       )}
 
-      <DocumentsSection ticket={ticket.data} internship={data} />
+      <InternshipDocumentsSection ticket={ticket.data} internship={data} />
 
       <CompanyData ticketId={id} internship={data} onOutcome={setOutcome} />
 
@@ -256,138 +253,6 @@ const StartSection = ({ ticket: d, internship, onOutcome }: StartSectionProps) =
         </div>
       )}
     </section>
-  );
-};
-
-/** Documenti del tirocinio: tipo per l'API, prefisso del nome del file (lo stesso del server) e testi. */
-const DOCUMENTS = [
-  { kind: 'convenzione', filePrefix: 'Convenzione', key: 'convenzione' },
-  { kind: 'progetto-formativo', filePrefix: 'Progetto-formativo', key: 'progettoFormativo' },
-] as const satisfies readonly { kind: InternshipDocumentKind; filePrefix: string; key: string }[];
-
-/**
- * Documenti del tirocinio (US-1004, US-1005): compilati dal server con la scheda salvata, si scaricano come .docx.
- * Con più modelli caricati dall'ADMIN per un documento il Tutor sceglie quale usare (US-1010). L'esito si annuncia lì
- * accanto (stato), il focus resta sul pulsante.
- */
-const DocumentsSection = ({ ticket: d, internship }: { ticket: TicketDetail; internship: Internship }) => {
-  const { t } = useTranslation();
-  const download = useDownloadInternshipDocument();
-  const [status, setStatus] = useState<{ text: string; error?: boolean } | null>(null);
-
-  const onDownload = async (item: DocumentItem, template?: string): Promise<void> => {
-    const filename = `${item.filePrefix}-segnalazione-${d.number}.docx`;
-    setStatus({ text: t('internship.documents.preparing') });
-    try {
-      saveBlob(await download.mutateAsync({ ticketId: d.id, kind: item.kind, template }), filename);
-      setStatus({ text: t(`internship.documents.downloaded.${item.key}`, { filename }) });
-    } catch {
-      setStatus({ text: t('internship.documents.error'), error: true });
-    }
-  };
-
-  return (
-    <section
-      aria-labelledby="internship-documents"
-      className="space-y-3 rounded-xl border border-border bg-card p-4"
-    >
-      <h2 id="internship-documents" className="text-lg font-semibold text-primary">
-        {t('internship.documents.heading')}
-      </h2>
-      <p className="text-muted-foreground">{t('internship.documents.intro')}</p>
-      {internship.missingForStart.length > 0 && (
-        <p className="rounded-md bg-warning p-3 text-warning-foreground">
-          {t('internship.documents.incomplete')}
-        </p>
-      )}
-      <div className="flex flex-wrap items-end gap-4">
-        {DOCUMENTS.map((item) => (
-          <DocumentDownload
-            key={item.kind}
-            ticketId={d.id}
-            item={item}
-            disabled={download.isPending}
-            onDownload={(template) => void onDownload(item, template)}
-            onMissingTemplate={(label) =>
-              setStatus({ text: t('internship.documents.templateMissing', { label }), error: true })
-            }
-          />
-        ))}
-      </div>
-      <p role="status" className={status?.error ? 'font-medium text-destructive' : 'text-muted-foreground'}>
-        {status?.text}
-      </p>
-    </section>
-  );
-};
-
-type DocumentItem = (typeof DOCUMENTS)[number];
-
-type DocumentDownloadProps = {
-  ticketId: string;
-  item: DocumentItem;
-  disabled: boolean;
-  onDownload: (template?: string) => void;
-  onMissingTemplate: (label: string) => void;
-};
-
-/** Pulsante di un documento, con la scelta del modello quando per il documento ce n'è più di uno (US-1010). */
-const DocumentDownload = ({
-  ticketId,
-  item,
-  disabled,
-  onDownload,
-  onMissingTemplate,
-}: DocumentDownloadProps) => {
-  const { t } = useTranslation();
-  const choices = useDocumentTemplateChoices(ticketId, item.kind);
-  const [template, setTemplate] = useState('');
-  const selectRef = useRef<HTMLSelectElement>(null);
-  const many = (choices.data?.length ?? 0) > 1;
-  const selectId = `internship-template-${item.kind}`;
-  const hintId = `${selectId}-hint`;
-  const label = t(`internship.documents.template.${item.key}`);
-
-  const onClick = (): void => {
-    if (many && template === '') {
-      onMissingTemplate(label);
-      selectRef.current?.focus();
-      return;
-    }
-    onDownload(many ? template : undefined);
-  };
-
-  return (
-    <div className="space-y-2">
-      {many && (
-        <div className="space-y-1">
-          <label htmlFor={selectId} className="block text-sm font-medium">
-            {label}
-          </label>
-          <p id={hintId} className="text-sm text-muted-foreground">
-            {t('internship.documents.templateHint')}
-          </p>
-          <NativeSelect
-            ref={selectRef}
-            id={selectId}
-            aria-describedby={hintId}
-            value={template}
-            onChange={(e) => setTemplate(e.target.value)}
-          >
-            <option value="">{t('internship.documents.chooseTemplate')}</option>
-            {choices.data?.map((choice) => (
-              <option key={choice.id} value={choice.id}>
-                {choice.name}
-              </option>
-            ))}
-          </NativeSelect>
-        </div>
-      )}
-      <Button size="lg" variant="outline" onClick={onClick} disabled={disabled || choices.isPending}>
-        <FileDown aria-hidden="true" />
-        {t(`internship.documents.download.${item.key}`)}
-      </Button>
-    </div>
   );
 };
 

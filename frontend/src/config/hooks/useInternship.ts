@@ -18,6 +18,7 @@ import {
   fetchDocumentTemplateChoices,
   fetchInternship,
   saveInternship,
+  type DocumentTarget,
   type DocumentTemplateChoice,
   type Internship,
   type InternshipDocumentKind,
@@ -59,7 +60,7 @@ export const useDocumentTemplateChoices = (
 export const useDownloadInternshipDocument = (): UseMutationResult<
   Blob,
   unknown,
-  { ticketId: string; kind: InternshipDocumentKind; template?: string }
+  { ticketId: string; kind: InternshipDocumentKind; template?: string; target?: DocumentTarget }
 > => {
   const queryClient = useQueryClient();
   return useMutation({

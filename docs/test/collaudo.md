@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `8d43ad3` (11/11/2026): Sprint 1–13 completi (indirizzi con il comune, fine effettiva e ruolo del tutor aziendale, convenzione e progetti formativi, modelli dei documenti caricati dall'ADMIN) |
-| **Ultimo aggiornamento** | 16/11/2026 (T-24.2: da provare dopo il deploy di US-1012; T-24.1, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 16/11/2026 (T-24.3 e T-24.4: da provare dopo il deploy di US-1011; T-24.2, T-24.1, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -975,3 +975,36 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   7. Apri il report di restituzione dello stesso tirocinio. **Atteso:** la fine effettiva è precompilata con la fine
      della proroga; con la fine della convenzione iniziale compare il motivo dell'interruzione anticipata.
   8. Dopo l'invio del report riapri la scheda. **Atteso:** la proroga si legge ma non si modifica più.
+
+- [ ] **T-24.3 Intestazione e avviso dei documenti per progetto (US-1011)**
+  1. Come `admin` apri **Cataloghi**. **Atteso:** la sezione «Intestazione e avviso dei documenti», con ogni progetto,
+     «Nessuna intestazione» e «Testo predefinito».
+  2. Premi «Modifica» su GOL. **Atteso:** il modulo si apre con il focus sul titolo; il «Riferimento all'avviso» ha
+     già il testo predefinito (Avviso pubblico n. 10). Scrivi l'intestazione «Firenze in Rete 2 – Codice 9014358 – CUP
+     B81D24000440006» e salva. **Atteso:** l'esito «Intestazione e avviso di «GOL» salvati.» e la riga aggiornata.
+  3. Riapri GOL, svuota il riferimento all'avviso e salva. **Atteso:** la colonna «Avviso» torna a «Testo
+     predefinito».
+  4. Apri **Modelli dei documenti** e il riquadro «Segnaposto che i modelli possono usare». **Atteso:** i segnaposto
+     sono divisi per gruppo (Segnalazione e progetto, Soggetto promotore, Ente di presa in carico, Soggetto ospitante,
+     Tirocinante, Tirocinio e orario, Convenzione, Progetto formativo, Chiusura), ognuno con la sua descrizione.
+
+- [ ] **T-24.4 Documenti per convenzione e progetto, relazione finale (US-1011)**
+
+  Prima della prova: i dati del soggetto promotore nel `.env` del server (vedi il README, «Soggetto promotore nei
+  documenti») e il deploy. Senza modelli caricati i documenti usano il modello generico di NEXUS.
+  1. Come `tutor1` apri la scheda di una segnalazione con la convenzione e due progetti formativi salvati.
+     **Atteso:** la sezione «Documenti» ha tre gruppi: «Convenzione» con «Scarica la Convenzione (.docx)»,
+     «Progetti formativi» con un pulsante per ogni progetto, «Relazione finale» con «Si scarica a tirocinio chiuso…»
+     e nessun pulsante.
+  2. Scarica la Convenzione. **Atteso:** il file `Convenzione-segnalazione-<n>.docx` riporta l'intestazione di GOL
+     (T-24.3), numero e date della convenzione, il riferimento all'avviso e i dati del promotore del `.env`.
+  3. Scarica il Progetto Formativo 2. **Atteso:** il file `Progetto-formativo-2-segnalazione-<n>.docx` riporta il
+     progetto 2 con le sue date, mesi, ore e mansione, e il numero della convenzione.
+  4. Sul tirocinio con la proroga (T-24.2) scarica «Scarica la Convenzione della proroga 1» e «Proroga 1: scarica il
+     Progetto Formativo 1». **Atteso:** numero e date sono quelli della proroga; nella cronologia della segnalazione
+     «Documento scaricato» dice «Progetto Formativo 1, proroga 1».
+  5. Dopo l'invio del report di restituzione riapri la scheda. **Atteso:** nel gruppo «Relazione finale» c'è
+     «Scarica la Relazione finale (.docx)»; il documento riporta la fine effettiva, i mesi del tirocinio, il motivo di
+     chiusura (con la descrizione, se l'interruzione è anticipata), la sede di competenza e la data di chiusura.
+  6. Usa la tastiera: **Atteso:** ogni pulsante si raggiunge con Tab e l'esito del download si legge sotto i gruppi
+     («Documento scaricato: …»), mentre il focus resta sul pulsante.

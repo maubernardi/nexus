@@ -542,24 +542,32 @@ export const it = {
     documents: {
       heading: 'Documenti',
       intro:
-        'Compilati con i dati salvati della scheda. Per ora sono modelli provvisori, in attesa dei moduli ufficiali della cooperativa.',
+        'Compilati con i dati salvati della scheda, sui modelli caricati dall’ADMIN o su quello generico. Una convenzione per ogni convenzione, proroghe comprese, e un progetto formativo per ogni progetto.',
       incomplete: 'La scheda non è completa: nel documento i dati mancanti restano da completare a mano.',
+      groups: {
+        convenzione: 'Convenzione',
+        progettoFormativo: 'Progetti formativi',
+        relazioneFinale: 'Relazione finale',
+      },
       download: {
         convenzione: 'Scarica la Convenzione (.docx)',
+        convenzioneProroga: 'Scarica la Convenzione della proroga {{k}} (.docx)',
         progettoFormativo: 'Scarica il Progetto Formativo (.docx)',
+        progettoFormativoN: 'Scarica il Progetto Formativo {{n}} (.docx)',
+        progettoFormativoProroga: 'Proroga {{k}}: scarica il Progetto Formativo {{n}} (.docx)',
+        relazioneFinale: 'Scarica la Relazione finale (.docx)',
       },
+      relazioneFinaleClosed: 'Si scarica a tirocinio chiuso, dopo l’invio del report di restituzione.',
       preparing: 'Preparazione del documento…',
       template: {
         convenzione: 'Modello della convenzione',
         progettoFormativo: 'Modello del progetto formativo',
+        relazioneFinale: 'Modello della relazione finale',
       },
       templateHint: 'Ci sono più modelli per questo documento: scegli quale usare.',
       chooseTemplate: 'Scegli il modello',
       templateMissing: 'Scegli prima il modello: {{label}}.',
-      downloaded: {
-        convenzione: 'Convenzione scaricata: {{filename}}',
-        progettoFormativo: 'Progetto Formativo scaricato: {{filename}}',
-      },
+      downloaded: 'Documento scaricato: {{filename}}',
       error: 'Download non riuscito. Controlla la connessione e riprova.',
     },
     start: {
@@ -1164,6 +1172,31 @@ export const it = {
       legend: 'Tipi di tirocinio ammessi',
       hint: 'Nessuna casella scelta = tutti i tipi. Un tipo tolto resta sulle schede che già lo usano.',
       saved: 'Tipi ammessi da «{{name}}» salvati.',
+    },
+    projectDocuments: {
+      heading: 'Intestazione e avviso dei documenti',
+      intro:
+        'Per ogni progetto, la riga di intestazione con codice e CUP e il riferimento all’avviso: i documenti del tirocinio li riportano.',
+      caption: 'Intestazione e avviso dei documenti per progetto',
+      project: 'Progetto',
+      header: 'Intestazione',
+      notice: 'Avviso',
+      noHeader: 'Nessuna intestazione',
+      defaultNotice: 'Testo predefinito',
+      customNotice: 'Testo del progetto',
+      inactive: '(disattivato)',
+      action: 'Modifica',
+      editHeading: 'Intestazione e avviso di «{{name}}»',
+      fields: {
+        headerLine: 'Intestazione dei documenti',
+        noticeReference: 'Riferimento all’avviso',
+      },
+      hints: {
+        headerLine:
+          'Codice e CUP del progetto, per esempio «Firenze in Rete 2 – Codice 9014358 – CUP B81D24000440006».',
+        noticeReference: 'Se lo svuoti, torna il testo predefinito (Avviso pubblico n. 10 di GOL).',
+      },
+      saved: 'Intestazione e avviso di «{{name}}» salvati.',
     },
     agencies: {
       kind: 'Tipologia',

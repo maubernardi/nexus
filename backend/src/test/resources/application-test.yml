@@ -7,3 +7,19 @@ nexus:
   municipalities:
     # i file dei test hanno pochi comuni
     min-rows: 3
+  # soggetto promotore finto per i documenti (US-1011): quelli veri stanno solo nel .env del server
+  promoter:
+    name: Cooperativa di prova
+    address: Via della Prova 1, Firenze
+    fiscal-code: "01234567890"
+    representative: Paola Neri
+    representative-role: Rappresentante Legale
+    representative-birth-place: Prato
+    representative-birth-date: 01/02/1970
+    phone: 055 000000
+    email: info@prova.example
+    pec: prova@pec.example
+    inail-position: "123456"
+    rc-insurer: Assicurazioni di prova
+    rc-policy: RC-1
+    rc-expiry: 22/07/2027

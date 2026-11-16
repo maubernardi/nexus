@@ -17,6 +17,8 @@ import it.nexus.domain.dto.CareAgencyDTO;
 import it.nexus.domain.dto.CareAgencyFormDTO;
 import it.nexus.domain.dto.CompetenceSiteDTO;
 import it.nexus.domain.dto.IdsFormDTO;
+import it.nexus.domain.dto.ProjectDocumentsDTO;
+import it.nexus.domain.dto.ProjectDocumentsFormDTO;
 import it.nexus.domain.dto.ProjectInternshipTypesDTO;
 import it.nexus.services.DocumentCatalogService;
 import it.nexus.web.rest.PathAPI;
@@ -25,7 +27,8 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * Dettagli dei cataloghi per i documenti reali (US-115), solo per l'ADMIN: progetti delle sedi di competenza, tipi
- * ammessi dai progetti, dati degli enti di presa in carico. Aggiunta, nome e stato: {@code /catalogs/{kind}}.
+ * ammessi dai progetti, dati dei documenti dei progetti (US-1011), dati degli enti di presa in carico. Aggiunta, nome
+ * e stato: {@code /catalogs/{kind}}.
  */
 @RestController
 @RequestMapping(PathAPI.BASE_PATH_V1 + "/document-catalogs")
@@ -63,6 +66,21 @@ public class DocumentCatalogResource {
     public ResponseEntity<ProjectInternshipTypesDTO> setProjectInternshipTypes(@PathVariable String id,
             @RequestBody @Valid IdsFormDTO form) {
         return ResponseEntity.ok(service.setProjectInternshipTypes(id, form.ids()));
+    }
+
+    @GetMapping("/project-documents")
+    @PreAuthorize("hasRole(@requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Riferimento all'avviso e intestazione dei documenti di ogni progetto")
+    public ResponseEntity<List<ProjectDocumentsDTO>> projectDocuments() {
+        return ResponseEntity.ok(service.projectDocuments());
+    }
+
+    @PutMapping("/projects/{id}/documents")
+    @PreAuthorize("hasRole(@requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Riferimento all'avviso e intestazione dei documenti di un progetto (vuoti = predefiniti)")
+    public ResponseEntity<ProjectDocumentsDTO> updateProjectDocuments(@PathVariable String id,
+            @RequestBody @Valid ProjectDocumentsFormDTO form) {
+        return ResponseEntity.ok(service.updateProjectDocuments(id, form));
     }
 
     @GetMapping("/care-agencies")

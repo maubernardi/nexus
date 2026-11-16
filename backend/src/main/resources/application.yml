@@ -93,3 +93,19 @@ nexus:
     enabled: ${MAIL_ENABLED:false}
     from: ${MAIL_FROM:NEXUS <noreply@portalenexus.it>}
     app-url: ${APP_URL:http://localhost:5173}
+  # soggetto promotore nei documenti (US-1011): solo dal .env del server, vuoti = righe da completare
+  promoter:
+    name: ${NEXUS_PROMOTER_NAME:}
+    address: ${NEXUS_PROMOTER_ADDRESS:}
+    fiscal-code: ${NEXUS_PROMOTER_FISCAL_CODE:}
+    representative: ${NEXUS_PROMOTER_REPRESENTATIVE:}
+    representative-role: ${NEXUS_PROMOTER_REPRESENTATIVE_ROLE:}
+    representative-birth-place: ${NEXUS_PROMOTER_REPRESENTATIVE_BIRTH_PLACE:}
+    representative-birth-date: ${NEXUS_PROMOTER_REPRESENTATIVE_BIRTH_DATE:}
+    phone: ${NEXUS_PROMOTER_PHONE:}
+    email: ${NEXUS_PROMOTER_EMAIL:}
+    pec: ${NEXUS_PROMOTER_PEC:}
+    inail-position: ${NEXUS_PROMOTER_INAIL_POSITION:}
+    rc-insurer: ${NEXUS_PROMOTER_RC_INSURER:}
+    rc-policy: ${NEXUS_PROMOTER_RC_POLICY:}
+    rc-expiry: ${NEXUS_PROMOTER_RC_EXPIRY:}

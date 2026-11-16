@@ -1228,5 +1228,19 @@ class DomainConstraintsIT {
             assertViolates("uq_document_template_file", () -> jdbc.update(
                     "UPDATE document_template SET file_id = ? WHERE id = ?", fileId, second));
         }
+
+        @Test
+        void avvisoDelProgettoVuoto() {
+            Long id = fixtures.graph().project().getId();
+            assertViolates("ck_project_notice_reference", () -> jdbc.update(
+                    "UPDATE project SET notice_reference = '  ' WHERE id = ?", id));
+        }
+
+        @Test
+        void intestazioneDelProgettoVuota() {
+            Long id = fixtures.graph().project().getId();
+            assertViolates("ck_project_header_line", () -> jdbc.update(
+                    "UPDATE project SET header_line = '' WHERE id = ?", id));
+        }
     }
 }

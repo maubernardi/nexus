@@ -24,6 +24,8 @@ import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.CareAgencyDTO;
 import it.nexus.domain.dto.CareAgencyFormDTO;
 import it.nexus.domain.dto.CompetenceSiteDTO;
+import it.nexus.domain.dto.ProjectDocumentsDTO;
+import it.nexus.domain.dto.ProjectDocumentsFormDTO;
 import it.nexus.domain.dto.ProjectInternshipTypesDTO;
 import it.nexus.domain.dto.ReferenceItemDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
@@ -97,6 +99,33 @@ public class DocumentCatalogServiceImpl implements DocumentCatalogService {
                     AuditChanges.of().value("internshipTypes", before, after), null);
         }
         return toDto(projects.saveAndFlush(project));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProjectDocumentsDTO> projectDocuments() {
+        return projects.findAllByOrderByActiveDescNameAsc().stream().map(this::toDocumentsDto).toList();
+    }
+
+    @Override
+    public ProjectDocumentsDTO updateProjectDocuments(String projectId, ProjectDocumentsFormDTO form) {
+        Project project = find(projects, projectId, "Progetto non trovato");
+        String notice = blankToNull(form.noticeReference());
+        String header = blankToNull(form.headerLine());
+        // il testo predefinito non si salva: resta quello del codice anche se un giorno cambia
+        if (Project.DEFAULT_NOTICE_REFERENCE.equals(notice)) {
+            notice = null;
+        }
+        AuditChanges changes = AuditChanges.of()
+                .value("noticeReference", project.getNoticeReference(), notice)
+                .value("headerLine", project.getHeaderLine(), header);
+        project.setNoticeReference(notice);
+        project.setHeaderLine(header);
+        Project saved = projects.saveAndFlush(project);
+        if (!changes.asMap().isEmpty()) {
+            auditService.record(AuditEntityType.PROJECT, saved.getId(), "UPDATE", changes, null);
+        }
+        return toDocumentsDto(saved);
     }
 
     @Override
@@ -184,6 +213,11 @@ public class DocumentCatalogServiceImpl implements DocumentCatalogService {
     private ProjectInternshipTypesDTO toDto(Project project) {
         return new ProjectInternshipTypesDTO(referenceMapper.toDto(project), project.isActive(),
                 sorted(project.getAllowedInternshipTypes()));
+    }
+
+    private ProjectDocumentsDTO toDocumentsDto(Project project) {
+        return new ProjectDocumentsDTO(referenceMapper.toDto(project), project.isActive(),
+                project.effectiveNoticeReference(), project.getNoticeReference() == null, project.getHeaderLine());
     }
 
     private static CareAgencyDTO toDto(CareAgency a) {

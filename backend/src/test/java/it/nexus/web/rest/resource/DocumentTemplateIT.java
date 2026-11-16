@@ -125,7 +125,10 @@ class DocumentTemplateIT {
                 .andExpect(content().contentType(DOCX))
                 .andExpect(content().bytes(content));
         mockMvc.perform(get(BASE + "/placeholders").header(USER, "admin"))
-                .andExpect(jsonPath("$", hasItem("NOME_TIROCINANTE")));
+                .andExpect(jsonPath("$[*].name", hasItem("NOME_TIROCINANTE")))
+                .andExpect(jsonPath("$[?(@.name == 'NUMERO_CONVENZIONE')].group").value("Convenzione"))
+                .andExpect(jsonPath("$[?(@.name == 'NUMERO_CONVENZIONE')].description")
+                        .value("Numero della convenzione: quella iniziale o la proroga del documento"));
 
         Map<String, Object> changes = audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(
                 AuditEntityType.DOCUMENT_TEMPLATE, TsidMapper.toInternal(id)).getFirst().getChanges();

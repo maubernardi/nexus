@@ -73,12 +73,15 @@ public class InternshipResource {
     @GetMapping("/documents/{kind}")
     @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
     @Operation(summary = "Documento del tirocinio compilato dalla scheda (.docx), es. la Convenzione; con più modelli "
-            + "caricati, quello scelto ({@code template})")
+            + "caricati, quello scelto ({@code template}); {@code extension} = numero della proroga, {@code project} = "
+            + "numero del progetto formativo nella sua convenzione")
     public ResponseEntity<byte[]> document(@PathVariable String ticketId, @PathVariable String kind,
-            @RequestParam(value = "template", required = false) String template) {
+            @RequestParam(value = "template", required = false) String template,
+            @RequestParam(value = "extension", required = false) Integer extension,
+            @RequestParam(value = "project", required = false) Integer project) {
         InternshipDocumentKind documentKind = InternshipDocumentKind.fromSlug(kind)
                 .orElseThrow(() -> new NotFoundException("Documento non trovato"));
-        GeneratedDocument document = documentService.generate(ticketId, documentKind, template);
+        GeneratedDocument document = documentService.generate(ticketId, documentKind, template, extension, project);
         return ResponseEntity.ok()
                 .contentType(DOCX)
                 .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()

@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.nexus.domain.dto.DocumentTemplateActiveDTO;
+import it.nexus.domain.dto.DocumentPlaceholderDTO;
 import it.nexus.domain.dto.DocumentTemplateDTO;
 import it.nexus.domain.dto.DocumentTemplateFormDTO;
 import it.nexus.services.DocumentTemplateService;
@@ -53,7 +54,7 @@ public class DocumentTemplateResource {
     @GetMapping("/placeholders")
     @PreAuthorize("hasRole(@requestsAuthorizer.ADMIN)")
     @Operation(summary = "Segnaposto che i modelli possono usare")
-    public ResponseEntity<List<String>> placeholders() {
+    public ResponseEntity<List<DocumentPlaceholderDTO>> placeholders() {
         return ResponseEntity.ok(service.placeholders());
     }
 

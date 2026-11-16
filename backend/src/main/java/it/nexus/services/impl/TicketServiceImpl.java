@@ -466,7 +466,8 @@ public class TicketServiceImpl implements TicketService {
             case "APPOINTMENT_SET" -> "Timer fermato";
             case "CLOSE" -> closureReportService.outcome(event.getEntityId()).orElse(null);
             case "DOCUMENT_GENERATED" -> Optional.ofNullable(changed(event, "document", "after"))
-                    .map(kind -> InternshipDocumentKind.valueOf(kind).label())
+                    .map(kind -> documentDetail(InternshipDocumentKind.valueOf(kind).label(),
+                            changed(event, "extension", "after"), changed(event, "project", "after")))
                     .orElse(null);
             case "TIMER_REMINDER" -> "Promemoria inviato al Tutor";
             case "TIMER_EXPIRE" -> "Nessun appuntamento entro la scadenza: mansione di nuovo libera";
@@ -491,6 +492,12 @@ public class TicketServiceImpl implements TicketService {
                 .flatMap(appUserRepository::findById)
                 .map(u -> u.getFirstName() + " " + u.getLastName())
                 .orElse(null);
+    }
+
+    /** Il documento scaricato: «Progetto Formativo 2, proroga 1» (US-1011). */
+    private static String documentDetail(String label, String extension, String project) {
+        String detail = project == null ? label : label + " " + project;
+        return extension == null ? detail : detail + ", proroga " + extension;
     }
 
     private static String changed(AuditEvent event, String field, String side) {

@@ -9,13 +9,16 @@ import {
 import {
   fetchCareAgencies,
   fetchCompetenceSites,
+  fetchProjectDocuments,
   fetchProjectInternshipTypes,
   setCompetenceSiteProjects,
   setProjectInternshipTypes,
   updateCareAgency,
+  updateProjectDocuments,
   type CareAgency,
   type CareAgencyData,
   type CompetenceSite,
+  type ProjectDocuments,
   type ProjectInternshipTypes,
 } from '@/config/api/documentCatalogApi';
 
@@ -26,6 +29,9 @@ export const useCompetenceSites = (): UseQueryResult<CompetenceSite[]> =>
 
 export const useProjectInternshipTypes = (): UseQueryResult<ProjectInternshipTypes[]> =>
   useQuery({ queryKey: [...key, 'project-internship-types'], queryFn: fetchProjectInternshipTypes });
+
+export const useProjectDocuments = (): UseQueryResult<ProjectDocuments[]> =>
+  useQuery({ queryKey: [...key, 'project-documents'], queryFn: fetchProjectDocuments });
 
 export const useCareAgencies = (): UseQueryResult<CareAgency[]> =>
   useQuery({ queryKey: [...key, 'care-agencies'], queryFn: fetchCareAgencies });
@@ -56,6 +62,12 @@ export const useSetProjectInternshipTypes = (): UseMutationResult<
   unknown,
   { id: string; ids: string[] }
 > => useDocumentCatalogMutation(setProjectInternshipTypes);
+
+export const useUpdateProjectDocuments = (): UseMutationResult<
+  ProjectDocuments,
+  unknown,
+  { id: string; noticeReference: string | null; headerLine: string | null }
+> => useDocumentCatalogMutation(updateProjectDocuments);
 
 export const useUpdateCareAgency = (): UseMutationResult<
   CareAgency,

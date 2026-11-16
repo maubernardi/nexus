@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Genera i modelli segnaposto dei documenti del tirocinio (US-1004, US-1005) in formato .docx, senza librerie esterne.
+"""Genera i modelli generici dei documenti del tirocinio (US-1004, US-1005, US-1011) in .docx, senza librerie esterne.
 
 Uso: python3 tools/genera-modelli-docx.py   (dalla radice del repository)
 
-Scrive backend/src/main/resources/templates/documents/{convenzione,progetto-formativo}/{CODICE_TIPO,default}.docx. I file sono
-riproducibili (date fisse nell'archivio): rigenerarli non cambia nulla se il testo non cambia. Sono modelli provvisori,
-da sostituire con i moduli ufficiali della cooperativa (Q5); i segnaposto sono quelli di InternshipDocumentServiceImpl.
+Scrive backend/src/main/resources/templates/documents/{convenzione,progetto-formativo}/{CODICE_TIPO,default}.docx e
+relazione-finale/default.docx. I file sono riproducibili (date fisse nell'archivio): rigenerarli non cambia nulla se il
+testo non cambia. Sono i modelli generici di ripiego, usati quando l'ADMIN non ha caricato un modello (US-1010); i
+segnaposto sono quelli di DocumentPlaceholders.
 """
 import os
 import zipfile
@@ -74,7 +75,7 @@ STYLES = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 FOOTER = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:ftr xmlns:w="{W}"><w:p><w:pPr><w:pStyle w:val="Nota"/><w:jc w:val="center"/></w:pPr>
-<w:r><w:t xml:space="preserve">NEXUS · segnalazione n. {{NUMERO_SEGNALAZIONE}} · modello segnaposto</w:t></w:r></w:p></w:ftr>"""
+<w:r><w:t xml:space="preserve">NEXUS · segnalazione n. {{NUMERO_SEGNALAZIONE}} · modello generico</w:t></w:r></w:p></w:ftr>"""
 
 APP = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"><Application>NEXUS</Application></Properties>"""
@@ -85,7 +86,7 @@ def core(title):
 <cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
  xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/"
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<dc:title>{escape(title)} (modello segnaposto)</dc:title><dc:creator>NEXUS</dc:creator>
+<dc:title>{escape(title)} (modello generico)</dc:title><dc:creator>NEXUS</dc:creator>
 <dcterms:created xsi:type="dcterms:W3CDTF">2026-10-29T00:00:00Z</dcterms:created>
 </cp:coreProperties>"""
 
@@ -115,11 +116,15 @@ def table(rows):
 def convenzione(title):
     body = [
         para(title, 'Title'),
-        para('Modello segnaposto di NEXUS: il testo definitivo arriverà con i moduli ufficiali della cooperativa.',
-             'Nota'),
+        para('Modello generico di NEXUS: l\'ADMIN può caricare i modelli della cooperativa dalla pagina «Modelli dei '
+             'documenti».', 'Nota'),
+        para('{INTESTAZIONE_PROGETTO}', 'Nota'),
+        para('Convenzione n. {NUMERO_CONVENZIONE} del {DATA_CONVENZIONE}, stipulata il {DATA_STIPULA_CONVENZIONE}, a '
+             'valere sull’{AVVISO}.'),
         para('Tra', 'Heading1'),
-        para('Cooperativa Sociale «Il Girasole» – Area Lavoro, soggetto promotore, rappresentata dal tutor '
-             '{TUTOR_PROMOTORE} (progetto {PROGETTO});'),
+        para('{PROMOTORE}, con sede in {SEDE_PROMOTORE}, codice fiscale {CODICE_FISCALE_PROMOTORE}, soggetto '
+             'promotore, rappresentato da {LEGALE_RAPPRESENTANTE_PROMOTORE} (progetto {PROGETTO}, tutor '
+             '{TUTOR_PROMOTORE});'),
         para('e', 'Heading1'),
         para('{RAGIONE_SOCIALE}, partita IVA {PARTITA_IVA}, con sede legale in {SEDE_LEGALE}, codice ATECO '
              '{CODICE_ATECO}, soggetto ospitante, nella persona del legale rappresentante {LEGALE_RAPPRESENTANTE}, '
@@ -134,7 +139,7 @@ def convenzione(title):
             ('Tipo di tirocinio', '{TIPO_TIROCINIO}'),
             ('Mansione', '{MANSIONE}'),
             ('Sede del tirocinio', '{SEDE_TIROCINIO}'),
-            ('Periodo', 'dal {DATA_INIZIO} al {DATA_FINE}'),
+            ('Periodo della convenzione', 'dal {INIZIO_CONVENZIONE} al {FINE_CONVENZIONE}'),
             ('Periodi di sospensione', '{SOSPENSIONI}'),
         ]),
         para('Art. 3 – Orario e monte ore', 'Heading1'),
@@ -161,22 +166,30 @@ def progetto_formativo(title):
     lines = '__________________________________________________________________'
     body = [
         para(title, 'Title'),
-        para('Modello segnaposto di NEXUS: il testo definitivo arriverà con i moduli ufficiali della cooperativa.',
-             'Nota'),
+        para('Modello generico di NEXUS: l\'ADMIN può caricare i modelli della cooperativa dalla pagina «Modelli dei '
+             'documenti».', 'Nota'),
+        para('{INTESTAZIONE_PROGETTO}', 'Nota'),
+        para('Progetto formativo n. {NUMERO_PROGETTO_FORMATIVO}, convenzione n. {NUMERO_CONVENZIONE} stipulata il '
+             '{DATA_STIPULA_CONVENZIONE}.'),
         para('Tirocinante', 'Heading1'),
         para('{NOME_TIROCINANTE}, nato/a a {LUOGO_NASCITA_TIROCINANTE} il {DATA_NASCITA_TIROCINANTE}, codice fiscale '
              '{CODICE_FISCALE_TIROCINANTE}, residente in {RESIDENZA_TIROCINANTE}.'),
         para('Soggetto promotore', 'Heading1'),
-        para('Cooperativa Sociale «Il Girasole» – Area Lavoro, progetto {PROGETTO}. Tutor: {TUTOR_PROMOTORE}.'),
+        para('{PROMOTORE}, {SEDE_PROMOTORE}, progetto {PROGETTO}. Tutor: {TUTOR_PROMOTORE}.'),
+        para('Infortuni sul lavoro: INAIL, posizione {POSIZIONE_INAIL}. Responsabilità civile: {COMPAGNIA_RC}, '
+             'polizza {POLIZZA_RC}, scadenza {SCADENZA_RC}.'),
         para('Soggetto ospitante', 'Heading1'),
         para('{RAGIONE_SOCIALE}, partita IVA {PARTITA_IVA}, sede legale in {SEDE_LEGALE}, codice ATECO {CODICE_ATECO}. '
              'Legale rappresentante: {LEGALE_RAPPRESENTANTE}. Tutor aziendali: {TUTOR_AZIENDALI}.'),
         para('Tirocinio', 'Heading1'),
         table([
             ('Tipo di tirocinio', '{TIPO_TIROCINIO}'),
-            ('Mansione', '{MANSIONE}'),
+            ('Mansione', '{MANSIONE_PROGETTO_FORMATIVO}'),
+            ('Dettaglio della mansione', '{DETTAGLIO_MANSIONE_PROGETTO_FORMATIVO}'),
             ('Sede del tirocinio', '{SEDE_TIROCINIO}'),
-            ('Periodo', 'dal {DATA_INIZIO} al {DATA_FINE}'),
+            ('Periodo del progetto', 'dal {INIZIO_PROGETTO_FORMATIVO} al {FINE_PROGETTO_FORMATIVO}'),
+            ('Durata del progetto', '{MESI_PROGETTO_FORMATIVO} mesi, {ORE_PROGETTO_FORMATIVO} ore'),
+            ('Periodo del tirocinio', 'dal {DATA_INIZIO} al {DATA_FINE}'),
             ('Periodi di sospensione', '{SOSPENSIONI}'),
             ('Ore settimanali', '{ORE_SETTIMANALI}'),
             ('Monte ore complessivo', '{MONTE_ORE_TOTALE}'),
@@ -196,6 +209,42 @@ def progetto_formativo(title):
         para('Il tirocinante ______________________________'),
         para('Il tutor del soggetto promotore ______________________________'),
         para('Il tutor del soggetto ospitante ______________________________'),
+    ]
+    sect = (f'<w:sectPr><w:footerReference w:type="default" r:id="rId2"/>'
+            '<w:pgSz w:w="11906" w:h="16838"/>'
+            '<w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="567" w:footer="567" '
+            'w:gutter="0"/></w:sectPr>')
+    return (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+            f'<w:document xmlns:w="{W}" xmlns:r="{R}"><w:body>{"".join(body)}{sect}</w:body></w:document>')
+
+
+def relazione_finale(title):
+    lines = '__________________________________________________________________'
+    body = [
+        para(title, 'Title'),
+        para('Modello generico di NEXUS: l\'ADMIN può caricare i modelli della cooperativa dalla pagina «Modelli dei '
+             'documenti».', 'Nota'),
+        para('{INTESTAZIONE_PROGETTO}', 'Nota'),
+        para('Attestazione finale', 'Heading1'),
+        para('Si attesta che {NOME_TIROCINANTE}, codice fiscale {CODICE_FISCALE_TIROCINANTE}, ha partecipato al '
+             'tirocinio {TIPO_TIROCINIO} promosso da {PROMOTORE} e svolto presso {RAGIONE_SOCIALE}, sede del '
+             'tirocinio {SEDE_TIROCINIO}.'),
+        table([
+            ('Mansione', '{MANSIONE}'),
+            ('Periodo', 'dal {DATA_INIZIO} al {DATA_FINE_EFFETTIVA}'),
+            ('Durata', '{MESI_TIROCINIO} mesi'),
+            ('Motivo di chiusura', '{MOTIVO_CHIUSURA}'),
+            ('Descrizione dell\'interruzione', '{DESCRIZIONE_INTERRUZIONE}'),
+            ('Tutor del soggetto ospitante', '{TUTOR_AZIENDALI}'),
+            ('Tutor del soggetto promotore', '{TUTOR_PROMOTORE}'),
+        ]),
+        para('Attività svolte', 'Heading1'),
+        para(lines),
+        para(lines),
+        para(lines),
+        para('{SEDE_COMPETENZA}, {DATA_CHIUSURA}'),
+        para('Per il soggetto promotore ______________________________'),
+        para('Per il soggetto ospitante ______________________________'),
     ]
     sect = (f'<w:sectPr><w:footerReference w:type="default" r:id="rId2"/>'
             '<w:pgSz w:w="11906" w:h="16838"/>'
@@ -235,6 +284,10 @@ def main():
             doc_title = title(prefix, suffix)
             write(path, doc_title, build(doc_title))
             print(path)
+    # la relazione finale ha un solo modello generico: quelli per tipo li carica l'ADMIN
+    path = os.path.normpath(os.path.join(OUT, 'relazione-finale', 'default.docx'))
+    write(path, 'RELAZIONE FINALE DEL TIROCINIO', relazione_finale('RELAZIONE FINALE DEL TIROCINIO'))
+    print(path)
 
 
 if __name__ == '__main__':

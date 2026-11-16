@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { useCatalog } from '@/config/hooks/useCatalogs';
 import {
   useCareAgencies,
   useCompetenceSites,
+  useProjectDocuments,
   useProjectInternshipTypes,
   useSetCompetenceSiteProjects,
   useSetProjectInternshipTypes,
@@ -14,6 +15,7 @@ import {
 import { CareAgencyForm } from '@/organisms/CareAgencyForm/CareAgencyForm';
 import { CatalogSection } from '@/organisms/CatalogSection/CatalogSection';
 import { ChecklistForm } from '@/organisms/ChecklistForm/ChecklistForm';
+import { ProjectDocumentsForm } from '@/organisms/ProjectDocumentsForm/ProjectDocumentsForm';
 
 /** Voci attive di un catalogo più quelle già scelte (che restano anche se disattivate), come opzioni. */
 const useOptions = (kind: 'projects' | 'internship-types', chosen: readonly string[]) => {
@@ -145,16 +147,29 @@ const ProjectTypesEditor = ({
   );
 };
 
-/** Tipi di tirocinio ammessi da ogni progetto (US-115); nessun tipo indicato = tutti. */
-export const ProjectInternshipTypesSection = () => {
+type ProjectRow = { project: { id: string; name: string }; active: boolean };
+
+type ProjectsSectionProps<T extends ProjectRow> = {
+  /** Prefisso dei testi in `documentCatalogs` e degli id. */
+  name: 'projectTypes' | 'projectDocuments';
+  rows: { data?: T[]; isError: boolean };
+  columns: { header: string; cell: (row: T) => ReactNode }[];
+  editor: (row: T, onDone: () => void, onCancel: () => void) => ReactNode;
+};
+
+/**
+ * Una tabella con una riga per progetto e un pulsante per modificarla: il modulo si apre sopra la tabella con il focus
+ * sul titolo, l'esito prende il focus dopo il salvataggio.
+ */
+const ProjectsSection = <T extends ProjectRow>({ name, rows, columns, editor }: ProjectsSectionProps<T>) => {
   const { t } = useTranslation();
-  const rows = useProjectInternshipTypes();
-  const [editing, setEditing] = useState<ProjectInternshipTypes | null>(null);
+  const [editing, setEditing] = useState<T | null>(null);
   const [outcome, setOutcome] = useState<string | null>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const outcomeRef = useRef<HTMLDivElement>(null);
   const th = 'px-3 py-2 text-left text-sm font-semibold whitespace-nowrap';
   const td = 'px-3 py-2 align-top';
+  const headingId = `catalog-${name === 'projectTypes' ? 'project-types' : 'project-documents'}-heading`;
 
   useEffect(() => {
     if (editing) headingRef.current?.focus();
@@ -164,11 +179,11 @@ export const ProjectInternshipTypesSection = () => {
   }, [outcome]);
 
   return (
-    <section aria-labelledby="catalog-project-types-heading" className="space-y-4">
-      <h2 id="catalog-project-types-heading" className="text-lg font-semibold text-primary">
-        {t('documentCatalogs.projectTypes.heading')}
+    <section aria-labelledby={headingId} className="space-y-4">
+      <h2 id={headingId} className="text-lg font-semibold text-primary">
+        {t(`documentCatalogs.${name}.heading`)}
       </h2>
-      <p className="text-muted-foreground">{t('documentCatalogs.projectTypes.intro')}</p>
+      <p className="text-muted-foreground">{t(`documentCatalogs.${name}.intro`)}</p>
       {outcome && (
         <div
           ref={outcomeRef}
@@ -181,17 +196,18 @@ export const ProjectInternshipTypesSection = () => {
       {editing && (
         <div className="space-y-4 rounded-xl border border-border bg-card p-4">
           <h3 ref={headingRef} tabIndex={-1} className="text-base font-semibold">
-            {t('documentCatalogs.projectTypes.editHeading', { name: editing.project.name })}
+            {t(`documentCatalogs.${name}.editHeading`, { name: editing.project.name })}
           </h3>
-          <ProjectTypesEditor
-            key={editing.project.id}
-            row={editing}
-            onDone={() => {
-              setOutcome(t('documentCatalogs.projectTypes.saved', { name: editing.project.name }));
-              setEditing(null);
-            }}
-            onCancel={() => setEditing(null)}
-          />
+          <Fragment key={editing.project.id}>
+            {editor(
+              editing,
+              () => {
+                setOutcome(t(`documentCatalogs.${name}.saved`, { name: editing.project.name }));
+                setEditing(null);
+              },
+              () => setEditing(null),
+            )}
+          </Fragment>
         </div>
       )}
       {rows.isError && !rows.data ? (
@@ -206,15 +222,17 @@ export const ProjectInternshipTypesSection = () => {
       ) : (
         <div className="overflow-x-auto rounded-xl border border-border bg-card">
           <table className="w-full border-collapse text-sm">
-            <caption className="sr-only">{t('documentCatalogs.projectTypes.caption')}</caption>
+            <caption className="sr-only">{t(`documentCatalogs.${name}.caption`)}</caption>
             <thead className="border-b border-border bg-muted">
               <tr>
                 <th scope="col" className={th}>
-                  {t('documentCatalogs.projectTypes.project')}
+                  {t(`documentCatalogs.${name}.project`)}
                 </th>
-                <th scope="col" className={th}>
-                  {t('documentCatalogs.projectTypes.types')}
-                </th>
+                {columns.map((c) => (
+                  <th key={c.header} scope="col" className={th}>
+                    {c.header}
+                  </th>
+                ))}
                 <th scope="col" className={th}>
                   {t('catalog.columns.actions')}
                 </th>
@@ -225,13 +243,13 @@ export const ProjectInternshipTypesSection = () => {
                 <tr key={row.project.id} className="border-b border-border last:border-b-0">
                   <th scope="row" className={`${td} text-left font-semibold`}>
                     {row.project.name}
-                    {!row.active && ` ${t('documentCatalogs.projectTypes.inactive')}`}
+                    {!row.active && ` ${t(`documentCatalogs.${name}.inactive`)}`}
                   </th>
-                  <td className={td}>
-                    {row.internshipTypes.length > 0
-                      ? row.internshipTypes.map((i) => i.name).join(', ')
-                      : t('documentCatalogs.projectTypes.all')}
-                  </td>
+                  {columns.map((c) => (
+                    <td key={c.header} className={td}>
+                      {c.cell(row)}
+                    </td>
+                  ))}
                   <td className={`${td} whitespace-nowrap`}>
                     <Button
                       size="sm"
@@ -242,7 +260,7 @@ export const ProjectInternshipTypesSection = () => {
                         setEditing(row);
                       }}
                     >
-                      {t('documentCatalogs.projectTypes.action')}{' '}
+                      {t(`documentCatalogs.${name}.action`)}{' '}
                       <span className="sr-only">{row.project.name}</span>
                     </Button>
                   </td>
@@ -253,5 +271,57 @@ export const ProjectInternshipTypesSection = () => {
         </div>
       )}
     </section>
+  );
+};
+
+/** Tipi di tirocinio ammessi da ogni progetto (US-115); nessun tipo indicato = tutti. */
+export const ProjectInternshipTypesSection = () => {
+  const { t } = useTranslation();
+  const rows = useProjectInternshipTypes();
+  return (
+    <ProjectsSection
+      name="projectTypes"
+      rows={rows}
+      columns={[
+        {
+          header: t('documentCatalogs.projectTypes.types'),
+          cell: (row) =>
+            row.internshipTypes.length > 0
+              ? row.internshipTypes.map((i) => i.name).join(', ')
+              : t('documentCatalogs.projectTypes.all'),
+        },
+      ]}
+      editor={(row, onDone, onCancel) => <ProjectTypesEditor row={row} onDone={onDone} onCancel={onCancel} />}
+    />
+  );
+};
+
+/** Intestazione e riferimento all'avviso dei documenti di ogni progetto (US-1011). */
+export const ProjectDocumentsSection = () => {
+  const { t } = useTranslation();
+  const rows = useProjectDocuments();
+  return (
+    <ProjectsSection
+      name="projectDocuments"
+      rows={rows}
+      columns={[
+        {
+          header: t('documentCatalogs.projectDocuments.header'),
+          cell: (row) => row.headerLine ?? t('documentCatalogs.projectDocuments.noHeader'),
+        },
+        {
+          header: t('documentCatalogs.projectDocuments.notice'),
+          cell: (row) =>
+            t(
+              row.defaultNotice
+                ? 'documentCatalogs.projectDocuments.defaultNotice'
+                : 'documentCatalogs.projectDocuments.customNotice',
+            ),
+        },
+      ]}
+      editor={(row, onDone, onCancel) => (
+        <ProjectDocumentsForm row={row} onDone={onDone} onCancel={onCancel} />
+      )}
+    />
   );
 };
