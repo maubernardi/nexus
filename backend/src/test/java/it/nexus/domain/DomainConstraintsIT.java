@@ -1242,5 +1242,51 @@ class DomainConstraintsIT {
             assertViolates("ck_project_header_line", () -> jdbc.update(
                     "UPDATE project SET header_line = '' WHERE id = ?", id));
         }
+
+        @Test
+        void promotoreDelProgettoVuoto() {
+            Long id = fixtures.graph().project().getId();
+            assertViolates("ck_project_promoter_not_blank", () -> jdbc.update(
+                    "UPDATE project SET promoter_pec = ' ' WHERE id = ?", id));
+        }
+
+        private static final String INSERT_VARIABLE = "INSERT INTO project_variable (id, project_id, name, value, "
+                + "description, created_at, created_by, updated_at, updated_by) "
+                + "VALUES (?, ?, ?, ?, ?, now(), 'test', now(), 'test')";
+
+        @Test
+        void variabileRipetutaNelProgetto() {
+            Long id = fixtures.graph().project().getId();
+            jdbc.update(INSERT_VARIABLE, 893700000000099001L, id, "SEDE_OPERATIVA", "Via Roma 1", null);
+            assertViolates("uq_project_variable_name", () -> jdbc.update(INSERT_VARIABLE, 893700000000099002L, id,
+                    "SEDE_OPERATIVA", "Via Verdi 2", null));
+        }
+
+        @Test
+        void nomeDellaVariabileNonValido() {
+            Long id = fixtures.graph().project().getId();
+            assertViolates("ck_project_variable_name", () -> jdbc.update(INSERT_VARIABLE, 893700000000099003L, id,
+                    "sede operativa", "Via Roma 1", null));
+        }
+
+        @Test
+        void valoreDellaVariabileVuoto() {
+            Long id = fixtures.graph().project().getId();
+            assertViolates("ck_project_variable_value", () -> jdbc.update(INSERT_VARIABLE, 893700000000099004L, id,
+                    "ALTRA", " ", null));
+        }
+
+        @Test
+        void descrizioneDellaVariabileVuota() {
+            Long id = fixtures.graph().project().getId();
+            assertViolates("ck_project_variable_description", () -> jdbc.update(INSERT_VARIABLE,
+                    893700000000099005L, id, "ALTRA", "x", ""));
+        }
+
+        @Test
+        void variabileSenzaProgetto() {
+            assertViolates("fk_project_variable_project", () -> jdbc.update(INSERT_VARIABLE, 893700000000099006L,
+                    -1L, "ALTRA", "x", null));
+        }
     }
 }

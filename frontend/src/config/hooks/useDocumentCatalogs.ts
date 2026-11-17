@@ -19,6 +19,7 @@ import {
   type CareAgencyData,
   type CompetenceSite,
   type ProjectDocuments,
+  type ProjectDocumentsUpdate,
   type ProjectInternshipTypes,
 } from '@/config/api/documentCatalogApi';
 
@@ -66,7 +67,7 @@ export const useSetProjectInternshipTypes = (): UseMutationResult<
 export const useUpdateProjectDocuments = (): UseMutationResult<
   ProjectDocuments,
   unknown,
-  { id: string; noticeReference: string | null; headerLine: string | null }
+  ProjectDocumentsUpdate
 > => useDocumentCatalogMutation(updateProjectDocuments);
 
 export const useUpdateCareAgency = (): UseMutationResult<

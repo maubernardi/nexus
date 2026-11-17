@@ -3,8 +3,10 @@ package it.nexus.services.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.List;
@@ -22,6 +24,7 @@ import it.nexus.domain.CareAgency;
 import it.nexus.domain.DocumentTemplate;
 import it.nexus.domain.InternshipType;
 import it.nexus.domain.Project;
+import it.nexus.domain.ProjectVariable;
 import it.nexus.domain.StoredFile;
 import it.nexus.domain.StoredFileContent;
 import it.nexus.domain.Ticket;
@@ -38,6 +41,7 @@ import it.nexus.repository.CareAgencyRepository;
 import it.nexus.repository.DocumentTemplateRepository;
 import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.repository.ProjectRepository;
+import it.nexus.repository.ProjectVariableRepository;
 import it.nexus.repository.StoredFileContentRepository;
 import it.nexus.repository.StoredFileRepository;
 import it.nexus.services.AuditService;
@@ -69,6 +73,7 @@ public class DocumentTemplateServiceImpl implements DocumentTemplateService {
     private final CareAgencyRepository careAgencies;
     private final StoredFileRepository files;
     private final StoredFileContentRepository contents;
+    private final ProjectVariableRepository variables;
     private final AuditService auditService;
     private final ReferenceMapper referenceMapper;
 
@@ -79,10 +84,18 @@ public class DocumentTemplateServiceImpl implements DocumentTemplateService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<DocumentPlaceholderDTO> placeholders() {
-        return DocumentPlaceholders.ALL.stream()
+        List<DocumentPlaceholderDTO> all = new ArrayList<>(DocumentPlaceholders.ALL.stream()
                 .map(p -> new DocumentPlaceholderDTO(p.name(), p.group(), p.description()))
-                .toList();
+                .toList());
+        for (ProjectVariable v : variables.findAllWithProject()) {
+            String group = "Variabili del progetto «%s»".formatted(v.getProject().getName());
+            String description = v.getDescription() != null ? v.getDescription()
+                    : "Variabile del progetto: «%s»".formatted(v.getValue());
+            all.add(new DocumentPlaceholderDTO(v.getName(), group, description));
+        }
+        return all;
     }
 
     @Override
@@ -111,7 +124,7 @@ public class DocumentTemplateServiceImpl implements DocumentTemplateService {
         if (name.length() > 200) {
             throw new FieldValidationException("name", "Massimo 200 caratteri");
         }
-        checkDocx(content);
+        checkDocx(content, project);
         DocumentTemplate saved = templates.saveAndFlush(
                 new DocumentTemplate(kind, project, type, agency, name, store(fileName, content)));
         auditService.record(AuditEntityType.DOCUMENT_TEMPLATE, saved.getId(), "TEMPLATE_UPLOADED", AuditChanges.of()
@@ -135,7 +148,7 @@ public class DocumentTemplateServiceImpl implements DocumentTemplateService {
     public DocumentTemplateDTO replaceFile(String id, Long version, String fileName, byte[] content) {
         DocumentTemplate template = template(id);
         checkVersion(template, version);
-        checkDocx(content);
+        checkDocx(content, template.getProject());
         StoredFile old = template.getFile();
         long oldSize = old.getSizeBytes();
         template.setFile(store(fileName, content));
@@ -155,6 +168,14 @@ public class DocumentTemplateServiceImpl implements DocumentTemplateService {
         checkVersion(template, dto.version());
         if (template.isActive() == dto.active()) {
             return toDto(template);
+        }
+        // una variabile del progetto può essere stata tolta mentre il modello era disattivato (US-1013)
+        if (dto.active()) {
+            List<String> unknown = unknownPlaceholders(placeholdersOf(content(template)), template.getProject());
+            if (!unknown.isEmpty()) {
+                throw new ConflictException("Il modello usa segnaposto che NEXUS non conosce più: %s. Sostituisci il "
+                        .formatted(braces(unknown)) + "file prima di riattivarlo");
+            }
         }
         template.setActive(dto.active());
         DocumentTemplate saved = templates.saveAndFlush(template);
@@ -188,11 +209,19 @@ public class DocumentTemplateServiceImpl implements DocumentTemplateService {
                 .getContent();
     }
 
+    @Override
+    public List<String> templatesUsing(Project project, String placeholder) {
+        return templates.findByProjectIdAndActiveTrueOrderByNameAsc(project.getId()).stream()
+                .filter(t -> placeholdersOf(content(t)).contains(placeholder))
+                .map(DocumentTemplate::getName)
+                .toList();
+    }
+
     /**
-     * Un .docx leggibile, al massimo 5 MB, con i soli segnaposto che NEXUS sa compilare: altrimenti l'errore sul file,
-     * con l'elenco dei segnaposto sconosciuti.
+     * Un .docx leggibile, al massimo 5 MB, con i soli segnaposto che NEXUS sa compilare (i suoi e le variabili del
+     * progetto del modello, US-1013): altrimenti l'errore sul file, con l'elenco dei segnaposto sconosciuti.
      */
-    private static void checkDocx(byte[] content) {
+    private void checkDocx(byte[] content, Project project) {
         if (content == null || content.length == 0) {
             throw new FieldValidationException("file", "Scegli il file del modello");
         }
@@ -203,16 +232,38 @@ public class DocumentTemplateServiceImpl implements DocumentTemplateService {
             throw new FieldValidationException("file", NOT_DOCX);
         }
         Set<String> found;
-        try (InputStream in = new ByteArrayInputStream(content)) {
-            found = DocxTemplate.placeholders(in);
-        } catch (IOException | RuntimeException e) {
+        try {
+            found = placeholdersOf(content);
+        } catch (RuntimeException e) {
             // Apache POI segnala i file non Word con eccezioni non controllate
             throw new FieldValidationException("file", NOT_DOCX);
         }
-        List<String> unknown = found.stream().filter(p -> !DocumentPlaceholders.KNOWN.contains(p)).toList();
+        List<String> unknown = unknownPlaceholders(found, project);
         if (!unknown.isEmpty()) {
             throw new FieldValidationException("file", "Il modello usa segnaposto che NEXUS non conosce: "
-                    + unknown.stream().map(p -> "{" + p + "}").collect(Collectors.joining(", ")));
+                    + braces(unknown));
+        }
+    }
+
+    /** I segnaposto che non sono né di NEXUS né variabili del progetto (US-1013). */
+    private List<String> unknownPlaceholders(Set<String> found, Project project) {
+        Set<String> projectVariables = variables.findByProjectOrderByNameAsc(project).stream()
+                .map(ProjectVariable::getName)
+                .collect(Collectors.toSet());
+        return found.stream()
+                .filter(p -> !DocumentPlaceholders.KNOWN.contains(p) && !projectVariables.contains(p))
+                .toList();
+    }
+
+    private static String braces(List<String> placeholders) {
+        return placeholders.stream().map(p -> "{" + p + "}").collect(Collectors.joining(", "));
+    }
+
+    private static Set<String> placeholdersOf(byte[] content) {
+        try (InputStream in = new ByteArrayInputStream(content)) {
+            return DocxTemplate.placeholders(in);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 

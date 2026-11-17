@@ -1,6 +1,7 @@
 package it.nexus.web.rest.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -34,10 +35,12 @@ import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.InternshipType;
 import it.nexus.domain.Project;
+import it.nexus.domain.ProjectVariable;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.InternshipTypeRepository;
+import it.nexus.repository.ProjectVariableRepository;
 import it.nexus.support.TestDocx;
 import it.nexus.support.WorkflowScenarios;
 import jakarta.persistence.EntityManager;
@@ -62,6 +65,7 @@ class DocumentTemplateIT {
     @Autowired InternshipTypeRepository internshipTypes;
     @Autowired AuditEventRepository audit;
     @Autowired JdbcTemplate jdbc;
+    @Autowired ProjectVariableRepository variables;
 
     private Project project;
     private InternshipType type;
@@ -231,6 +235,52 @@ class DocumentTemplateIT {
                 .extracting(e -> e.getAction())
                 .containsExactly("TEMPLATE_UPLOADED", "TEMPLATE_FILE_REPLACED", "TEMPLATE_DEACTIVATED",
                         "TEMPLATE_ACTIVATED");
+    }
+
+    /** US-1013: le variabili di un progetto valgono solo nei suoi modelli, e una variabile usata non si toglie. */
+    @Test
+    void variabiliDelProgetto_soloNeiModelliDelProgetto() throws Exception {
+        variables.save(new ProjectVariable(project, "SEDE_OPERATIVA", "Via Roma 1, Firenze", null));
+        em.flush();
+        byte[] content = TestDocx.of("Sede operativa {SEDE_OPERATIVA} per {NOME_TIROCINANTE}");
+        String id = JsonPath.read(upload("admin", docx("convenzione.docx", content), fields("Convenzione GOL"))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString(), "$.id");
+
+        Map<String, String> other = new HashMap<>(fields("Convenzione POLIS"));
+        other.put("projectId", TsidMapper.toExternal(scenarios.project("POLIS").getId()));
+        upload("admin", docx("convenzione.docx", content), other)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("file"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value(containsString("{SEDE_OPERATIVA}")));
+
+        mockMvc.perform(get(BASE + "/placeholders").header(USER, "admin"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.name == 'SEDE_OPERATIVA')].group")
+                        .value("Variabili del progetto «%s»".formatted(project.getName())))
+                .andExpect(jsonPath("$[?(@.name == 'SEDE_OPERATIVA')].description")
+                        .value("Variabile del progetto: «Via Roma 1, Firenze»"));
+
+        mockMvc.perform(put("/api/v1/document-catalogs/projects/" + TsidMapper.toExternal(project.getId())
+                        + "/documents").contentType(MediaType.APPLICATION_JSON).content("{\"variables\": []}")
+                        .header(USER, "admin"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("variables"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value(containsString("«Convenzione GOL»")));
+        assertThat(variables.findByProjectOrderByNameAsc(project)).hasSize(1);
+
+        // disattivato il modello, la variabile si toglie; riattivarlo senza la variabile è rifiutato
+        mockMvc.perform(put(BASE + "/" + id + "/active").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"active\": false, \"version\": 0}").header(USER, "admin"))
+                .andExpect(status().isOk());
+        mockMvc.perform(put("/api/v1/document-catalogs/projects/" + TsidMapper.toExternal(project.getId())
+                        + "/documents").contentType(MediaType.APPLICATION_JSON).content("{\"variables\": []}")
+                        .header(USER, "admin"))
+                .andExpect(status().isOk());
+        mockMvc.perform(put(BASE + "/" + id + "/active").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"active\": true, \"version\": 1}").header(USER, "admin"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value(containsString("{SEDE_OPERATIVA}")));
     }
 
     @Test

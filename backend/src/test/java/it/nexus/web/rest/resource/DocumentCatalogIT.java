@@ -171,6 +171,79 @@ class DocumentCatalogIT {
     }
 
     @Test
+    void promotoreDelProgetto_conAuditSenzaDatiPersonali() throws Exception {
+        String path = "/projects/" + id(this.gol) + "/documents";
+        putJson("admin", path, """
+                {"headerLine": "%s", "promoter": {"name": " Cooperativa di prova ", "address": "Via della Prova 1",
+                 "fiscalCode": "01234567890", "representative": "Paola Neri", "representativeRole": "Presidente",
+                 "representativeBirthPlace": "Prato", "representativeBirthDate": "1970-02-01", "phone": "055 000000",
+                 "email": "info@prova.example", "pec": "", "inailPosition": "123456", "rcInsurer": "Assicurazioni",
+                 "rcPolicy": "RC-1", "rcExpiry": "2027-07-22"}}""".formatted(HEADER))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.promoter.name").value("Cooperativa di prova"))
+                .andExpect(jsonPath("$.promoter.representativeBirthDate").value("1970-02-01"))
+                .andExpect(jsonPath("$.promoter.rcExpiry").value("2027-07-22"))
+                .andExpect(jsonPath("$.promoter.pec").doesNotExist());
+        assertThat(jdbc.queryForObject("SELECT promoter_rc_policy FROM project WHERE id = ?", String.class,
+                this.gol.getId())).isEqualTo("RC-1");
+        // nell'audit i dati dell'ente sì, quelli del legale rappresentante solo come «cambiati»
+        em.flush();
+        String changes = jdbc.queryForObject("SELECT changes::text FROM audit_event WHERE entity_type = 'PROJECT' "
+                + "AND entity_id = ? AND action = 'UPDATE' ORDER BY created_at DESC, id DESC LIMIT 1", String.class,
+                this.gol.getId());
+        assertThat(changes).contains("RC-1", "promoter.representative").doesNotContain("Paola", "Prato", "1970");
+
+        // senza promotore nel modulo i dati restano
+        putJson("admin", path, "{\"headerLine\": \"%s\"}".formatted(HEADER))
+                .andExpect(jsonPath("$.promoter.rcPolicy").value("RC-1"));
+        putJson("admin", path, """
+                {"promoter": {"email": "non-una-mail", "fiscalCode": "123", "representativeBirthDate": "2999-01-01"}}""")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[*].field").value(org.hamcrest.Matchers.containsInAnyOrder(
+                        "promoter.email", "promoter.fiscalCode", "promoter.representativeBirthDate")));
+    }
+
+    @Test
+    void variabiliDelProgetto_aggiunteModificateTolte() throws Exception {
+        String path = "/projects/" + id(this.gol) + "/documents";
+        putJson("admin", path, """
+                {"variables": [{"name": "SEDE_OPERATIVA", "value": " Via Roma 1, Firenze "},
+                               {"name": "CODICE_ATS", "value": "ATS-7", "description": "Codice dell'ATS"}]}""")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.variables[*].name").value(org.hamcrest.Matchers.contains("CODICE_ATS",
+                        "SEDE_OPERATIVA")))
+                .andExpect(jsonPath("$.variables[1].value").value("Via Roma 1, Firenze"));
+        putJson("admin", path, """
+                {"variables": [{"name": "SEDE_OPERATIVA", "value": "Via Verdi 2, Firenze", "description": "Sede"}]}""")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.variables.length()").value(1))
+                .andExpect(jsonPath("$.variables[0].value").value("Via Verdi 2, Firenze"))
+                .andExpect(jsonPath("$.variables[0].description").value("Sede"));
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM project_variable WHERE project_id = ?", Long.class,
+                this.gol.getId())).isOne();
+        em.flush();
+        assertThat(jdbc.queryForList("SELECT changes::text FROM audit_event WHERE entity_type = 'PROJECT' "
+                + "AND entity_id = ? AND action = 'UPDATE' ORDER BY created_at, id", String.class, this.gol.getId()))
+                .hasSize(2)
+                .last().asString().contains("variable:CODICE_ATS", "Via Verdi 2, Firenze");
+
+        // nome di NEXUS, ripetuto, non valido
+        putJson("admin", path, "{\"variables\": [{\"name\": \"PROMOTORE\", \"value\": \"x\"}]}")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("variables[0].name"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value(org.hamcrest.Matchers.containsString(
+                        "segnaposto di NEXUS")));
+        putJson("admin", path, """
+                {"variables": [{"name": "UNO", "value": "1"}, {"name": "UNO", "value": "2"}]}""")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("variables[1].name"));
+        putJson("admin", path, "{\"variables\": [{\"name\": \"sede\", \"value\": \"\"}]}")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[*].field").value(org.hamcrest.Matchers.containsInAnyOrder(
+                        "variables[0].name", "variables[0].value")));
+    }
+
+    @Test
     void enti_vociInizialiEDati() throws Exception {
         mockMvc.perform(get(BASE + "/care-agencies").header(USER, "admin"))
                 .andExpect(jsonPath("$[?(@.id == '%s')].kind".formatted(COMUNE)).value("COMUNE"))

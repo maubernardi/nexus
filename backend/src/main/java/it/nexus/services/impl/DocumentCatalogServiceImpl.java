@@ -3,9 +3,11 @@ package it.nexus.services.impl;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -20,6 +22,8 @@ import it.nexus.domain.CareAgency;
 import it.nexus.domain.CompetenceSite;
 import it.nexus.domain.InternshipType;
 import it.nexus.domain.Project;
+import it.nexus.domain.ProjectPromoter;
+import it.nexus.domain.ProjectVariable;
 import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.CareAgencyDTO;
 import it.nexus.domain.dto.CareAgencyFormDTO;
@@ -27,6 +31,8 @@ import it.nexus.domain.dto.CompetenceSiteDTO;
 import it.nexus.domain.dto.ProjectDocumentsDTO;
 import it.nexus.domain.dto.ProjectDocumentsFormDTO;
 import it.nexus.domain.dto.ProjectInternshipTypesDTO;
+import it.nexus.domain.dto.ProjectPromoterDTO;
+import it.nexus.domain.dto.ProjectVariableDTO;
 import it.nexus.domain.dto.ReferenceItemDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.mapper.ReferenceMapper;
@@ -35,8 +41,11 @@ import it.nexus.repository.CareAgencyRepository;
 import it.nexus.repository.CompetenceSiteRepository;
 import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.repository.ProjectRepository;
+import it.nexus.repository.ProjectVariableRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.DocumentCatalogService;
+import it.nexus.services.DocumentTemplateService;
+import it.nexus.services.documents.DocumentPlaceholders;
 import it.nexus.web.errors.ConflictException;
 import it.nexus.web.errors.FieldValidationException;
 import it.nexus.web.errors.NotFoundException;
@@ -56,6 +65,8 @@ public class DocumentCatalogServiceImpl implements DocumentCatalogService {
     private final CareAgencyRepository careAgencies;
     private final ReferenceMapper referenceMapper;
     private final AuditService auditService;
+    private final ProjectVariableRepository variables;
+    private final DocumentTemplateService documentTemplates;
 
     @Override
     @Transactional(readOnly = true)
@@ -121,6 +132,14 @@ public class DocumentCatalogServiceImpl implements DocumentCatalogService {
                 .value("headerLine", project.getHeaderLine(), header);
         project.setNoticeReference(notice);
         project.setHeaderLine(header);
+        if (form.promoter() != null) {
+            ProjectPromoter promoter = promoter(form.promoter());
+            changes = changes.merge(promoterChanges(project.getPromoter(), promoter));
+            project.setPromoter(promoter);
+        }
+        if (form.variables() != null) {
+            changes = changes.merge(saveVariables(project, form.variables()));
+        }
         Project saved = projects.saveAndFlush(project);
         if (!changes.asMap().isEmpty()) {
             auditService.record(AuditEntityType.PROJECT, saved.getId(), "UPDATE", changes, null);
@@ -216,8 +235,99 @@ public class DocumentCatalogServiceImpl implements DocumentCatalogService {
     }
 
     private ProjectDocumentsDTO toDocumentsDto(Project project) {
+        ProjectPromoter p = project.getPromoter();
+        ProjectPromoterDTO promoter = new ProjectPromoterDTO(p.name(), p.address(), p.fiscalCode(), p.representative(),
+                p.representativeRole(), p.representativeBirthPlace(), p.representativeBirthDate(), p.phone(),
+                p.email(), p.pec(), p.inailPosition(), p.rcInsurer(), p.rcPolicy(), p.rcExpiry());
+        List<ProjectVariableDTO> vars = variables.findByProjectOrderByNameAsc(project).stream()
+                .map(v -> new ProjectVariableDTO(v.getName(), v.getValue(), v.getDescription()))
+                .toList();
         return new ProjectDocumentsDTO(referenceMapper.toDto(project), project.isActive(),
-                project.effectiveNoticeReference(), project.getNoticeReference() == null, project.getHeaderLine());
+                project.effectiveNoticeReference(), project.getNoticeReference() == null, project.getHeaderLine(),
+                promoter, vars);
+    }
+
+    /** Il promotore dal modulo: testi senza spazi ai lati, vuoti = assenti (US-1013). */
+    private static ProjectPromoter promoter(ProjectPromoterDTO f) {
+        return new ProjectPromoter(blankToNull(f.name()), blankToNull(f.address()), blankToNull(f.fiscalCode()),
+                blankToNull(f.representative()), blankToNull(f.representativeRole()),
+                blankToNull(f.representativeBirthPlace()), f.representativeBirthDate(), blankToNull(f.phone()),
+                blankToNull(f.email()), blankToNull(f.pec()), blankToNull(f.inailPosition()),
+                blankToNull(f.rcInsurer()), blankToNull(f.rcPolicy()), f.rcExpiry());
+    }
+
+    /** Nome, luogo e data di nascita del legale rappresentante sono dati personali: solo che sono cambiati (D6). */
+    private static AuditChanges promoterChanges(ProjectPromoter b, ProjectPromoter a) {
+        return AuditChanges.of()
+                .value("promoter.name", b.name(), a.name())
+                .value("promoter.address", b.address(), a.address())
+                .value("promoter.fiscalCode", b.fiscalCode(), a.fiscalCode())
+                .redactedIfChanged("promoter.representative", b.representative(), a.representative())
+                .value("promoter.representativeRole", b.representativeRole(), a.representativeRole())
+                .redactedIfChanged("promoter.representativeBirthPlace", b.representativeBirthPlace(),
+                        a.representativeBirthPlace())
+                .redactedIfChanged("promoter.representativeBirthDate", b.representativeBirthDate(),
+                        a.representativeBirthDate())
+                .value("promoter.phone", b.phone(), a.phone())
+                .value("promoter.email", b.email(), a.email())
+                .value("promoter.pec", b.pec(), a.pec())
+                .value("promoter.inailPosition", b.inailPosition(), a.inailPosition())
+                .value("promoter.rcInsurer", b.rcInsurer(), a.rcInsurer())
+                .value("promoter.rcPolicy", b.rcPolicy(), a.rcPolicy())
+                .value("promoter.rcExpiry", b.rcExpiry(), a.rcExpiry());
+    }
+
+    /**
+     * Le variabili del progetto diventano quelle del modulo (D3): nuove, aggiornate, tolte. Un nome di NEXUS o ripetuto
+     * è rifiutato; una variabile usata da un modello del progetto non si toglie.
+     */
+    private AuditChanges saveVariables(Project project, List<ProjectVariableDTO> form) {
+        Map<String, ProjectVariableDTO> wanted = new LinkedHashMap<>();
+        for (int i = 0; i < form.size(); i++) {
+            ProjectVariableDTO v = form.get(i);
+            String name = v.name().strip();
+            String field = "variables[%d].name".formatted(i);
+            if (DocumentPlaceholders.KNOWN.contains(name)) {
+                throw new FieldValidationException(field, "%s è già un segnaposto di NEXUS: scegli un altro nome"
+                        .formatted(name));
+            }
+            if (wanted.putIfAbsent(name, v) != null) {
+                throw new FieldValidationException(field, "La variabile %s c'è già".formatted(name));
+            }
+        }
+        AuditChanges changes = AuditChanges.of();
+        Map<String, ProjectVariable> saved = new LinkedHashMap<>();
+        variables.findByProjectOrderByNameAsc(project).forEach(v -> saved.put(v.getName(), v));
+        for (ProjectVariable old : saved.values()) {
+            if (wanted.containsKey(old.getName())) {
+                continue;
+            }
+            List<String> users = documentTemplates.templatesUsing(project, old.getName());
+            if (!users.isEmpty()) {
+                throw new FieldValidationException("variables",
+                        "La variabile %s è usata dal modello «%s»: toglila prima dal modello"
+                                .formatted(old.getName(), String.join("», «", users)));
+            }
+            changes = changes.value("variable:" + old.getName(), old.getValue(), null);
+            variables.delete(old);
+        }
+        for (ProjectVariableDTO v : wanted.values()) {
+            String name = v.name().strip();
+            String value = v.value().strip();
+            String description = blankToNull(v.description());
+            ProjectVariable old = saved.get(name);
+            if (old == null) {
+                variables.save(new ProjectVariable(project, name, value, description));
+                changes = changes.value("variable:" + name, null, value);
+            } else {
+                changes = changes.value("variable:" + name, old.getValue(), value)
+                        .value("variable:" + name + ".description", old.getDescription(), description);
+                old.setValue(value);
+                old.setDescription(description);
+            }
+        }
+        variables.flush();
+        return changes;
     }
 
     private static CareAgencyDTO toDto(CareAgency a) {

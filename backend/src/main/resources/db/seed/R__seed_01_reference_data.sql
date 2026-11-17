@@ -75,3 +75,21 @@ UPDATE care_agency SET fiscal_code = '00000000004', legal_address = 'Via della P
     representative_birth_date = '1968-05-18', referent_name = 'Elena Esempio', referent_phone = '055 0000004',
     referent_email = 'referente.nordovest@esempio.it'
 WHERE code = 'SOCIETA_DELLA_SALUTE_FIORENTINA_NORD_OVEST' AND fiscal_code IS NULL;
+
+-- Soggetto promotore FINTO di GOL per i documenti (US-1013): quello vero lo inserisce l'ADMIN dai Cataloghi.
+UPDATE project SET
+    promoter_name = 'Cooperativa di prova',
+    promoter_address = 'Via della Prova 1, Firenze',
+    promoter_fiscal_code = '01234567890',
+    promoter_representative = 'Paola Neri',
+    promoter_representative_role = 'Rappresentante Legale',
+    promoter_representative_birth_place = 'Prato',
+    promoter_representative_birth_date = DATE '1970-02-01',
+    promoter_phone = '055 000000',
+    promoter_email = 'info@prova.example',
+    promoter_pec = 'prova@pec.example',
+    promoter_inail_position = '123456',
+    promoter_rc_insurer = 'Assicurazioni di prova',
+    promoter_rc_policy = 'RC-1',
+    promoter_rc_expiry = DATE '2027-07-22'
+WHERE code = 'GOL' AND promoter_name IS NULL;

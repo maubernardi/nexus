@@ -977,11 +977,11 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   8. Dopo l'invio del report riapri la scheda. **Atteso:** la proroga si legge ma non si modifica più.
 
 - [ ] **T-24.3 Intestazione e avviso dei documenti per progetto (US-1011)**
-  1. Come `admin` apri **Cataloghi**. **Atteso:** la sezione «Intestazione e avviso dei documenti», con ogni progetto,
+  1. Come `admin` apri **Cataloghi**. **Atteso:** la sezione «Dati dei documenti dei progetti», con ogni progetto,
      «Nessuna intestazione» e «Testo predefinito».
   2. Premi «Modifica» su GOL. **Atteso:** il modulo si apre con il focus sul titolo; il «Riferimento all'avviso» ha
      già il testo predefinito (Avviso pubblico n. 10). Scrivi l'intestazione «Firenze in Rete 2 – Codice 9014358 – CUP
-     B81D24000440006» e salva. **Atteso:** l'esito «Intestazione e avviso di «GOL» salvati.» e la riga aggiornata.
+     B81D24000440006» e salva. **Atteso:** l'esito «Dati dei documenti di «GOL» salvati.» e la riga aggiornata.
   3. Riapri GOL, svuota il riferimento all'avviso e salva. **Atteso:** la colonna «Avviso» torna a «Testo
      predefinito».
   4. Apri **Modelli dei documenti** e il riquadro «Segnaposto che i modelli possono usare». **Atteso:** i segnaposto
@@ -990,14 +990,14 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
 
 - [ ] **T-24.4 Documenti per convenzione e progetto, relazione finale (US-1011)**
 
-  Prima della prova: i dati del soggetto promotore nel `.env` del server (vedi il README, «Soggetto promotore nei
-  documenti») e il deploy. Senza modelli caricati i documenti usano il modello generico di NEXUS.
+  Prima della prova: i dati del soggetto promotore di GOL in «Cataloghi» (T-24.6). Senza modelli caricati i documenti
+  usano il modello generico di NEXUS.
   1. Come `tutor1` apri la scheda di una segnalazione con la convenzione e due progetti formativi salvati.
      **Atteso:** la sezione «Documenti» ha tre gruppi: «Convenzione» con «Scarica la Convenzione (.docx)»,
      «Progetti formativi» con un pulsante per ogni progetto, «Relazione finale» con «Si scarica a tirocinio chiuso…»
      e nessun pulsante.
   2. Scarica la Convenzione. **Atteso:** il file `Convenzione-segnalazione-<n>.docx` riporta l'intestazione di GOL
-     (T-24.3), numero e date della convenzione, il riferimento all'avviso e i dati del promotore del `.env`.
+     (T-24.3), numero e date della convenzione, il riferimento all'avviso e i dati del promotore di GOL (T-24.6).
   3. Scarica il Progetto Formativo 2. **Atteso:** il file `Progetto-formativo-2-segnalazione-<n>.docx` riporta il
      progetto 2 con le sue date, mesi, ore e mansione, e il numero della convenzione.
   4. Sul tirocinio con la proroga (T-24.2) scarica «Scarica la Convenzione della proroga 1» e «Proroga 1: scarica il
@@ -1011,8 +1011,8 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
 
 - [ ] **T-24.5 Modelli reali di GOL (EN-8)**
 
-  Prima della prova: il deploy di EN-8, i dati del promotore nel `.env` (T-24.4) e i 6 modelli preparati in
-  `documenti_base/modelli-nexus/` (fuori dal repository).
+  Prima della prova: i dati del promotore di GOL (T-24.6) e i 6 modelli preparati in `documenti_base/modelli-nexus/`
+  (fuori dal repository).
   1. Come `admin` apri **Modelli dei documenti** e il riquadro dei segnaposto. **Atteso:** nel gruppo «Ente di presa
      in carico» ci sono le sette caselle della tipologia («Casella della tipologia «Comune»…», fino ad «Altro
      soggetto»).
@@ -1036,3 +1036,28 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      descrizione dell'interruzione) in testa alla «Valutazione complessiva», i mesi e la fine effettiva; nell'Allegato
      C la durata fino alla fine effettiva, con luogo (sede di competenza) e data di chiusura.
   6. Apri i documenti in Word. **Atteso:** si aprono senza avvisi di contenuto illeggibile.
+
+- [ ] **T-24.6 Dati del promotore e variabili per progetto (US-1013)**
+
+  Da fare prima di T-24.4 e T-24.5: i dati del promotore servono ai documenti.
+  1. Come `admin` apri **Cataloghi** → «Dati dei documenti dei progetti». **Atteso:** le colonne «Promotore» («Non
+     indicato») e «Variabili» («Nessuna»).
+  2. Premi «Modifica» su GOL. **Atteso:** oltre a intestazione e avviso, i gruppi «Soggetto promotore», «Legale
+     rappresentante del promotore», «Assicurazioni» e «Variabili del progetto».
+  3. Inserisci i dati del promotore dai modelli della cooperativa (denominazione, sede, codice fiscale, telefono, mail,
+     PEC, legale rappresentante con ruolo, luogo e data di nascita, posizione INAIL, compagnia, numero e scadenza della
+     polizza RC) e salva. **Atteso:** l'esito «Dati dei documenti di «GOL» salvati.» e la denominazione nella colonna
+     «Promotore».
+  4. Riapri GOL e scrivi una PEC sbagliata (`pec-sbagliata`). **Atteso:** il riepilogo degli errori con il link al
+     campo PEC; correggila e salva.
+  5. Premi «Aggiungi una variabile»: nome `prova`, valore «Valore di prova», e salva. **Atteso:** il nome diventa
+     `PROVA` e la colonna «Variabili» lo riporta. Riapri: il nome non si modifica più. Prova anche il nome `PROMOTORE`.
+     **Atteso:** l'errore «PROMOTORE è già un segnaposto di NEXUS».
+  6. In **Modelli dei documenti** il riquadro dei segnaposto ha il gruppo «Variabili del progetto «GOL…»» con `PROVA`.
+     Carica per GOL un .docx che contiene `{PROVA}`. **Atteso:** accettato; lo stesso file per un altro progetto è
+     rifiutato perché `{PROVA}` è sconosciuto.
+  7. Torna in Cataloghi e togli la variabile `PROVA`. **Atteso:** il salvataggio è rifiutato: la variabile è usata dal
+     modello appena caricato.
+  8. In Modelli dei documenti disattiva il modello di prova, poi togli `PROVA` dai Cataloghi. **Atteso:** ora si
+     salva. Riattiva il modello. **Atteso:** rifiutato, perché `{PROVA}` non è più un segnaposto noto; il modello
+     resta disattivato.
