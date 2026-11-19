@@ -132,13 +132,13 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1008](#us-1008) | E10 | Convenzione e progetti formativi | Must | 8 | R4 | 🎉 Done (Sprint 13) |
 | [US-1009](#us-1009) | E10 | Fine effettiva del tirocinio e ruolo del tutor aziendale | Must | 2 | R4 | 🎉 Done (Sprint 13) |
 | [US-1010](#us-1010) | E10 | Modelli dei documenti caricati dall'ADMIN | Must | 8 | R4 | 🎉 Done (Sprint 13) |
-| [US-1011](#us-1011) | E10 | Documenti sui modelli reali (GOL) | Must | 8 | R4 | ✅ Ready (Sprint 14) |
-| [US-1012](#us-1012) | E10 | Proroga del tirocinio | Must | 8 | R4 | ✅ Ready (Sprint 14) |
-| [US-1013](#us-1013) | E10 | Dati del promotore e variabili per progetto | Must | 8 | R4 | ✅ Ready (Sprint 14) |
-| [EN-8](#en-8) | E10 | Preparazione dei modelli reali | Must | 3 | R4 | ✅ Ready (Sprint 14) |
+| [US-1011](#us-1011) | E10 | Documenti sui modelli reali (GOL) | Must | 8 | R4 | 🎉 Done (Sprint 14) |
+| [US-1012](#us-1012) | E10 | Proroga del tirocinio | Must | 8 | R4 | 🎉 Done (Sprint 14) |
+| [US-1013](#us-1013) | E10 | Dati del promotore e variabili per progetto | Must | 8 | R4 | 🎉 Done (Sprint 14) |
+| [EN-8](#en-8) | E10 | Preparazione dei modelli reali | Must | 3 | R4 | 🎉 Done (Sprint 14) |
 | [US-1101](#us-1101) | E11 | Report di restituzione | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1102](#us-1102) | E11 | Esito sulla mansione e audit trail | Must | 2 | R3 | 🎉 Done (Sprint 8) |
-| [US-1103](#us-1103) | E11 | Motivo di chiusura del tirocinio | Must | 2 | R4 | ✅ Ready (Sprint 14) |
+| [US-1103](#us-1103) | E11 | Motivo di chiusura del tirocinio | Must | 2 | R4 | 🎉 Done (Sprint 14) |
 | [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | 🎉 Done (Sprint 5) |
 | [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1301](#us-1301) | E13 | Verifica della PWA online | Must | 1 | R1 | 📋 Backlog |
@@ -1079,7 +1079,7 @@ Criteri di accettazione:
 Dipendenze: US-115
 
 #### US-1011
-**Documenti sui modelli reali (GOL)** · Must · 8 punti · R4 · ✅ Ready (Sprint 14)
+**Documenti sui modelli reali (GOL)** · Must · 8 punti · R4 · 🎉 Done (Sprint 14)
 
 Come **Tutor** voglio scaricare convenzione, progetto formativo e relazione finale compilati sui modelli reali della
 cooperativa, per usarli senza ritoccarli (Q5, planning del 09/11).
@@ -1089,7 +1089,8 @@ Criteri di accettazione:
   attiva solo a tirocinio chiuso. Con le proroghe (US-1012) una convenzione per ogni convenzione, con lo stesso
   modello (PO, 15/11).
 - Dati del soggetto promotore (denominazione, sede, codice fiscale, legale rappresentante con nascita, contatti,
-  posizione INAIL, polizza RC con scadenza) nel `.env` del server, non nei modelli (PO, 09/11).
+  posizione INAIL, polizza RC con scadenza) nel `.env` del server, non nei modelli (PO, 09/11). **Cambiato il 16/11:**
+  nel database, per progetto, con le variabili libere (US-1013).
 - Per ogni progetto, modificabili dall'ADMIN: riferimento all'avviso (con un testo predefinito) e riga di intestazione
   con codice e CUP (es. «Firenze in Rete 2 – Codice 9014358 – CUP B81D24000440006»).
 - Nuovi segnaposto: dati dell'ente e del case manager, contatti e titolo di studio e cittadinanza del beneficiario,
@@ -1104,7 +1105,7 @@ Criteri di accettazione:
 Dipendenze: US-1007, US-1008, US-1009, US-1010, US-1012, US-1103, US-206, US-308
 
 #### US-1012
-**Proroga del tirocinio** · Must · 8 punti · R4 · ✅ Ready (Sprint 14)
+**Proroga del tirocinio** · Must · 8 punti · R4 · 🎉 Done (Sprint 14)
 
 Come **Tutor** voglio prorogare un tirocinio con una nuova convenzione, per continuarlo senza rifare la segnalazione
 né la scheda (PO, 15/11).
@@ -1125,7 +1126,7 @@ Criteri di accettazione:
 Dipendenze: US-1008
 
 #### US-1013
-**Dati del promotore e variabili per progetto** · Must · 8 punti · R4 · ✅ Ready (Sprint 14)
+**Dati del promotore e variabili per progetto** · Must · 8 punti · R4 · 🎉 Done (Sprint 14)
 
 Come **ADMIN** voglio indicare per ogni progetto i dati del soggetto promotore e altre variabili per i modelli, perché
 possono cambiare da un progetto all'altro (PO, 16/11).
@@ -1148,7 +1149,7 @@ Criteri di accettazione:
 Dipendenze: US-1011
 
 #### EN-8
-**Preparazione dei modelli reali** · Must · 3 punti · R4 · ✅ Ready (Sprint 14)
+**Preparazione dei modelli reali** · Must · 3 punti · R4 · 🎉 Done (Sprint 14)
 
 Il team prepara i 6 modelli di GOL partendo dai file della cooperativa: 3 per l'Extracurriculare e 3 per l'Inclusione,
 uno solo per tutti e quattro gli enti perché i testi sono identici (PO, 09/11).
@@ -1186,7 +1187,7 @@ Criteri di accettazione:
 Dipendenze: US-1101
 
 #### US-1103
-**Motivo di chiusura del tirocinio** · Must · 2 punti · R4 · ✅ Ready (Sprint 14)
+**Motivo di chiusura del tirocinio** · Must · 2 punti · R4 · 🎉 Done (Sprint 14)
 
 Come **Tutor** voglio indicare perché un tirocinio è finito prima del previsto, per la relazione finale e le
 statistiche (PO, 15/11).
@@ -1199,6 +1200,8 @@ Criteri di accettazione:
 - Nel report di restituzione, se la fine effettiva (US-1009) precede la fine prevista, il Tutor sceglie il motivo tra
   le voci attive di interruzione, obbligatorio; altrimenti il motivo è «Chiusura regolare», automatico.
 - Il motivo compare nel report inviato e nella cronologia, entra nell'audit e serve alla relazione finale (US-1011).
+- Con un'interruzione anticipata il Tutor scrive anche una **descrizione** dell'interruzione, obbligatoria insieme al
+  motivo. Compare nel report e nella relazione finale; come testo libero non entra nell'audit (PO, 16/11).
 
 Dipendenze: US-1009, US-109
 
