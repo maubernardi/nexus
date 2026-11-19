@@ -1,0 +1,58 @@
+# Sprint 15 — 19 – 21 novembre 2026
+
+**Stato:** 📋 pianificato, 27 punti. **Planning:** 19/11, sull'[analisi del database attuale](../../analisi/database-attuale.md)
+(§7, §8) chiesta nella [review dello Sprint 14](sprint-14-review.md) (§8.2). Il PO ha scelto di mettere tutto nello
+sprint, anche sopra la velocity media (22,9).
+
+## Obiettivo
+
+> Le aziende del database attuale possono entrare in NEXUS con tutti i loro dati: categoria, referenti, recapiti e
+> chiamate in archivio, con un'importazione provata e i dati da completare riconoscibili. Il Call Center propone la
+> stessa mansione a più segnalazioni, una per tipo di tirocinio.
+
+## Impegno (27 punti)
+
+| ID | Storia | Punti | Stato | Change OpenSpec | PR |
+|---|---|---|---|---|---|
+| US-508 | Partita IVA e nome da completare | 3 | ✅ Ready | | |
+| US-509 | Categoria merceologica e attività dell'azienda | 3 | ✅ Ready | | |
+| US-510 | Referenti e recapiti dell'azienda | 5 | ✅ Ready | | |
+| US-1309 | Importazione dal database attuale | 8 | ✅ Ready | | |
+| US-605 | Una mansione per più segnalazioni, una per tipo di tirocinio | 8 | ✅ Ready | | |
+
+Ordine: prima le tre storie che danno all'azienda i campi del database attuale, poi l'importazione, che li usa; per
+ultima US-605, indipendente. Prossima migrazione: **V45**.
+
+Ogni storia con interfaccia nuova si controlla in Chrome **prima** della PR (A26). Se l'estensione si blocca, il
+controllo si fa con Chrome senza finestra e un profilo pulito (A34). Un difetto si segnala solo dopo aver escluso che
+dipenda dalla simulazione (A29).
+
+## Decisioni del planning (19/11)
+
+- **Database attuale** ([analisi](../../analisi/database-attuale.md)):
+  - è il registro delle aziende e delle chiamate del Call Center; i beneficiari sono «immersi» nelle chiamate, non c'è
+    un'anagrafica;
+  - NEXUS lo sostituisce in tutto: categoria merceologica, referenti e recapiti si aggiungono a NEXUS.
+- **Partita IVA mancante**: «00000000000», che il programma non lascia salvare; l'unicità nel database esclude quel
+  valore.
+- **Nome mancante**: «Azienda senza nome n. ‹numero di Access›», con lo stesso vincolo.
+- **Aziende**: si importano tutte.
+- **Chiamate**: in una tabella di archivio, non visibile nell'interfaccia. I beneficiari sono indicati con le
+  iniziali; 7 note da controllare prima dell'importazione.
+- **Importazione**: provata su una copia in locale. Sulla demo restano i dati dimostrativi; l'importazione vera si fa
+  con il passaggio in produzione (US-1306).
+- **Backup** (US-1302): resta nel backlog fino a dopo questo sprint.
+- **Collaudo** (T-22 … T-24): dopo l'analisi del database attuale, cioè da ora.
+
+## Burndown
+
+| Momento | Punti residui |
+|---|---|
+| Inizio (19/11, dopo il planning) | 27 |
+
+## Per il PO durante lo sprint
+
+- Unire questa PR con il planning, poi le PR delle storie.
+- Controllare in Access le 7 chiamate con nome e cognome: n. 11719, 26711, 28531, 31037, 34116, 36661, 40614.
+- Caricare i 6 modelli di GOL (T-24.5) e il collaudo T-22 … T-24.
+- Chiudere la PR di Dependabot #156, se Dependabot non la chiude da solo.
