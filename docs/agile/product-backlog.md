@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 90 elementi, 358 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-14](sprints/sprint-14.md), il 17/11 ([review](sprints/sprint-14-review.md)); prossimo: sprint 15, da pianificare.
+**Totale: 94 elementi, 377 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-14](sprints/sprint-14.md), il 17/11 ([review](sprints/sprint-14-review.md)); prossimo: [sprint-15](sprints/sprint-15.md), dal 19/11.
 
 ## Epiche
 
@@ -13,7 +13,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 6 | 23 |
 | E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 8 | 31 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 5 | 17 |
-| E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 7 | 15 (+ US-507 da stimare) |
+| E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 10 | 26 (+ US-507 da stimare) |
 | E6 | Abbinamento (fase 4) | Il Call Center abbina il beneficiario a una mansione libera e la blocca. | 5 | 25 |
 | E7 | Proposta e timer (fase 5) | Il Tutor valuta la proposta; i tempi di risposta sono presidiati da un timer di 7 giorni lavorativi. | 5 | 15 |
 | E8 | Appuntamento e rilancio (fase 6) | Il Tutor registra l'esito dell'appuntamento; se fallisce, la mansione può essere rilanciata in bacheca. | 3 | 10 |
@@ -21,7 +21,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione, Progetto Formativo e Relazione finale sui modelli reali in Word. | 13 | 70 |
 | E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 3 | 9 |
 | E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 2 | 10 |
-| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 14 | 55 |
+| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 15 | 63 |
 
 ## Release
 
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 32 | 166 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 36 | 185 |
 
 ## Domande aperte per il Product Owner
 
@@ -105,6 +105,9 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-505](#us-505) | E5 | Diario delle note dell'azienda | Must | 2 | R1 | 🎉 Done (Sprint 4) |
 | [US-506](#us-506) | E5 | Legale rappresentante e codici ATECO dell'azienda | Must | 3 | R3 | 🎉 Done (Sprint 7) |
 | [US-507](#us-507) | E5 | Richiesta di contatto di un'azienda dal Tutor | Should | ? | — | 📋 Backlog (da analizzare) |
+| [US-508](#us-508) | E5 | Partita IVA e nome da completare | Must | 3 | R4 | ✅ Ready (Sprint 15) |
+| [US-509](#us-509) | E5 | Categoria merceologica e attività dell'azienda | Must | 3 | R4 | ✅ Ready (Sprint 15) |
+| [US-510](#us-510) | E5 | Referenti e recapiti dell'azienda | Must | 5 | R4 | ✅ Ready (Sprint 15) |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 🎉 Done (Sprint 5) |
@@ -149,6 +152,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1306](#us-1306) | E13 | Passaggio in produzione | Must | 5 | R4 | 📋 Backlog |
 | [US-1307](#us-1307) | E13 | Monitoraggio e revisione di sicurezza | Must | 5 | R4 | 🎉 Done (Sprint 10) |
 | [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | 🎉 Done (Sprint 10) |
+| [US-1309](#us-1309) | E13 | Importazione dal database attuale | Must | 8 | R4 | ✅ Ready (Sprint 15) |
 
 ## Dettaglio per epica
 
@@ -702,6 +706,56 @@ zona), così che il Call Center prenda in carico la richiesta e contatti l'azien
 
 Criteri di accettazione: da definire in una **sessione di analisi dedicata**, quando il PO decide di affrontarla
 (PO, 15/11).
+
+#### US-508
+**Partita IVA e nome da completare** · Must · 3 punti · R4 · ✅ Ready (Sprint 15)
+
+Come **Call Center** voglio riconoscere le aziende arrivate dal database attuale senza partita IVA o senza nome, e
+doverle completare, perché il database attuale non ha la partita IVA (PO, 19/11;
+[analisi](../analisi/database-attuale.md)).
+
+Criteri di accettazione:
+- L'importazione (US-1309) mette **«00000000000»** come partita IVA mancante e **«Azienda senza nome n. ‹numero di
+  Access›»** come nome mancante (PO, 19/11). Nel database l'unicità della partita IVA esclude «00000000000».
+- Nessuno può salvare un'azienda con quei valori: il modulo li rifiuta e chiede quelli veri, così la prima modifica li
+  corregge (PO, 19/11).
+- Nell'elenco e nella scheda dell'azienda compare «Da completare» con il dato che manca; l'elenco si filtra sulle
+  aziende da completare.
+- Nei documenti, al posto di «00000000000», c'è la riga da completare.
+
+Dipendenze: US-501
+
+#### US-509
+**Categoria merceologica e attività dell'azienda** · Must · 3 punti · R4 · ✅ Ready (Sprint 15)
+
+Come **Call Center** voglio indicare la categoria merceologica e l'attività di un'azienda, e cercare le aziende per
+categoria, per non perdere la classificazione del database attuale (PO, 19/11).
+
+Criteri di accettazione:
+- Catalogo dell'ADMIN **«Categorie merceologiche»** con le 55 voci del database attuale (Albergo, Ristorante /
+  Trattoria / Bistrot, Pulizie e facchinaggio…): si aggiungono, rinominano e disattivano come gli altri cataloghi.
+- Nella scheda dell'azienda: categoria merceologica (facoltativa, dal catalogo) e descrizione dell'attività (testo
+  libero, es. «Pizzeria»).
+- Nell'elenco delle aziende la categoria si vede e si filtra.
+- Le modifiche entrano nell'audit dell'azienda.
+
+Dipendenze: US-501, US-106
+
+#### US-510
+**Referenti e recapiti dell'azienda** · Must · 5 punti · R4 · ✅ Ready (Sprint 15)
+
+Come **Call Center** voglio registrare più referenti di un'azienda, ognuno con il ruolo e i suoi recapiti, e gli altri
+recapiti dell'azienda, per non perdere i contatti del database attuale (PO, 19/11).
+
+Criteri di accettazione:
+- Un'azienda ha **più referenti**: nome, ruolo, telefono, cellulare, email. Il referente di oggi (US-501) diventa il
+  primo.
+- I ruoli sono un catalogo dell'ADMIN, con le voci del database attuale ripulite: Titolare, Referente, Responsabile
+  del personale, Legale rappresentante, Presidente, Direttore…
+- L'azienda ha anche **cellulare, fax, seconda email** e una **sede operativa** (indirizzo e comune, US-1007).
+- I dati dei referenti entrano nell'audit solo come «cambiati»: sono dati personali.
+
+Dipendenze: US-501, US-1007
 
 ### E6 — Abbinamento (fase 4)
 
@@ -1389,3 +1443,28 @@ Criteri di accettazione:
   italiana e IP); su richiesta del PO, oggetto «PORTALE NEXUS - …» e firma «Portale Nexus» in **tutte** le email.
 
 Dipendenze: US-1202. Lo fa Keycloak con l'SMTP di IONOS (review dello Sprint 8, §8.7)
+
+#### US-1309
+**Importazione dal database attuale** · Must · 8 punti · R4 · ✅ Ready (Sprint 15)
+
+Come **PO** voglio portare in NEXUS le aziende e le chiamate del database Access, per usare NEXUS al posto del
+database attuale, che NEXUS sostituisce in tutto (PO, 19/11; [analisi](../analisi/database-attuale.md)).
+
+Criteri di accettazione:
+- Si importano **tutte le aziende** (13.799), con:
+  - nome, oppure «Azienda senza nome n. …», e partita IVA «00000000000» (US-508);
+  - indirizzo e comune abbinato all'elenco ufficiale, con una tabella di alias per frazioni, abbreviazioni e comuni
+    fusi;
+  - telefono, email ripulite, referenti con il ruolo, cellulare, fax, seconda email e sede operativa (US-510);
+  - categoria e attività (US-509);
+  - note nel diario con la data originale.
+- Le **chiamate** (38.789) vanno in una **tabella di archivio** con tutti i loro dati, collegate all'azienda quando
+  esiste: non compaiono nell'interfaccia, ma restano disponibili (PO, 19/11). I beneficiari sono già indicati con le
+  iniziali; prima dell'importazione il PO controlla le 7 note con nome e cognome indicate nell'analisi.
+- I dati non entrano mai nel repository: l'importazione legge il file sul server, e i log non riportano dati personali.
+- Alla fine un **resoconto**: quante righe sono entrate e quali vanno riviste (duplicati, comuni non trovati, aziende
+  senza nome).
+- Si prova su una copia in locale; sulla demo restano i dati dimostrativi. L'importazione vera si fa con il passaggio
+  in produzione (US-1306) (PO, 19/11).
+
+Dipendenze: US-508, US-509, US-510, US-114
