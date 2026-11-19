@@ -1,7 +1,8 @@
 # Sprint 14 — 12 – 14 novembre 2026
 
 **Stato:** 🎉 concluso il 17/11: impegno di 29 punti completato (21 al planning, più US-1013 aggiunta dal PO il 16/11),
-demo a `2a123af`; collaudo T-24.1 … T-24.6 da fare; review da fare. **Planning:** 11/11, nella
+demo a `2a123af`; collaudo T-24.1 … T-24.6 da fare, dopo l'analisi del database attuale;
+[review](sprint-14-review.md) del 19/11. **Planning:** 11/11, nella
 [review dello Sprint 13](sprint-13-review.md) (§8.2, §9); il 15/11 il PO ha proposto delle variazioni funzionali, e due
 completano lo sprint (motivo di chiusura e proroga).
 
@@ -130,8 +131,8 @@ Due dati per progetto, che l'ADMIN potrà modificare dopo US-1011:
 
 | Sprint | Storie | Punti |
 |---|---|---|
-| 15 | US-605 Una mansione per più segnalazioni, una per tipo di tirocinio | 8 |
-| poi | US-507 (dopo l'analisi) · US-1305 Revisione UX/UI · US-1302 Backup · US-1306 Passaggio in produzione | — |
+| 15 | Da definire dopo il confronto con il database attuale (PO, 19/11); in partenza US-605 Una mansione per più segnalazioni, una per tipo di tirocinio | 8 |
+| poi | US-507 (dopo l'analisi) · US-1305 Revisione UX/UI · US-1302 Backup (dopo lo Sprint 15) · US-1306 Passaggio in produzione | — |
 
 ## Burndown
 
