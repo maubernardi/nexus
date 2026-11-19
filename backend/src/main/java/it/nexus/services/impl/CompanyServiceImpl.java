@@ -46,9 +46,9 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CompanyDTO> search(String search, boolean includeInactive) {
+    public List<CompanyDTO> search(String search, boolean includeInactive, boolean toComplete) {
         String term = search == null || search.isBlank() ? null : search.strip();
-        return repository.search(term, includeInactive).stream().map(mapper::toDto).toList();
+        return repository.search(term, includeInactive, toComplete).stream().map(mapper::toDto).toList();
     }
 
     @Override

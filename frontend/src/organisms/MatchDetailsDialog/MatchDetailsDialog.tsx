@@ -9,6 +9,7 @@ import { apiError } from '@/config/api/errors';
 import type { JobSlotMatch } from '@/config/api/ticketApi';
 import { useCompany } from '@/config/hooks/useCompanies';
 import { useCompanyNotes } from '@/config/hooks/useCompanyNotes';
+import { isMissing } from '@/lib/companyCompletion';
 import { FormField } from '@/molecules/FormField/FormField';
 import { addressLine } from '@/molecules/MunicipalityField/municipalityValue';
 import { CompanyHistorySection } from '@/organisms/CompanyHistorySection/CompanyHistorySection';
@@ -212,7 +213,7 @@ const MatchDetailsBody = ({ slot }: { slot: JobSlotMatch }) => {
           <Fields
             rows={[
               [t('company.fields.name'), c.name],
-              [t('company.fields.vatCode'), c.vatCode],
+              [t('company.fields.vatCode'), isMissing(c, 'VAT_CODE') ? t('company.toComplete') : c.vatCode],
               [t('company.legalSeat'), addressLine(c.legalAddress, c.legalMunicipality) ?? none],
               [t('company.fields.contactPerson'), c.contactPerson ?? none],
               [t('company.fields.phone'), c.phone ?? none],

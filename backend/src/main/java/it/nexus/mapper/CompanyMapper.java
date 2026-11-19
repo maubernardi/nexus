@@ -13,5 +13,6 @@ public interface CompanyMapper {
     @Mapping(target = "active", source = "active")
     @Mapping(target = "legalMunicipality",
             expression = "java(MunicipalityMapper.toDto(company.getLegalMunicipality()))")
+    @Mapping(target = "missingData", expression = "java(company.missingData())")
     CompanyDTO toDto(Company company);
 }

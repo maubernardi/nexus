@@ -10,6 +10,13 @@ INSERT INTO company (id, name, vat_code, legal_address, contact_person, phone, e
     (892398395572130070, 'Demo Commercio al Dettaglio S.p.A.', '99000000004', 'Corso Simulato 4, Città Demo', 'Referente Negozio', '+39 000 1000004', 'negozio@demo.invalid', true, now(), 'seed', now(), 'seed')
 ON CONFLICT DO NOTHING;
 
+-- Aziende come arriveranno dal database attuale (US-508): senza partita IVA, una anche senza nome. Sono da completare
+-- dalla scheda; il numero 90001 non esiste nel database attuale.
+INSERT INTO company (id, name, vat_code, legal_address, contact_person, phone, email, active, created_at, created_by, updated_at, updated_by) VALUES
+    (892398395572130095, 'Demo Bar del Centro', '00000000000', 'Via Immaginaria 5', NULL, '+39 000 1000005', NULL, true, now(), 'seed', now(), 'seed'),
+    (892398395572130096, 'Azienda senza nome n. 90001', '00000000000', NULL, NULL, '+39 000 1000006', NULL, true, now(), 'seed', now(), 'seed')
+ON CONFLICT DO NOTHING;
+
 INSERT INTO job_slot (id, company_id, job_category_id, zone_id, title, description, status, created_at, created_by, updated_at, updated_by) VALUES
     -- s_mag_nord
     (892398395572130061, (SELECT id FROM company WHERE vat_code = '99000000001'), (SELECT id FROM job_category WHERE code = 'MAGAZZINIERE'), (SELECT id FROM zone WHERE code = 'RIFREDI'), 'Magazziniere reparto spedizioni', 'Mansione dimostrativa.', 'LIBERA', now(), 'seed', now(), 'seed'),

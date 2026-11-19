@@ -79,6 +79,34 @@ describe('<CompaniesPage>', () => {
     expect(searchCompanies).toHaveBeenLastCalledWith({ search: 'rossi', includeInactive: true });
   });
 
+  it('aziende da completare: etichetta nella colonna del dato che manca e filtro nell’indirizzo', async () => {
+    vi.mocked(searchCompanies).mockResolvedValue([
+      {
+        ...company('C3', 'Azienda senza nome n. 1234'),
+        vatCode: '00000000000',
+        missingData: ['NAME', 'VAT_CODE'],
+      },
+      { ...company('C4', 'Bar Centrale'), vatCode: '00000000000', missingData: ['VAT_CODE'] },
+    ]);
+    const user = userEvent.setup();
+    const { router } = renderPage();
+
+    const table = await screen.findByRole('table', { name: /Aziende ospitanti/ });
+    const [, first, second] = within(table).getAllByRole('row');
+    expect(within(first).getByRole('rowheader')).toHaveTextContent(
+      'Azienda senza nome n. 1234 Da completare',
+    );
+    expect(within(first).getAllByRole('cell')[0]).toHaveTextContent(/^Da completare$/);
+    expect(within(second).getByRole('rowheader')).toHaveTextContent(/^Bar Centrale$/);
+    expect(within(second).getAllByRole('cell')[0]).toHaveTextContent(/^Da completare$/);
+    expect(table).not.toHaveTextContent('00000000000');
+    await expectNoAxeViolations();
+
+    await user.click(screen.getByRole('checkbox', { name: 'Solo le aziende da completare' }));
+    await waitFor(() => expect(router.state.location.search).toBe('?daCompletare=1'));
+    expect(searchCompanies).toHaveBeenLastCalledWith({ includeInactive: false, toComplete: true });
+  });
+
   it('nessun risultato: lo dice', async () => {
     vi.mocked(searchCompanies).mockResolvedValue([]);
     renderPage('/aziende?q=zzz');

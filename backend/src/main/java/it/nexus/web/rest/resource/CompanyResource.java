@@ -37,10 +37,11 @@ public class CompanyResource {
 
     @GetMapping
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
-    @Operation(summary = "Cerca aziende per ragione sociale o partita IVA")
+    @Operation(summary = "Cerca aziende per ragione sociale o partita IVA; con toComplete solo quelle da completare")
     public ResponseEntity<List<CompanyDTO>> search(@RequestParam(required = false) String search,
-            @RequestParam(defaultValue = "false") boolean includeInactive) {
-        return ResponseEntity.ok(companyService.search(search, includeInactive));
+            @RequestParam(defaultValue = "false") boolean includeInactive,
+            @RequestParam(defaultValue = "false") boolean toComplete) {
+        return ResponseEntity.ok(companyService.search(search, includeInactive, toComplete));
     }
 
     @GetMapping("/{id}")

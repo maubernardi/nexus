@@ -14,7 +14,7 @@ sprint, anche sopra la velocity media (22,9).
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-508 | Partita IVA e nome da completare | 3 | ✅ Ready | | |
+| US-508 | Partita IVA e nome da completare | 3 | ✅ Ready | `mark-companies-to-complete` | |
 | US-509 | Categoria merceologica e attività dell'azienda | 3 | ✅ Ready | | |
 | US-510 | Referenti e recapiti dell'azienda | 5 | ✅ Ready | | |
 | US-1309 | Importazione dal database attuale | 8 | ✅ Ready | | |
@@ -43,6 +43,18 @@ dipenda dalla simulazione (A29).
   con il passaggio in produzione (US-1306).
 - **Backup** (US-1302): resta nel backlog fino a dopo questo sprint.
 - **Collaudo** (T-22 … T-24): dopo l'analisi del database attuale, cioè da ora.
+
+## Decisioni durante lo sprint
+
+- **US-508**:
+  - V45: l'unicità della partita IVA diventa un indice univoco parziale con lo stesso nome (`uq_company_vat_code`),
+    che esclude «00000000000»;
+  - il modulo rifiuta «00000000000» e ogni nome che comincia con «Azienda senza nome n.», anche con maiuscole e spazi
+    diversi;
+  - nella scheda i campi con il segnaposto si aprono vuoti, con la spiegazione;
+  - anche il nome segnaposto, nei documenti, diventa la riga da completare: in una convenzione sarebbe sbagliato
+    quanto gli zeri;
+  - nella demo due aziende dimostrative da completare, per il collaudo (T-25.1).
 
 ## Burndown
 

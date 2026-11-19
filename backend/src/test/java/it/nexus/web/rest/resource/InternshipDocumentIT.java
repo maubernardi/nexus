@@ -35,6 +35,7 @@ import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.ClosureReport;
 import it.nexus.domain.CompanyAtecoCode;
 import it.nexus.domain.CompanyLegalRepresentative;
+import it.nexus.domain.CompanyPlaceholders;
 import it.nexus.domain.InternshipType;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Municipality;
@@ -514,6 +515,22 @@ class InternshipDocumentIT {
                 .contains("Sede operativa Via Roma 1, Firenze")
                 .contains("Chiusura [] " + InternshipDocumentServiceImpl.BLANK);
         assertThat(text).containsPattern("Sede del tirocinio nella provincia di \\S+");
+    }
+
+    /** Azienda arrivata dal database attuale (US-508): i segnaposto diventano righe da completare. */
+    @Test
+    void aziendaDaCompletare_righeVuoteAlPostoDeiSegnaposto() throws Exception {
+        place.company().setName(CompanyPlaceholders.name(1234));
+        place.company().setVatCode(CompanyPlaceholders.VAT_CODE);
+        em.flush();
+        String typeId = typeId("EXTRACURRICULARE");
+        save(typeId, true);
+        uploadTemplate("Convenzione GOL", typeId, null, "Ospitante {RAGIONE_SOCIALE}, P.IVA {PARTITA_IVA}");
+
+        assertThat(convenzione(null))
+                .contains("Ospitante " + InternshipDocumentServiceImpl.BLANK + ", P.IVA "
+                        + InternshipDocumentServiceImpl.BLANK)
+                .doesNotContain("00000000000", "Azienda senza nome");
     }
 
     @Test

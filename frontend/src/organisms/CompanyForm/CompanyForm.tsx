@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { Company, CompanyForm as CompanyPayload } from '@/config/api/companyApi';
 import { apiError } from '@/config/api/errors';
+import { isMissing, isNamePlaceholder, isVatCodePlaceholder } from '@/lib/companyCompletion';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
 import { FormField } from '@/molecules/FormField/FormField';
@@ -38,9 +39,10 @@ const FIELDS = [
 
 const fieldId = (field: keyof CompanyFormValues): string => `company-${field}`;
 
+// i segnaposto del database attuale non si mostrano: il campo vuoto chiede il dato vero (US-508)
 const toValues = (company?: Company): CompanyFormValues => ({
-  name: company?.name ?? '',
-  vatCode: company?.vatCode ?? '',
+  name: company && !isMissing(company, 'NAME') ? company.name : '',
+  vatCode: company && !isMissing(company, 'VAT_CODE') ? company.vatCode : '',
   legalAddress: company?.legalAddress ?? '',
   legalMunicipality: toMunicipalityValue(company?.legalMunicipality ?? undefined),
   contactPerson: company?.contactPerson ?? '',
@@ -66,7 +68,10 @@ type CompanyFormProps = {
   onSuccess: (company: Company) => void;
 };
 
-/** Dati anagrafici dell'azienda ospitante (US-501), con errori sui campi e riepilogo focalizzato. */
+/**
+ * Dati anagrafici dell'azienda ospitante (US-501), con errori sui campi e riepilogo focalizzato. I dati da completare
+ * (US-508) partono vuoti e non accettano i segnaposto.
+ */
 export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: CompanyFormProps) => {
   const { t } = useTranslation();
   const [formError, setFormError] = useState<'generic' | 'conflict' | null>(null);
@@ -99,6 +104,8 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
     return message ? [{ fieldId: fieldId(field), message: `${labels[field]}: ${message}` }] : [];
   });
   const required = { value: true, message: t('form.errors.required') };
+  const missingName = company !== undefined && isMissing(company, 'NAME');
+  const missingVatCode = company !== undefined && isMissing(company, 'VAT_CODE');
   const max = (n: number) => ({ value: n, message: t('form.errors.maxLength', { max: n }) });
 
   const onValid = async (values: CompanyFormValues): Promise<void> => {
@@ -138,6 +145,7 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
         <FormField
           id={fieldId('name')}
           label={labels.name}
+          hint={missingName ? t('company.hints.nameMissing') : undefined}
           required
           error={errors.name?.message}
           className="md:col-span-2"
@@ -149,7 +157,10 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
               {...register('name', {
                 required,
                 maxLength: max(200),
-                validate: (v) => v.trim() !== '' || t('form.errors.required'),
+                validate: (v) =>
+                  v.trim() === ''
+                    ? t('form.errors.required')
+                    : !isNamePlaceholder(v) || t('company.errors.namePlaceholder'),
               })}
             />
           )}
@@ -157,7 +168,7 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
         <FormField
           id={fieldId('vatCode')}
           label={labels.vatCode}
-          hint={t('company.hints.vatCode')}
+          hint={t(missingVatCode ? 'company.hints.vatCodeMissing' : 'company.hints.vatCode')}
           required
           error={errors.vatCode?.message}
         >
@@ -169,6 +180,7 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
               {...register('vatCode', {
                 required,
                 pattern: { value: /^\s*\d{11}\s*$/, message: t('company.errors.vatCode') },
+                validate: (v) => !isVatCodePlaceholder(v) || t('company.errors.vatCodePlaceholder'),
               })}
             />
           )}

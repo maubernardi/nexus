@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { AxiosError, AxiosHeaders } from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { fetchCompany } from '@/config/api/companyApi';
 import { fetchJobCategories, fetchZones } from '@/config/api/referenceApi';
 import { fetchBoardPost } from '@/config/api/boardPostApi';
 import {
@@ -322,6 +323,25 @@ describe('<TicketPage>', () => {
     await user.keyboard('{Escape}');
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     await waitFor(() => expect(details).toHaveFocus());
+  });
+
+  it('Dettagli: azienda senza partita IVA, «Da completare» al posto degli zeri (US-508)', async () => {
+    const alfa = await fetchCompany('C1');
+    vi.mocked(fetchCompany).mockResolvedValueOnce({
+      ...alfa,
+      vatCode: '00000000000',
+      missingData: ['VAT_CODE'],
+    });
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Dettagli Magazziniere presso Alfa Logistica' }),
+    );
+
+    const dialog = await screen.findByRole('dialog', { name: '«Magazziniere» presso Alfa Logistica' });
+    expect(await within(dialog).findByText('Da completare')).toBeInTheDocument();
+    expect(within(dialog).queryByText('00000000000')).not.toBeInTheDocument();
   });
 
   it('Dettagli: esclusione dell’azienda con motivo, esito ed elenco delle escluse', async () => {
