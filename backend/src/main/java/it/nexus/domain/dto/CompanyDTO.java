@@ -16,9 +16,17 @@ public record CompanyDTO(
         ReferenceItemDTO businessCategory,
         /** Descrizione dell'attività (US-509). */
         String activity,
-        String contactPerson,
+        /** Sede operativa (US-510). */
+        String operatingAddress,
+        MunicipalityDTO operatingMunicipality,
         String phone,
+        /** Cellulare, fax e seconda email dell'azienda (US-510). */
+        String mobile,
+        String fax,
         String email,
+        String secondaryEmail,
+        /** Referenti in ordine (US-510). */
+        List<CompanyContactDTO> contacts,
         boolean active,
         long version,
         Instant updatedAt,

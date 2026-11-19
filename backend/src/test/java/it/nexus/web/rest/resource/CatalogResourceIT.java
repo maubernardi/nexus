@@ -31,6 +31,7 @@ import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.Beneficiary;
 import it.nexus.domain.BusinessCategory;
+import it.nexus.domain.ContactRole;
 import it.nexus.domain.Project;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.UserProject;
@@ -271,6 +272,34 @@ class CatalogResourceIT {
         mockMvc.perform(get("/api/v1/reference/business-categories").header(USER, "tutor1"))
                 .andExpect(status().isForbidden());
         assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.BUSINESS_CATEGORY,
+                TsidMapper.toInternal(added))).extracting(e -> e.getAction()).containsExactly("CREATE");
+    }
+
+    @Test
+    void ruoliDeiReferenti_vociDelDatabaseAttuale_soloCallCenterEAdmin() throws Exception {
+        String path = "/api/v1/catalogs/contact-roles";
+        mockMvc.perform(get(path).header(USER, "admin"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(12))
+                // id fisso = base + numero del ruolo in Access, per l'importazione (US-1309)
+                .andExpect(jsonPath("$[?(@.code == 'RESPONSABILE_DEL_PERSONALE')].id")
+                        .value(TsidMapper.toExternal(ContactRole.LEGACY_ID_BASE + 3)))
+                .andExpect(jsonPath("$[?(@.code == 'LEGALE_RAPPRESENTANTE')].id")
+                        .value(TsidMapper.toExternal(ContactRole.LEGACY_ID_BASE + 27)))
+                .andExpect(jsonPath("$[*].name", hasItems("Titolare", "Referente", "Capo area",
+                        "Legale rappresentante", "Amministratore delegato")))
+                .andExpect(jsonPath("$[*].name", not(hasItem("pelle"))));
+        String added = createdId(path, "Responsabile di cucina");
+        action(path, TsidMapper.toExternal(ContactRole.LEGACY_ID_BASE + 26), "deactivate").andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/reference/contact-roles").header(USER, "operatore.cc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(12))
+                .andExpect(jsonPath("$[*].name", hasItem("Responsabile di cucina")))
+                .andExpect(jsonPath("$[*].name", not(hasItem("Centralino"))));
+        mockMvc.perform(get("/api/v1/reference/contact-roles").header(USER, "tutor1"))
+                .andExpect(status().isForbidden());
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.CONTACT_ROLE,
                 TsidMapper.toInternal(added))).extracting(e -> e.getAction()).containsExactly("CREATE");
     }
 

@@ -9,9 +9,11 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
+import type { Company } from '@/config/api/companyApi';
 import { useCompanySearch } from '@/config/hooks/useCompanies';
 import { useBusinessCategories } from '@/config/hooks/useReferenceData';
 import { isMissing } from '@/lib/companyCompletion';
+import { contactName } from '@/lib/companyContacts';
 
 // parametri dell'indirizzo: Indietro e link condivisi mantengono la ricerca
 const SEARCH_PARAM = 'q';
@@ -27,6 +29,13 @@ type Filters = { q: string; inactive: boolean; toComplete: boolean; category: st
  */
 export const CompaniesPage = () => {
   const { t } = useTranslation();
+  /** Il primo referente, con quanti sono gli altri (US-510). */
+  const firstContact = (c: Company): string => {
+    const [first, ...others] = c.contacts ?? [];
+    if (!first) return '—';
+    const name = contactName(first);
+    return others.length > 0 ? t('company.contacts.more', { name, count: others.length }) : name;
+  };
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get(SEARCH_PARAM) ?? '';
   const includeInactive = searchParams.get(INACTIVE_PARAM) === '1';
@@ -180,7 +189,7 @@ export const CompaniesPage = () => {
                   {t('company.category')}
                 </th>
                 <th scope="col" className={th}>
-                  {t('company.fields.contactPerson')}
+                  {t('company.contacts.column')}
                 </th>
                 <th scope="col" className={th}>
                   {t('company.fields.phone')}
@@ -211,7 +220,7 @@ export const CompaniesPage = () => {
                     {isMissing(c, 'VAT_CODE') ? <ToCompleteBadge /> : c.vatCode}
                   </td>
                   <td className={td}>{c.businessCategory?.name ?? '—'}</td>
-                  <td className={td}>{c.contactPerson ?? '—'}</td>
+                  <td className={td}>{firstContact(c)}</td>
                   <td className={`${td} whitespace-nowrap`}>{c.phone ?? '—'}</td>
                   <td className={td}>{c.email ?? '—'}</td>
                   <td className={td}>{t(c.active ? 'company.active' : 'company.inactive')}</td>

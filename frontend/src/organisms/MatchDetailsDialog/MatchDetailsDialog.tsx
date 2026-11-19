@@ -5,11 +5,13 @@ import { Link } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import type { CompanyContact } from '@/config/api/companyApi';
 import { apiError } from '@/config/api/errors';
 import type { JobSlotMatch } from '@/config/api/ticketApi';
 import { useCompany } from '@/config/hooks/useCompanies';
 import { useCompanyNotes } from '@/config/hooks/useCompanyNotes';
 import { isMissing } from '@/lib/companyCompletion';
+import { contactWho } from '@/lib/companyContacts';
 import { FormField } from '@/molecules/FormField/FormField';
 import { addressLine } from '@/molecules/MunicipalityField/municipalityValue';
 import { CompanyHistorySection } from '@/organisms/CompanyHistorySection/CompanyHistorySection';
@@ -35,6 +37,29 @@ const Fields = ({ rows }: { rows: [string, ReactNode][] }) => (
     ))}
   </dl>
 );
+
+/** Referenti dell'azienda (US-510): chi è e come raggiungerlo, uno per riga. */
+const ContactList = ({ contacts, none }: { contacts: CompanyContact[]; none: string }) => {
+  const { t } = useTranslation();
+  if (contacts.length === 0) return <>{none}</>;
+  return (
+    <ul className="space-y-1">
+      {contacts.map((c, i) => {
+        const reach = [
+          c.phone && `${t('company.fields.phone')} ${c.phone}`,
+          c.mobile && `${t('company.fields.mobile')} ${c.mobile}`,
+          c.email && `${t('company.fields.email')} ${c.email}`,
+        ].filter(Boolean);
+        return (
+          <li key={i}>
+            <span className="font-medium">{contactWho(c)}</span>
+            {reach.length > 0 && <> — {reach.join(', ')}</>}
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
 
 type MatchDetailsDialogProps = {
   /** Mansione di cui mostrare i dettagli; null = dialogo chiuso. */
@@ -217,9 +242,16 @@ const MatchDetailsBody = ({ slot }: { slot: JobSlotMatch }) => {
               [t('company.fields.businessCategory'), c.businessCategory?.name ?? none],
               [t('company.fields.activity'), c.activity ?? none],
               [t('company.legalSeat'), addressLine(c.legalAddress, c.legalMunicipality) ?? none],
-              [t('company.fields.contactPerson'), c.contactPerson ?? none],
+              [t('company.operatingSeat'), addressLine(c.operatingAddress, c.operatingMunicipality) ?? none],
               [t('company.fields.phone'), c.phone ?? none],
+              [t('company.fields.mobile'), c.mobile ?? none],
+              [t('company.fields.fax'), c.fax ?? none],
               [t('company.fields.email'), c.email ?? none],
+              [t('company.fields.secondaryEmail'), c.secondaryEmail ?? none],
+              [
+                t('company.contacts.heading'),
+                <ContactList key="contacts" contacts={c.contacts ?? []} none={none} />,
+              ],
               [t('company.status'), t(c.active ? 'company.active' : 'company.inactive')],
             ]}
           />

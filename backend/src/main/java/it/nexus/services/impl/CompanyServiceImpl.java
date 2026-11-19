@@ -1,7 +1,11 @@
 package it.nexus.services.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -9,9 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.domain.BusinessCategory;
 import it.nexus.domain.Company;
+import it.nexus.domain.CompanyContact;
+import it.nexus.domain.ContactRole;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Municipality;
 import it.nexus.domain.audit.AuditChanges;
+import it.nexus.domain.dto.CompanyContactFormDTO;
 import it.nexus.domain.dto.CompanyDTO;
 import it.nexus.domain.dto.CompanyFormDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
@@ -20,6 +27,7 @@ import it.nexus.mapper.MunicipalityMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.BusinessCategoryRepository;
 import it.nexus.repository.CompanyRepository;
+import it.nexus.repository.ContactRoleRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BoardPostService;
@@ -29,6 +37,8 @@ import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.ConflictException;
 import it.nexus.web.errors.FieldValidationException;
 import it.nexus.web.errors.NotFoundException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -39,6 +49,7 @@ public class CompanyServiceImpl implements CompanyService {
     private static final String DUPLICATE_VAT = "Esiste già un'azienda con questa partita IVA";
     private static final String LEGAL_MUNICIPALITY = "legalMunicipalityId";
     private static final String BUSINESS_CATEGORY = "businessCategoryId";
+    private static final String OPERATING_MUNICIPALITY = "operatingMunicipalityId";
 
     private final CompanyRepository repository;
     private final JobSlotRepository jobSlotRepository;
@@ -47,6 +58,17 @@ public class CompanyServiceImpl implements CompanyService {
     private final CompanyMapper mapper;
     private final MunicipalityService municipalityService;
     private final BusinessCategoryRepository businessCategoryRepository;
+    private final ContactRoleRepository contactRoleRepository;
+    private final EntityManager entityManager;
+
+    /** Referente normalizzato (US-510): confronto prima/dopo e righe da inserire. */
+    private record Contact(String name, ContactRole role, String phone, String mobile, String email) {
+
+        /** Per il confronto: il ruolo conta per l'id. */
+        private List<Object> key() {
+            return Arrays.asList(name, role == null ? null : role.getId(), phone, mobile, email);
+        }
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -77,20 +99,28 @@ public class CompanyServiceImpl implements CompanyService {
             throw new FieldValidationException("vatCode", DUPLICATE_VAT);
         }
         Company company = new Company(dto.name().strip(), vatCode);
+        List<Contact> contacts = contacts(dto.contacts(), Set.of());
         apply(company, dto, municipalityService.forAddress(dto.legalMunicipalityId(), null, LEGAL_MUNICIPALITY),
+                municipalityService.forAddress(dto.operatingMunicipalityId(), null, OPERATING_MUNICIPALITY),
                 businessCategory(dto.businessCategoryId(), null));
+        contacts.forEach(c -> company.addContact(c.name(), c.role(), c.phone(), c.mobile(), c.email()));
         Company saved = repository.saveAndFlush(company);
         auditService.record(AuditEntityType.COMPANY, saved.getId(), "CREATE", AuditChanges.of()
                 .value("name", null, saved.getName())
                 .value("vatCode", null, saved.getVatCode())
                 .value("legalAddress", null, saved.getLegalAddress())
                 .value("legalMunicipality", null, MunicipalityMapper.label(saved.getLegalMunicipality()))
+                .value("operatingAddress", null, saved.getOperatingAddress())
+                .value("operatingMunicipality", null, MunicipalityMapper.label(saved.getOperatingMunicipality()))
                 .value("businessCategory", null, name(saved.getBusinessCategory()))
                 .value("activity", null, saved.getActivity())
-                // contatti del referente: dati personali, nell'audit senza valori (EN-4)
-                .redactedIfChanged("contactPerson", null, saved.getContactPerson())
+                // recapiti e referenti: dati personali, nell'audit senza valori (EN-4, US-510)
                 .redactedIfChanged("phone", null, saved.getPhone())
-                .redactedIfChanged("email", null, saved.getEmail()), null);
+                .redactedIfChanged("mobile", null, saved.getMobile())
+                .redactedIfChanged("fax", null, saved.getFax())
+                .redactedIfChanged("email", null, saved.getEmail())
+                .redactedIfChanged("secondaryEmail", null, saved.getSecondaryEmail())
+                .redactedIfChanged("contacts", List.of(), keys(contacts)), null);
         return mapper.toDto(saved);
     }
 
@@ -108,22 +138,43 @@ public class CompanyServiceImpl implements CompanyService {
 
         Municipality municipality = municipalityService.forAddress(dto.legalMunicipalityId(),
                 company.getLegalMunicipality(), LEGAL_MUNICIPALITY);
+        Municipality operatingMunicipality = municipalityService.forAddress(dto.operatingMunicipalityId(),
+                company.getOperatingMunicipality(), OPERATING_MUNICIPALITY);
         BusinessCategory category = businessCategory(dto.businessCategoryId(), company.getBusinessCategory());
+        List<Object> contactsBefore = keys(company.getContacts().stream().map(CompanyServiceImpl::contact).toList());
+        List<Contact> contacts = contacts(dto.contacts(), company.getContacts().stream()
+                .map(CompanyContact::getRole).filter(Objects::nonNull).map(ContactRole::getId)
+                .collect(Collectors.toSet()));
         AuditChanges changes = AuditChanges.of()
                 .value("name", company.getName(), dto.name().strip())
                 .value("vatCode", company.getVatCode(), vatCode)
                 .value("legalAddress", company.getLegalAddress(), blankToNull(dto.legalAddress()))
                 .value("legalMunicipality", MunicipalityMapper.label(company.getLegalMunicipality()),
                         MunicipalityMapper.label(municipality))
+                .value("operatingAddress", company.getOperatingAddress(), blankToNull(dto.operatingAddress()))
+                .value("operatingMunicipality", MunicipalityMapper.label(company.getOperatingMunicipality()),
+                        MunicipalityMapper.label(operatingMunicipality))
                 .value("businessCategory", name(company.getBusinessCategory()), name(category))
                 .value("activity", company.getActivity(), blankToNull(dto.activity()))
-                .redactedIfChanged("contactPerson", company.getContactPerson(), blankToNull(dto.contactPerson()))
                 .redactedIfChanged("phone", company.getPhone(), blankToNull(dto.phone()))
-                .redactedIfChanged("email", company.getEmail(), blankToNull(dto.email()));
+                .redactedIfChanged("mobile", company.getMobile(), blankToNull(dto.mobile()))
+                .redactedIfChanged("fax", company.getFax(), blankToNull(dto.fax()))
+                .redactedIfChanged("email", company.getEmail(), blankToNull(dto.email()))
+                .redactedIfChanged("secondaryEmail", company.getSecondaryEmail(), blankToNull(dto.secondaryEmail()))
+                .redactedIfChanged("contacts", contactsBefore, keys(contacts));
         company.setName(dto.name().strip());
         company.setVatCode(vatCode);
-        apply(company, dto, municipality, category);
+        apply(company, dto, municipality, operatingMunicipality, category);
+        boolean contactsChanged = !contactsBefore.equals(keys(contacts));
+        if (contactsChanged) {
+            replaceContacts(company, contacts);
+        }
         Company saved = repository.saveAndFlush(company);
+        if (contactsChanged) {
+            // i referenti sono dal lato inverso: cambiarli non incrementa da solo la versione dell'azienda, che invece
+            // deve cambiare perché un collega con la versione di prima riceva il 409
+            entityManager.lock(saved, LockModeType.PESSIMISTIC_FORCE_INCREMENT);
+        }
         if (!changes.asMap().isEmpty()) {
             auditService.record(AuditEntityType.COMPANY, saved.getId(), "UPDATE", changes, null);
         }
@@ -182,19 +233,80 @@ public class CompanyServiceImpl implements CompanyService {
                 .orElseThrow(() -> new FieldValidationException(BUSINESS_CATEGORY, "Categoria non valida"));
     }
 
+    /**
+     * Referenti del modulo, normalizzati e controllati (US-510): serve il nome o il ruolo; il ruolo è una voce attiva
+     * oppure uno che un referente dell'azienda ha già ({@code currentRoles}). Errori sul campo del referente.
+     */
+    private List<Contact> contacts(List<CompanyContactFormDTO> rows, Set<Long> currentRoles) {
+        if (rows == null) {
+            return List.of();
+        }
+        List<Contact> contacts = new ArrayList<>();
+        for (int i = 0; i < rows.size(); i++) {
+            CompanyContactFormDTO row = rows.get(i);
+            if (row == null) {
+                throw new BadRequestException("Referente mancante");
+            }
+            String name = blankToNull(row.name());
+            ContactRole role = contactRole(row.roleId(), currentRoles, i);
+            if (name == null && role == null) {
+                throw new FieldValidationException("contacts[%d].name".formatted(i),
+                        "Inserisci il nome o scegli il ruolo");
+            }
+            contacts.add(new Contact(name, role, blankToNull(row.phone()), blankToNull(row.mobile()),
+                    blankToNull(row.email())));
+        }
+        return contacts;
+    }
+
+    private ContactRole contactRole(String id, Set<Long> currentRoles, int index) {
+        if (id == null || id.isBlank()) {
+            return null;
+        }
+        return Optional.ofNullable(TsidMapper.toInternal(id.strip()))
+                .flatMap(contactRoleRepository::findById)
+                .filter(r -> r.isActive() || currentRoles.contains(r.getId()))
+                .orElseThrow(() -> new FieldValidationException("contacts[%d].roleId".formatted(index),
+                        "Ruolo non valido"));
+    }
+
+    private static Contact contact(CompanyContact c) {
+        return new Contact(c.getName(), c.getRole(), c.getPhone(), c.getMobile(), c.getEmail());
+    }
+
+    private static List<Object> keys(List<Contact> contacts) {
+        return contacts.stream().<Object>map(Contact::key).toList();
+    }
+
+    /**
+     * Referenti sostituiti in blocco: prima si cancellano i vecchi con un flush, perché Hibernate inserisce prima di
+     * cancellare e una posizione ripetuta violerebbe {@code uq_company_contact_position}.
+     */
+    private void replaceContacts(Company company, List<Contact> contacts) {
+        if (!company.getContacts().isEmpty()) {
+            company.getContacts().clear();
+            repository.flush();
+        }
+        contacts.forEach(c -> company.addContact(c.name(), c.role(), c.phone(), c.mobile(), c.email()));
+    }
+
     private static String name(BusinessCategory category) {
         return category == null ? null : category.getName();
     }
 
     private static void apply(Company company, CompanyFormDTO dto, Municipality legalMunicipality,
-            BusinessCategory businessCategory) {
+            Municipality operatingMunicipality, BusinessCategory businessCategory) {
         company.setLegalAddress(blankToNull(dto.legalAddress()));
         company.setLegalMunicipality(legalMunicipality);
+        company.setOperatingAddress(blankToNull(dto.operatingAddress()));
+        company.setOperatingMunicipality(operatingMunicipality);
         company.setBusinessCategory(businessCategory);
         company.setActivity(blankToNull(dto.activity()));
-        company.setContactPerson(blankToNull(dto.contactPerson()));
         company.setPhone(blankToNull(dto.phone()));
+        company.setMobile(blankToNull(dto.mobile()));
+        company.setFax(blankToNull(dto.fax()));
         company.setEmail(blankToNull(dto.email()));
+        company.setSecondaryEmail(blankToNull(dto.secondaryEmail()));
     }
 
     private static String blankToNull(String value) {

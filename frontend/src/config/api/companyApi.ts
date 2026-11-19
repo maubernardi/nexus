@@ -6,6 +6,24 @@ import type { ReferenceItem } from '@/config/api/referenceApi';
 /** Dato arrivato vuoto dal database attuale, con un segnaposto ancora da sostituire (US-508). */
 export type CompanyMissingData = 'NAME' | 'VAT_CODE';
 
+/** Referente dell'azienda (US-510); i campi vuoti sono assenti. */
+export type CompanyContact = {
+  name?: string | null;
+  /** Ruolo dal catalogo, anche se nel frattempo disattivato. */
+  role?: ReferenceItem | null;
+  phone?: string | null;
+  mobile?: string | null;
+  email?: string | null;
+};
+
+export type CompanyContactForm = {
+  name: string | null;
+  roleId: string | null;
+  phone: string | null;
+  mobile: string | null;
+  email: string | null;
+};
+
 export type Company = {
   id: string;
   name: string;
@@ -17,9 +35,17 @@ export type Company = {
   businessCategory?: ReferenceItem | null;
   /** Descrizione dell'attività (US-509). */
   activity?: string | null;
-  contactPerson: string | null;
+  /** Sede operativa (US-510). */
+  operatingAddress?: string | null;
+  operatingMunicipality?: Municipality | null;
   phone: string | null;
+  /** Cellulare, fax e seconda email dell'azienda (US-510). */
+  mobile?: string | null;
+  fax?: string | null;
   email: string | null;
+  secondaryEmail?: string | null;
+  /** Referenti in ordine (US-510). */
+  contacts?: CompanyContact[];
   active: boolean;
   version: number;
   updatedAt: string;
@@ -34,9 +60,14 @@ export type CompanyForm = {
   legalMunicipalityId: string | null;
   businessCategoryId: string | null;
   activity: string | null;
-  contactPerson: string | null;
+  operatingAddress: string | null;
+  operatingMunicipalityId: string | null;
   phone: string | null;
+  mobile: string | null;
+  fax: string | null;
   email: string | null;
+  secondaryEmail: string | null;
+  contacts: CompanyContactForm[];
   /** Solo in modifica: versione vista (blocco ottimistico). */
   version?: number;
 };

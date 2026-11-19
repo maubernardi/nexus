@@ -16,6 +16,7 @@ import it.nexus.domain.BusinessCategory;
 import it.nexus.domain.CareAgency;
 import it.nexus.domain.ClosureReason;
 import it.nexus.domain.CompetenceSite;
+import it.nexus.domain.ContactRole;
 import it.nexus.domain.HiringFormula;
 import it.nexus.domain.InternshipType;
 import it.nexus.domain.NoHireReason;
@@ -32,6 +33,7 @@ import it.nexus.repository.BusinessCategoryRepository;
 import it.nexus.repository.CareAgencyRepository;
 import it.nexus.repository.ClosureReasonRepository;
 import it.nexus.repository.CompetenceSiteRepository;
+import it.nexus.repository.ContactRoleRepository;
 import it.nexus.repository.HiringFormulaRepository;
 import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.repository.NoHireReasonRepository;
@@ -60,6 +62,7 @@ public class CatalogServiceImpl implements CatalogService {
     private final CareAgencyRepository careAgencyRepository;
     private final ClosureReasonRepository closureReasonRepository;
     private final BusinessCategoryRepository businessCategoryRepository;
+    private final ContactRoleRepository contactRoleRepository;
     private final AuditService auditService;
 
     /** Le operazioni che servono su un catalogo: i due repository hanno metodi omonimi ma tipi diversi. */
@@ -102,6 +105,10 @@ public class CatalogServiceImpl implements CatalogService {
                     businessCategoryRepository::findFirstByNameIgnoreCaseAndActiveTrue,
                     businessCategoryRepository::existsByCode, BusinessCategory::new,
                     e -> businessCategoryRepository.saveAndFlush((BusinessCategory) e));
+            case CONTACT_ROLES -> new Store(contactRoleRepository::findAllByOrderByActiveDescNameAsc,
+                    contactRoleRepository::findById, contactRoleRepository::findFirstByNameIgnoreCaseAndActiveTrue,
+                    contactRoleRepository::existsByCode, ContactRole::new,
+                    e -> contactRoleRepository.saveAndFlush((ContactRole) e));
             case PROJECTS -> new Store(projectRepository::findAllByOrderByActiveDescNameAsc, projectRepository::findById,
                     projectRepository::findFirstByNameIgnoreCaseAndActiveTrue, projectRepository::existsByCode,
                     Project::new, e -> projectRepository.saveAndFlush((Project) e));

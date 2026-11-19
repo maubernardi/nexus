@@ -11,3 +11,16 @@ FROM (VALUES ('99000000001', 'I684'), ('99000000002', 'D612'), ('99000000003', '
 JOIN municipality m ON m.cadastral_code = demo.cadastral_code AND m.valid_to IS NULL
 WHERE c.vat_code = demo.vat_code
   AND c.legal_municipality_id IS NULL;
+
+-- Sede operativa di un'azienda dimostrativa (US-510), solo se non ne ha già una.
+UPDATE company c
+SET operating_address = 'Via del Magazzino 10',
+    operating_municipality_id = m.id,
+    updated_at = now(),
+    updated_by = 'seed'
+FROM municipality m
+WHERE c.vat_code = '99000000001'
+  AND m.cadastral_code = 'G999'
+  AND m.valid_to IS NULL
+  AND c.operating_address IS NULL
+  AND c.operating_municipality_id IS NULL;

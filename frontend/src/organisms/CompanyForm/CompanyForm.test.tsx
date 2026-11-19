@@ -5,13 +5,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Company } from '@/config/api/companyApi';
 import { searchMunicipalities } from '@/config/api/municipalityApi';
-import { fetchBusinessCategories } from '@/config/api/referenceApi';
+import { fetchBusinessCategories, fetchContactRoles } from '@/config/api/referenceApi';
 import { CompanyForm } from '@/organisms/CompanyForm/CompanyForm';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderWithProviders } from '@/tests/renderWithProviders';
 
 vi.mock('@/config/api/municipalityApi', () => ({ searchMunicipalities: vi.fn() }));
-vi.mock('@/config/api/referenceApi', () => ({ fetchBusinessCategories: vi.fn() }));
+vi.mock('@/config/api/referenceApi', () => ({
+  fetchBusinessCategories: vi.fn(),
+  fetchContactRoles: vi.fn(),
+}));
 
 const RISTORANTE = {
   id: 'K11',
@@ -19,6 +22,8 @@ const RISTORANTE = {
   name: 'Ristorante / Trattoria / Bistrot',
 };
 const BAR = { id: 'K14', code: 'BAR_PUB', name: 'Bar / Pub' };
+const TITOLARE = { id: 'R13', code: 'TITOLARE', name: 'Titolare' };
+const PERSONALE = { id: 'R3', code: 'RESPONSABILE_DEL_PERSONALE', name: 'Responsabile del personale' };
 
 const FIRENZE = {
   id: 'M1',
@@ -35,7 +40,6 @@ const saved: Company = {
   name: 'Officina Rossi',
   vatCode: '12345678901',
   legalAddress: null,
-  contactPerson: null,
   phone: null,
   email: null,
   active: true,
@@ -55,6 +59,7 @@ const renderForm = (onSubmit = vi.fn().mockResolvedValue(saved), onSuccess = vi.
 describe('<CompanyForm>', () => {
   beforeEach(() => {
     vi.mocked(fetchBusinessCategories).mockResolvedValue([BAR, RISTORANTE]);
+    vi.mocked(fetchContactRoles).mockResolvedValue([PERSONALE, TITOLARE]);
   });
 
   it('senza dati obbligatori e con P.IVA errata mostra il riepilogo con focus', async () => {
@@ -91,9 +96,14 @@ describe('<CompanyForm>', () => {
       legalMunicipalityId: null,
       businessCategoryId: null,
       activity: null,
-      contactPerson: null,
+      operatingAddress: null,
+      operatingMunicipalityId: null,
       phone: null,
+      mobile: null,
+      fax: null,
       email: null,
+      secondaryEmail: null,
+      contacts: [],
       version: undefined,
     });
   });
@@ -313,5 +323,176 @@ describe('<CompanyForm>', () => {
       }),
     ).toBeInTheDocument();
     expect(municipality).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('referenti: aggiunta con il focus sul nome, ruolo dal catalogo, rimozione (US-510)', async () => {
+    const user = userEvent.setup();
+    const { onSubmit } = renderForm();
+    expect(screen.getByRole('group', { name: 'Referenti' })).toHaveTextContent('Nessun referente.');
+    const add = screen.getByRole('button', { name: 'Aggiungi referente' });
+
+    await user.click(add);
+    expect(screen.getByRole('textbox', { name: 'Referente 1: nome' })).toHaveFocus();
+    await user.keyboard(' Paola Neri ');
+    const role = screen.getByRole('combobox', { name: 'Referente 1: ruolo' });
+    await waitFor(() => expect(role).toBeEnabled());
+    await user.selectOptions(role, 'Titolare');
+    await user.type(screen.getByRole('textbox', { name: 'Referente 1: cellulare' }), '+39 333 1234567');
+
+    await user.click(add);
+    expect(screen.getByRole('textbox', { name: 'Referente 2: nome' })).toHaveFocus();
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: 'Referente 2: ruolo' }),
+      'Responsabile del personale',
+    );
+    await user.click(add);
+    expect(screen.getByRole('group', { name: 'Referente 3' })).toBeInTheDocument();
+    await expectNoAxeViolations();
+
+    await user.click(screen.getByRole('button', { name: 'Togli il referente 3' }));
+    expect(screen.queryByRole('group', { name: 'Referente 3' })).not.toBeInTheDocument();
+    expect(add).toHaveFocus();
+
+    await user.type(screen.getByLabelText(/^Ragione sociale/), 'Hotel Bellavista');
+    await user.type(screen.getByLabelText(/^Partita IVA/), '12345678901');
+    await user.click(screen.getByRole('button', { name: 'Registra azienda' }));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(onSubmit.mock.calls[0][0].contacts).toEqual([
+      { name: 'Paola Neri', roleId: 'R13', phone: null, mobile: '+39 333 1234567', email: null },
+      { name: null, roleId: 'R3', phone: null, mobile: null, email: null },
+    ]);
+  });
+
+  it('referente senza nome né ruolo: errore nel riepilogo, che sparisce scegliendo il ruolo (US-510)', async () => {
+    const user = userEvent.setup();
+    const { onSubmit } = renderForm();
+    await user.type(screen.getByLabelText(/^Ragione sociale/), 'Hotel Bellavista');
+    await user.type(screen.getByLabelText(/^Partita IVA/), '12345678901');
+    await user.click(screen.getByRole('button', { name: 'Aggiungi referente' }));
+    await user.type(screen.getByRole('textbox', { name: 'Referente 1: telefono' }), '055 1234');
+    await user.type(screen.getByRole('textbox', { name: 'Referente 1: email' }), 'non-una-mail');
+
+    await user.click(screen.getByRole('button', { name: 'Registra azienda' }));
+    expect(
+      await screen.findByRole('link', { name: 'Referente 1: nome: Inserisci il nome o scegli il ruolo' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Referente 1: email: Indirizzo email non valido' }),
+    ).toBeInTheDocument();
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    const role = screen.getByRole('combobox', { name: 'Referente 1: ruolo' });
+    await waitFor(() => expect(role).toBeEnabled());
+    await user.selectOptions(role, 'Titolare');
+    await waitFor(() =>
+      expect(screen.getByRole('textbox', { name: 'Referente 1: nome' })).toHaveAttribute(
+        'aria-invalid',
+        'false',
+      ),
+    );
+  });
+
+  it('un ruolo disattivato resta sul referente che l’ha; l’errore del server va sul suo campo (US-510)', async () => {
+    const onSubmit = vi.fn().mockRejectedValue(
+      new AxiosError('Bad Request', '400', undefined, undefined, {
+        status: 400,
+        statusText: 'Bad Request',
+        headers: {},
+        config: { headers: new AxiosHeaders() },
+        data: { status: 400, fieldErrors: [{ field: 'contacts[1].roleId', message: 'Ruolo non valido' }] },
+      }),
+    );
+    const user = userEvent.setup();
+    renderWithProviders(
+      <main>
+        <CompanyForm
+          company={{
+            ...saved,
+            contacts: [
+              { name: 'Paola Neri', role: { id: 'R24', code: 'SOCIO', name: 'Socio' }, mobile: '333 1' },
+              { role: TITOLARE },
+            ],
+          }}
+          submitLabel="Salva modifiche"
+          onSubmit={onSubmit}
+          onSuccess={vi.fn()}
+        />
+      </main>,
+    );
+    const first = screen.getByRole('combobox', { name: 'Referente 1: ruolo' });
+    await waitFor(() => expect(first).toBeEnabled());
+    expect(first).toHaveDisplayValue('Socio');
+    expect(screen.getByRole('textbox', { name: 'Referente 1: cellulare' })).toHaveValue('333 1');
+    expect(screen.getByRole('textbox', { name: 'Referente 2: nome' })).toHaveValue('');
+    expect(
+      screen
+        .getAllByRole('option')
+        .slice(0, 4)
+        .map((o) => o.textContent),
+    ).toEqual(['Nessuna', 'Bar / Pub', 'Ristorante / Trattoria / Bistrot', 'Nessuno']);
+    expect(Array.from(first.querySelectorAll('option')).map((o) => o.textContent)).toEqual([
+      'Nessuno',
+      'Socio',
+      'Responsabile del personale',
+      'Titolare',
+    ]);
+
+    await user.click(screen.getByRole('button', { name: 'Salva modifiche' }));
+    expect(
+      await screen.findByRole('link', { name: 'Referente 2: ruolo: Ruolo non valido' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Referente 2: ruolo' })).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
+  });
+
+  it('recapiti e sede operativa dell’azienda (US-510)', async () => {
+    vi.mocked(searchMunicipalities).mockResolvedValue([FIRENZE]);
+    const user = userEvent.setup();
+    const { onSubmit } = renderForm();
+    expect(screen.getByRole('group', { name: 'Sede operativa' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Recapiti dell’azienda' })).toBeInTheDocument();
+    await user.type(screen.getByLabelText(/^Ragione sociale/), 'Officina Rossi');
+    await user.type(screen.getByLabelText(/^Partita IVA/), '12345678901');
+    await user.type(screen.getByLabelText(/^Indirizzo della sede operativa/), ' Via dei Mille 3 ');
+    await user.type(screen.getByRole('combobox', { name: /^Comune della sede operativa/ }), 'fire');
+    await user.click(await screen.findByRole('option', { name: 'Firenze (FI)' }));
+    await user.type(screen.getByLabelText(/^Cellulare/), '333 7654321');
+    await user.type(screen.getByLabelText(/^Fax/), '055 ABC');
+    await user.type(screen.getByLabelText(/^Seconda email/), 'ordini@azienda.test');
+
+    await user.click(screen.getByRole('button', { name: 'Registra azienda' }));
+    expect(
+      await screen.findByRole('link', { name: 'Fax: Usa solo cifre, spazi e i simboli + ( ) . - /' }),
+    ).toBeInTheDocument();
+    await user.clear(screen.getByLabelText(/^Fax/));
+    await user.type(screen.getByLabelText(/^Fax/), '055 765432');
+    await user.click(screen.getByRole('button', { name: 'Registra azienda' }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(onSubmit.mock.calls[0][0]).toMatchObject({
+      operatingAddress: 'Via dei Mille 3',
+      operatingMunicipalityId: 'M1',
+      mobile: '333 7654321',
+      fax: '055 765432',
+      secondaryEmail: 'ordini@azienda.test',
+    });
+  });
+
+  it('al massimo 10 referenti: il pulsante si disattiva e lo spiega (US-510)', async () => {
+    renderWithProviders(
+      <main>
+        <CompanyForm
+          company={{ ...saved, contacts: Array.from({ length: 10 }, (_, i) => ({ name: `Referente ${i}` })) }}
+          submitLabel="Salva modifiche"
+          onSubmit={vi.fn()}
+          onSuccess={vi.fn()}
+        />
+      </main>,
+    );
+    const add = screen.getByRole('button', { name: 'Aggiungi referente' });
+    expect(add).toBeDisabled();
+    expect(add).toHaveAccessibleDescription('Al massimo 10 referenti.');
   });
 });

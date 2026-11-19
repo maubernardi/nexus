@@ -51,6 +51,12 @@ export const fetchBusinessCategories = async (): Promise<ReferenceItem[]> => {
   return data;
 };
 
+/** Ruoli dei referenti attivi (US-510): solo Call Center e ADMIN. */
+export const fetchContactRoles = async (): Promise<ReferenceItem[]> => {
+  const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.contactRoles);
+  return data;
+};
+
 /** Enti di presa in carico attivi (US-206). */
 export const fetchCareAgencies = async (): Promise<ReferenceItem[]> => {
   const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.careAgencies);

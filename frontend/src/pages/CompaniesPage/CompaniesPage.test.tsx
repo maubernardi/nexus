@@ -26,7 +26,7 @@ const company = (id: string, name: string, active = true): Company => ({
   name,
   vatCode: '12345678901',
   legalAddress: null,
-  contactPerson: 'Paola Neri',
+  contacts: [{ name: 'Paola Neri' }],
   phone: null,
   email: null,
   active,
@@ -153,5 +153,28 @@ describe('<CompaniesPage>', () => {
     vi.mocked(searchCompanies).mockResolvedValue([]);
     renderPage('/aziende?q=zzz');
     expect(await screen.findByText('Nessuna azienda corrisponde alla ricerca.')).toBeInTheDocument();
+  });
+
+  it('referente: il primo, con quanti sono gli altri; il ruolo se manca il nome (US-510)', async () => {
+    const titolare = { id: 'R13', code: 'TITOLARE', name: 'Titolare' };
+    const personale = { id: 'R3', code: 'RESPONSABILE_DEL_PERSONALE', name: 'Responsabile del personale' };
+    vi.mocked(searchCompanies).mockResolvedValue([
+      {
+        ...company('C6', 'Hotel Bellavista'),
+        contacts: [{ name: 'Paola Neri', role: titolare }, { role: personale }, { name: 'Ugo' }],
+      },
+      { ...company('C7', 'Hotel Miramare'), contacts: [{ role: personale }, { name: 'Ada' }] },
+      { ...company('C8', 'Hotel Stella'), contacts: [] },
+    ]);
+    renderPage();
+
+    const table = await screen.findByRole('table', { name: /Aziende ospitanti/ });
+    expect(within(table).getByRole('columnheader', { name: 'Referente' })).toBeInTheDocument();
+    const [, bellavista, miramare, stella] = within(table).getAllByRole('row');
+    expect(within(bellavista).getAllByRole('cell')[2]).toHaveTextContent(/^Paola Neri e altri 2$/);
+    expect(within(miramare).getAllByRole('cell')[2]).toHaveTextContent(
+      /^Responsabile del personale e un altro$/,
+    );
+    expect(within(stella).getAllByRole('cell')[2]).toHaveTextContent(/^—$/);
   });
 });

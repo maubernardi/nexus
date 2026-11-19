@@ -14,6 +14,7 @@ export type CatalogKind =
   | 'no-hire-reasons'
   | 'closure-reasons'
   | 'business-categories'
+  | 'contact-roles'
   | 'competence-sites'
   | 'care-agencies';
 

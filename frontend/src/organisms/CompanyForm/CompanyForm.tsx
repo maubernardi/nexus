@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { Controller, useForm, type FieldPath } from 'react-hook-form';
+import { useState, type ReactNode } from 'react';
+import { Controller, useForm, type Control, type FieldPath } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
 import type { Company, CompanyForm as CompanyPayload } from '@/config/api/companyApi';
-import { apiError } from '@/config/api/errors';
+import { apiError, toFormPath } from '@/config/api/errors';
 import type { ReferenceItem } from '@/config/api/referenceApi';
-import { useBusinessCategories } from '@/config/hooks/useReferenceData';
+import { useBusinessCategories, useContactRoles } from '@/config/hooks/useReferenceData';
 import { isMissing, isNamePlaceholder, isVatCodePlaceholder } from '@/lib/companyCompletion';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
@@ -19,62 +19,105 @@ import {
   toMunicipalityValue,
   type MunicipalityValue,
 } from '@/molecules/MunicipalityField/municipalityValue';
+import {
+  CONTACT_PARTS,
+  EMAIL_PATTERN,
+  PHONE_PATTERN,
+  type CompanyFormValues,
+  type ContactValues,
+} from '@/organisms/CompanyForm/companyFormValues';
+import { ContactsFields } from '@/organisms/CompanyForm/ContactsFields';
 
-type CompanyFormValues = {
-  name: string;
-  vatCode: string;
-  legalAddress: string;
-  legalMunicipality: MunicipalityValue;
-  businessCategoryId: string;
-  activity: string;
-  contactPerson: string;
-  phone: string;
-  email: string;
-};
+type Field = Exclude<keyof CompanyFormValues, 'contacts'>;
 
+/** Campi dell'azienda nell'ordine del modulo: l'ordine del riepilogo degli errori. */
 const FIELDS = [
   'name',
   'vatCode',
-  'contactPerson',
   'businessCategoryId',
   'activity',
   'legalAddress',
   'legalMunicipality',
+  'operatingAddress',
+  'operatingMunicipality',
   'phone',
+  'mobile',
+  'fax',
   'email',
-] as const;
+  'secondaryEmail',
+] as const satisfies readonly Field[];
 
-const fieldId = (field: keyof CompanyFormValues): string => `company-${field}`;
+/** Il server parla degli id dei comuni, il modulo dei campi dei comuni (US-1007). */
+const SERVER_FIELDS: Record<string, string> = {
+  legalMunicipalityId: 'legalMunicipality',
+  operatingMunicipalityId: 'operatingMunicipality',
+};
 
-/** Categorie attive più quella dell'azienda, anche se nel frattempo disattivata (resta così com'è, US-509). */
-const withCurrent = (items: ReferenceItem[] | undefined, current?: ReferenceItem | null): ReferenceItem[] => {
+const fieldId = (path: string): string => `company-${path.replaceAll('.', '-')}`;
+
+/**
+ * Voci attive più quelle che l'azienda ha già, anche se nel frattempo disattivate (US-509, US-510). Le voci dell'azienda
+ * ci sono anche mentre il catalogo si carica: il menu parte già con il valore salvato.
+ */
+const withCurrent = (
+  items: ReferenceItem[] | undefined,
+  current: (ReferenceItem | null | undefined)[],
+): ReferenceItem[] => {
   const list = items ?? [];
-  return current && !list.some((i) => i.id === current.id) ? [current, ...list] : list;
+  const missing = current.filter(
+    (c, i, all): c is ReferenceItem =>
+      !!c && !list.some((item) => item.id === c.id) && all.findIndex((o) => o?.id === c.id) === i,
+  );
+  return [...missing, ...list];
 };
 
 // i segnaposto del database attuale non si mostrano: il campo vuoto chiede il dato vero (US-508)
 const toValues = (company?: Company): CompanyFormValues => ({
   name: company && !isMissing(company, 'NAME') ? company.name : '',
   vatCode: company && !isMissing(company, 'VAT_CODE') ? company.vatCode : '',
-  legalAddress: company?.legalAddress ?? '',
-  legalMunicipality: toMunicipalityValue(company?.legalMunicipality ?? undefined),
   businessCategoryId: company?.businessCategory?.id ?? '',
   activity: company?.activity ?? '',
-  contactPerson: company?.contactPerson ?? '',
+  legalAddress: company?.legalAddress ?? '',
+  legalMunicipality: toMunicipalityValue(company?.legalMunicipality ?? undefined),
+  operatingAddress: company?.operatingAddress ?? '',
+  operatingMunicipality: toMunicipalityValue(company?.operatingMunicipality ?? undefined),
   phone: company?.phone ?? '',
+  mobile: company?.mobile ?? '',
+  fax: company?.fax ?? '',
   email: company?.email ?? '',
+  secondaryEmail: company?.secondaryEmail ?? '',
+  contacts: (company?.contacts ?? []).map((c): ContactValues => ({
+    name: c.name ?? '',
+    roleId: c.role?.id ?? '',
+    phone: c.phone ?? '',
+    mobile: c.mobile ?? '',
+    email: c.email ?? '',
+  })),
 });
+
+const text = (v: string): string | null => v.trim() || null;
 
 const toPayload = (v: CompanyFormValues): CompanyPayload => ({
   name: v.name.trim(),
   vatCode: v.vatCode.trim(),
-  legalAddress: v.legalAddress.trim() || null,
+  legalAddress: text(v.legalAddress),
   legalMunicipalityId: v.legalMunicipality.municipality?.id ?? null,
   businessCategoryId: v.businessCategoryId || null,
-  activity: v.activity.trim() || null,
-  contactPerson: v.contactPerson.trim() || null,
-  phone: v.phone.trim() || null,
-  email: v.email.trim() || null,
+  activity: text(v.activity),
+  operatingAddress: text(v.operatingAddress),
+  operatingMunicipalityId: v.operatingMunicipality.municipality?.id ?? null,
+  phone: text(v.phone),
+  mobile: text(v.mobile),
+  fax: text(v.fax),
+  email: text(v.email),
+  secondaryEmail: text(v.secondaryEmail),
+  contacts: v.contacts.map((c) => ({
+    name: text(c.name),
+    roleId: c.roleId || null,
+    phone: text(c.phone),
+    mobile: text(c.mobile),
+    email: text(c.email),
+  })),
 });
 
 type CompanyFormProps = {
@@ -87,12 +130,13 @@ type CompanyFormProps = {
 
 /**
  * Dati anagrafici dell'azienda ospitante (US-501), con errori sui campi e riepilogo focalizzato. I dati da completare
- * (US-508) partono vuoti e non accettano i segnaposto.
+ * (US-508) partono vuoti e non accettano i segnaposto. Sedi, recapiti e referenti sono in gruppi (US-510).
  */
 export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: CompanyFormProps) => {
   const { t } = useTranslation();
   const [formError, setFormError] = useState<'generic' | 'conflict' | null>(null);
   const categories = useBusinessCategories();
+  const roles = useContactRoles();
   const {
     register,
     control,
@@ -108,25 +152,57 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
   });
   const { summaryRef, requestSummaryFocus } = useErrorSummaryFocus(submitCount, errors);
 
-  const labels: Record<keyof CompanyFormValues, string> = {
+  const labels: Record<Field, string> = {
     name: t('company.fields.name'),
     vatCode: t('company.fields.vatCode'),
-    legalAddress: t('company.fields.legalAddress'),
-    legalMunicipality: t('company.fields.legalMunicipality'),
     businessCategoryId: t('company.fields.businessCategory'),
     activity: t('company.fields.activity'),
-    contactPerson: t('company.fields.contactPerson'),
+    legalAddress: t('company.fields.legalAddress'),
+    legalMunicipality: t('company.fields.legalMunicipality'),
+    operatingAddress: t('company.fields.operatingAddress'),
+    operatingMunicipality: t('company.fields.operatingMunicipality'),
     phone: t('company.fields.phone'),
+    mobile: t('company.fields.mobile'),
+    fax: t('company.fields.fax'),
     email: t('company.fields.email'),
+    secondaryEmail: t('company.fields.secondaryEmail'),
   };
-  const summary: SummaryError[] = FIELDS.flatMap((field) => {
-    const message = errors[field]?.message;
-    return message ? [{ fieldId: fieldId(field), message: `${labels[field]}: ${message}` }] : [];
-  });
+  const contactErrors = errors.contacts;
+  const summary: SummaryError[] = [
+    ...FIELDS.flatMap((field) => {
+      const message = errors[field]?.message;
+      return message ? [{ fieldId: fieldId(field), message: `${labels[field]}: ${message}` }] : [];
+    }),
+    ...(contactErrors?.message
+      ? [
+          {
+            fieldId: fieldId('contacts'),
+            message: `${t('company.contacts.heading')}: ${contactErrors.message}`,
+          },
+        ]
+      : []),
+    ...Array.from({ length: Array.isArray(contactErrors) ? contactErrors.length : 0 }, (_, k) =>
+      CONTACT_PARTS.flatMap((part) => {
+        const message = contactErrors?.[k]?.[part]?.message;
+        const label = t(`company.contacts.${part}`, { n: k + 1 });
+        return message
+          ? [{ fieldId: fieldId(`contacts.${k}.${part}`), message: `${label}: ${message}` }]
+          : [];
+      }),
+    ).flat(),
+  ];
   const required = { value: true, message: t('form.errors.required') };
   const missingName = company !== undefined && isMissing(company, 'NAME');
   const missingVatCode = company !== undefined && isMissing(company, 'VAT_CODE');
   const max = (n: number) => ({ value: n, message: t('form.errors.maxLength', { max: n }) });
+  const phoneRules = (n: number) => ({
+    maxLength: max(n),
+    pattern: { value: PHONE_PATTERN, message: t('company.errors.phone') },
+  });
+  const emailRules = {
+    maxLength: max(254),
+    pattern: { value: EMAIL_PATTERN, message: t('company.errors.email') },
+  };
 
   const onValid = async (values: CompanyFormValues): Promise<void> => {
     setFormError(null);
@@ -134,10 +210,14 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
       onSuccess(await onSubmit({ ...toPayload(values), version: company?.version }));
     } catch (error) {
       const body = apiError(error);
-      // il server parla dell'id del comune, il modulo del campo del comune (US-1007)
       const fieldErrors = (body?.fieldErrors ?? [])
-        .map((fe) => (fe.field === 'legalMunicipalityId' ? { ...fe, field: 'legalMunicipality' } : fe))
-        .filter((fe) => (FIELDS as readonly string[]).includes(fe.field));
+        .map((fe) => ({ ...fe, field: SERVER_FIELDS[fe.field] ?? toFormPath(fe.field) }))
+        .filter(
+          (fe) =>
+            (FIELDS as readonly string[]).includes(fe.field) ||
+            fe.field === 'contacts' ||
+            fe.field.startsWith('contacts.'),
+        );
       if (fieldErrors.length > 0) {
         fieldErrors.forEach((fe) =>
           setError(fe.field as FieldPath<CompanyFormValues>, { type: 'server', message: fe.message }),
@@ -150,7 +230,7 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
   };
 
   return (
-    <form noValidate onSubmit={handleSubmit(onValid, requestSummaryFocus)} className="space-y-6">
+    <form noValidate onSubmit={handleSubmit(onValid, requestSummaryFocus)} className="max-w-3xl space-y-8">
       {submitCount > 0 && <ErrorSummary ref={summaryRef} errors={summary} />}
       {formError && (
         <p
@@ -161,7 +241,7 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
         </p>
       )}
 
-      <div className="grid max-w-3xl gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         <FormField
           id={fieldId('name')}
           label={labels.name}
@@ -206,13 +286,6 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
           )}
         </FormField>
         <FormField
-          id={fieldId('contactPerson')}
-          label={labels.contactPerson}
-          error={errors.contactPerson?.message}
-        >
-          {(p) => <Input {...p} autoComplete="off" {...register('contactPerson', { maxLength: max(200) })} />}
-        </FormField>
-        <FormField
           id={fieldId('businessCategoryId')}
           label={labels.businessCategoryId}
           error={errors.businessCategoryId?.message}
@@ -220,7 +293,7 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
           {(p) => (
             <NativeSelect {...p} disabled={!categories.data} {...register('businessCategoryId')}>
               <option value="">{t('company.noCategory')}</option>
-              {withCurrent(categories.data, company?.businessCategory).map((c) => (
+              {withCurrent(categories.data, [company?.businessCategory]).map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
@@ -233,9 +306,13 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
           label={labels.activity}
           hint={t('company.hints.activity')}
           error={errors.activity?.message}
+          className="md:col-span-2"
         >
           {(p) => <Input {...p} autoComplete="off" {...register('activity', { maxLength: max(200) })} />}
         </FormField>
+      </div>
+
+      <Group legend={t('company.legalSeat')}>
         <FormField
           id={fieldId('legalAddress')}
           label={labels.legalAddress}
@@ -244,60 +321,113 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
         >
           {(p) => <Input {...p} autoComplete="off" {...register('legalAddress', { maxLength: max(300) })} />}
         </FormField>
-        <FormField
-          id={fieldId('legalMunicipality')}
+        <MunicipalityFormField
+          name="legalMunicipality"
           label={labels.legalMunicipality}
-          hint={t('municipalityField.hint')}
           error={errors.legalMunicipality?.message}
+          control={control}
+        />
+      </Group>
+
+      <Group legend={t('company.operatingSeat')} intro={t('company.hints.operatingSeat')}>
+        <FormField
+          id={fieldId('operatingAddress')}
+          label={labels.operatingAddress}
+          hint={t('company.hints.legalAddress')}
+          error={errors.operatingAddress?.message}
         >
           {(p) => (
-            <Controller
-              control={control}
-              name="legalMunicipality"
-              rules={{ validate: (v) => !isUnchosen(v) || t('municipalityField.choose') }}
-              render={({ field }) => (
-                <MunicipalityField
-                  {...p}
-                  ref={field.ref}
-                  value={field.value}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                />
-              )}
-            />
+            <Input {...p} autoComplete="off" {...register('operatingAddress', { maxLength: max(300) })} />
           )}
         </FormField>
+        <MunicipalityFormField
+          name="operatingMunicipality"
+          label={labels.operatingMunicipality}
+          error={errors.operatingMunicipality?.message}
+          control={control}
+        />
+      </Group>
+
+      <Group legend={t('company.contactDetails')}>
         <FormField id={fieldId('phone')} label={labels.phone} error={errors.phone?.message}>
-          {(p) => (
-            <Input
-              {...p}
-              type="tel"
-              autoComplete="off"
-              {...register('phone', {
-                maxLength: max(30),
-                pattern: { value: /^[0-9 +().\-/]*$/, message: t('company.errors.phone') },
-              })}
-            />
-          )}
+          {(p) => <Input {...p} type="tel" autoComplete="off" {...register('phone', phoneRules(30))} />}
+        </FormField>
+        <FormField id={fieldId('mobile')} label={labels.mobile} error={errors.mobile?.message}>
+          {(p) => <Input {...p} type="tel" autoComplete="off" {...register('mobile', phoneRules(30))} />}
+        </FormField>
+        <FormField id={fieldId('fax')} label={labels.fax} error={errors.fax?.message}>
+          {(p) => <Input {...p} type="tel" autoComplete="off" {...register('fax', phoneRules(30))} />}
         </FormField>
         <FormField id={fieldId('email')} label={labels.email} error={errors.email?.message}>
+          {(p) => <Input {...p} type="email" autoComplete="off" {...register('email', emailRules)} />}
+        </FormField>
+        <FormField
+          id={fieldId('secondaryEmail')}
+          label={labels.secondaryEmail}
+          error={errors.secondaryEmail?.message}
+        >
           {(p) => (
-            <Input
-              {...p}
-              type="email"
-              autoComplete="off"
-              {...register('email', {
-                maxLength: max(254),
-                pattern: { value: /^$|^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t('company.errors.email') },
-              })}
-            />
+            <Input {...p} type="email" autoComplete="off" {...register('secondaryEmail', emailRules)} />
           )}
         </FormField>
-      </div>
+      </Group>
+
+      <ContactsFields
+        control={control}
+        register={register}
+        errors={errors}
+        roles={withCurrent(
+          roles.data,
+          (company?.contacts ?? []).map((c) => c.role),
+        )}
+        rolesLoaded={roles.data !== undefined}
+        fieldId={fieldId}
+      />
 
       <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={isSubmitting}>
         {isSubmitting ? t('company.saving') : submitLabel}
       </Button>
     </form>
+  );
+};
+
+/** Gruppo di campi con la sua legenda: sedi e recapiti (US-510). */
+const Group = ({ legend, intro, children }: { legend: string; intro?: string; children: ReactNode }) => (
+  <fieldset className="space-y-4">
+    <legend className="text-base font-semibold">{legend}</legend>
+    {intro && <p className="text-sm text-muted-foreground">{intro}</p>}
+    <div className="grid gap-4 md:grid-cols-2">{children}</div>
+  </fieldset>
+);
+
+type MunicipalityFormFieldProps = {
+  name: 'legalMunicipality' | 'operatingMunicipality';
+  label: string;
+  error?: string;
+  control: Control<CompanyFormValues>;
+};
+
+/** Comune scelto dall'elenco ufficiale (US-1007): il testo scritto senza sceglierlo è un errore. */
+const MunicipalityFormField = ({ name, label, error, control }: MunicipalityFormFieldProps) => {
+  const { t } = useTranslation();
+  return (
+    <FormField id={fieldId(name)} label={label} hint={t('municipalityField.hint')} error={error}>
+      {(p) => (
+        <Controller
+          control={control}
+          name={name}
+          rules={{ validate: (v: MunicipalityValue) => !isUnchosen(v) || t('municipalityField.choose') }}
+          render={({ field }) => (
+            <MunicipalityField
+              {...p}
+              ref={field.ref}
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+            />
+          )}
+        />
+      )}
+    </FormField>
   );
 };

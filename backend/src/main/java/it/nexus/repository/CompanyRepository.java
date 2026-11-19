@@ -19,7 +19,8 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 
     /**
      * Ricerca per ragione sociale (senza distinzione di maiuscole) o partita IVA, ordinata per nome; con il comune della
-     * sede legale (US-1007) e la categoria merceologica già caricati. Con {@code toComplete} solo le aziende con un dato
+     * sede legale (US-1007), la categoria merceologica e la sede operativa (US-510) già caricati; i referenti arrivano a
+     * lotti ({@code @BatchSize} su {@link Company#getContacts()}). Con {@code toComplete} solo le aziende con un dato
      * da completare (US-508); con {@code businessCategoryId} solo quelle della categoria (US-509).
      */
     default List<Company> search(String search, boolean includeInactive, boolean toComplete, Long businessCategoryId) {
@@ -27,7 +28,8 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
                 CompanyPlaceholders.NAME_PREFIX + "%", businessCategoryId);
     }
 
-    @EntityGraph(attributePaths = {"legalMunicipality", "legalMunicipality.province", "businessCategory"})
+    @EntityGraph(attributePaths = {"legalMunicipality", "legalMunicipality.province", "businessCategory",
+            "operatingMunicipality", "operatingMunicipality.province"})
     @Query("""
             select c from Company c
             where (:includeInactive = true or c.active = true)

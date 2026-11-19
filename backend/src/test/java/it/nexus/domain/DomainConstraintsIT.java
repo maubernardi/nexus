@@ -47,6 +47,7 @@ import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.AuditEventRepository;
 import it.nexus.repository.BusinessCategoryRepository;
+import it.nexus.repository.ContactRoleRepository;
 import it.nexus.repository.ClosureReportRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyNoteRepository;
@@ -86,6 +87,7 @@ class DomainConstraintsIT {
     @Autowired ProjectRepository projects;
     @Autowired ZoneRepository zones;
     @Autowired BusinessCategoryRepository businessCategories;
+    @Autowired ContactRoleRepository contactRoles;
     @Autowired JobCategoryRepository categories;
     @Autowired InternshipTypeRepository internshipTypes;
     @Autowired HiringFormulaRepository hiringFormulas;
@@ -293,6 +295,71 @@ class DomainConstraintsIT {
         void nomeCategoriaMerceologicaAttivaDuplicato() {
             assertViolates("uq_business_category_active_name",
                     () -> businessCategories.saveAndFlush(new BusinessCategory(DomainFixtures.code("C"), "pizzeria")));
+        }
+
+        @Test
+        void codiceRuoloDelReferenteDuplicato() {
+            // TITOLARE è una delle voci iniziali di V47 (US-510)
+            assertViolates("uq_contact_role_code",
+                    () -> contactRoles.saveAndFlush(new ContactRole("TITOLARE", "Titolare bis")));
+        }
+
+        @Test
+        void codiceRuoloDelReferenteFuoriFormato() {
+            assertViolates("ck_contact_role_code",
+                    () -> contactRoles.saveAndFlush(new ContactRole("ruolo-1", "Ruolo di prova")));
+        }
+
+        @Test
+        void nomeRuoloDelReferenteVuoto() {
+            assertViolates("ck_contact_role_name",
+                    () -> contactRoles.saveAndFlush(new ContactRole(DomainFixtures.code("R"), "  ")));
+        }
+
+        @Test
+        void nomeRuoloDelReferenteAttivoDuplicato() {
+            assertViolates("uq_contact_role_active_name",
+                    () -> contactRoles.saveAndFlush(new ContactRole(DomainFixtures.code("R"), "titolare")));
+        }
+
+        @Test
+        void referenteSenzaNomeNeRuolo() {
+            Company c = company(DomainFixtures.vatCode());
+            c.addContact(null, null, "055 1234", null, null);
+            assertViolates("ck_company_contact_name_or_role", () -> companies.saveAndFlush(c));
+        }
+
+        @Test
+        void nomeDelReferenteVuoto() {
+            Company c = company(DomainFixtures.vatCode());
+            c.addContact("  ", contactRoles.findById(ContactRole.LEGACY_ID_BASE + 13).orElseThrow(), null, null, null);
+            assertViolates("ck_company_contact_name", () -> companies.saveAndFlush(c));
+        }
+
+        @Test
+        void posizioneDelReferenteRipetuta() {
+            Company c = company(DomainFixtures.vatCode());
+            c.addContact("Paola Neri", null, null, null, null);
+            Long id = companies.saveAndFlush(c).getId();
+            assertViolates("uq_company_contact_position", () -> jdbc.update("""
+                    INSERT INTO company_contact (id, company_id, position, name, created_at, created_by)
+                    VALUES (1, ?, 0, 'Altro', now(), 'test')""", id));
+        }
+
+        @Test
+        void posizioneDelReferenteNegativa() {
+            Long id = companies.saveAndFlush(company(DomainFixtures.vatCode())).getId();
+            assertViolates("ck_company_contact_position", () -> jdbc.update("""
+                    INSERT INTO company_contact (id, company_id, position, name, created_at, created_by)
+                    VALUES (?, ?, -1, 'Altro', now(), 'test')""", id, id));
+        }
+
+        @Test
+        void ruoloDelReferenteInesistente() {
+            Long id = companies.saveAndFlush(company(DomainFixtures.vatCode())).getId();
+            assertViolates("fk_company_contact_role", () -> jdbc.update("""
+                    INSERT INTO company_contact (id, company_id, position, role_id, created_at, created_by)
+                    VALUES (?, ?, 0, 1, now(), 'test')""", id, id));
         }
 
         @Test
@@ -612,6 +679,13 @@ class DomainConstraintsIT {
             Long id = internships.saveAndFlush(internship()).getId();
             assertViolates(constraint,
                     () -> jdbc.update("UPDATE internship SET " + column + " = 1 WHERE id = ?", id));
+        }
+
+        @Test
+        void comuneDellaSedeOperativaInesistente() {
+            Long id = fixtures.graph().company().getId();
+            assertViolates("fk_company_operating_municipality",
+                    () -> jdbc.update("UPDATE company SET operating_municipality_id = 1 WHERE id = ?", id));
         }
 
         @Test
