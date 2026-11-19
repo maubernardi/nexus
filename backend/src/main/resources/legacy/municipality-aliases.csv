@@ -1,0 +1,97 @@
+# Alias dei comuni del database attuale (US-1309): testo come in Access ; nome ufficiale del comune vigente.
+# Il confronto ignora maiuscole, accenti e punteggiatura; la sigla della provincia in coda si toglie da sola.
+# Solo nomi di luoghi. Si allunga con i «Comuni non trovati» del resoconto.
+#
+# abbreviazioni e refusi
+S FIORENTINO;Sesto Fiorentino
+SFIORENTINO;Sesto Fiorentino
+SESTO F;Sesto Fiorentino
+C BISENZIO;Campi Bisenzio
+CBISENZIO;Campi Bisenzio
+CAMPI B;Campi Bisenzio
+CAMPI;Campi Bisenzio
+FIRENZ E;Firenze
+LASTA A SIGNA;Lastra a Signa
+SAN CASCIANO;San Casciano in Val di Pesa
+S CASCIANO;San Casciano in Val di Pesa
+SANTA C SULL ARNO;Santa Croce sull'Arno
+VILLAFRANCA LUN;Villafranca in Lunigiana
+INCISA V RNO;Figline e Incisa Valdarno
+#
+# comuni fusi dopo il 2014
+FIGLINE VALDARNO;Figline e Incisa Valdarno
+FIGLINE;Figline e Incisa Valdarno
+INCISA VALDARNO;Figline e Incisa Valdarno
+INCISA IN VAL D ARNO;Figline e Incisa Valdarno
+SCARPERIA;Scarperia e San Piero
+SAN PIERO A SIEVE;Scarperia e San Piero
+BARBERINO VAL D ELSA;Barberino Tavarnelle
+TAVARNELLE VAL DI PESA;Barberino Tavarnelle
+TAVARNELLE;Barberino Tavarnelle
+SAMBUCA;Barberino Tavarnelle
+LATERINA;Laterina Pergine Valdarno
+#
+# frazioni e quartieri
+FIRENZE CENTRO;Firenze
+ISOLOTTO;Firenze
+GALLUZZO;Firenze
+NOVOLI;Firenze
+RIFREDI;Firenze
+OSMANNORO;Sesto Fiorentino
+GRASSINA;Bagno a Ripoli
+ANTELLA;Bagno a Ripoli
+VALLINA;Bagno a Ripoli
+TAVARNUZZE;Impruneta
+SIECI;Pontassieve
+LE SIECI;Pontassieve
+SCOPETI;Rufina
+BADIA A SETTIMO;Scandicci
+GINESTRA FIORENTINA;Lastra a Signa
+#
+# dal resoconto della prova sul file vero (19/11)
+B SAN LORENZO;Borgo San Lorenzo
+BORGO S LORENZO;Borgo San Lorenzo
+FIGLINE V RNO;Figline e Incisa Valdarno
+SAN PIERO SCARPERIA;Scarperia e San Piero
+SAN CASCIANO VAL PE;San Casciano in Val di Pesa
+SAN CASCIANO VAL DI;San Casciano in Val di Pesa
+TAVARNELLE V P;Barberino Tavarnelle
+SAMBUCA VAL DI PESA;Barberino Tavarnelle
+PERGINE VALDARNO;Laterina Pergine Valdarno
+MONTELUPOFIORENTINO;Montelupo Fiorentino
+MONTELUPO;Montelupo Fiorentino
+SESTO F NO;Sesto Fiorentino
+SCANDICI;Scandicci
+FIRENZRE;Firenze
+FIRENZEE;Firenze
+REGELLO;Reggello
+SAN GIMINIANO;San Gimignano
+REGGIO EMILIA;Reggio nell'Emilia
+SCOPETI RUFINA;Rufina
+CAPALLE;Campi Bisenzio
+SAN DONNINO;Campi Bisenzio
+SAN PIERO A PONTI;Campi Bisenzio
+PONTE A EMA;Bagno a Ripoli
+COMPIOBBI;Fiesole
+CALDINE;Fiesole
+MOLINO DEL PIANO;Pontassieve
+LECCIO;Reggello
+STRADA IN CHIANTI;Greve in Chianti
+PANZANO IN CHIANTI;Greve in Chianti
+COMEANA;Carmignano
+SEANO;Carmignano
+MARINA DI CARRARA;Carrara
+VICARELLO;Collesalvetti
+SAN DONATO IN COLLIN;Rignano sull'Arno
+SAN DONATO IN COLLINA;Rignano sull'Arno
+CASTELLO;Firenze
+BROZZI;Firenze
+SETTIGNANO;Firenze
+ROVEZZANO;Firenze
+SESTO FIORENTION;Sesto Fiorentino
+SESTO FIORENTIINO;Sesto Fiorentino
+SESTO FOIORENTINO;Sesto Fiorentino
+SESTO FIORENTINOI;Sesto Fiorentino
+SESTO FIOREFIRENZE;Sesto Fiorentino
+NAVE A ROVEZZANO;Firenze
+PONTE A SIGNA;Lastra a Signa

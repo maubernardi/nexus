@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import it.nexus.legacy.LegacyIds;
 import it.nexus.repository.AppUserRepository;
 import it.nexus.services.UserDisplayNameService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,8 @@ public class UserDisplayNameServiceImpl implements UserDisplayNameService {
         Map<String, String> names = new HashMap<>();
         appUserRepository.findByUsernameIn(new HashSet<>(usernames))
                 .forEach(u -> names.put(u.getUsername(), u.getFirstName() + " " + u.getLastName()));
-        usernames.forEach(u -> names.putIfAbsent(u, "Sistema"));
+        // righe importate dal database attuale (US-1309), per esempio le note del diario
+        usernames.forEach(u -> names.putIfAbsent(u, LegacyIds.AUTHOR.equals(u) ? "Database attuale" : "Sistema"));
         return names;
     }
 }

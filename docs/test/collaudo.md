@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `2a123af` (17/11/2026): Sprint 1–14 completi (motivo di chiusura, proroga, documenti sui modelli reali con il promotore e le variabili per progetto) |
-| **Ultimo aggiornamento** | 19/11/2026 (T-25.1 … T-25.3: da provare dopo il deploy di US-508, US-509 e US-510; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 19/11/2026 (T-25.1 … T-25.3: da provare dopo il deploy di US-508, US-509 e US-510; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -1130,3 +1130,22 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      - «Sede operativa: Via del Magazzino 10, Prato (PO)»;
      - cellulare e fax;
      - i referenti, ognuno con il ruolo e i recapiti.
+
+- [ ] **T-25.4 Importazione dal database attuale, in prova (US-1309)**
+
+  Si fa sul PC, non sulla demo: il file Access ha dati personali e sulla demo restano i dati dimostrativi.
+  L'importazione vera si fa con il passaggio in produzione (US-1306).
+  1. Segui la procedura dell'[analisi](../analisi/database-attuale.md), §9.1. **Atteso:** il comando finisce da solo
+     in pochi secondi; nel log c'è la riga «Importazione dal database attuale: aziende 13799 lette, 13799 nuove…».
+  2. Apri `documenti_base/nexus.mdb-resoconto.txt`. **Atteso:**
+     - i conteggi come nella tabella del §9.3;
+     - le sezioni «Da rivedere» con i numeri di Access e i collegamenti `/aziende/…`;
+     - nessun nome di azienda o di persona, recapito o nota.
+  3. Tra le «Chiamate con possibili nomi di beneficiari» controlla in Access quelle che hanno davvero nome e cognome,
+     insieme alle 7 dell'analisi (§7, 4b).
+  4. Ripeti il comando. **Atteso:** «0 nuove» per aziende e chiamate.
+  5. Facoltativo, con il frontend in locale (`pnpm dev`) e l'utente `operatore.cc`: apri un'azienda del resoconto.
+     **Atteso:**
+     - la partita IVA è da completare;
+     - ci sono i referenti con il ruolo;
+     - nel diario c'è la nota con la data di Access e l'autore «Database attuale».
