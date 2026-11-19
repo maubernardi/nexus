@@ -126,12 +126,30 @@ Tutte (13.799), solo quelle con il nome (12.212), oppure solo quelle vive: per e
 - **Progetti:** solo quelli attivi, creati dall'ADMIN.
 - **Duplicati e comuni:** si sistemano durante l'importazione, con un elenco dei casi da rivedere a mano.
 
-## 7. Domande per il PO
+## 7. Decisioni del PO (19/11)
 
-1. I **beneficiari** di oggi dove sono (fogli Excel, un altro database)? Vanno portati in NEXUS?
-2. **Partita IVA** (§6.1): quale strada?
-3. **Quali aziende** importare (§6.2)?
-4. Le **chiamate** (§6.3): note o storico strutturato? E delle funzioni mancanti (§5, G1–G6) quali servono prima del
-   passaggio in produzione?
-5. Il Call Center continuerà a fare **prospezione telefonica** delle aziende in NEXUS, come oggi? Da questo dipende il
-   peso di G1–G3.
+| # | Domanda | Decisione |
+|---|---|---|
+| 1 | Dove sono i beneficiari? | Non c'è un'anagrafica: sono «immersi» nelle segnalazioni, cioè nelle chiamate. Non si importano come beneficiari. |
+| 2 | Partita IVA | Quando manca si importa **«00000000000»**. Il programma non lascia salvare un'azienda con quel valore, così la si corregge alla prima modifica. Il vincolo di unicità del database esclude quel valore. |
+| 3 | Quali aziende | **Tutte.** Le 1.587 senza nome sono quasi tutte vecchie (1.261 registrate fino al 2019; solo 7 chiamate dal 2023), ma hanno telefono, indirizzo e attività. *Proposta:* nome «Azienda senza nome n. ‹numero di Access›», con lo stesso vincolo della partita IVA. |
+| 4 | Chiamate | Corrispondono alle segnalazioni: si importano in una **tabella di archivio**, per averle se serviranno. |
+| 4b | Dati personali nelle chiamate | Per regola interna i beneficiari sono indicati con le **iniziali**. Verifica sulle note: le iniziali compaiono in circa 15.500 chiamate; nome e cognome dopo «utente», «candidato» o «ragazzo» solo in **7**, da controllare a mano (n. 11719, 26711, 28531, 31037, 34116, 36661, 40614). Circa 3.000 note citano «sig./sig.ra» e un cognome, e circa 900 un'email o un cellulare: dal contesto sembrano i referenti delle aziende. |
+| 5 | Prospezione in NEXUS | Sì: NEXUS sostituisce il database attuale in tutto. |
+| 5b | Dati senza un campo in NEXUS (G4, G5) | Si **aggiungono a NEXUS**: categoria merceologica e attività, più referenti con il ruolo, cellulare, fax, seconda email. |
+
+Lo storico delle chiamate e le richiamate (G1, G2) corrispondono al flusso delle segnalazioni di NEXUS. I requisiti
+dei profili (G6) restano fuori.
+
+## 8. Proposta per lo Sprint 15
+
+| Ordine | Storia (proposta) | Punti | Contenuto |
+|---|---|---|---|
+| 1 | Partita IVA e nome da completare | 3 | «00000000000» e «Azienda senza nome n. …» ammessi solo dall'importazione; il programma non li lascia salvare; «Da completare» nell'elenco e nella scheda, con un filtro; nei documenti la riga da completare. La migrazione toglie quei valori dall'unicità. |
+| 2 | Categoria merceologica e attività dell'azienda | 3 | Catalogo dell'ADMIN con le 55 categorie di oggi; categoria e descrizione dell'attività nella scheda dell'azienda, con il filtro nell'elenco. |
+| 3 | Referenti e recapiti dell'azienda | 5 | Più referenti con nome, ruolo (catalogo dai «Tipi di contatti» di oggi, ripulito), telefono, cellulare ed email; fax e seconda email dell'azienda; sede operativa con il comune. |
+| 4 | Importazione dal database attuale | 8 | Lettura del file Access sul server, senza dati nel repository: tutte le aziende con comune (con gli alias), email ripulite, note nel diario con la data originale, referenti e categoria; chiamate nella tabella di archivio. Alla fine un resoconto con le righe da rivedere: duplicati, comuni non trovati, aziende senza nome. Si prova su una copia e si esegue con il passaggio in produzione (US-1306). |
+| — | US-605 Una mansione per più segnalazioni | 8 | Pianificata il 15/11 |
+
+Le prime quattro valgono **19 punti** e preparano il passaggio in produzione; con US-605 si arriva a 27, sopra la
+velocity media (22,9). *Proposta:* Sprint 15 = le prime quattro, US-605 nello Sprint 16.
