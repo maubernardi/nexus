@@ -9,7 +9,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | https://portalenexus.it |
-| **Versione della demo** | `8d43ad3` (11/11/2026): Sprint 1–13 completi (indirizzi con il comune, fine effettiva e ruolo del tutor aziendale, convenzione e progetti formativi, modelli dei documenti caricati dall'ADMIN) |
+| **Versione della demo** | `2a123af` (17/11/2026): Sprint 1–14 completi (motivo di chiusura, proroga, documenti sui modelli reali con il promotore e le variabili per progetto) |
 | **Ultimo aggiornamento** | 16/11/2026 (T-24.3 e T-24.4: da provare dopo il deploy di US-1011; T-24.2, T-24.1, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi

@@ -11,11 +11,11 @@ cataloghi, non dai modelli né dalla configurazione del server:
 
 I dati MUST NOT stare nel repository. Un dato non indicato SHALL restare una riga da completare.
 
-#### Scenario: Dati indicati
+#### Scenario: Dati configurati
 - **WHEN** per il progetto della segnalazione è indicata la polizza RC con la scadenza 22/07/2027
 - **THEN** i documenti riportano polizza e scadenza «22/07/2027»
 
-#### Scenario: Dati non indicati
+#### Scenario: Dati non configurati
 - **WHEN** per il progetto della segnalazione manca la PEC del promotore
 - **THEN** i documenti hanno la riga da completare al suo posto
 
