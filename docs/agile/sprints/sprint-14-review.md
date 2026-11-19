@@ -161,16 +161,23 @@ Da stimare: **US-507** Richiesta di contatto di un'azienda dal Tutor, dopo l'ana
 *Proposta:* Sprint 14 chiuso con velocity **29**: 21 punti pianificati più gli 8 di US-1013, aggiunta da te durante lo
 sprint.
 
+> ✅ **Deciso (PO, 19/11): proposta accettata.**
+
 ### 8.2 Contenuto dello Sprint 15
 Al 15/11 lo Sprint 15 era **US-605 (8 punti)**. *Proposta:* aggiungere **US-1302 Backup del database (5 punti)**, se
 scegli la destinazione (§8.3). Il backup sblocca il passaggio in produzione. *Alternative:*
 - solo US-605, con le sessioni di analisi di US-507 (§8.4) e di raffinamento di US-1305;
 - US-605 con la revisione UX/UI (US-1305), che però va prima raffinata con te.
 
+> ⏸️ **Deciso (PO, 19/11): lo Sprint 15 si definisce dopo un confronto con il database attuale**, che il PO ha
+> recuperato. Prima si chiude lo Sprint 14.
+
 ### 8.3 Destinazione del backup (US-1302)
 L'11/11 il backup è stato rinviato e la destinazione non è ancora decisa (review dello Sprint 13, §8.3). *Proposta:*
 spazio di archiviazione **IONOS** (S3), 30 backup giornalieri cifrati, costo piccolo a consumo; le credenziali le metti
 tu nel `.env` del server. *Alternative:* un altro server o un NAS via SSH; un servizio esterno (es. Backblaze B2).
+
+> ⏸️ **Deciso (PO, 19/11): il backup resta nel backlog**; se ne riparla dopo lo Sprint 15.
 
 ### 8.4 Analisi di US-507 (richiesta di contatto di un'azienda dal Tutor)
 La storia va analizzata prima di stimarla. *Proposta:* una sessione dedicata durante lo Sprint 15, sulle domande:
@@ -179,10 +186,17 @@ La storia va analizzata prima di stimarla. *Proposta:* una sessione dedicata dur
 - se la richiesta crea un'azienda o una mansione;
 - se servono notifiche.
 
+> ⏸️ **PO, 19/11:** chiesto di che cosa tratta la storia. Il Tutor segnala al Call Center un'azienda che conosce (nome
+> e zona) e il Call Center la contatta; oggi le aziende le inserisce solo il Call Center. Le domande sono quelle
+> sopra, più: cosa vede il Tutor dell'esito e se la richiesta è legata a un beneficiario. La sessione si decide al
+> planning dello Sprint 15.
+
 ### 8.5 Collaudo arretrato
 Sulla demo ci sono le funzioni degli Sprint 12, 13 e 14 da collaudare (T-22, T-23, T-24). *Proposta:* collaudarle
 prima del passaggio in produzione (US-1306), cominciando da T-24, che usa i dati e i modelli reali. Ti chiedo una data
 indicativa, per pianificare US-1306.
+
+> ⏸️ **Deciso (PO, 19/11): il collaudo si fa dopo l'analisi del database attuale.**
 
 ## 9. Proposta per lo Sprint 15
 
@@ -198,11 +212,16 @@ giornaliero fuori dal server.*
 
 Il backup è indipendente da US-605 e può andare in parallelo. Prossima migrazione: **V45**.
 
+> ⏸️ **Proposta sospesa (PO, 19/11):** lo Sprint 15 si pianifica dopo il confronto con il database attuale (§8.2); il
+> backup non ne fa parte (§8.3).
+
 ## 10. Azioni a carico del PO
 
-- [ ] Decidere i punti §8.1 … §8.5 e confermare il planning.
+- [x] Decidere i punti §8.1 … §8.5 (19/11): Sprint 14 chiuso; Sprint 15 dopo il confronto con il database attuale.
+- [ ] Il database attuale, per il confronto (prima del planning dello Sprint 15).
 - [x] Dati di GOL (promotore, intestazione) e degli enti nei Cataloghi (19/11).
 - [ ] Caricare i 6 modelli di GOL da «Modelli dei documenti» (T-24.5).
-- [ ] Collaudo T-24.1 … T-24.6 sulla demo `2a123af`; T-23.1 … T-23.4 e T-22.1 … T-22.4, se non sono già fatti.
+- [ ] Collaudo T-24.1 … T-24.6 sulla demo `2a123af`; T-23.1 … T-23.4 e T-22.1 … T-22.4, se non sono già fatti: dopo
+  l'analisi del database attuale (§8.5).
 - [ ] Chiudere la PR di Dependabot #156, se Dependabot non la chiude da solo dopo #162.
 - [ ] US-1301: PWA su Android e iOS (collaudo T-10.1).
