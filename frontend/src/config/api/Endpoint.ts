@@ -25,6 +25,7 @@ export const ENDPOINTS = {
   noHireReasons: '/reference/no-hire-reasons',
   interruptionReasons: '/reference/interruption-reasons',
   businessCategories: '/reference/business-categories',
+  contactRoles: '/reference/contact-roles',
   careAgencies: '/reference/care-agencies',
   competenceSites: '/reference/competence-sites',
   municipalities: '/municipalities',

@@ -4,15 +4,19 @@ import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import it.nexus.domain.enumeration.CompanyMissingData;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.AccessLevel;
@@ -57,14 +61,41 @@ public class Company extends AbstractTsidEntity {
     @Column(name = "activity", length = 200)
     private String activity;
 
-    @Column(name = "contact_person", length = 200)
-    private String contactPerson;
+    /** Sede operativa (US-510): indirizzo e versione del comune, come la sede legale. */
+    @Column(name = "operating_address", length = 300)
+    private String operatingAddress;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "operating_municipality_id")
+    private Municipality operatingMunicipality;
+
+    // la colonna contact_person resta per il ripristino della release precedente (A16): V47 l'ha copiata nei referenti
 
     @Column(name = "phone", length = 30)
     private String phone;
 
+    /** Cellulare, fax e seconda email dell'azienda (US-510). */
+    @Column(name = "mobile", length = 30)
+    private String mobile;
+
+    @Column(name = "fax", length = 30)
+    private String fax;
+
     @Column(name = "email", length = 254)
     private String email;
+
+    @Column(name = "secondary_email", length = 254)
+    private String secondaryEmail;
+
+    /**
+     * Referenti (US-510), in ordine: sostituiti in blocco quando cambiano. Nell'elenco delle aziende arrivano a lotti,
+     * senza moltiplicare le righe della ricerca.
+     */
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("position")
+    @BatchSize(size = 100)
+    @Setter(AccessLevel.NONE)
+    private List<CompanyContact> contacts = new ArrayList<>();
 
     @Column(name = "active", nullable = false)
     private boolean active = true;
@@ -78,6 +109,11 @@ public class Company extends AbstractTsidEntity {
     public Company(String name, String vatCode) {
         this.name = name;
         this.vatCode = vatCode;
+    }
+
+    /** Aggiunge un referente in fondo all'elenco. */
+    public void addContact(String name, ContactRole role, String phone, String mobile, String email) {
+        contacts.add(new CompanyContact(this, contacts.size(), name, role, phone, mobile, email));
     }
 
     /** Dati arrivati vuoti dal database attuale e ancora da completare (US-508), in ordine. */

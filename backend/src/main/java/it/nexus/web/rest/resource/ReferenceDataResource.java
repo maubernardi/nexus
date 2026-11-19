@@ -66,6 +66,13 @@ public class ReferenceDataResource {
         return ResponseEntity.ok(referenceDataService.activeBusinessCategories());
     }
 
+    @GetMapping("/contact-roles")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Ruoli dei referenti attivi, per il modulo dell'azienda (US-510)")
+    public ResponseEntity<List<ReferenceItemDTO>> contactRoles() {
+        return ResponseEntity.ok(referenceDataService.activeContactRoles());
+    }
+
     @GetMapping("/hiring-formulas")
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
     @Operation(summary = "Formule di assunzione attive, per il report di restituzione (US-109)")

@@ -2,6 +2,7 @@ import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 
 import {
   fetchBusinessCategories,
+  fetchContactRoles,
   fetchCareAgencies,
   fetchCompetenceSites,
   fetchHiringFormulas,
@@ -40,6 +41,10 @@ export const useBusinessCategories = (): UseQueryResult<ReferenceItem[]> =>
     queryFn: fetchBusinessCategories,
     staleTime: STALE,
   });
+
+/** Ruoli dei referenti attivi (US-510): solo per Call Center e ADMIN. */
+export const useContactRoles = (): UseQueryResult<ReferenceItem[]> =>
+  useQuery({ queryKey: ['reference', 'contactRoles'], queryFn: fetchContactRoles, staleTime: STALE });
 
 export const useInterruptionReasons = (): UseQueryResult<ReferenceItem[]> =>
   useQuery({

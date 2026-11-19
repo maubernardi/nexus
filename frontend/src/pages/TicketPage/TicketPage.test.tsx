@@ -79,8 +79,29 @@ vi.mock('@/config/api/companyApi', () => ({
       provinceAbbreviation: 'FI',
       validFrom: '2026-01-01',
     },
-    contactPerson: 'Paola Neri',
+    operatingAddress: 'Via dei Mille 3',
+    operatingMunicipality: {
+      id: 'M2',
+      name: 'Prato',
+      istatCode: '100005',
+      cadastralCode: 'G999',
+      provinceName: 'Prato',
+      provinceAbbreviation: 'PO',
+      validFrom: '2026-01-01',
+    },
+    contacts: [
+      {
+        name: 'Paola Neri',
+        role: { id: 'R13', code: 'TITOLARE', name: 'Titolare' },
+        mobile: '+39 333 1234567',
+      },
+      {
+        role: { id: 'R3', code: 'RESPONSABILE_DEL_PERSONALE', name: 'Responsabile del personale' },
+        email: 'personale@alfa.test',
+      },
+    ],
     phone: null,
+    fax: '055 765432',
     email: 'info@alfa.test',
     active: true,
     version: 1,
@@ -309,7 +330,12 @@ describe('<TicketPage>', () => {
     await user.click(details);
 
     const dialog = await screen.findByRole('dialog', { name: '«Magazziniere» presso Alfa Logistica' });
-    expect(await within(dialog).findByText('Paola Neri')).toBeInTheDocument();
+    // referenti con ruolo e recapiti, sede operativa e fax (US-510)
+    const contacts = await within(dialog).findAllByRole('listitem');
+    expect(contacts[0]).toHaveTextContent('Paola Neri (Titolare) — Cellulare +39 333 1234567');
+    expect(contacts[1]).toHaveTextContent('Responsabile del personale — Email personale@alfa.test');
+    expect(within(dialog).getByText('Via dei Mille 3, Prato (PO)')).toBeInTheDocument();
+    expect(within(dialog).getByText('055 765432')).toBeInTheDocument();
     // sede legale con il comune (US-1007)
     expect(within(dialog).getByText('Via Roma 1, Firenze (FI)')).toBeInTheDocument();
     expect(within(dialog).getByRole('heading', { level: 3, name: 'Mansione' })).toBeInTheDocument();

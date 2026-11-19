@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `2a123af` (17/11/2026): Sprint 1–14 completi (motivo di chiusura, proroga, documenti sui modelli reali con il promotore e le variabili per progetto) |
-| **Ultimo aggiornamento** | 19/11/2026 (T-25.1 e T-25.2: da provare dopo il deploy di US-508 e US-509; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 19/11/2026 (T-25.1 … T-25.3: da provare dopo il deploy di US-508, US-509 e US-510; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -1101,3 +1101,32 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      propone più, né la propone il filtro dell'elenco.
   7. In una segnalazione da abbinare, premi «Dettagli» su una mansione di un'azienda dimostrativa. **Atteso:** tra i
      dati dell'azienda «Categoria merceologica» e «Attività».
+
+- [ ] **T-25.3 Referenti, recapiti e sede operativa (US-510)**
+
+  Sulla demo il referente che le aziende avevano prima diventa il primo referente, senza ruolo. Le due aziende
+  dimostrative senza referente ne ricevono uno con il ruolo.
+  1. Come `admin` apri **Cataloghi**. **Atteso:** dopo «Categorie merceologiche» c'è la sezione «Ruoli dei referenti»
+     con 12 voci attive, tra cui «Titolare», «Responsabile del personale» e «Legale rappresentante».
+  2. Come `operatore.cc` apri **Aziende**. **Atteso:**
+     - la colonna «Referente» mostra il primo referente: per esempio «Referente Bar» per «Demo Bar del Centro»;
+     - per «Azienda senza nome n. 90001» mostra «Centralino», cioè il ruolo, perché il nome manca.
+  3. Apri «Demo Logistica S.r.l.». **Atteso:**
+     - il modulo è diviso in «Sede legale», «Sede operativa», «Recapiti dell'azienda» e «Referenti»;
+     - la sede operativa è «Via del Magazzino 10», «Prato (PO)»;
+     - tra i recapiti ci sono anche «Cellulare», «Fax» e «Seconda email»;
+     - «Referente 1» è il referente di prima.
+  4. Scegli per il referente 1 il ruolo «Titolare». Premi «Aggiungi referente». **Atteso:** compare «Referente 2» e il
+     cursore è nel suo nome.
+  5. Lascia vuoto il nome, scrivi solo il telefono del referente 2 e salva. **Atteso:** il riepilogo «Referente 2:
+     nome: Inserisci il nome o scegli il ruolo»; il collegamento porta al campo.
+  6. Scegli per il referente 2 il ruolo «Responsabile del personale», scrivi il cellulare e il fax dell'azienda e
+     salva. **Atteso:**
+     - «Modifiche salvate.»;
+     - nell'elenco delle aziende «Referente Logistica e un altro» (o il nome del referente 1 seguito da «e un altro»).
+  7. Riapri l'azienda e premi «Togli il referente 2». **Atteso:** il gruppo sparisce e il cursore è su «Aggiungi
+     referente». Salva.
+  8. In una segnalazione da abbinare, premi «Dettagli» su una mansione di «Demo Logistica S.r.l.». **Atteso:**
+     - «Sede operativa: Via del Magazzino 10, Prato (PO)»;
+     - cellulare e fax;
+     - i referenti, ognuno con il ruolo e i recapiti.

@@ -15,6 +15,8 @@ public enum CatalogKind {
     CLOSURE_REASONS("closure-reasons", AuditEntityType.CLOSURE_REASON, "MOTIVO"),
     /** Categorie merceologiche delle aziende (US-509). */
     BUSINESS_CATEGORIES("business-categories", AuditEntityType.BUSINESS_CATEGORY, "CATEGORIA"),
+    /** Ruoli dei referenti delle aziende (US-510). */
+    CONTACT_ROLES("contact-roles", AuditEntityType.CONTACT_ROLE, "RUOLO"),
     /** Progetti finanziati (US-102). */
     PROJECTS("projects", AuditEntityType.PROJECT, "PROGETTO"),
     /** Sedi di competenza e enti di presa in carico (US-115). */

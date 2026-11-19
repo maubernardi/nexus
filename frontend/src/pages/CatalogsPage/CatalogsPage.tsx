@@ -24,6 +24,7 @@ export const CatalogsPage = () => {
       <CatalogSection kind="zones" />
       <CatalogSection kind="job-categories" />
       <CatalogSection kind="business-categories" />
+      <CatalogSection kind="contact-roles" />
       <CatalogSection kind="internship-types" />
       <ProjectInternshipTypesSection />
       <ProjectDocumentsSection />

@@ -79,8 +79,13 @@ class MunicipalitySeedIT {
         assertThat(seeded.getLegalMunicipality().getName()).isEqualTo("Sesto Fiorentino");
         assertThat(companies.findByVatCode("99000000002").orElseThrow().getLegalMunicipality().getName())
                 .isEqualTo("Prato");
+        // sede operativa di un'azienda dimostrativa (US-510), non delle altre
+        assertThat(seeded.getOperatingAddress()).isEqualTo("Via del Magazzino 10");
+        assertThat(seeded.getOperatingMunicipality().getName()).isEqualTo("Prato");
+        assertThat(companies.findByVatCode("99000000002").orElseThrow().getOperatingMunicipality()).isNull();
         Company untouched = companies.findByVatCode("01234567890").orElseThrow();
         assertThat(untouched.getLegalMunicipality()).isNull();
         assertThat(untouched.getLegalAddress()).isEqualTo("Via Roma 1, Città Demo");
+        assertThat(untouched.getOperatingMunicipality()).isNull();
     }
 }

@@ -15,8 +15,8 @@ sprint, anche sopra la velocity media (22,9).
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
 | US-508 | Partita IVA e nome da completare | 3 | ✅ Ready | `mark-companies-to-complete` | [#165](https://github.com/maubernardi/nexus/pull/165) |
-| US-509 | Categoria merceologica e attività dell'azienda | 3 | ✅ Ready | `add-business-categories` | |
-| US-510 | Referenti e recapiti dell'azienda | 5 | ✅ Ready | | |
+| US-509 | Categoria merceologica e attività dell'azienda | 3 | ✅ Ready | `add-business-categories` | [#166](https://github.com/maubernardi/nexus/pull/166) |
+| US-510 | Referenti e recapiti dell'azienda | 5 | ✅ Ready | `add-company-contacts` | |
 | US-1309 | Importazione dal database attuale | 8 | ✅ Ready | | |
 | US-605 | Una mansione per più segnalazioni, una per tipo di tirocinio | 8 | ✅ Ready | | |
 
@@ -64,6 +64,16 @@ dipenda dalla simulazione (A29).
   - la categoria si filtra dal menu dell'elenco, che si applica alla scelta; la ricerca resta per ragione sociale e
     partita IVA;
   - categoria e attività anche nel dettaglio dell'abbinamento.
+- **US-510**:
+  - catalogo «Ruoli dei referenti» con i 12 ruoli del database attuale, ripuliti: fuori le righe vuote, quelle che non
+    sono ruoli («pelle», «DI», «ele») e il doppione di «Legale Rappresentante». L'id delle voci iniziali è fisso
+    (893700000000000500 + il numero in Access), come per le categorie;
+  - fino a 10 referenti per azienda, in ordine; di ognuno serve almeno il nome o il ruolo, perché nel database attuale
+    1.129 referenti hanno il solo ruolo;
+  - il referente di oggi diventa il primo, senza ruolo; la colonna `contact_person` resta per il ripristino della
+    release precedente (A16) e si toglierà dopo il passaggio in produzione;
+  - referenti, cellulare, fax e seconda email nell'audit solo come «cambiati»; la sede operativa con i valori;
+  - nell'elenco la colonna «Referente» mostra il primo referente, con quanti sono gli altri.
 
 ## Burndown
 
@@ -71,6 +81,7 @@ dipenda dalla simulazione (A29).
 |---|---|
 | Inizio (19/11, dopo il planning) | 27 |
 | US-508 unita (19/11) | 24 |
+| US-509 unita (19/11) | 21 |
 
 ## Per il PO durante lo sprint
 

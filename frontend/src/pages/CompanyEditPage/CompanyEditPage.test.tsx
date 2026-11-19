@@ -42,6 +42,7 @@ vi.mock('@/config/api/referenceApi', () => ({
   fetchZones: vi.fn().mockResolvedValue([]),
   fetchJobCategories: vi.fn().mockResolvedValue([]),
   fetchBusinessCategories: vi.fn().mockResolvedValue([]),
+  fetchContactRoles: vi.fn().mockResolvedValue([{ id: 'R13', code: 'TITOLARE', name: 'Titolare' }]),
   fetchMyProjects: vi.fn(),
   fetchProjects: vi.fn(),
 }));
@@ -58,7 +59,7 @@ const rossi: Company = {
   name: 'Officina Rossi',
   vatCode: '12345678901',
   legalAddress: 'Via Roma 1',
-  contactPerson: 'Paola Neri',
+  contacts: [{ name: 'Paola Neri', role: { id: 'R13', code: 'TITOLARE', name: 'Titolare' } }],
   phone: null,
   email: null,
   active: true,
@@ -103,7 +104,12 @@ describe('<CompanyEditPage>', () => {
     await waitFor(() => expect(outcome).toHaveFocus());
     expect(vi.mocked(updateCompany).mock.calls[0][0]).toMatchObject({
       id: 'C1',
-      payload: { name: 'Officina Rossi S.r.l.', version: 3 },
+      payload: {
+        name: 'Officina Rossi S.r.l.',
+        version: 3,
+        // i referenti tornano com'erano (US-510)
+        contacts: [{ name: 'Paola Neri', roleId: 'R13', phone: null, mobile: null, email: null }],
+      },
     });
     await expectNoAxeViolations();
   });

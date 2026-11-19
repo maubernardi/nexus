@@ -3,6 +3,7 @@ package it.nexus.web.rest.resource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -12,6 +13,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -32,9 +35,11 @@ import com.jayway.jsonpath.JsonPath;
 import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.AppUser;
+import it.nexus.domain.AuditEvent;
 import it.nexus.domain.BusinessCategory;
 import it.nexus.domain.Company;
 import it.nexus.domain.CompanyPlaceholders;
+import it.nexus.domain.ContactRole;
 import it.nexus.domain.JobCategory;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Municipality;
@@ -88,7 +93,7 @@ class CompanyResourceIT {
 
     private static String body(String name, String vat, String extra) {
         return """
-                {"name": "%s", "vatCode": "%s", "legalAddress": "Via Roma 1, Firenze", "contactPerson": "Paola Neri",
+                {"name": "%s", "vatCode": "%s", "legalAddress": "Via Roma 1, Firenze", "contacts": [{"name": "Paola Neri"}],
                  "phone": "+39 055 123456", "email": "info@azienda.test" %s}
                 """.formatted(name, vat, extra);
     }
@@ -115,9 +120,9 @@ class CompanyResourceIT {
                 .satisfies(e -> {
                     assertThat(e.getAction()).isEqualTo("CREATE");
                     assertThat(e.getCreatedBy()).isEqualTo("operatore.cc");
-                    assertThat(e.getChanges()).containsKeys("name", "vatCode", "contactPerson");
-                    // contatti del referente: solo "campo impostato", mai i valori (EN-4)
-                    assertThat(e.getChanges()).containsEntry("contactPerson", Map.of("redacted", true))
+                    assertThat(e.getChanges()).containsKeys("name", "vatCode", "contacts");
+                    // referenti e recapiti: solo "campo impostato", mai i valori (EN-4, US-510)
+                    assertThat(e.getChanges()).containsEntry("contacts", Map.of("redacted", true))
                             .containsEntry("phone", Map.of("redacted", true))
                             .containsEntry("email", Map.of("redacted", true));
                     assertThat(e.getChanges().toString()).doesNotContain("Paola Neri", "055 123456", "info@azienda.test");
@@ -145,7 +150,7 @@ class CompanyResourceIT {
         // la versione salvata resta anche se chiusa; una versione chiusa non si sceglie di nuovo
         firenze.close(LocalDate.of(2026, 6, 1));
         sesto.close(LocalDate.of(2026, 6, 1));
-        em.flush();
+        newRequest();
         mockMvc.perform(put(API + "/" + id).header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
                         .content(body("Officina Rossi", "12345678901",
                                 ", \"legalMunicipalityId\": \"%s\", \"version\": 0".formatted(firenzeId))))
@@ -228,8 +233,8 @@ class CompanyResourceIT {
                 .last()
                 .satisfies(e -> {
                     assertThat(e.getAction()).isEqualTo("UPDATE");
-                    assertThat(e.getChanges()).containsOnlyKeys("contactPerson")
-                            .containsEntry("contactPerson", Map.of("redacted", true));
+                    assertThat(e.getChanges()).containsOnlyKeys("contacts")
+                            .containsEntry("contacts", Map.of("redacted", true));
                     assertThat(e.getChanges().toString()).doesNotContain("Paola Neri", "Marco Gialli");
                 });
     }
@@ -349,6 +354,173 @@ class CompanyResourceIT {
                         .containsEntry("businessCategory",
                                 Map.of("before", "Ristorante / Trattoria / Bistrot", "after", "Bar / Pub"))
                         .containsEntry("activity", Map.of("before", "Pizzeria", "after", "Pizzeria e bar")));
+    }
+
+    private static String role(int legacyNumber) {
+        return TsidMapper.toExternal(ContactRole.LEGACY_ID_BASE + legacyNumber);
+    }
+
+    /** Come {@link #body}, ma con i referenti indicati (JSON di un array). */
+    private static String withContacts(String name, String vat, String contacts, String extra) {
+        return """
+                {"name": "%s", "vatCode": "%s", "contacts": %s %s}
+                """.formatted(name, vat, contacts, extra);
+    }
+
+    /**
+     * La richiesta che segue parte da un contesto di persistenza nuovo, come nell'applicazione: nel contesto condiviso
+     * del test un'azienda appena creata con i referenti verrebbe riscritta al salvataggio successivo, con la versione
+     * incrementata anche senza modifiche.
+     */
+    private void newRequest() {
+        em.flush();
+        em.clear();
+    }
+
+    private ResultActions update(String id, String json) throws Exception {
+        return mockMvc.perform(put(API + "/" + id).header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
+                .content(json));
+    }
+
+    private List<AuditEvent> companyAudit(String id) {
+        return audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.COMPANY,
+                TsidMapper.toInternal(id));
+    }
+
+    @Test
+    void referentiConIlRuolo_inOrdine_auditSenzaValori() throws Exception {
+        String contacts = """
+                [{"name": " Paola Neri ", "roleId": "%s", "mobile": "+39 333 1234567"},
+                 {"roleId": "%s", "email": "personale@azienda.test"}]""".formatted(role(13), role(3));
+        String id = JsonPath.read(create("operatore.cc", withContacts("Hotel Bellavista", "12345678901", contacts, ""))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.contacts.length()").value(2))
+                .andExpect(jsonPath("$.contacts[0].name").value("Paola Neri"))
+                .andExpect(jsonPath("$.contacts[0].role.name").value("Titolare"))
+                .andExpect(jsonPath("$.contacts[0].mobile").value("+39 333 1234567"))
+                .andExpect(jsonPath("$.contacts[1].name").doesNotExist())
+                .andExpect(jsonPath("$.contacts[1].role.name").value("Responsabile del personale"))
+                .andExpect(jsonPath("$.contacts[1].email").value("personale@azienda.test"))
+                .andReturn().getResponse().getContentAsString(), "$.id");
+        mockMvc.perform(get(API).param("search", "Bellavista").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$[0].contacts[*].role.name", contains("Titolare", "Responsabile del personale")));
+        assertThat(companyAudit(id)).singleElement().satisfies(e -> {
+            assertThat(e.getChanges()).containsEntry("contacts", Map.of("redacted", true));
+            assertThat(e.getChanges().toString()).doesNotContain("Paola", "333 1234567", "personale@");
+        });
+
+        newRequest();
+        // salvare senza cambiare nulla non tocca versione e audit
+        update(id, withContacts("Hotel Bellavista", "12345678901", contacts, ", \"version\": 0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.version").value(0));
+        assertThat(companyAudit(id)).hasSize(1);
+
+        // cambia solo l'ordine: è una modifica dei referenti, che incrementa la versione
+        String swapped = """
+                [{"roleId": "%s", "email": "personale@azienda.test"},
+                 {"name": "Paola Neri", "roleId": "%s", "mobile": "+39 333 1234567"}]""".formatted(role(3), role(13));
+        String json = withContacts("Hotel Bellavista", "12345678901", swapped, ", \"version\": 0");
+        update(id, json)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.version").value(greaterThan(0)))
+                .andExpect(jsonPath("$.contacts[0].role.name").value("Responsabile del personale"))
+                .andExpect(jsonPath("$.contacts[1].name").value("Paola Neri"));
+        assertThat(companyAudit(id)).last().satisfies(e -> assertThat(e.getChanges()).containsOnlyKeys("contacts")
+                .containsEntry("contacts", Map.of("redacted", true)));
+        // un collega che partiva dalla versione di prima riceve il 409
+        update(id, json).andExpect(status().isConflict());
+    }
+
+    @Test
+    void referenteSenzaNomeNeRuolo_ruoloNonValido_troppiReferenti_400() throws Exception {
+        create("operatore.cc", withContacts("Officina Rossi", "12345678901",
+                        "[{\"name\": \"Paola Neri\"}, {\"phone\": \"055 1234\"}]", ""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("contacts[1].name"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value("Inserisci il nome o scegli il ruolo"));
+        create("operatore.cc", withContacts("Officina Rossi", "12345678901",
+                        "[{\"name\": \"Paola Neri\", \"roleId\": \"non-un-id\"}]", ""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("contacts[0].roleId"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value("Ruolo non valido"));
+        create("operatore.cc", withContacts("Officina Rossi", "12345678901",
+                        "[{\"name\": \"Paola Neri\", \"email\": \"non-una-email\"}]", ""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("contacts[0].email"));
+        String eleven = "[" + String.join(", ", Collections.nCopies(11, "{\"name\": \"Referente\"}")) + "]";
+        create("operatore.cc", withContacts("Officina Rossi", "12345678901", eleven, ""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("contacts"));
+        assertThat(companies.findByVatCode("12345678901")).isEmpty();
+    }
+
+    @Test
+    void ruoloDisattivato_restaSuiReferentiDellAzienda_nonSiScegliePerUnAltra() throws Exception {
+        String partner = "[{\"name\": \"Paola Neri\", \"roleId\": \"%s\"}]".formatted(role(24));
+        String id = JsonPath.read(create("operatore.cc", withContacts("Officina Rossi", "12345678901", partner, ""))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString(), "$.id");
+
+        mockMvc.perform(post("/api/v1/catalogs/contact-roles/" + role(24) + "/deactivate").header(USER, "admin"))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/reference/contact-roles").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$[*].name", not(hasItem("Socio"))));
+        update(id, withContacts("Officina Rossi S.r.l.", "12345678901", partner, ", \"version\": 0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.contacts[0].role.name").value("Socio"));
+        create("operatore.cc", withContacts("Officina Bianchi", "22222222222", partner, ""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("contacts[0].roleId"));
+    }
+
+    @Test
+    void recapitiESedeOperativa_auditConIValoriSoloPerLaSede() throws Exception {
+        Municipality prato = scenarios.municipality("Prato", "PO");
+        em.flush();
+        String extra = """
+                , "mobile": "+39 333 7654321", "fax": "055 765432", "secondaryEmail": "ordini@azienda.test",
+                  "operatingAddress": " Via dei Mille 3 ", "operatingMunicipalityId": "%s"
+                """.formatted(TsidMapper.toExternal(prato.getId()));
+        String id = JsonPath.read(create("operatore.cc", body("Officina Rossi", "12345678901", extra))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.mobile").value("+39 333 7654321"))
+                .andExpect(jsonPath("$.fax").value("055 765432"))
+                .andExpect(jsonPath("$.secondaryEmail").value("ordini@azienda.test"))
+                .andExpect(jsonPath("$.operatingAddress").value("Via dei Mille 3"))
+                .andExpect(jsonPath("$.operatingMunicipality.name").value("Prato"))
+                .andExpect(jsonPath("$.operatingMunicipality.provinceAbbreviation").value("PO"))
+                .andReturn().getResponse().getContentAsString(), "$.id");
+        assertThat(companyAudit(id)).singleElement().satisfies(e -> {
+            assertThat(e.getChanges()).containsEntry("mobile", Map.of("redacted", true))
+                    .containsEntry("fax", Map.of("redacted", true))
+                    .containsEntry("secondaryEmail", Map.of("redacted", true));
+            assertThat(e.getChanges().get("operatingAddress")).asInstanceOf(InstanceOfAssertFactories.MAP)
+                    .containsEntry("after", "Via dei Mille 3");
+            assertThat(e.getChanges().get("operatingMunicipality")).asInstanceOf(InstanceOfAssertFactories.MAP)
+                    .containsEntry("after", "Prato (PO)");
+            assertThat(e.getChanges().toString()).doesNotContain("7654321", "765432", "ordini@");
+        });
+
+        update(id, body("Officina Rossi", "12345678901", ", \"fax\": \"055 ABC\", \"version\": 0"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("fax"));
+        update(id, body("Officina Rossi", "12345678901", ", \"operatingMunicipalityId\": \"non-un-id\", \"version\": 0"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("operatingMunicipalityId"));
+
+        // tutto tolto: la sede con i valori prima e dopo, i recapiti solo come cambiati
+        update(id, body("Officina Rossi", "12345678901", ", \"version\": 0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.operatingMunicipality").doesNotExist())
+                .andExpect(jsonPath("$.mobile").doesNotExist());
+        assertThat(companyAudit(id)).last().satisfies(e -> {
+            assertThat(e.getChanges())
+                    .containsOnlyKeys("mobile", "fax", "secondaryEmail", "operatingAddress", "operatingMunicipality")
+                    .containsEntry("fax", Map.of("redacted", true));
+            assertThat(e.getChanges().get("operatingMunicipality")).asInstanceOf(InstanceOfAssertFactories.MAP)
+                    .containsEntry("before", "Prato (PO)");
+        });
     }
 
     @Test

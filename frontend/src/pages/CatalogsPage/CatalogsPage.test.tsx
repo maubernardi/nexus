@@ -74,6 +74,9 @@ describe('<CatalogsPage>', () => {
     // categorie merceologiche delle aziende (US-509)
     expect(fetchCatalog).toHaveBeenCalledWith('business-categories');
     expect(screen.getByRole('button', { name: 'Aggiungi categoria' })).toBeInTheDocument();
+    // ruoli dei referenti delle aziende (US-510)
+    expect(fetchCatalog).toHaveBeenCalledWith('contact-roles');
+    expect(screen.getByRole('button', { name: 'Aggiungi ruolo' })).toBeInTheDocument();
     await expectNoAxeViolations();
   });
 });
