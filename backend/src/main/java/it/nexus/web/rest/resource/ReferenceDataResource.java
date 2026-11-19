@@ -59,6 +59,13 @@ public class ReferenceDataResource {
         return ResponseEntity.ok(referenceDataService.activeCareAgencies());
     }
 
+    @GetMapping("/business-categories")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Categorie merceologiche attive, per il modulo e l'elenco delle aziende (US-509)")
+    public ResponseEntity<List<ReferenceItemDTO>> businessCategories() {
+        return ResponseEntity.ok(referenceDataService.activeBusinessCategories());
+    }
+
     @GetMapping("/hiring-formulas")
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
     @Operation(summary = "Formule di assunzione attive, per il report di restituzione (US-109)")

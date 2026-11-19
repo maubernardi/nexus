@@ -7,6 +7,12 @@ import { CompaniesPage } from '@/pages/CompaniesPage/CompaniesPage';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderRoutes } from '@/tests/renderWithProviders';
 
+vi.mock('@/config/api/referenceApi', () => ({
+  fetchBusinessCategories: vi.fn().mockResolvedValue([
+    { id: 'K14', code: 'BAR_PUB', name: 'Bar / Pub' },
+    { id: 'K11', code: 'RISTORANTE_TRATTORIA_BISTR', name: 'Ristorante / Trattoria / Bistrot' },
+  ]),
+}));
 vi.mock('@/config/api/companyApi', () => ({
   searchCompanies: vi.fn(),
   fetchCompany: vi.fn(),
@@ -105,6 +111,42 @@ describe('<CompaniesPage>', () => {
     await user.click(screen.getByRole('checkbox', { name: 'Solo le aziende da completare' }));
     await waitFor(() => expect(router.state.location.search).toBe('?daCompletare=1'));
     expect(searchCompanies).toHaveBeenLastCalledWith({ includeInactive: false, toComplete: true });
+  });
+
+  it('categoria nella colonna e filtro per categoria nell’indirizzo (US-509)', async () => {
+    vi.mocked(searchCompanies).mockResolvedValue([
+      {
+        ...company('C5', 'Pizzeria Napoli'),
+        businessCategory: {
+          id: 'K11',
+          code: 'RISTORANTE_TRATTORIA_BISTR',
+          name: 'Ristorante / Trattoria / Bistrot',
+        },
+      },
+      company('C6', 'Officina Verdi'),
+    ]);
+    const user = userEvent.setup();
+    const { router } = renderPage('/aziende?q=a');
+
+    const table = await screen.findByRole('table', { name: /Aziende ospitanti/ });
+    expect(within(table).getByRole('columnheader', { name: 'Categoria' })).toBeInTheDocument();
+    const [, first, second] = within(table).getAllByRole('row');
+    expect(within(first).getAllByRole('cell')[1]).toHaveTextContent('Ristorante / Trattoria / Bistrot');
+    expect(within(second).getAllByRole('cell')[1]).toHaveTextContent('—');
+
+    const filter = screen.getByRole('combobox', { name: 'Categoria merceologica' });
+    await waitFor(() => expect(filter).toBeEnabled());
+    expect(filter).toHaveDisplayValue('Tutte le categorie');
+    await user.selectOptions(filter, 'Bar / Pub');
+
+    await waitFor(() => expect(router.state.location.search).toBe('?q=a&categoria=K14'));
+    expect(searchCompanies).toHaveBeenLastCalledWith({
+      search: 'a',
+      includeInactive: false,
+      businessCategoryId: 'K14',
+    });
+    expect(filter).toHaveDisplayValue('Bar / Pub');
+    await expectNoAxeViolations();
   });
 
   it('nessun risultato: lo dice', async () => {

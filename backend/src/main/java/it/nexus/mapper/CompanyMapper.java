@@ -6,7 +6,7 @@ import org.mapstruct.Mapping;
 import it.nexus.domain.Company;
 import it.nexus.domain.dto.CompanyDTO;
 
-@Mapper(imports = {TsidMapper.class, MunicipalityMapper.class})
+@Mapper(uses = ReferenceMapper.class, imports = {TsidMapper.class, MunicipalityMapper.class})
 public interface CompanyMapper {
 
     @Mapping(target = "id", expression = "java(TsidMapper.toExternal(company.getId()))")

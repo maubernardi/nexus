@@ -756,6 +756,8 @@ export const it = {
       vatCode: 'Partita IVA',
       legalAddress: 'Indirizzo della sede legale',
       legalMunicipality: 'Comune della sede legale',
+      businessCategory: 'Categoria merceologica',
+      activity: 'Attività',
       contactPerson: 'Referente',
       phone: 'Telefono',
       email: 'Email',
@@ -766,6 +768,7 @@ export const it = {
         'Da completare: il database attuale non aveva la partita IVA. 11 cifre, senza prefisso IT.',
       nameMissing: 'Da completare: il database attuale non aveva la ragione sociale.',
       legalAddress: 'Via e numero civico.',
+      activity: 'Che cosa fa l’azienda, in breve: per esempio «Pizzeria».',
     },
     legalSeat: 'Sede legale',
     errors: {
@@ -783,6 +786,11 @@ export const it = {
     searchSubmit: 'Cerca',
     includeInactive: 'Mostra anche le aziende disattivate',
     onlyToComplete: 'Solo le aziende da completare',
+    noCategory: 'Nessuna',
+    allCategories: 'Tutte le categorie',
+    categoryFilter: 'Categoria merceologica',
+    category: 'Categoria',
+    otherCategory: 'Categoria non più attiva',
     toComplete: 'Da completare',
     missingData: { NAME: 'la ragione sociale', VAT_CODE: 'la partita IVA' },
     toCompleteNotice_one:
@@ -1763,6 +1771,15 @@ export const it = {
       newHeading: 'Nuovo motivo della mancata assunzione',
       caption_one: 'Motivi della mancata assunzione: {{count}} voce',
       caption_other: 'Motivi della mancata assunzione: {{count}} voci',
+    },
+    'business-categories': {
+      heading: 'Categorie merceologiche',
+      intro:
+        'Classificano le aziende: il Call Center sceglie la categoria nella scheda dell’azienda e filtra l’elenco. Le voci iniziali sono quelle del database attuale.',
+      add: 'Aggiungi categoria',
+      newHeading: 'Nuova categoria merceologica',
+      caption_one: 'Categorie merceologiche: {{count}} voce',
+      caption_other: 'Categorie merceologiche: {{count}} voci',
     },
     'closure-reasons': {
       heading: 'Motivi di chiusura del tirocinio',

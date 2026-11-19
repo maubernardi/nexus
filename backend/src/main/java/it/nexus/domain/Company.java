@@ -48,6 +48,15 @@ public class Company extends AbstractTsidEntity {
     @JoinColumn(name = "legal_municipality_id")
     private Municipality legalMunicipality;
 
+    /** Categoria merceologica dal catalogo dell'ADMIN (US-509); facoltativa. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "business_category_id")
+    private BusinessCategory businessCategory;
+
+    /** Descrizione dell'attività, testo libero (US-509): in Access il campo «Paese». */
+    @Column(name = "activity", length = 200)
+    private String activity;
+
     @Column(name = "contact_person", length = 200)
     private String contactPerson;
 

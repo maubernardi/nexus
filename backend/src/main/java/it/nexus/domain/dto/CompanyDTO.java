@@ -12,6 +12,10 @@ public record CompanyDTO(
         String legalAddress,
         /** Comune della sede legale (US-1007), con la provincia della versione scelta. */
         MunicipalityDTO legalMunicipality,
+        /** Categoria merceologica (US-509); assente se non indicata. */
+        ReferenceItemDTO businessCategory,
+        /** Descrizione dell'attività (US-509). */
+        String activity,
         String contactPerson,
         String phone,
         String email,

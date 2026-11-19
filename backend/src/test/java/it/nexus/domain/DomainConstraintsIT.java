@@ -46,6 +46,7 @@ import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.AuditEventRepository;
+import it.nexus.repository.BusinessCategoryRepository;
 import it.nexus.repository.ClosureReportRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyNoteRepository;
@@ -84,6 +85,7 @@ class DomainConstraintsIT {
     @Autowired JdbcTemplate jdbc;
     @Autowired ProjectRepository projects;
     @Autowired ZoneRepository zones;
+    @Autowired BusinessCategoryRepository businessCategories;
     @Autowired JobCategoryRepository categories;
     @Autowired InternshipTypeRepository internshipTypes;
     @Autowired HiringFormulaRepository hiringFormulas;
@@ -259,6 +261,38 @@ class DomainConstraintsIT {
             // le aziende del database attuale senza partita IVA (US-508): l'unicità non le conta
             companies.saveAndFlush(company(CompanyPlaceholders.VAT_CODE));
             assertThatCode(() -> companies.saveAndFlush(company(CompanyPlaceholders.VAT_CODE))).doesNotThrowAnyException();
+        }
+
+        @Test
+        void attivitaDellAziendaVuota() {
+            Company c = company(DomainFixtures.vatCode());
+            c.setActivity("  ");
+            assertViolates("ck_company_activity", () -> companies.saveAndFlush(c));
+        }
+
+        @Test
+        void codiceCategoriaMerceologicaDuplicato() {
+            // ALBERGO è una delle voci iniziali di V46 (US-509)
+            assertViolates("uq_business_category_code",
+                    () -> businessCategories.saveAndFlush(new BusinessCategory("ALBERGO", "Albergo bis")));
+        }
+
+        @Test
+        void codiceCategoriaMerceologicaFuoriFormato() {
+            assertViolates("ck_business_category_code",
+                    () -> businessCategories.saveAndFlush(new BusinessCategory("cat-1", "Categoria di prova")));
+        }
+
+        @Test
+        void nomeCategoriaMerceologicaVuoto() {
+            assertViolates("ck_business_category_name",
+                    () -> businessCategories.saveAndFlush(new BusinessCategory(DomainFixtures.code("C"), "  ")));
+        }
+
+        @Test
+        void nomeCategoriaMerceologicaAttivaDuplicato() {
+            assertViolates("uq_business_category_active_name",
+                    () -> businessCategories.saveAndFlush(new BusinessCategory(DomainFixtures.code("C"), "pizzeria")));
         }
 
         @Test

@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `2a123af` (17/11/2026): Sprint 1–14 completi (motivo di chiusura, proroga, documenti sui modelli reali con il promotore e le variabili per progetto) |
-| **Ultimo aggiornamento** | 19/11/2026 (T-25.1: da provare dopo il deploy di US-508; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 19/11/2026 (T-25.1 e T-25.2: da provare dopo il deploy di US-508 e US-509; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -1084,3 +1084,20 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   6. Aggiungi a «Demo Bar del Centro» una mansione con la tipologia e la zona di una segnalazione da abbinare. Apri
      quella segnalazione e, tra le mansioni compatibili, premi «Dettagli» sulla mansione del bar. **Atteso:** «Partita
      IVA: Da completare».
+
+- [ ] **T-25.2 Categoria merceologica e attività (US-509)**
+  1. Come `admin` apri **Cataloghi**. **Atteso:** dopo «Tipologie di mansione» la sezione «Categorie merceologiche»
+     con 53 voci attive, tra cui «Albergo», «Ristorante / Trattoria / Bistrot» e «Pulizie e facchinaggio».
+  2. Aggiungi «Agenzia immobiliare». **Atteso:** la voce compare attiva nell'elenco.
+  3. Come `operatore.cc` apri **Aziende**. **Atteso:** la colonna «Categoria» dopo la partita IVA: le aziende
+     dimostrative hanno una categoria (per esempio «Demo Ristorazione S.n.c.» → «Ristorante / Trattoria / Bistrot»).
+  4. Nel menu «Categoria merceologica» scegli «Bar / Pub». **Atteso:** l'elenco si aggiorna subito, mostra solo «Demo
+     Bar del Centro» e l'indirizzo contiene `categoria=`; torna a «Tutte le categorie».
+  5. Apri «Demo Logistica S.r.l.». **Atteso:** nel modulo «Categoria merceologica» («Trasporto merci / Traslochi /
+     Imballaggi») e «Attività» («Logistica e magazzino»). Scegli «Agenzia immobiliare», scrivi un'altra attività e
+     salva. **Atteso:** «Modifiche salvate.» e la categoria nuova nell'elenco.
+  6. Come `admin` disattiva «Agenzia immobiliare» nei Cataloghi. Come `operatore.cc` riapri «Demo Logistica S.r.l.».
+     **Atteso:** la categoria resta «Agenzia immobiliare» e il salvataggio riesce; in un'altra azienda il menu non la
+     propone più, né la propone il filtro dell'elenco.
+  7. In una segnalazione da abbinare, premi «Dettagli» su una mansione di un'azienda dimostrativa. **Atteso:** tra i
+     dati dell'azienda «Categoria merceologica» e «Attività».

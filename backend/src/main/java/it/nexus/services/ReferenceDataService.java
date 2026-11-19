@@ -28,6 +28,9 @@ public interface ReferenceDataService {
     /** Interruzioni anticipate attive (US-1103): i motivi di chiusura tranne la chiusura regolare. */
     List<ReferenceItemDTO> activeInterruptionReasons();
 
+    /** Categorie merceologiche attive, per il modulo e l'elenco delle aziende (US-509). */
+    List<ReferenceItemDTO> activeBusinessCategories();
+
     List<ReferenceItemDTO> activeProjects();
 
     /** Progetti attivi a cui è assegnato l'utente corrente. */

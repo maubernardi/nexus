@@ -8,33 +8,43 @@ import { ToCompleteBadge } from '@/atoms/ToCompleteBadge/ToCompleteBadge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { NativeSelect } from '@/components/ui/native-select';
 import { useCompanySearch } from '@/config/hooks/useCompanies';
+import { useBusinessCategories } from '@/config/hooks/useReferenceData';
 import { isMissing } from '@/lib/companyCompletion';
 
 // parametri dell'indirizzo: Indietro e link condivisi mantengono la ricerca
 const SEARCH_PARAM = 'q';
 const INACTIVE_PARAM = 'disattivate';
 const TO_COMPLETE_PARAM = 'daCompletare';
+const CATEGORY_PARAM = 'categoria';
 
-type Filters = { q: string; inactive: boolean; toComplete: boolean };
+type Filters = { q: string; inactive: boolean; toComplete: boolean; category: string };
 
-/** Anagrafica aziende (US-501): ricerca ed elenco per Call Center e ADMIN, con le aziende da completare (US-508). */
+/**
+ * Anagrafica aziende (US-501): ricerca ed elenco per Call Center e ADMIN, con le aziende da completare (US-508) e il
+ * filtro per categoria merceologica (US-509).
+ */
 export const CompaniesPage = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get(SEARCH_PARAM) ?? '';
   const includeInactive = searchParams.get(INACTIVE_PARAM) === '1';
   const toComplete = searchParams.get(TO_COMPLETE_PARAM) === '1';
+  const category = searchParams.get(CATEGORY_PARAM) ?? '';
+  const categories = useBusinessCategories();
   const companies = useCompanySearch({
     search: search || undefined,
     includeInactive,
     toComplete: toComplete || undefined,
+    businessCategoryId: category || undefined,
   });
-  const current: Filters = { q: search, inactive: includeInactive, toComplete };
+  const current: Filters = { q: search, inactive: includeInactive, toComplete, category };
 
-  const update = ({ q, inactive, toComplete: onlyToComplete }: Filters): void => {
+  const update = ({ q, inactive, toComplete: onlyToComplete, category: categoryId }: Filters): void => {
     const next = new URLSearchParams();
     if (q.trim()) next.set(SEARCH_PARAM, q.trim());
+    if (categoryId) next.set(CATEGORY_PARAM, categoryId);
     if (inactive) next.set(INACTIVE_PARAM, '1');
     if (onlyToComplete) next.set(TO_COMPLETE_PARAM, '1');
     setSearchParams(next);
@@ -83,6 +93,29 @@ export const CompaniesPage = () => {
           <Button type="submit" size="lg" variant="outline">
             {t('company.searchSubmit')}
           </Button>
+        </div>
+        <div className="max-w-md space-y-1">
+          <label htmlFor="company-category" className="block text-sm font-medium">
+            {t('company.categoryFilter')}
+          </label>
+          {/* il filtro si applica alla scelta, come le caselle: niente pulsante */}
+          <NativeSelect
+            id="company-category"
+            value={category}
+            disabled={!categories.data}
+            onChange={(e) => update({ ...current, category: e.target.value })}
+          >
+            <option value="">{t('company.allCategories')}</option>
+            {/* una categoria nell'indirizzo ma non più attiva resta scelta: l'elenco la filtra comunque */}
+            {category && categories.data && !categories.data.some((c) => c.id === category) && (
+              <option value={category}>{t('company.otherCategory')}</option>
+            )}
+            {(categories.data ?? []).map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </NativeSelect>
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-3">
           <div className="flex items-center gap-2">
@@ -144,6 +177,9 @@ export const CompaniesPage = () => {
                   {t('company.fields.vatCode')}
                 </th>
                 <th scope="col" className={th}>
+                  {t('company.category')}
+                </th>
+                <th scope="col" className={th}>
                   {t('company.fields.contactPerson')}
                 </th>
                 <th scope="col" className={th}>
@@ -171,11 +207,12 @@ export const CompaniesPage = () => {
                       </>
                     )}
                   </th>
-                  <td className={`${td} tabular-nums`}>
+                  <td className={`${td} whitespace-nowrap tabular-nums`}>
                     {isMissing(c, 'VAT_CODE') ? <ToCompleteBadge /> : c.vatCode}
                   </td>
+                  <td className={td}>{c.businessCategory?.name ?? '—'}</td>
                   <td className={td}>{c.contactPerson ?? '—'}</td>
-                  <td className={td}>{c.phone ?? '—'}</td>
+                  <td className={`${td} whitespace-nowrap`}>{c.phone ?? '—'}</td>
                   <td className={td}>{c.email ?? '—'}</td>
                   <td className={td}>{t(c.active ? 'company.active' : 'company.inactive')}</td>
                 </tr>

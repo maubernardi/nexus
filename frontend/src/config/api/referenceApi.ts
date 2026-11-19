@@ -45,6 +45,12 @@ export const fetchInterruptionReasons = async (): Promise<ReferenceItem[]> => {
   return data;
 };
 
+/** Categorie merceologiche attive (US-509): solo Call Center e ADMIN. */
+export const fetchBusinessCategories = async (): Promise<ReferenceItem[]> => {
+  const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.businessCategories);
+  return data;
+};
+
 /** Enti di presa in carico attivi (US-206). */
 export const fetchCareAgencies = async (): Promise<ReferenceItem[]> => {
   const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.careAgencies);

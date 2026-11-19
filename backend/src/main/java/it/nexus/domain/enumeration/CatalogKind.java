@@ -13,6 +13,8 @@ public enum CatalogKind {
     NO_HIRE_REASONS("no-hire-reasons", AuditEntityType.NO_HIRE_REASON, "MOTIVO"),
     /** Motivi di chiusura del tirocinio (US-1103). */
     CLOSURE_REASONS("closure-reasons", AuditEntityType.CLOSURE_REASON, "MOTIVO"),
+    /** Categorie merceologiche delle aziende (US-509). */
+    BUSINESS_CATEGORIES("business-categories", AuditEntityType.BUSINESS_CATEGORY, "CATEGORIA"),
     /** Progetti finanziati (US-102). */
     PROJECTS("projects", AuditEntityType.PROJECT, "PROGETTO"),
     /** Sedi di competenza e enti di presa in carico (US-115). */
