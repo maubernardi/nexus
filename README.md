@@ -31,7 +31,8 @@ nexus/
 
 ## Prerequisiti
 
-- **JDK 25** (LTS, es. Temurin 25.0.5). Il wrapper Maven (3.10.0) è incluso e la build rifiuta altre versioni di JDK
+- **JDK 25** (LTS, es. Temurin 25.0.5). Il wrapper Maven (3.10.1) è incluso: la build accetta Maven 3.10.x e rifiuta
+  altre versioni di JDK
 - **Node.js 26.13.0** (LTS, vedi `.nvmrc`: `nvm use`) e **pnpm 12.18.0** (`npm i -g pnpm@12.18.0`); pnpm rifiuta altre versioni di Node
 - Docker
 

@@ -185,8 +185,10 @@
                                 <requireJavaVersion>
                                     <version>[25,26)</version>
                                 </requireJavaVersion>
+                                <!-- la serie 3.10.x: le correzioni del wrapper (Dependabot) passano senza toccare
+                                     il pom; una versione minore nuova richiede di aggiornare il vincolo (PO, 19/11) -->
                                 <requireMavenVersion>
-                                    <version>[3.10.0]</version>
+                                    <version>[3.10.0,3.11)</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>
