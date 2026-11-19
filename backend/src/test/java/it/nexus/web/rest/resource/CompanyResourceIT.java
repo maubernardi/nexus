@@ -2,6 +2,7 @@ package it.nexus.web.rest.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -31,6 +32,7 @@ import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.AppUser;
 import it.nexus.domain.Company;
+import it.nexus.domain.CompanyPlaceholders;
 import it.nexus.domain.JobCategory;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Municipality;
@@ -238,6 +240,59 @@ class CompanyResourceIT {
                         .content(body("Seconda", "11111111111", ", \"version\": 0")))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldErrors[0].field").value("vatCode"));
+    }
+
+    /** Azienda come arriverà dal database attuale (US-1309): i segnaposto li scrive solo l'importazione. */
+    private Company imported(String name) {
+        Company company = TestEntities.company(CompanyPlaceholders.VAT_CODE);
+        company.setName(name);
+        return companies.saveAndFlush(company);
+    }
+
+    @Test
+    void segnapostoDelDatabaseAttuale_nonSiSalvano_400SuiCampi() throws Exception {
+        long before = companies.count();
+        create("operatore.cc", body("  azienda SENZA nome n. 12", " 00000000000 ", ""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[*].field", containsInAnyOrder("name", "vatCode")))
+                .andExpect(jsonPath("$.fieldErrors[*].message", containsInAnyOrder(
+                        "Inserisci la ragione sociale vera: «Azienda senza nome n. …» vuol dire che manca",
+                        "Inserisci la partita IVA vera: «00000000000» vuol dire che manca")));
+        assertThat(companies.count()).isEqualTo(before);
+
+        String id = TsidMapper.toExternal(imported(CompanyPlaceholders.name(1234)).getId());
+        mockMvc.perform(put(API + "/" + id).header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
+                        .content(body("Azienda senza nome n. 1234", "00000000000", ", \"version\": 0")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[*].field", containsInAnyOrder("name", "vatCode")));
+    }
+
+    @Test
+    void aziendeDaCompletare_datiMancanti_filtro_eCompletamento() throws Exception {
+        Company noName = imported(CompanyPlaceholders.name(1234));
+        imported("Bar Centrale");
+        createdId("Bar Completo", "12345678901");
+
+        mockMvc.perform(get(API).param("search", "bar").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$[*].name", contains("Bar Centrale", "Bar Completo")))
+                .andExpect(jsonPath("$[0].missingData", contains("VAT_CODE")))
+                .andExpect(jsonPath("$[1].missingData").isEmpty());
+        mockMvc.perform(get(API).param("toComplete", "true").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$[*].name", contains("Azienda senza nome n. 1234", "Bar Centrale")))
+                .andExpect(jsonPath("$[0].missingData", contains("NAME", "VAT_CODE")));
+
+        String id = TsidMapper.toExternal(noName.getId());
+        mockMvc.perform(put(API + "/" + id).header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
+                        .content(body("Trattoria da Mario", "98765432109", ", \"version\": 0")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.missingData").isEmpty());
+        mockMvc.perform(get(API).param("toComplete", "true").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$[*].name", contains("Bar Centrale")));
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.COMPANY, noName.getId()))
+                .last()
+                .satisfies(e -> assertThat(e.getChanges())
+                        .containsEntry("name", Map.of("before", "Azienda senza nome n. 1234", "after", "Trattoria da Mario"))
+                        .containsEntry("vatCode", Map.of("before", "00000000000", "after", "98765432109")));
     }
 
     @Test

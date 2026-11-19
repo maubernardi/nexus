@@ -8,6 +8,7 @@ import static it.nexus.domain.TestEntities.ticket;
 import static it.nexus.domain.TestEntities.user;
 import static it.nexus.domain.TestEntities.zone;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Instant;
@@ -251,6 +252,13 @@ class DomainConstraintsIT {
             String vat = DomainFixtures.vatCode();
             companies.saveAndFlush(company(vat));
             assertViolates("uq_company_vat_code", () -> companies.saveAndFlush(company(vat)));
+        }
+
+        @Test
+        void partitaIvaSegnaposto_ripetibile() {
+            // le aziende del database attuale senza partita IVA (US-508): l'unicità non le conta
+            companies.saveAndFlush(company(CompanyPlaceholders.VAT_CODE));
+            assertThatCode(() -> companies.saveAndFlush(company(CompanyPlaceholders.VAT_CODE))).doesNotThrowAnyException();
         }
 
         @Test

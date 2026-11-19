@@ -25,6 +25,7 @@ import it.nexus.domain.Beneficiary;
 import it.nexus.domain.CareAgency;
 import it.nexus.domain.ClosureReport;
 import it.nexus.domain.Company;
+import it.nexus.domain.CompanyPlaceholders;
 import it.nexus.domain.Project;
 import it.nexus.domain.ProjectPromoter;
 import it.nexus.domain.Ticket;
@@ -169,8 +170,9 @@ public final class DocumentValues {
         Company company = ticket.getJobSlot() == null ? null : ticket.getJobSlot().getCompany();
         if (company != null) {
             MunicipalityDTO legal = MunicipalityMapper.toDto(company.getLegalMunicipality());
-            v.put("RAGIONE_SOCIALE", company.getName());
-            v.put("PARTITA_IVA", company.getVatCode());
+            // i segnaposto del database attuale diventano la riga da completare (US-508)
+            v.put("RAGIONE_SOCIALE", CompanyPlaceholders.isName(company.getName()) ? null : company.getName());
+            v.put("PARTITA_IVA", CompanyPlaceholders.isVatCode(company.getVatCode()) ? null : company.getVatCode());
             v.put("SEDE_LEGALE", AddressLine.of(company.getLegalAddress(), legal));
             v.put("COMUNE_SEDE_LEGALE", legal == null ? null : legal.name());
             v.put("PROVINCIA_SEDE_LEGALE", legal == null ? null : legal.provinceAbbreviation());

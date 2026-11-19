@@ -8,7 +8,8 @@ import it.nexus.domain.dto.CompanyFormDTO;
 /** Anagrafica delle aziende ospitanti (US-501): Call Center e ADMIN. Nessuna cancellazione, solo disattivazione. */
 public interface CompanyService {
 
-    List<CompanyDTO> search(String search, boolean includeInactive);
+    /** Con {@code toComplete} solo le aziende con un dato da completare (US-508). */
+    List<CompanyDTO> search(String search, boolean includeInactive, boolean toComplete);
 
     CompanyDTO getById(String id);
 

@@ -1,6 +1,9 @@
 package it.nexus.domain.dto;
 
 import java.time.Instant;
+import java.util.List;
+
+import it.nexus.domain.enumeration.CompanyMissingData;
 
 public record CompanyDTO(
         String id,
@@ -14,5 +17,7 @@ public record CompanyDTO(
         String email,
         boolean active,
         long version,
-        Instant updatedAt) {
+        Instant updatedAt,
+        /** Dati arrivati vuoti dal database attuale, con il segnaposto ancora da sostituire (US-508). */
+        List<CompanyMissingData> missingData) {
 }

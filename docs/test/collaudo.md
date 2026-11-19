@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `2a123af` (17/11/2026): Sprint 1–14 completi (motivo di chiusura, proroga, documenti sui modelli reali con il promotore e le variabili per progetto) |
-| **Ultimo aggiornamento** | 16/11/2026 (T-24.3 e T-24.4: da provare dopo il deploy di US-1011; T-24.2, T-24.1, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 19/11/2026 (T-25.1: da provare dopo il deploy di US-508; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -1061,3 +1061,26 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   8. In Modelli dei documenti disattiva il modello di prova, poi togli `PROVA` dai Cataloghi. **Atteso:** ora si
      salva. Riattiva il modello. **Atteso:** rifiutato, perché `{PROVA}` non è più un segnaposto noto; il modello
      resta disattivato.
+
+## 25. Database attuale e aziende (Sprint 15)
+
+- [ ] **T-25.1 Aziende da completare (US-508)**
+
+  Le aziende del database attuale arriveranno con l'importazione (US-1309). Nella demo ce ne sono due dimostrative:
+  «Demo Bar del Centro», senza partita IVA, e «Azienda senza nome n. 90001», senza nome né partita IVA.
+  1. Come `operatore.cc` apri **Aziende**. **Atteso:** per le due aziende, nella colonna «Partita IVA» c'è «Da
+     completare» al posto degli zeri; accanto ad «Azienda senza nome n. 90001» c'è anche «Da completare».
+  2. Spunta «Solo le aziende da completare». **Atteso:** restano solo le due aziende e l'indirizzo della pagina
+     contiene `daCompletare=1`; con il tasto Indietro torna l'elenco completo.
+  3. Apri «Azienda senza nome n. 90001». **Atteso:** sotto il titolo «P.IVA da completare» e l'avviso «Da completare:
+     mancano la ragione sociale e la partita IVA…»; nel modulo i due campi sono vuoti, con la spiegazione, e il
+     telefono è quello salvato.
+  4. Premi «Salva modifiche» senza compilarli. **Atteso:** il riepilogo degli errori con i due campi. Scrivi
+     «Azienda senza nome n. 5» e «00000000000». **Atteso:** i messaggi «Inserisci la ragione sociale vera…» e
+     «Inserisci la partita IVA vera…».
+  5. Inserisci un nome e una partita IVA veri (11 cifre, non usata da altre aziende) e salva. **Atteso:** «Modifiche
+     salvate.», il titolo diventa il nome nuovo, sotto c'è la partita IVA e l'avviso sparisce; l'azienda non compare
+     più tra quelle da completare.
+  6. Aggiungi a «Demo Bar del Centro» una mansione con la tipologia e la zona di una segnalazione da abbinare. Apri
+     quella segnalazione e, tra le mansioni compatibili, premi «Dettagli» sulla mansione del bar. **Atteso:** «Partita
+     IVA: Da completare».

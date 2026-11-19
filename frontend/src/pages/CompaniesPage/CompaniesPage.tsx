@@ -4,34 +4,46 @@ import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
+import { ToCompleteBadge } from '@/atoms/ToCompleteBadge/ToCompleteBadge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { useCompanySearch } from '@/config/hooks/useCompanies';
+import { isMissing } from '@/lib/companyCompletion';
 
 // parametri dell'indirizzo: Indietro e link condivisi mantengono la ricerca
 const SEARCH_PARAM = 'q';
 const INACTIVE_PARAM = 'disattivate';
+const TO_COMPLETE_PARAM = 'daCompletare';
 
-/** Anagrafica aziende (US-501): ricerca ed elenco per Call Center e ADMIN. */
+type Filters = { q: string; inactive: boolean; toComplete: boolean };
+
+/** Anagrafica aziende (US-501): ricerca ed elenco per Call Center e ADMIN, con le aziende da completare (US-508). */
 export const CompaniesPage = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get(SEARCH_PARAM) ?? '';
   const includeInactive = searchParams.get(INACTIVE_PARAM) === '1';
-  const companies = useCompanySearch({ search: search || undefined, includeInactive });
+  const toComplete = searchParams.get(TO_COMPLETE_PARAM) === '1';
+  const companies = useCompanySearch({
+    search: search || undefined,
+    includeInactive,
+    toComplete: toComplete || undefined,
+  });
+  const current: Filters = { q: search, inactive: includeInactive, toComplete };
 
-  const update = (q: string, inactive: boolean): void => {
+  const update = ({ q, inactive, toComplete: onlyToComplete }: Filters): void => {
     const next = new URLSearchParams();
     if (q.trim()) next.set(SEARCH_PARAM, q.trim());
     if (inactive) next.set(INACTIVE_PARAM, '1');
+    if (onlyToComplete) next.set(TO_COMPLETE_PARAM, '1');
     setSearchParams(next);
   };
 
   const onSearch = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     const value = new FormData(event.currentTarget).get('q');
-    update(typeof value === 'string' ? value : '', includeInactive);
+    update({ ...current, q: typeof value === 'string' ? value : '' });
   };
 
   const th = 'px-3 py-2 text-left text-sm font-semibold whitespace-nowrap';
@@ -72,15 +84,27 @@ export const CompaniesPage = () => {
             {t('company.searchSubmit')}
           </Button>
         </div>
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="company-inactive"
-            checked={includeInactive}
-            onChange={(e) => update(search, e.target.checked)}
-          />
-          <label htmlFor="company-inactive" className="text-sm">
-            {t('company.includeInactive')}
-          </label>
+        <div className="flex flex-wrap gap-x-6 gap-y-3">
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="company-inactive"
+              checked={includeInactive}
+              onChange={(e) => update({ ...current, inactive: e.target.checked })}
+            />
+            <label htmlFor="company-inactive" className="text-sm">
+              {t('company.includeInactive')}
+            </label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="company-to-complete"
+              checked={toComplete}
+              onChange={(e) => update({ ...current, toComplete: e.target.checked })}
+            />
+            <label htmlFor="company-to-complete" className="text-sm">
+              {t('company.onlyToComplete')}
+            </label>
+          </div>
         </div>
       </form>
 
@@ -140,8 +164,16 @@ export const CompaniesPage = () => {
                     <Link to={`/aziende/${c.id}`} className="text-primary underline underline-offset-4">
                       {c.name}
                     </Link>
+                    {isMissing(c, 'NAME') && (
+                      <>
+                        {' '}
+                        <ToCompleteBadge />
+                      </>
+                    )}
                   </th>
-                  <td className={`${td} tabular-nums`}>{c.vatCode}</td>
+                  <td className={`${td} tabular-nums`}>
+                    {isMissing(c, 'VAT_CODE') ? <ToCompleteBadge /> : c.vatCode}
+                  </td>
                   <td className={td}>{c.contactPerson ?? '—'}</td>
                   <td className={td}>{c.phone ?? '—'}</td>
                   <td className={td}>{c.email ?? '—'}</td>

@@ -760,10 +760,18 @@ export const it = {
       phone: 'Telefono',
       email: 'Email',
     },
-    hints: { vatCode: '11 cifre, senza prefisso IT.', legalAddress: 'Via e numero civico.' },
+    hints: {
+      vatCode: '11 cifre, senza prefisso IT.',
+      vatCodeMissing:
+        'Da completare: il database attuale non aveva la partita IVA. 11 cifre, senza prefisso IT.',
+      nameMissing: 'Da completare: il database attuale non aveva la ragione sociale.',
+      legalAddress: 'Via e numero civico.',
+    },
     legalSeat: 'Sede legale',
     errors: {
       vatCode: 'La partita IVA è composta da 11 cifre',
+      vatCodePlaceholder: 'Inserisci la partita IVA vera: «00000000000» vuol dire che manca',
+      namePlaceholder: 'Inserisci la ragione sociale vera: «Azienda senza nome n. …» vuol dire che manca',
       phone: 'Usa solo cifre, spazi e i simboli + ( ) . - /',
       email: 'Indirizzo email non valido',
     },
@@ -774,6 +782,13 @@ export const it = {
     search: 'Cerca per ragione sociale o partita IVA',
     searchSubmit: 'Cerca',
     includeInactive: 'Mostra anche le aziende disattivate',
+    onlyToComplete: 'Solo le aziende da completare',
+    toComplete: 'Da completare',
+    missingData: { NAME: 'la ragione sociale', VAT_CODE: 'la partita IVA' },
+    toCompleteNotice_one:
+      'Da completare: manca {{data}}, che il database attuale non aveva. Inseriscila nei dati dell’azienda e salva.',
+    toCompleteNotice_other:
+      'Da completare: mancano {{data}}, che il database attuale non aveva. Inseriscile nei dati dell’azienda e salva.',
     caption: 'Aziende ospitanti, in ordine di ragione sociale',
     count_zero: 'Nessuna azienda trovata',
     count_one: '1 azienda',
@@ -786,6 +801,7 @@ export const it = {
     active: 'Attiva',
     inactive: 'Disattivata',
     vatLine: 'P.IVA {{vat}}',
+    vatMissing: 'P.IVA da completare',
     sections: { data: 'Dati dell’azienda', status: 'Stato dell’azienda' },
     deactivate: 'Disattiva azienda',
     activate: 'Riattiva azienda',

@@ -1,10 +1,13 @@
 package it.nexus.domain;
 
 import java.io.Serial;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import it.nexus.domain.enumeration.CompanyMissingData;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -31,9 +34,9 @@ public class Company extends AbstractTsidEntity {
     @Column(name = "name", nullable = false, length = 200)
     private String name;
 
-    /** Partita IVA: 11 cifre. */
+    /** Partita IVA: 11 cifre, unica tranne il segnaposto {@link CompanyPlaceholders#VAT_CODE} (US-508). */
     @JdbcTypeCode(SqlTypes.CHAR)
-    @Column(name = "vat_code", nullable = false, unique = true, length = 11)
+    @Column(name = "vat_code", nullable = false, length = 11)
     private String vatCode;
 
     /** Indirizzo della sede legale (via e numero civico); il comune è a parte (US-1007). */
@@ -66,5 +69,17 @@ public class Company extends AbstractTsidEntity {
     public Company(String name, String vatCode) {
         this.name = name;
         this.vatCode = vatCode;
+    }
+
+    /** Dati arrivati vuoti dal database attuale e ancora da completare (US-508), in ordine. */
+    public List<CompanyMissingData> missingData() {
+        List<CompanyMissingData> missing = new ArrayList<>();
+        if (CompanyPlaceholders.isName(name)) {
+            missing.add(CompanyMissingData.NAME);
+        }
+        if (CompanyPlaceholders.isVatCode(vatCode)) {
+            missing.add(CompanyMissingData.VAT_CODE);
+        }
+        return List.copyOf(missing);
     }
 }

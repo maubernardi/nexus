@@ -107,6 +107,41 @@ describe('<CompanyEditPage>', () => {
     await expectNoAxeViolations();
   });
 
+  it('azienda da completare: dice quali dati mancano e non mostra gli zeri (US-508)', async () => {
+    vi.mocked(fetchCompany).mockResolvedValue({
+      ...rossi,
+      name: 'Azienda senza nome n. 1234',
+      vatCode: '00000000000',
+      missingData: ['NAME', 'VAT_CODE'],
+    });
+    renderPage();
+
+    expect(await screen.findByText(/^P\.IVA da completare · Attiva$/)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Da completare: mancano la ragione sociale e la partita IVA, che il database attuale non aveva. Inseriscile nei dati dell’azienda e salva.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/00000000000/)).not.toBeInTheDocument();
+    await expectNoAxeViolations();
+  });
+
+  it('azienda senza partita IVA: un dato solo', async () => {
+    vi.mocked(fetchCompany).mockResolvedValue({
+      ...rossi,
+      vatCode: '00000000000',
+      missingData: ['VAT_CODE'],
+    });
+    renderPage();
+
+    expect(
+      await screen.findByText(
+        'Da completare: manca la partita IVA, che il database attuale non aveva. Inseriscila nei dati dell’azienda e salva.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Ragione sociale/)).toHaveValue('Officina Rossi');
+  });
+
   it('disattiva e, se il server rifiuta, mostra il motivo', async () => {
     const user = userEvent.setup();
     vi.mocked(setCompanyActive)

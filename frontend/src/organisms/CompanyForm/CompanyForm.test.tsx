@@ -83,6 +83,72 @@ describe('<CompanyForm>', () => {
     });
   });
 
+  it('rifiuta i segnaposto del database attuale con lo stesso messaggio del server (US-508)', async () => {
+    const user = userEvent.setup();
+    const { onSubmit } = renderForm();
+    await user.type(screen.getByLabelText(/^Ragione sociale/), ' azienda SENZA nome n. 5');
+    await user.type(screen.getByLabelText(/^Partita IVA/), '00000000000');
+
+    await user.click(screen.getByRole('button', { name: 'Registra azienda' }));
+
+    expect(
+      await screen.findByRole('link', {
+        name: 'Ragione sociale: Inserisci la ragione sociale vera: «Azienda senza nome n. …» vuol dire che manca',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', {
+        name: 'Partita IVA: Inserisci la partita IVA vera: «00000000000» vuol dire che manca',
+      }),
+    ).toBeInTheDocument();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('azienda da completare: i campi con il segnaposto partono vuoti e lo spiegano (US-508)', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn().mockResolvedValue(saved);
+    renderWithProviders(
+      <main>
+        <CompanyForm
+          company={{
+            ...saved,
+            name: 'Azienda senza nome n. 1234',
+            vatCode: '00000000000',
+            phone: '055 123456',
+            missingData: ['NAME', 'VAT_CODE'],
+          }}
+          submitLabel="Salva modifiche"
+          onSubmit={onSubmit}
+          onSuccess={vi.fn()}
+        />
+      </main>,
+    );
+
+    const name = screen.getByLabelText(/^Ragione sociale/);
+    const vat = screen.getByLabelText(/^Partita IVA/);
+    expect(name).toHaveValue('');
+    expect(name).toHaveAccessibleDescription(
+      'Da completare: il database attuale non aveva la ragione sociale.',
+    );
+    expect(vat).toHaveValue('');
+    expect(vat).toHaveAccessibleDescription(/^Da completare: il database attuale non aveva la partita IVA/);
+    expect(screen.getByLabelText(/^Telefono/)).toHaveValue('055 123456');
+    await expectNoAxeViolations();
+
+    await user.click(screen.getByRole('button', { name: 'Salva modifiche' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Correggi 2 errori');
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    await user.type(name, 'Trattoria da Mario');
+    await user.type(vat, '98765432109');
+    await user.click(screen.getByRole('button', { name: 'Salva modifiche' }));
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'Trattoria da Mario', vatCode: '98765432109', version: 0 }),
+      ),
+    );
+  });
+
   it('riporta sul campo la partita IVA già registrata', async () => {
     const user = userEvent.setup();
     renderForm(

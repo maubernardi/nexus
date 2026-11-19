@@ -2,6 +2,9 @@ import { axiosInstance } from '@/config/api/axiosInstance';
 import { ENDPOINTS } from '@/config/api/Endpoint';
 import type { Municipality } from '@/config/api/municipalityApi';
 
+/** Dato arrivato vuoto dal database attuale, con un segnaposto ancora da sostituire (US-508). */
+export type CompanyMissingData = 'NAME' | 'VAT_CODE';
+
 export type Company = {
   id: string;
   name: string;
@@ -15,6 +18,8 @@ export type Company = {
   active: boolean;
   version: number;
   updatedAt: string;
+  /** Dati da completare (US-508); vuoto se l'azienda è completa. */
+  missingData?: CompanyMissingData[];
 };
 
 export type CompanyForm = {
@@ -29,7 +34,12 @@ export type CompanyForm = {
   version?: number;
 };
 
-export type CompanySearch = { search?: string; includeInactive?: boolean };
+export type CompanySearch = {
+  search?: string;
+  includeInactive?: boolean;
+  /** Solo le aziende con un dato da completare (US-508). */
+  toComplete?: boolean;
+};
 
 export const searchCompanies = async (params: CompanySearch): Promise<Company[]> => {
   const { data } = await axiosInstance.get<Company[]>(ENDPOINTS.companies, { params });

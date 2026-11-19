@@ -6,6 +6,7 @@ import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
 import { apiError } from '@/config/api/errors';
 import { useCompany, useSetCompanyActive, useUpdateCompany } from '@/config/hooks/useCompanies';
+import { isMissing } from '@/lib/companyCompletion';
 import { AtecoCodesSection } from '@/organisms/AtecoCodesSection/AtecoCodesSection';
 import { CompanyForm } from '@/organisms/CompanyForm/CompanyForm';
 import { CompanyHistorySection } from '@/organisms/CompanyHistorySection/CompanyHistorySection';
@@ -17,7 +18,7 @@ type Outcome = 'created' | 'saved' | 'activated' | 'deactivated' | 'conflict' | 
 
 /**
  * Scheda dell'azienda: dati e attivazione (US-501), legale rappresentante e codici ATECO (US-506), mansioni (US-502),
- * note (US-505), storico (US-503).
+ * note (US-505), storico (US-503), dati da completare (US-508).
  */
 export const CompanyEditPage = () => {
   const { t } = useTranslation();
@@ -69,13 +70,25 @@ export const CompanyEditPage = () => {
   };
 
   const isError = outcome === 'conflict' || outcome === 'error';
+  const missing = c.missingData ?? [];
 
   return (
     <div className="space-y-6">
       <PageHeading>{c.name}</PageHeading>
       <p className="text-muted-foreground">
-        {t('company.vatLine', { vat: c.vatCode })} · {t(c.active ? 'company.active' : 'company.inactive')}
+        {isMissing(c, 'VAT_CODE') ? t('company.vatMissing') : t('company.vatLine', { vat: c.vatCode })} ·{' '}
+        {t(c.active ? 'company.active' : 'company.inactive')}
       </p>
+      {missing.length > 0 && (
+        <p className="rounded-md border-l-4 border-warning-foreground bg-warning p-4 text-warning-foreground">
+          {t('company.toCompleteNotice', {
+            count: missing.length,
+            data: new Intl.ListFormat('it', { type: 'conjunction' }).format(
+              missing.map((d) => t(`company.missingData.${d}`)),
+            ),
+          })}
+        </p>
+      )}
 
       {outcome && (
         <div
