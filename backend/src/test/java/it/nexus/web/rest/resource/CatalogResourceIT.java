@@ -30,6 +30,7 @@ import com.jayway.jsonpath.JsonPath;
 import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.Beneficiary;
+import it.nexus.domain.BusinessCategory;
 import it.nexus.domain.Project;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.UserProject;
@@ -245,6 +246,32 @@ class CatalogResourceIT {
                         "Interruzione anticipata per assunzione altrove")));
         assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.CLOSURE_REASON,
                 TsidMapper.toInternal(other))).extracting(e -> e.getAction()).containsExactly("CREATE");
+    }
+
+    @Test
+    void categorieMerceologiche_vociDelDatabaseAttuale_soloCallCenterEAdmin() throws Exception {
+        String path = "/api/v1/catalogs/business-categories";
+        mockMvc.perform(get(path).header(USER, "admin"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(53))
+                // id fisso = base + numero della categoria in Access, per l'importazione (US-1309)
+                .andExpect(jsonPath("$[?(@.code == 'RISTORANTE_TRATTORIA_BISTR')].id")
+                        .value(TsidMapper.toExternal(BusinessCategory.LEGACY_ID_BASE + 11)))
+                .andExpect(jsonPath("$[*].name", hasItems("Albergo", "Pulizie e facchinaggio",
+                        "Lavori edili / Restauri / Prodotti per l'edilizia",
+                        "Telecomunicazioni, informatica, cinema e TV")));
+        String added = createdId(path, "Agenzia immobiliare");
+        action(path, TsidMapper.toExternal(BusinessCategory.LEGACY_ID_BASE + 5), "deactivate").andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/reference/business-categories").header(USER, "operatore.cc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(53))
+                .andExpect(jsonPath("$[*].name", hasItem("Agenzia immobiliare")))
+                .andExpect(jsonPath("$[*].name", not(hasItem("Pensione"))));
+        mockMvc.perform(get("/api/v1/reference/business-categories").header(USER, "tutor1"))
+                .andExpect(status().isForbidden());
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.BUSINESS_CATEGORY,
+                TsidMapper.toInternal(added))).extracting(e -> e.getAction()).containsExactly("CREATE");
     }
 
     @Test

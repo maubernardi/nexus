@@ -41,6 +41,7 @@ vi.mock('@/config/api/companyNoteApi', () => ({
 vi.mock('@/config/api/referenceApi', () => ({
   fetchZones: vi.fn().mockResolvedValue([]),
   fetchJobCategories: vi.fn().mockResolvedValue([]),
+  fetchBusinessCategories: vi.fn().mockResolvedValue([]),
   fetchMyProjects: vi.fn(),
   fetchProjects: vi.fn(),
 }));

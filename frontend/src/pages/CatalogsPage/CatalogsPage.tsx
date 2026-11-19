@@ -12,7 +12,7 @@ import { MunicipalitiesSection } from '@/organisms/MunicipalitiesSection/Municip
 
 /**
  * Cataloghi per l'ADMIN: progetti (US-102), zone e tipologie di mansione (US-106), tipi di tirocinio (US-108), formule di assunzione e
- * motivi della mancata assunzione del report di restituzione (US-109), comuni e province dell'ISTAT (US-114), sedi di competenza, tipi per progetto ed enti di presa in carico (US-115), intestazione e avviso dei documenti (US-1011). I valori reali della cooperativa senza rilasci.
+ * motivi della mancata assunzione del report di restituzione (US-109), comuni e province dell'ISTAT (US-114), sedi di competenza, tipi per progetto ed enti di presa in carico (US-115), intestazione e avviso dei documenti (US-1011), categorie merceologiche delle aziende (US-509). I valori reali della cooperativa senza rilasci.
  */
 export const CatalogsPage = () => {
   const { t } = useTranslation();
@@ -23,6 +23,7 @@ export const CatalogsPage = () => {
       <CatalogSection kind="projects" />
       <CatalogSection kind="zones" />
       <CatalogSection kind="job-categories" />
+      <CatalogSection kind="business-categories" />
       <CatalogSection kind="internship-types" />
       <ProjectInternshipTypesSection />
       <ProjectDocumentsSection />

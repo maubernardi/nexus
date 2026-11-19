@@ -31,3 +31,21 @@ INSERT INTO job_slot (id, company_id, job_category_id, zone_id, title, descripti
     -- s_vendite
     (892398395572130066, (SELECT id FROM company WHERE vat_code = '99000000004'), (SELECT id FROM job_category WHERE code = 'ADDETTO_VENDITE'), (SELECT id FROM zone WHERE code = 'ISOLOTTO'), 'Addetto vendite e scaffalatura', 'Mansione dimostrativa.', 'LIBERA', now(), 'seed', now(), 'seed')
 ON CONFLICT DO NOTHING;
+
+-- Categoria merceologica e attività delle aziende dimostrative (US-509): solo quelle ancora senza l'una e l'altra,
+-- così le aziende modificate a mano non cambiano. Le categorie sono le voci iniziali di V46.
+UPDATE company c
+SET business_category_id = demo.category_id,
+    activity = demo.activity,
+    updated_at = now(),
+    updated_by = 'seed'
+FROM (VALUES (892398395572130067, 893700000000000429, 'Logistica e magazzino'),
+             (892398395572130068, 893700000000000411, 'Trattoria'),
+             (892398395572130069, 893700000000000416, 'Pulizie di uffici'),
+             (892398395572130070, 893700000000000408, 'Supermercato'),
+             (892398395572130095, 893700000000000414, 'Bar'),
+             (892398395572130096, NULL, 'Pizzeria'))
+         AS demo (company_id, category_id, activity)
+WHERE c.id = demo.company_id
+  AND c.business_category_id IS NULL
+  AND c.activity IS NULL;

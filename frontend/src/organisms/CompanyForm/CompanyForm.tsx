@@ -4,8 +4,11 @@ import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { NativeSelect } from '@/components/ui/native-select';
 import type { Company, CompanyForm as CompanyPayload } from '@/config/api/companyApi';
 import { apiError } from '@/config/api/errors';
+import type { ReferenceItem } from '@/config/api/referenceApi';
+import { useBusinessCategories } from '@/config/hooks/useReferenceData';
 import { isMissing, isNamePlaceholder, isVatCodePlaceholder } from '@/lib/companyCompletion';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
@@ -22,6 +25,8 @@ type CompanyFormValues = {
   vatCode: string;
   legalAddress: string;
   legalMunicipality: MunicipalityValue;
+  businessCategoryId: string;
+  activity: string;
   contactPerson: string;
   phone: string;
   email: string;
@@ -31,6 +36,8 @@ const FIELDS = [
   'name',
   'vatCode',
   'contactPerson',
+  'businessCategoryId',
+  'activity',
   'legalAddress',
   'legalMunicipality',
   'phone',
@@ -39,12 +46,20 @@ const FIELDS = [
 
 const fieldId = (field: keyof CompanyFormValues): string => `company-${field}`;
 
+/** Categorie attive più quella dell'azienda, anche se nel frattempo disattivata (resta così com'è, US-509). */
+const withCurrent = (items: ReferenceItem[] | undefined, current?: ReferenceItem | null): ReferenceItem[] => {
+  const list = items ?? [];
+  return current && !list.some((i) => i.id === current.id) ? [current, ...list] : list;
+};
+
 // i segnaposto del database attuale non si mostrano: il campo vuoto chiede il dato vero (US-508)
 const toValues = (company?: Company): CompanyFormValues => ({
   name: company && !isMissing(company, 'NAME') ? company.name : '',
   vatCode: company && !isMissing(company, 'VAT_CODE') ? company.vatCode : '',
   legalAddress: company?.legalAddress ?? '',
   legalMunicipality: toMunicipalityValue(company?.legalMunicipality ?? undefined),
+  businessCategoryId: company?.businessCategory?.id ?? '',
+  activity: company?.activity ?? '',
   contactPerson: company?.contactPerson ?? '',
   phone: company?.phone ?? '',
   email: company?.email ?? '',
@@ -55,6 +70,8 @@ const toPayload = (v: CompanyFormValues): CompanyPayload => ({
   vatCode: v.vatCode.trim(),
   legalAddress: v.legalAddress.trim() || null,
   legalMunicipalityId: v.legalMunicipality.municipality?.id ?? null,
+  businessCategoryId: v.businessCategoryId || null,
+  activity: v.activity.trim() || null,
   contactPerson: v.contactPerson.trim() || null,
   phone: v.phone.trim() || null,
   email: v.email.trim() || null,
@@ -75,6 +92,7 @@ type CompanyFormProps = {
 export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: CompanyFormProps) => {
   const { t } = useTranslation();
   const [formError, setFormError] = useState<'generic' | 'conflict' | null>(null);
+  const categories = useBusinessCategories();
   const {
     register,
     control,
@@ -95,6 +113,8 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
     vatCode: t('company.fields.vatCode'),
     legalAddress: t('company.fields.legalAddress'),
     legalMunicipality: t('company.fields.legalMunicipality'),
+    businessCategoryId: t('company.fields.businessCategory'),
+    activity: t('company.fields.activity'),
     contactPerson: t('company.fields.contactPerson'),
     phone: t('company.fields.phone'),
     email: t('company.fields.email'),
@@ -191,6 +211,30 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
           error={errors.contactPerson?.message}
         >
           {(p) => <Input {...p} autoComplete="off" {...register('contactPerson', { maxLength: max(200) })} />}
+        </FormField>
+        <FormField
+          id={fieldId('businessCategoryId')}
+          label={labels.businessCategoryId}
+          error={errors.businessCategoryId?.message}
+        >
+          {(p) => (
+            <NativeSelect {...p} disabled={!categories.data} {...register('businessCategoryId')}>
+              <option value="">{t('company.noCategory')}</option>
+              {withCurrent(categories.data, company?.businessCategory).map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </NativeSelect>
+          )}
+        </FormField>
+        <FormField
+          id={fieldId('activity')}
+          label={labels.activity}
+          hint={t('company.hints.activity')}
+          error={errors.activity?.message}
+        >
+          {(p) => <Input {...p} autoComplete="off" {...register('activity', { maxLength: max(200) })} />}
         </FormField>
         <FormField
           id={fieldId('legalAddress')}

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import it.nexus.domain.dto.ReferenceItemDTO;
 import it.nexus.mapper.ReferenceMapper;
 import it.nexus.mapper.TsidMapper;
+import it.nexus.repository.BusinessCategoryRepository;
 import it.nexus.repository.CareAgencyRepository;
 import it.nexus.repository.CompetenceSiteRepository;
 import it.nexus.repository.HiringFormulaRepository;
@@ -32,6 +33,7 @@ public class ReferenceDataServiceImpl implements ReferenceDataService {
     private final HiringFormulaRepository hiringFormulaRepository;
     private final NoHireReasonRepository noHireReasonRepository;
     private final ClosureReasonRepository closureReasonRepository;
+    private final BusinessCategoryRepository businessCategoryRepository;
     private final ProjectRepository projectRepository;
     private final CareAgencyRepository careAgencyRepository;
     private final CompetenceSiteRepository competenceSiteRepository;
@@ -81,6 +83,11 @@ public class ReferenceDataServiceImpl implements ReferenceDataService {
                 .filter(r -> !r.isRegular())
                 .map(mapper::toDto)
                 .toList();
+    }
+
+    @Override
+    public List<ReferenceItemDTO> activeBusinessCategories() {
+        return businessCategoryRepository.findByActiveTrueOrderByNameAsc().stream().map(mapper::toDto).toList();
     }
 
     @Override

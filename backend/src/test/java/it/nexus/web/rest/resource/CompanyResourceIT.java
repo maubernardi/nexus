@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDate;
 import java.util.Map;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ import com.jayway.jsonpath.JsonPath;
 import it.nexus.TestcontainersConfiguration;
 import it.nexus.config.security.MockHeaderAuthenticationFilter;
 import it.nexus.domain.AppUser;
+import it.nexus.domain.BusinessCategory;
 import it.nexus.domain.Company;
 import it.nexus.domain.CompanyPlaceholders;
 import it.nexus.domain.JobCategory;
@@ -293,6 +295,60 @@ class CompanyResourceIT {
                 .satisfies(e -> assertThat(e.getChanges())
                         .containsEntry("name", Map.of("before", "Azienda senza nome n. 1234", "after", "Trattoria da Mario"))
                         .containsEntry("vatCode", Map.of("before", "00000000000", "after", "98765432109")));
+    }
+
+    private static String category(int legacyNumber) {
+        return TsidMapper.toExternal(BusinessCategory.LEGACY_ID_BASE + legacyNumber);
+    }
+
+    @Test
+    void categoriaEAttivita_audit_filtro_categoriaDisattivataRestaSoloSullAzienda() throws Exception {
+        String ristorante = category(11);
+        String bar = category(14);
+        String id = JsonPath.read(create("operatore.cc", body("Pizzeria Napoli", "12345678901",
+                        ", \"businessCategoryId\": \"" + ristorante + "\", \"activity\": \" Pizzeria \""))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.businessCategory.name").value("Ristorante / Trattoria / Bistrot"))
+                .andExpect(jsonPath("$.activity").value("Pizzeria"))
+                .andReturn().getResponse().getContentAsString(), "$.id");
+        createdId("Bar Sport", "22222222222");
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.COMPANY, TsidMapper.toInternal(id)))
+                .singleElement()
+                .satisfies(e -> {
+                    assertThat(e.getChanges().get("businessCategory")).asInstanceOf(InstanceOfAssertFactories.MAP)
+                            .containsEntry("after", "Ristorante / Trattoria / Bistrot");
+                    assertThat(e.getChanges().get("activity")).asInstanceOf(InstanceOfAssertFactories.MAP)
+                            .containsEntry("after", "Pizzeria");
+                });
+
+        mockMvc.perform(get(API).param("businessCategoryId", ristorante).header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$[*].name", contains("Pizzeria Napoli")));
+        mockMvc.perform(get(API).param("businessCategoryId", "non-un-id").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$").isEmpty());
+
+        // categoria disattivata dall'ADMIN: resta sull'azienda che l'ha, non si sceglie per le altre
+        mockMvc.perform(post("/api/v1/catalogs/business-categories/" + ristorante + "/deactivate").header(USER, "admin"))
+                .andExpect(status().isOk());
+        mockMvc.perform(put(API + "/" + id).header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
+                        .content(body("Pizzeria Napoli S.n.c.", "12345678901",
+                                ", \"businessCategoryId\": \"" + ristorante + "\", \"activity\": \"Pizzeria\", \"version\": 0")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.businessCategory.name").value("Ristorante / Trattoria / Bistrot"));
+        create("operatore.cc", body("Trattoria Nuova", "33333333333", ", \"businessCategoryId\": \"" + ristorante + "\""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("businessCategoryId"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value("Categoria non valida"));
+
+        mockMvc.perform(put(API + "/" + id).header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
+                        .content(body("Pizzeria Napoli S.n.c.", "12345678901",
+                                ", \"businessCategoryId\": \"" + bar + "\", \"activity\": \"Pizzeria e bar\", \"version\": 1")))
+                .andExpect(status().isOk());
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.COMPANY, TsidMapper.toInternal(id)))
+                .last()
+                .satisfies(e -> assertThat(e.getChanges()).containsOnlyKeys("businessCategory", "activity")
+                        .containsEntry("businessCategory",
+                                Map.of("before", "Ristorante / Trattoria / Bistrot", "after", "Bar / Pub"))
+                        .containsEntry("activity", Map.of("before", "Pizzeria", "after", "Pizzeria e bar")));
     }
 
     @Test

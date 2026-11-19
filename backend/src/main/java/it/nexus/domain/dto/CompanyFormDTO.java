@@ -20,6 +20,9 @@ public record CompanyFormDTO(
         @Size(max = 300, message = "Massimo 300 caratteri") String legalAddress,
         /** Versione del comune della sede legale (US-1007); vuoto = non indicato. */
         String legalMunicipalityId,
+        /** Categoria merceologica (US-509): voce attiva o quella che l'azienda ha già; vuoto = nessuna. */
+        String businessCategoryId,
+        @Size(max = 200, message = "Massimo 200 caratteri") String activity,
         @Size(max = 200, message = "Massimo 200 caratteri") String contactPerson,
         @Size(max = 30, message = "Massimo 30 caratteri")
         @Pattern(regexp = "[0-9 +().\\-/]*", message = "Usa solo cifre, spazi e i simboli + ( ) . - /") String phone,

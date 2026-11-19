@@ -3,7 +3,7 @@ import { ENDPOINTS } from '@/config/api/Endpoint';
 
 /**
  * Cataloghi gestiti dall'ADMIN (US-106, tipi di tirocinio US-108, report di restituzione US-109, progetti US-102, sedi di
- * competenza ed enti di presa in carico US-115).
+ * competenza ed enti di presa in carico US-115, categorie merceologiche US-509).
  */
 export type CatalogKind =
   | 'projects'
@@ -13,6 +13,7 @@ export type CatalogKind =
   | 'hiring-formulas'
   | 'no-hire-reasons'
   | 'closure-reasons'
+  | 'business-categories'
   | 'competence-sites'
   | 'care-agencies';
 

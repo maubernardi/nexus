@@ -1,6 +1,7 @@
 import { axiosInstance } from '@/config/api/axiosInstance';
 import { ENDPOINTS } from '@/config/api/Endpoint';
 import type { Municipality } from '@/config/api/municipalityApi';
+import type { ReferenceItem } from '@/config/api/referenceApi';
 
 /** Dato arrivato vuoto dal database attuale, con un segnaposto ancora da sostituire (US-508). */
 export type CompanyMissingData = 'NAME' | 'VAT_CODE';
@@ -12,6 +13,10 @@ export type Company = {
   legalAddress: string | null;
   /** Comune della sede legale (US-1007), con la provincia della versione scelta. */
   legalMunicipality?: Municipality | null;
+  /** Categoria merceologica (US-509); assente se non indicata. */
+  businessCategory?: ReferenceItem | null;
+  /** Descrizione dell'attività (US-509). */
+  activity?: string | null;
   contactPerson: string | null;
   phone: string | null;
   email: string | null;
@@ -27,6 +32,8 @@ export type CompanyForm = {
   vatCode: string;
   legalAddress: string | null;
   legalMunicipalityId: string | null;
+  businessCategoryId: string | null;
+  activity: string | null;
   contactPerson: string | null;
   phone: string | null;
   email: string | null;
@@ -39,6 +46,8 @@ export type CompanySearch = {
   includeInactive?: boolean;
   /** Solo le aziende con un dato da completare (US-508). */
   toComplete?: boolean;
+  /** Solo le aziende della categoria merceologica (US-509). */
+  businessCategoryId?: string;
 };
 
 export const searchCompanies = async (params: CompanySearch): Promise<Company[]> => {

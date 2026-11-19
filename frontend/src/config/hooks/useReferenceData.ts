@@ -1,6 +1,7 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 
 import {
+  fetchBusinessCategories,
   fetchCareAgencies,
   fetchCompetenceSites,
   fetchHiringFormulas,
@@ -31,6 +32,14 @@ export const useActiveCareAgencies = (): UseQueryResult<ReferenceItem[]> =>
 
 export const useNoHireReasons = (): UseQueryResult<ReferenceItem[]> =>
   useQuery({ queryKey: ['reference', 'noHireReasons'], queryFn: fetchNoHireReasons, staleTime: STALE });
+
+/** Categorie merceologiche attive (US-509): solo per Call Center e ADMIN. */
+export const useBusinessCategories = (): UseQueryResult<ReferenceItem[]> =>
+  useQuery({
+    queryKey: ['reference', 'businessCategories'],
+    queryFn: fetchBusinessCategories,
+    staleTime: STALE,
+  });
 
 export const useInterruptionReasons = (): UseQueryResult<ReferenceItem[]> =>
   useQuery({

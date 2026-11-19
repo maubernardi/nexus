@@ -214,6 +214,8 @@ const MatchDetailsBody = ({ slot }: { slot: JobSlotMatch }) => {
             rows={[
               [t('company.fields.name'), c.name],
               [t('company.fields.vatCode'), isMissing(c, 'VAT_CODE') ? t('company.toComplete') : c.vatCode],
+              [t('company.fields.businessCategory'), c.businessCategory?.name ?? none],
+              [t('company.fields.activity'), c.activity ?? none],
               [t('company.legalSeat'), addressLine(c.legalAddress, c.legalMunicipality) ?? none],
               [t('company.fields.contactPerson'), c.contactPerson ?? none],
               [t('company.fields.phone'), c.phone ?? none],

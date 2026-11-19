@@ -325,12 +325,18 @@ describe('<TicketPage>', () => {
     await waitFor(() => expect(details).toHaveFocus());
   });
 
-  it('Dettagli: azienda senza partita IVA, «Da completare» al posto degli zeri (US-508)', async () => {
+  it('Dettagli: azienda senza partita IVA e con la categoria (US-508, US-509)', async () => {
     const alfa = await fetchCompany('C1');
     vi.mocked(fetchCompany).mockResolvedValueOnce({
       ...alfa,
       vatCode: '00000000000',
       missingData: ['VAT_CODE'],
+      businessCategory: {
+        id: 'K29',
+        code: 'TRASPORTO_MERCI_TRASLOCHI',
+        name: 'Trasporto merci / Traslochi / Imballaggi',
+      },
+      activity: 'Logistica e magazzino',
     });
     const user = userEvent.setup();
     renderPage();
@@ -342,6 +348,9 @@ describe('<TicketPage>', () => {
     const dialog = await screen.findByRole('dialog', { name: '«Magazziniere» presso Alfa Logistica' });
     expect(await within(dialog).findByText('Da completare')).toBeInTheDocument();
     expect(within(dialog).queryByText('00000000000')).not.toBeInTheDocument();
+    // categoria e attività dell'azienda (US-509)
+    expect(within(dialog).getByText('Trasporto merci / Traslochi / Imballaggi')).toBeInTheDocument();
+    expect(within(dialog).getByText('Logistica e magazzino')).toBeInTheDocument();
   });
 
   it('Dettagli: esclusione dell’azienda con motivo, esito ed elenco delle escluse', async () => {

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import it.nexus.domain.BusinessCategory;
 import it.nexus.domain.Company;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Municipality;
@@ -17,6 +18,7 @@ import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.mapper.CompanyMapper;
 import it.nexus.mapper.MunicipalityMapper;
 import it.nexus.mapper.TsidMapper;
+import it.nexus.repository.BusinessCategoryRepository;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.services.AuditService;
@@ -36,6 +38,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     private static final String DUPLICATE_VAT = "Esiste già un'azienda con questa partita IVA";
     private static final String LEGAL_MUNICIPALITY = "legalMunicipalityId";
+    private static final String BUSINESS_CATEGORY = "businessCategoryId";
 
     private final CompanyRepository repository;
     private final JobSlotRepository jobSlotRepository;
@@ -43,12 +46,22 @@ public class CompanyServiceImpl implements CompanyService {
     private final AuditService auditService;
     private final CompanyMapper mapper;
     private final MunicipalityService municipalityService;
+    private final BusinessCategoryRepository businessCategoryRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public List<CompanyDTO> search(String search, boolean includeInactive, boolean toComplete) {
+    public List<CompanyDTO> search(String search, boolean includeInactive, boolean toComplete,
+            String businessCategoryId) {
         String term = search == null || search.isBlank() ? null : search.strip();
-        return repository.search(term, includeInactive, toComplete).stream().map(mapper::toDto).toList();
+        Long category = null;
+        if (businessCategoryId != null && !businessCategoryId.isBlank()) {
+            category = TsidMapper.toInternal(businessCategoryId.strip());
+            if (category == null) {
+                // categoria non valida: nessuna azienda, come una ricerca senza risultati
+                return List.of();
+            }
+        }
+        return repository.search(term, includeInactive, toComplete, category).stream().map(mapper::toDto).toList();
     }
 
     @Override
@@ -64,13 +77,16 @@ public class CompanyServiceImpl implements CompanyService {
             throw new FieldValidationException("vatCode", DUPLICATE_VAT);
         }
         Company company = new Company(dto.name().strip(), vatCode);
-        apply(company, dto, municipalityService.forAddress(dto.legalMunicipalityId(), null, LEGAL_MUNICIPALITY));
+        apply(company, dto, municipalityService.forAddress(dto.legalMunicipalityId(), null, LEGAL_MUNICIPALITY),
+                businessCategory(dto.businessCategoryId(), null));
         Company saved = repository.saveAndFlush(company);
         auditService.record(AuditEntityType.COMPANY, saved.getId(), "CREATE", AuditChanges.of()
                 .value("name", null, saved.getName())
                 .value("vatCode", null, saved.getVatCode())
                 .value("legalAddress", null, saved.getLegalAddress())
                 .value("legalMunicipality", null, MunicipalityMapper.label(saved.getLegalMunicipality()))
+                .value("businessCategory", null, name(saved.getBusinessCategory()))
+                .value("activity", null, saved.getActivity())
                 // contatti del referente: dati personali, nell'audit senza valori (EN-4)
                 .redactedIfChanged("contactPerson", null, saved.getContactPerson())
                 .redactedIfChanged("phone", null, saved.getPhone())
@@ -92,18 +108,21 @@ public class CompanyServiceImpl implements CompanyService {
 
         Municipality municipality = municipalityService.forAddress(dto.legalMunicipalityId(),
                 company.getLegalMunicipality(), LEGAL_MUNICIPALITY);
+        BusinessCategory category = businessCategory(dto.businessCategoryId(), company.getBusinessCategory());
         AuditChanges changes = AuditChanges.of()
                 .value("name", company.getName(), dto.name().strip())
                 .value("vatCode", company.getVatCode(), vatCode)
                 .value("legalAddress", company.getLegalAddress(), blankToNull(dto.legalAddress()))
                 .value("legalMunicipality", MunicipalityMapper.label(company.getLegalMunicipality()),
                         MunicipalityMapper.label(municipality))
+                .value("businessCategory", name(company.getBusinessCategory()), name(category))
+                .value("activity", company.getActivity(), blankToNull(dto.activity()))
                 .redactedIfChanged("contactPerson", company.getContactPerson(), blankToNull(dto.contactPerson()))
                 .redactedIfChanged("phone", company.getPhone(), blankToNull(dto.phone()))
                 .redactedIfChanged("email", company.getEmail(), blankToNull(dto.email()));
         company.setName(dto.name().strip());
         company.setVatCode(vatCode);
-        apply(company, dto, municipality);
+        apply(company, dto, municipality, category);
         Company saved = repository.saveAndFlush(company);
         if (!changes.asMap().isEmpty()) {
             auditService.record(AuditEntityType.COMPANY, saved.getId(), "UPDATE", changes, null);
@@ -152,9 +171,27 @@ public class CompanyServiceImpl implements CompanyService {
         }
     }
 
-    private static void apply(Company company, CompanyFormDTO dto, Municipality legalMunicipality) {
+    /** Voce attiva del catalogo, oppure quella che l'azienda ha già anche se disattivata (US-509); vuoto = nessuna. */
+    private BusinessCategory businessCategory(String id, BusinessCategory current) {
+        if (id == null || id.isBlank()) {
+            return null;
+        }
+        return Optional.ofNullable(TsidMapper.toInternal(id.strip()))
+                .flatMap(businessCategoryRepository::findById)
+                .filter(c -> c.isActive() || c.equals(current))
+                .orElseThrow(() -> new FieldValidationException(BUSINESS_CATEGORY, "Categoria non valida"));
+    }
+
+    private static String name(BusinessCategory category) {
+        return category == null ? null : category.getName();
+    }
+
+    private static void apply(Company company, CompanyFormDTO dto, Municipality legalMunicipality,
+            BusinessCategory businessCategory) {
         company.setLegalAddress(blankToNull(dto.legalAddress()));
         company.setLegalMunicipality(legalMunicipality);
+        company.setBusinessCategory(businessCategory);
+        company.setActivity(blankToNull(dto.activity()));
         company.setContactPerson(blankToNull(dto.contactPerson()));
         company.setPhone(blankToNull(dto.phone()));
         company.setEmail(blankToNull(dto.email()));

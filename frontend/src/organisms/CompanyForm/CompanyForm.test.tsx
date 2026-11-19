@@ -1,15 +1,24 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AxiosError, AxiosHeaders } from 'axios';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Company } from '@/config/api/companyApi';
 import { searchMunicipalities } from '@/config/api/municipalityApi';
+import { fetchBusinessCategories } from '@/config/api/referenceApi';
 import { CompanyForm } from '@/organisms/CompanyForm/CompanyForm';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderWithProviders } from '@/tests/renderWithProviders';
 
 vi.mock('@/config/api/municipalityApi', () => ({ searchMunicipalities: vi.fn() }));
+vi.mock('@/config/api/referenceApi', () => ({ fetchBusinessCategories: vi.fn() }));
+
+const RISTORANTE = {
+  id: 'K11',
+  code: 'RISTORANTE_TRATTORIA_BISTR',
+  name: 'Ristorante / Trattoria / Bistrot',
+};
+const BAR = { id: 'K14', code: 'BAR_PUB', name: 'Bar / Pub' };
 
 const FIRENZE = {
   id: 'M1',
@@ -44,6 +53,10 @@ const renderForm = (onSubmit = vi.fn().mockResolvedValue(saved), onSuccess = vi.
 };
 
 describe('<CompanyForm>', () => {
+  beforeEach(() => {
+    vi.mocked(fetchBusinessCategories).mockResolvedValue([BAR, RISTORANTE]);
+  });
+
   it('senza dati obbligatori e con P.IVA errata mostra il riepilogo con focus', async () => {
     const user = userEvent.setup();
     const { onSubmit } = renderForm();
@@ -76,11 +89,65 @@ describe('<CompanyForm>', () => {
       vatCode: '12345678901',
       legalAddress: null,
       legalMunicipalityId: null,
+      businessCategoryId: null,
+      activity: null,
       contactPerson: null,
       phone: null,
       email: null,
       version: undefined,
     });
+  });
+
+  it('categoria merceologica dal catalogo e attività (US-509)', async () => {
+    const user = userEvent.setup();
+    const { onSubmit } = renderForm();
+    const category = screen.getByRole('combobox', { name: 'Categoria merceologica' });
+    await waitFor(() => expect(category).toBeEnabled());
+    expect(category).toHaveDisplayValue('Nessuna');
+    expect(screen.getByLabelText(/^Attività/)).toHaveAccessibleDescription(
+      'Che cosa fa l’azienda, in breve: per esempio «Pizzeria».',
+    );
+    await expectNoAxeViolations();
+
+    await user.type(screen.getByLabelText(/^Ragione sociale/), 'Pizzeria Napoli');
+    await user.type(screen.getByLabelText(/^Partita IVA/), '12345678901');
+    await user.selectOptions(category, 'Ristorante / Trattoria / Bistrot');
+    await user.type(screen.getByLabelText(/^Attività/), ' Pizzeria ');
+    await user.click(screen.getByRole('button', { name: 'Registra azienda' }));
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ businessCategoryId: 'K11', activity: 'Pizzeria' }),
+      ),
+    );
+  });
+
+  it('una categoria disattivata resta sull’azienda che l’ha già (US-509)', async () => {
+    renderWithProviders(
+      <main>
+        <CompanyForm
+          company={{
+            ...saved,
+            businessCategory: { id: 'K5', code: 'PENSIONE', name: 'Pensione' },
+            activity: 'Pensione familiare',
+          }}
+          submitLabel="Salva modifiche"
+          onSubmit={vi.fn()}
+          onSuccess={vi.fn()}
+        />
+      </main>,
+    );
+
+    const category = screen.getByRole('combobox', { name: 'Categoria merceologica' });
+    await waitFor(() => expect(category).toBeEnabled());
+    expect(category).toHaveDisplayValue('Pensione');
+    expect(screen.getAllByRole('option').map((o) => o.textContent)).toEqual([
+      'Nessuna',
+      'Pensione',
+      'Bar / Pub',
+      'Ristorante / Trattoria / Bistrot',
+    ]);
+    expect(screen.getByLabelText(/^Attività/)).toHaveValue('Pensione familiare');
   });
 
   it('rifiuta i segnaposto del database attuale con lo stesso messaggio del server (US-508)', async () => {

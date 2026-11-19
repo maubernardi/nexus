@@ -71,6 +71,9 @@ describe('<CatalogsPage>', () => {
     // motivi di chiusura del tirocinio (US-1103)
     expect(fetchCatalog).toHaveBeenCalledWith('closure-reasons');
     expect(screen.getByRole('button', { name: 'Aggiungi motivo di chiusura' })).toBeInTheDocument();
+    // categorie merceologiche delle aziende (US-509)
+    expect(fetchCatalog).toHaveBeenCalledWith('business-categories');
+    expect(screen.getByRole('button', { name: 'Aggiungi categoria' })).toBeInTheDocument();
     await expectNoAxeViolations();
   });
 });
