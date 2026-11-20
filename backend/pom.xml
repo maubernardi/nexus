@@ -24,6 +24,9 @@
         <springdoc.version>3.2.0</springdoc.version>
         <hypersistence-tsid.version>2.1.4</hypersistence-tsid.version>
         <poi.version>6.0.0</poi.version>
+        <jackcess.version>5.0.4</jackcess.version>
+        <jackcess-encrypt.version>5.0.2</jackcess-encrypt.version>
+        <bouncycastle.version>1.87</bouncycastle.version>
     </properties>
 
     <dependencies>
@@ -85,6 +88,23 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
+        </dependency>
+        <!-- importazione dal database Access attuale (US-1309): lettura del file .mdb senza strumenti esterni -->
+        <dependency>
+            <groupId>com.healthmarketscience.jackcess</groupId>
+            <artifactId>jackcess</artifactId>
+            <version>${jackcess.version}</version>
+        </dependency>
+        <!-- il file attuale è «codificato» da Access: serve il codec; BouncyCastle all'ultima versione stabile -->
+        <dependency>
+            <groupId>com.healthmarketscience.jackcess</groupId>
+            <artifactId>jackcess-encrypt</artifactId>
+            <version>${jackcess-encrypt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>

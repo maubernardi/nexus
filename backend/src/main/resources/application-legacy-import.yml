@@ -1,0 +1,8 @@
+# Importazione dal database attuale (US-1309): un'istanza a parte che importa il file Access e si chiude
+# (LegacyImportRunner). Server web su una porta libera, senza attività pianificate: accanto all'istanza in servizio
+# non manda promemoria né fa scadere timer. Il file: nexus.legacy-import.file (NEXUS_LEGACY_IMPORT_FILE).
+server:
+  port: 0
+nexus:
+  scheduling:
+    enabled: false

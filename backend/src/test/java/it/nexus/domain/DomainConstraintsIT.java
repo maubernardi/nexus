@@ -322,6 +322,36 @@ class DomainConstraintsIT {
                     () -> contactRoles.saveAndFlush(new ContactRole(DomainFixtures.code("R"), "titolare")));
         }
 
+        private int insertLegacyCall(long id, int number, Long companyId) {
+            return jdbc.update("""
+                    INSERT INTO legacy_call (id, legacy_number, company_id, legacy_company_number, handled, internship,
+                                             stage, ist, work_grant, hiring, giovanisi, created_at, created_by)
+                    VALUES (?, ?, ?, 0, false, false, false, false, false, false, false, now(), 'test')""",
+                    id, number, companyId);
+        }
+
+        @Test
+        void chiamataDiArchivioConNumeroRipetuto() {
+            insertLegacyCall(1, 7, null);
+            assertViolates("uq_legacy_call_legacy_number", () -> insertLegacyCall(2, 7, null));
+        }
+
+        @Test
+        void chiamataDiArchivioSenzaNumero() {
+            assertViolates("ck_legacy_call_legacy_number", () -> insertLegacyCall(1, 0, null));
+        }
+
+        @Test
+        void chiamataDiArchivioDiUnAziendaInesistente() {
+            assertViolates("fk_legacy_call_company", () -> insertLegacyCall(1, 7, 1L));
+        }
+
+        @Test
+        void chiamataDiArchivioConIdRipetuto() {
+            insertLegacyCall(1, 7, null);
+            assertViolates("pk_legacy_call", () -> insertLegacyCall(1, 8, null));
+        }
+
         @Test
         void referenteSenzaNomeNeRuolo() {
             Company c = company(DomainFixtures.vatCode());

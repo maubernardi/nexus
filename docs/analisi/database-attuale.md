@@ -158,3 +158,71 @@ velocity media (22,9). *Proposta:* Sprint 15 = le prime quattro, US-605 nello Sp
 > senza nome come «Azienda senza nome n. ‹numero di Access›», con lo stesso vincolo della partita IVA. Importazione
 > provata su una copia in locale ed eseguita con il passaggio in produzione (US-1306). Storie: US-508, US-509, US-510,
 > US-1309; [sprint-15.md](../agile/sprints/sprint-15.md).
+
+## 9. Importazione (US-1309)
+
+L'importazione legge il file Access in sola lettura, scrive in una transazione e chiude l'applicazione: 0 se è
+riuscita, 1 se no. Il file e il resoconto restano fuori dal repository.
+
+**Che cosa importa** (dettagli nella change `add-legacy-import`):
+- tutte le aziende:
+  - nome, oppure «Azienda senza nome n. …», e la partita IVA da completare;
+  - sedi con il comune abbinato all'elenco ufficiale;
+  - recapiti ripuliti, referenti con il ruolo, categoria, attività e la nota nel diario.
+- tutte le chiamate, nell'archivio `legacy_call`.
+
+Una seconda esecuzione non duplica e non tocca le aziende che ci sono già.
+
+**Prima di partire:**
+- l'elenco dei comuni deve essere caricato (Cataloghi → Comuni, US-114);
+- il PO controlla in Access le 7 chiamate con nome e cognome (§7, 4b).
+
+### 9.1 Prova in locale, su una copia
+
+```bash
+docker run -d --rm --name nexus-prova-pg -e POSTGRES_USER=nexus -e POSTGRES_PASSWORD=nexus -e POSTGRES_DB=nexus \
+  -p 55432:5432 postgres:18.6-alpine
+cd backend
+DB_URL=jdbc:postgresql://localhost:55432/nexus PROFILES_ACTIVE=postgresql,security-mock,seed,legacy-import \
+  NEXUS_LEGACY_IMPORT_FILE="$PWD/../documenti_base/nexus.mdb" ./mvnw -q spring-boot:run
+```
+
+- Il profilo `seed` carica l'elenco dei comuni della demo.
+- Il resoconto va accanto al file: `documenti_base/nexus.mdb-resoconto.txt`, ignorato da git.
+
+### 9.2 Sul server, con il passaggio in produzione (US-1306)
+
+Da provare con US-1306.
+
+```bash
+sudo install -d -o "$USER" -m 700 /opt/nexus/import   # poi copiare il file con scp in /opt/nexus/import/nexus.mdb
+cd /opt/nexus/current
+docker compose --project-directory . -f compose.yaml --env-file /opt/nexus/.env --env-file release.env \
+  run --rm --user "$(id -u):$(id -g)" -v /opt/nexus/import:/import \
+  -e PROFILES_ACTIVE=keycloak,legacy-import -e NEXUS_LEGACY_IMPORT_FILE=/import/nexus.mdb backend
+```
+
+- L'istanza dell'importazione non ha attività pianificate e usa una porta libera: può girare accanto a quella in
+  servizio.
+- Il resoconto è in `/opt/nexus/import/nexus.mdb-resoconto.txt`.
+- Dopo il controllo, il file Access si cancella dal server: contiene dati personali.
+
+### 9.3 Prova del 19/11 sul file del PO
+
+Il file ha dati fino al 09/09/2026; l'importazione ha impiegato circa 11 secondi. Solo conteggi:
+
+| | Risultato |
+|---|---|
+| Aziende | 13.799, di cui 1.587 senza nome |
+| Comune della sede legale | 11.986 abbinati su 12.965 compilati (92%): nome esatto 9.764, nome e sigla 1.187, alias 800, parole iniziali 218, nome tagliato 17 |
+| Comune della sede operativa | 2.154 abbinati su 2.281 |
+| Comuni non trovati | 1.106 righe in 568 testi; il più frequente è la sola sigla «FI» (428) |
+| Categoria, attività | 13.460, 12.799 |
+| Referenti | 7.786; 16 con un ruolo sconosciuto, entrati senza ruolo |
+| Recapiti | telefono 13.344, cellulare 3.311, fax 644, email 5.934, seconda email 1.116 |
+| Recapiti fuori formato | 838 aziende, con il testo originale in una nota del diario |
+| Note nel diario | 6.142 di Access più le 838 dei recapiti |
+| Chiamate | 38.789 nell'archivio, 34.683 collegate a un'azienda |
+| Da rivedere | 23 gruppi di duplicati per nome; 20 chiamate con possibili nomi di beneficiari |
+
+Le email di Access sono quasi tutte collegamenti `http://indirizzo`: l'importazione li riduce all'indirizzo.

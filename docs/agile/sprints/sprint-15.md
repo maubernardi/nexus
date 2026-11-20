@@ -16,8 +16,8 @@ sprint, anche sopra la velocity media (22,9).
 |---|---|---|---|---|---|
 | US-508 | Partita IVA e nome da completare | 3 | ✅ Ready | `mark-companies-to-complete` | [#165](https://github.com/maubernardi/nexus/pull/165) |
 | US-509 | Categoria merceologica e attività dell'azienda | 3 | ✅ Ready | `add-business-categories` | [#166](https://github.com/maubernardi/nexus/pull/166) |
-| US-510 | Referenti e recapiti dell'azienda | 5 | ✅ Ready | `add-company-contacts` | |
-| US-1309 | Importazione dal database attuale | 8 | ✅ Ready | | |
+| US-510 | Referenti e recapiti dell'azienda | 5 | ✅ Ready | `add-company-contacts` | [#167](https://github.com/maubernardi/nexus/pull/167) |
+| US-1309 | Importazione dal database attuale | 8 | ✅ Ready | `add-legacy-import` | |
 | US-605 | Una mansione per più segnalazioni, una per tipo di tirocinio | 8 | ✅ Ready | | |
 
 Ordine: prima le tre storie che danno all'azienda i campi del database attuale, poi l'importazione, che li usa; per
@@ -74,6 +74,16 @@ dipenda dalla simulazione (A29).
     release precedente (A16) e si toglierà dopo il passaggio in produzione;
   - referenti, cellulare, fax e seconda email nell'audit solo come «cambiati»; la sede operativa con i valori;
   - nell'elenco la colonna «Referente» mostra il primo referente, con quanti sono gli altri.
+- **US-1309**:
+  - l'importazione è un'istanza del backend con il profilo `legacy-import`, che legge il file e si chiude, senza
+    endpoint: il file non passa da HTTP;
+  - il file attuale è «codificato» da Access: si legge con Jackcess e jackcess-encrypt, senza mdbtools sul server;
+  - id fissi ricavati dai numeri di Access e una transazione sola: la seconda esecuzione non cambia nulla;
+  - i comuni si abbinano con regole e alias (92% delle sedi legali nella prova); i recapiti che non stanno nei campi
+    vanno in una nota del diario;
+  - il resoconto ha solo numeri, conteggi e testi dei comuni, con le cifre lunghe nascoste;
+  - la prova sul file vero ha trovato due difetti prima della PR: le email di Access sono collegamenti `http://…`, e
+    alcune parole iniziali abbinavano comuni fuori Toscana («SESTO» → Sesto, BZ).
 
 ## Burndown
 
@@ -82,6 +92,7 @@ dipenda dalla simulazione (A29).
 | Inizio (19/11, dopo il planning) | 27 |
 | US-508 unita (19/11) | 24 |
 | US-509 unita (19/11) | 21 |
+| US-510 unita (19/11) | 16 |
 
 ## Per il PO durante lo sprint
 
