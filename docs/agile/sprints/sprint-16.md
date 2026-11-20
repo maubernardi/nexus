@@ -1,6 +1,6 @@
 # Sprint 16 — 21 – 23 novembre 2026
 
-**Stato:** 📋 proposta di planning, 13 punti: da confermare le scelte del §«Da confermare». **Planning:** 20/11, dalla
+**Stato:** 🏃 in corso: planning confermato dal PO il 20/11, 13 punti. **Planning:** 20/11, dalla
 [review dello Sprint 15](sprint-15-review.md) (§8, §9).
 
 ## Obiettivo
@@ -39,9 +39,19 @@ controllo si fa con Chrome senza finestra e un profilo pulito (A34). Per attende
 
 ## Decisioni del planning (20/11)
 
-- **Dati della produzione** (PO): si riporta tutto dalla demo, tranne segnalazioni, utenti e beneficiari. Le aziende
-  vengono dal database attuale (US-1309): quelle della demo si tolgono. Sostituisce la proposta di un'installazione
-  pulita: la configurazione non si rifà.
+Tutte del PO.
+
+- **Dati della produzione**: si riporta tutto dalla demo, tranne segnalazioni, utenti e beneficiari. Le aziende vengono
+  dal database attuale (US-1309): quelle della demo si tolgono. Sostituisce la proposta di un'installazione pulita: la
+  configurazione non si rifà.
+- **Audit della demo**: lo script di pulizia toglie anche le voci su segnalazioni, beneficiari, utenti e aziende tolte;
+  restano quelle sulla configurazione che teniamo. È l'unica volta che l'audit si tocca, prima che ci siano dati veri.
+- **Avviso del backup**: un controllo ogni mattina alle 9. Se manca un backup riuscito nelle ultime 26 ore, GitHub ti
+  manda un'email, come fa oggi il controllo della demo.
+- **Protezione dei backup**: se IONOS offre il blocco degli oggetti senza costi in più, nessuno può cancellare un backup
+  per 30 giorni, nemmeno chi entrasse nel server. Lo verifico all'inizio di US-1302; altrimenti le chiavi del server
+  possono solo caricare.
+- **Stima**: 13 punti invece dei 10 detti alla review, per US-1306 portata a 8.
 
 ## Come li faccio
 
@@ -55,7 +65,7 @@ controllo si fa con Chrome senza finestra e un profilo pulito (A34). Per attende
 - resta tutta la configurazione della demo, con le impostazioni di Keycloak;
 - uno script, una volta sola e in una transazione, toglie segnalazioni (con bacheca, schede, report, storico,
   notifiche), beneficiari, utenti di NEXUS e di Keycloak e aziende della demo (con referenti, diario, storico e
-  mansioni);
+  mansioni), e le loro voci dell'audit;
 - storico dell'azienda, diario, report di chiusura e audit rifiutano le cancellazioni (EN-2): lo script sospende queste
   regole solo dentro la sua transazione. Se qualcosa va storto, la transazione si annulla e non cambia nulla;
 - lo provo in locale su una copia del backup della demo: è il primo uso di US-1302, e nel backup ci sono solo dati
@@ -66,17 +76,6 @@ controllo si fa con Chrome senza finestra e un profilo pulito (A34). Per attende
 - Keycloak importa un realm senza utenti di prova;
 - al primo avvio NEXUS crea l'ADMIN dall'email nel `.env`, con l'invito di US-103;
 - la procedura parte da un backup della demo, per poter tornare indietro, e finisce con il controllo di sicurezza.
-
-## Da confermare
-
-1. **Audit della demo**: lo script toglie anche le voci dell'audit su segnalazioni, beneficiari, utenti e aziende tolte;
-   restano quelle sulla configurazione che teniamo. È l'unica volta che l'audit si tocca, prima che ci siano dati veri.
-   *Alternativa:* tenerlo tutto, con la storia delle prove fatte sulla demo.
-2. **Avviso del backup**: un controllo ogni mattina alle 9. Se manca un backup riuscito nelle ultime 26 ore, GitHub ti
-   manda un'email, come fa oggi il controllo della demo.
-3. **Protezione dei backup**: se IONOS offre il blocco degli oggetti senza costi in più, nessuno può cancellare un
-   backup per 30 giorni, nemmeno chi entrasse nel server. Lo verifico all'inizio di US-1302.
-4. **Stima**: 13 punti invece di 10, per US-1306 portata a 8.
 
 ## Per il PO
 
@@ -102,4 +101,4 @@ controllo si fa con Chrome senza finestra e un profilo pulito (A34). Per attende
 
 | Momento | Punti residui |
 |---|---|
-| Inizio (dopo la conferma del planning) | 13 |
+| Inizio (20/11, dopo la conferma del planning) | 13 |

@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 94 elementi, 380 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-15](sprints/sprint-15.md), il 20/11 ([review](sprints/sprint-15-review.md)); prossimo: [sprint-16](sprints/sprint-16.md), dal 21/11.
+**Totale: 94 elementi, 380 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-15](sprints/sprint-15.md), il 20/11 ([review](sprints/sprint-15-review.md)); in corso: [sprint-16](sprints/sprint-16.md), dal 21/11 (planning confermato il 20/11).
 
 ## Epiche
 
@@ -1392,11 +1392,11 @@ Criteri di accettazione:
   Restano le ultime 30 copie; le più vecchie si cancellano da sole.
 - **Le chiavi di IONOS e la chiave pubblica** stanno solo nel `.env` del server e le mette il PO: mai nel repository né
   nei log.
-- **Avviso**: se manca un backup riuscito nelle ultime 26 ore, il controllo del mattino fallisce e GitHub manda
-  un'email al PO, come per il controllo della demo (US-1307). Lo stato si legge anche da «Stato del server», senza dati
+- **Avviso** (PO, 20/11): ogni mattina alle 9, se manca un backup riuscito nelle ultime 26 ore, il controllo fallisce
+  e GitHub manda un'email al PO, come per il controllo della demo (US-1307). Lo stato si legge anche da «Stato del server», senza dati
   personali.
-- **Protezione**: un backup caricato non si può cancellare dal server per 30 giorni, se IONOS offre il blocco degli
-  oggetti senza costi in più; altrimenti le chiavi del server possono solo caricare.
+- **Protezione** (PO, 20/11): un backup caricato non si può cancellare dal server per 30 giorni, se IONOS offre il
+  blocco degli oggetti senza costi in più; altrimenti le chiavi del server possono solo caricare.
 - **Il ripristino di prova su un ambiente pulito riesce ed è documentato**: scaricare, decifrare, ripristinare, avviare
   NEXUS e ritrovare i dati. La procedura è nel README.
 - Privacy: un dato cancellato o anonimizzato (US-1303) resta nei backup fino a 30 giorni. Va scritto nel registro dei
@@ -1455,11 +1455,12 @@ Criteri di accettazione:
     stati, notifiche;
   - i beneficiari, con i curriculum;
   - gli utenti, in NEXUS e in Keycloak; resta l'account tecnico del backend;
-  - le aziende della demo, con referenti, diario, storico e mansioni.
+  - le aziende della demo, con referenti, diario, storico e mansioni;
+  - le voci dell'audit su tutto quello che si toglie (PO, 20/11). Restano quelle sulla configurazione che si tiene.
 
   Storico dell'azienda, diario, report di chiusura e audit rifiutano le cancellazioni (EN-2): lo script sospende queste
-  regole solo dentro la sua transazione. Si prova in locale su una copia del backup della demo, che ha solo dati
-  dimostrativi.
+  regole solo dentro la sua transazione. È l'unica volta che si toccano, prima che ci siano dati veri. Si prova in
+  locale su una copia del backup della demo, che ha solo dati dimostrativi.
 - **Le aziende vengono dal database attuale** (PO, 20/11): importazione sul server dopo la pulizia (US-1309,
   [analisi §9.2](../analisi/database-attuale.md)). Si controlla il resoconto, poi il file Access si cancella dal
   server.
