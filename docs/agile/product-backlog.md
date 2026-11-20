@@ -3,14 +3,14 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 94 elementi, 377 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-14](sprints/sprint-14.md), il 17/11 ([review](sprints/sprint-14-review.md)); prossimo: [sprint-15](sprints/sprint-15.md), dal 19/11.
+**Totale: 95 elementi, 382 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-14](sprints/sprint-14.md), il 17/11 ([review](sprints/sprint-14-review.md)); prossimo: [sprint-15](sprints/sprint-15.md), dal 19/11.
 
 ## Epiche
 
 | Epica | Titolo | Obiettivo | Storie | Punti |
 |---|---|---|---|---|
 | E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, il calendario e i cataloghi senza passare dalla console di Keycloak. | 16 | 65 |
-| E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 6 | 23 |
+| E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 7 | 28 |
 | E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 8 | 31 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 5 | 17 |
 | E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 10 | 26 (+ US-507 da stimare) |
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 36 | 185 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 37 | 190 |
 
 ## Domande aperte per il Product Owner
 
@@ -51,6 +51,8 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | Q11 | Cosa vedono gli altri tutor dello stesso progetto del beneficiario (oltre al divieto su nome e cognome). | US-204 | Ogni tutor gestisce le proprie segnalazioni e vede **complete** (nome e cognome compresi) quelle del proprio progetto: dentro il progetto le informazioni sono condivise (PO, 01/10). |
 | Q12 | Un beneficiario può avere più segnalazioni aperte insieme (es. su progetti o mansioni diverse)? | US-301 | **No**: una sola segnalazione aperta alla volta (PO, 01/10). Aperta = qualunque stato tranne FORM_RESTITUZIONE. |
 | Q13 | Che cos'è un "servizio", a cui legare il calendario (patrono, chiusure)? | US-107, US-703 | Il "servizio" non esiste: era il **progetto** del Tutor. Il calendario (patrono, chiusure) è del progetto (PO, 01/10). **Aggiornata il 24/10 (review dello Sprint 3):** il calendario è **unico per tutti** i progetti: festività nazionali (senza il 4 ottobre), patrono del 24 giugno e chiusure, impostati dall'ADMIN. |
+| Q14 | Rubrica dei case manager: importare i 237 assistenti sociali del database attuale? 223 sono fermi a prima del 2015 e 89 non hanno l'ente. Proposta: non importarli; l'ADMIN inserisce i case manager di oggi. In alternativa, importare solo quelli con l'ente e la mail, disattivati finché l'ADMIN non li conferma. | US-207 | Da decidere. |
+| Q15 | Rubrica dei case manager: chi aggiunge un case manager nuovo? Solo l'ADMIN dai Cataloghi, o anche il Tutor dalla scheda del beneficiario («Aggiungi alla rubrica»)? Proposta: anche il Tutor, che li conosce; l'ADMIN corregge e disattiva. | US-207 | Da decidere. |
 
 ## Elenco delle storie
 
@@ -85,6 +87,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-204](#us-204) | E2 | Visibilità dei beneficiari per progetto | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-205](#us-205) | E2 | Curriculum del beneficiario | Could | 5 | — | 🎉 Done (Sprint 11) |
 | [US-206](#us-206) | E2 | Contatti, ente di presa in carico e case manager del beneficiario | Must | 5 | R4 | 🎉 Done (Sprint 12) |
+| [US-207](#us-207) | E2 | Rubrica dei case manager | Should | 5 | R4 | 📋 Backlog |
 | [US-301](#us-301) | E3 | Nuova segnalazione | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-302](#us-302) | E3 | Nuova tipologia di mansione dal Tutor, approvata dal Call Center | Should | 5 | R2 | 🎉 Done (Sprint 4) |
 | [US-303](#us-303) | E3 | Elenco delle segnalazioni (Home) | Must | 5 | R1 | 🎉 Done (Sprint 3) |
@@ -454,6 +457,40 @@ Criteri di accettazione:
   nell'anonimizzazione (US-1303).
 - Fatto il 10/11: tirocinio aperto = segnalazione non ancora in FORM_RESTITUZIONE con la scheda del tirocinio;
   nell'audit solo quali campi cambiano, senza i valori.
+
+#### US-207
+**Rubrica dei case manager** · Should · 5 punti · R4 · 📋 Backlog
+
+Come **Tutor** voglio scegliere il case manager del beneficiario da una rubrica dell'ente che lo ha in carico, per non
+riscriverne i recapiti per ogni beneficiario e non sbagliarli (PO, 20/11).
+
+Criteri di accettazione:
+- **Rubrica nell'ente** (Cataloghi → Enti, US-115): per ogni ente i suoi case manager, con nome e cognome
+  (obbligatori), sede operativa, telefono e mail, validati come nella scheda del beneficiario (US-206).
+  - Un case manager che lascia l'ente si disattiva o si cancella. I beneficiari hanno la loro copia dei dati, quindi
+    per loro non cambia nulla.
+  - Ogni modifica è registrata nell'audit (EN-2), con i campi cambiati ma senza i valori, come in US-206.
+- **Scheda del beneficiario**: scelto l'ente, il nome del case manager diventa una casella con suggerimenti accessibile
+  (combobox WAI-ARIA, come il comune di US-1007), con i case manager attivi di quell'ente.
+  - La scelta compila nome, sede operativa, telefono e mail, che restano modificabili.
+  - Si può sempre scrivere un case manager che non è nella rubrica.
+  - Il beneficiario tiene la sua copia: cambiare la rubrica non cambia i beneficiari già salvati né i documenti già
+    generati. Per aggiornare un beneficiario si sceglie di nuovo il case manager.
+  - Le regole del tirocinio di inclusione restano come oggi. L'anonimizzazione (US-1303) cancella la copia del
+    beneficiario, non la rubrica.
+- **Privacy**: la rubrica ha solo i recapiti di lavoro dei case manager e non dice quali beneficiari seguono. La
+  gestisce l'ADMIN; i Tutor la vedono solo nei suggerimenti della scheda.
+- **Dati del database attuale** (tabella «Assistenti» di Access, solo conteggi): 237 assistenti sociali che non sono
+  operatori del Call Center.
+  - Ente: Comune di Firenze 106, ASL 10 25, Cooperativa Sociale 8, POLIS 5, Ministero/Tribunale 2, ASP Montedomini 1,
+    Associazione Onlus 1, nessun ente 89.
+  - 217 hanno nome e cognome, 188 la mail (tutte come collegamento `http://`, da ripulire come per le aziende), 192 il
+    telefono, 27 il cellulare.
+  - **223 sono stati aggiornati l'ultima volta prima del 2015**, 14 dopo.
+  - Alcuni enti non esistono più con quel nome: l'ASL 10 dal 2016 è l'Azienda USL Toscana Centro.
+  - Se importarli lo decide il PO (Q14). Stima: 5 punti con l'importazione, 3 senza.
+
+Dipendenze: US-115, US-206, US-1007 (casella con suggerimenti) · Domande aperte: Q14, Q15
 
 ### E3 — Segnalazioni (fase 1)
 
