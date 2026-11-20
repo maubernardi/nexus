@@ -35,7 +35,6 @@ const slot = (id: string, title: string, overrides: Partial<JobSlot> = {}): JobS
   jobCategory: { id: 'J1', code: 'MAG', name: 'Magazziniere' },
   zone: { id: 'Z1', code: 'NOVOLI', name: 'Novoli' },
   status: 'LIBERA',
-  blockedByTicketNumber: null,
   active: true,
   version: 0,
   ...overrides,
@@ -51,7 +50,15 @@ const renderSection = (companyActive = true) =>
 describe('<JobSlotsSection>', () => {
   beforeEach(() => {
     vi.mocked(fetchJobSlots).mockResolvedValue([
-      slot('S1', 'Carrellista', { status: 'BLOCCATA', blockedByTicketNumber: 12 }),
+      slot('S1', 'Carrellista', {
+        status: 'BLOCCATA',
+        assignments: [
+          {
+            ticketNumber: 12,
+            internshipType: { id: 'IT2', code: 'EXTRACURRICULARE', name: 'Extracurriculare' },
+          },
+        ],
+      }),
       slot('S2', 'Magazziniere'),
     ]);
     vi.mocked(fetchZones).mockResolvedValue([{ id: 'Z1', code: 'NOVOLI', name: 'Novoli' }]);
@@ -66,7 +73,9 @@ describe('<JobSlotsSection>', () => {
     const table = await screen.findByRole('table', { name: /Mansioni dell’azienda/ });
     const [blocked, free] = within(table).getAllByRole('row').slice(1);
 
-    expect(within(blocked).getByText('Bloccata – segnalazione n. 12')).toBeInTheDocument();
+    expect(
+      within(blocked).getByText('Assegnata – segnalazione n. 12 (Extracurriculare)'),
+    ).toBeInTheDocument();
     expect(within(blocked).queryByRole('button', { name: /^Ritira/ })).not.toBeInTheDocument();
     expect(within(free).getByRole('button', { name: 'Ritira Magazziniere' })).toBeInTheDocument();
     expect(within(free).getByRole('button', { name: 'Modifica Magazziniere' })).toBeInTheDocument();
@@ -130,7 +139,15 @@ describe('<JobSlotsSection>', () => {
 
   it('annunci: link a quello attivo, "Crea annuncio" solo per le mansioni libere', async () => {
     vi.mocked(fetchJobSlots).mockResolvedValue([
-      slot('S1', 'Carrellista', { status: 'BLOCCATA', blockedByTicketNumber: 12 }),
+      slot('S1', 'Carrellista', {
+        status: 'BLOCCATA',
+        assignments: [
+          {
+            ticketNumber: 12,
+            internshipType: { id: 'IT2', code: 'EXTRACURRICULARE', name: 'Extracurriculare' },
+          },
+        ],
+      }),
       slot('S2', 'Magazziniere', { activeBoardPostId: 'P3', activeBoardPostNumber: 3 }),
       slot('S3', 'Mulettista'),
       slot('S4', 'Cassiere', { active: false }),
@@ -200,5 +217,25 @@ describe('<JobSlotsSection>', () => {
     expect(
       await screen.findByText('Mansione «Magazziniere» ritirata: l’annuncio #3 è stato archiviato.'),
     ).toHaveFocus();
+  });
+
+  it('mansione assegnata a più segnalazioni: le elenca con il tipo (US-605)', async () => {
+    vi.mocked(fetchJobSlots).mockResolvedValue([
+      slot('S1', 'Cameriere', {
+        status: 'BLOCCATA',
+        assignments: [
+          {
+            ticketNumber: 12,
+            internshipType: { id: 'IT2', code: 'EXTRACURRICULARE', name: 'Extracurriculare' },
+          },
+          { ticketNumber: 15 },
+        ],
+      }),
+    ]);
+    renderSection();
+    const table = await screen.findByRole('table', { name: /Mansioni dell’azienda/ });
+    expect(
+      within(table).getByText('Assegnata – segnalazioni n. 12 (Extracurriculare), n. 15 (tipo non indicato)'),
+    ).toBeInTheDocument();
   });
 });

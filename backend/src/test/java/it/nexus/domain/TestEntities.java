@@ -74,6 +74,13 @@ public final class TestEntities {
         return beneficiary;
     }
 
+    /** Voci iniziali dei tipi di tirocinio (V21): «Curriculare», «Extracurriculare» e «Di inclusione». */
+    public static final long CURRICULAR_ID = 893700000000000101L;
+    public static final long EXTRACURRICULAR_ID = 893700000000000102L;
+    public static final long INCLUSION_ID = 893700000000000103L;
+    /** Id esterno di «Extracurriculare», per i moduli delle segnalazioni (US-605). */
+    public static final String EXTRACURRICULAR = "0RSRFD8XW8G36";
+
     public static Ticket ticket(AppUser tutor, Project project, Beneficiary beneficiary, JobCategory requested) {
         Ticket ticket = new Ticket();
         ticket.setTutor(tutor);

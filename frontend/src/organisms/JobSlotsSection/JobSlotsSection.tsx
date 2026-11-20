@@ -13,6 +13,7 @@ import {
   useSetJobSlotActive,
   useUpdateJobSlot,
 } from '@/config/hooks/useJobSlots';
+import { assignmentList } from '@/lib/jobSlotAssignments';
 import { JobSlotForm } from '@/organisms/JobSlotForm/JobSlotForm';
 
 type OutcomeKey =
@@ -221,8 +222,11 @@ export const JobSlotsSection = ({ companyId, companyActive }: JobSlotsSectionPro
                   <td className={td}>{s.jobCategory.name}</td>
                   <td className={td}>{s.zone.name}</td>
                   <td className={td}>
-                    {s.status === 'BLOCCATA'
-                      ? t('jobSlot.blockedBy', { number: s.blockedByTicketNumber })
+                    {s.assignments && s.assignments.length > 0
+                      ? t('jobSlot.assignedTo', {
+                          count: s.assignments.length,
+                          list: assignmentList(s.assignments, t),
+                        })
                       : t('jobSlot.free')}
                   </td>
                   <td className={td}>{t(s.active ? 'jobSlot.available' : 'jobSlot.withdrawn')}</td>

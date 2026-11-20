@@ -64,6 +64,14 @@ export const fetchCareAgencies = async (): Promise<ReferenceItem[]> => {
 };
 
 /** Sedi di competenza attive di un progetto (US-308). */
+/** Tipi di tirocinio attivi ammessi dal progetto (US-605), per i moduli di segnalazione. */
+export const fetchProjectInternshipTypes = async (projectId: string): Promise<ReferenceItem[]> => {
+  const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.internshipTypes, {
+    params: { projectId },
+  });
+  return data;
+};
+
 export const fetchCompetenceSites = async (projectId: string): Promise<ReferenceItem[]> => {
   const { data } = await axiosInstance.get<ReferenceItem[]>(ENDPOINTS.competenceSites, {
     params: { projectId },

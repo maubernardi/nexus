@@ -25,14 +25,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.domain.AppUser;
-import it.nexus.domain.Beneficiary;
 import it.nexus.domain.Company;
 import it.nexus.domain.CompanyAtecoCode;
 import it.nexus.domain.Internship;
 import it.nexus.domain.InternshipExtension;
 import it.nexus.domain.InternshipType;
 import it.nexus.domain.Municipality;
-import it.nexus.domain.Project;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.UserProject;
 import it.nexus.domain.audit.AuditChanges;
@@ -45,7 +43,6 @@ import it.nexus.domain.dto.InternshipDTO;
 import it.nexus.domain.dto.InternshipFormDTO;
 import it.nexus.domain.dto.LegalRepresentativeDTO;
 import it.nexus.domain.dto.LegalRepresentativeFormDTO;
-import it.nexus.domain.dto.ReferenceItemDTO;
 import it.nexus.domain.dto.ScheduleDayDTO;
 import it.nexus.domain.dto.SuspensionDTO;
 import it.nexus.domain.dto.TrainingProjectDTO;
@@ -59,13 +56,14 @@ import it.nexus.mapper.ReferenceMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.CompanyAtecoCodeRepository;
 import it.nexus.repository.InternshipRepository;
-import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.repository.TicketRepository;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.CompanyLegalDataService;
 import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.InternshipService;
+import it.nexus.services.InternshipTypeRules;
+import it.nexus.services.TicketInternshipTypeService;
 import it.nexus.services.MunicipalityService;
 import it.nexus.validation.FiscalCodes;
 import it.nexus.web.errors.ConflictException;
@@ -108,17 +106,11 @@ public class InternshipServiceImpl implements InternshipService {
             Map.entry("legalRepresentative", "il legale rappresentante dell'azienda"),
             Map.entry("legalRepresentativeData", "codice fiscale, nascita e residenza del legale rappresentante"));
 
-    /** Come chiamare i dati mancanti per l'inclusione nel messaggio d'errore (US-206). */
-    private static final Map<String, String> INCLUSION_LABELS = Map.of(
-            "careAgency", "l'ente che lo ha in carico",
-            "caseManagerName", "il nome del case manager",
-            "caseManagerEmail", "la mail del case manager",
-            "caseManagerPhone", "il telefono del case manager");
-
     private final InternshipRepository internshipRepository;
     private final TicketRepository ticketRepository;
     private final UserProjectRepository userProjectRepository;
-    private final InternshipTypeRepository internshipTypeRepository;
+    private final InternshipTypeRules internshipTypeRules;
+    private final TicketInternshipTypeService ticketInternshipTypeService;
     private final CompanyAtecoCodeRepository atecoCodeRepository;
     private final CompanyLegalDataService companyLegalDataService;
     private final CurrentAppUserService currentAppUserService;
@@ -145,15 +137,16 @@ public class InternshipServiceImpl implements InternshipService {
                     "La scheda del tirocinio è stata modificata nel frattempo: ricarica la pagina e riprova");
         }
         Internship internship = existing.orElseGet(() -> new Internship(ticket));
-        InternshipType type = internshipType(dto.internshipTypeId(), internship.getInternshipType(),
-                ticket.getProject());
-        if (type != null && type.isInclusion() && !type.equals(internship.getInternshipType())) {
-            List<String> missing = inclusionMissing(ticket.getBeneficiary());
-            if (!missing.isEmpty()) {
-                throw new FieldValidationException("internshipTypeId",
-                        "Per un tirocinio di inclusione completa nella scheda del beneficiario: "
-                                + missing.stream().map(INCLUSION_LABELS::get).collect(Collectors.joining(", ")));
-            }
+        // il tipo è della segnalazione (US-605): cambiarlo dalla scheda è la stessa correzione, con gli stessi controlli
+        InternshipType current = ticket.getInternshipType() != null ? ticket.getInternshipType()
+                : internship.getInternshipType();
+        InternshipType type = internshipTypeRules.choose(dto.internshipTypeId(), current, ticket.getProject(),
+                ticket.getBeneficiary());
+        if (type == null) {
+            // la scheda non toglie il tipo della segnalazione: resta quello
+            type = ticket.getInternshipType();
+        } else {
+            ticketInternshipTypeService.change(ticket, type, true);
         }
         CompanyAtecoCode ateco = atecoCode(dto.atecoCodeId(), company(ticket));
         Municipality siteMunicipality = municipalityService.forAddress(dto.siteMunicipalityId(),
@@ -297,7 +290,8 @@ public class InternshipServiceImpl implements InternshipService {
     @Override
     public boolean clearCompanyData(Ticket ticket) {
         return internshipRepository.findByTicketId(ticket.getId())
-                .filter(i -> i.getInternshipType() != null || i.getStartDate() != null || i.getExpectedEndDate() != null
+                // il tipo resta: è della segnalazione (US-605)
+                .filter(i -> i.getStartDate() != null || i.getExpectedEndDate() != null
                         || i.getSite() != null || i.getSiteMunicipality() != null || i.getAtecoCode() != null
                         || i.getNotes() != null
                         || !i.getCompanyTutors().isEmpty() || !i.getSuspensions().isEmpty()
@@ -347,59 +341,6 @@ public class InternshipServiceImpl implements InternshipService {
     /** Azienda della mansione abbinata; nulla solo se la segnalazione non ne ha più una. */
     private static Company company(Ticket ticket) {
         return ticket.getJobSlot() == null ? null : ticket.getJobSlot().getCompany();
-    }
-
-    /**
-     * Tipo attivo del catalogo ammesso dal progetto (US-115), oppure quello già scelto anche se nel frattempo
-     * disattivato o non più ammesso.
-     */
-    private InternshipType internshipType(String id, InternshipType current, Project project) {
-        if (id == null || id.isBlank()) {
-            return null;
-        }
-        InternshipType type = Optional.ofNullable(TsidMapper.toInternal(id))
-                .flatMap(internshipTypeRepository::findById)
-                .filter(t -> t.isActive() || t.equals(current))
-                .orElseThrow(() -> new FieldValidationException("internshipTypeId", "Tipo di tirocinio non valido"));
-        if (!type.equals(current) && !allowed(project, type)) {
-            throw new FieldValidationException("internshipTypeId",
-                    "Il tipo «%s» non è ammesso dal progetto %s".formatted(type.getName(), project.getName()));
-        }
-        return type;
-    }
-
-    /** Cosa manca al beneficiario per un tirocinio di inclusione (US-206), nell'ordine del modulo. */
-    private static List<String> inclusionMissing(Beneficiary b) {
-        List<String> missing = new ArrayList<>();
-        if (b.getCareAgency() == null) {
-            missing.add("careAgency");
-        }
-        if (b.getCaseManagerName() == null) {
-            missing.add("caseManagerName");
-        }
-        if (b.getCaseManagerEmail() == null) {
-            missing.add("caseManagerEmail");
-        }
-        if (b.getCaseManagerPhone() == null) {
-            missing.add("caseManagerPhone");
-        }
-        return missing;
-    }
-
-    /** Un progetto senza tipi indicati li ammette tutti (fino al censimento dei progetti). */
-    private static boolean allowed(Project project, InternshipType type) {
-        return project.getAllowedInternshipTypes().isEmpty() || project.getAllowedInternshipTypes().contains(type);
-    }
-
-    /** I tipi che il Tutor può scegliere nella scheda: attivi e ammessi dal progetto, più quello già scelto. */
-    private List<ReferenceItemDTO> choosableTypes(Project project, InternshipType current) {
-        List<InternshipType> types = new ArrayList<>(internshipTypeRepository.findByActiveTrueOrderByNameAsc().stream()
-                .filter(t -> allowed(project, t))
-                .toList());
-        if (current != null && !types.contains(current)) {
-            types.add(current);
-        }
-        return types.stream().map(referenceMapper::toDto).toList();
     }
 
     private CompanyAtecoCode atecoCode(String id, Company company) {
@@ -670,7 +611,7 @@ public class InternshipServiceImpl implements InternshipService {
         return new InternshipDTO(i.getId() == null ? null : i.getVersion(),
                 company == null ? null : company.getName(), rep, codes,
                 referenceMapper.toDto(i.getInternshipType()),
-                choosableTypes(ticket.getProject(), i.getInternshipType()), i.getStartDate(), i.getExpectedEndDate(),
+                internshipTypeRules.choosable(ticket.getProject(), i.getInternshipType()), i.getStartDate(), i.getExpectedEndDate(),
                 i.getSite(), MunicipalityMapper.toDto(i.getSiteMunicipality()),
                 i.getAtecoCode() == null ? null : TsidMapper.toExternal(i.getAtecoCode().getId()), tutors(i),
                 i.getFiscalCode(), i.getBirthDate(), i.getBirthPlace(),
@@ -681,7 +622,7 @@ public class InternshipServiceImpl implements InternshipService {
                 extensionDtos, i.currentEndDate(), ticket.getStatus() == TicketStatus.IN_TIROCINIO,
                 i.getFirstSlotStart(), i.getFirstSlotEnd(), i.getSecondSlotStart(), i.getSecondSlotEnd(),
                 i.isExcludeHolidays(), schedule, InternshipHours.weeklyMinutes(slots, days), total,
-                missingForStart(i, rep), inclusionMissing(ticket.getBeneficiary()));
+                missingForStart(i, rep), InternshipTypeRules.inclusionMissing(ticket.getBeneficiary()));
     }
 
     private LegalRepresentativeDTO legalRepresentative(Company company) {

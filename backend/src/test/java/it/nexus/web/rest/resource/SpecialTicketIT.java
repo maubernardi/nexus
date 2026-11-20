@@ -86,7 +86,7 @@ class SpecialTicketIT {
             throws Exception {
         String projectId = project == null ? "null" : "\"" + TsidMapper.toExternal(project.getId()) + "\"";
         return mockMvc.perform(post(SPECIAL).header(USER, user).contentType(MediaType.APPLICATION_JSON)
-                .content("{\"boardPostId\": \"%s\", \"beneficiaryId\": \"%s\", \"projectId\": %s}"
+                .content("{\"boardPostId\": \"%s\", \"beneficiaryId\": \"%s\", \"projectId\": %s, \"internshipTypeId\": \"0RSRFD8XW8G36\"}"
                         .formatted(id(post), id(beneficiary), projectId)));
     }
 

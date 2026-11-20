@@ -40,9 +40,11 @@ public class ReferenceDataResource {
 
     @GetMapping("/internship-types")
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
-    @Operation(summary = "Tipi di tirocinio attivi (US-108)")
-    public ResponseEntity<List<ReferenceItemDTO>> internshipTypes() {
-        return ResponseEntity.ok(referenceDataService.activeInternshipTypes());
+    @Operation(summary = "Tipi di tirocinio attivi (US-108); con projectId solo quelli ammessi dal progetto (US-605)")
+    public ResponseEntity<List<ReferenceItemDTO>> internshipTypes(
+            @RequestParam(name = "projectId", required = false) String projectId) {
+        return ResponseEntity.ok(projectId == null ? referenceDataService.activeInternshipTypes()
+                : referenceDataService.projectInternshipTypes(projectId));
     }
 
     @GetMapping("/competence-sites")

@@ -17,8 +17,8 @@ sprint, anche sopra la velocity media (22,9).
 | US-508 | Partita IVA e nome da completare | 3 | ✅ Ready | `mark-companies-to-complete` | [#165](https://github.com/maubernardi/nexus/pull/165) |
 | US-509 | Categoria merceologica e attività dell'azienda | 3 | ✅ Ready | `add-business-categories` | [#166](https://github.com/maubernardi/nexus/pull/166) |
 | US-510 | Referenti e recapiti dell'azienda | 5 | ✅ Ready | `add-company-contacts` | [#167](https://github.com/maubernardi/nexus/pull/167) |
-| US-1309 | Importazione dal database attuale | 8 | ✅ Ready | `add-legacy-import` | |
-| US-605 | Una mansione per più segnalazioni, una per tipo di tirocinio | 8 | ✅ Ready | | |
+| US-1309 | Importazione dal database attuale | 8 | ✅ Ready | `add-legacy-import` | [#168](https://github.com/maubernardi/nexus/pull/168) |
+| US-605 | Una mansione per più segnalazioni, una per tipo di tirocinio | 8 | ✅ Ready | `add-slot-per-internship-type` | |
 
 Ordine: prima le tre storie che danno all'azienda i campi del database attuale, poi l'importazione, che li usa; per
 ultima US-605, indipendente. Prossima migrazione: **V45**.
@@ -84,6 +84,15 @@ dipenda dalla simulazione (A29).
   - il resoconto ha solo numeri, conteggi e testi dei comuni, con le cifre lunghe nascoste;
   - la prova sul file vero ha trovato due difetti prima della PR: le email di Access sono collegamenti `http://…`, e
     alcune parole iniziali abbinavano comuni fuori Toscana («SESTO» → Sesto, BZ).
+- **US-605**:
+  - il tipo di tirocinio passa sulla segnalazione: lo indica il Tutor alla creazione (anche dalla bacheca) e lo
+    corregge fino all'avvio, dalla segnalazione o dalla scheda, che ha sempre lo stesso tipo;
+  - l'assegnazione della mansione sta sulla segnalazione (`job_slot_held`), con un indice univoco per mansione e
+    tipo; lo stato BLOCCATA della mansione resta come riassunto, per la release precedente (A16);
+  - le segnalazioni aperte prendono il tipo dalla scheda; senza scheda il Call Center vede «tipo non indicato» e non
+    propone finché il Tutor non lo indica;
+  - con il report e la mansione non più disponibile l'assegnazione resta per quel tipo, come prima il blocco;
+  - nella demo la segnalazione n. 3 è Curriculare, per vedere l'avviso sulla mansione della n. 4.
 
 ## Burndown
 
@@ -93,6 +102,7 @@ dipenda dalla simulazione (A29).
 | US-508 unita (19/11) | 24 |
 | US-509 unita (19/11) | 21 |
 | US-510 unita (19/11) | 16 |
+| US-1309 unita (20/11) | 8 |
 
 ## Per il PO durante lo sprint
 

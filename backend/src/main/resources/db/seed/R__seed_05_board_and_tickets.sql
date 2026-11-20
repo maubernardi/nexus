@@ -60,6 +60,19 @@ UPDATE job_slot SET status = 'BLOCCATA', blocked_by_ticket_id = 8923983955721300
 UPDATE job_slot SET status = 'BLOCCATA', blocked_by_ticket_id = 892398395572130094, updated_at = now(), updated_by = 'seed'
  WHERE id = 892398395572130066 AND blocked_by_ticket_id IS DISTINCT FROM 892398395572130094;  -- s_vendite <- t6
 
+-- US-605: tipo di tirocinio delle segnalazioni dimostrative, solo dove manca (quelle corrette a mano non cambiano):
+-- t3 Curriculare, così nell'abbinamento la mansione di t4 compare con l'avviso; le altre Extracurriculare.
+UPDATE ticket t SET internship_type_id = it.id, updated_at = now(), updated_by = 'seed'
+FROM internship_type it
+WHERE t.internship_type_id IS NULL
+  AND ((t.id = 892398395572130091 AND it.code = 'CURRICULARE')
+       OR (t.id IN (892398395572130089, 892398395572130090, 892398395572130092, 892398395572130093,
+                    892398395572130094, 892398395576324284) AND it.code = 'EXTRACURRICULARE'));
+-- le segnalazioni che bloccano la mansione la hanno assegnata (idempotente)
+UPDATE ticket t SET job_slot_held = true
+FROM job_slot j
+WHERE j.blocked_by_ticket_id = t.id AND t.job_slot_id = j.id AND NOT t.job_slot_held;
+
 -- Storico degli stati (creazione ed eventuali transizioni).
 INSERT INTO ticket_status_history (id, ticket_id, from_status, to_status, note, created_at, created_by, updated_at, updated_by) VALUES
     (892398395576324285, 892398395572130089, NULL, 'NUOVA', NULL, now() - interval '1 days', 'seed', now() - interval '1 days', 'seed'),

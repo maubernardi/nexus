@@ -31,6 +31,9 @@ public interface ReferenceDataService {
     /** Categorie merceologiche attive, per il modulo e l'elenco delle aziende (US-509). */
     List<ReferenceItemDTO> activeBusinessCategories();
 
+    /** Tipi di tirocinio attivi ammessi dal progetto, per i moduli di segnalazione (US-605); progetto ignoto: nessuno. */
+    List<ReferenceItemDTO> projectInternshipTypes(String projectId);
+
     /** Ruoli dei referenti attivi, per il modulo dell'azienda (US-510). */
     List<ReferenceItemDTO> activeContactRoles();
 

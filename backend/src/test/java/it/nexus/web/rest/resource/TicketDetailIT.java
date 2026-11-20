@@ -123,7 +123,7 @@ class TicketDetailIT {
         String beneficiaryId = TsidMapper.toExternal(beneficiaries.save(TestEntities.beneficiary(tutor1, zone)).getId());
         String id = JsonPath.read(mockMvc.perform(post("/api/v1/tickets").header(USER, "tutor1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"beneficiaryId\": \"%s\", \"projectId\": \"%s\", \"jobCategoryId\": \"%s\"}".formatted(
+                        .content("{\"beneficiaryId\": \"%s\", \"projectId\": \"%s\", \"jobCategoryId\": \"%s\", \"internshipTypeId\": \"0RSRFD8XW8G36\"}".formatted(
                                 beneficiaryId, TsidMapper.toExternal(gol.getId()), TsidMapper.toExternal(category.getId()))))
                 .andReturn().getResponse().getContentAsString(), "$.id");
         mockMvc.perform(post("/api/v1/tickets/" + id + "/take-charge").header(USER, "operatore.cc")

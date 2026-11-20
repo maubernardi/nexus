@@ -13,6 +13,8 @@ export type TicketCreate = {
   jobFreeText: string | null;
   /** Sede di competenza (US-308): obbligatoria se il progetto ne ha. */
   competenceSiteId: string | null;
+  /** Tipo di tirocinio (US-605): tra quelli ammessi dal progetto. */
+  internshipTypeId: string;
 };
 
 export type Ticket = {
@@ -43,6 +45,8 @@ export type TicketSpecialCreate = {
   projectId: string | null;
   /** Sede di competenza (US-308): obbligatoria se il progetto ne ha. */
   competenceSiteId: string | null;
+  /** Tipo di tirocinio (US-605): tra quelli ammessi dal progetto. */
+  internshipTypeId: string;
 };
 
 export const submitSpecialTicket = async (payload: TicketSpecialCreate): Promise<Ticket> => {
@@ -89,6 +93,12 @@ export const takeCharge = async ({
   return data;
 };
 
+/** Segnalazione a cui è assegnata una mansione (US-605), con il tipo di tirocinio; l'API omette il tipo se manca. */
+export type JobSlotAssignment = {
+  ticketNumber: number;
+  internshipType?: ReferenceItem | null;
+};
+
 export type JobSlotMatch = {
   id: string;
   title: string;
@@ -98,6 +108,8 @@ export type JobSlotMatch = {
   jobCategory: ReferenceItem;
   zone: ReferenceItem;
   version: number;
+  /** Segnalazioni di altri tipi a cui la mansione è già assegnata (US-605): l'avviso nell'abbinamento. */
+  assignments?: JobSlotAssignment[];
 };
 
 export type TicketDetail = {
@@ -134,6 +146,12 @@ export type TicketDetail = {
   competenceSite?: ReferenceItem;
   /** L'utente corrente può correggere la sede: ADMIN o Coordinatore del progetto. */
   canChangeCompetenceSite: boolean;
+  /** Tipo di tirocinio (US-605); assente se il Tutor non l'ha ancora indicato. */
+  internshipType?: ReferenceItem | null;
+  /** Il Tutor della segnalazione può indicarlo o correggerlo, fino all'avvio del tirocinio. */
+  canChangeInternshipType: boolean;
+  /** I tipi che il Tutor può scegliere. */
+  internshipTypes?: ReferenceItem[];
 };
 
 /**
@@ -432,6 +450,21 @@ export const excludeCompany = async ({
     companyId,
     reason,
   });
+  return data;
+};
+
+/** Indica o corregge il tipo di tirocinio (US-605): il Tutor della segnalazione, fino all'avvio. */
+export const changeInternshipType = async ({
+  id,
+  internshipTypeId,
+}: {
+  id: string;
+  internshipTypeId: string;
+}): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.put<TicketDetail>(
+    `${ENDPOINTS.tickets}/${encodeURIComponent(id)}/internship-type`,
+    { internshipTypeId },
+  );
   return data;
 };
 

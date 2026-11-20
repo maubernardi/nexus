@@ -9,6 +9,7 @@ import it.nexus.domain.dto.ClosureReportFormDTO;
 import it.nexus.domain.dto.CompanyExclusionDTO;
 import it.nexus.domain.dto.CompanyExclusionFormDTO;
 import it.nexus.domain.dto.CompetenceSiteChangeDTO;
+import it.nexus.domain.dto.InternshipTypeChangeDTO;
 import it.nexus.domain.dto.FastTrackRejectDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
@@ -36,6 +37,9 @@ public interface TicketService {
 
     /** Corregge la sede di competenza (US-308): solo l'ADMIN e il Coordinatore del progetto, con l'audit. */
     TicketDetailDTO changeCompetenceSite(String ticketId, CompetenceSiteChangeDTO dto);
+
+    /** Il Tutor della segnalazione indica o corregge il tipo di tirocinio, fino all'avvio (US-605). */
+    TicketDetailDTO changeInternshipType(String ticketId, InternshipTypeChangeDTO dto);
 
 
     /** Presa in carico da parte dell'operatore corrente (US-402); 409 se un collega l'ha già presa. */

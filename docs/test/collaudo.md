@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `2a123af` (17/11/2026): Sprint 1–14 completi (motivo di chiusura, proroga, documenti sui modelli reali con il promotore e le variabili per progetto) |
-| **Ultimo aggiornamento** | 19/11/2026 (T-25.1 … T-25.3: da provare dopo il deploy di US-508, US-509 e US-510; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 20/11/2026 (T-25.1 … T-25.3 e T-25.5: da provare dopo il deploy di US-508, US-509, US-510 e US-605; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -1149,3 +1149,32 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      - la partita IVA è da completare;
      - ci sono i referenti con il ruolo;
      - nel diario c'è la nota con la data di Access e l'autore «Database attuale».
+
+- [ ] **T-25.5 Una mansione per più segnalazioni, una per tipo di tirocinio (US-605)**
+
+  Nella demo la segnalazione n. 4 (GOL, Extracurriculare) ha la proposta della mansione «Magazziniere reparto
+  spedizioni». La n. 3 (POLIS, in lavorazione, in carico a `operatore.cc`) è Curriculare.
+  1. Come `tutor1` apri **Nuova segnalazione**. **Atteso:**
+     - c'è il menu «Tipo di tirocinio», obbligatorio, spento finché non scegli il progetto;
+     - scelto GOL, propone solo i tipi ammessi dal progetto.
+     Scegli «Di inclusione» per un beneficiario senza case manager e invia. **Atteso:** l'errore sul tipo dice che
+     cosa manca nella scheda del beneficiario.
+  2. Come `operatore.cc` apri la segnalazione n. 3. **Atteso:** nei dati c'è «Tipo di tirocinio: Curriculare».
+  3. Tra le mansioni compatibili scegli «Tutte le zone» e «Tutte le tipologie». **Atteso:**
+     - «Magazziniere reparto spedizioni» compare con l'avviso «Già assegnata alla segnalazione n. 4
+       (Extracurriculare)»;
+     - l'avviso c'è anche in «Dettagli»;
+     - c'è anche nella conferma della proposta.
+  4. Conferma la proposta. **Atteso:**
+     - la proposta riesce;
+     - nella scheda di «Demo Logistica S.r.l.», tra le mansioni, lo stato è «Assegnata – segnalazioni n. 3
+       (Curriculare), n. 4 (Extracurriculare)».
+  5. Come `tutor2`, sulla segnalazione n. 3 premi «Cambia il tipo», scegli «Extracurriculare» e salva. **Atteso:**
+     l'errore dice che sulla mansione c'è già la segnalazione n. 4 (Extracurriculare). Premi «Annulla»: il focus
+     torna su «Cambia il tipo».
+  6. Come `tutor2` rifiuta la proposta della n. 3. **Atteso:** la mansione resta assegnata alla n. 4, e lo stato
+     nelle mansioni dell'azienda torna «Assegnata – segnalazione n. 4 (Extracurriculare)».
+  7. Se trovi una segnalazione senza tipo, aprila come `operatore.cc`. **Atteso:**
+     - «Tipo di tirocinio: Non indicato»;
+     - sopra le mansioni l'avviso che il tipo lo indica il Tutor;
+     - i pulsanti «Proponi» spenti.

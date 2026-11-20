@@ -29,6 +29,7 @@ import it.nexus.domain.BoardPost;
 import it.nexus.domain.Company;
 import it.nexus.domain.CompanyAuditEvent;
 import it.nexus.domain.CompetenceSite;
+import it.nexus.domain.InternshipType;
 import it.nexus.domain.JobCategory;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Project;
@@ -47,6 +48,8 @@ import it.nexus.domain.dto.CompanyExclusionDTO;
 import it.nexus.domain.dto.CompanyExclusionFormDTO;
 import it.nexus.domain.dto.CompetenceSiteChangeDTO;
 import it.nexus.domain.dto.FastTrackRejectDTO;
+import it.nexus.domain.dto.InternshipTypeChangeDTO;
+import it.nexus.domain.dto.JobSlotAssignmentDTO;
 import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
 import it.nexus.domain.dto.ProposalRejectDTO;
@@ -62,7 +65,6 @@ import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.domain.enumeration.BoardPostStatus;
 import it.nexus.domain.enumeration.CompanyEventType;
 import it.nexus.domain.enumeration.InternshipDocumentKind;
-import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.domain.enumeration.NotificationType;
 import it.nexus.domain.enumeration.Role;
 import it.nexus.domain.enumeration.TicketListView;
@@ -81,6 +83,7 @@ import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.CompetenceSiteRepository;
+import it.nexus.repository.InternshipRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ProjectRepository;
@@ -95,7 +98,10 @@ import it.nexus.services.ClosureReportService;
 import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.FastTrackService;
 import it.nexus.services.InternshipService;
+import it.nexus.services.InternshipTypeRules;
+import it.nexus.services.JobSlotAssignments;
 import it.nexus.services.NotificationService;
+import it.nexus.services.TicketInternshipTypeService;
 import it.nexus.services.TicketService;
 import it.nexus.services.TicketStateMachine;
 import it.nexus.services.UserDisplayNameService;
@@ -133,6 +139,7 @@ public class TicketServiceImpl implements TicketService {
     private final NotificationService notificationService;
     private final Clock clock;
     private final JobSlotRepository jobSlotRepository;
+    private final JobSlotAssignments jobSlotAssignments;
     private final TicketCompanyBlacklistRepository blacklistRepository;
     private final CompanyRepository companyRepository;
     private final CompanyAuditEventRepository companyAuditEvents;
@@ -146,6 +153,9 @@ public class TicketServiceImpl implements TicketService {
     private final BeneficiaryMapper beneficiaryMapper;
     private final ReferenceMapper referenceMapper;
     private final CompetenceSiteRepository competenceSiteRepository;
+    private final InternshipTypeRules internshipTypeRules;
+    private final TicketInternshipTypeService ticketInternshipTypeService;
+    private final InternshipRepository internshipRepository;
 
     @Override
     public TicketDTO submit(TicketCreateDTO dto) {
@@ -158,6 +168,7 @@ public class TicketServiceImpl implements TicketService {
         Project project = assignedProject(dto.projectId(), me);
         Ticket ticket = new Ticket(me, project, beneficiary, TicketType.NORMAL);
         ticket.setCompetenceSite(competenceSite(project, dto.competenceSiteId()));
+        ticket.setInternshipType(internshipType(dto.internshipTypeId(), project, beneficiary));
         // esattamente una delle due è garantito da @JobChoice sul DTO
         if (!isBlank(dto.jobCategoryId())) {
             ticket.setRequestedJobCategory(activeJobCategory(dto.jobCategoryId()));
@@ -193,10 +204,24 @@ public class TicketServiceImpl implements TicketService {
         Project project = post.getProject() != null ? post.getProject() : assignedProject(dto.projectId(), me);
         Ticket ticket = new Ticket(me, project, beneficiary, TicketType.SPECIAL);
         ticket.setCompetenceSite(competenceSite(project, dto.competenceSiteId()));
+        ticket.setInternshipType(internshipType(dto.internshipTypeId(), project, beneficiary));
         ticket.setFastTrack(true);
         ticket.setBoardPost(post);
         ticket.setRequestedJobCategory(post.getJobSlot().getJobCategory());
         return mapper.toDto(stateMachine.create(ticket, TicketTransitions.SUBMIT_SPECIAL, null));
+    }
+
+    @Override
+    public TicketDetailDTO changeInternshipType(String ticketId, InternshipTypeChangeDTO dto) {
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        Ticket ticket = ownTicket(ticketId, me, "indicare il tipo di tirocinio");
+        InternshipType type = internshipTypeRules.choose(dto.internshipTypeId(), ticket.getInternshipType(),
+                ticket.getProject(), ticket.getBeneficiary());
+        if (ticketInternshipTypeService.change(ticket, type, false)) {
+            // la scheda ha lo stesso tipo della segnalazione
+            internshipRepository.findByTicketId(ticket.getId()).ifPresent(i -> i.setInternshipType(type));
+        }
+        return detail(ticket, me);
     }
 
     @Override
@@ -220,6 +245,15 @@ public class TicketServiceImpl implements TicketService {
                     .value("competenceSite", before == null ? null : before.getName(), site.getName()), null);
         }
         return detail(ticket, me);
+    }
+
+    /** Tipo di tirocinio scelto alla creazione (US-605): obbligatorio, con le regole della scheda. */
+    private InternshipType internshipType(String id, Project project, Beneficiary beneficiary) {
+        InternshipType type = internshipTypeRules.choose(id, null, project, beneficiary);
+        if (type == null) {
+            throw new FieldValidationException(InternshipTypeRules.FIELD, "Scegli il tipo di tirocinio");
+        }
+        return type;
     }
 
     /**
@@ -450,6 +484,9 @@ public class TicketServiceImpl implements TicketService {
             case "COMPETENCE_SITE_CHANGED" -> Optional.ofNullable(changed(event, "competenceSite", "before"))
                     .map(before -> before + " → " + changed(event, "competenceSite", "after"))
                     .orElse(changed(event, "competenceSite", "after"));
+            case "INTERNSHIP_TYPE_CHANGED" -> Optional.ofNullable(changed(event, "internshipType", "before"))
+                    .map(before -> before + " → " + changed(event, "internshipType", "after"))
+                    .orElse(changed(event, "internshipType", "after"));
             case "RELEASE" -> Optional.ofNullable(userName(changed(event, "assignedCcOperatorId", "before")))
                     .map(name -> name + " non è più disponibile: la segnalazione torna libera per un collega")
                     .orElse(null);
@@ -524,9 +561,14 @@ public class TicketServiceImpl implements TicketService {
     @Transactional(readOnly = true)
     public List<JobSlotMatchDTO> compatibleJobSlots(String ticketId, String zoneId, String jobCategoryId) {
         Ticket ticket = findTicket(ticketId);
-        return jobSlotRepository.findCompatible(ticket.getId(), filterId(zoneId, "zona"), filterId(jobCategoryId, "tipologia"))
-                .stream()
-                .map(jobSlotMapper::toMatch)
+        List<JobSlot> slots = jobSlotRepository.findCompatible(ticket.getId(),
+                ticket.getInternshipType() == null ? null : ticket.getInternshipType().getId(),
+                filterId(zoneId, "zona"), filterId(jobCategoryId, "tipologia"));
+        // le assegnazioni degli altri tipi, per l'avviso (US-605)
+        Map<Long, List<JobSlotAssignmentDTO>> assignments =
+                jobSlotAssignments.assignments(slots.stream().map(JobSlot::getId).toList());
+        return slots.stream()
+                .map(s -> jobSlotMapper.toMatch(s).withAssignments(assignments.getOrDefault(s.getId(), List.of())))
                 .toList();
     }
 
@@ -590,22 +632,22 @@ public class TicketServiceImpl implements TicketService {
     }
 
     /**
-     * Dentro la transizione: la mansione è libera, a disposizione e di un'azienda attiva non esclusa per la segnalazione;
-     * la blocca per la segnalazione e restituisce le scelte da registrare.
+     * Dentro la transizione: la mansione è a disposizione, di un'azienda attiva non esclusa per la segnalazione, e non ha
+     * un'altra segnalazione dello stesso tipo di tirocinio (US-605); la assegna alla segnalazione e restituisce le scelte
+     * da registrare. Il riassunto della mansione lo aggiorna {@link #afterProposal}.
      */
     private AuditChanges proposeSlot(Ticket t, JobSlot slot) {
         Company company = slot.getCompany();
-        if (slot.getStatus() != JobSlotStatus.LIBERA || !slot.isActive() || !company.isActive()) {
+        if (!slot.isActive() || !company.isActive()) {
             throw new ConflictException(
-                    "La mansione «%s» non è più disponibile: è stata appena bloccata o modificata", slot.getTitle());
+                    "La mansione «%s» non è più disponibile: è stata appena ritirata o modificata", slot.getTitle());
         }
         if (blacklistRepository.existsById(new TicketCompanyBlacklist.Id(t.getId(), company.getId()))) {
             throw new ConflictException("L'azienda %s è esclusa per questa segnalazione", company.getName());
         }
+        jobSlotAssignments.requireAssignable(t, slot);
         t.setJobSlot(slot);
-        slot.blockFor(t);
-        // flush subito: se un'altra segnalazione ha appena bloccato la mansione, il conflitto emerge qui (409)
-        jobSlotRepository.saveAndFlush(slot);
+        t.setJobSlotHeld(true);
         return AuditChanges.of()
                 .value("jobSlotId", null, TsidMapper.toExternal(slot.getId()))
                 .value("companyId", null, TsidMapper.toExternal(company.getId()));
@@ -616,9 +658,7 @@ public class TicketServiceImpl implements TicketService {
      * il motivo, evento nello storico dell'azienda (brief, audit trail) e notifica al Tutor.
      */
     private void afterProposal(Ticket saved, JobSlot slot, String boardPostReason) {
-        auditService.record(AuditEntityType.JOB_SLOT, slot.getId(), "BLOCK", AuditChanges.of()
-                .value("status", JobSlotStatus.LIBERA.name(), JobSlotStatus.BLOCCATA.name())
-                .value("blockedByTicketId", null, TsidMapper.toExternal(saved.getId())), null);
+        jobSlotAssignments.sync(slot, saved, true);
         boardPostService.archiveForUnavailableSlots(List.of(slot.getId()), boardPostReason);
         companyAuditEvents.save(new CompanyAuditEvent(slot.getCompany(), saved, CompanyEventType.PROPOSTA_INVIATA.name(),
                 Map.of("ticketNumber", saved.getNumber(),
@@ -698,18 +738,16 @@ public class TicketServiceImpl implements TicketService {
         // dentro la transizione: prima si controllano versione e stato, poi il report
         Ticket saved = stateMachine.apply(ticket, TicketTransitions.CLOSE, form.version(), null, t -> {
             AuditChanges changes = closureReportService.create(t, form);
-            // US-1102: se l'azienda offre ancora la mansione, torna libera; altrimenti resta bloccata da questa
-            // segnalazione, che resta collegata alla mansione per lo storico
+            // US-1102: se l'azienda offre ancora la mansione, si libera per questa segnalazione (US-605); altrimenti
+            // l'assegnazione resta per il suo tipo. La segnalazione resta collegata alla mansione per lo storico
             if (form.jobSlotStillAvailable()) {
-                slot.release();
+                t.setJobSlotHeld(false);
                 changes.value("jobSlotReleased", null, true);
             }
             return changes;
         });
         if (form.jobSlotStillAvailable()) {
-            auditService.record(AuditEntityType.JOB_SLOT, slot.getId(), "RELEASE", AuditChanges.of()
-                    .value("status", JobSlotStatus.BLOCCATA.name(), JobSlotStatus.LIBERA.name())
-                    .value("blockedByTicketId", TsidMapper.toExternal(saved.getId()), null), null);
+            jobSlotAssignments.sync(slot, saved, false);
         }
         ClosureReportDTO report = closureReportService.find(saved).orElseThrow();
         Map<String, Object> outcome = new LinkedHashMap<>();
@@ -735,8 +773,9 @@ public class TicketServiceImpl implements TicketService {
         }
         JobSlot slot = ticket.getJobSlot();
         Ticket saved = stateMachine.apply(ticket, TicketTransitions.APPOINTMENT_FAILED, dto.version(), note, t -> {
-            // la mansione torna libera; nessuna esclusione automatica dell'azienda: decide l'operatore (PO, 27/10)
-            slot.release();
+            // la mansione si libera per questa segnalazione (US-605); nessuna esclusione automatica dell'azienda: decide
+            // l'operatore (PO, 27/10)
+            t.setJobSlotHeld(false);
             t.setJobSlot(null);
             AuditChanges changes = AuditChanges.of()
                     .value("cause", null, dto.cause().name())
@@ -747,9 +786,7 @@ public class TicketServiceImpl implements TicketService {
             }
             return dto.relaunchRequested() ? changes.value("boardRelaunch", null, true) : changes;
         });
-        auditService.record(AuditEntityType.JOB_SLOT, slot.getId(), "RELEASE", AuditChanges.of()
-                .value("status", JobSlotStatus.BLOCCATA.name(), JobSlotStatus.LIBERA.name())
-                .value("blockedByTicketId", TsidMapper.toExternal(saved.getId()), null), null);
+        jobSlotAssignments.sync(slot, saved, false);
         companyAuditEvents.save(new CompanyAuditEvent(slot.getCompany(), saved,
                 CompanyEventType.APPUNTAMENTO_FALLITO.name(), Map.of("ticketNumber", saved.getNumber(),
                         "jobSlotTitle", slot.getTitle(), "cause", dto.cause().name())));
@@ -770,15 +807,13 @@ public class TicketServiceImpl implements TicketService {
         JobSlot slot = ticket.getJobSlot();
         Company company = slot == null ? null : slot.getCompany();
         Ticket saved = stateMachine.apply(ticket, TicketTransitions.PROPOSAL_REJECT, dto.version(), reason, t -> {
-            slot.release();
+            t.setJobSlotHeld(false);
             t.setJobSlot(null);
             return AuditChanges.of()
                     .value("jobSlotId", TsidMapper.toExternal(slot.getId()), null)
                     .value("excludedCompanyId", null, TsidMapper.toExternal(company.getId()));
         });
-        auditService.record(AuditEntityType.JOB_SLOT, slot.getId(), "RELEASE", AuditChanges.of()
-                .value("status", JobSlotStatus.BLOCCATA.name(), JobSlotStatus.LIBERA.name())
-                .value("blockedByTicketId", TsidMapper.toExternal(saved.getId()), null), null);
+        jobSlotAssignments.sync(slot, saved, false);
         // l'azienda non si ripropone per questa segnalazione (Q3); l'esclusione compare nello storico con il motivo
         if (!blacklistRepository.existsById(new TicketCompanyBlacklist.Id(saved.getId(), company.getId()))) {
             blacklistRepository.save(new TicketCompanyBlacklist(saved, company, reason));
@@ -906,7 +941,17 @@ public class TicketServiceImpl implements TicketService {
                 referenceMapper.toDto(t.getCompetenceSite()),
                 // il comando si propone solo se c'è una sede da scegliere (controllo in Chrome, 10/11)
                 canChangeCompetenceSite(t, me)
-                        && competenceSiteRepository.existsActiveForProject(t.getProject().getId()));
+                        && competenceSiteRepository.existsActiveForProject(t.getProject().getId()),
+                referenceMapper.toDto(t.getInternshipType()),
+                canChangeInternshipType(t, me),
+                canChangeInternshipType(t, me)
+                        ? internshipTypeRules.choosable(t.getProject(), t.getInternshipType()) : List.of());
+    }
+
+    /** Il Tutor della segnalazione, fino all'avvio del tirocinio (US-605). */
+    private static boolean canChangeInternshipType(Ticket t, AppUser me) {
+        return t.getTutor().getId().equals(me.getId())
+                && !TicketInternshipTypeServiceImpl.STARTED.contains(t.getStatus());
     }
 
     private static String fullName(AppUser user) {

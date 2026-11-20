@@ -112,7 +112,7 @@ class TicketResourceIT {
 
     private ResultActions submit(String user, String beneficiary, String project, String category) throws Exception {
         String json = """
-                {"beneficiaryId": "%s", "projectId": "%s", "jobCategoryId": "%s"}
+                {"beneficiaryId": "%s", "projectId": "%s", "jobCategoryId": "%s", "internshipTypeId": "0RSRFD8XW8G36"}
                 """.formatted(beneficiary, project, category);
         return mockMvc.perform(post("/api/v1/tickets").header(USER, user).contentType(MediaType.APPLICATION_JSON).content(json));
     }
@@ -227,7 +227,8 @@ class TicketResourceIT {
     void campiMancanti_400ConTuttiGliErrori() throws Exception {
         mockMvc.perform(post("/api/v1/tickets").header(USER, "tutor1").contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.fieldErrors", hasSize(3)));
+                // beneficiario, progetto, mansione richiesta e tipo di tirocinio (US-605)
+                .andExpect(jsonPath("$.fieldErrors", hasSize(4)));
     }
 
     @Test

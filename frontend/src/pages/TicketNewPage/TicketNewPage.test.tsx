@@ -15,6 +15,10 @@ vi.mock('@/config/api/referenceApi', () => ({
   fetchJobCategories: vi.fn(),
   fetchMyProjects: vi.fn(),
   fetchCompetenceSites: vi.fn(async () => []),
+  // tipi di tirocinio del progetto (US-605): uno solo, già scelto
+  fetchProjectInternshipTypes: vi.fn(async () => [
+    { id: 'IT2', code: 'EXTRACURRICULARE', name: 'Extracurriculare' },
+  ]),
 }));
 vi.mock('@/config/api/ticketApi', () => ({ submitTicket: vi.fn() }));
 

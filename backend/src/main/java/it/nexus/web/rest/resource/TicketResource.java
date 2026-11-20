@@ -29,6 +29,7 @@ import it.nexus.domain.dto.RejectCategoryDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.dto.FastTrackRejectDTO;
 import it.nexus.domain.dto.CompetenceSiteChangeDTO;
+import it.nexus.domain.dto.InternshipTypeChangeDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketSpecialCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
@@ -129,6 +130,14 @@ public class TicketResource {
     @Operation(summary = "Sposta su di sé una segnalazione in carico a un collega")
     public ResponseEntity<TicketDetailDTO> takeOver(@PathVariable String id, @RequestBody @Valid VersionDTO body) {
         return ResponseEntity.ok(ticketService.takeOver(id, body.version()));
+    }
+
+    @PutMapping("/{id}/internship-type")
+    @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
+    @Operation(summary = "Indica o corregge il tipo di tirocinio (US-605): il Tutor della segnalazione, fino all'avvio")
+    public ResponseEntity<TicketDetailDTO> changeInternshipType(@PathVariable String id,
+            @RequestBody @Valid InternshipTypeChangeDTO body) {
+        return ResponseEntity.ok(ticketService.changeInternshipType(id, body));
     }
 
     @PutMapping("/{id}/competence-site")

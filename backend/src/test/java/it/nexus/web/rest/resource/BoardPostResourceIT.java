@@ -228,7 +228,7 @@ class BoardPostResourceIT {
         jobSlots.saveAndFlush(draftSlot);
         action(draft, "publish", 0)
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message", containsString("bloccata dalla segnalazione n. " + ticket.getNumber())));
+                .andExpect(jsonPath("$.message", containsString("assegnata alla segnalazione n. " + ticket.getNumber())));
 
         draftSlot.release();
         draftSlot.setActive(false);
@@ -309,7 +309,7 @@ class BoardPostResourceIT {
         jobSlots.saveAndFlush(freeSlot);
         create(freeSlot, "operatore.cc")
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message", containsString("è bloccata dalla segnalazione n. " + ticket.getNumber())));
+                .andExpect(jsonPath("$.message", containsString("è assegnata alla segnalazione n. " + ticket.getNumber())));
         create(freeSlot, "tutor1").andExpect(status().isForbidden());
         mockMvc.perform(post(POSTS).header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"jobSlotId\": \"xyz\"}"))

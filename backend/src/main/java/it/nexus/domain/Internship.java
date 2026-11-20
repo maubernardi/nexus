@@ -161,8 +161,10 @@ public class Internship extends AbstractTsidEntity {
     @Setter(AccessLevel.NONE)
     private long version;
 
+    /** Scheda nuova: parte dal tipo di tirocinio della segnalazione (US-605). */
     public Internship(Ticket ticket) {
         this.ticket = ticket;
+        this.internshipType = ticket.getInternshipType();
     }
 
     public void addCompanyTutor(String fullName, String role, String contact) {
@@ -206,10 +208,10 @@ public class Internship extends AbstractTsidEntity {
 
     /**
      * Appuntamento non andato a buon fine (D7): i dati del tirocinio riguardavano quell'azienda e si azzerano, convenzione
-     * e progetti formativi compresi (US-1008); restano quelli del beneficiario.
+     * e progetti formativi compresi (US-1008); restano quelli del beneficiario e il tipo, che è della segnalazione
+     * (US-605).
      */
     public void clearCompanyData() {
-        internshipType = null;
         startDate = null;
         expectedEndDate = null;
         site = null;

@@ -89,7 +89,7 @@ class TicketCompetenceSiteIT {
         String beneficiary = TsidMapper.toExternal(scenarios.beneficiary(actors.tutor1(), place).getId());
         String site = siteId == null ? "" : ", \"competenceSiteId\": \"%s\"".formatted(siteId);
         return mockMvc.perform(post("/api/v1/tickets").header(USER, "tutor1").contentType(MediaType.APPLICATION_JSON)
-                .content("{\"beneficiaryId\": \"%s\", \"projectId\": \"%s\", \"jobCategoryId\": \"%s\"%s}".formatted(
+                .content("{\"beneficiaryId\": \"%s\", \"projectId\": \"%s\", \"jobCategoryId\": \"%s\", \"internshipTypeId\": \"0RSRFD8XW8G36\"%s}".formatted(
                         beneficiary, id(project), TsidMapper.toExternal(place.category().getId()), site)));
     }
 
@@ -183,7 +183,7 @@ class TicketCompetenceSiteIT {
         BoardPost post = scenarios.publishedPost(scenarios.freeSlot(place, "Cameriere"), gol);
         em.flush();
         String beneficiary = TsidMapper.toExternal(scenarios.beneficiary(actors.tutor1(), place).getId());
-        String json = "{\"boardPostId\": \"%s\", \"beneficiaryId\": \"%s\", \"projectId\": null%s}";
+        String json = "{\"boardPostId\": \"%s\", \"beneficiaryId\": \"%s\", \"projectId\": null, \"internshipTypeId\": \"0RSRFD8XW8G36\"%s}";
         mockMvc.perform(post("/api/v1/tickets/special").header(USER, "tutor1").contentType(MediaType.APPLICATION_JSON)
                         .content(json.formatted(TsidMapper.toExternal(post.getId()), beneficiary, "")))
                 .andExpect(status().isBadRequest())

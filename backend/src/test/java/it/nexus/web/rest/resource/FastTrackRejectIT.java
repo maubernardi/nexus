@@ -126,7 +126,7 @@ class FastTrackRejectIT {
         mockMvc.perform(get("/api/v1/board/" + TsidMapper.toExternal(post.getId())).header(USER, "tutor2"))
                 .andExpect(jsonPath("$.candidatureInProgress").value(false));
         mockMvc.perform(post("/api/v1/tickets/special").header(USER, "tutor2").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"boardPostId\": \"%s\", \"beneficiaryId\": \"%s\", \"projectId\": \"%s\"}".formatted(
+                        .content("{\"boardPostId\": \"%s\", \"beneficiaryId\": \"%s\", \"projectId\": \"%s\", \"internshipTypeId\": \"0RSRFD8XW8G36\"}".formatted(
                                 TsidMapper.toExternal(post.getId()),
                                 TsidMapper.toExternal(scenarios.beneficiary(actors.tutor2(), place).getId()),
                                 TsidMapper.toExternal(gol.getId()))))
@@ -187,6 +187,7 @@ class FastTrackRejectIT {
     void mansioneAbbinataAUnAltraSegnalazione_laCorsiaVeloceDecadeConIlMotivo() throws Exception {
         Ticket normal = TestEntities.ticket(actors.tutor2(), gol, scenarios.beneficiary(actors.tutor2(), place),
                 place.category());
+        normal.setInternshipType(scenarios.extracurricular());
         normal.setStatus(TicketStatus.IN_LAVORAZIONE);
         normal.setAssignedCcOperator(actors.operator());
         normal = tickets.saveAndFlush(normal);

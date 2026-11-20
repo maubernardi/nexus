@@ -28,6 +28,7 @@ export const ENDPOINTS = {
   contactRoles: '/reference/contact-roles',
   careAgencies: '/reference/care-agencies',
   competenceSites: '/reference/competence-sites',
+  internshipTypes: '/reference/internship-types',
   municipalities: '/municipalities',
   documentCatalogs: '/document-catalogs',
   documentTemplates: '/document-templates',

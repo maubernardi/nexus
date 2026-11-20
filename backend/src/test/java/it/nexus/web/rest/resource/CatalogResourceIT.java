@@ -333,7 +333,7 @@ class CatalogResourceIT {
         Beneficiary beneficiary = scenarios.beneficiary(actors.tutor1(), place);
         mockMvc.perform(post("/api/v1/tickets").header(USER, "tutor1").contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"beneficiaryId": "%s", "projectId": "%s", "jobCategoryId": "%s"}
+                                {"beneficiaryId": "%s", "projectId": "%s", "jobCategoryId": "%s", "internshipTypeId": "0RSRFD8XW8G36"}
                                 """.formatted(TsidMapper.toExternal(beneficiary.getId()), id,
                                 TsidMapper.toExternal(place.category().getId()))))
                 .andExpect(status().isBadRequest())

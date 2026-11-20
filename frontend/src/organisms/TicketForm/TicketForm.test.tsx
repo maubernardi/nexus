@@ -4,7 +4,7 @@ import { AxiosError, AxiosHeaders } from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { fetchMyBeneficiaries, type BeneficiarySummary } from '@/config/api/beneficiaryApi';
-import { fetchJobCategories, fetchMyProjects } from '@/config/api/referenceApi';
+import { fetchJobCategories, fetchMyProjects, fetchProjectInternshipTypes } from '@/config/api/referenceApi';
 import { submitTicket, type Ticket } from '@/config/api/ticketApi';
 import { TicketForm } from '@/organisms/TicketForm/TicketForm';
 import { expectNoAxeViolations } from '@/tests/axe';
@@ -15,6 +15,10 @@ vi.mock('@/config/api/referenceApi', () => ({
   fetchZones: vi.fn(),
   fetchJobCategories: vi.fn(),
   fetchMyProjects: vi.fn(),
+  // tipi di tirocinio del progetto (US-605): uno solo, già scelto
+  fetchProjectInternshipTypes: vi.fn(async () => [
+    { id: 'IT2', code: 'EXTRACURRICULARE', name: 'Extracurriculare' },
+  ]),
   // sedi di competenza (US-308): GOL ne ha due, gli altri progetti nessuna
   fetchCompetenceSites: vi.fn(async (projectId: string) =>
     projectId === 'P1'
@@ -86,6 +90,7 @@ describe('<TicketForm>', () => {
         jobCategoryId: null,
         jobFreeText: 'Tecnico del suono',
         competenceSiteId: null,
+        internshipTypeId: 'IT2',
       }),
     );
   });
@@ -135,6 +140,7 @@ describe('<TicketForm>', () => {
       jobCategoryId: 'J1',
       jobFreeText: null,
       competenceSiteId: 'S2',
+      internshipTypeId: 'IT2',
     });
   });
 
@@ -222,5 +228,34 @@ describe('<TicketForm>', () => {
 
     expect(await screen.findByRole('heading', { name: 'Nessun progetto assegnato' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Invia segnalazione' })).not.toBeInTheDocument();
+  });
+
+  it('tipo di tirocinio: spento senza progetto, poi i tipi del progetto, obbligatorio (US-605)', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchProjectInternshipTypes).mockImplementation(async (projectId: string) =>
+      projectId === 'P1'
+        ? [
+            { id: 'IT2', code: 'EXTRACURRICULARE', name: 'Extracurriculare' },
+            { id: 'IT3', code: 'INCLUSIONE', name: 'Di inclusione' },
+          ]
+        : [{ id: 'IT2', code: 'EXTRACURRICULARE', name: 'Extracurriculare' }],
+    );
+    renderForm();
+
+    const type = await screen.findByRole('combobox', { name: /^Tipo di tirocinio/ });
+    expect(type).toBeDisabled();
+    expect(type).toHaveDisplayValue('Scegli prima il progetto');
+    await user.selectOptions(screen.getByRole('combobox', { name: /^Progetto/ }), 'P1');
+    await waitFor(() => expect(type).toBeEnabled());
+    expect(Array.from((type as HTMLSelectElement).options).map((o) => o.textContent)).toEqual([
+      'Seleziona…',
+      'Extracurriculare',
+      'Di inclusione',
+    ]);
+    await user.click(screen.getByRole('button', { name: 'Invia segnalazione' }));
+    expect(
+      await screen.findByRole('link', { name: 'Tipo di tirocinio: Campo obbligatorio' }),
+    ).toBeInTheDocument();
+    await expectNoAxeViolations();
   });
 });

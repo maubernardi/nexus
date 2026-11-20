@@ -7,6 +7,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import it.nexus.domain.Ticket;
@@ -14,6 +16,23 @@ import it.nexus.domain.enumeration.TicketStatus;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecificationExecutor<Ticket> {
+
+    /** Segnalazioni assegnate alla mansione (US-605), con il tipo, dal numero più basso. */
+    @Query("""
+            select t from Ticket t left join fetch t.internshipType
+            where t.jobSlot.id = :jobSlotId and t.jobSlotHeld = true
+            order by t.number
+            """)
+    List<Ticket> findHolders(@Param("jobSlotId") Long jobSlotId);
+
+    /** Segnalazioni assegnate a una delle mansioni (US-605), con il tipo: le assegnazioni di un elenco di mansioni. */
+    @Query("""
+            select t from Ticket t join fetch t.jobSlot left join fetch t.internshipType
+            where t.jobSlot.id in :jobSlotIds and t.jobSlotHeld = true
+            order by t.number
+            """)
+    List<Ticket> findHolders(@Param("jobSlotIds") Collection<Long> jobSlotIds);
+
 
     Optional<Ticket> findByNumber(Long number);
 
