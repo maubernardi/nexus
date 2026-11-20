@@ -13,7 +13,7 @@
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-1302 | Backup del database | 5 | ✅ Ready | `add-database-backup` | PR in arrivo |
+| US-1302 | Backup del database | 5 | ✅ Ready | `add-database-backup` | [#174](https://github.com/maubernardi/nexus/pull/174) |
 | US-1306 | Passaggio in produzione | 8 (era 5) | ✅ Ready | `prepare-production` | |
 
 Alla review avevamo detto 10 punti. Scrivendo i criteri, US-1306 è salita a 8: il suo criterio unico nascondeva la
