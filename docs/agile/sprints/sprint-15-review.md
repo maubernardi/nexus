@@ -178,9 +178,9 @@ NAS via SSH; un servizio esterno (es. Backblaze B2).
 
 ### 8.4 Ambiente e utenze della produzione (US-1306)
 - **Dove gira la produzione.** Il server di oggi ospita la demo e ha poca memoria per due installazioni complete
-  (Keycloak, backend e database) una accanto all'altra. *Proposta:* lo stesso server diventa la produzione: via i dati dimostrativi e gli utenti di prova, dentro
-  le utenze vere e l'importazione del database attuale. Le prove successive si fanno in locale. *Alternativa:* un
-  secondo server per la demo.
+  (Keycloak, backend e database) una accanto all'altra. *Proposta:* lo stesso server diventa la produzione: via i dati
+  dimostrativi e gli utenti di prova, dentro le utenze vere e l'importazione del database attuale. Le prove successive
+  si fanno in locale. *Alternativa:* un secondo server per la demo.
 - **Le utenze.** Dall'analisi del 20/11:
   - i Tutor non sono nel database attuale: l'elenco (nome, cognome, email, progetti) deve arrivare dalla cooperativa;
   - degli operatori del Call Center ce ne sono 35, ma solo 6 attivi dal 2025 e nessuno con l'email;
