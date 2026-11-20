@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 94 elementi, 377 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-15](sprints/sprint-15.md), il 20/11 ([review](sprints/sprint-15-review.md)); prossimo: Sprint 16, da pianificare.
+**Totale: 94 elementi, 380 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-15](sprints/sprint-15.md), il 20/11 ([review](sprints/sprint-15-review.md)); prossimo: [sprint-16](sprints/sprint-16.md), dal 21/11.
 
 ## Epiche
 
@@ -21,7 +21,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione, Progetto Formativo e Relazione finale sui modelli reali in Word. | 13 | 70 |
 | E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 3 | 9 |
 | E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 2 | 10 |
-| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 15 | 63 |
+| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 15 | 66 |
 
 ## Release
 
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 36 | 185 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 36 | 188 |
 
 ## Domande aperte per il Product Owner
 
@@ -145,11 +145,11 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | 🎉 Done (Sprint 5) |
 | [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1301](#us-1301) | E13 | Verifica della PWA online | Must | 1 | R1 | 📋 Backlog |
-| [US-1302](#us-1302) | E13 | Backup del database | Must | 5 | R4 | 📋 Backlog |
+| [US-1302](#us-1302) | E13 | Backup del database | Must | 5 | R4 | ✅ Ready (Sprint 16) |
 | [US-1303](#us-1303) | E13 | Anonimizzazione a scadenza | Must | 8 | R4 | 🎉 Done (Sprint 10) |
 | [US-1304](#us-1304) | E13 | Tema di Keycloak | Should | 3 | R4 | 🎉 Done (Sprint 7, fuori piano) |
 | [US-1305](#us-1305) | E13 | Revisione UX/UI | Should | 8 | R4 | 📋 Backlog |
-| [US-1306](#us-1306) | E13 | Passaggio in produzione | Must | 5 | R4 | 📋 Backlog |
+| [US-1306](#us-1306) | E13 | Passaggio in produzione | Must | 8 | R4 | ✅ Ready (Sprint 16) |
 | [US-1307](#us-1307) | E13 | Monitoraggio e revisione di sicurezza | Must | 5 | R4 | 🎉 Done (Sprint 10) |
 | [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | 🎉 Done (Sprint 10) |
 | [US-1309](#us-1309) | E13 | Importazione dal database attuale | Must | 8 | R4 | 🎉 Done (Sprint 15) |
@@ -1378,13 +1378,31 @@ Criteri di accettazione:
 - L'app si installa su Android e iOS; offline si apre la shell con l'avviso.
 
 #### US-1302
-**Backup del database** · Must · 5 punti · R4 · 📋 Backlog
+**Backup del database** · Must · 5 punti · R4 · ✅ Ready (Sprint 16)
 
 Come **ADMIN** voglio backup automatici giornalieri fuori dal server, con prova di ripristino per non perdere dati.
-Rinviato dal PO l'11/11 (review dello Sprint 13, §8.2), insieme alla scelta della destinazione.
+Rinviato dal PO l'11/11 (review dello Sprint 13, §8.2); destinazione decisa il 20/11 (review dello Sprint 15, §8.3).
 
 Criteri di accettazione:
-- Il ripristino di prova su un ambiente pulito riesce ed è documentato.
+- **Ogni notte** parte da solo un backup dei due database: NEXUS e Keycloak (utenti e impostazioni dell'accesso). Il
+  servizio non si ferma.
+- **Cifrato sul server**, prima di uscire, con una chiave pubblica. La chiave che lo apre la tiene solo il PO, fuori
+  dal server: IONOS non può leggere i backup.
+- **Fuori dal server**: Object Storage di IONOS, con i dati in Germania (0,008 € per GiB ogni 30 giorni, PO, 20/11).
+  Restano le ultime 30 copie; le più vecchie si cancellano da sole.
+- **Le chiavi di IONOS e la chiave pubblica** stanno solo nel `.env` del server e le mette il PO: mai nel repository né
+  nei log.
+- **Avviso**: se manca un backup riuscito nelle ultime 26 ore, il controllo del mattino fallisce e GitHub manda
+  un'email al PO, come per il controllo della demo (US-1307). Lo stato si legge anche da «Stato del server», senza dati
+  personali.
+- **Protezione**: un backup caricato non si può cancellare dal server per 30 giorni, se IONOS offre il blocco degli
+  oggetti senza costi in più; altrimenti le chiavi del server possono solo caricare.
+- **Il ripristino di prova su un ambiente pulito riesce ed è documentato**: scaricare, decifrare, ripristinare, avviare
+  NEXUS e ritrovare i dati. La procedura è nel README.
+- Privacy: un dato cancellato o anonimizzato (US-1303) resta nei backup fino a 30 giorni. Va scritto nel registro dei
+  trattamenti (PO e DPO).
+
+Dipendenze: US-1307
 
 #### US-1303
 **Anonimizzazione a scadenza** · Must · 8 punti · R4 · 🎉 Done (Sprint 10)
@@ -1422,14 +1440,33 @@ Criteri di accettazione:
 - Decisione del PO dell'08/11: si farà in **uno sprint dedicato**, perché non sarà semplice.
 
 #### US-1306
-**Passaggio in produzione** · Must · 5 punti · R4 · 📋 Backlog
+**Passaggio in produzione** · Must · 8 punti · R4 · ✅ Ready (Sprint 16)
 
 Come **PO** voglio passare dalla demo alla produzione per usare NEXUS con dati reali.
 
 Criteri di accettazione:
-- Niente dati dimostrativi, utenti reali creati dall'ADMIN, backup attivi, checklist di sicurezza superata.
+- **Stesso server, installazione pulita** (PO, 20/11): la demo sparisce. Database e utenti ripartono da zero, senza
+  dati dimostrativi (niente profilo `seed`).
+- **Accesso**: il realm di produzione ha le impostazioni di oggi (criteri delle password, blocco dopo i tentativi
+  falliti, email, tema, registro degli accessi) e nessun utente di prova.
+- **Solo l'ADMIN** (PO, 20/11): al primo avvio, se non c'è un ADMIN, NEXUS lo crea dall'email indicata nel `.env` e gli
+  manda l'invito, come US-103. Gli altri account li crea il PO.
+- **Configurazione iniziale** con una lista di controllo per l'ADMIN: comuni (file ISTAT, US-114), progetti, tipologie
+  di mansione, sedi di competenza, tipi di tirocinio per progetto, enti, promotore e variabili, modelli dei documenti.
+- **Importazione del database attuale sul server** (US-1309, [analisi §9.2](../analisi/database-attuale.md)), dopo i
+  comuni. Si controlla il resoconto, poi il file Access si cancella dal server.
+- **Si può tornare indietro**: prima del passaggio un backup della demo (US-1302); se il passaggio non riesce, si
+  ripristina la demo. Dopo il passaggio il backup giornaliero gira sui dati veri dal primo giorno.
+- **Procedura passo per passo** nel README. I comandi che chiedono i permessi di amministratore del server li esegue il
+  PO; i segreti li mette solo lui nel `.env`.
+- **Controllo di sicurezza** della produzione (ASVS livello 1, [docs/security/asvs-l1.md](../security/asvs-l1.md)),
+  con l'esito scritto.
+- **Nomi**: «demo» diventa «produzione» nei workflow, nel README e nel collaudo. Le prove delle storie future si fanno
+  in locale (review dello Sprint 15, §8.4).
+- Stima portata da 5 a 8 punti al planning del 20/11: il criterio unico di prima nascondeva il realm di produzione, la
+  creazione dell'ADMIN, la procedura, l'importazione sul server e il cambio di nome.
 
-Dipendenze: US-102..105, US-1302, US-1307
+Dipendenze: US-102..105, US-1302, US-1307, US-1309
 
 #### US-1307
 **Monitoraggio e revisione di sicurezza** · Must · 5 punti · R4 · 🎉 Done (Sprint 10)
