@@ -188,11 +188,11 @@ class JobSlotResourceIT {
 
         mockMvc.perform(get("/api/v1/companies/" + companyId + "/job-slots").header(USER, "operatore.cc"))
                 .andExpect(jsonPath("$[0].status").value("BLOCCATA"))
-                .andExpect(jsonPath("$[0].blockedByTicketNumber").value(ticket.getNumber().intValue()));
+                .andExpect(jsonPath("$[0].assignments[0].ticketNumber").value(ticket.getNumber().intValue()));
         mockMvc.perform(post("/api/v1/job-slots/" + id + "/deactivate").header(USER, "operatore.cc")
                         .contentType(MediaType.APPLICATION_JSON).content("{\"version\": " + slot.getVersion() + "}"))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("bloccata dalla segnalazione")));
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("assegnata alla segnalazione")));
     }
 
     @Test

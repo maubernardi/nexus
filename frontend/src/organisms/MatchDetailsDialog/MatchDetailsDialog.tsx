@@ -2,6 +2,7 @@ import { useRef, useState, type ReactNode, type RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
+import { AssignmentWarning } from '@/atoms/AssignmentWarning/AssignmentWarning';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
@@ -111,6 +112,8 @@ export const MatchDetailsDialog = ({
             {t('matchDetails.title', { title: shown.title, company: shown.companyName })}
           </DialogTitle>
           <DialogDescription>{t('matchDetails.description')}</DialogDescription>
+          {/* già assegnata ad altri tipi di tirocinio (US-605): l'avviso si legge prima dei dati */}
+          <AssignmentWarning assignments={shown.assignments ?? []} />
           <MatchDetailsBody slot={shown} />
           <div className="flex flex-wrap gap-3 border-t border-border pt-4">
             <Button

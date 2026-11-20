@@ -32,6 +32,7 @@ import it.nexus.repository.JobSlotRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BoardPostService;
 import it.nexus.services.CompanyService;
+import it.nexus.services.JobSlotAssignments;
 import it.nexus.services.MunicipalityService;
 import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.ConflictException;
@@ -60,6 +61,7 @@ public class CompanyServiceImpl implements CompanyService {
     private final BusinessCategoryRepository businessCategoryRepository;
     private final ContactRoleRepository contactRoleRepository;
     private final EntityManager entityManager;
+    private final JobSlotAssignments jobSlotAssignments;
 
     /** Referente normalizzato (US-510): confronto prima/dopo e righe da inserire. */
     private record Contact(String name, ContactRole role, String phone, String mobile, String email) {
@@ -193,8 +195,8 @@ public class CompanyServiceImpl implements CompanyService {
             List<JobSlot> blocked = jobSlotRepository.findBlockedByCompany(company.getId());
             if (!blocked.isEmpty()) {
                 throw new ConflictException("Non si può disattivare l'azienda: %s", blocked.stream()
-                        .map(j -> "la mansione «%s» è bloccata dalla segnalazione n. %d"
-                                .formatted(j.getTitle(), j.getBlockedByTicket().getNumber()))
+                        .map(j -> "la mansione «%s» è assegnata alla segnalazione %s"
+                                .formatted(j.getTitle(), jobSlotAssignments.describe(jobSlotAssignments.holders(j))))
                         .collect(Collectors.joining("; ")));
             }
         }

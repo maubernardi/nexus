@@ -19,6 +19,10 @@ vi.mock('@/config/api/referenceApi', () => ({
   fetchMyProjects: vi.fn(),
   fetchProjects: vi.fn(),
   fetchCompetenceSites: vi.fn(async () => []),
+  // tipi di tirocinio del progetto (US-605): uno solo, già scelto
+  fetchProjectInternshipTypes: vi.fn(async () => [
+    { id: 'IT2', code: 'EXTRACURRICULARE', name: 'Extracurriculare' },
+  ]),
 }));
 vi.mock('@/config/api/ticketApi', () => ({ submitSpecialTicket: vi.fn() }));
 
@@ -124,6 +128,7 @@ describe('<CandidaturePage>', () => {
       beneficiaryId: 'B2',
       projectId: null,
       competenceSiteId: null,
+      internshipTypeId: 'IT2',
     });
     expect(screen.getByRole('link', { name: 'Apri la segnalazione' })).toHaveAttribute(
       'href',

@@ -624,6 +624,50 @@ class DomainConstraintsIT {
         }
 
         @Test
+        void dueAssegnazioniDelloStessoTipoSullaMansione() {
+            Graph g = fixtures.graph();
+            InternshipType type = internshipTypes.findById(TestEntities.EXTRACURRICULAR_ID).orElseThrow();
+            Ticket first = fixtures.ticket(g);
+            first.setInternshipType(type);
+            g.slot().blockFor(first);
+            tickets.saveAndFlush(first);
+            jobSlots.saveAndFlush(g.slot());
+            Ticket second = fixtures.ticket(g);
+            second.setInternshipType(type);
+            second.setJobSlot(g.slot());
+            second.setJobSlotHeld(true);
+            assertViolates("uq_ticket_job_slot_internship_type", () -> tickets.saveAndFlush(second));
+        }
+
+        @Test
+        void dueAssegnazioniDiTipiDiversiSullaMansione() {
+            Graph g = fixtures.graph();
+            Ticket first = fixtures.ticket(g);
+            first.setInternshipType(internshipTypes.findById(TestEntities.EXTRACURRICULAR_ID).orElseThrow());
+            g.slot().blockFor(first);
+            tickets.saveAndFlush(first);
+            Ticket second = fixtures.ticket(g);
+            second.setInternshipType(internshipTypes.findById(TestEntities.INCLUSION_ID).orElseThrow());
+            second.setJobSlot(g.slot());
+            second.setJobSlotHeld(true);
+            assertThatCode(() -> tickets.saveAndFlush(second)).doesNotThrowAnyException();
+        }
+
+        @Test
+        void assegnazioneSenzaMansione() {
+            Ticket t = fixtures.ticket(fixtures.graph());
+            assertViolates("ck_ticket_job_slot_held",
+                    () -> jdbc.update("UPDATE ticket SET job_slot_held = true WHERE id = ?", t.getId()));
+        }
+
+        @Test
+        void tipoDiTirocinioInesistente() {
+            Ticket t = fixtures.ticket(fixtures.graph());
+            assertViolates("fk_ticket_internship_type",
+                    () -> jdbc.update("UPDATE ticket SET internship_type_id = 1 WHERE id = ?", t.getId()));
+        }
+
+        @Test
         void bloccoESblocco() {
             Graph g = fixtures.graph();
             Ticket t = fixtures.ticket(g);

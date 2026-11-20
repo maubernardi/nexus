@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useParams } from 'react-router';
 
+import { AssignmentWarning } from '@/atoms/AssignmentWarning/AssignmentWarning';
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -42,6 +43,7 @@ import {
 import { FormField } from '@/molecules/FormField/FormField';
 import { ClosureReportView } from '@/organisms/ClosureReportView/ClosureReportView';
 import { CompetenceSiteCorrection } from '@/organisms/CompetenceSiteCorrection/CompetenceSiteCorrection';
+import { InternshipTypeCorrection } from '@/organisms/InternshipTypeCorrection/InternshipTypeCorrection';
 import { MatchDetailsDialog } from '@/organisms/MatchDetailsDialog/MatchDetailsDialog';
 import type { BeneficiaryLinkState } from '@/pages/BeneficiaryPage/BeneficiaryPage';
 
@@ -505,6 +507,7 @@ const KNOWN_ACTIONS = [
   'CLOSE',
   'DOCUMENT_GENERATED',
   'COMPETENCE_SITE_CHANGED',
+  'INTERNSHIP_TYPE_CHANGED',
   'STATUS',
 ] as const;
 
@@ -1155,6 +1158,8 @@ const TicketData = ({ ticket: d, manage }: { ticket: TicketDetail; manage: boole
         <dd>{d.project.name}</dd>
         <dt className="font-medium">{t('work.fields.competenceSite')}</dt>
         <dd>{d.competenceSite?.name ?? t('work.competenceSite.none')}</dd>
+        <dt className="font-medium">{t('ticket.fields.internshipType')}</dt>
+        <dd>{d.internshipType?.name ?? t('work.internshipType.none')}</dd>
         <dt className="font-medium">{t('work.fields.requestedJob')}</dt>
         <dd>{d.requestedJobCategory?.name ?? d.requestedJobFreeText ?? '—'}</dd>
         <dt className="font-medium">{t('work.fields.tutor')}</dt>
@@ -1193,6 +1198,7 @@ const TicketData = ({ ticket: d, manage }: { ticket: TicketDetail; manage: boole
         )}
       </dl>
       {d.canChangeCompetenceSite && <CompetenceSiteCorrection ticket={d} />}
+      {d.canChangeInternshipType && <InternshipTypeCorrection ticket={d} />}
     </section>
   );
 };
@@ -1241,6 +1247,8 @@ const CompatibleSection = ({ ticket: d, onOutcome }: CompatibleSectionProps) => 
   const th = 'px-3 py-2 text-left text-sm font-semibold whitespace-nowrap';
   const td = 'px-3 py-2 align-top';
   const beneficiary = `${d.beneficiary.firstName} ${d.beneficiary.lastName}`;
+  // senza il tipo di tirocinio non si propone (US-605): lo indica il Tutor
+  const untyped = !d.internshipType;
 
   return (
     <section aria-labelledby="work-compatible" className="space-y-4">
@@ -1289,6 +1297,12 @@ const CompatibleSection = ({ ticket: d, onOutcome }: CompatibleSectionProps) => 
         {compatible.data ? t('work.count', { count: compatible.data.length }) : ''}
       </p>
 
+      {untyped && (
+        <p className="rounded-md border border-warning-foreground bg-warning p-3 font-medium text-warning-foreground">
+          {t('work.noInternshipType')}
+        </p>
+      )}
+
       {candidate && (
         <div className="space-y-3 rounded-xl border-2 border-primary bg-card p-4">
           <h3 ref={confirmRef} tabIndex={-1} className="font-semibold">
@@ -1297,8 +1311,14 @@ const CompatibleSection = ({ ticket: d, onOutcome }: CompatibleSectionProps) => 
           <p>
             {t('work.confirmText', { beneficiary, title: candidate.title, company: candidate.companyName })}
           </p>
+          <AssignmentWarning id="work-confirm-warning" assignments={candidate.assignments ?? []} />
           <div className="flex flex-wrap gap-3">
-            <Button size="lg" onClick={() => confirm(candidate)} disabled={match.isPending}>
+            <Button
+              size="lg"
+              onClick={() => confirm(candidate)}
+              disabled={match.isPending}
+              aria-describedby={candidate.assignments?.length ? 'work-confirm-warning' : undefined}
+            >
               {t('work.confirm')}
             </Button>
             <Button size="lg" variant="outline" onClick={() => setCandidate(null)} disabled={match.isPending}>
@@ -1356,6 +1376,10 @@ const CompatibleSection = ({ ticket: d, onOutcome }: CompatibleSectionProps) => 
                   <td className={td}>{s.companyName}</td>
                   <th scope="row" className={`${td} text-left font-semibold`}>
                     {s.title}
+                    <AssignmentWarning
+                      assignments={s.assignments ?? []}
+                      className="mt-1 max-w-xs font-normal whitespace-normal"
+                    />
                   </th>
                   <td className={td}>{s.jobCategory.name}</td>
                   <td className={td}>{s.zone.name}</td>
@@ -1378,7 +1402,7 @@ const CompatibleSection = ({ ticket: d, onOutcome }: CompatibleSectionProps) => 
                       <Button
                         size="sm"
                         onClick={() => setCandidate(s)}
-                        disabled={candidate !== null || match.isPending}
+                        disabled={untyped || candidate !== null || match.isPending}
                       >
                         {t('work.propose')}
                         {/* spazio come nodo a sé: nome accessibile "Proponi Magazziniere presso Alfa" */}{' '}
@@ -1402,7 +1426,7 @@ const CompatibleSection = ({ ticket: d, onOutcome }: CompatibleSectionProps) => 
           setDetails(null);
           setCandidate(slot);
         }}
-        proposeDisabled={candidate !== null || match.isPending}
+        proposeDisabled={untyped || candidate !== null || match.isPending}
         onExclude={async (slot, reason) => {
           await exclude.mutateAsync({ id: d.id, companyId: slot.companyId, reason });
           setDetails(null);

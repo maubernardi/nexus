@@ -85,10 +85,22 @@ public class Ticket extends AbstractTsidEntity {
     @JoinColumn(name = "assigned_cc_operator_id")
     private AppUser assignedCcOperator;
 
-    /** Mansione abbinata dal Call Center. */
+    /** Mansione abbinata dal Call Center; resta dopo il report di restituzione, per lo storico. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_slot_id")
     private JobSlot jobSlot;
+
+    /**
+     * La segnalazione occupa la mansione per il suo tipo di tirocinio (US-605): al più una segnalazione per mansione e
+     * tipo ({@code uq_ticket_job_slot_internship_type}).
+     */
+    @Column(name = "job_slot_held", nullable = false)
+    private boolean jobSlotHeld;
+
+    /** Tipo di tirocinio indicato dal Tutor (US-605); assente solo nelle segnalazioni di prima, finché non lo indica. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "internship_type_id")
+    private InternshipType internshipType;
 
     @Column(name = "timer_started_at")
     private Instant timerStartedAt;

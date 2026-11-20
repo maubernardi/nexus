@@ -10,6 +10,7 @@ import it.nexus.domain.AppUser;
 import it.nexus.domain.Beneficiary;
 import it.nexus.domain.BoardPost;
 import it.nexus.domain.Company;
+import it.nexus.domain.InternshipType;
 import it.nexus.domain.JobCategory;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Municipality;
@@ -27,6 +28,7 @@ import it.nexus.repository.AppUserRepository;
 import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.CompanyRepository;
+import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.MunicipalityRepository;
@@ -60,6 +62,7 @@ public class WorkflowScenarios {
     private final TicketRepository tickets;
     private final ProvinceRepository provinces;
     private final MunicipalityRepository municipalities;
+    private final InternshipTypeRepository internshipTypes;
 
     /** Gli utenti della sicurezza mock (header {@code X-USER-ID}), con gli stessi id esterni della configurazione. */
     public record Actors(AppUser tutor1, AppUser tutor2, AppUser operator, AppUser admin) {
@@ -132,6 +135,7 @@ public class WorkflowScenarios {
     public Ticket specialTicket(AppUser tutor, Project project, BoardPost post, AppUser operator) {
         Ticket ticket = TestEntities.ticket(tutor, project, beneficiary(tutor, placeOf(post)),
                 post.getJobSlot().getJobCategory());
+        ticket.setInternshipType(extracurricular());
         ticket.setType(TicketType.SPECIAL);
         ticket.setFastTrack(true);
         ticket.setBoardPost(post);
@@ -146,6 +150,7 @@ public class WorkflowScenarios {
      */
     public Ticket appointmentTicket(AppUser tutor, Project project, JobSlot slot, AppUser operator) {
         Ticket ticket = TestEntities.ticket(tutor, project, beneficiary(tutor, placeOf(slot)), slot.getJobCategory());
+        ticket.setInternshipType(extracurricular());
         ticket.setStatus(TicketStatus.APPUNTAMENTO);
         ticket.setAssignedCcOperator(operator);
         ticket.setJobSlot(slot);
@@ -153,6 +158,21 @@ public class WorkflowScenarios {
         slot.blockFor(saved);
         jobSlots.saveAndFlush(slot);
         return saved;
+    }
+
+    /** Tipo di tirocinio «Extracurriculare», voce iniziale di V21 (US-605: la proposta richiede il tipo). */
+    public InternshipType extracurricular() {
+        return internshipTypes.findById(TestEntities.EXTRACURRICULAR_ID).orElseThrow();
+    }
+
+    /** Tipo di tirocinio «Curriculare», voce iniziale di V21. */
+    public InternshipType curricular() {
+        return internshipTypes.findById(TestEntities.CURRICULAR_ID).orElseThrow();
+    }
+
+    /** Tipo di tirocinio «Di inclusione», voce iniziale di V21. */
+    public InternshipType inclusion() {
+        return internshipTypes.findById(TestEntities.INCLUSION_ID).orElseThrow();
     }
 
     private static Place placeOf(BoardPost post) {

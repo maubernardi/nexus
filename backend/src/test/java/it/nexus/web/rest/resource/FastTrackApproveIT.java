@@ -151,7 +151,7 @@ class FastTrackApproveIT {
         approve("operatore.cc", version())
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value(
-                        "La mansione «Magazziniere» non è più disponibile: è stata appena bloccata o modificata"));
+                        "La mansione «Magazziniere» non è più disponibile: è stata appena ritirata o modificata"));
 
         s.setActive(true);
         jobSlots.saveAndFlush(s);

@@ -15,5 +15,7 @@ public record TicketCreateDTO(
         String jobCategoryId,
         @Size(max = 200) String jobFreeText,
         /** Sede di competenza (US-308): obbligatoria se il progetto ne ha. */
-        String competenceSiteId) {
+        String competenceSiteId,
+        /** Tipo di tirocinio (US-605): tra i tipi attivi ammessi dal progetto. */
+        @NotBlank(message = "Scegli il tipo di tirocinio") String internshipTypeId) {
 }

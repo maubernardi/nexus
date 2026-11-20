@@ -22,8 +22,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Mansione offerta da un'azienda. È {@code BLOCCATA} se e solo se {@code blockedByTicket} è valorizzato; un ticket
- * blocca al massimo una mansione (vincoli del database). Protetta da blocco ottimistico.
+ * Mansione offerta da un'azienda. Si assegna a più segnalazioni, al più una per tipo di tirocinio (US-605):
+ * l'assegnazione sta sulla segnalazione ({@code job_slot_held}). Stato e {@code blockedByTicket} ne sono il riassunto:
+ * {@code BLOCCATA} se e solo se c'è almeno un'assegnazione (vincoli del database). Protetta da blocco ottimistico.
  */
 @Getter
 @Setter
@@ -79,15 +80,30 @@ public class JobSlot extends AbstractTsidEntity {
         this.title = title;
     }
 
-    /** Blocca la mansione per il ticket indicato. */
+    /**
+     * Assegna la mansione alla segnalazione, per il suo tipo di tirocinio (US-605), e aggiorna il riassunto se è la
+     * prima o ha il numero più basso. Nel servizio l'assegnazione passa da {@code JobSlotAssignments}.
+     */
     public void blockFor(Ticket ticket) {
-        this.status = JobSlotStatus.BLOCCATA;
-        this.blockedByTicket = ticket;
+        ticket.setJobSlot(this);
+        ticket.setJobSlotHeld(true);
+        if (blockedByTicket == null || ticket.getNumber() != null && blockedByTicket.getNumber() != null
+                && ticket.getNumber() < blockedByTicket.getNumber()) {
+            summarize(ticket);
+        }
     }
 
-    /** Rende di nuovo libera la mansione. */
+    /** Riassunto senza assegnazioni: la mansione è libera. */
     public void release() {
-        this.status = JobSlotStatus.LIBERA;
-        this.blockedByTicket = null;
+        summarize(null);
+    }
+
+    /**
+     * Riassunto delle assegnazioni (US-605): {@code BLOCCATA} con almeno una, riferita alla segnalazione con il numero
+     * più basso; {@code LIBERA} senza. La release precedente (A16) legge la mansione da qui.
+     */
+    public void summarize(Ticket first) {
+        this.status = first == null ? JobSlotStatus.LIBERA : JobSlotStatus.BLOCCATA;
+        this.blockedByTicket = first;
     }
 }

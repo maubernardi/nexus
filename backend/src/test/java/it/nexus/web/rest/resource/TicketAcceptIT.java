@@ -51,6 +51,7 @@ import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyRepository;
+import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ProjectRepository;
@@ -72,6 +73,7 @@ class TicketAcceptIT {
     @Autowired MockMvc mockMvc;
     @Autowired EntityManager em;
     @Autowired AppUserRepository users;
+    @Autowired InternshipTypeRepository internshipTypes;
     @Autowired ProjectRepository projects;
     @Autowired UserProjectRepository userProjects;
     @Autowired ZoneRepository zones;
@@ -109,6 +111,7 @@ class TicketAcceptIT {
         s.setTitle("Magazziniere");
         slot = jobSlots.save(s);
         Ticket t = TestEntities.ticket(tutor, project, beneficiaries.save(TestEntities.beneficiary(tutor, zone)), category);
+        t.setInternshipType(internshipTypes.findById(TestEntities.EXTRACURRICULAR_ID).orElseThrow());
         t.setStatus(TicketStatus.IN_LAVORAZIONE);
         t.setAssignedCcOperator(operator);
         ticket = tickets.saveAndFlush(t);

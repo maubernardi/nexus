@@ -20,6 +20,7 @@ import {
   fetchTicket,
   fetchTicketHistory,
   changeCompetenceSite,
+  changeInternshipType,
   matchTicket,
   takeOverTicket,
   type JobSlotMatch,
@@ -51,6 +52,7 @@ vi.mock('@/config/api/ticketApi', () => ({
   approveFastTrack: vi.fn(),
   rejectFastTrack: vi.fn(),
   changeCompetenceSite: vi.fn(),
+  changeInternshipType: vi.fn(),
 }));
 vi.mock('@/config/api/boardPostApi', () => ({ fetchBoardPost: vi.fn() }));
 vi.mock('@/config/api/referenceApi', () => ({
@@ -166,6 +168,8 @@ const detail = (overrides: Partial<TicketDetail> = {}): TicketDetail => ({
   myTicket: false,
   timerDeadline: null,
   canChangeCompetenceSite: false,
+  internshipType: { id: 'IT2', code: 'EXTRACURRICULARE', name: 'Extracurriculare' },
+  canChangeInternshipType: false,
   ...overrides,
 });
 
@@ -1011,5 +1015,103 @@ describe('<TicketPage>', () => {
     expect(
       screen.getByRole('link', { name: /^Bianchi Anna \(\d{4}\), apri la scheda del beneficiario$/ }),
     ).toHaveAttribute('href', '/beneficiari/B1');
+  });
+
+  it('mansione già assegnata a un altro tipo: avviso nella riga, nei dettagli e nella conferma (US-605)', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchCompatibleJobSlots).mockResolvedValue([
+      {
+        ...alfa,
+        assignments: [
+          { ticketNumber: 30, internshipType: { id: 'IT3', code: 'INCLUSIONE', name: 'Di inclusione' } },
+        ],
+      },
+    ]);
+    renderPage();
+
+    const table = await screen.findByRole('table', { name: /Mansioni proponibili/ });
+    expect(
+      within(table).getByText('Già assegnata alla segnalazione n. 30 (Di inclusione)'),
+    ).toBeInTheDocument();
+    await expectNoAxeViolations();
+
+    await user.click(screen.getByRole('button', { name: 'Dettagli Magazziniere presso Alfa Logistica' }));
+    const dialog = await screen.findByRole('dialog', { name: '«Magazziniere» presso Alfa Logistica' });
+    expect(
+      within(dialog).getByText('Già assegnata alla segnalazione n. 30 (Di inclusione)'),
+    ).toBeInTheDocument();
+    await user.click(within(dialog).getByRole('button', { name: 'Proponi' }));
+
+    expect(screen.getByRole('heading', { name: 'Conferma la proposta' })).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'Conferma proposta' })).toHaveAccessibleDescription(
+      'Già assegnata alla segnalazione n. 30 (Di inclusione)',
+    );
+  });
+
+  it('tipo di tirocinio non indicato: il Call Center lo vede e non può proporre (US-605)', async () => {
+    vi.mocked(fetchTicket).mockResolvedValue(detail({ internshipType: undefined }));
+    renderPage();
+
+    expect(await screen.findByText(/Il tipo di tirocinio non è indicato/)).toBeInTheDocument();
+    expect(screen.getByText('Non indicato')).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: 'Proponi Magazziniere presso Alfa Logistica' }),
+    ).toBeDisabled();
+  });
+
+  it('il Tutor corregge il tipo di tirocinio, con il focus sull’esito (US-605)', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchCurrentUser).mockResolvedValue({
+      id: 'tutor1',
+      username: 'tutor1',
+      firstName: 'Tutor',
+      lastName: 'Uno',
+      roles: ['TUTOR'],
+    });
+    const inclusion = { id: 'IT3', code: 'INCLUSIONE', name: 'Di inclusione' };
+    vi.mocked(fetchTicket).mockResolvedValue(
+      detail({
+        myTicket: true,
+        canChangeInternshipType: true,
+        internshipTypes: [{ id: 'IT2', code: 'EXTRACURRICULARE', name: 'Extracurriculare' }, inclusion],
+      }),
+    );
+    vi.mocked(changeInternshipType)
+      .mockRejectedValueOnce(
+        new AxiosError('Bad Request', '400', undefined, undefined, {
+          status: 400,
+          statusText: 'Bad Request',
+          headers: {},
+          config: { headers: new AxiosHeaders() },
+          data: {
+            status: 400,
+            fieldErrors: [
+              {
+                field: 'internshipTypeId',
+                message: 'Sulla mansione «Magazziniere» c’è già la segnalazione n. 30 (Di inclusione)',
+              },
+            ],
+          },
+        }),
+      )
+      .mockResolvedValueOnce(detail({ internshipType: inclusion }));
+    renderPage();
+
+    expect(await screen.findByText('Extracurriculare')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Cambia il tipo' }));
+    const select = screen.getByLabelText(/^Tipo di tirocinio/);
+    await waitFor(() => expect(select).toHaveFocus());
+    await user.selectOptions(select, 'IT3');
+    await user.click(screen.getByRole('button', { name: 'Salva il tipo' }));
+    expect(
+      await screen.findByText('Sulla mansione «Magazziniere» c’è già la segnalazione n. 30 (Di inclusione)'),
+    ).toBeInTheDocument();
+    expect(select).toHaveAttribute('aria-invalid', 'true');
+    await expectNoAxeViolations();
+
+    await user.click(screen.getByRole('button', { name: 'Salva il tipo' }));
+    const outcome = await screen.findByText('Tipo di tirocinio: Di inclusione.');
+    await waitFor(() => expect(outcome).toHaveFocus());
+    expect(vi.mocked(changeInternshipType).mock.calls[1][0]).toEqual({ id: 'T9', internshipTypeId: 'IT3' });
   });
 });

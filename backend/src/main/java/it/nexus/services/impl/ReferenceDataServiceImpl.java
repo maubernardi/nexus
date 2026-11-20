@@ -1,6 +1,7 @@
 package it.nexus.services.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.ProjectRepository;
 import it.nexus.repository.ZoneRepository;
 import it.nexus.services.CurrentAppUserService;
+import it.nexus.services.InternshipTypeRules;
 import it.nexus.services.ReferenceDataService;
 import lombok.RequiredArgsConstructor;
 
@@ -37,6 +39,7 @@ public class ReferenceDataServiceImpl implements ReferenceDataService {
     private final BusinessCategoryRepository businessCategoryRepository;
     private final ContactRoleRepository contactRoleRepository;
     private final ProjectRepository projectRepository;
+    private final InternshipTypeRules internshipTypeRules;
     private final CareAgencyRepository careAgencyRepository;
     private final CompetenceSiteRepository competenceSiteRepository;
     private final CurrentAppUserService currentAppUserService;
@@ -55,6 +58,14 @@ public class ReferenceDataServiceImpl implements ReferenceDataService {
     @Override
     public List<ReferenceItemDTO> activeInternshipTypes() {
         return internshipTypeRepository.findByActiveTrueOrderByNameAsc().stream().map(mapper::toDto).toList();
+    }
+
+    @Override
+    public List<ReferenceItemDTO> projectInternshipTypes(String projectId) {
+        return Optional.ofNullable(TsidMapper.toInternal(projectId))
+                .flatMap(projectRepository::findById)
+                .map(project -> internshipTypeRules.choosable(project, null))
+                .orElse(List.of());
     }
 
     @Override

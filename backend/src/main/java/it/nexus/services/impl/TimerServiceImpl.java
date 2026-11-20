@@ -12,13 +12,13 @@ import it.nexus.domain.JobSlot;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.enumeration.AuditEntityType;
-import it.nexus.domain.enumeration.JobSlotStatus;
 import it.nexus.domain.enumeration.NotificationType;
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.domain.workflow.TicketTransitions;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.TicketRepository;
 import it.nexus.services.AuditService;
+import it.nexus.services.JobSlotAssignments;
 import it.nexus.services.NotificationService;
 import it.nexus.services.TicketStateMachine;
 import it.nexus.services.TimerService;
@@ -38,6 +38,7 @@ public class TimerServiceImpl implements TimerService {
     private final AuditService auditService;
     private final NotificationService notificationService;
     private final TicketStateMachine stateMachine;
+    private final JobSlotAssignments jobSlotAssignments;
 
     @Override
     public int sendDueReminders(Instant now) {
@@ -76,15 +77,14 @@ public class TimerServiceImpl implements TimerService {
                 t.setTimerReminderSentAt(null);
                 t.setTimerDeadlineAt(null);
                 if (slot != null) {
-                    slot.release();
+                    // la mansione si libera solo per questa segnalazione (US-605)
+                    t.setJobSlotHeld(false);
                     t.setJobSlot(null);
                 }
                 return changes;
             });
             if (slot != null) {
-                auditService.record(AuditEntityType.JOB_SLOT, slot.getId(), "RELEASE", AuditChanges.of()
-                        .value("status", JobSlotStatus.BLOCCATA.name(), JobSlotStatus.LIBERA.name())
-                        .value("blockedByTicketId", TsidMapper.toExternal(saved.getId()), null), null);
+                jobSlotAssignments.sync(slot, saved, false);
             }
             notificationService.notify(saved.getTutor(), NotificationType.TIMER_EXPIRED, saved);
             notificationService.notify(saved.getAssignedCcOperator(), NotificationType.TIMER_EXPIRED, saved);

@@ -37,6 +37,7 @@ import it.nexus.repository.ProjectRepository;
 import it.nexus.repository.UserProjectRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BoardPostService;
+import it.nexus.services.JobSlotAssignments;
 import it.nexus.services.FastTrackService;
 import it.nexus.services.CurrentAppUserService;
 import it.nexus.web.errors.BadRequestException;
@@ -54,6 +55,7 @@ public class BoardPostServiceImpl implements BoardPostService {
             .withZone(TimeConfig.ZONE);
 
     private final BoardPostRepository repository;
+    private final JobSlotAssignments jobSlotAssignments;
     private final ProjectRepository projectRepository;
     private final JobSlotRepository jobSlotRepository;
     private final TicketRepository ticketRepository;
@@ -191,13 +193,14 @@ public class BoardPostServiceImpl implements BoardPostService {
     }
 
     /** La mansione si può offrire in bacheca: libera, a disposizione, di un'azienda attiva (design D3). */
-    private static void requireProposable(JobSlot slot, String subject) {
+    private void requireProposable(JobSlot slot, String subject) {
         if (!slot.isActive() || !slot.getCompany().isActive()) {
             throw new ConflictException("%s non è a disposizione", subject);
         }
+        // la bacheca resta com'è (US-605): solo mansioni senza assegnazioni
         if (slot.getStatus() == JobSlotStatus.BLOCCATA) {
-            throw new ConflictException("%s è bloccata dalla segnalazione n. %d", subject,
-                    slot.getBlockedByTicket().getNumber());
+            throw new ConflictException("%s è assegnata alla segnalazione %s", subject,
+                    jobSlotAssignments.describe(jobSlotAssignments.holders(slot)));
         }
     }
 

@@ -16,6 +16,7 @@ import it.nexus.domain.JobCategory;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Zone;
 import it.nexus.domain.audit.AuditChanges;
+import it.nexus.domain.dto.JobSlotAssignmentDTO;
 import it.nexus.domain.dto.JobSlotDTO;
 import it.nexus.domain.dto.JobSlotFormDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
@@ -30,6 +31,7 @@ import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ZoneRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BoardPostService;
+import it.nexus.services.JobSlotAssignments;
 import it.nexus.services.JobSlotService;
 import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.ConflictException;
@@ -50,6 +52,7 @@ public class JobSlotServiceImpl implements JobSlotService {
     private final BoardPostService boardPostService;
     private final AuditService auditService;
     private final JobSlotMapper mapper;
+    private final JobSlotAssignments jobSlotAssignments;
 
     @Override
     @Transactional(readOnly = true)
@@ -60,7 +63,10 @@ public class JobSlotServiceImpl implements JobSlotService {
                 .findByJobSlot_IdInAndStatusIn(slots.stream().map(JobSlot::getId).toList(), BoardPostStatus.ACTIVE)
                 .stream()
                 .collect(Collectors.toMap(p -> p.getJobSlot().getId(), Function.identity()));
-        return slots.stream().map(s -> withPost(mapper.toDto(s), posts.get(s.getId()))).toList();
+        Map<Long, List<JobSlotAssignmentDTO>> assignments =
+                jobSlotAssignments.assignments(slots.stream().map(JobSlot::getId).toList());
+        return slots.stream().map(s -> withPost(mapper.toDto(s), posts.get(s.getId()))
+                .withAssignments(assignments.getOrDefault(s.getId(), List.of()))).toList();
     }
 
     @Override
@@ -116,8 +122,8 @@ public class JobSlotServiceImpl implements JobSlotService {
             return dto(slot);
         }
         if (!active && slot.getStatus() == JobSlotStatus.BLOCCATA) {
-            throw new ConflictException("La mansione è bloccata dalla segnalazione n. %d: non si può ritirare",
-                    slot.getBlockedByTicket().getNumber());
+            throw new ConflictException("La mansione è assegnata alla segnalazione %s: non si può ritirare",
+                    jobSlotAssignments.describe(jobSlotAssignments.holders(slot)));
         }
         if (active && !slot.getCompany().isActive()) {
             throw new ConflictException("L'azienda è disattivata: riattivala prima di rimettere a disposizione la mansione");
@@ -135,7 +141,9 @@ public class JobSlotServiceImpl implements JobSlotService {
     /** Mansione con l'annuncio attivo in bacheca, se c'è (US-904). */
     private JobSlotDTO dto(JobSlot slot) {
         return withPost(mapper.toDto(slot),
-                boardPostRepository.findFirstByJobSlot_IdAndStatusIn(slot.getId(), BoardPostStatus.ACTIVE).orElse(null));
+                boardPostRepository.findFirstByJobSlot_IdAndStatusIn(slot.getId(), BoardPostStatus.ACTIVE).orElse(null))
+                .withAssignments(jobSlotAssignments.assignments(List.of(slot.getId())).getOrDefault(slot.getId(),
+                        List.of()));
     }
 
     private static JobSlotDTO withPost(JobSlotDTO dto, BoardPost post) {

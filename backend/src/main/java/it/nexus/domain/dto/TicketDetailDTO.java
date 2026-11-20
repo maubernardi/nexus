@@ -2,6 +2,7 @@ package it.nexus.domain.dto;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 import it.nexus.domain.enumeration.BoardPostStatus;
 
@@ -43,5 +44,11 @@ public record TicketDetailDTO(
         /** Sede di competenza (US-308), se c'è. */
         ReferenceItemDTO competenceSite,
         /** L'utente corrente può correggere la sede: ADMIN o Coordinatore del progetto. */
-        boolean canChangeCompetenceSite) {
+        boolean canChangeCompetenceSite,
+        /** Tipo di tirocinio (US-605); assente se il Tutor non l'ha ancora indicato. */
+        ReferenceItemDTO internshipType,
+        /** Il Tutor della segnalazione può indicare o correggere il tipo: fino all'avvio del tirocinio. */
+        boolean canChangeInternshipType,
+        /** I tipi che il Tutor può scegliere (vuoto se non può cambiarlo). */
+        List<ReferenceItemDTO> internshipTypes) {
 }

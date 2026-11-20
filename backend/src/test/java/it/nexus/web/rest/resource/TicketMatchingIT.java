@@ -49,6 +49,7 @@ import it.nexus.repository.BeneficiaryRepository;
 import it.nexus.repository.BoardPostRepository;
 import it.nexus.repository.CompanyAuditEventRepository;
 import it.nexus.repository.CompanyRepository;
+import it.nexus.repository.InternshipTypeRepository;
 import it.nexus.repository.JobCategoryRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ProjectRepository;
@@ -70,6 +71,7 @@ class TicketMatchingIT {
     @Autowired MockMvc mockMvc;
     @Autowired EntityManager em;
     @Autowired AppUserRepository users;
+    @Autowired InternshipTypeRepository internshipTypes;
     @Autowired ProjectRepository projects;
     @Autowired ZoneRepository zones;
     @Autowired JobCategoryRepository categories;
@@ -146,6 +148,7 @@ class TicketMatchingIT {
 
     private Ticket workingTicket(AppUser assignee) {
         Ticket t = TestEntities.ticket(tutor, project, beneficiaries.save(TestEntities.beneficiary(tutor, near)), wanted);
+        t.setInternshipType(internshipTypes.findById(TestEntities.EXTRACURRICULAR_ID).orElseThrow());
         t.setStatus(TicketStatus.IN_LAVORAZIONE);
         t.setAssignedCcOperator(assignee);
         return tickets.saveAndFlush(t);
@@ -239,9 +242,11 @@ class TicketMatchingIT {
 
     @Test
     void mansioneAppenaBloccataOVersioneSuperata_409() throws Exception {
+        // già assegnata a un'altra segnalazione dello stesso tipo (US-605)
         doMatch("operatore.cc", ticket, blocked, blocked.getVersion())
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("non è più disponibile")));
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString(
+                        "è già assegnata alla segnalazione n. ")));
         doMatch("operatore.cc", ticket, match, match.getVersion() + 1).andExpect(status().isConflict());
         em.flush();
         em.clear();

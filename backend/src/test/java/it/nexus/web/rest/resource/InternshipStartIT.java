@@ -144,8 +144,9 @@ class InternshipStartIT {
 
     @Test
     void schedaIncompleta_elencoDiCioCheMancaEAvvioRifiutato() throws Exception {
+        // il tipo c'è già: la scheda parte da quello della segnalazione (US-605)
         mockMvc.perform(get(ticketPath + "/internship").header(USER, "tutor1"))
-                .andExpect(jsonPath("$.missingForStart", contains("internshipType", "startDate", "expectedEndDate",
+                .andExpect(jsonPath("$.missingForStart", contains("startDate", "expectedEndDate",
                         "site", "atecoCode", "companyTutors", "schedule", "agreement", "trainingProjects", "fiscalCode",
                         "birthDate", "birthPlace", "residence", "legalRepresentative")));
 

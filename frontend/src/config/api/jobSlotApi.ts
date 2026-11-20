@@ -1,6 +1,7 @@
 import { axiosInstance } from '@/config/api/axiosInstance';
 import { ENDPOINTS } from '@/config/api/Endpoint';
 import type { ReferenceItem } from '@/config/api/referenceApi';
+import type { JobSlotAssignment } from '@/config/api/ticketApi';
 
 export type JobSlotStatus = 'LIBERA' | 'BLOCCATA';
 
@@ -12,8 +13,8 @@ export type JobSlot = {
   jobCategory: ReferenceItem;
   zone: ReferenceItem;
   status: JobSlotStatus;
-  /** Segnalazione che tiene bloccata la mansione. */
-  blockedByTicketNumber: number | null;
+  /** Segnalazioni a cui la mansione è assegnata, una per tipo di tirocinio (US-605). */
+  assignments?: JobSlotAssignment[];
   active: boolean;
   version: number;
   /** Annuncio attivo (bozza o pubblicato) in bacheca, se c'è (US-904); l'API omette i campi vuoti. */

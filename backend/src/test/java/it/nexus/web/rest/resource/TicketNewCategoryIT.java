@@ -86,7 +86,7 @@ class TicketNewCategoryIT {
 
     private ResultActions submit(String category, String freeText) throws Exception {
         String json = """
-                {"beneficiaryId": "%s", "projectId": "%s", "jobCategoryId": %s, "jobFreeText": %s}
+                {"beneficiaryId": "%s", "projectId": "%s", "jobCategoryId": %s, "jobFreeText": %s, "internshipTypeId": "0RSRFD8XW8G36"}
                 """.formatted(beneficiary(), projectId, category == null ? "null" : "\"" + category + "\"",
                 freeText == null ? "null" : "\"" + freeText + "\"");
         return mockMvc.perform(post("/api/v1/tickets").header(USER, "tutor1").contentType(MediaType.APPLICATION_JSON)

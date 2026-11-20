@@ -541,8 +541,8 @@ class CompanyResourceIT {
         mockMvc.perform(post(API + "/" + id + "/deactivate").header(USER, "operatore.cc")
                         .contentType(MediaType.APPLICATION_JSON).content("{\"version\": " + company.getVersion() + "}"))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("Non si può disattivare l'azienda: la mansione «Magazziniere» è bloccata "
-                        + "dalla segnalazione n. " + ticket.getNumber()));
+                .andExpect(jsonPath("$.message").value("Non si può disattivare l'azienda: la mansione «Magazziniere» è "
+                        + "assegnata alla segnalazione n. " + ticket.getNumber() + " (tipo non indicato)"));
         assertThat(companies.findById(company.getId()).orElseThrow().isActive()).isTrue();
     }
 

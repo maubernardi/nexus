@@ -10,6 +10,7 @@ import {
   fetchJobCategories,
   fetchMyProjects,
   fetchNoHireReasons,
+  fetchProjectInternshipTypes,
   fetchProjects,
   fetchZones,
   type ReferenceItem,
@@ -62,6 +63,15 @@ export const useMyProjects = (enabled = true): UseQueryResult<ReferenceItem[]> =
   useQuery({ queryKey: ['me', 'projects'], queryFn: fetchMyProjects, enabled });
 
 /** Sedi di competenza attive del progetto scelto (US-308); nessuna richiesta senza progetto. */
+/** Tipi di tirocinio ammessi dal progetto (US-605); nessuna richiesta finché il progetto non è scelto. */
+export const useProjectInternshipTypes = (projectId: string): UseQueryResult<ReferenceItem[]> =>
+  useQuery({
+    queryKey: ['reference', 'internshipTypes', projectId],
+    queryFn: () => fetchProjectInternshipTypes(projectId),
+    enabled: projectId !== '',
+    staleTime: STALE,
+  });
+
 export const useProjectCompetenceSites = (projectId: string): UseQueryResult<ReferenceItem[]> =>
   useQuery({
     queryKey: ['reference', 'competenceSites', projectId],

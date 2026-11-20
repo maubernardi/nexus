@@ -86,8 +86,11 @@ class InternshipIT {
         JobSlot slot = scenarios.freeSlot(place, "Aiuto cuoco");
         ticket = scenarios.appointmentTicket(a.tutor1(), project, slot, a.operator());
         base = "/api/v1/tickets/" + TsidMapper.toExternal(ticket.getId()) + "/internship";
-        typeId = TsidMapper.toExternal(internshipTypes.save(new InternshipType("T_IT_" + ticket.getId(),
-                "Tipo di prova " + ticket.getId())).getId());
+        InternshipType type = internshipTypes.save(new InternshipType("T_IT_" + ticket.getId(),
+                "Tipo di prova " + ticket.getId()));
+        typeId = TsidMapper.toExternal(type.getId());
+        // il tipo è della segnalazione (US-605): la scheda parte da quello
+        ticket.setInternshipType(type);
         firenze = scenarios.municipality("Firenze", "FI");
         em.flush();
     }
@@ -191,7 +194,8 @@ class InternshipIT {
 
         AuditEvent event = ticketAudit().getLast();
         assertThat(event.getAction()).isEqualTo("INTERNSHIP_SAVE");
-        assertThat(event.getChanges()).containsOnlyKeys("internshipType", "startDate");
+        // la scheda parte già con il tipo della segnalazione (US-605): cambia solo la data
+        assertThat(event.getChanges()).containsOnlyKeys("startDate");
         assertThat(event.getChanges().get("startDate")).extracting("after").isEqualTo("2026-12-01");
         mockMvc.perform(get("/api/v1/tickets/" + TsidMapper.toExternal(ticket.getId()) + "/history")
                         .header(USER, "operatore.cc"))
@@ -808,7 +812,8 @@ class InternshipIT {
         assertThat(left.getResidenceStreetNumber()).isEqualTo("2");
         assertThat(left.getResidenceMunicipality().getId()).isEqualTo(firenze.getId());
         assertThat(left.getSiteMunicipality()).isNull();
-        assertThat(left.getInternshipType()).isNull();
+        // il tipo è della segnalazione e resta (US-605)
+        assertThat(left.getInternshipType()).isNotNull();
         assertThat(left.getStartDate()).isNull();
         assertThat(left.getSite()).isNull();
         assertThat(left.getNotes()).isNull();

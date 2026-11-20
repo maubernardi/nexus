@@ -12,7 +12,11 @@ import { apiError } from '@/config/api/errors';
 import type { Ticket } from '@/config/api/ticketApi';
 import { useReportableBeneficiaries } from '@/config/hooks/useBeneficiaries';
 import { useTutorBoardPost } from '@/config/hooks/useBoardPosts';
-import { useMyProjects, useProjectCompetenceSites } from '@/config/hooks/useReferenceData';
+import {
+  useMyProjects,
+  useProjectCompetenceSites,
+  useProjectInternshipTypes,
+} from '@/config/hooks/useReferenceData';
 import { useSubmitSpecialTicket } from '@/config/hooks/useTickets';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
@@ -116,9 +120,14 @@ const Notice = ({ id, heading, children }: { id: string; heading: string; childr
   </section>
 );
 
-type Values = { beneficiaryId: string; projectId: string; competenceSiteId: string };
+type Values = {
+  beneficiaryId: string;
+  projectId: string;
+  competenceSiteId: string;
+  internshipTypeId: string;
+};
 
-const FIELDS = ['beneficiaryId', 'projectId', 'competenceSiteId'] as const;
+const FIELDS = ['beneficiaryId', 'projectId', 'competenceSiteId', 'internshipTypeId'] as const;
 const fieldId = (field: keyof Values): string => `candidature-${field}`;
 
 /** Scelta del beneficiario e, per un annuncio aperto a tutti, del progetto della segnalazione. */
@@ -216,6 +225,7 @@ const CandidatureFields = ({ post: p, beneficiaries, projects, onSuccess }: Cand
       beneficiaryId: onlyOption(available),
       projectId: onlyOption(projects),
       competenceSiteId: '',
+      internshipTypeId: '',
     },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
@@ -231,6 +241,13 @@ const CandidatureFields = ({ post: p, beneficiaries, projects, onSuccess }: Cand
   useEffect(() => {
     setValue('competenceSiteId', onlySiteId);
   }, [projectId, onlySiteId, setValue]);
+  // tipi di tirocinio ammessi dal progetto della segnalazione (US-605)
+  const types = useProjectInternshipTypes(projectId);
+  const typeOptions = projectId === '' ? [] : (types.data ?? []);
+  const onlyTypeId = typeOptions.length === 1 ? typeOptions[0].id : '';
+  useEffect(() => {
+    setValue('internshipTypeId', onlyTypeId);
+  }, [projectId, onlyTypeId, setValue]);
 
   useEffect(() => {
     if (refused) refusedRef.current?.focus();
@@ -241,6 +258,7 @@ const CandidatureFields = ({ post: p, beneficiaries, projects, onSuccess }: Cand
     beneficiaryId: t('ticket.fields.beneficiary'),
     projectId: t('ticket.fields.project'),
     competenceSiteId: t('ticket.fields.competenceSite'),
+    internshipTypeId: t('ticket.fields.internshipType'),
   };
   const summary: SummaryError[] = FIELDS.flatMap((field) => {
     const message = errors[field]?.message;
@@ -256,6 +274,7 @@ const CandidatureFields = ({ post: p, beneficiaries, projects, onSuccess }: Cand
           beneficiaryId: v.beneficiaryId,
           projectId: p.project ? null : v.projectId,
           competenceSiteId: siteOptions.length > 0 ? v.competenceSiteId : null,
+          internshipTypeId: v.internshipTypeId,
         }),
       );
     } catch (error) {
@@ -362,6 +381,31 @@ const CandidatureFields = ({ post: p, beneficiaries, projects, onSuccess }: Cand
               )}
             </FormField>
           )}
+          <FormField
+            id={fieldId('internshipTypeId')}
+            label={labels.internshipTypeId}
+            hint={t('ticket.hints.internshipType')}
+            required
+            error={errors.internshipTypeId?.message}
+          >
+            {(f) => (
+              <NativeSelect
+                {...f}
+                disabled={projectId === '' || !types.data}
+                // senza progetto il menu è spento e basta l'errore del progetto
+                {...register('internshipTypeId', {
+                  validate: (v) => projectId === '' || v !== '' || t('form.errors.required'),
+                })}
+              >
+                <option value="">{t(projectId === '' ? 'ticket.chooseProjectFirst' : 'form.select')}</option>
+                {typeOptions.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))}
+              </NativeSelect>
+            )}
+          </FormField>
         </div>
         <div className="flex flex-wrap gap-3">
           <Button type="submit" size="lg" disabled={isSubmitting}>

@@ -12,7 +12,12 @@ import { apiError } from '@/config/api/errors';
 import type { ReferenceItem } from '@/config/api/referenceApi';
 import type { Ticket } from '@/config/api/ticketApi';
 import { useReportableBeneficiaries } from '@/config/hooks/useBeneficiaries';
-import { useJobCategories, useMyProjects, useProjectCompetenceSites } from '@/config/hooks/useReferenceData';
+import {
+  useJobCategories,
+  useMyProjects,
+  useProjectCompetenceSites,
+  useProjectInternshipTypes,
+} from '@/config/hooks/useReferenceData';
 import { useSubmitTicket } from '@/config/hooks/useTickets';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
@@ -27,9 +32,18 @@ type TicketFormValues = {
   jobFreeText: string;
   /** Sede di competenza del progetto (US-308). */
   competenceSiteId: string;
+  /** Tipo di tirocinio, tra quelli ammessi dal progetto (US-605). */
+  internshipTypeId: string;
 };
 
-const FIELDS = ['beneficiaryId', 'projectId', 'competenceSiteId', 'jobCategoryId', 'jobFreeText'] as const;
+const FIELDS = [
+  'beneficiaryId',
+  'projectId',
+  'competenceSiteId',
+  'internshipTypeId',
+  'jobCategoryId',
+  'jobFreeText',
+] as const;
 
 const fieldId = (field: keyof TicketFormValues): string => `ticket-${field}`;
 
@@ -155,6 +169,7 @@ const TicketFormFields = ({
       newCategory: false,
       jobFreeText: '',
       competenceSiteId: '',
+      internshipTypeId: '',
     },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
@@ -168,6 +183,7 @@ const TicketFormFields = ({
     beneficiaryId: t('ticket.fields.beneficiary'),
     projectId: t('ticket.fields.project'),
     competenceSiteId: t('ticket.fields.competenceSite'),
+    internshipTypeId: t('ticket.fields.internshipType'),
     jobCategoryId: t('ticket.fields.jobCategory'),
     jobFreeText: t('ticket.fields.jobFreeText'),
   };
@@ -181,6 +197,13 @@ const TicketFormFields = ({
     // cambiando progetto la sede si sceglie di nuovo; con una sola sede è già scelta
     setValue('competenceSiteId', onlySiteId);
   }, [projectId, onlySiteId, setValue]);
+  // tipi di tirocinio del progetto scelto (US-605): cambiando progetto il tipo si sceglie di nuovo
+  const types = useProjectInternshipTypes(projectId);
+  const typeOptions = projectId === '' ? [] : (types.data ?? []);
+  const onlyTypeId = typeOptions.length === 1 ? typeOptions[0].id : '';
+  useEffect(() => {
+    setValue('internshipTypeId', onlyTypeId);
+  }, [projectId, onlyTypeId, setValue]);
   const summary: SummaryError[] = FIELDS.flatMap((field) => {
     const message = errors[field]?.message;
     return message ? [{ fieldId: fieldId(field), message: `${labels[field]}: ${message}` }] : [];
@@ -196,6 +219,7 @@ const TicketFormFields = ({
           jobCategoryId: values.newCategory ? null : values.jobCategoryId,
           jobFreeText: values.newCategory ? values.jobFreeText.trim() : null,
           competenceSiteId: siteOptions.length > 0 ? values.competenceSiteId : null,
+          internshipTypeId: values.internshipTypeId,
         }),
       );
     } catch (error) {
@@ -292,6 +316,31 @@ const TicketFormFields = ({
             )}
           </FormField>
         )}
+        <FormField
+          id={fieldId('internshipTypeId')}
+          label={labels.internshipTypeId}
+          hint={t('ticket.hints.internshipType')}
+          required
+          error={errors.internshipTypeId?.message}
+        >
+          {(p) => (
+            <NativeSelect
+              {...p}
+              disabled={projectId === '' || !types.data}
+              // senza progetto il menu è spento e basta l'errore del progetto: nessun collegamento a un campo spento
+              {...register('internshipTypeId', {
+                validate: (v, values) => values.projectId === '' || v !== '' || t('form.errors.required'),
+              })}
+            >
+              <option value="">{t(projectId === '' ? 'ticket.chooseProjectFirst' : 'form.select')}</option>
+              {typeOptions.map((type) => (
+                <option key={type.id} value={type.id}>
+                  {type.name}
+                </option>
+              ))}
+            </NativeSelect>
+          )}
+        </FormField>
         {!newCategory && (
           <FormField
             id={fieldId('jobCategoryId')}
