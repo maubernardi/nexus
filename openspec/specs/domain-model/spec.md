@@ -91,9 +91,11 @@ autore, nota) e l'elenco delle aziende escluse per quel ticket, ciascuna al mass
 - **THEN** l'operazione viene rifiutata
 
 ### Requirement: Mansione e blocco
-Ogni mansione SHALL appartenere a un'azienda, a una tipologia del catalogo e a una zona, con stato `LIBERA` o `BLOCCATA`.
-Una mansione MUST essere `BLOCCATA` se e solo se riferisce il ticket che la blocca. Un ticket MUST bloccare al massimo
-una mansione.
+Ogni mansione SHALL appartenere a un'azienda, a una tipologia del catalogo e a una zona, con stato `LIBERA` o
+`BLOCCATA`. Una mansione SHALL essere assegnata a più segnalazioni, al massimo una per tipo di tirocinio: il database
+MUST rifiutare la seconda assegnazione dello stesso tipo. Una segnalazione MUST essere assegnata al più a una mansione.
+Lo stato SHALL essere `BLOCCATA` se e solo se la mansione ha almeno un'assegnazione, e la mansione MUST riferire una
+delle segnalazioni assegnate.
 
 #### Scenario: Mansione bloccata senza ticket
 - **WHEN** si imposta una mansione a `BLOCCATA` senza indicare il ticket
@@ -102,6 +104,10 @@ una mansione.
 #### Scenario: Stesso ticket su due mansioni
 - **WHEN** si tenta di far bloccare a un ticket una seconda mansione
 - **THEN** l'operazione viene rifiutata
+
+#### Scenario: Due assegnazioni dello stesso tipo
+- **WHEN** si assegna la stessa mansione a due segnalazioni dello stesso tipo di tirocinio
+- **THEN** il database rifiuta la seconda (`uq_ticket_job_slot_internship_type`)
 
 ### Requirement: Post di bacheca
 Ogni post SHALL riferire una mansione (azienda e zona si ricavano da essa), avere stato `DRAFT`, `PUBLISHED` o `ARCHIVED`

@@ -9,8 +9,8 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | https://portalenexus.it |
-| **Versione della demo** | `2a123af` (17/11/2026): Sprint 1–14 completi (motivo di chiusura, proroga, documenti sui modelli reali con il promotore e le variabili per progetto) |
-| **Ultimo aggiornamento** | 20/11/2026 (T-25.1 … T-25.3 e T-25.5: da provare dopo il deploy di US-508, US-509, US-510 e US-605; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Versione della demo** | `da10853` (20/11/2026): Sprint 1–15 completi (aziende da completare, categoria merceologica, referenti e recapiti, una mansione per più segnalazioni con il tipo di tirocinio; l'importazione dal database attuale si prova in locale) |
+| **Ultimo aggiornamento** | 20/11/2026 (T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 

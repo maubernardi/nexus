@@ -1,6 +1,7 @@
 # Sprint 15 — 19 – 21 novembre 2026
 
-**Stato:** 📋 pianificato, 27 punti. **Planning:** 19/11, sull'[analisi del database attuale](../../analisi/database-attuale.md)
+**Stato:** 🎉 concluso il 20/11: impegno di 27 punti completato, demo a `da10853`; collaudo T-25.1 … T-25.5 da fare;
+[review](sprint-15-review.md). **Planning:** 19/11, sull'[analisi del database attuale](../../analisi/database-attuale.md)
 (§7, §8) chiesta nella [review dello Sprint 14](sprint-14-review.md) (§8.2). Il PO ha scelto di mettere tutto nello
 sprint, anche sopra la velocity media (22,9).
 
@@ -14,11 +15,11 @@ sprint, anche sopra la velocity media (22,9).
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-508 | Partita IVA e nome da completare | 3 | ✅ Ready | `mark-companies-to-complete` | [#165](https://github.com/maubernardi/nexus/pull/165) |
-| US-509 | Categoria merceologica e attività dell'azienda | 3 | ✅ Ready | `add-business-categories` | [#166](https://github.com/maubernardi/nexus/pull/166) |
-| US-510 | Referenti e recapiti dell'azienda | 5 | ✅ Ready | `add-company-contacts` | [#167](https://github.com/maubernardi/nexus/pull/167) |
-| US-1309 | Importazione dal database attuale | 8 | ✅ Ready | `add-legacy-import` | [#168](https://github.com/maubernardi/nexus/pull/168) |
-| US-605 | Una mansione per più segnalazioni, una per tipo di tirocinio | 8 | ✅ Ready | `add-slot-per-internship-type` | |
+| US-508 | Partita IVA e nome da completare | 3 | 🎉 Done | `mark-companies-to-complete` | [#165](https://github.com/maubernardi/nexus/pull/165) |
+| US-509 | Categoria merceologica e attività dell'azienda | 3 | 🎉 Done | `add-business-categories` | [#166](https://github.com/maubernardi/nexus/pull/166) |
+| US-510 | Referenti e recapiti dell'azienda | 5 | 🎉 Done | `add-company-contacts` | [#167](https://github.com/maubernardi/nexus/pull/167) |
+| US-1309 | Importazione dal database attuale | 8 | 🎉 Done | `add-legacy-import` | [#168](https://github.com/maubernardi/nexus/pull/168) |
+| US-605 | Una mansione per più segnalazioni, una per tipo di tirocinio | 8 | 🎉 Done | `add-slot-per-internship-type` | [#169](https://github.com/maubernardi/nexus/pull/169) |
 
 Ordine: prima le tre storie che danno all'azienda i campi del database attuale, poi l'importazione, che li usa; per
 ultima US-605, indipendente. Prossima migrazione: **V45**.
@@ -26,6 +27,10 @@ ultima US-605, indipendente. Prossima migrazione: **V45**.
 Ogni storia con interfaccia nuova si controlla in Chrome **prima** della PR (A26). Se l'estensione si blocca, il
 controllo si fa con Chrome senza finestra e un profilo pulito (A34). Un difetto si segnala solo dopo aver escluso che
 dipenda dalla simulazione (A29).
+
+**Velocità:** 27 punti in due giorni (19–20/11). Migrazioni V45–V49, tutte solo additive (A16). Un deploy alla fine, su
+richiesta del PO, riuscito e controllato online (`da10853`, 20/11: `/api/v1/me` → 401, bundle nuovo con i testi delle
+storie dello sprint). Prossima migrazione: **V50**.
 
 ## Decisioni del planning (19/11)
 
@@ -103,10 +108,12 @@ dipenda dalla simulazione (A29).
 | US-509 unita (19/11) | 21 |
 | US-510 unita (19/11) | 16 |
 | US-1309 unita (20/11) | 8 |
+| US-605 unita (20/11) | 0 |
 
-## Per il PO durante lo sprint
+## Per il PO dopo lo sprint
 
-- Unire questa PR con il planning, poi le PR delle storie.
-- Controllare in Access le 7 chiamate con nome e cognome: n. 11719, 26711, 28531, 31037, 34116, 36661, 40614.
-- Caricare i 6 modelli di GOL (T-24.5) e il collaudo T-22 … T-24.
-- Chiudere la PR di Dependabot #156, se Dependabot non la chiude da solo.
+- Controllare in Access le 7 chiamate con nome e cognome (n. 11719, 26711, 28531, 31037, 34116, 36661, 40614) e le 20
+  che il resoconto dell'importazione indica come possibili nomi: prima dell'importazione vera (US-1306).
+- Collaudo T-25.1 … T-25.5 sulla demo `da10853` (T-25.4 in locale, sul tuo PC); T-24, T-23 e T-22, se non sono già
+  fatti; caricare i 6 modelli di GOL (T-24.5).
+- ~~Chiudere la PR di Dependabot #156~~: chiusa.

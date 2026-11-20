@@ -285,3 +285,46 @@ essere tolta: il messaggio SHALL dire quale modello la usa. Ogni modifica SHALL 
 - **WHEN** l'ADMIN toglie `SEDE_OPERATIVA` e il modello attivo «Convenzione GOL» la usa
 - **THEN** il salvataggio è rifiutato con il nome del modello
 
+### Requirement: Categorie merceologiche
+L'ADMIN SHALL gestire le categorie merceologiche delle aziende come gli altri cataloghi: aggiunta, rinomina,
+disattivazione e riattivazione, con l'audit. Le voci iniziali MUST essere le 53 categorie del database attuale, con
+due nomi corretti (refusi e spaziature). L'id di ogni voce iniziale MUST essere 893700000000000400 più il numero della
+categoria nel database attuale, perché l'importazione la ritrovi anche dopo una rinomina. Il Call Center e l'ADMIN
+SHALL ricevere le categorie attive per i loro moduli e filtri; il Tutor MUST NOT riceverle.
+
+#### Scenario: Voci iniziali
+- **WHEN** l'ADMIN apre il catalogo delle categorie merceologiche
+- **THEN** trova 53 voci attive, tra cui «Albergo», «Ristorante / Trattoria / Bistrot» e «Pulizie e facchinaggio»
+
+#### Scenario: Nuova categoria
+- **WHEN** l'ADMIN aggiunge «Agenzia immobiliare»
+- **THEN** la voce è attiva, il Call Center la trova nel modulo dell'azienda e la creazione è nell'audit
+
+#### Scenario: Categoria disattivata
+- **WHEN** l'ADMIN disattiva «Pensione», che è la categoria di un'azienda
+- **THEN** «Pensione» non si sceglie più per le altre aziende, ma l'azienda la mantiene
+
+#### Scenario: Tutor
+- **WHEN** un Tutor chiede le categorie merceologiche
+- **THEN** la risposta è `403`
+
+### Requirement: Ruoli dei referenti
+L'ADMIN SHALL gestire i ruoli dei referenti delle aziende come gli altri cataloghi: aggiunta, rinomina,
+disattivazione e riattivazione, con l'audit. Le voci iniziali MUST essere i 12 ruoli del database attuale, ripuliti
+dalle righe vuote, da quelle che non sono ruoli e dai doppioni. L'id di ogni voce iniziale MUST essere
+893700000000000500 più il numero del ruolo nel database attuale, perché l'importazione lo ritrovi anche dopo una
+rinomina. Il Call Center e l'ADMIN SHALL ricevere i ruoli attivi per il modulo dell'azienda; il Tutor MUST NOT
+riceverli.
+
+#### Scenario: Voci iniziali
+- **WHEN** l'ADMIN apre il catalogo dei ruoli dei referenti
+- **THEN** trova 12 voci attive, tra cui «Titolare», «Responsabile del personale» e «Legale rappresentante»
+
+#### Scenario: Nuovo ruolo
+- **WHEN** l'ADMIN aggiunge «Responsabile di cucina»
+- **THEN** la voce è attiva, il Call Center la trova nel modulo dell'azienda e la creazione è nell'audit
+
+#### Scenario: Tutor
+- **WHEN** un Tutor chiede i ruoli dei referenti
+- **THEN** la risposta è `403`
+
