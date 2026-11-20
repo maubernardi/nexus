@@ -163,6 +163,8 @@ Da stimare: **US-507** Richiesta di contatto di un'azienda dal Tutor, dopo l'ana
 *Proposta:* Sprint 15 chiuso con velocity **27**, tutto l'impegno del planning (chiusura nella
 [PR #171](https://github.com/maubernardi/nexus/pull/171)).
 
+> ✅ **Deciso (PO, 20/11): proposta accettata.**
+
 ### 8.2 Contenuto dello Sprint 16
 Nel backlog restano il backup, il passaggio in produzione, la revisione UX/UI e US-507 da analizzare. *Proposta:* uno
 sprint per **andare in produzione**: US-1302 (backup) e US-1306 (passaggio in produzione), 10 punti (§9). Con meno
@@ -171,10 +173,21 @@ punti della media resta tempo per correggere quello che emerge dal collaudo. Ser
 - prima la revisione UX/UI (US-1305), poi la produzione: va però raffinata con te;
 - prima l'analisi di US-507, se ti serve in produzione dal primo giorno.
 
+> ✅ **Deciso (PO, 20/11): proposta accettata**, Sprint 16 = US-1302 + US-1306. Prima del planning, un approfondimento
+> sui costi del backup (§8.3).
+
 ### 8.3 Destinazione del backup (US-1302)
 È in sospeso dalla review dello Sprint 13. *Proposta:* spazio di archiviazione **IONOS** (S3), 30 backup giornalieri
 cifrati, costo piccolo a consumo; le credenziali le metti tu nel `.env` del server. *Alternative:* un altro server o un
 NAS via SSH; un servizio esterno (es. Backblaze B2).
+
+> ✅ **Deciso (PO, 20/11): IONOS va bene, ma prima di partire il PO vuole capire i costi.** Approfondimento del 20/11:
+> - il backup compresso con tutti i dati del database attuale importati pesa circa **3,6 MB** (prova in locale);
+>   crescerà soprattutto con i CV, che l'anonimizzazione cancella dopo 2 anni;
+> - listino IONOS Cloud in vigore dal 29/10/2026: **0,007 € per GB ogni 30 giorni**, IVA esclusa; richieste gratuite;
+>   traffico in uscita gratuito fino a 2 TB al mese;
+> - con 30 copie giornaliere la spesa resta sotto 1 € al mese anche con molti CV. Il prezzo del proprio contratto si
+>   controlla nell'area clienti IONOS prima di attivare il servizio.
 
 ### 8.4 Ambiente e utenze della produzione (US-1306)
 - **Dove gira la produzione.** Il server di oggi ospita la demo e ha poca memoria per due installazioni complete
@@ -189,23 +202,34 @@ NAS via SSH; un servizio esterno (es. Backblaze B2).
   *Proposta:* mi mandi un elenco con nome, cognome, email, ruolo e progetti di ognuno. Se le persone sono una
   trentina o meno, l'ADMIN le invita a mano da «Nuovo utente»; se sono di più, ne parliamo prima del planning.
 
+> ✅ **Deciso (PO, 20/11): lo stesso server diventa la produzione.** Al passaggio c'è solo l'utenza dell'ADMIN; gli
+> altri account li crea il PO.
+
 ### 8.5 Collaudo prima della produzione
 Sulla demo ci sono le funzioni degli Sprint 12–15 da collaudare (T-22 … T-25) e i 6 modelli di GOL da caricare
 (T-24.5). *Proposta:* collaudo prima di US-1306, cominciando da T-24 e T-25, che usano i modelli e i dati veri. Ti
 chiedo una data indicativa, per fissare il passaggio in produzione.
 
+> ✅ **Deciso (PO, 20/11): la data si decide durante lo Sprint 16.**
+
 ### 8.6 Analisi di US-507 (richiesta di contatto di un'azienda dal Tutor)
 In sospeso dalla review dello Sprint 14 (§8.4): le domande sono lì. *Proposta:* una sessione durante lo Sprint 16;
 la storia si stima dopo, e può entrare in produzione in un secondo momento.
+
+> ✅ **Deciso (PO, 20/11): proposta accettata.**
 
 ### 8.7 Revisione UX/UI (US-1305)
 Hai deciso l'08/11 che si fa in uno sprint dedicato. *Proposta:* dopo il passaggio in produzione, partendo dalle prime
 settimane d'uso reale di Tutor e Call Center: è quello che serve per studiare i flussi veri.
 
+> ✅ **Deciso (PO, 20/11): proposta accettata.**
+
 ### 8.8 Chiamate del database attuale
 Il 19/11 hai deciso che restano nell'archivio, non visibili (D4). Il 20/11 ti ho proposto di mostrarle in sola lettura
 nella pagina dell'azienda (circa 3 punti), e non l'hai scelta. *Proposta:* resta valida la decisione del 19/11; i dati
 restano nell'archivio e la storia si può scrivere quando servirà.
+
+> ✅ **Deciso (PO, 20/11): proposta accettata.**
 
 ## 9. Proposta per lo Sprint 16
 
@@ -221,13 +245,16 @@ dati del database attuale importati e un backup giornaliero fuori dal server, pr
 Prima del planning servono: la destinazione del backup (§8.3), l'ambiente e l'elenco delle utenze (§8.4), il collaudo
 (§8.5). US-1306 va raffinata insieme al planning: oggi ha un criterio solo. Prossima migrazione: **V50**.
 
+> ✅ **Deciso (PO, 20/11): proposta accettata.** Il planning parte dopo l'approfondimento sui costi del backup (§8.3).
+
 ## 10. Azioni a carico del PO
 
-- [ ] Decidere i punti §8.1 … §8.8.
+- [x] Decidere i punti §8.1 … §8.8 (20/11).
 - [ ] Unire la [PR #171](https://github.com/maubernardi/nexus/pull/171) con la chiusura dello Sprint 15.
 - [ ] Controllare in Access le 7 chiamate con nome e cognome (n. 11719, 26711, 28531, 31037, 34116, 36661, 40614) e le
   20 che il resoconto indica come possibili nomi, prima dell'importazione vera.
-- [ ] L'elenco delle utenze della produzione (§8.4).
+- [ ] Controllare nell'area clienti IONOS il prezzo dell'Object Storage del proprio contratto (§8.3).
+- [ ] Creare gli altri account della produzione dopo il passaggio; l'utenza dell'ADMIN arriva con US-1306 (§8.4).
 - [ ] Caricare i 6 modelli di GOL da «Modelli dei documenti» (T-24.5).
 - [ ] Collaudo T-25.1 … T-25.5 sulla demo `da10853` (T-25.4 in locale); T-24.1 … T-24.6, T-23.1 … T-23.4 e
   T-22.1 … T-22.4, se non sono già fatti.
