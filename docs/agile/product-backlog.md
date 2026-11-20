@@ -1445,16 +1445,28 @@ Criteri di accettazione:
 Come **PO** voglio passare dalla demo alla produzione per usare NEXUS con dati reali.
 
 Criteri di accettazione:
-- **Stesso server, installazione pulita** (PO, 20/11): la demo sparisce. Database e utenti ripartono da zero, senza
-  dati dimostrativi (niente profilo `seed`).
-- **Accesso**: il realm di produzione ha le impostazioni di oggi (criteri delle password, blocco dopo i tentativi
-  falliti, email, tema, registro degli accessi) e nessun utente di prova.
+- **Stesso server, con i dati della demo** (PO, 20/11): si riporta tutto dalla demo, tranne segnalazioni, utenti e
+  beneficiari. Restano la configurazione e i cataloghi (comuni, progetti, tipologie di mansione, sedi di competenza,
+  tipi di tirocinio per progetto, enti, promotore e variabili, modelli dei documenti, calendario e gli altri elenchi)
+  e le impostazioni di Keycloak (criteri delle password, blocco dopo i tentativi falliti, email, tema, registro degli
+  accessi).
+- **Pulizia della demo**, con uno script che gira una volta sola, in una transazione. Toglie:
+  - le segnalazioni con quello che hanno attaccato: bacheca, schede del tirocinio, report di chiusura, storico degli
+    stati, notifiche;
+  - i beneficiari, con i curriculum;
+  - gli utenti, in NEXUS e in Keycloak; resta l'account tecnico del backend;
+  - le aziende della demo, con referenti, diario, storico e mansioni.
+
+  Storico dell'azienda, diario, report di chiusura e audit rifiutano le cancellazioni (EN-2): lo script sospende queste
+  regole solo dentro la sua transazione. Si prova in locale su una copia del backup della demo, che ha solo dati
+  dimostrativi.
+- **Le aziende vengono dal database attuale** (PO, 20/11): importazione sul server dopo la pulizia (US-1309,
+  [analisi §9.2](../analisi/database-attuale.md)). Si controlla il resoconto, poi il file Access si cancella dal
+  server.
+- **Mai più dati dimostrativi**: il backend parte senza il profilo `seed`, e Keycloak importa un realm senza utenti di
+  prova. Se il suo database ripartisse vuoto, gli account dimostrativi con le password note non tornerebbero.
 - **Solo l'ADMIN** (PO, 20/11): al primo avvio, se non c'è un ADMIN, NEXUS lo crea dall'email indicata nel `.env` e gli
   manda l'invito, come US-103. Gli altri account li crea il PO.
-- **Configurazione iniziale** con una lista di controllo per l'ADMIN: comuni (file ISTAT, US-114), progetti, tipologie
-  di mansione, sedi di competenza, tipi di tirocinio per progetto, enti, promotore e variabili, modelli dei documenti.
-- **Importazione del database attuale sul server** (US-1309, [analisi §9.2](../analisi/database-attuale.md)), dopo i
-  comuni. Si controlla il resoconto, poi il file Access si cancella dal server.
 - **Si può tornare indietro**: prima del passaggio un backup della demo (US-1302); se il passaggio non riesce, si
   ripristina la demo. Dopo il passaggio il backup giornaliero gira sui dati veri dal primo giorno.
 - **Procedura passo per passo** nel README. I comandi che chiedono i permessi di amministratore del server li esegue il
@@ -1463,8 +1475,8 @@ Criteri di accettazione:
   con l'esito scritto.
 - **Nomi**: «demo» diventa «produzione» nei workflow, nel README e nel collaudo. Le prove delle storie future si fanno
   in locale (review dello Sprint 15, §8.4).
-- Stima portata da 5 a 8 punti al planning del 20/11: il criterio unico di prima nascondeva il realm di produzione, la
-  creazione dell'ADMIN, la procedura, l'importazione sul server e il cambio di nome.
+- Stima portata da 5 a 8 punti al planning del 20/11: il criterio unico di prima nascondeva la pulizia della demo, il
+  realm senza utenti, la creazione dell'ADMIN, la procedura, l'importazione sul server e il cambio di nome.
 
 Dipendenze: US-102..105, US-1302, US-1307, US-1309
 
