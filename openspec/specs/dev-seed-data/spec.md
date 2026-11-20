@@ -46,3 +46,39 @@ toccare le aziende modificate a mano.
 - **WHEN** un'azienda dimostrativa ha già un comune scelto a mano
 - **THEN** l'avvio non lo cambia
 
+### Requirement: Aziende dimostrative da completare
+I dati dimostrativi SHALL comprendere due aziende arrivate come dal database attuale:
+- una con il nome e senza partita IVA;
+- una senza nome e senza partita IVA.
+
+Servono a provare l'etichetta «Da completare», il filtro e il completamento dalla scheda.
+
+#### Scenario: Elenco filtrato
+- **WHEN** nella demo l'operatore filtra le aziende da completare
+- **THEN** l'elenco mostra le due aziende dimostrative da completare
+
+### Requirement: Categoria delle aziende dimostrative
+Le aziende dimostrative SHALL avere una categoria merceologica e una descrizione dell'attività. Le aziende dimostrative
+già modificate a mano MUST NOT cambiare.
+
+#### Scenario: Elenco con le categorie
+- **WHEN** il backend locale si avvia con i dati dimostrativi
+- **THEN** l'elenco delle aziende mostra una categoria per ogni azienda dimostrativa
+
+#### Scenario: Categoria già scelta a mano
+- **WHEN** un'azienda dimostrativa ha già una categoria o un'attività scelta a mano
+- **THEN** il riavvio non la cambia
+
+### Requirement: Referenti delle aziende dimostrative
+Le aziende dimostrative senza referenti SHALL ricevere referenti con il ruolo, e una di loro SHALL avere anche la sede
+operativa quando l'elenco dei comuni è caricato. Le aziende dimostrative che hanno già referenti o una sede operativa
+MUST NOT cambiare.
+
+#### Scenario: Demo nuova
+- **WHEN** il backend locale si avvia su un database vuoto con i dati dimostrativi
+- **THEN** ogni azienda dimostrativa ha almeno un referente con il ruolo, e una ne ha due
+
+#### Scenario: Referenti già presenti
+- **WHEN** un'azienda dimostrativa ha già dei referenti
+- **THEN** l'avvio non li cambia
+

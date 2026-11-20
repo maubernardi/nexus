@@ -47,6 +47,10 @@ dell'azienda. Il sistema SHALL rispondere `409` con un messaggio chiaro, senza m
 - **WHEN** l'operatore propone una mansione già assegnata a un'altra segnalazione dello stesso tipo
 - **THEN** la risposta è `409` con il numero di quella segnalazione e la segnalazione resta in lavorazione
 
+#### Scenario: Mansione appena bloccata
+- **WHEN** la mansione scelta è stata assegnata a un'altra segnalazione, o modificata, un istante prima
+- **THEN** la risposta è `409`, la segnalazione resta in lavorazione e l'interfaccia spiega cosa è successo
+
 #### Scenario: Tipo non indicato
 - **WHEN** l'operatore propone una mansione a una segnalazione senza tipo di tirocinio
 - **THEN** la risposta è `409` e l'interfaccia spiega che il tipo lo indica il Tutor

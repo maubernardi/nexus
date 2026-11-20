@@ -22,11 +22,17 @@ aziende, senza mai cancellarle. Il Tutor SHALL NOT accedere all'anagrafica.
 
 ### Requirement: Partita IVA valida e univoca
 Il sistema SHALL accettare solo P.IVA di 11 cifre e SHALL rifiutare una P.IVA già usata da un'altra azienda con un
-errore sul campo.
+errore sul campo. La P.IVA segnaposto «00000000000» delle aziende arrivate dal database attuale senza partita IVA
+SHALL NOT contare per l'unicità: più aziende possono averla.
 
 #### Scenario: P.IVA duplicata
 - **WHEN** si registra o modifica un'azienda con la P.IVA di un'altra
 - **THEN** la risposta è `400` con errore sul campo `vatCode`
+
+#### Scenario: Più aziende senza partita IVA
+- **WHEN** il database contiene già un'azienda con la P.IVA «00000000000» e ne arriva un'altra con la stessa P.IVA
+- **THEN** il database le accetta entrambe, mentre una P.IVA vera ripetuta resta rifiutata dal vincolo
+  `uq_company_vat_code`
 
 ### Requirement: Modifiche concorrenti e tracciate
 Il sistema SHALL rifiutare con `409` una modifica basata su una versione superata e SHALL registrare nell'audit solo i
@@ -131,4 +137,131 @@ provincia. L'audit SHALL registrare indirizzo e comune cambiati con i valori pri
 #### Scenario: Indirizzo già inserito come testo libero
 - **WHEN** l'operatore apre un'azienda registrata prima di questa funzione
 - **THEN** l'indirizzo contiene il testo di prima e il comune è vuoto, da scegliere
+
+### Requirement: Dati da completare
+Un'azienda arrivata dal database attuale SHALL avere al posto dei dati che mancano i valori segnaposto:
+- la P.IVA «00000000000»;
+- il nome «Azienda senza nome n. ‹numero›».
+
+Il sistema SHALL indicare per ogni azienda quali di questi dati sono da completare.
+- **Nell'elenco delle aziende** SHALL comparire «Da completare» nella colonna del dato che manca, e l'elenco SHALL
+  potersi filtrare sulle sole aziende da completare.
+- **Nella scheda e nel dettaglio dell'abbinamento** SHALL comparire quali dati mancano, MUST NOT comparire la P.IVA
+  segnaposto.
+
+Registrazione e modifica dell'azienda MUST rifiutare con `400` sul campo:
+- la P.IVA «00000000000»;
+- un nome che comincia con «Azienda senza nome n.», senza distinguere maiuscole e minuscole.
+
+Nella scheda i campi con il segnaposto SHALL aprirsi vuoti, così il salvataggio chiede i dati veri. Le altre sezioni
+della scheda (legale rappresentante, codici ATECO, mansioni, note) SHALL restare modificabili.
+
+#### Scenario: Azienda senza partita IVA nell'elenco
+- **WHEN** l'operatore cerca un'azienda che ha la P.IVA «00000000000»
+- **THEN** nella colonna della partita IVA compare «Da completare» al posto degli zeri
+
+#### Scenario: Filtro sulle aziende da completare
+- **WHEN** l'operatore sceglie «Solo le aziende da completare»
+- **THEN** l'elenco mostra solo le aziende senza partita IVA o senza nome, e il filtro resta nell'indirizzo della
+  pagina
+
+#### Scenario: Scheda da completare
+- **WHEN** l'operatore apre la scheda dell'azienda «Azienda senza nome n. 1234», che non ha la partita IVA
+- **THEN** la pagina dice che mancano ragione sociale e partita IVA, e nel modulo i due campi sono vuoti e obbligatori
+
+#### Scenario: Segnaposto rifiutato
+- **WHEN** si registra o modifica un'azienda con la P.IVA «00000000000» o con il nome «azienda senza nome n. 12»
+- **THEN** la risposta è `400` con l'errore sul campo `vatCode` o `name`, che chiede il dato vero, e nulla è salvato
+
+#### Scenario: Completamento
+- **WHEN** l'operatore inserisce ragione sociale e partita IVA vere e salva
+- **THEN** l'azienda non è più da completare e l'audit registra i valori prima e dopo
+
+### Requirement: Categoria merceologica e attività dell'azienda
+Il Call Center e l'ADMIN SHALL poter indicare nella scheda dell'azienda:
+- la categoria merceologica, facoltativa, scelta tra le voci attive del catalogo;
+- la descrizione dell'attività, facoltativa, al massimo 200 caratteri.
+
+Un'azienda con una categoria poi disattivata SHALL mantenerla, anche quando si salva la scheda; una categoria
+disattivata o inesistente MUST NOT essere scelta altrimenti (`400` sul campo). L'audit SHALL registrare categoria e
+attività cambiate, con i valori prima e dopo. L'elenco delle aziende SHALL mostrare la categoria e SHALL potersi
+filtrare per categoria, insieme alla ricerca e agli altri filtri, con il filtro nell'indirizzo della pagina. Il
+dettaglio dell'abbinamento SHALL mostrare categoria e attività.
+
+#### Scenario: Categoria e attività
+- **WHEN** l'operatore sceglie «Ristorante / Trattoria / Bistrot», scrive «Pizzeria» come attività e salva
+- **THEN** la scheda e l'elenco mostrano la categoria, e l'audit registra categoria e attività con i valori prima e
+  dopo
+
+#### Scenario: Filtro per categoria
+- **WHEN** l'operatore sceglie nell'elenco la categoria «Bar / Pub»
+- **THEN** l'elenco mostra solo le aziende di quella categoria e l'indirizzo della pagina contiene il filtro
+
+#### Scenario: Categoria disattivata sull'azienda
+- **WHEN** l'operatore salva la scheda di un'azienda la cui categoria è stata disattivata
+- **THEN** la categoria resta e il salvataggio riesce
+
+#### Scenario: Categoria non valida
+- **WHEN** il modulo invia una categoria disattivata che l'azienda non ha, o una categoria inesistente
+- **THEN** la risposta è `400` con l'errore sul campo `businessCategoryId`
+
+### Requirement: Referenti dell'azienda
+Il Call Center e l'ADMIN SHALL poter registrare nella scheda dell'azienda **fino a 10 referenti**, in ordine. Ogni
+referente ha nome, ruolo, telefono, cellulare ed email, tutti facoltativi. Ogni referente MUST avere almeno il nome o il
+ruolo. Il ruolo si sceglie tra le voci attive del catalogo. Un referente con un ruolo poi disattivato SHALL mantenerlo
+quando si salva la scheda. Un ruolo disattivato o inesistente MUST NOT essere scelto altrimenti (`400` sul campo).
+
+Il referente registrato prima di questa funzione SHALL diventare il primo referente, senza ruolo. I referenti sono
+dati personali: l'audit dell'azienda MUST registrarli solo come «cambiati», senza valori. L'elenco delle aziende SHALL
+mostrare il primo referente e quanti sono gli altri. Il dettaglio dell'abbinamento SHALL mostrare tutti i referenti con
+ruolo e recapiti.
+
+#### Scenario: Due referenti con il ruolo
+- **WHEN** l'operatore aggiunge «Paola Neri», Titolare, con il cellulare, e un secondo referente, Responsabile del
+  personale, con l'email, e salva
+- **THEN** la scheda mostra i due referenti in quell'ordine e l'audit registra i referenti come cambiati, senza valori
+
+#### Scenario: Solo il ruolo
+- **WHEN** l'operatore aggiunge un referente con il solo ruolo «Responsabile del personale»
+- **THEN** il salvataggio riesce
+
+#### Scenario: Né nome né ruolo
+- **WHEN** l'operatore aggiunge un referente con il solo telefono
+- **THEN** la risposta è `400` con l'errore sul nome di quel referente
+
+#### Scenario: Referente di prima
+- **WHEN** l'operatore apre un'azienda che aveva il referente «Mario Rossi»
+- **THEN** «Mario Rossi» è il primo referente, senza ruolo
+
+#### Scenario: Ruolo disattivato sul referente
+- **WHEN** l'operatore salva la scheda di un'azienda con un referente il cui ruolo è stato disattivato
+- **THEN** il ruolo resta e il salvataggio riesce
+
+#### Scenario: Ruolo non valido
+- **WHEN** il modulo invia un ruolo disattivato che nessun referente dell'azienda ha, o un ruolo inesistente
+- **THEN** la risposta è `400` con l'errore sul ruolo di quel referente
+
+#### Scenario: Troppi referenti
+- **WHEN** il modulo invia 11 referenti
+- **THEN** la risposta è `400`
+
+### Requirement: Recapiti e sede operativa dell'azienda
+L'azienda SHALL avere, oltre a telefono ed email, il **cellulare**, il **fax** e una **seconda email**, facoltativi e
+con gli stessi controlli di formato di telefono ed email. L'azienda SHALL avere anche una **sede operativa**
+facoltativa, con l'indirizzo e il comune scelto dall'elenco ufficiale, come la sede legale. L'audit MUST registrare i
+recapiti nuovi solo come «cambiati», come telefono ed email, e SHALL registrare la sede operativa con i valori prima e
+dopo. Il dettaglio dell'abbinamento SHALL mostrare i recapiti nuovi e la sede operativa.
+
+#### Scenario: Recapiti nuovi
+- **WHEN** l'operatore indica cellulare, fax e seconda email e salva
+- **THEN** la scheda li mostra e l'audit li registra come cambiati, senza valori
+
+#### Scenario: Sede operativa
+- **WHEN** l'operatore indica «Via dei Mille 3» e sceglie «Prato (PO)» come sede operativa e salva
+- **THEN** il dettaglio dell'abbinamento mostra la sede operativa «Via dei Mille 3, Prato (PO)» e l'audit registra
+  indirizzo e comune
+
+#### Scenario: Fax non valido
+- **WHEN** l'operatore scrive lettere nel fax
+- **THEN** la risposta è `400` con l'errore sul campo `fax`
 
