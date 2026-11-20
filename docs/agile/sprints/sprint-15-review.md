@@ -187,7 +187,9 @@ NAS via SSH; un servizio esterno (es. Backblaze B2).
 > - listino IONOS Cloud in vigore dal 29/10/2026: **0,007 € per GB ogni 30 giorni**, IVA esclusa; richieste gratuite;
 >   traffico in uscita gratuito fino a 2 TB al mese;
 > - con 30 copie giornaliere la spesa resta sotto 1 € al mese anche con molti CV. Il prezzo del proprio contratto si
->   controlla nell'area clienti IONOS prima di attivare il servizio.
+>   controlla nell'area clienti IONOS prima di attivare il servizio;
+> - prezzo del contratto del PO, visto nell'area clienti alla creazione: **0,008 € per GiB ogni 30 giorni**. Con 30
+>   copie: meno di 0,01 € al mese oggi, circa 0,06 € con 500 CV da 0,5 MB, circa 0,60 € nel caso estremo (IVA esclusa).
 
 ### 8.4 Ambiente e utenze della produzione (US-1306)
 - **Dove gira la produzione.** Il server di oggi ospita la demo e ha poca memoria per due installazioni complete
@@ -253,7 +255,8 @@ Prima del planning servono: la destinazione del backup (§8.3), l'ambiente e l'e
 - [ ] Unire la [PR #171](https://github.com/maubernardi/nexus/pull/171) con la chiusura dello Sprint 15.
 - [ ] Controllare in Access le 7 chiamate con nome e cognome (n. 11719, 26711, 28531, 31037, 34116, 36661, 40614) e le
   20 che il resoconto indica come possibili nomi, prima dell'importazione vera.
-- [ ] Controllare nell'area clienti IONOS il prezzo dell'Object Storage del proprio contratto (§8.3).
+- [x] Controllare nell'area clienti IONOS il prezzo dell'Object Storage del proprio contratto (§8.3): 0,008 €/GiB
+  ogni 30 giorni.
 - [ ] Creare gli altri account della produzione dopo il passaggio; l'utenza dell'ADMIN arriva con US-1306 (§8.4).
 - [ ] Caricare i 6 modelli di GOL da «Modelli dei documenti» (T-24.5).
 - [ ] Collaudo T-25.1 … T-25.5 sulla demo `da10853` (T-25.4 in locale); T-24.1 … T-24.6, T-23.1 … T-23.4 e
