@@ -1,0 +1,289 @@
+#!/usr/bin/env bash
+# NEXUS — backup notturno cifrato dei database (US-1302).
+#   nexus-backup pianifica   comando dell'immagine: un backup ogni notte alle 3:30, ora italiana
+#   nexus-backup backup      un backup subito (dalle Actions: «backup adesso»)
+#   nexus-backup stato       esito dei backup; esce con 1 se l'ultimo riuscito ha più di 26 ore o non c'è
+# Il backup salva i database nexus e keycloak con pg_dump, li chiude in un tar con l'indice e le impronte, lo cifra con
+# la chiave pubblica age del PO e lo carica su IONOS Object Storage (S3). La chiave privata non è mai sul server.
+# Nel file di stato e nel log vanno solo date, dimensioni, nomi dei file e il passo fallito: mai dati personali.
+set -euo pipefail
+
+readonly STATE_DIR="${NEXUS_BACKUP_STATE_DIR:-/var/lib/postgresql/nexus-backup}"
+readonly STATE="$STATE_DIR/stato"
+readonly LOCK="$STATE_DIR/.lock"
+readonly RUN_AT="03:30"
+readonly MAX_AGE_HOURS=26
+readonly RETENTION_DAYS=30
+readonly PREFIX="nexus"
+export TZ="${TZ:-Europe/Rome}"
+# AWS CLI con i servizi compatibili con S3: niente impronte aggiuntive (non tutti le supportano), niente metadati EC2
+export AWS_REQUEST_CHECKSUM_CALCULATION=when_required AWS_RESPONSE_CHECKSUM_VALIDATION=when_required
+export AWS_EC2_METADATA_DISABLED=true AWS_PAGER=""
+
+log() { printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*"; }
+now_iso() { date -u +%Y-%m-%dT%H:%M:%SZ; }
+local_time() { date -d "@$1" '+%d/%m/%Y %H:%M'; }
+
+# --- stato: righe chiave=valore, riscritte per intero a ogni tentativo ----------------------------------------------
+declare -A S=()
+load_state() {
+  [[ -f $STATE ]] || return 0
+  local k v
+  while IFS='=' read -r k v; do
+    [[ $k =~ ^[a-z_]+$ ]] && S[$k]=$v
+  done <"$STATE"
+}
+save_state() {
+  local tmp="$STATE.tmp" k
+  : >"$tmp"
+  for k in $(printf '%s\n' "${!S[@]}" | sort); do
+    printf '%s=%s\n' "$k" "${S[$k]//$'\n'/ }" >>"$tmp"
+  done
+  mv -f "$tmp" "$STATE"
+}
+
+# --- configurazione -------------------------------------------------------------------------------------------------
+readonly REQUIRED=(NEXUS_BACKUP_S3_ENDPOINT NEXUS_BACKUP_S3_REGION NEXUS_BACKUP_S3_BUCKET NEXUS_BACKUP_S3_ACCESS_KEY
+  NEXUS_BACKUP_S3_SECRET_KEY NEXUS_BACKUP_AGE_RECIPIENT NEXUS_OWNER_PASSWORD KEYCLOAK_DB_PASSWORD)
+
+# stampa il problema di configurazione, o niente se è tutto a posto
+config_problem() {
+  local v
+  for v in "${REQUIRED[@]}"; do
+    [[ -n ${!v:-} ]] || { echo "manca $v nel .env"; return; }
+  done
+  [[ $NEXUS_BACKUP_AGE_RECIPIENT =~ ^age1[02-9ac-hj-np-z]{58}$ ]] \
+    || { echo "NEXUS_BACKUP_AGE_RECIPIENT non è una chiave pubblica age (age1…)"; return; }
+  # solo HTTPS; HTTP solo per la prova della CI, su richiesta esplicita
+  [[ $NEXUS_BACKUP_S3_ENDPOINT == https://* || ${NEXUS_BACKUP_ALLOW_HTTP:-} == true ]] \
+    || echo "NEXUS_BACKUP_S3_ENDPOINT deve cominciare con https://"
+}
+
+s3() {
+  AWS_ACCESS_KEY_ID="$NEXUS_BACKUP_S3_ACCESS_KEY" AWS_SECRET_ACCESS_KEY="$NEXUS_BACKUP_S3_SECRET_KEY" \
+    aws --endpoint-url "$NEXUS_BACKUP_S3_ENDPOINT" --region "$NEXUS_BACKUP_S3_REGION" --output json s3api "$@"
+}
+
+# Content-MD5 (base64 dell'MD5 binario): con il blocco degli oggetti S3 lo chiede per ogni caricamento
+content_md5() {
+  python3 -I -c 'import base64, hashlib, sys
+h = hashlib.md5(usedforsecurity=False)
+with open(sys.argv[1], "rb") as f:
+    for chunk in iter(lambda: f.read(1 << 20), b""):
+        h.update(chunk)
+print(base64.b64encode(h.digest()).decode())' "$1"
+}
+
+# --- backup ---------------------------------------------------------------------------------------------------------
+fail_step() { # $1 passo
+  S[tentativo_esito]="errore"
+  S[tentativo_passo]="$1"
+  save_state
+  log "ERRORE: backup non riuscito al passo «$1». L'ultimo backup riuscito resta quello di prima."
+  exit 1
+}
+
+cmd_backup() {
+  mkdir -p "$STATE_DIR"
+  exec 9>"$LOCK"
+  if ! flock -n 9; then
+    log "Un backup è già in corso: non ne avvio un altro."
+    return 0
+  fi
+  load_state
+  S[tentativo_il]="$(now_iso)"
+  S[tentativo_epoch]="$(date +%s)"
+  S[tentativo_passo]=""
+  S[tentativo_dettaglio]=""
+  S[avvisi]=""
+
+  local problem
+  problem="$(config_problem)"
+  if [[ -n $problem ]]; then
+    S[tentativo_esito]="non configurato"
+    S[tentativo_dettaglio]="$problem"
+    save_state
+    log "Backup non configurato: $problem."
+    exit 1
+  fi
+
+  local started stamp key archive size md5 head lock_mode lock_until warnings=()
+  started=$(date +%s)
+  # cartella di lavoro in /tmp (tmpfs nel compose), globale per la trap: cancellata in ogni caso, anche dopo un errore
+  work=$(mktemp -d /tmp/nexus-backup.XXXXXX)
+  trap 'rm -rf -- "$work"' EXIT
+  stamp=$(date -u +%Y%m%d-%H%M%SZ)
+  key="$PREFIX/$(date -u +%Y/%m)/nexus-$stamp.tar.age"
+  log "Backup $key"
+
+  log "Salvataggio del database nexus"
+  PGPASSWORD="$NEXUS_OWNER_PASSWORD" pg_dump --no-password --format=custom --host="${PGHOST:-postgres}" \
+    --username=nexus_owner --dbname=nexus --file="$work/nexus.dump" || fail_step "salvataggio di nexus"
+  log "Salvataggio del database keycloak"
+  PGPASSWORD="$KEYCLOAK_DB_PASSWORD" pg_dump --no-password --format=custom --host="${PGHOST:-postgres}" \
+    --username=keycloak --dbname=keycloak --file="$work/keycloak.dump" || fail_step "salvataggio di keycloak"
+
+  (cd "$work" && sha256sum nexus.dump keycloak.dump >SHA256SUMS) || fail_step "impronte"
+  cat >"$work/MANIFEST.txt" <<EOF
+NEXUS — backup dei database (US-1302)
+creato_il=$(now_iso)
+nexus_version=${NEXUS_VERSION:-sconosciuta}
+postgresql=$(pg_dump --version)
+nexus.dump=$(stat -c %s "$work/nexus.dump") byte
+keycloak.dump=$(stat -c %s "$work/keycloak.dump") byte
+Ripristino: README, «Backup del database».
+EOF
+
+  log "Cifratura con la chiave pubblica del PO"
+  archive="$work/archivio.tar.age"
+  tar -C "$work" -cf - MANIFEST.txt SHA256SUMS nexus.dump keycloak.dump \
+    | age --encrypt --recipient "$NEXUS_BACKUP_AGE_RECIPIENT" --output "$archive" || fail_step "cifratura"
+  rm -f -- "$work/nexus.dump" "$work/keycloak.dump"
+  size=$(stat -c %s "$archive")
+  md5=$(content_md5 "$archive")
+
+  log "Caricamento su $NEXUS_BACKUP_S3_ENDPOINT ($size byte)"
+  s3 put-object --bucket "$NEXUS_BACKUP_S3_BUCKET" --key "$key" --body "$archive" --content-md5 "$md5" \
+    --content-type application/octet-stream >/dev/null || fail_step "caricamento"
+
+  log "Verifica del caricamento"
+  head=$(s3 head-object --bucket "$NEXUS_BACKUP_S3_BUCKET" --key "$key") || fail_step "verifica"
+  [[ $(json_field ContentLength <<<"$head") == "$size" ]] || fail_step "verifica: dimensione diversa"
+  lock_mode=$(json_field ObjectLockMode <<<"$head")
+  lock_until=$(json_field ObjectLockRetainUntilDate <<<"$head")
+  if [[ -n $lock_mode ]]; then
+    S[riuscito_blocco]="$lock_mode fino al $(iso_to_local "$lock_until")"
+  else
+    S[riuscito_blocco]="assente"
+    warnings+=("backup non protetto: il contenitore non ha il blocco degli oggetti")
+  fi
+
+  log "Regola di conservazione ($RETENTION_DAYS giorni)"
+  if ! ensure_lifecycle; then
+    warnings+=("regola di conservazione non impostata: mettila dalla console di IONOS (README)")
+  fi
+
+  S[tentativo_esito]="ok"
+  S[riuscito_il]="$(now_iso)"
+  S[riuscito_epoch]="$(date +%s)"
+  S[riuscito_oggetto]="$key"
+  S[riuscito_byte]="$size"
+  S[riuscito_durata_s]="$(($(date +%s) - started))"
+  S[avvisi]="$(IFS=';'; echo "${warnings[*]}")"
+  save_state
+  log "OK: $key, $size byte, blocco ${S[riuscito_blocco]}"
+  local w
+  for w in "${warnings[@]}"; do log "AVVISO: $w"; done
+}
+
+# legge un campo di primo livello dal JSON della AWS CLI (python3 arriva con aws-cli); vuoto se manca
+json_field() {
+  python3 -I -c 'import json, sys; v = json.load(sys.stdin).get(sys.argv[1]); print("" if v is None else v)' "$1"
+}
+
+# Ciclo di vita del contenitore: le versioni correnti scadono dopo 30 giorni (marcatore di cancellazione), quelle non
+# più correnti si cancellano dopo 1 giorno, quando il blocco di 30 giorni è già scaduto; via i marcatori rimasti soli.
+# Si riscrive dopo ogni backup: è idempotente. L'impronta della richiesta è CRC32: quella predefinita della AWS CLI
+# recente (CRC64NVME) non la accettano tutti i servizi compatibili con S3. Se il servizio rifiuta anche la regola
+# semplice, va bene una regola di 30 giorni messa a mano dalla console (README).
+ensure_lifecycle() {
+  local expire='{"ID":"nexus-scadenza","Status":"Enabled","Filter":{"Prefix":"'"$PREFIX"'/"},'
+  expire+='"Expiration":{"Days":'"$RETENTION_DAYS"'},"NoncurrentVersionExpiration":{"NoncurrentDays":1}}'
+  local markers='{"ID":"nexus-marcatori","Status":"Enabled","Filter":{"Prefix":"'"$PREFIX"'/"},'
+  markers+='"Expiration":{"ExpiredObjectDeleteMarker":true}}'
+  local rules
+  for rules in "$expire,$markers" "$expire"; do
+    s3 put-bucket-lifecycle-configuration --bucket "$NEXUS_BACKUP_S3_BUCKET" --checksum-algorithm CRC32 \
+      --lifecycle-configuration '{"Rules":['"$rules"']}' && return 0
+    log "Regola di conservazione rifiutata, provo la successiva"
+  done
+  s3 get-bucket-lifecycle-configuration --bucket "$NEXUS_BACKUP_S3_BUCKET" 2>/dev/null \
+    | grep -q "\"Days\": $RETENTION_DAYS" && { log "Regola di $RETENTION_DAYS giorni già presente"; return 0; }
+  return 1
+}
+
+# istante ISO 8601 → ora italiana, per l'esito
+iso_to_local() {
+  python3 -I -c 'import datetime, sys
+d = datetime.datetime.fromisoformat(sys.argv[1].replace("Z", "+00:00"))
+print(d.astimezone().strftime("%d/%m/%Y %H:%M"))' "$1" 2>/dev/null || echo "$1"
+}
+
+# --- stato ----------------------------------------------------------------------------------------------------------
+cmd_stato() {
+  load_state
+  local now problem
+  now=$(date +%s)
+  echo "Backup del database (US-1302): ogni notte alle $RUN_AT, ora italiana"
+  problem="$(config_problem)"
+  [[ -z $problem ]] && echo "Configurazione: completa" || echo "Configurazione: $problem"
+  if [[ -n ${S[tentativo_il]:-} ]]; then
+    local detail="${S[tentativo_passo]:+, passo «${S[tentativo_passo]}»}"
+    detail+="${S[tentativo_dettaglio]:+, ${S[tentativo_dettaglio]}}"
+    echo "Ultimo tentativo: $(local_time "${S[tentativo_epoch]:-$now}") — ${S[tentativo_esito]:-?}$detail"
+  else
+    echo "Ultimo tentativo: nessuno"
+  fi
+  if [[ -z ${S[riuscito_epoch]:-} ]]; then
+    echo "Ultimo backup riuscito: nessuno"
+    echo "ERRORE: nessun backup riuscito"
+    return 1
+  fi
+  local last=${S[riuscito_epoch]}
+  local age_h=$(((now - last) / 3600))
+  echo "Ultimo backup riuscito: $(local_time "$last") ($age_h ore fa)," \
+    "${S[riuscito_byte]} byte, ${S[riuscito_oggetto]}"
+  echo "Blocco: ${S[riuscito_blocco]:-?}"
+  [[ -n ${S[avvisi]:-} ]] && echo "Avvisi: ${S[avvisi]//;/; }"
+  if ((now - last > MAX_AGE_HOURS * 3600)); then
+    echo "ERRORE: l'ultimo backup riuscito ha più di $MAX_AGE_HOURS ore"
+    return 1
+  fi
+  echo "OK"
+}
+
+# --- pianificazione -------------------------------------------------------------------------------------------------
+# Le 3:30 esistono sempre, e una volta sola: in Italia l'ora cambia tra le 2 e le 3. «Domani» parte da mezzogiorno di
+# oggi, così i giorni di 23 o 25 ore non fanno saltare una data.
+next_run() {
+  local now today next noon
+  now=$(date +%s)
+  today=$(date +%Y-%m-%d)
+  next=$(date -d "$today $RUN_AT" +%s)
+  if ((next <= now)); then
+    noon=$(date -d "$today 12:00" +%s)
+    next=$(date -d "$(date -d "@$((noon + 86400))" +%Y-%m-%d) $RUN_AT" +%s)
+  fi
+  echo "$next"
+}
+
+cmd_pianifica() {
+  local child=""
+  trap 'log "Arresto del servizio"; [[ -n $child ]] && kill "$child" 2>/dev/null; exit 0' TERM INT
+  log "Backup pianificato ogni notte alle $RUN_AT ($TZ)"
+  local problem
+  problem="$(config_problem)"
+  [[ -z $problem ]] || log "ATTENZIONE: backup non configurato ($problem)"
+  while true; do
+    local next
+    next=$(next_run)
+    log "Prossimo backup: $(local_time "$next")"
+    sleep "$((next - $(date +%s)))" &
+    child=$!
+    wait "$child" || true
+    "$0" backup &
+    child=$!
+    wait "$child" || true
+    child=""
+  done
+}
+
+case "${1:-}" in
+  pianifica) cmd_pianifica ;;
+  backup) cmd_backup ;;
+  stato) cmd_stato ;;
+  *)
+    echo "Uso: nexus-backup pianifica | backup | stato" >&2
+    exit 2
+    ;;
+esac

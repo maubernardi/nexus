@@ -1,8 +1,8 @@
 name: Stato del server
 
 # A16: stato dei container e log recenti della demo, in sola lettura, con la stessa chiave del deploy (forced command
-# nexus-deploy). Solo backend e postgres: i log delle Actions di un repository pubblico sono pubblici, Keycloak e Caddy
-# registrano utenti e indirizzi IP.
+# nexus-deploy). Solo backend, postgres e backup: i log delle Actions di un repository pubblico sono pubblici, Keycloak e
+# Caddy registrano utenti e indirizzi IP. L'esito dei backup è nel workflow «Backup del database».
 on:
   workflow_dispatch:
     inputs:
@@ -14,7 +14,7 @@ on:
       service:
         description: Servizio (solo per logs)
         type: choice
-        options: [backend, postgres]
+        options: [backend, postgres, backup]
         default: backend
       lines:
         description: Righe di log (1–2000)

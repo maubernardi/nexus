@@ -13,7 +13,7 @@
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-1302 | Backup del database | 5 | ✅ Ready | `add-database-backup` | |
+| US-1302 | Backup del database | 5 | ✅ Ready | `add-database-backup` | PR in arrivo |
 | US-1306 | Passaggio in produzione | 8 (era 5) | ✅ Ready | `prepare-production` | |
 
 Alla review avevamo detto 10 punti. Scrivendo i criteri, US-1306 è salita a 8: il suo criterio unico nascondeva la
@@ -52,6 +52,27 @@ Tutte del PO.
   per 30 giorni, nemmeno chi entrasse nel server. Lo verifico all'inizio di US-1302; altrimenti le chiavi del server
   possono solo caricare.
 - **Stima**: 13 punti invece dei 10 detti alla review, per US-1306 portata a 8.
+
+## Decisioni durante lo sprint
+
+- **US-1302**:
+  - nuova immagine `nexus-backup` sulla stessa base di PostgreSQL del server: `pg_dump` ha la stessa versione del
+    database, e il controllo delle immagini (EN-6) la segue. Dentro `age` e la AWS CLI, dai pacchetti di Alpine;
+  - i due database li salvano i loro proprietari (`nexus_owner`, `keycloak`): niente superutente. L'archivio ha un
+    indice con commit e versione di PostgreSQL e le impronte SHA-256 dei file;
+  - le 3:30 perché in Italia l'ora cambia tra le 2 e le 3: esistono sempre, e una volta sola;
+  - niente controllo di salute nel compose: un backup mancato non deve bloccare il deploy dell'app. Lo stato lo legge
+    il controllo delle 9;
+  - il controllo delle 9 ha due cron UTC, uno per l'ora solare e uno per la legale. Gira solo quello della stagione;
+  - IONOS: il blocco degli oggetti si sceglie solo quando si crea il contenitore, e accende il versioning. La regola
+    dei 30 giorni la scrive il servizio dopo ogni backup;
+  - la AWS CLI recente firma alcune richieste con un'impronta (CRC64NVME) che non tutti i servizi compatibili con S3
+    accettano. Il caricamento usa `Content-MD5` e la regola CRC32. Se IONOS rifiuta comunque la regola, l'esito lo
+    dice e la si mette dalla console;
+  - `nexus-deploy` ha i comandi `backup`, `backup adesso` e `logs backup`. Non si aggiorna con il deploy: lo
+    reinstalli tu, una volta, con sudo;
+  - la prova completa nella CI usa VersityGW come S3 di prova, perché MinIO non pubblica più le immagini. Non gestisce
+    la regola dei 30 giorni: la prova controlla così anche l'avviso.
 
 ## Come li faccio
 
@@ -102,3 +123,4 @@ Tutte del PO.
 | Momento | Punti residui |
 |---|---|
 | Inizio (20/11, dopo la conferma del planning) | 13 |
+| US-1302 unita | 8 |

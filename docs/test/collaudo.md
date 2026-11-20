@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `da10853` (20/11/2026): Sprint 1–15 completi (aziende da completare, categoria merceologica, referenti e recapiti, una mansione per più segnalazioni con il tipo di tirocinio; l'importazione dal database attuale si prova in locale) |
-| **Ultimo aggiornamento** | 20/11/2026 (T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 20/11/2026 (T-26.1 … T-26.3: backup, da provare dopo il deploy di US-1302 e la preparazione su IONOS; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -1178,3 +1178,43 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      - «Tipo di tirocinio: Non indicato»;
      - sopra le mansioni l'avviso che il tipo lo indica il Tutor;
      - i pulsanti «Proponi» spenti.
+
+## 26. Backup del database (Sprint 16)
+
+Si fanno dopo il deploy di US-1302 e la preparazione del README, «Backup del database», punti 1–5: contenitore su IONOS,
+chiavi age, variabili nel `.env` e `nexus-deploy` aggiornato. Sulla demo ci sono solo dati dimostrativi.
+
+- [ ] **T-26.1 Backup subito e stato (US-1302)**
+  1. Su GitHub apri Actions → «Backup del database» → *Run workflow*, scegli «backup adesso». **Atteso:**
+     - il run è verde;
+     - nel log ci sono i passi (salvataggio di nexus e keycloak, cifratura, caricamento, verifica) e la riga «OK: …»
+       con il nome del file e la dimensione;
+     - nessun nome, email o altro dato della demo.
+  2. Rilancia il workflow con «stato». **Atteso:**
+     - «Configurazione: completa»;
+     - «Ultimo backup riuscito» con l'ora del punto 1;
+     - «Blocco: COMPLIANCE fino al …», 30 giorni dopo;
+     - nessun avviso, e in fondo «OK».
+  3. Nella console di IONOS apri il contenitore. **Atteso:** c'è il file `nexus/AAAA/MM/nexus-….tar.age`.
+  4. Fai vedere le versioni del file e prova a cancellare **la versione**. **Atteso:** IONOS rifiuta, perché il
+     blocco non è scaduto. Se la console invece nasconde il file con un «marcatore di cancellazione», la versione
+     resta comunque: cancella il marcatore e il file ricompare.
+
+- [ ] **T-26.2 Ripristino di prova sul PC (US-1302)**
+  1. Scarica dalla console di IONOS il file del punto T-26.1.
+  2. Sul PC, in WSL, nella cartella del progetto: `backup/ripristino-di-prova.sh <file scaricato>
+     ~/nexus-backup-chiave.txt`. **Atteso:**
+     - «Impronte corrette.» e l'indice con la data e la versione;
+     - le righe per tabella, simili a quelle della demo (per esempio `company` e `ticket` non a zero);
+     - «Ultima migrazione: V49» (o la più recente);
+     - gli utenti di Keycloak del realm `nexus`;
+     - in fondo «Fatto: il ripristino riesce».
+  3. Ripeti con una chiave diversa (`age-keygen -o /tmp/altra.txt`, poi `/tmp/altra.txt` al posto della tua).
+     **Atteso:** «non riesco a decifrare l'archivio», e nessun database ripristinato.
+
+- [ ] **T-26.3 Controllo del mattino (US-1302)**
+  1. Il giorno dopo il deploy, verso le 9:15, apri Actions → «Backup del database». **Atteso:** c'è un run delle 9,
+     verde, con l'esito del backup delle 3:30.
+  2. Nello stesso giorno c'è un solo run pianificato che ha controllato davvero; l'altro, se c'è, dice «Cron
+     dell'altra stagione».
+  3. Facoltativo: se un giorno il run fallisce, arriva l'email di GitHub, come per «Controllo della demo».

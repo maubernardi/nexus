@@ -119,6 +119,17 @@ jobs:
         if: failure()
         run: docker logs kc
 
+  backup:
+    name: Backup e ripristino
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: age per il ripristino di prova, come sul PC del PO
+        run: sudo apt-get update -q && sudo apt-get install -y -q age
+      - name: Backup, caricamento su S3 di prova e ripristino (US-1302)
+        run: tools/ci/backup-e2e.sh
+
   openspec:
     name: OpenSpec
     runs-on: ubuntu-26.04
