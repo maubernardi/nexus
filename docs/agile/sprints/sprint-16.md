@@ -72,7 +72,24 @@ Tutte del PO.
   - `nexus-deploy` ha i comandi `backup`, `backup adesso` e `logs backup`. Non si aggiorna con il deploy: lo
     reinstalli tu, una volta, con sudo;
   - la prova completa nella CI usa VersityGW come S3 di prova, perché MinIO non pubblica più le immagini. Non gestisce
-    la regola dei 30 giorni: la prova controlla così anche l'avviso.
+    la regola dei 30 giorni: la prova controlla così anche l'avviso;
+  - **blocco in *Governance*** invece di *Compliance* (PO, 21/11): il PO vuole poter cancellare un backup a mano, se
+    serve. Una richiesta normale resta rifiutata, anche con le chiavi del server. Il rischio che resta: chi prendesse
+    il server, con le chiavi dell'utente del PO, potrebbe scavalcare il blocco con una richiesta fatta apposta. Se
+    servirà, il server avrà un utente IONOS suo, senza quel permesso;
+  - **messa in funzione (21/11)**:
+    - deploy di `765dec9`;
+    - il PO ha creato il contenitore a Berlino (`eu-central-3`) con il blocco di 30 giorni, la chiave, la coppia age e
+      le righe del `.env`, e ha reinstallato `nexus-deploy`;
+    - il primo «backup adesso» è riuscito (1 MB, blocco fino al 21/12), e IONOS ha accettato la regola dei 30 giorni
+      al primo tentativo;
+  - **ripristino di prova riuscito** (21/11), sul PC del PO con l'archivio scaricato da IONOS:
+    - impronte corrette;
+    - ultima migrazione V49 e gli 8 trigger dello schema;
+    - tutte le tabelle della demo, compresi 7.896 comuni e 6 modelli dei documenti;
+    - 6 utenti nel realm `nexus`;
+  - lo script di ripristino ora controlla subito che Docker risponda: con Docker Desktop spento si fermava senza dire
+    perché.
 
 ## Come li faccio
 
@@ -123,4 +140,4 @@ Tutte del PO.
 | Momento | Punti residui |
 |---|---|
 | Inizio (20/11, dopo la conferma del planning) | 13 |
-| US-1302 unita | 8 |
+| US-1302 unita (21/11) | 8 |

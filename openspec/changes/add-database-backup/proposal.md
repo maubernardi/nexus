@@ -16,8 +16,9 @@ dati in Germania, a 0,008 € per GiB ogni 30 giorni (review dello Sprint 15, §
   - Lo carica su IONOS Object Storage e controlla che sia arrivato intero.
 - **Conservazione di 30 giorni**: i backup più vecchi si cancellano da soli, con una regola del contenitore impostata
   dal servizio.
-- **Protezione**: il contenitore si crea con il blocco degli oggetti in modalità *compliance* per 30 giorni (PO,
-  20/11). Per 30 giorni nessuno può cancellare un backup, nemmeno con le chiavi del server.
+- **Protezione**: il contenitore si crea con il blocco degli oggetti in modalità *governance* per 30 giorni (PO,
+  21/11). Per 30 giorni una richiesta normale non cancella un backup, nemmeno con le chiavi del server. Il PO può
+  farlo a mano, dalla console, scavalcando il blocco.
 - **Esito**: il servizio scrive data, dimensione e nome dell'ultimo backup riuscito, o il passo fallito. Mai dati
   personali.
 - **Controllo del mattino alle 9** (PO, 20/11): un workflow legge l'esito dal server. Se manca un backup riuscito nelle
