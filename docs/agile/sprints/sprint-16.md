@@ -91,6 +91,26 @@ Tutte del PO.
   - lo script di ripristino ora controlla subito che Docker risponda: con Docker Desktop spento si fermava senza dire
     perché.
 
+- **US-1306, preparazione** (prima PR; il passaggio vero nel giorno che scegli):
+  - pulizia della demo in `infra/deploy/pulizia-demo.sql`, una sola transazione come `nexus_owner`:
+    - `TRUNCATE` senza `CASCADE` delle 25 tabelle di segnalazioni, beneficiari, utenti e aziende: se ne mancasse
+      una, PostgreSQL si fermerebbe;
+    - via i curriculum, l'audit degli oggetti tolti e le righe degli script dimostrativi nella cronologia di Flyway,
+      senza le quali il backend non partirebbe senza `seed`;
+    - controlli finali dentro la transazione;
+    - alla fine elenca le voci della configurazione rimaste come le aveva messe la demo: le 8 tipologie di mansione
+      segnaposto, i progetti, gli enti con i dati inventati;
+  - primo ADMIN: con i dati `NEXUS_ADMIN_*` nel `.env` e nessun ADMIN in NEXUS, il backend lo crea come da «Utenti»,
+    con l'invito, e riprova ogni minuto finché Keycloak non risponde;
+  - realm di produzione = quello della demo senza utenti di prova. Lo scarica `nexus-deploy`, da reinstallare con
+    sudo; la CI controlla che si importi senza utenti;
+  - utenti di Keycloak: l'elenco esclude da solo l'account tecnico del backend (provato su Keycloak 26.8.2);
+  - script del passaggio con 8 passi, conferme e indicazioni per tornare indietro;
+  - il profilo predefinito resta `keycloak,seed` fino al passaggio: lo script mette `keycloak` nel `.env`, e la
+    seconda PR cambia il compose. Prima, un deploy della demo non partirebbe;
+  - prova generale in locale (21/11): demo dai dati dimostrativi, pulizia, importazione del file vero (13.799 aziende,
+    38.789 chiamate, come il 19/11), backend senza `seed` con 49 migrazioni valide e l'ADMIN creato con l'invito.
+
 ## Come li faccio
 
 **Backup (US-1302):**

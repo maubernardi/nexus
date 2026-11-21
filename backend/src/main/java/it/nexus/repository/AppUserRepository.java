@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import it.nexus.domain.AppUser;
+import it.nexus.domain.enumeration.Role;
 
 @Repository
 public interface AppUserRepository extends JpaRepository<AppUser, Long> {
@@ -25,6 +26,9 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     List<AppUser> findAllByOrderByActiveDescLastNameAscFirstNameAsc();
 
     boolean existsByUsernameIgnoreCase(String username);
+
+    /** C'è almeno un utente con il ruolo, attivo o no: per il primo ADMIN della produzione (US-1306). */
+    boolean existsByRole(Role role);
 
     boolean existsByEmailIgnoreCase(String email);
 

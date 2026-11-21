@@ -1,0 +1,26 @@
+## 1. Database e backend
+
+- [x] 1.1 `infra/deploy/pulizia-demo.sql` (D1); `DemoCleanupIT` sullo schema vero con i dati dimostrativi
+- [x] 1.2 `AdminBootstrapJob`, proprietà `nexus.bootstrap.admin.*`, `existsByRole` (D4); `AdminBootstrapJobIT`
+
+## 2. Infra e CI
+
+- [x] 2.1 Realm di produzione senza utenti di prova; `nexus-deploy` lo scarica; password demo facoltative e dati
+  dell'ADMIN nel compose (D5)
+- [x] 2.2 Controllo del realm di produzione nel job del tema di Keycloak (D5)
+- [x] 2.3 `infra/deploy/passaggio-in-produzione.sh` (D2, D3, D6); shellcheck pulito; comandi di Keycloak provati su
+  26.8.2
+
+## 3. Prove e documentazione
+
+- [x] 3.1 Prova generale in locale: demo dai dati dimostrativi, pulizia, importazione del file vero, backend senza
+  `seed` con l'ADMIN (D8)
+- [x] 3.2 README «Passaggio in produzione», analisi §9.2, collaudo, Sprint 16
+- [x] 3.3 `./mvnw verify` verde; `openspec validate prepare-production --strict` senza errori; CI verde
+
+## 4. Passaggio (con il PO, dopo il merge)
+
+- [ ] 4.1 Deploy sulla demo; prova generale sul backup vero della demo
+- [ ] 4.2 Dati dell'ADMIN nel `.env`, file Access sul server, `nexus-deploy` reinstallato
+- [ ] 4.3 `passaggio-in-produzione.sh`; invito, accesso dell'ADMIN, controllo della configurazione
+- [ ] 4.4 Seconda PR: profilo predefinito, realm e password demo, nomi «produzione», ASVS, chiusura della storia

@@ -310,6 +310,66 @@ rm -rf ~/ripristino ~/archivio.tar && $C up -d
 **Privacy:** un dato cancellato o anonimizzato (US-1303) resta nei backup fino a 30 giorni: va scritto nel registro
 dei trattamenti, con il DPO.
 
+### Passaggio in produzione
+
+US-1306 ([design](openspec/changes/prepare-production/design.md)). Decisione del PO del 20/11: si riporta tutto dalla
+demo tranne segnalazioni, utenti e beneficiari; le aziende vengono dal database attuale (US-1309). Lo fa lo script
+`infra/deploy/passaggio-in-produzione.sh`, provato in locale; il PO lo lancia sul server.
+
+**Prima (il PO):**
+1. Collaudo finito. Dai Cataloghi si tolgono le voci create solo per prova: la configurazione passa così com'è.
+2. Prova generale sul backup vero della demo, insieme: ripristino con `backup/ripristino-di-prova.sh --tieni`, poi
+   pulizia e importazione sul database ripristinato.
+3. Dati dell'ADMIN in fondo al `.env` (`sudo nano /opt/nexus/.env`):
+   ```bash
+   NEXUS_ADMIN_USERNAME=<username, es. mario.rossi>
+   NEXUS_ADMIN_FIRST_NAME=<nome>
+   NEXUS_ADMIN_LAST_NAME=<cognome>
+   NEXUS_ADMIN_EMAIL=<email: riceve l'invito per impostare la password>
+   ```
+4. Script di deploy aggiornato: scarica il realm di produzione, senza utenti di prova.
+   ```bash
+   sudo curl -fsSL https://raw.githubusercontent.com/maubernardi/nexus/<commit>/infra/deploy/nexus-deploy \
+     -o /usr/local/bin/nexus-deploy && sudo chmod 755 /usr/local/bin/nexus-deploy
+   ```
+5. Deploy di `main` dalle Actions: il backend riceve i dati dell'ADMIN. Sulla demo non li usa, perché gli ADMIN ci
+   sono già.
+6. Il file Access sul server, dopo i controlli in Access delle chiamate con possibili nomi (analisi, §7 e §9.3):
+   ```bash
+   sudo install -d -o "$USER" -m 700 /opt/nexus/import                # sul server
+   scp documenti_base/nexus.mdb <server>:/opt/nexus/import/nexus.mdb   # dal PC
+   ```
+
+**Passaggio (sul server, una volta sola):**
+```bash
+curl -fsSLO https://raw.githubusercontent.com/maubernardi/nexus/<commit>/infra/deploy/passaggio-in-produzione.sh
+curl -fsSLO https://raw.githubusercontent.com/maubernardi/nexus/<commit>/infra/deploy/pulizia-demo.sql
+sudo bash passaggio-in-produzione.sh
+```
+Lo script si ferma al primo errore e chiede «SI» prima di fermare il sito e prima di cancellare il file Access. Passi:
+1. controlli;
+2. **backup della demo** su IONOS, il punto a cui tornare;
+3. fermo del backend e del sito;
+4. **pulizia** del database (`pulizia-demo.sql`), in una sola transazione. Alla fine elenca le voci rimaste come le
+   aveva messe la demo: tipologie di mansione segnaposto, progetti, enti con dati inventati;
+5. **utenti di Keycloak**: via tutti, resta l'account tecnico del backend;
+6. **importazione** del database attuale, con il resoconto in `/opt/nexus/import/nexus.mdb-resoconto.txt`;
+7. `.env` con `NEXUS_BACKEND_PROFILES=keycloak` (niente dati dimostrativi), poi il riavvio. Entro un paio di minuti il
+   backend crea l'ADMIN e gli manda l'invito;
+8. **primo backup della produzione**, poi la cancellazione del file Access, se confermi.
+
+**Dopo (il PO):**
+1. Dall'email di invito imposti la password e accedi come ADMIN. Se l'email non arriva: «Password dimenticata?» nella
+   pagina di accesso, con lo stesso indirizzo.
+2. Nei Cataloghi controlli le voci elencate al passo 4; nel resoconto dell'importazione, duplicati e comuni non trovati.
+3. Da «Utenti» crei gli account.
+4. Nel registro dei trattamenti: i 30 giorni dei backup, con il DPO.
+
+**Se qualcosa va storto**, lo script dice cosa fare:
+- fino alla pulizia, che è una transazione, i dati non cambiano e basta riavviare;
+- dopo, si ripristina il backup del passo 2 (sezione precedente, «Ripristino sul server»), si toglie
+  `NEXUS_BACKEND_PROFILES=keycloak` dal `.env` e si riavvia.
+
 ## Comandi utili
 
 | | Backend (`backend/`) | Frontend (`frontend/`) |
