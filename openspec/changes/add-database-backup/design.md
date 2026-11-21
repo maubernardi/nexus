@@ -66,9 +66,10 @@ per 30 giorni. Un avviso se manca, e un ripristino provato.
 ### D5. Conservazione e protezione
 
 - **Blocco degli oggetti**: si attiva solo quando si crea il contenitore, e accende il versioning. Lo sceglie il PO
-  nella console di IONOS: modalità *Compliance*, 30 giorni.
-  - In *compliance* nessuno può accorciare il blocco o cancellare una versione prima della scadenza: né IONOS, né il
-    proprietario.
+  nella console di IONOS: modalità *Governance*, 30 giorni (PO, 21/11; il planning diceva *Compliance*).
+  - In *governance* una richiesta normale non cancella una versione prima della scadenza. Solo chi ha il permesso di
+    scavalcare il blocco, e lo chiede esplicitamente, può farlo: il PO, dalla console, se serve.
+  - In *compliance* non potrebbe nessuno, nemmeno il proprietario: il PO preferisce poter intervenire a mano.
   - Il blocco non ha un costo a parte: si paga lo spazio occupato.
 - **Ciclo di vita**: il servizio lo riscrive dopo ogni backup riuscito; l'operazione è idempotente. La richiesta usa
   l'impronta CRC32, perché quella predefinita della AWS CLI recente (CRC64NVME) non la accettano tutti i servizi
@@ -81,8 +82,8 @@ per 30 giorni. Un avviso se manca, e un ripristino provato.
 - Se IONOS rifiuta la regola, il servizio riprova senza quella dei marcatori. Se la rifiuta ancora, il backup resta
   riuscito: se nel contenitore c'è già una regola di 30 giorni messa dalla console va bene, altrimenti l'esito riporta
   l'avviso.
-- **Chiavi**: quelle di IONOS dell'utente del PO. Con il blocco in *compliance*, chi le rubasse dal server non
-  potrebbe cancellare i backup.
+- **Chiavi**: quelle di IONOS dell'utente del PO. Una cancellazione per sbaglio, o una normale, è rifiutata. Chi le
+  rubasse dal server potrebbe però scavalcare il blocco con una richiesta fatta apposta (vedi i rischi).
 
 ### D6. Esito
 
@@ -175,6 +176,9 @@ Nel compose sono facoltative (`:-`): senza, il servizio scrive «non configurato
   `aws` è nel log del servizio.
 - **[Regione con il blocco mancante]**: se il contenitore è stato creato senza blocco, il blocco non si aggiunge più.
   → L'esito lo segnala, e si crea un contenitore nuovo.
+- **[Chiavi del server con il permesso di scavalcare il blocco]**: con *governance* e le chiavi dell'utente del PO,
+  chi prendesse il controllo del server potrebbe cancellare i backup prima dei 30 giorni. → Accettato dal PO (21/11).
+  Se servirà, il server avrà un utente IONOS suo, senza quel permesso.
 - **[Pacchetti Alpine non fissati alla versione]**: un nuovo `aws-cli` arriva con una nuova base. → Lo prova il job
   «Backup» della PR di Dependabot.
 

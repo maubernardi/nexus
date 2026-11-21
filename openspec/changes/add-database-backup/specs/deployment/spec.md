@@ -28,8 +28,9 @@ L'esito e i log MUST NOT contenere dati personali.
 
 ### Requirement: Conservazione e protezione dei backup
 I backup SHALL restare su IONOS per 30 giorni, poi SHALL cancellarsi da soli con una regola del contenitore impostata
-dal servizio. Il contenitore SHALL avere il blocco degli oggetti in modalità *compliance* per 30 giorni: per 30 giorni
-un backup MUST NOT poter essere cancellato o sovrascritto, nemmeno con le chiavi del server.
+dal servizio. Il contenitore SHALL avere il blocco degli oggetti in modalità *governance* per 30 giorni: per 30 giorni
+una richiesta normale MUST NOT poter cancellare o sovrascrivere un backup, nemmeno con le chiavi del server. Solo chi
+ha il permesso di scavalcare il blocco e lo chiede esplicitamente MAY farlo: il PO, dalla console di IONOS.
 
 #### Scenario: Backup più vecchio di 30 giorni
 - **WHEN** un backup ha più di 30 giorni
@@ -38,6 +39,10 @@ un backup MUST NOT poter essere cancellato o sovrascritto, nemmeno con le chiavi
 #### Scenario: Tentativo di cancellare un backup recente
 - **WHEN** con le chiavi del server si tenta di cancellare definitivamente un backup di 10 giorni prima
 - **THEN** IONOS rifiuta e il backup resta
+
+#### Scenario: Cancellazione voluta dal PO
+- **WHEN** il PO, dalla console di IONOS, sceglie di scavalcare il blocco per cancellare un backup
+- **THEN** IONOS lo permette
 
 #### Scenario: Blocco assente
 - **WHEN** il contenitore è stato creato senza il blocco degli oggetti

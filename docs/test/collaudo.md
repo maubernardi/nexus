@@ -9,8 +9,8 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | https://portalenexus.it |
-| **Versione della demo** | `da10853` (20/11/2026): Sprint 1–15 completi (aziende da completare, categoria merceologica, referenti e recapiti, una mansione per più segnalazioni con il tipo di tirocinio; l'importazione dal database attuale si prova in locale) |
-| **Ultimo aggiornamento** | 20/11/2026 (T-26.1 … T-26.3: backup, da provare dopo il deploy di US-1302 e la preparazione su IONOS; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Versione della demo** | `765dec9` (21/11/2026): Sprint 1–15 completi e il backup notturno su IONOS (US-1302) (aziende da completare, categoria merceologica, referenti e recapiti, una mansione per più segnalazioni con il tipo di tirocinio; l'importazione dal database attuale si prova in locale) |
+| **Ultimo aggiornamento** | 21/11/2026 (T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -1193,12 +1193,11 @@ chiavi age, variabili nel `.env` e `nexus-deploy` aggiornato. Sulla demo ci sono
   2. Rilancia il workflow con «stato». **Atteso:**
      - «Configurazione: completa»;
      - «Ultimo backup riuscito» con l'ora del punto 1;
-     - «Blocco: COMPLIANCE fino al …», 30 giorni dopo;
+     - «Blocco: GOVERNANCE fino al …», 30 giorni dopo;
      - nessun avviso, e in fondo «OK».
   3. Nella console di IONOS apri il contenitore. **Atteso:** c'è il file `nexus/AAAA/MM/nexus-….tar.age`.
-  4. Fai vedere le versioni del file e prova a cancellare **la versione**. **Atteso:** IONOS rifiuta, perché il
-     blocco non è scaduto. Se la console invece nasconde il file con un «marcatore di cancellazione», la versione
-     resta comunque: cancella il marcatore e il file ricompare.
+  4. Apri le proprietà del file. **Atteso:** il blocco è *Governance*, fino a 30 giorni dopo il backup. Non serve
+     provare a cancellarlo: con *Governance* tu puoi farlo, scavalcando il blocco, e il backup andrebbe perso.
 
 - [ ] **T-26.2 Ripristino di prova sul PC (US-1302)**
   1. Scarica dalla console di IONOS il file del punto T-26.1.

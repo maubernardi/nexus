@@ -19,10 +19,10 @@
 - [x] 3.2 README: variabili, preparazione su IONOS, chiavi age, aggiornamento di `nexus-deploy`, ripristino di prova
   e sul server
 - [x] 3.3 Collaudo, Sprint 16, backlog
-- [ ] 3.4 `openspec validate add-database-backup --strict` senza errori; CI verde
+- [x] 3.4 `openspec validate add-database-backup --strict` senza errori; CI verde
 
 ## 4. Messa in funzione (con il PO, dopo il merge)
 
-- [ ] 4.1 Deploy sulla demo; esito «non configurato»
-- [ ] 4.2 Contenitore su IONOS con il blocco, chiavi, coppia age, `.env`, `nexus-deploy` aggiornato
-- [ ] 4.3 «Backup adesso» dalle Actions, poi ripristino di prova sul PC del PO con l'archivio vero
+- [x] 4.1 Deploy sulla demo; esito «non configurato»
+- [x] 4.2 Contenitore su IONOS con il blocco, chiavi, coppia age, `.env`, `nexus-deploy` aggiornato
+- [x] 4.3 «Backup adesso» dalle Actions, poi ripristino di prova sul PC del PO con l'archivio vero
