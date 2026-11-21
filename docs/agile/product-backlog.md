@@ -1393,10 +1393,11 @@ Criteri di accettazione:
 - **Le chiavi di IONOS e la chiave pubblica** stanno solo nel `.env` del server e le mette il PO: mai nel repository né
   nei log.
 - **Avviso** (PO, 20/11): ogni mattina alle 9, se manca un backup riuscito nelle ultime 26 ore, il controllo fallisce
-  e GitHub manda un'email al PO, come per il controllo della demo (US-1307). Lo stato si legge anche da «Stato del server», senza dati
-  personali.
-- **Protezione** (PO, 20/11): un backup caricato non si può cancellare dal server per 30 giorni, se IONOS offre il
-  blocco degli oggetti senza costi in più; altrimenti le chiavi del server possono solo caricare.
+  e GitHub manda un'email al PO, come per il controllo della demo (US-1307). Lo stato si legge anche da «Stato del
+  server», senza dati personali.
+- **Protezione** (PO, 20/11 e 21/11): un backup caricato non si può cancellare con una richiesta normale per 30
+  giorni, nemmeno con le chiavi del server: blocco degli oggetti di IONOS in modalità *Governance*, che il PO può
+  scavalcare a mano dalla console, se serve.
 - **Il ripristino di prova su un ambiente pulito riesce ed è documentato**: scaricare, decifrare, ripristinare, avviare
   NEXUS e ritrovare i dati. La procedura è nel README.
 - Privacy: un dato cancellato o anonimizzato (US-1303) resta nei backup fino a 30 giorni. Va scritto nel registro dei

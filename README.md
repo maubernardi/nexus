@@ -251,7 +251,7 @@ sono in «Stato del server», servizio `backup`.
 **Preparazione (una volta, il PO):**
 1. **Contenitore su IONOS** (DCD → *Storage* → *Object Storage* → *Create bucket*):
    - regione in Germania;
-   - **Object Lock attivo, modalità *Compliance*, 30 giorni**: si può scegliere solo adesso, alla creazione, poi non
+   - **Object Lock attivo, modalità *Governance*, 30 giorni**: si può scegliere solo adesso, alla creazione, poi non
      si aggiunge più.
 
    Poi, in *Access keys*, una chiave nuova: chiave e segreto vanno nel password manager.
@@ -277,7 +277,7 @@ sono in «Stato del server», servizio `backup`.
      -o /usr/local/bin/nexus-deploy && sudo chmod 755 /usr/local/bin/nexus-deploy
    ```
 5. **Deploy** di `main` (il servizio rilegge il `.env`), poi Actions → «Backup del database» → **backup adesso**.
-   - L'esito deve dire `OK` e «Blocco: COMPLIANCE fino al …».
+   - L'esito deve dire `OK` e «Blocco: GOVERNANCE fino al …».
    - Se compare l'avviso sulla **regola di conservazione**, IONOS non ha accettato quella del servizio. Va messa dalla
      console, nel contenitore, in *Lifecycle*: scadenza dopo 30 giorni, versioni non correnti cancellate dopo 1 giorno.
 

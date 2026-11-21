@@ -79,8 +79,8 @@ for i in $(seq 1 30); do
 done
 aws s3api create-bucket --bucket "$BUCKET" --object-lock-enabled-for-bucket >/dev/null
 aws s3api put-object-lock-configuration --bucket "$BUCKET" --object-lock-configuration \
-  '{"ObjectLockEnabled":"Enabled","Rule":{"DefaultRetention":{"Mode":"COMPLIANCE","Days":1}}}' >/dev/null
-ok "contenitore $BUCKET con blocco COMPLIANCE di 1 giorno"
+  '{"ObjectLockEnabled":"Enabled","Rule":{"DefaultRetention":{"Mode":"GOVERNANCE","Days":1}}}' >/dev/null
+ok "contenitore $BUCKET con blocco GOVERNANCE di 1 giorno, come su IONOS"
 
 step "Chiave age di prova"
 docker run --rm --entrypoint age-keygen "$IMAGE" >"$tmp/chiave.txt" 2>/dev/null
@@ -127,7 +127,7 @@ nb "${base_env[@]}" "${s3_env[@]}" -e NEXUS_BACKUP_S3_SECRET_KEY="$S3_SECRET" --
 out=$(nb -- stato) || ko "stato dopo il backup: $out"
 echo "$out"
 grep -q "^OK$" <<<"$out" || ko "stato senza OK"
-grep -q "Blocco: COMPLIANCE fino al" <<<"$out" || ko "il backup risulta senza blocco"
+grep -q "Blocco: GOVERNANCE fino al" <<<"$out" || ko "il backup risulta senza blocco"
 grep -qi "DATO-IN-CHIARO\|$pw" "$tmp/log" && ko "il log contiene dati o password"
 # VersityGW non gestisce il ciclo di vita: si prova così l'avviso che chiede la regola dalla console
 grep -q "regola di conservazione non impostata" <<<"$out" || ko "manca l'avviso sulla regola di conservazione"

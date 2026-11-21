@@ -27,6 +27,8 @@ identity=$2
 [[ -f $identity ]] || fail "chiave privata non trovata: $identity"
 command -v "$AGE" >/dev/null || fail "manca age: sudo apt install age"
 command -v docker >/dev/null || fail "manca Docker"
+# con Docker Desktop spento, in WSL il comando c'è ma non risponde (21/11)
+docker info >/dev/null 2>&1 || fail "Docker non risponde: avvia Docker Desktop e riprova"
 
 work=$(mktemp -d)
 chmod 700 "$work"
