@@ -26,6 +26,8 @@ public class ApplicationProperties {
 
     private final Municipalities municipalities = new Municipalities();
 
+    private final Bootstrap bootstrap = new Bootstrap();
+
 
     @Getter
     @Setter
@@ -78,5 +80,31 @@ public class ApplicationProperties {
 
         /** Comuni minimi perché un file sia l'elenco completo (in Italia sono quasi 7 900): protegge da file parziali. */
         private int minRows = 7000;
+    }
+
+    /** Avvio della produzione (US-1306). */
+    @Getter
+    @Setter
+    public static class Bootstrap {
+
+        private final Admin admin = new Admin();
+    }
+
+    /**
+     * Primo ADMIN della produzione (US-1306): dati dal {@code .env} del server (NEXUS_ADMIN_*). Se in NEXUS non c'è
+     * nessun ADMIN, l'applicazione lo crea come farebbe un ADMIN da «Utenti» (US-103), con l'invito per email.
+     */
+    @Getter
+    @Setter
+    public static class Admin {
+        private String username = "";
+        private String firstName = "";
+        private String lastName = "";
+        private String email = "";
+
+        /** Tutti i dati ci sono: senza, l'ADMIN iniziale non si crea. */
+        public boolean isComplete() {
+            return !username.isBlank() && !firstName.isBlank() && !lastName.isBlank() && !email.isBlank();
+        }
     }
 }

@@ -14,7 +14,8 @@ set -euo pipefail
 
 readonly REPO="maubernardi/nexus"
 readonly BASE="/opt/nexus"
-readonly FILES=(compose.yaml postgres/init/10-create-roles.sh keycloak/nexus-realm.demo.json)
+# realm di produzione, senza utenti di prova (US-1306): lo legge Keycloak solo se il realm non esiste ancora
+readonly FILES=(compose.yaml postgres/init/10-create-roles.sh keycloak/nexus-realm.json)
 readonly KEEP_RELEASES=5
 
 readonly LOG_SERVICES="backend postgres backup"

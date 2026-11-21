@@ -115,9 +115,32 @@ jobs:
           # al prossimo accesso tutor1 deve aggiornare la password: è il cambio che fa partire l'email di sicurezza
           kcadm update users/00000000-0000-4000-8000-000000000001 -r nexus -s 'requiredActions=["UPDATE_PASSWORD"]'
           python3 -I tools/ci/keycloak-password-reset-e2e.py http://localhost:8080 tutor1 tutor1@nexus.local password
+      - name: Realm di produzione senza utenti di prova (US-1306)
+        run: |
+          docker run -d --name kcprod -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+            -e KC_HEALTH_ENABLED=true -e NEXUS_DOMAIN=portalenexus.it -e NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET=prova \
+            -e NEXUS_SMTP_PASSWORD= \
+            -v "$PWD/infra/deploy/keycloak/nexus-realm.json:/opt/keycloak/data/import/nexus-realm.json:ro" \
+            nexus-keycloak:ci start-dev --import-realm
+          for i in $(seq 1 60); do
+            docker exec kcprod bash -c 'exec 3<>/dev/tcp/127.0.0.1/9000 &&
+              printf "GET /health/ready HTTP/1.1\r\nHost: x\r\nConnection: close\r\n\r\n" >&3 && grep -q UP <&3' && break
+            [ "$i" -eq 60 ] && { echo "Keycloak non parte con il realm di produzione"; exit 1; }
+            sleep 2
+          done
+          kcadm() { docker exec kcprod /opt/keycloak/bin/kcadm.sh "$@" --config /tmp/kc.config; }
+          kcadm config credentials --server http://localhost:8080 --realm master --user admin --password admin
+          users=$(kcadm get users/count -r nexus)
+          [ "$users" = 0 ] || { echo "Il realm di produzione ha $users utenti"; exit 1; }
+          client=$(kcadm get clients -r nexus -q clientId=nexus-backend-admin --fields id --format csv --noquotes)
+          kcadm get "clients/$client/service-account-user" -r nexus --fields username --format csv --noquotes \
+            | grep -qx service-account-nexus-backend-admin
+          echo "Realm di produzione: nessun utente, account tecnico del backend presente"
       - name: Log di Keycloak
         if: failure()
-        run: docker logs kc
+        run: |
+          docker logs kc
+          docker logs kcprod 2>/dev/null || true
 
   backup:
     name: Backup e ripristino

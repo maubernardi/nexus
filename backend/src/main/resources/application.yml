@@ -88,6 +88,14 @@ nexus:
     period: ${RETENTION_PERIOD:P2Y}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:}
+  # primo ADMIN della produzione (US-1306): se in NEXUS non c'è nessun ADMIN e i quattro dati ci sono, lo crea con
+  # l'invito per email; riprova ogni minuto finché Keycloak non risponde. Vuoti in locale, nei test e sulla demo
+  bootstrap:
+    admin:
+      username: ${NEXUS_ADMIN_USERNAME:}
+      first-name: ${NEXUS_ADMIN_FIRST_NAME:}
+      last-name: ${NEXUS_ADMIN_LAST_NAME:}
+      email: ${NEXUS_ADMIN_EMAIL:}
   mail:
     # spente in locale e nei test; in produzione le accende il compose (servono anche la password e l'indirizzo)
     enabled: ${MAIL_ENABLED:false}
