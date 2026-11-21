@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # EN-6: le immagini dei test (Testcontainers, nel codice Java) devono essere le stesse della demo. Dependabot aggiorna
-# compose e Dockerfile ma non le stringhe nel codice: questo controllo fa fallire la CI se divergono.
+# compose e Dockerfile ma non le stringhe nel codice: questo controllo fa fallire la CI se divergono. Il backup
+# (US-1302) usa la stessa immagine di PostgreSQL del server, così pg_dump ha la stessa versione del database.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
@@ -19,7 +20,7 @@ keycloak=$(grep -oE 'keycloak/keycloak:[0-9.]+' keycloak/Dockerfile | head -n1)
 [[ -n $postgres && -n $keycloak ]] || { echo "::error::versioni di riferimento non trovate"; exit 1; }
 echo "PostgreSQL: $postgres · Keycloak: $keycloak"
 
-expect "PostgreSQL" "$postgres" infra/docker-compose.yml \
+expect "PostgreSQL" "$postgres" infra/docker-compose.yml backup/Dockerfile backup/ripristino-di-prova.sh \
   backend/src/test/java/it/nexus/TestcontainersConfiguration.java \
   backend/src/test/java/it/nexus/config/FlywayRollbackIT.java
 expect "Keycloak" "$keycloak" infra/docker-compose.yml \

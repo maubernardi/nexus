@@ -135,9 +135,10 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
 | Cosa | Dove |
 |---|---|
 | Stack (Caddy, backend, Keycloak, PostgreSQL) | `infra/deploy/compose.yaml` |
-| Immagini | `backend/Dockerfile`, `frontend/Dockerfile` + `frontend/Caddyfile`, `keycloak/Dockerfile` (tema di accesso) → `ghcr.io/maubernardi/nexus-{backend,web,keycloak}` |
+| Immagini | `backend/Dockerfile`, `frontend/Dockerfile` + `frontend/Caddyfile`, `keycloak/Dockerfile` (tema di accesso), `backup/Dockerfile` → `ghcr.io/maubernardi/nexus-{backend,web,keycloak,backup}` |
 | Preparazione del server (una volta) | `infra/deploy/bootstrap.sh` |
 | Deploy | GitHub → Actions → **Deploy demo** → *Run workflow* (`.github/workflows/deploy-demo.yml`) |
+| Backup | ogni notte alle 3:30; esito e backup subito: Actions → **Backup del database** ([sotto](#backup-del-database)) |
 
 - **Deploy su comando.** Il workflow costruisce le immagini del commit scelto, le pubblica su GHCR e le installa sul
   server con una chiave SSH che può solo eseguire `nexus-deploy`. Se l'avvio fallisce, torna alla release precedente.
@@ -234,6 +235,80 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
 - **Stato e log sul server:**
   `cd /opt/nexus/current && sudo docker compose --env-file ../.env --env-file release.env ps` (oppure `logs -f backend`).
 - **DNS (IONOS):** A `@`, `auth`, `www` → IP del server; CAA `0 issue "letsencrypt.org"`; i record email restano.
+
+### Backup del database
+
+US-1302 ([design](openspec/changes/add-database-backup/design.md)). Il servizio `backup` del compose (`backup/`):
+- ogni notte alle **3:30**, ora italiana, salva i database `nexus` e `keycloak`;
+- li cifra sul server con la **chiave pubblica age del PO**: la chiave privata non è mai sul server, quindi né IONOS né
+  chi entrasse nel server può leggere i backup;
+- li carica su **IONOS Object Storage**, in Germania. Restano 30 giorni, protetti dal blocco degli oggetti.
+
+Ogni mattina alle **9** il workflow «Backup del database» legge l'esito. Se manca un backup riuscito nelle ultime 26
+ore, fallisce e GitHub manda un'email. Dallo stesso workflow, a mano: «stato» o «backup adesso». I log del servizio
+sono in «Stato del server», servizio `backup`.
+
+**Preparazione (una volta, il PO):**
+1. **Contenitore su IONOS** (DCD → *Storage* → *Object Storage* → *Create bucket*):
+   - regione in Germania;
+   - **Object Lock attivo, modalità *Compliance*, 30 giorni**: si può scegliere solo adesso, alla creazione, poi non
+     si aggiunge più.
+
+   Poi, in *Access keys*, una chiave nuova: chiave e segreto vanno nel password manager.
+2. **Chiavi di cifratura**, sul PC (WSL):
+   ```bash
+   sudo apt install age
+   age-keygen -o ~/nexus-backup-chiave.txt && chmod 600 ~/nexus-backup-chiave.txt   # stampa «Public key: age1…»
+   ```
+   Il contenuto del file è la **chiave privata**: va nel password manager e in una copia offline (chiavetta o carta).
+   **Senza, i backup non si aprono più.** Sul server va solo la chiave pubblica `age1…`.
+3. **Variabili sul server**: `sudo nano /opt/nexus/.env`, in fondo:
+   ```bash
+   NEXUS_BACKUP_S3_ENDPOINT=https://s3.<regione>.ionoscloud.com   # es. https://s3.eu-central-3.ionoscloud.com
+   NEXUS_BACKUP_S3_REGION=<regione>                               # es. eu-central-3
+   NEXUS_BACKUP_S3_BUCKET=<nome del contenitore>
+   NEXUS_BACKUP_S3_ACCESS_KEY=<chiave di IONOS>
+   NEXUS_BACKUP_S3_SECRET_KEY=<segreto di IONOS>
+   NEXUS_BACKUP_AGE_RECIPIENT=age1...                             # la chiave PUBBLICA
+   ```
+4. **Script di deploy aggiornato** (non si aggiorna da solo: è il forced command della chiave di deploy):
+   ```bash
+   sudo curl -fsSL https://raw.githubusercontent.com/maubernardi/nexus/main/infra/deploy/nexus-deploy \
+     -o /usr/local/bin/nexus-deploy && sudo chmod 755 /usr/local/bin/nexus-deploy
+   ```
+5. **Deploy** di `main` (il servizio rilegge il `.env`), poi Actions → «Backup del database» → **backup adesso**.
+   - L'esito deve dire `OK` e «Blocco: COMPLIANCE fino al …».
+   - Se compare l'avviso sulla **regola di conservazione**, IONOS non ha accettato quella del servizio. Va messa dalla
+     console, nel contenitore, in *Lifecycle*: scadenza dopo 30 giorni, versioni non correnti cancellate dopo 1 giorno.
+
+**Ripristino di prova** (sul PC; obbligatorio la prima volta, poi ogni tanto):
+1. Scaricare l'ultimo archivio dalla console di IONOS (cartella `nexus/AAAA/MM/`).
+2. Lanciare lo script (da WSL i download di Windows sono in `/mnt/c/Users/<utente>/Downloads/`):
+   ```bash
+   backup/ripristino-di-prova.sh <archivio scaricato>.tar.age ~/nexus-backup-chiave.txt
+   ```
+   Lo script decifra e controlla le impronte. Poi ripristina in un PostgreSQL temporaneo con la stessa procedura del
+   server e stampa righe per tabella, ultima migrazione e utenti di Keycloak. Alla fine cancella tutto.
+3. Con `--tieni` il database resta acceso per avviarci il backend in locale: lo script stampa il comando.
+
+**Ripristino sul server** (dopo un guasto; su un server nuovo, prima `bootstrap.sh` e il deploy dello stesso commit
+del backup, che è nel `MANIFEST.txt`):
+```bash
+# sul PC: decifrare (il file in chiaro passa solo dal canale SSH e resta sul server il tempo del ripristino)
+age -d -i ~/nexus-backup-chiave.txt -o archivio.tar nexus-AAAAMMGG-HHMMSSZ.tar.age && scp archivio.tar <server>:
+# sul server
+mkdir -m 700 ~/ripristino && tar -xf ~/archivio.tar -C ~/ripristino && (cd ~/ripristino && sha256sum -c SHA256SUMS)
+cd /opt/nexus/current && C="sudo docker compose --env-file ../.env --env-file release.env"
+$C stop backend keycloak backup
+curl -fsSL https://raw.githubusercontent.com/maubernardi/nexus/main/backup/ricrea-database.sql \
+  | $C exec -T postgres psql -U postgres -d postgres
+$C exec -T postgres pg_restore --exit-on-error -U postgres -d nexus <~/ripristino/nexus.dump
+$C exec -T postgres pg_restore --exit-on-error -U postgres -d keycloak <~/ripristino/keycloak.dump
+rm -rf ~/ripristino ~/archivio.tar && $C up -d
+```
+
+**Privacy:** un dato cancellato o anonimizzato (US-1303) resta nei backup fino a 30 giorni: va scritto nel registro
+dei trattamenti, con il DPO.
 
 ## Comandi utili
 

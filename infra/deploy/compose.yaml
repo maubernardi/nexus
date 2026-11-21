@@ -134,7 +134,42 @@ services:
     mem_limit: 256m
     logging: *logging
 
+  backup:
+    # US-1302: ogni notte alle 3:30 (ora italiana) salva i database nexus e keycloak, li cifra con la chiave pubblica
+    # age del PO e li carica su IONOS Object Storage (backup/nexus-backup). Esito: `nexus-backup stato`, letto ogni
+    # mattina alle 9 dal workflow «Backup del database». Niente controllo di salute: un backup mancato non deve
+    # bloccare il deploy dell'app.
+    image: ${NEXUS_REGISTRY:-ghcr.io/maubernardi}/nexus-backup:${NEXUS_VERSION:?}
+    restart: unless-stopped
+    init: true
+    environment:
+      NEXUS_VERSION: ${NEXUS_VERSION:?}
+      PGHOST: postgres
+      # i proprietari dei due database: niente superutente
+      NEXUS_OWNER_PASSWORD: ${NEXUS_OWNER_PASSWORD:?}
+      KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?}
+      # IONOS Object Storage e chiave pubblica age: solo nel .env, le mette il PO (README, «Backup del database»).
+      # Senza, il servizio gira ma l'esito è «non configurato», e il controllo delle 9 avvisa
+      NEXUS_BACKUP_S3_ENDPOINT: ${NEXUS_BACKUP_S3_ENDPOINT:-}
+      NEXUS_BACKUP_S3_REGION: ${NEXUS_BACKUP_S3_REGION:-}
+      NEXUS_BACKUP_S3_BUCKET: ${NEXUS_BACKUP_S3_BUCKET:-}
+      NEXUS_BACKUP_S3_ACCESS_KEY: ${NEXUS_BACKUP_S3_ACCESS_KEY:-}
+      NEXUS_BACKUP_S3_SECRET_KEY: ${NEXUS_BACKUP_S3_SECRET_KEY:-}
+      NEXUS_BACKUP_AGE_RECIPIENT: ${NEXUS_BACKUP_AGE_RECIPIENT:-}
+    volumes:
+      # esito dei backup e blocco «un backup alla volta»
+      - backup-state:/var/lib/postgresql
+    tmpfs:
+      # i file in chiaro del backup stanno solo in memoria, e spariscono con il container
+      - /tmp:size=512m,mode=1777
+    depends_on:
+      postgres:
+        condition: service_healthy
+    mem_limit: 768m
+    logging: *logging
+
 volumes:
   postgres-data:
   caddy-data:
   caddy-config:
+  backup-state:

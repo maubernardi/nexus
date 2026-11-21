@@ -1,0 +1,76 @@
+name: Backup del database
+
+# US-1302: ogni mattina alle 9, ora italiana, legge dal server l'esito dei backup notturni, con la stessa chiave del
+# deploy (forced command nexus-deploy: "backup"). Se manca un backup riuscito nelle ultime 26 ore il run fallisce e
+# GitHub manda un'email al PO (notifiche delle Actions dell'account), come per «Controllo della demo».
+# A mano: «stato», oppure «backup adesso» per un backup subito. Nel log solo date, dimensioni e nomi dei file.
+# Il cron di GitHub è in UTC e non conosce l'ora legale: ci sono due cron, e il primo passo tiene solo quello della
+# stagione in corso, guardando quale cron è partito. Così il controllo gira una volta sola, anche se GitHub lo ritarda.
+
+on:
+  schedule:
+    - cron: '0 8 * * *' # le 9 a Roma con l'ora solare (+0100)
+    - cron: '0 7 * * *' # le 9 a Roma con l'ora legale (+0200)
+  workflow_dispatch:
+    inputs:
+      azione:
+        description: Cosa fare
+        type: choice
+        options: [stato, backup adesso]
+        default: stato
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    name: Backup sul server
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    environment:
+      name: demo
+    steps:
+      - name: Solo alle 9, ora italiana
+        id: window
+        env:
+          EVENT: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          offset=$(TZ=Europe/Rome date +%z)
+          if [ "$EVENT" != schedule ] \
+            || { [ "$SCHEDULE" = '0 8 * * *' ] && [ "$offset" = +0100 ]; } \
+            || { [ "$SCHEDULE" = '0 7 * * *' ] && [ "$offset" = +0200 ]; }; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Cron dell'altra stagione (Roma $offset): nessun controllo"
+          fi
+
+      - name: Esito dei backup, o backup subito
+        if: steps.window.outputs.run == 'true'
+        env:
+          AZIONE: ${{ inputs.azione || 'stato' }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          case "$AZIONE" in
+            stato) remote="backup" ;;
+            "backup adesso") remote="backup adesso" ;;
+            *) echo "Azione non valida"; exit 1 ;;
+          esac
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          rc=0
+          ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes "deploy@$DEPLOY_HOST" "$remote" \
+            </dev/null || rc=$?
+          rm -f ~/.ssh/deploy
+          if [ "$rc" -ne 0 ]; then
+            echo "::error::Backup del database: manca un backup riuscito nelle ultime 26 ore, o il comando è fallito." \
+              "Leggi l'esito qui sopra e i log del servizio (workflow «Stato del server», servizio backup)."
+            exit "$rc"
+          fi
