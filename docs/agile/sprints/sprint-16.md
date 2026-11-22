@@ -17,7 +17,7 @@ il 22/11.
 | US-1302 | Backup del database | 5 | ✅ Ready | `add-database-backup` | [#174](https://github.com/maubernardi/nexus/pull/174) |
 | US-1306 | Passaggio in produzione | 8 (era 5) | ✅ Ready | `prepare-production` | [#177](https://github.com/maubernardi/nexus/pull/177) (preparazione) |
 | US-1203 | Avvisi di fine tirocinio e blocco delle nuove segnalazioni | 5 (aggiunta il 22/11) | ✅ Ready | `add-internship-end-reminders` | [#179](https://github.com/maubernardi/nexus/pull/179) |
-| US-1204 | Testi delle notifiche e delle email modificabili dall'ADMIN | 8 (aggiunta il 22/11) | ✅ Ready | `add-editable-message-texts` | |
+| US-1204 | Testi delle notifiche e delle email modificabili dall'ADMIN | 8 (aggiunta il 22/11) | ✅ Ready | `add-editable-message-texts` | [#180](https://github.com/maubernardi/nexus/pull/180) |
 
 Alla review avevamo detto 10 punti. Scrivendo i criteri, US-1306 è salita a 8: il suo criterio unico nascondeva la
 pulizia della demo, il realm senza utenti, la creazione dell'ADMIN, la procedura, l'importazione sul server e il cambio
