@@ -141,7 +141,8 @@ Tutte del PO.
     tranne la parte distintiva dell'oggetto, che è nuova;
   - le notifiche nell'app prendono il testo dal backend: il frontend non ha più una copia;
   - pagina a parte, «Testi dei messaggi», nel menu di amministrazione;
-  - le email di Keycloak restano nel tema.
+  - le email di Keycloak restano nel tema; si ridefiniscono dalla console di Keycloak (*Realm settings → Localization
+    → Realm overrides*), provato il 23/11 con l'oggetto dell'invito.
 
 ## Come li faccio
 

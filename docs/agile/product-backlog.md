@@ -1337,7 +1337,8 @@ Criteri di accettazione:
   sul campo.
 - **Ripristino del testo predefinito**. Finché nessuno li cambia valgono i predefiniti, quelli di oggi.
 - **Audit** di modifiche e ripristini.
-- **Fuori**: le email di Keycloak, che restano nel tema. Il README dice dove si cambiano.
+- **Fuori**: le email di Keycloak, che restano nel tema e si ridefiniscono dalla console di Keycloak (provato il
+  23/11). Il README dice come.
 
 Dipendenze: US-1201, US-1202, US-110
 

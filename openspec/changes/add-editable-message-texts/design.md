@@ -85,7 +85,8 @@ cambia nulla, tranne la parte distintiva dell'oggetto che è nuova. Le parti fis
 - **[Testo cambiato che perde il numero]**: l'ADMIN può togliere `{numero}`. → È una sua scelta; l'anteprima lo
   mostra, e nell'email il collegamento alla segnalazione resta fisso.
 - **[Tipo di notifica nuovo]**: serve il suo predefinito. → `MessageDefaultsTest` fallisce finché non c'è.
-- **[Email di Keycloak]**: restano nel tema. → Il README dice dove si cambiano.
+- **[Email di Keycloak]**: restano nel tema. → Si ridefiniscono dalla console di Keycloak, senza deploy (provato il
+  23/11); il README dice come.
 
 ## Migration Plan
 

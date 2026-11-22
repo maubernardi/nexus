@@ -20,8 +20,9 @@ email delle notifiche dica di che cosa si tratta, non solo il numero della segna
 
 ## Non-goals
 
-- **Le email di Keycloak** (invito, password dimenticata, password cambiata): restano nel tema. Si verifica se la
-  console di Keycloak può ridefinirle (*Realm settings → Localization*), e lo si scrive nel README.
+- **Le email di Keycloak** (invito, password dimenticata, password cambiata): restano nel tema. La console di
+  Keycloak le ridefinisce già (*Realm settings → Localization → Realm overrides*), provato il 23/11: il README dice
+  come.
 - **Altre lingue**: NEXUS è solo in italiano.
 - **Testi dei documenti Word**: sono i modelli caricati dall'ADMIN (EN-8).
 
