@@ -17,10 +17,11 @@ import {
   useProjectCompetenceSites,
   useProjectInternshipTypes,
 } from '@/config/hooks/useReferenceData';
-import { useSubmitSpecialTicket } from '@/config/hooks/useTickets';
+import { useInternshipsToClose, useSubmitSpecialTicket } from '@/config/hooks/useTickets';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
 import { FormField } from '@/molecules/FormField/FormField';
+import { InternshipsToCloseNotice } from '@/molecules/InternshipsToCloseNotice/InternshipsToCloseNotice';
 import { TutorBoardPostCard } from '@/molecules/TutorBoardPostCard/TutorBoardPostCard';
 
 /**
@@ -142,6 +143,8 @@ const CandidatureForm = ({
   const beneficiaries = useReportableBeneficiaries();
   // annuncio riservato: il progetto è il suo, non si sceglie
   const projects = useMyProjects(!p.project);
+  // tirocini finiti e non chiusi (US-1203): finché ce ne sono, niente candidature
+  const toClose = useInternshipsToClose();
 
   if (beneficiaries.isError || projects.isError) {
     return (
@@ -159,8 +162,11 @@ const CandidatureForm = ({
       </div>
     );
   }
-  if (!beneficiaries.data || (!p.project && !projects.data)) {
+  if (!beneficiaries.data || (!p.project && !projects.data) || toClose.isPending) {
     return <p role="status">{t('ticket.loading')}</p>;
+  }
+  if (toClose.data && toClose.data.length > 0) {
+    return <InternshipsToCloseNotice items={toClose.data} />;
   }
   if (beneficiaries.data.length === 0) {
     return (

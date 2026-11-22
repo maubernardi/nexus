@@ -368,7 +368,17 @@ export const it = {
         'Il Tutor ha inviato il report di restituzione della segnalazione n. {{number}}: il percorso è concluso.',
       TICKET_TRANSFERRED:
         'Ti è stata affidata la segnalazione n. {{number}}, con il suo beneficiario: prima la seguiva un altro Tutor.',
+      INTERNSHIP_ENDING:
+        'Il tirocinio della segnalazione n. {{number}} sta per finire: la convenzione è in chiusura. Se serve, prorogalo; altrimenti ricordati di chiuderlo con il report di restituzione.',
+      INTERNSHIP_OVERDUE:
+        'Il tirocinio della segnalazione n. {{number}} è finito alla data prevista: chiudilo con il report di restituzione o prorogalo. Finché non chiudi i tirocini finiti non puoi aprire nuove segnalazioni.',
     },
+  },
+  internshipsToClose: {
+    heading: 'Prima chiudi i tirocini finiti',
+    intro:
+      'Non puoi aprire nuove segnalazioni finché non chiudi o proroghi i tirocini che hanno passato la data di fine prevista: chiudili con il report di restituzione, oppure registra la proroga nella scheda del tirocinio.',
+    item: 'Segnalazione n. {{number}}, fine prevista il {{date}}',
   },
   legalRep: {
     heading: 'Legale rappresentante',
@@ -1089,6 +1099,7 @@ export const it = {
       PROPOSAL_REJECT: 'Proposta rifiutata dal Tutor',
       TIMER_REMINDER: 'Promemoria del timer',
       TIMER_EXPIRE: 'Scadenza del timer',
+      INTERNSHIP_END_REMINDER: 'Avviso di fine tirocinio al Tutor',
       COMPANY_EXCLUDE: 'Azienda esclusa dal Call Center',
       INTERNSHIP_SAVE: 'Scheda del tirocinio aggiornata',
       START: 'Tirocinio avviato',

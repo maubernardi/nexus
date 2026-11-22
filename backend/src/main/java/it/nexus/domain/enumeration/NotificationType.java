@@ -34,5 +34,12 @@ public enum NotificationType {
     /** All'operatore: il Tutor ha inviato il report di restituzione, il percorso è concluso (US-1101). */
     CLOSURE_REPORT_SUBMITTED,
     /** Al Tutor: gli è stata affidata la segnalazione di un altro Tutor, con il beneficiario (US-111). */
-    TICKET_TRANSFERRED
+    TICKET_TRANSFERRED,
+    /** Al Tutor: 7 e 3 giorni alla fine prevista, la convenzione è in chiusura: prorogarla o chiuderla (US-1203). */
+    INTERNSHIP_ENDING,
+    /**
+     * Al Tutor: 3 e 7 giorni dopo la fine prevista, il tirocinio va chiuso o prorogato; intanto non apre nuove
+     * segnalazioni (US-1203).
+     */
+    INTERNSHIP_OVERDUE
 }

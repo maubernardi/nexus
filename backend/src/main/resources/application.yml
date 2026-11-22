@@ -82,6 +82,9 @@ nexus:
   # controllo del timer delle proposte accettate (US-704/705): ogni ora, ora di Roma; "-" lo disattiva
   timer:
     cron: ${TIMER_CRON:0 5 * * * *}
+  # avvisi di fine tirocinio al Tutor (US-1203): ogni mattina alle 8, ora di Roma; "-" lo disattiva
+  internship-end-reminders:
+    cron: ${INTERNSHIP_END_REMINDERS_CRON:0 0 8 * * *}
   # conservazione dei dati dei beneficiari (US-1303): ogni notte alle 2:30, ora di Roma; "-" lo disattiva
   retention:
     cron: ${RETENTION_CRON:0 30 2 * * *}

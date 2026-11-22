@@ -724,6 +724,19 @@ class DomainConstraintsIT {
         }
 
         @Test
+        void avvisiDiFineTirocinio_faseFuoriIntervallo() {
+            Internship i = internships.saveAndFlush(internship());
+            assertViolates("ck_internship_end_reminder_stage", () -> internships.markEndReminder(i.getId(),
+                    LocalDate.of(2026, 12, 10), 5));
+        }
+
+        @Test
+        void avvisiDiFineTirocinio_faseSenzaData() {
+            Internship i = internships.saveAndFlush(internship());
+            assertViolates("ck_internship_end_reminder_for", () -> internships.markEndReminder(i.getId(), null, 1));
+        }
+
+        @Test
         void giornoDellaGrigliaSenzaFasce() {
             Internship i = internship();
             i.addScheduleDay(1, false, false, null);

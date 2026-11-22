@@ -59,6 +59,19 @@ export const submitTicket = async (payload: TicketCreate): Promise<Ticket> => {
   return data;
 };
 
+/** Tirocinio finito alla data prevista e non chiuso (US-1203): finché ce ne sono, il Tutor non apre segnalazioni. */
+export type InternshipToClose = {
+  ticketId: string;
+  ticketNumber: number;
+  /** Fine prevista, con le proroghe (aaaa-mm-gg). */
+  endDate: string;
+};
+
+export const fetchInternshipsToClose = async (): Promise<InternshipToClose[]> => {
+  const { data } = await axiosInstance.get<InternshipToClose[]>(`${ENDPOINTS.tickets}/internships-to-close`);
+  return data;
+};
+
 /** Riga dell'elenco delle segnalazioni (Home, US-303). */
 export type TicketListItem = Ticket &
   NewCategoryInfo & {

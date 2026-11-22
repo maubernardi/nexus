@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fetchMyBeneficiaries, type BeneficiarySummary } from '@/config/api/beneficiaryApi';
 import { fetchTutorBoardPost, type TutorBoardPost } from '@/config/api/boardPostApi';
 import { fetchMyProjects } from '@/config/api/referenceApi';
-import { submitSpecialTicket, type Ticket } from '@/config/api/ticketApi';
+import { fetchInternshipsToClose, submitSpecialTicket, type Ticket } from '@/config/api/ticketApi';
 import { CandidaturePage } from '@/pages/CandidaturePage/CandidaturePage';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderRoutes } from '@/tests/renderWithProviders';
@@ -24,7 +24,11 @@ vi.mock('@/config/api/referenceApi', () => ({
     { id: 'IT2', code: 'EXTRACURRICULARE', name: 'Extracurriculare' },
   ]),
 }));
-vi.mock('@/config/api/ticketApi', () => ({ submitSpecialTicket: vi.fn() }));
+vi.mock('@/config/api/ticketApi', () => ({
+  submitSpecialTicket: vi.fn(),
+  // tirocini finiti da chiudere (US-1203): di solito nessuno
+  fetchInternshipsToClose: vi.fn(async () => []),
+}));
 
 const GOL = { id: 'PR1', code: 'GOL', name: 'GOL' };
 const POLIS = { id: 'PR2', code: 'POLIS', name: 'POLIS' };
@@ -89,6 +93,7 @@ const renderPage = () =>
 
 describe('<CandidaturePage>', () => {
   beforeEach(() => {
+    vi.mocked(fetchInternshipsToClose).mockResolvedValue([]);
     vi.mocked(fetchTutorBoardPost).mockReset();
     vi.mocked(submitSpecialTicket).mockReset();
     vi.mocked(fetchMyBeneficiaries).mockResolvedValue([
@@ -194,5 +199,22 @@ describe('<CandidaturePage>', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Annuncio non trovato' }),
     ).toBeInTheDocument();
+  });
+
+  it('con un tirocinio finito da chiudere niente candidatura: l’elenco porta alla segnalazione', async () => {
+    vi.mocked(fetchTutorBoardPost).mockResolvedValue(post({ project: GOL }));
+    vi.mocked(fetchInternshipsToClose).mockResolvedValue([
+      { ticketId: 'T12', ticketNumber: 12, endDate: '2026-11-20' },
+    ]);
+    renderPage();
+
+    expect(
+      await screen.findByRole('heading', { name: 'Prima chiudi i tirocini finiti' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Segnalazione n. 12, fine prevista il 20/11/2026' }),
+    ).toHaveAttribute('href', '/segnalazioni/T12');
+    expect(screen.queryByRole('button', { name: /Invia/ })).not.toBeInTheDocument();
+    await expectNoAxeViolations();
   });
 });

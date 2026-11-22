@@ -23,6 +23,7 @@ import {
   rejectFastTrack,
   excludeCompany,
   fetchExclusions,
+  fetchInternshipsToClose,
   appointmentFailed,
   appointmentSet,
   approveCategory,
@@ -34,6 +35,7 @@ import {
   submitClosureReport,
   type CompanyExclusion,
   type CompatibleFilters,
+  type InternshipToClose,
   type JobSlotMatch,
   type Ticket,
   type TicketCreate,
@@ -45,6 +47,10 @@ import {
 } from '@/config/api/ticketApi';
 
 export const TICKETS_KEY = ['tickets'] as const;
+
+/** Tirocini del Tutor finiti alla data prevista e non chiusi (US-1203): bloccano le nuove segnalazioni. */
+export const useInternshipsToClose = (): UseQueryResult<InternshipToClose[]> =>
+  useQuery({ queryKey: [...TICKETS_KEY, 'internships-to-close'], queryFn: fetchInternshipsToClose });
 
 export const useSubmitTicket = (): UseMutationResult<Ticket, unknown, TicketCreate> => {
   const queryClient = useQueryClient();

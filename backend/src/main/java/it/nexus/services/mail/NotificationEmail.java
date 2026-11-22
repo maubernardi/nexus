@@ -37,6 +37,11 @@ public record NotificationEmail(String subject, String body) {
                     + "il percorso è concluso.";
             case TICKET_TRANSFERRED -> "Ti è stata affidata la segnalazione n. %d, con il suo beneficiario: prima la "
                     + "seguiva un altro Tutor.";
+            case INTERNSHIP_ENDING -> "Il tirocinio della segnalazione n. %d sta per finire: la convenzione è in "
+                    + "chiusura. Se serve, prorogalo; altrimenti ricordati di chiuderlo con il report di restituzione.";
+            case INTERNSHIP_OVERDUE -> "Il tirocinio della segnalazione n. %d è finito alla data prevista: chiudilo "
+                    + "con il report di restituzione o prorogalo. Finché non chiudi i tirocini finiti non puoi aprire "
+                    + "nuove segnalazioni.";
         };
         String text = template.formatted(ticketNumber);
         String body = """

@@ -15,6 +15,7 @@ import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
 import it.nexus.domain.dto.ProposalRejectDTO;
 import it.nexus.domain.dto.RejectCategoryDTO;
+import it.nexus.domain.dto.InternshipToCloseDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
@@ -34,6 +35,12 @@ public interface TicketService {
      * e visibile al Tutor, non già bloccato da un'altra candidatura (409).
      */
     TicketDTO submitSpecial(TicketSpecialCreateDTO dto);
+
+    /**
+     * Tirocini del Tutor corrente finiti alla data prevista e non chiusi (US-1203): finché ce ne sono non apre nuove
+     * segnalazioni.
+     */
+    List<InternshipToCloseDTO> internshipsToClose();
 
     /** Corregge la sede di competenza (US-308): solo l'ADMIN e il Coordinatore del progetto, con l'audit. */
     TicketDetailDTO changeCompetenceSite(String ticketId, CompetenceSiteChangeDTO dto);

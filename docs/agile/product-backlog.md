@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 94 elementi, 380 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-15](sprints/sprint-15.md), il 20/11 ([review](sprints/sprint-15-review.md)); in corso: [sprint-16](sprints/sprint-16.md), dal 21/11 (planning confermato il 20/11).
+**Totale: 95 elementi, 385 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-15](sprints/sprint-15.md), il 20/11 ([review](sprints/sprint-15-review.md)); in corso: [sprint-16](sprints/sprint-16.md), dal 21/11 (planning confermato il 20/11).
 
 ## Epiche
 
@@ -20,7 +20,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E9 | Bacheca opportunità | Le mansioni disponibili sono visibili ai Tutor in forma anonima e gestite dal Call Center. | 4 | 13 |
 | E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione, Progetto Formativo e Relazione finale sui modelli reali in Word. | 13 | 70 |
 | E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 3 | 9 |
-| E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 2 | 10 |
+| E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 3 | 15 |
 | E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 15 | 66 |
 
 ## Release
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 36 | 188 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 37 | 193 |
 
 ## Domande aperte per il Product Owner
 
@@ -144,6 +144,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1103](#us-1103) | E11 | Motivo di chiusura del tirocinio | Must | 2 | R4 | 🎉 Done (Sprint 14) |
 | [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | 🎉 Done (Sprint 5) |
 | [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 🎉 Done (Sprint 8) |
+| [US-1203](#us-1203) | E12 | Avvisi di fine tirocinio e blocco delle nuove segnalazioni | Must | 5 | R4 | ✅ Ready (Sprint 16) |
 | [US-1301](#us-1301) | E13 | Verifica della PWA online | Must | 1 | R1 | 📋 Backlog |
 | [US-1302](#us-1302) | E13 | Backup del database | Must | 5 | R4 | ✅ Ready (Sprint 16) |
 | [US-1303](#us-1303) | E13 | Anonimizzazione a scadenza | Must | 8 | R4 | 🎉 Done (Sprint 10) |
@@ -1293,6 +1294,28 @@ Criteri di accettazione:
 - Ogni notifica in app arriva anche via email alla stessa controparte.
 - Invio tramite SMTP IONOS da un indirizzo del dominio; nessun dato personale sensibile nel testo dell'email.
 - Dati SMTP dal PO (review dello Sprint 7): la password solo nel `.env` del server, mai nel repository.
+
+#### US-1203
+**Avvisi di fine tirocinio e blocco delle nuove segnalazioni** · Must · 5 punti · R4 · ✅ Ready (Sprint 16)
+
+Come **Tutor** voglio essere avvisato quando la convenzione di un tirocinio sta per scadere e quando un tirocinio finito
+va chiuso, e come **cooperativa** vogliamo che chi ha tirocini finiti e non chiusi non apra nuove segnalazioni. Chiesta
+dal PO il 22/11, prima del passaggio in produzione.
+
+Criteri di accettazione:
+- **Prima della fine**: 7 e 3 giorni prima della fine prevista, il Tutor riceve una notifica in app e un'email: «la
+  convenzione è in chiusura: se serve prorogalo, altrimenti ricordati di chiuderlo» (solo al Tutor, PO 22/11).
+- **Dopo la fine**: 3 e 7 giorni dopo, se il tirocinio non è chiuso, il Tutor riceve «chiudilo con il report di
+  restituzione o prorogalo; finché non chiudi i tirocini finiti non puoi aprire nuove segnalazioni».
+- **Giorni di calendario** (PO, 22/11); il controllo gira alle 8. La fine prevista tiene conto delle proroghe: dopo
+  una proroga gli avvisi ripartono dalla nuova fine. Ogni avviso parte una volta sola; dopo un giorno saltato parte
+  solo il più recente. Ogni avviso entra nella cronologia.
+- **Blocco** (PO, 22/11): dal giorno dopo la fine prevista, finché il tirocinio non è chiuso o prorogato, il Tutor non
+  apre segnalazioni, né dal modulo né dalla bacheca. Le pagine mostrano l'elenco dei tirocini da chiudere con il
+  collegamento; il backend rifiuta comunque. Gli altri Tutor lavorano normalmente.
+- Il controllo delle 8 non fa fallire il salvataggio di un Tutor che ha la scheda aperta.
+
+Dipendenze: US-1003, US-1012, US-1101, US-1201, US-1202
 
 ### E13 — Trasversali e produzione
 

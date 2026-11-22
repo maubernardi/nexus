@@ -1,7 +1,7 @@
 # Sprint 16 — 21 – 23 novembre 2026
 
-**Stato:** 🏃 in corso: planning confermato dal PO il 20/11, 13 punti. **Planning:** 20/11, dalla
-[review dello Sprint 15](sprint-15-review.md) (§8, §9).
+**Stato:** 🏃 in corso: planning confermato dal PO il 20/11, 13 punti; 18 con US-1203, aggiunta dal PO il 22/11.
+**Planning:** 20/11, dalla [review dello Sprint 15](sprint-15-review.md) (§8, §9).
 
 ## Obiettivo
 
@@ -9,12 +9,13 @@
 > ripristino. La produzione tiene la configurazione della demo e prende le aziende dal database attuale; parte senza
 > segnalazioni, beneficiari e utenti, con la sola utenza dell'ADMIN.
 
-## Impegno (13 punti)
+## Impegno (18 punti)
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
 | US-1302 | Backup del database | 5 | ✅ Ready | `add-database-backup` | [#174](https://github.com/maubernardi/nexus/pull/174) |
 | US-1306 | Passaggio in produzione | 8 (era 5) | ✅ Ready | `prepare-production` | [#177](https://github.com/maubernardi/nexus/pull/177) (preparazione) |
+| US-1203 | Avvisi di fine tirocinio e blocco delle nuove segnalazioni | 5 (aggiunta il 22/11) | ✅ Ready | `add-internship-end-reminders` | |
 
 Alla review avevamo detto 10 punti. Scrivendo i criteri, US-1306 è salita a 8: il suo criterio unico nascondeva la
 pulizia della demo, il realm senza utenti, la creazione dell'ADMIN, la procedura, l'importazione sul server e il cambio
@@ -31,7 +32,7 @@ di nome. Resta sotto la velocity media (23,1), e il margine serve per correggere
 
    Se il collaudo non finisce in tre giorni, il passaggio slitta e la storia si chiude quando è fatto.
 
-Prossima migrazione: **V50**; per queste storie non dovrebbe servirne una.
+Migrazioni: **V50** per US-1203; la prossima è **V51**.
 
 Ogni storia con interfaccia nuova si controlla in Chrome **prima** della PR (A26). Se l'estensione si blocca, il
 controllo si fa con Chrome senza finestra e un profilo pulito (A34). Per attendere la CI uso solo
@@ -116,6 +117,18 @@ Tutte del PO.
   - prova generale in locale (21/11): demo dai dati dimostrativi, pulizia, importazione del file vero (13.799 aziende,
     38.789 chiamate, come il 19/11), backend senza `seed` con 49 migrazioni valide e l'ADMIN creato con l'invito.
 
+- **US-1203, aggiunta dal PO il 22/11**, da avere prima del passaggio in produzione. Decisioni del PO:
+  - avvisi prima della fine solo al Tutor;
+  - giorni di calendario;
+  - blocco delle nuove segnalazioni dal giorno dopo la fine prevista.
+
+  Lo sprint passa da 13 a 18 punti, sempre sotto la velocity media (23,1). Altre scelte:
+  - il controllo gira alle 8;
+  - le fasi degli avvisi sono sulla scheda del tirocinio (V50) e si scrivono senza toccare la sua versione, così un
+    Tutor che sta modificando la scheda non trova un conflitto;
+  - dopo un giorno saltato parte solo l'avviso più recente;
+  - il blocco vale anche per la candidatura dalla bacheca.
+
 ## Come li faccio
 
 **Backup (US-1302):**
@@ -166,3 +179,5 @@ Tutte del PO.
 |---|---|
 | Inizio (20/11, dopo la conferma del planning) | 13 |
 | US-1302 unita (21/11) | 8 |
+| US-1203 aggiunta dal PO (22/11) | 13 |
+| US-1203 unita | 8 |
