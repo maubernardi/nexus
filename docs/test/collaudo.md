@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `765dec9` (21/11/2026): Sprint 1–15 completi e il backup notturno su IONOS (US-1302) (aziende da completare, categoria merceologica, referenti e recapiti, una mansione per più segnalazioni con il tipo di tirocinio; l'importazione dal database attuale si prova in locale) |
-| **Ultimo aggiornamento** | 21/11/2026 (T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 21/11/2026 (T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -1217,3 +1217,31 @@ chiavi age, variabili nel `.env` e `nexus-deploy` aggiornato. Sulla demo ci sono
   2. Nello stesso giorno c'è un solo run pianificato che ha controllato davvero; l'altro, se c'è, dice «Cron
      dell'altra stagione».
   3. Facoltativo: se un giorno il run fallisce, arriva l'email di GitHub, come per «Controllo della demo».
+
+## 27. Passaggio in produzione (Sprint 16)
+
+Si fanno subito dopo lo script del passaggio (README, «Passaggio in produzione»), sul sito vero, con i dati veri: nelle
+note scrivi solo numeri e codici, mai nomi o recapiti.
+
+- [ ] **T-27.1 Primo accesso dell'ADMIN (US-1306)**
+  1. Entro qualche minuto dal passo 7 dello script controlla la casella di `NEXUS_ADMIN_EMAIL`. **Atteso:** l'email
+     di Keycloak per impostare la password. Se non arriva, usa «Password dimenticata?» nella pagina di accesso.
+  2. Imposta la password e accedi. **Atteso:** sei dentro come ADMIN.
+  3. Apri «Utenti». **Atteso:** ci sei solo tu, con il ruolo ADMIN.
+  4. Prova ad accedere come `tutor1` con la password della demo. **Atteso:** l'accesso è rifiutato: l'utente non
+     esiste più.
+
+- [ ] **T-27.2 Dati della produzione (US-1306)**
+  1. Apri la bacheca e l'elenco delle segnalazioni. **Atteso:** sono vuoti.
+  2. Apri «Aziende». **Atteso:**
+     - 13.799 aziende, quelle del database attuale; nessuna azienda «Demo»;
+     - con «Solo le aziende da completare» restano quelle senza partita IVA o senza nome.
+  3. Apri un'azienda con una nota di Access. **Atteso:** nel diario la nota ha la data di Access e l'autore «Database
+     attuale».
+  4. Apri i Cataloghi. **Atteso:** progetti, tipologie di mansione, sedi, enti, comuni e i 6 modelli dei documenti
+     sono quelli della demo. Correggi o disattiva le voci che la pulizia ha elencato come dimostrative.
+
+- [ ] **T-27.3 Backup della produzione (US-1302, US-1306)**
+  1. Il giorno dopo il passaggio, alle 9, controlla Actions → «Backup del database». **Atteso:** verde, con il backup
+     della notte.
+

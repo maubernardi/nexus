@@ -192,7 +192,9 @@ DB_URL=jdbc:postgresql://localhost:55432/nexus PROFILES_ACTIVE=postgresql,securi
 
 ### 9.2 Sul server, con il passaggio in produzione (US-1306)
 
-Da provare con US-1306.
+Lo fa lo script del passaggio (`infra/deploy/passaggio-in-produzione.sh`, passo 6; README, «Passaggio in produzione»),
+subito dopo la pulizia della demo. Il comando è questo; provato in locale il 21/11 su una demo pulita, con lo stesso
+esito del §9.3.
 
 ```bash
 sudo install -d -o "$USER" -m 700 /opt/nexus/import   # poi copiare il file con scp in /opt/nexus/import/nexus.mdb

@@ -1,9 +1,13 @@
-# Nei test il controllo orario del timer non parte da solo: i test chiamano direttamente il servizio.
+# Nei test il controllo orario del timer non parte da solo: i test chiamano direttamente il servizio. Lo stesso per il
+# primo ADMIN della produzione (US-1306).
 nexus:
   timer:
     cron: "-"
   retention:
     cron: "-"
+  bootstrap:
+    admin:
+      initial-delay: P3650D
   municipalities:
     # i file dei test hanno pochi comuni
     min-rows: 3
