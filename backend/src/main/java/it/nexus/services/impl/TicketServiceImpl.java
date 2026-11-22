@@ -54,6 +54,7 @@ import it.nexus.domain.dto.JobSlotMatchDTO;
 import it.nexus.domain.dto.MatchRequestDTO;
 import it.nexus.domain.dto.ProposalRejectDTO;
 import it.nexus.domain.dto.RejectCategoryDTO;
+import it.nexus.domain.dto.InternshipToCloseDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
@@ -97,6 +98,7 @@ import it.nexus.services.BoardPostService;
 import it.nexus.services.ClosureReportService;
 import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.FastTrackService;
+import it.nexus.services.InternshipEndReminderService;
 import it.nexus.services.InternshipService;
 import it.nexus.services.InternshipTypeRules;
 import it.nexus.services.JobSlotAssignments;
@@ -156,10 +158,31 @@ public class TicketServiceImpl implements TicketService {
     private final InternshipTypeRules internshipTypeRules;
     private final TicketInternshipTypeService ticketInternshipTypeService;
     private final InternshipRepository internshipRepository;
+    private final InternshipEndReminderService internshipEndReminderService;
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<InternshipToCloseDTO> internshipsToClose() {
+        return internshipEndReminderService.toClose(currentAppUserService.getCurrentAppUser());
+    }
+
+    /**
+     * Nessuna segnalazione nuova finché il Tutor ha tirocini finiti alla data prevista e non chiusi (US-1203, PO
+     * 22/11): li chiude con il report di restituzione o li proroga.
+     */
+    private void requireInternshipsClosed(AppUser me) {
+        List<InternshipToCloseDTO> open = internshipEndReminderService.toClose(me);
+        if (!open.isEmpty()) {
+            throw new ConflictException("Non puoi aprire nuove segnalazioni finché non chiudi o proroghi i tirocini "
+                    + "finiti: %s", open.stream().map(i -> "segnalazione n. " + i.ticketNumber())
+                            .collect(Collectors.joining(", ")));
+        }
+    }
 
     @Override
     public TicketDTO submit(TicketCreateDTO dto) {
         AppUser me = currentAppUserService.getCurrentAppUser();
+        requireInternshipsClosed(me);
         Beneficiary beneficiary = ownBeneficiary(dto.beneficiaryId(), me);
         ticketRepository.findFirstByBeneficiaryIdAndStatusNot(beneficiary.getId(), TicketStatus.CLOSED).ifPresent(open -> {
             throw new FieldValidationException("beneficiaryId",
@@ -187,6 +210,7 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketDTO submitSpecial(TicketSpecialCreateDTO dto) {
         AppUser me = currentAppUserService.getCurrentAppUser();
+        requireInternshipsClosed(me);
         BoardPost post = visibleBoardPost(dto.boardPostId(), me);
         if (post.getStatus() == BoardPostStatus.ARCHIVED) {
             throw new ConflictException("L'annuncio #%d non è più in bacheca", post.getNumber());

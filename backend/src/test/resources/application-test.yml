@@ -5,6 +5,8 @@ nexus:
     cron: "-"
   retention:
     cron: "-"
+  internship-end-reminders:
+    cron: "-"
   bootstrap:
     admin:
       initial-delay: P3650D

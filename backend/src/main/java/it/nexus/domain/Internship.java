@@ -131,6 +131,18 @@ public class Internship extends AbstractTsidEntity {
     @Column(name = "exclude_holidays", nullable = false)
     private boolean excludeHolidays = true;
 
+    /**
+     * Fine prevista a cui si riferiscono gli avvisi di fine tirocinio già partiti (US-1203). In sola lettura: la scrive
+     * solo il controllo degli avvisi, con un aggiornamento che non tocca la versione della scheda, così il Tutor che la
+     * sta modificando non trova un conflitto.
+     */
+    @Column(name = "end_reminder_for", insertable = false, updatable = false)
+    private LocalDate endReminderFor;
+
+    /** Ultimo avviso partito per quella fine: 0 nessuno, 1 e 2 prima della fine, 3 e 4 dopo (US-1203). */
+    @Column(name = "end_reminder_stage", insertable = false, updatable = false)
+    private int endReminderStage;
+
     @OneToMany(mappedBy = "internship", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id")
     private List<InternshipCompanyTutor> companyTutors = new ArrayList<>();

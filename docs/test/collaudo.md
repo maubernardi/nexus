@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `765dec9` (21/11/2026): Sprint 1–15 completi e il backup notturno su IONOS (US-1302) (aziende da completare, categoria merceologica, referenti e recapiti, una mansione per più segnalazioni con il tipo di tirocinio; l'importazione dal database attuale si prova in locale) |
-| **Ultimo aggiornamento** | 21/11/2026 (T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 22/11/2026 (T-28.1 … T-28.3: avvisi di fine tirocinio, da provare dopo il deploy di US-1203; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -1244,4 +1244,34 @@ note scrivi solo numeri e codici, mai nomi o recapiti.
 - [ ] **T-27.3 Backup della produzione (US-1302, US-1306)**
   1. Il giorno dopo il passaggio, alle 9, controlla Actions → «Backup del database». **Atteso:** verde, con il backup
      della notte.
+
+## 28. Avvisi di fine tirocinio (Sprint 16)
+
+Si fanno sulla demo dopo il deploy di US-1203, come `tutor1`, con un tirocinio avviato. Se non ce n'è uno: porta una
+segnalazione fino all'appuntamento, compila la scheda con inizio un mese fa e avvia il tirocinio (T-16.2).
+
+- [ ] **T-28.1 Blocco delle nuove segnalazioni (US-1203)**
+  1. Nella scheda del tirocinio metti come fine prevista **ieri** e salva.
+  2. Apri «Nuova segnalazione». **Atteso:**
+     - al posto del modulo c'è «Prima chiudi i tirocini finiti»;
+     - c'è il collegamento «Segnalazione n. …, fine prevista il …» con la data di ieri, e porta alla segnalazione.
+  3. Dalla bacheca prova a candidare un beneficiario a un annuncio. **Atteso:** lo stesso avviso, niente modulo.
+  4. Accedi come `tutor2` e apri «Nuova segnalazione». **Atteso:** il modulo c'è: il blocco vale solo per `tutor1`.
+  5. Torna `tutor1` e metti come fine prevista **oggi**. **Atteso:** «Nuova segnalazione» mostra di nuovo il modulo.
+
+- [ ] **T-28.2 Proroga e chiusura (US-1203)**
+  1. Rimetti la fine prevista a ieri. **Atteso:** «Nuova segnalazione» è di nuovo bloccata.
+  2. Registra una proroga di un mese. **Atteso:** il modulo torna.
+  3. Facoltativo: chiudi il tirocinio con il report di restituzione. **Atteso:** anche così il blocco non c'è.
+
+- [ ] **T-28.3 Avvisi del mattino (US-1203)**
+  1. Su un tirocinio in corso metti come fine prevista il giorno fra **7 giorni** e salva.
+  2. La mattina dopo, dalle 8, controlla le notifiche di `tutor1` e la sua casella. **Atteso:**
+     - la notifica «Il tirocinio della segnalazione n. … sta per finire: la convenzione è in chiusura…»;
+     - la stessa email, con oggetto «PORTALE NEXUS - Segnalazione n. …».
+
+     Se `tutor1` ha un indirizzo finto, dagli prima un indirizzo vero dal suo profilo (README, US-110).
+  3. Nella cronologia della segnalazione. **Atteso:** «Avviso di fine tirocinio al Tutor».
+  4. Ricontrolla dopo le 8 del giorno dopo. **Atteso:** nessun altro avviso, perché il prossimo è a 3 giorni dalla
+     fine.
 

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { fetchMyBeneficiaries } from '@/config/api/beneficiaryApi';
 import { fetchJobCategories, fetchMyProjects } from '@/config/api/referenceApi';
-import { submitTicket, type Ticket } from '@/config/api/ticketApi';
+import { fetchInternshipsToClose, submitTicket, type Ticket } from '@/config/api/ticketApi';
 import { TicketNewPage } from '@/pages/TicketNewPage/TicketNewPage';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderRoutes } from '@/tests/renderWithProviders';
@@ -20,12 +20,17 @@ vi.mock('@/config/api/referenceApi', () => ({
     { id: 'IT2', code: 'EXTRACURRICULARE', name: 'Extracurriculare' },
   ]),
 }));
-vi.mock('@/config/api/ticketApi', () => ({ submitTicket: vi.fn() }));
+vi.mock('@/config/api/ticketApi', () => ({
+  submitTicket: vi.fn(),
+  // tirocini finiti da chiudere (US-1203): di solito nessuno
+  fetchInternshipsToClose: vi.fn(async () => []),
+}));
 
 const MARIO = { id: 'C1', firstName: 'Mario', lastName: 'Rossi', birthYear: 1998, residenceZoneName: 'Nord' };
 
 describe('<TicketNewPage>', () => {
   beforeEach(() => {
+    vi.mocked(fetchInternshipsToClose).mockResolvedValue([]);
     vi.mocked(fetchMyBeneficiaries).mockResolvedValue([MARIO, { ...MARIO, id: 'C2', firstName: 'Luca' }]);
     vi.mocked(fetchMyProjects).mockResolvedValue([{ id: 'P1', code: 'GOL', name: 'GOL' }]);
     vi.mocked(fetchJobCategories).mockResolvedValue([
@@ -67,5 +72,35 @@ describe('<TicketNewPage>', () => {
     // una nuova segnalazione riparte da zero, senza riprendere il beneficiario dall'indirizzo
     await user.click(screen.getByRole('button', { name: 'Invia un’altra segnalazione' }));
     expect(await screen.findByLabelText(/^Beneficiario/)).toHaveValue('');
+  });
+
+  it('con tirocini finiti da chiudere non mostra il modulo ma l’elenco, con i collegamenti', async () => {
+    vi.mocked(fetchInternshipsToClose).mockResolvedValue([
+      { ticketId: 'T12', ticketNumber: 12, endDate: '2026-11-20' },
+      { ticketId: 'T15', ticketNumber: 15, endDate: '2026-11-21' },
+    ]);
+    renderRoutes({
+      routes: [
+        {
+          path: '/segnalazioni/nuova',
+          element: (
+            <main>
+              <TicketNewPage />
+            </main>
+          ),
+        },
+      ],
+      initialPath: '/segnalazioni/nuova',
+    });
+
+    expect(
+      await screen.findByRole('heading', { name: 'Prima chiudi i tirocini finiti' }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: /^Segnalazione n\. / })).toHaveLength(2);
+    expect(
+      screen.getByRole('link', { name: 'Segnalazione n. 15, fine prevista il 21/11/2026' }),
+    ).toHaveAttribute('href', '/segnalazioni/T15');
+    expect(screen.queryByRole('button', { name: 'Invia segnalazione' })).not.toBeInTheDocument();
+    await expectNoAxeViolations();
   });
 });

@@ -29,6 +29,7 @@ import it.nexus.domain.dto.RejectCategoryDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.dto.FastTrackRejectDTO;
 import it.nexus.domain.dto.CompetenceSiteChangeDTO;
+import it.nexus.domain.dto.InternshipToCloseDTO;
 import it.nexus.domain.dto.InternshipTypeChangeDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketSpecialCreateDTO;
@@ -57,6 +58,13 @@ public class TicketResource {
     public ResponseEntity<List<TicketListItemDTO>> list(@RequestParam(required = false) TicketListView view,
             @RequestParam(required = false) TicketStatus status, @RequestParam(required = false) String projectId) {
         return ResponseEntity.ok(ticketService.list(view, status, projectId));
+    }
+
+    @GetMapping("/internships-to-close")
+    @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
+    @Operation(summary = "Tirocini del Tutor finiti alla data prevista e non chiusi: bloccano le nuove segnalazioni")
+    public ResponseEntity<List<InternshipToCloseDTO>> internshipsToClose() {
+        return ResponseEntity.ok(ticketService.internshipsToClose());
     }
 
     @PostMapping("/{id}/take-charge")

@@ -6,6 +6,8 @@ import { Link, useSearchParams } from 'react-router';
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
 import type { Ticket } from '@/config/api/ticketApi';
+import { useInternshipsToClose } from '@/config/hooks/useTickets';
+import { InternshipsToCloseNotice } from '@/molecules/InternshipsToCloseNotice/InternshipsToCloseNotice';
 import { TicketForm } from '@/organisms/TicketForm/TicketForm';
 
 /** Parametro con cui altre pagine preselezionano il beneficiario (es. dopo la registrazione). */
@@ -17,6 +19,8 @@ export const TicketNewPage = () => {
   const [created, setCreated] = useState<Ticket | null>(null);
   const [formKey, setFormKey] = useState(0);
   const successRef = useRef<HTMLHeadingElement>(null);
+  // tirocini finiti e non chiusi (US-1203): finché ce ne sono, niente nuove segnalazioni
+  const toClose = useInternshipsToClose();
 
   // conferma annunciata: il focus va sul titolo del riquadro di esito
   useEffect(() => {
@@ -68,6 +72,10 @@ export const TicketNewPage = () => {
             </Button>
           </div>
         </section>
+      ) : toClose.isPending ? (
+        <p role="status">{t('ticket.loading')}</p>
+      ) : toClose.data && toClose.data.length > 0 ? (
+        <InternshipsToCloseNotice items={toClose.data} />
       ) : (
         <>
           <p className="text-muted-foreground">{t('pages.ticketNew.intro')}</p>

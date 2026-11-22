@@ -18,6 +18,8 @@ export const NOTIFICATION_TYPES = [
   'INTERNSHIP_STARTED',
   'CLOSURE_REPORT_SUBMITTED',
   'TICKET_TRANSFERRED',
+  'INTERNSHIP_ENDING',
+  'INTERNSHIP_OVERDUE',
 ] as const;
 
 export type AppNotification = {
