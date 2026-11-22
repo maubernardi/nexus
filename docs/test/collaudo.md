@@ -1212,8 +1212,8 @@ chiavi age, variabili nel `.env` e `nexus-deploy` aggiornato. Sulla demo ci sono
      **Atteso:** «non riesco a decifrare l'archivio», e nessun database ripristinato.
 
 - [ ] **T-26.3 Controllo del mattino (US-1302)**
-  1. Il giorno dopo il deploy, verso le 9:15, apri Actions → «Backup del database». **Atteso:** c'è un run delle 9,
-     verde, con l'esito del backup delle 3:30.
+  1. Il giorno dopo il deploy, verso le 9:30, apri Actions → «Backup del database». **Atteso:** c'è un run delle
+     9:07, verde, con l'esito del backup delle 3:30. GitHub può ritardarlo: il 22/11 è partito alle 17:06.
   2. Nello stesso giorno c'è un solo run pianificato che ha controllato davvero; l'altro, se c'è, dice «Cron
      dell'altra stagione».
   3. Facoltativo: se un giorno il run fallisce, arriva l'email di GitHub, come per «Controllo della demo».

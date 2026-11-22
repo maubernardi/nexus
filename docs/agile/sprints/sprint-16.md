@@ -90,6 +90,11 @@ Tutte del PO.
     - 6 utenti nel realm `nexus`;
   - lo script di ripristino ora controlla subito che Docker risponda: con Docker Desktop spento si fermava senza dire
     perché.
+  - **primo giorno (22/11)**:
+    - il backup delle 3:30 è riuscito, con il blocco fino al 22/12;
+    - il controllo ha scelto il cron giusto (ora solare) e ha saltato l'altro;
+    - GitHub però l'ha fatto partire alle 17:06 invece che alle 9. Il controllo passa al minuto 7, meno carico
+      dello scoccare dell'ora.
 
 - **US-1306, preparazione** (prima PR; il passaggio vero nel giorno che scegli):
   - pulizia della demo in `infra/deploy/pulizia-demo.sql`, una sola transazione come `nexus_owner`:
