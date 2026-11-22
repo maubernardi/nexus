@@ -109,8 +109,11 @@ Lo script sul server non si aggiorna con il deploy: il PO lo reinstalla una volt
 ### D8. Controllo delle 9
 
 - Workflow «Backup del database» (`backup.yml`), con due cron UTC:
-  - `0 8 * * *`, valido quando Roma è a `+0100`;
-  - `0 7 * * *`, valido quando Roma è a `+0200`.
+  - `7 8 * * *`, valido quando Roma è a `+0100`;
+  - `7 7 * * *`, valido quando Roma è a `+0200`.
+
+  Il minuto 7 e non lo 0: allo scoccare dell'ora GitHub è più carico e ritarda i run pianificati. Il 22/11 il cron
+  delle 8:00 UTC è partito alle 17:06.
 - Il primo passo confronta `github.event.schedule` con lo scarto di Roma e salta il cron dell'altra stagione. Così il
   controllo gira una volta sola, anche se GitHub lo ritarda.
 - **Avvio manuale**: `stato` o `backup adesso`.

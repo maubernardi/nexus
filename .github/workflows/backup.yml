@@ -6,11 +6,13 @@ name: Backup del database
 # A mano: «stato», oppure «backup adesso» per un backup subito. Nel log solo date, dimensioni e nomi dei file.
 # Il cron di GitHub è in UTC e non conosce l'ora legale: ci sono due cron, e il primo passo tiene solo quello della
 # stagione in corso, guardando quale cron è partito. Così il controllo gira una volta sola, anche se GitHub lo ritarda.
+# Minuto 7, non 0: allo scoccare dell'ora GitHub è più carico e ritarda i run pianificati (il 22/11, con le 8:00 UTC,
+# il controllo è partito alle 17:06).
 
 on:
   schedule:
-    - cron: '0 8 * * *' # le 9 a Roma con l'ora solare (+0100)
-    - cron: '0 7 * * *' # le 9 a Roma con l'ora legale (+0200)
+    - cron: '7 8 * * *' # le 9:07 a Roma con l'ora solare (+0100)
+    - cron: '7 7 * * *' # le 9:07 a Roma con l'ora legale (+0200)
   workflow_dispatch:
     inputs:
       azione:
@@ -42,8 +44,8 @@ jobs:
         run: |
           offset=$(TZ=Europe/Rome date +%z)
           if [ "$EVENT" != schedule ] \
-            || { [ "$SCHEDULE" = '0 8 * * *' ] && [ "$offset" = +0100 ]; } \
-            || { [ "$SCHEDULE" = '0 7 * * *' ] && [ "$offset" = +0200 ]; }; then
+            || { [ "$SCHEDULE" = '7 8 * * *' ] && [ "$offset" = +0100 ]; } \
+            || { [ "$SCHEDULE" = '7 7 * * *' ] && [ "$offset" = +0200 ]; }; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "Cron dell'altra stagione (Roma $offset): nessun controllo"
