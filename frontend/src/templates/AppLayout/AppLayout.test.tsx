@@ -11,7 +11,6 @@ import { renderRoutes } from '@/tests/renderWithProviders';
 
 vi.mock('@/config/api/userApi', () => ({ fetchCurrentUser: vi.fn() }));
 vi.mock('@/config/api/notificationApi', () => ({
-  NOTIFICATION_TYPES: [],
   fetchUnreadCount: vi.fn().mockResolvedValue(0),
   fetchNotifications: vi.fn().mockResolvedValue({ unread: 0, items: [] }),
   markNotificationRead: vi.fn(),

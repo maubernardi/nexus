@@ -16,6 +16,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import it.nexus.config.ApplicationProperties;
+import it.nexus.services.MessageTextService;
+import it.nexus.services.messages.MessageTexts;
 import it.nexus.domain.enumeration.NotificationType;
 
 /** Invio delle email delle notifiche (US-1202): solo se accese e con la password, mai bloccante. */
@@ -25,13 +27,19 @@ class NotificationEmailSenderTest {
             NotificationType.CLOSURE_REPORT_SUBMITTED, "T1", 34L);
 
     private final JavaMailSenderImpl mailSender = mock(JavaMailSenderImpl.class);
+    /** Testi dei messaggi (US-1204): i predefiniti. */
+    private static final MessageTextService TEXTS = mock(MessageTextService.class);
+
+    static {
+        when(TEXTS.current()).thenReturn(MessageTexts.defaults());
+    }
 
     private NotificationEmailSender sender(boolean enabled, String password) {
         when(mailSender.getPassword()).thenReturn(password);
         ApplicationProperties properties = new ApplicationProperties();
         properties.getMail().setEnabled(enabled);
         properties.getMail().setAppUrl("https://portalenexus.it");
-        return new NotificationEmailSender(mailSender, properties);
+        return new NotificationEmailSender(mailSender, properties, TEXTS);
     }
 
     @Test
@@ -42,7 +50,7 @@ class NotificationEmailSenderTest {
         verify(mailSender).send(message.capture());
         assertThat(message.getValue().getFrom()).isEqualTo("NEXUS <noreply@portalenexus.it>");
         assertThat(message.getValue().getTo()).containsExactly("operatore@nexus.local");
-        assertThat(message.getValue().getSubject()).isEqualTo("PORTALE NEXUS - Segnalazione n. 34");
+        assertThat(message.getValue().getSubject()).isEqualTo("PORTALE NEXUS - Segnalazione n. 34 - Percorso concluso");
         assertThat(message.getValue().getText())
                 .startsWith("Il Tutor ha inviato il report di restituzione della segnalazione n. 34")
                 .contains("https://portalenexus.it/segnalazioni/T1");

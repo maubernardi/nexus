@@ -1,6 +1,8 @@
 package it.nexus.services.impl;
 
 import java.time.Clock;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.context.ApplicationEventPublisher;
@@ -14,12 +16,16 @@ import it.nexus.domain.Notification;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.dto.NotificationDTO;
 import it.nexus.domain.dto.NotificationsDTO;
+import it.nexus.domain.enumeration.MessageKey;
+import it.nexus.domain.enumeration.MessagePart;
 import it.nexus.domain.enumeration.NotificationType;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.NotificationRepository;
 import it.nexus.services.CurrentAppUserService;
+import it.nexus.services.MessageTextService;
 import it.nexus.services.NotificationService;
 import it.nexus.services.mail.NotificationCreatedEvent;
+import it.nexus.services.messages.MessageTexts;
 import it.nexus.web.errors.NotFoundException;
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +41,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final CurrentAppUserService currentAppUserService;
     private final Clock clock;
     private final ApplicationEventPublisher events;
+    private final MessageTextService messageTextService;
 
     @Override
     public void notify(AppUser recipient, NotificationType type, Ticket ticket) {
@@ -55,9 +62,10 @@ public class NotificationServiceImpl implements NotificationService {
     @Transactional(readOnly = true)
     public NotificationsDTO mine() {
         Long me = currentAppUserService.getCurrentAppUser().getId();
+        MessageTexts texts = messageTextService.current();
         return new NotificationsDTO(repository.countByRecipientIdAndReadAtIsNull(me),
                 repository.findByRecipientIdOrderByCreatedAtDescIdDesc(me, PageRequest.of(0, LIST_SIZE)).stream()
-                        .map(NotificationServiceImpl::toDto)
+                        .map(n -> toDto(n, texts))
                         .toList());
     }
 
@@ -82,10 +90,13 @@ public class NotificationServiceImpl implements NotificationService {
         repository.markAllRead(currentAppUserService.getCurrentAppUser().getId(), clock.instant());
     }
 
-    private static NotificationDTO toDto(Notification n) {
+    /** Con il testo della notifica nell'app, quello dell'ADMIN o il predefinito (US-1204). */
+    private static NotificationDTO toDto(Notification n, MessageTexts texts) {
         Ticket t = n.getTicket();
+        Map<String, Object> values = new HashMap<>();
+        values.put("numero", t == null ? null : t.getNumber());
         return new NotificationDTO(TsidMapper.toExternal(n.getId()), n.getType(),
                 t == null ? null : TsidMapper.toExternal(t.getId()), t == null ? null : t.getNumber(), n.getCreatedAt(),
-                n.getReadAt() != null);
+                n.getReadAt() != null, texts.render(MessageKey.of(n.getType()), MessagePart.APP, values));
     }
 }

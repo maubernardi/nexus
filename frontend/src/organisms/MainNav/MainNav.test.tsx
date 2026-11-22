@@ -65,7 +65,7 @@ describe('<MainNav>', () => {
       within(submenu)
         .getAllByRole('link')
         .map((l) => l.textContent),
-    ).toEqual(['Utenti', 'Cataloghi', 'Modelli dei documenti', 'Calendario']);
+    ).toEqual(['Utenti', 'Cataloghi', 'Modelli dei documenti', 'Testi dei messaggi', 'Calendario']);
     await expectNoAxeViolations();
 
     await user.keyboard('{Escape}');

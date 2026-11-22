@@ -2,6 +2,7 @@ package it.nexus.services.mail;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -15,6 +16,10 @@ import org.springframework.util.StringUtils;
 
 import it.nexus.config.ApplicationProperties;
 import it.nexus.config.TimeConfig;
+import it.nexus.domain.enumeration.MessageKey;
+import it.nexus.domain.enumeration.MessagePart;
+import it.nexus.services.MessageTextService;
+import it.nexus.services.messages.MessageTexts;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -29,8 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class EmailChangeMailer {
 
-    static final String CODE_SUBJECT = EmailSignature.SUBJECT_PREFIX + "Codice per confermare il nuovo indirizzo email";
-    static final String NOTICE_SUBJECT = EmailSignature.SUBJECT_PREFIX + "Il tuo indirizzo email è stato cambiato";
     private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm").withZone(TimeConfig.ZONE);
     private static final String FOOTER = """
 
@@ -39,10 +42,13 @@ public class EmailChangeMailer {
 
     private final JavaMailSender mailSender;
     private final ApplicationProperties.Mail properties;
+    private final MessageTextService messageTextService;
     private final boolean enabled;
 
-    public EmailChangeMailer(JavaMailSender mailSender, ApplicationProperties applicationProperties) {
+    public EmailChangeMailer(JavaMailSender mailSender, ApplicationProperties applicationProperties,
+            MessageTextService messageTextService) {
         this.mailSender = mailSender;
+        this.messageTextService = messageTextService;
         this.properties = applicationProperties.getMail();
         boolean passwordMissing = mailSender instanceof JavaMailSenderImpl impl && !StringUtils.hasText(impl.getPassword());
         this.enabled = properties.isEnabled() && !passwordMissing;
@@ -62,17 +68,11 @@ public class EmailChangeMailer {
             log.warn("Codice per il cambio di indirizzo non inviato: email spente");
             return false;
         }
-        String body = """
-                Ciao,
-
-                per confermare questo indirizzo come nuova email del tuo account NEXUS scrivi il codice:
-
-                    %s
-
-                Il codice vale fino alle %s (30 minuti). Se non hai chiesto tu il cambio, ignora questa email: \
-                l'indirizzo del tuo account resta quello di prima.
-                """.formatted(code, TIME.format(expiresAt)) + FOOTER;
-        return send(newEmail, CODE_SUBJECT, body);
+        // testi modificabili dall'ADMIN (US-1204); avvertenza e firma restano fisse
+        MessageTexts texts = messageTextService.current();
+        Map<String, Object> values = Map.of("codice", code, "ora", TIME.format(expiresAt));
+        String body = texts.render(MessageKey.EMAIL_CHANGE_CODE, MessagePart.EMAIL_BODY, values) + "\n" + FOOTER;
+        return send(newEmail, subject(texts, MessageKey.EMAIL_CHANGE_CODE, values), body);
     }
 
     @Async
@@ -86,15 +86,14 @@ public class EmailChangeMailer {
         if (!enabled || !StringUtils.hasText(event.previousEmail())) {
             return;
         }
-        String body = """
-                Ciao,
+        MessageTexts texts = messageTextService.current();
+        String body = texts.render(MessageKey.EMAIL_CHANGE_NOTICE, MessagePart.EMAIL_BODY, Map.of()) + "\n" + FOOTER;
+        send(event.previousEmail(), subject(texts, MessageKey.EMAIL_CHANGE_NOTICE, Map.of()), body);
+    }
 
-                l'indirizzo email del tuo account NEXUS è stato cambiato: da ora le notifiche arrivano al nuovo \
-                indirizzo e questo non riceverà più messaggi da NEXUS.
-
-                Se non sei stato tu, contatta subito l'amministratore di NEXUS.
-                """ + FOOTER;
-        send(event.previousEmail(), NOTICE_SUBJECT, body);
+    /** Oggetto: «PORTALE NEXUS - » e il testo dell'ADMIN, o il predefinito. */
+    static String subject(MessageTexts texts, MessageKey key, Map<String, ?> values) {
+        return EmailSignature.SUBJECT_PREFIX + texts.render(key, MessagePart.EMAIL_SUBJECT, values);
     }
 
     private boolean send(String to, String subject, String body) {

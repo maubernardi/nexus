@@ -1,27 +1,6 @@
 import { axiosInstance } from '@/config/api/axiosInstance';
 import { ENDPOINTS } from '@/config/api/Endpoint';
 
-/** Tipi di notifica noti all'interfaccia; un tipo nuovo si mostra con un testo generico. */
-export const NOTIFICATION_TYPES = [
-  'CATEGORY_CHANGED',
-  'CATEGORY_APPROVED',
-  'PROPOSAL_SENT',
-  'PROPOSAL_ACCEPTED',
-  'APPOINTMENT_SET',
-  'APPOINTMENT_FAILED',
-  'PROPOSAL_REJECTED',
-  'TIMER_REMINDER',
-  'TIMER_EXPIRED',
-  'BOARD_RELAUNCH_REQUESTED',
-  'FAST_TRACK_REJECTED',
-  'FAST_TRACK_DROPPED',
-  'INTERNSHIP_STARTED',
-  'CLOSURE_REPORT_SUBMITTED',
-  'TICKET_TRANSFERRED',
-  'INTERNSHIP_ENDING',
-  'INTERNSHIP_OVERDUE',
-] as const;
-
 export type AppNotification = {
   id: string;
   type: string;
@@ -29,6 +8,8 @@ export type AppNotification = {
   ticketNumber: number | null;
   createdAt: string;
   read: boolean;
+  /** Testo della notifica, quello dell'ADMIN o il predefinito (US-1204); manca solo nelle risposte vecchie. */
+  text?: string;
 };
 
 export type Notifications = { unread: number; items: AppNotification[] };

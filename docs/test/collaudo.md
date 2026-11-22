@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `765dec9` (21/11/2026): Sprint 1–15 completi e il backup notturno su IONOS (US-1302) (aziende da completare, categoria merceologica, referenti e recapiti, una mansione per più segnalazioni con il tipo di tirocinio; l'importazione dal database attuale si prova in locale) |
-| **Ultimo aggiornamento** | 22/11/2026 (T-28.1 … T-28.3: avvisi di fine tirocinio, da provare dopo il deploy di US-1203; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 22/11/2026 (T-29.1 … T-29.3: testi dei messaggi, da provare dopo il deploy di US-1204; T-28.1 … T-28.3: avvisi di fine tirocinio, sulla demo `2432f49`; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -1274,4 +1274,34 @@ segnalazione fino all'appuntamento, compila la scheda con inizio un mese fa e av
   3. Nella cronologia della segnalazione. **Atteso:** «Avviso di fine tirocinio al Tutor».
   4. Ricontrolla dopo le 8 del giorno dopo. **Atteso:** nessun altro avviso, perché il prossimo è a 3 giorni dalla
      fine.
+
+## 29. Testi dei messaggi (Sprint 16)
+
+Si fanno sulla demo dopo il deploy di US-1204, come `admin`. Alla fine ripristina i testi cambiati: la configurazione
+passa in produzione così com'è.
+
+- [ ] **T-29.1 Pagina e testi distinti (US-1204)**
+  1. Nel menu di amministrazione apri «Testi dei messaggi». **Atteso:** due gruppi, «Notifiche» ed «Email del cambio
+     di indirizzo»; ogni messaggio dice a chi va e quando parte.
+  2. Apri «Proposta di tirocinio». **Atteso:**
+     - tre campi: testo nell'app, oggetto (parte distintiva), testo dell'email;
+     - l'anteprima dell'oggetto è «PORTALE NEXUS - Segnalazione n. 12 - Nuova proposta di tirocinio»;
+     - l'anteprima dell'email finisce con collegamento, avvertenza e «Portale Nexus».
+  3. Cambia il testo nell'app in «Prova: proposta per la n. {numero}» e salva. **Atteso:** «Testo salvato.» e, nel
+     sommario, «Testi cambiati».
+  4. Come `operatore.cc` fai una proposta su una segnalazione di `tutor1`; come `tutor1` apri le notifiche. **Atteso:**
+     la notifica dice «Prova: proposta per la n. …»; l'email, se `tutor1` ha un indirizzo vero, ha il testo di sempre e
+     l'oggetto con «Nuova proposta di tirocinio».
+
+- [ ] **T-29.2 Controlli (US-1204)**
+  1. Nel testo dell'email scrivi «Ciao {nome}» e salva. **Atteso:** il campo dice che si può usare solo {numero}.
+  2. Scrivi «Proposta {numero» e salva. **Atteso:** il campo parla delle parentesi graffe.
+  3. Svuota l'oggetto e salva. **Atteso:** «Scrivi il testo».
+  4. Accedi come `tutor1` e apri `/testi`. **Atteso:** la pagina non c'è per il Tutor.
+
+- [ ] **T-29.3 Ripristino (US-1204)**
+  1. Come `admin`, sul testo nell'app cambiato al T-29.1, premi «Ripristina il testo predefinito». **Atteso:**
+     «Ripristinato il testo predefinito.», il campo torna al testo di prima e «Testi cambiati» sparisce.
+  2. Apri «Codice per il nuovo indirizzo email». **Atteso:** due campi, oggetto e testo, con i segnaposto {codice} e
+     {ora}; l'anteprima dell'oggetto non ha il numero della segnalazione.
 

@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 95 elementi, 385 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-15](sprints/sprint-15.md), il 20/11 ([review](sprints/sprint-15-review.md)); in corso: [sprint-16](sprints/sprint-16.md), dal 21/11 (planning confermato il 20/11).
+**Totale: 96 elementi, 393 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-15](sprints/sprint-15.md), il 20/11 ([review](sprints/sprint-15-review.md)); in corso: [sprint-16](sprints/sprint-16.md), dal 21/11 (planning confermato il 20/11).
 
 ## Epiche
 
@@ -20,7 +20,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E9 | Bacheca opportunità | Le mansioni disponibili sono visibili ai Tutor in forma anonima e gestite dal Call Center. | 4 | 13 |
 | E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione, Progetto Formativo e Relazione finale sui modelli reali in Word. | 13 | 70 |
 | E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 3 | 9 |
-| E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 3 | 15 |
+| E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 4 | 23 |
 | E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 15 | 66 |
 
 ## Release
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 37 | 193 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 38 | 201 |
 
 ## Domande aperte per il Product Owner
 
@@ -145,6 +145,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | 🎉 Done (Sprint 5) |
 | [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1203](#us-1203) | E12 | Avvisi di fine tirocinio e blocco delle nuove segnalazioni | Must | 5 | R4 | ✅ Ready (Sprint 16) |
+| [US-1204](#us-1204) | E12 | Testi delle notifiche e delle email modificabili dall'ADMIN | Must | 8 | R4 | ✅ Ready (Sprint 16) |
 | [US-1301](#us-1301) | E13 | Verifica della PWA online | Must | 1 | R1 | 📋 Backlog |
 | [US-1302](#us-1302) | E13 | Backup del database | Must | 5 | R4 | ✅ Ready (Sprint 16) |
 | [US-1303](#us-1303) | E13 | Anonimizzazione a scadenza | Must | 8 | R4 | 🎉 Done (Sprint 10) |
@@ -1316,6 +1317,29 @@ Criteri di accettazione:
 - Il controllo delle 8 non fa fallire il salvataggio di un Tutor che ha la scheda aperta.
 
 Dipendenze: US-1003, US-1012, US-1101, US-1201, US-1202
+
+#### US-1204
+**Testi delle notifiche e delle email modificabili dall'ADMIN** · Must · 8 punti · R4 · ✅ Ready (Sprint 16)
+
+Come **ADMIN** voglio cambiare i testi delle notifiche e delle email di NEXUS da una pagina, senza aspettare una modifica
+del codice e un deploy. Chiesta dal PO il 22/11.
+
+Criteri di accettazione:
+- **Pagina «Testi dei messaggi»**, solo per l'ADMIN.
+  - Per ogni tipo di notifica, separatamente: il testo nell'app, la parte distintiva dell'oggetto e il testo
+    dell'email (PO, 22/11).
+  - Per le due email del cambio di indirizzo: oggetto e testo.
+  - Per ogni messaggio: a chi va e quando parte, i segnaposto ammessi e l'anteprima composta.
+- **Oggetto delle notifiche** (PO, 22/11): resta «PORTALE NEXUS - Segnalazione n. N», più una parte distintiva per
+  ogni tipo, con un predefinito, modificabile.
+- **Restano fissi**: l'inizio dell'oggetto, il collegamento alla segnalazione, l'avvertenza e la firma «Portale Nexus».
+- **Controlli**: testo vuoto, troppo lungo, con un segnaposto sconosciuto o con graffe spaiate rifiutati, con il motivo
+  sul campo.
+- **Ripristino del testo predefinito**. Finché nessuno li cambia valgono i predefiniti, quelli di oggi.
+- **Audit** di modifiche e ripristini.
+- **Fuori**: le email di Keycloak, che restano nel tema. Il README dice dove si cambiano.
+
+Dipendenze: US-1201, US-1202, US-110
 
 ### E13 — Trasversali e produzione
 

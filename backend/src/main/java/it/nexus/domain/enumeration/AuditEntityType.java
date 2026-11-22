@@ -21,5 +21,7 @@ public enum AuditEntityType {
     DOCUMENT_TEMPLATE,
     CLOSURE_REASON,
     BUSINESS_CATEGORY,
-    CONTACT_ROLE
+    CONTACT_ROLE,
+    /** Testi dei messaggi cambiati dall'ADMIN (US-1204). */
+    MESSAGE_TEXT
 }

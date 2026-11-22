@@ -5,7 +5,7 @@ import { Link } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
-import { NOTIFICATION_TYPES, type AppNotification } from '@/config/api/notificationApi';
+import type { AppNotification } from '@/config/api/notificationApi';
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
@@ -28,10 +28,9 @@ export const NotificationsPage = () => {
     if (allRead) outcomeRef.current?.focus();
   }, [allRead]);
 
+  // il testo arriva dal backend: è quello dell'ADMIN o il predefinito (US-1204)
   const text = (n: AppNotification): string =>
-    (NOTIFICATION_TYPES as readonly string[]).includes(n.type)
-      ? t(`notifications.types.${n.type as (typeof NOTIFICATION_TYPES)[number]}`, { number: n.ticketNumber })
-      : t('notifications.generic', { number: n.ticketNumber });
+    n.text ?? t('notifications.generic', { number: n.ticketNumber });
 
   if (notifications.isError && !notifications.data) {
     return (

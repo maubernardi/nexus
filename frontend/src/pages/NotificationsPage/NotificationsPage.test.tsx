@@ -13,7 +13,6 @@ import { expectNoAxeViolations } from '@/tests/axe';
 import { renderWithProviders } from '@/tests/renderWithProviders';
 
 vi.mock('@/config/api/notificationApi', async () => ({
-  NOTIFICATION_TYPES: ['CATEGORY_CHANGED', 'CATEGORY_APPROVED', 'PROPOSAL_SENT', 'PROPOSAL_ACCEPTED'],
   fetchNotifications: vi.fn(),
   markNotificationRead: vi.fn().mockResolvedValue(undefined),
   markAllNotificationsRead: vi.fn().mockResolvedValue(undefined),
@@ -29,6 +28,8 @@ const data: Notifications = {
       ticketNumber: 9,
       createdAt: '2026-10-27T09:00:00Z',
       read: false,
+      // il testo lo manda il backend: quello dell'ADMIN o il predefinito (US-1204)
+      text: 'C’è una proposta di tirocinio per la segnalazione n. 9: valutala e accettala.',
     },
     {
       id: 'N1',
@@ -55,7 +56,7 @@ describe('<NotificationsPage>', () => {
     vi.mocked(markAllNotificationsRead).mockClear();
   });
 
-  it('elenca le notifiche con stato in testo, link alla segnalazione e testo generico per i tipi nuovi', async () => {
+  it('elenca le notifiche con il testo del backend, stato in testo, link alla segnalazione e testo generico se manca', async () => {
     renderPage();
 
     const items = await screen.findAllByRole('listitem');
