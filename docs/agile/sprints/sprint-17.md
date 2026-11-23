@@ -23,7 +23,8 @@
    - il passaggio sul server, già su PostgreSQL 19;
    - l'invito all'ADMIN;
    - poi la seconda PR: profilo predefinito, realm e password demo, nomi «produzione», controllo ASVS.
-4. **Analisi di US-507**, in una sessione dopo il passaggio (review, §8.5).
+4. **Analisi di US-507**, in una sessione dopo il passaggio (review, §8.5). Anticipata e fatta il 23/11 sera: tre
+   storie, 15 punti, da pianificare (sotto, «Analisi di US-507»).
 
 **Perché EN-10 prima del passaggio:**
 - il cambio di versione principale tocca solo i dati dimostrativi;
@@ -97,6 +98,30 @@ Dalla review dello Sprint 16, tutte del PO:
 **Da tenere d'occhio:** il controllo del backup delle 9:07. Il 22/11 GitHub l'ha fatto partire alle 17:06; il 23/11
 alle 10:25 non era ancora partito. Se continua, propongo un avviso mandato dal server stesso, con la posta di IONOS:
 una storia piccola.
+
+## Analisi di US-507 (23/11)
+
+Oggi la richiesta passa a voce o per email, senza traccia. Decisioni del PO:
+- la richiesta è **generale**, non per un beneficiario;
+- **azienda nuova**: nome e zona del catalogo obbligatori, settore facoltativo. **Azienda già presente**: «Chiedi di
+  contattarla» dalla sua scheda;
+- la prende in carico **un operatore qualsiasi**; il Call Center vede le richieste nel suo elenco, senza email;
+- **più tentativi**, ognuno con data, esito (elenco fisso) e nota; la richiesta la **chiude a mano** l'operatore;
+- il Tutor vede **tutti i tentativi** e riceve l'esito nell'app e per email;
+- il Tutor **vede le aziende** con pochi dati: nome, settore, zona, indirizzo;
+- l'azienda **ha una zona** sua, del catalogo. Il collegamento tra zone e comuni verrà in un secondo momento.
+
+Ne escono tre storie nel backlog, 15 punti, senza release, da pianificare:
+
+| ID | Storia | Punti |
+|---|---|---|
+| US-511 | Zona dell'azienda e aziende per il Tutor | 5 |
+| US-507 | Richiesta di contatto di un'azienda dal Tutor | 5 |
+| US-512 | Tentativi di contatto ed esito della richiesta | 5 |
+
+Le ho proposte io, da confermare:
+- i nomi simili mostrati prima dell'invio, contro i doppioni;
+- il collegamento all'azienda del database alla chiusura.
 
 ## Burndown
 
