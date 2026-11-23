@@ -17,7 +17,7 @@
 
 - [x] 3.1 Prova del backup (`tools/ci/backup-e2e.sh`) con l'immagine sulla 19
 - [x] 3.2 `./mvnw verify` con tutti i Testcontainers sulla 19 (246 test unitari, 561 di integrazione)
-- [ ] 3.3 Ripristino di prova sul backup vero della demo con la 19 (il PO, sul PC); backend e Keycloak avviati sul
+- [x] 3.3 Ripristino di prova sul backup vero della demo con la 19 (il PO, sul PC); backend e Keycloak avviati sul
       database ripristinato
 
 ## 4. Documentazione
@@ -28,7 +28,7 @@
 
 ## 5. Sul server (dopo il merge)
 
-- [ ] 5.1 `prepara`, deploy di `main`, `verifica` (il PO, con sudo)
+- [x] 5.1 `prepara`, deploy di `main` (`47fe414`), `verifica` (il PO, con sudo, 23/11)
 - [ ] 5.2 Controllo del mattino del giorno dopo: verde con il backup della notte sulla 19
 - [ ] 5.3 PR di Dependabot #182–#184 chiuse
 - [ ] 5.4 Dopo il passaggio in produzione: `pulisci`
