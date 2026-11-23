@@ -153,7 +153,8 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
 - **Tema e lingua del realm (una volta, dopo il primo deploy con il tema).** L'import all'avvio non modifica un realm
   già esistente: sulla demo tema `nexus` e sola lingua italiana si impostano con
   ```bash
-  cd /opt/nexus/current && sudo docker compose --env-file ../.env --env-file release.env exec -T keycloak bash -c \
+  cd /opt/nexus/current && sudo docker compose --env-file /opt/nexus/.env --env-file release.env \
+    exec -T keycloak bash -c \
     '/opt/keycloak/bin/kcadm.sh config credentials --server http://localhost:8080 --realm master --user admin \
        --password "$KC_BOOTSTRAP_ADMIN_PASSWORD" --config /tmp/kcadm.config \
      && /opt/keycloak/bin/kcadm.sh update realms/nexus --config /tmp/kcadm.config -s loginTheme=nexus \
@@ -242,8 +243,8 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
   `documenti_base/modelli-nexus/` dai file della cooperativa e li carica l'ADMIN da «Modelli dei documenti», con
   progetto GOL, tipo di tirocinio e nessun ente (un modello per tutti gli enti). Per cambiarli si modifica il `.docx`
   in Word e lo si ricarica: i segnaposto ammessi sono quelli elencati nella pagina.
-- **Stato e log sul server:**
-  `cd /opt/nexus/current && sudo docker compose --env-file ../.env --env-file release.env ps` (oppure `logs -f backend`).
+- **Stato e log sul server** (al posto di `ps`, per esempio `logs -f backend`):
+  `cd /opt/nexus/current && sudo docker compose --env-file /opt/nexus/.env --env-file release.env ps`.
 - **DNS (IONOS):** A `@`, `auth`, `www` → IP del server; CAA `0 issue "letsencrypt.org"`; i record email restano.
 
 ### Backup del database
@@ -308,7 +309,7 @@ del backup, che è nel `MANIFEST.txt`):
 age -d -i ~/nexus-backup-chiave.txt -o archivio.tar nexus-AAAAMMGG-HHMMSSZ.tar.age && scp archivio.tar <server>:
 # sul server
 mkdir -m 700 ~/ripristino && tar -xf ~/archivio.tar -C ~/ripristino && (cd ~/ripristino && sha256sum -c SHA256SUMS)
-cd /opt/nexus/current && C="sudo docker compose --env-file ../.env --env-file release.env"
+cd /opt/nexus/current && C="sudo docker compose --env-file /opt/nexus/.env --env-file release.env"
 $C stop backend keycloak backup
 curl -fsSL https://raw.githubusercontent.com/maubernardi/nexus/main/backup/ricrea-database.sql \
   | $C exec -T postgres psql -U postgres -d postgres
