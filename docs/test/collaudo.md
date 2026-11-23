@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `47fe414` (23/11/2026), su **PostgreSQL 19** (EN-10): Sprint 1–16 completi, tranne il passaggio in produzione: backup notturno su IONOS, avvisi di fine tirocinio, testi dei messaggi; l'importazione dal database attuale si prova in locale |
-| **Ultimo aggiornamento** | 23/11/2026 (T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, fatto il 23/11 sulla demo `47fe414`; T-30.3 corretta: le aziende si provano come `operatore.cc`; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 23/11/2026 (collaudo prima del passaggio finito dal PO il 23/11: T-24, T-25, T-28, T-29 e T-30.1 … T-30.3 riusciti; restano T-30.4, il backup della notte sulla 19, e dopo il passaggio T-26.3 e T-27; T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, fatto il 23/11 sulla demo `47fe414`; T-30.3 corretta: le aziende si provano come `operatore.cc`; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -939,7 +939,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
 
 ## 24. Proroghe, motivi di chiusura e documenti reali (Sprint 14)
 
-- [ ] **T-24.1 Motivo di chiusura del tirocinio (US-1103)**
+- [x] **T-24.1 Motivo di chiusura del tirocinio (US-1103)**
   1. Come `admin` apri **Cataloghi**. **Atteso:** la sezione «Motivi di chiusura del tirocinio» con «Chiusura
      regolare», «Interruzione anticipata per volontà dell'azienda» e «… del destinatario». Prova a disattivare
      «Chiusura regolare». **Atteso:** l'operazione è rifiutata con la spiegazione.
@@ -953,7 +953,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   4. Su un altro tirocinio invia il report con la fine effettiva uguale alla prevista. **Atteso:** «Motivo di
      chiusura: Chiusura regolare», senza averlo scelto.
 
-- [ ] **T-24.2 Proroga del tirocinio (US-1012)**
+- [x] **T-24.2 Proroga del tirocinio (US-1012)**
   1. Come `tutor1` apri la scheda di una segnalazione con l'appuntamento fissato (tirocinio non ancora avviato).
      **Atteso:** dopo «Progetti formativi» non c'è la sezione «Proroghe».
   2. Apri la scheda di un tirocinio avviato. **Atteso:** la sezione «Proroghe» con «Nessuna proroga.» e il pulsante
@@ -976,7 +976,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      della proroga; con la fine della convenzione iniziale compare il motivo dell'interruzione anticipata.
   8. Dopo l'invio del report riapri la scheda. **Atteso:** la proroga si legge ma non si modifica più.
 
-- [ ] **T-24.3 Intestazione e avviso dei documenti per progetto (US-1011)**
+- [x] **T-24.3 Intestazione e avviso dei documenti per progetto (US-1011)**
   1. Come `admin` apri **Cataloghi**. **Atteso:** la sezione «Dati dei documenti dei progetti», con ogni progetto,
      «Nessuna intestazione» e «Testo predefinito».
   2. Premi «Modifica» su GOL. **Atteso:** il modulo si apre con il focus sul titolo; il «Riferimento all'avviso» ha
@@ -988,7 +988,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      sono divisi per gruppo (Segnalazione e progetto, Soggetto promotore, Ente di presa in carico, Soggetto ospitante,
      Tirocinante, Tirocinio e orario, Convenzione, Progetto formativo, Chiusura), ognuno con la sua descrizione.
 
-- [ ] **T-24.4 Documenti per convenzione e progetto, relazione finale (US-1011)**
+- [x] **T-24.4 Documenti per convenzione e progetto, relazione finale (US-1011)**
 
   Prima della prova: i dati del soggetto promotore di GOL in «Cataloghi» (T-24.6). Senza modelli caricati i documenti
   usano il modello generico di NEXUS.
@@ -1009,7 +1009,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   6. Usa la tastiera: **Atteso:** ogni pulsante si raggiunge con Tab e l'esito del download si legge sotto i gruppi
      («Documento scaricato: …»), mentre il focus resta sul pulsante.
 
-- [ ] **T-24.5 Modelli reali di GOL (EN-8)**
+- [x] **T-24.5 Modelli reali di GOL (EN-8)**
 
   Prima della prova: i dati del promotore di GOL (T-24.6) e i 6 modelli preparati in `documenti_base/modelli-nexus/`
   (fuori dal repository).
@@ -1037,7 +1037,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      C la durata fino alla fine effettiva, con luogo (sede di competenza) e data di chiusura.
   6. Apri i documenti in Word. **Atteso:** si aprono senza avvisi di contenuto illeggibile.
 
-- [ ] **T-24.6 Dati del promotore e variabili per progetto (US-1013)**
+- [x] **T-24.6 Dati del promotore e variabili per progetto (US-1013)**
 
   Da fare prima di T-24.4 e T-24.5: i dati del promotore servono ai documenti.
   1. Come `admin` apri **Cataloghi** → «Dati dei documenti dei progetti». **Atteso:** le colonne «Promotore» («Non
@@ -1064,7 +1064,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
 
 ## 25. Database attuale e aziende (Sprint 15)
 
-- [ ] **T-25.1 Aziende da completare (US-508)**
+- [x] **T-25.1 Aziende da completare (US-508)**
 
   Le aziende del database attuale arriveranno con l'importazione (US-1309). Nella demo ce ne sono due dimostrative:
   «Demo Bar del Centro», senza partita IVA, e «Azienda senza nome n. 90001», senza nome né partita IVA.
@@ -1085,7 +1085,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      quella segnalazione e, tra le mansioni compatibili, premi «Dettagli» sulla mansione del bar. **Atteso:** «Partita
      IVA: Da completare».
 
-- [ ] **T-25.2 Categoria merceologica e attività (US-509)**
+- [x] **T-25.2 Categoria merceologica e attività (US-509)**
   1. Come `admin` apri **Cataloghi**. **Atteso:** dopo «Tipologie di mansione» la sezione «Categorie merceologiche»
      con 53 voci attive, tra cui «Albergo», «Ristorante / Trattoria / Bistrot» e «Pulizie e facchinaggio».
   2. Aggiungi «Agenzia immobiliare». **Atteso:** la voce compare attiva nell'elenco.
@@ -1102,7 +1102,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
   7. In una segnalazione da abbinare, premi «Dettagli» su una mansione di un'azienda dimostrativa. **Atteso:** tra i
      dati dell'azienda «Categoria merceologica» e «Attività».
 
-- [ ] **T-25.3 Referenti, recapiti e sede operativa (US-510)**
+- [x] **T-25.3 Referenti, recapiti e sede operativa (US-510)**
 
   Sulla demo il referente che le aziende avevano prima diventa il primo referente, senza ruolo. Le due aziende
   dimostrative senza referente ne ricevono uno con il ruolo.
@@ -1150,7 +1150,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      - ci sono i referenti con il ruolo;
      - nel diario c'è la nota con la data di Access e l'autore «Database attuale».
 
-- [ ] **T-25.5 Una mansione per più segnalazioni, una per tipo di tirocinio (US-605)**
+- [x] **T-25.5 Una mansione per più segnalazioni, una per tipo di tirocinio (US-605)**
 
   Nella demo la segnalazione n. 4 (GOL, Extracurriculare) ha la proposta della mansione «Magazziniere reparto
   spedizioni». La n. 3 (POLIS, in lavorazione, in carico a `operatore.cc`) è Curriculare.
@@ -1250,7 +1250,7 @@ note scrivi solo numeri e codici, mai nomi o recapiti.
 Si fanno sulla demo dopo il deploy di US-1203, come `tutor1`, con un tirocinio avviato. Se non ce n'è uno: porta una
 segnalazione fino all'appuntamento, compila la scheda con inizio un mese fa e avvia il tirocinio (T-16.2).
 
-- [ ] **T-28.1 Blocco delle nuove segnalazioni (US-1203)**
+- [x] **T-28.1 Blocco delle nuove segnalazioni (US-1203)**
   1. Nella scheda del tirocinio metti come fine prevista **ieri** e salva.
   2. Apri «Nuova segnalazione». **Atteso:**
      - al posto del modulo c'è «Prima chiudi i tirocini finiti»;
@@ -1259,12 +1259,12 @@ segnalazione fino all'appuntamento, compila la scheda con inizio un mese fa e av
   4. Accedi come `tutor2` e apri «Nuova segnalazione». **Atteso:** il modulo c'è: il blocco vale solo per `tutor1`.
   5. Torna `tutor1` e metti come fine prevista **oggi**. **Atteso:** «Nuova segnalazione» mostra di nuovo il modulo.
 
-- [ ] **T-28.2 Proroga e chiusura (US-1203)**
+- [x] **T-28.2 Proroga e chiusura (US-1203)**
   1. Rimetti la fine prevista a ieri. **Atteso:** «Nuova segnalazione» è di nuovo bloccata.
   2. Registra una proroga di un mese. **Atteso:** il modulo torna.
   3. Facoltativo: chiudi il tirocinio con il report di restituzione. **Atteso:** anche così il blocco non c'è.
 
-- [ ] **T-28.3 Avvisi del mattino (US-1203)**
+- [x] **T-28.3 Avvisi del mattino (US-1203)**
   1. Su un tirocinio in corso metti come fine prevista il giorno fra **7 giorni** e salva.
   2. La mattina dopo, dalle 8, controlla le notifiche di `tutor1` e la sua casella. **Atteso:**
      - la notifica «Il tirocinio della segnalazione n. … sta per finire: la convenzione è in chiusura…»;
@@ -1280,7 +1280,7 @@ segnalazione fino all'appuntamento, compila la scheda con inizio un mese fa e av
 Si fanno sulla demo dopo il deploy di US-1204, come `admin`. Alla fine ripristina i testi cambiati: la configurazione
 passa in produzione così com'è.
 
-- [ ] **T-29.1 Pagina e testi distinti (US-1204)**
+- [x] **T-29.1 Pagina e testi distinti (US-1204)**
   1. Nel menu di amministrazione apri «Testi dei messaggi». **Atteso:** due gruppi, «Notifiche» ed «Email del cambio
      di indirizzo»; ogni messaggio dice a chi va e quando parte.
   2. Apri «Proposta di tirocinio». **Atteso:**
@@ -1293,13 +1293,13 @@ passa in produzione così com'è.
      la notifica dice «Prova: proposta per la n. …»; l'email, se `tutor1` ha un indirizzo vero, ha il testo di sempre e
      l'oggetto con «Nuova proposta di tirocinio».
 
-- [ ] **T-29.2 Controlli (US-1204)**
+- [x] **T-29.2 Controlli (US-1204)**
   1. Nel testo dell'email scrivi «Ciao {nome}» e salva. **Atteso:** il campo dice che si può usare solo {numero}.
   2. Scrivi «Proposta {numero» e salva. **Atteso:** il campo parla delle parentesi graffe.
   3. Svuota l'oggetto e salva. **Atteso:** «Scrivi il testo».
   4. Accedi come `tutor1` e apri `/testi`. **Atteso:** la pagina non c'è per il Tutor.
 
-- [ ] **T-29.3 Ripristino (US-1204)**
+- [x] **T-29.3 Ripristino (US-1204)**
   1. Come `admin`, sul testo nell'app cambiato al T-29.1, premi «Ripristina il testo predefinito». **Atteso:**
      «Ripristinato il testo predefinito.», il campo torna al testo di prima e «Testi cambiati» sparisce.
   2. Apri «Codice per il nuovo indirizzo email». **Atteso:** due campi, oggetto e testo, con i segnaposto {codice} e
@@ -1330,7 +1330,7 @@ Si fanno con l'aggiornamento della demo (README, «Aggiornare PostgreSQL»). Nel
   4. Si fa una volta sola. **Atteso:** rilanciato dopo, `prepara` si ferma al passo 1 con «PostgreSQL è già alla 19:
      niente da aggiornare», senza fermare il sito né toccare i dati.
 
-- [ ] **T-30.3 La demo sulla 19 (EN-10)**
+- [x] **T-30.3 La demo sulla 19 (EN-10)**
   1. Accedi come `tutor1`. **Atteso:** le segnalazioni di prima, con lo stesso stato.
   2. Esci e rientra come `operatore.cc`: «Aziende» è del Call Center e dell'ADMIN, il Tutor non ce l'ha. Apri
      un'azienda e aggiungi una nota al diario. **Atteso:** la nota si salva e compare.

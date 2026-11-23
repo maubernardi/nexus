@@ -21,6 +21,7 @@
 ## 4. Passaggio (con il PO, dopo il merge)
 
 - [x] 4.1 Deploy sulla demo; prova generale sul backup vero della demo
-- [ ] 4.2 Dati dell'ADMIN nel `.env`, file Access sul server, `nexus-deploy` reinstallato
+- [ ] 4.2 Dati dell'ADMIN nel `.env`, file Access sul server, `nexus-deploy` reinstallato (23/11: dati dell'ADMIN e
+      `nexus-deploy` fatti, controllo delle chiamate in Access fatto; il file Access il giorno del passaggio)
 - [ ] 4.3 `passaggio-in-produzione.sh`; invito, accesso dell'ADMIN, controllo della configurazione
 - [ ] 4.4 Seconda PR: profilo predefinito, realm e password demo, nomi «produzione», ASVS, chiusura della storia

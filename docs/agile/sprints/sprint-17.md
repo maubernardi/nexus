@@ -18,7 +18,7 @@
 1. **EN-10 sulla demo**, anticipata al 23/11 sera (PO):
    - la PR, provata in locale sul backup vero della demo;
    - il deploy e lo script dell'aggiornamento sul server.
-2. **Collaudo T-24, T-25, T-28 e T-29** sulla demo già aggiornata, a cura tua (24–25/11).
+2. **Collaudo T-24, T-25, T-28 e T-29** sulla demo già aggiornata, a cura tua: finito il 23/11 sera, tutto riuscito.
 3. **US-1306 il 25 o il 26/11**:
    - il passaggio sul server, già su PostgreSQL 19;
    - l'invito all'ADMIN;
@@ -85,11 +85,12 @@ Dalla review dello Sprint 16, tutte del PO:
 - la demo resta ferma per 10–15 minuti.
 
 **Prima del passaggio (25–26/11):**
-- il collaudo T-24, T-25, T-28 e T-29;
-- i dati dell'ADMIN nel `.env`;
-- il file Access sul server;
-- `nexus-deploy` reinstallato;
-- il controllo in Access delle 7 chiamate con nome e cognome e delle 20 con possibili nomi.
+- ✅ il collaudo T-24, T-25, T-28 e T-29 (23/11);
+- ✅ i dati dell'ADMIN nel `.env`, arrivati al backend con il deploy `1890dd9` (23/11);
+- ✅ `nexus-deploy` reinstallato, con il realm di produzione (23/11);
+- ✅ il controllo in Access delle 7 chiamate con nome e cognome e delle 20 con possibili nomi: nessun nome di
+  beneficiario (23/11);
+- ⏳ il file Access sul server: una copia fresca, il giorno del passaggio.
 
 **Dopo il passaggio:**
 - gli account degli utenti;

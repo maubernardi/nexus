@@ -134,7 +134,7 @@ Tutte (13.799), solo quelle con il nome (12.212), oppure solo quelle vive: per e
 | 2 | Partita IVA | Quando manca si importa **«00000000000»**. Il programma non lascia salvare un'azienda con quel valore, così la si corregge alla prima modifica. Il vincolo di unicità del database esclude quel valore. |
 | 3 | Quali aziende | **Tutte.** Le 1.587 senza nome sono quasi tutte vecchie (1.261 registrate fino al 2019; solo 7 chiamate dal 2023), ma hanno telefono, indirizzo e attività: nome «Azienda senza nome n. ‹numero di Access›», con lo stesso vincolo della partita IVA. |
 | 4 | Chiamate | Corrispondono alle segnalazioni: si importano in una **tabella di archivio**, per averle se serviranno. |
-| 4b | Dati personali nelle chiamate | Per regola interna i beneficiari sono indicati con le **iniziali**. Verifica sulle note: le iniziali compaiono in circa 15.500 chiamate; nome e cognome dopo «utente», «candidato» o «ragazzo» solo in **7**, da controllare a mano (n. 11719, 26711, 28531, 31037, 34116, 36661, 40614). Circa 3.000 note citano «sig./sig.ra» e un cognome, e circa 900 un'email o un cellulare: dal contesto sembrano i referenti delle aziende. |
+| 4b | Dati personali nelle chiamate | Per regola interna i beneficiari sono indicati con le **iniziali**. Verifica sulle note: le iniziali compaiono in circa 15.500 chiamate; nome e cognome dopo «utente», «candidato» o «ragazzo» solo in **7**, da controllare a mano (n. 11719, 26711, 28531, 31037, 34116, 36661, 40614). Controllate dal PO il 23/11 in Access, con le 20 segnalate dalla prova generale: nessun nome di beneficiario. Circa 3.000 note citano «sig./sig.ra» e un cognome, e circa 900 un'email o un cellulare: dal contesto sembrano i referenti delle aziende. |
 | 5 | Prospezione in NEXUS | Sì: NEXUS sostituisce il database attuale in tutto. |
 | 5b | Dati senza un campo in NEXUS (G4, G5) | Si **aggiungono a NEXUS**: categoria merceologica e attività, più referenti con il ruolo, cellulare, fax, seconda email. |
 
@@ -175,7 +175,8 @@ Una seconda esecuzione non duplica e non tocca le aziende che ci sono già.
 
 **Prima di partire:**
 - l'elenco dei comuni deve essere caricato (Cataloghi → Comuni, US-114);
-- il PO controlla in Access le 7 chiamate con nome e cognome (§7, 4b).
+- il PO controlla in Access le 7 chiamate con nome e cognome (§7, 4b): fatto il 23/11, con le 20 della prova
+  generale, senza nomi di beneficiari.
 
 ### 9.1 Prova in locale, su una copia
 
