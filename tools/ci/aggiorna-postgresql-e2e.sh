@@ -39,6 +39,8 @@ ko() { echo "::error::Prova dell'aggiornamento di PostgreSQL: $*"; exit 1; }
 
 [[ -n $NEW_IMAGE && -n $NEW_KEY ]] || ko "immagine o volume di PostgreSQL non trovati in infra/deploy/compose.yaml"
 remove_stack
+# A37: i volumi che esistono già; alla fine non ne deve restare nessuno della prova
+volumes_before=$(docker volume ls -q | sort)
 
 step "Server finto in $NEXUS_BASE: release «vecchia» ($OLD_IMAGE) e «nuova» ($NEW_IMAGE, volume $NEW_KEY)"
 pw="prova-$(head -c 16 /dev/urandom | base64 | tr -dc 'A-Za-z0-9')"
@@ -245,5 +247,11 @@ docker volume inspect "${PROJECT}_$OLD_KEY" >/dev/null 2>&1 && ko "il volume vec
 [[ -d $NEXUS_BASE/aggiornamento-postgresql ]] && ko "la cartella dell'aggiornamento è rimasta"
 diff "$tmp/conteggi-origine.txt" <(counts nuova) || ko "righe diverse dopo la pulizia"
 ok "volume della 18 cancellato, la ${NEW_IMAGE:9:2} con i dati"
+
+step "Nessun volume lasciato sul disco (A37)"
+remove_stack
+left=$(comm -13 <(printf '%s\n' "$volumes_before") <(docker volume ls -q | sort))
+[[ -z $left ]] || ko "restano volumi della prova: $(tr '\n' ' ' <<<"$left")"
+ok "nessun volume della prova è rimasto"
 
 printf "\nProva dell'aggiornamento di PostgreSQL riuscita.\n"
