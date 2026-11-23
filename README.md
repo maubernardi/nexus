@@ -16,7 +16,7 @@ Il brief funzionale completo è in [`CLAUDE_CODE_PROMPT.md`](CLAUDE_CODE_PROMPT.
 nexus/
 ├── backend/    Spring Boot 4.1 · Java 25 LTS · PostgreSQL · Flyway · Spring Security 7 (Keycloak JWT)
 ├── frontend/   React 19.3 · React Router 8 · Vite 8 · TypeScript 6 · Tailwind v4 + shadcn/ui · PWA (Workbox)
-├── infra/      docker-compose: PostgreSQL 18 + Keycloak 26.7 (realm "nexus" importato)
+├── infra/      docker-compose: PostgreSQL 19 + Keycloak 26.8 (realm "nexus" importato)
 ├── keycloak/   tema di accesso "nexus" (aspetto del sito, solo italiano) e immagine nexus-keycloak
 └── openspec/   specifiche e change proposal (spec-driven development)
 ```
@@ -41,7 +41,8 @@ nexus/
 ```bash
 # 1. Infrastruttura
 cd infra && docker compose up -d        # Postgres :5432, Keycloak :8180 (admin/admin)
-#    se avevi un volume creato con PostgreSQL 17: docker compose down -v (dati solo di sviluppo)
+#    con PostgreSQL 19 il database riparte vuoto, su un volume nuovo (EN-10). Quello della 18, solo di sviluppo:
+#    docker volume rm nexus_postgres-data
 
 # 2. Backend (profilo "local" = Postgres + sicurezza mock)
 cd backend && ./mvnw spring-boot:run    # http://localhost:8080
@@ -125,7 +126,7 @@ Gli aggiornamenti arrivano con le PR di Dependabot, le versioni principali in PR
 
 | Java | Spring Boot | Node | pnpm | React | Vite | TypeScript | PostgreSQL | Keycloak |
 |---|---|---|---|---|---|---|---|---|
-| 25.0.5 | 4.1.2 | 26.13.0 | 12.18.0 | 19.3.1 | 8.3.6 | 7.0.2 (API 6.0 per typescript-eslint) | 18.6 | 26.8.2 |
+| 25.0.5 | 4.1.2 | 26.13.0 | 12.18.0 | 19.3.1 | 8.3.6 | 7.0.2 (API 6.0 per typescript-eslint) | 19.0 | 26.8.2 |
 
 ## Demo online
 
@@ -318,6 +319,49 @@ rm -rf ~/ripristino ~/archivio.tar && $C up -d
 
 **Privacy:** un dato cancellato o anonimizzato (US-1303) resta nei backup fino a 30 giorni: va scritto nel registro
 dei trattamenti, con il DPO.
+
+### Aggiornare PostgreSQL
+
+EN-10 ([design](openspec/changes/upgrade-postgresql-19/design.md)). Le versioni minori (19.0 → 19.1) arrivano con
+Dependabot, come le altre. Una **versione principale** nuova invece non legge i dati della precedente: l'immagine si
+rifiuta di partire. I dati passano allora con un backup e un ripristino, in un volume nuovo con la versione nel nome
+(`postgres19-data`). Lo fa `infra/deploy/aggiorna-postgresql.sh`, provato dalla CI a ogni PR
+(`tools/ci/aggiorna-postgresql-e2e.sh`).
+
+**Prima (il PO, sul PC):** il ripristino di prova dell'ultimo backup con la nuova versione (sezione precedente,
+«Ripristino di prova»).
+
+**Sul server:**
+1. Script e file SQL del commit da pubblicare, poi lo script:
+   ```bash
+   mkdir -p ~/aggiornamento && cd ~/aggiornamento
+   for f in infra/deploy/aggiorna-postgresql.sh backup/ricrea-database.sql backup/conteggi.sql; do
+     curl -fsSLO "https://raw.githubusercontent.com/maubernardi/nexus/<commit>/$f"; done
+   sudo bash aggiorna-postgresql.sh prepara
+   ```
+   Lo script chiede «SI» prima di fermare il sito. Poi, in ordine:
+   - backup su IONOS;
+   - copia dei due database;
+   - ripristino nella nuova versione, sul volume nuovo;
+   - confronto dei numeri: righe per tabella, trigger, ultima migrazione, utenti di Keycloak.
+
+   Se un passo fallisce, toglie il volume nuovo e riavvia il sito com'era. Mentre lavora, nessun deploy può partire.
+2. **Deploy** di `main` dalle Actions: parte la nuova versione sul volume già pronto. Il sito resta fermo dallo script
+   alla fine del deploy.
+3. `sudo bash aggiorna-postgresql.sh verifica`: rifà il confronto e un backup sulla nuova versione.
+4. Quando non serve più tornare indietro: `sudo bash aggiorna-postgresql.sh pulisci` toglie il volume vecchio, dopo
+   la tua conferma.
+
+**Tornare indietro:** si fa il deploy del commit precedente dalle Actions, e la versione precedente riparte dal suo
+volume. I dati però sono quelli di prima dell'aggiornamento: ha senso solo finché nessuno ha lavorato sulla nuova. Se
+il deploy della nuova versione non parte, `nexus-deploy` torna da solo alla precedente.
+
+**Per la prossima versione principale**, tutto nella stessa PR:
+- l'immagine nuova in tutti i file;
+- il volume `postgres<versione>-data` nei due compose;
+- le costanti `NEW_IMAGE` e `NEW_VOLUME` dello script.
+
+Il controllo delle immagini (EN-6) lo pretende. In locale il database di sviluppo riparte vuoto.
 
 ### Passaggio in produzione
 

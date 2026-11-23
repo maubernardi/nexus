@@ -40,7 +40,7 @@ class DemoCleanupIT {
     private static final String SCRIPT = "/tmp/pulizia-demo.sql";
 
     @Container
-    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(DockerImageName.parse("postgres:18.6-alpine"))
+    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(DockerImageName.parse("postgres:19.0-alpine"))
             .withCopyFileToContainer(MountableFile.forHostPath(Path.of("..", "infra", "deploy", "pulizia-demo.sql")),
                     SCRIPT);
 

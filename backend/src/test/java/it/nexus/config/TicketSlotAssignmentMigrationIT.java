@@ -21,7 +21,7 @@ import org.testcontainers.utility.DockerImageName;
 class TicketSlotAssignmentMigrationIT {
 
     @Container
-    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(DockerImageName.parse("postgres:18.6-alpine"));
+    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(DockerImageName.parse("postgres:19.0-alpine"));
 
     private static final long INCLUSION = 893700000000000103L;
 

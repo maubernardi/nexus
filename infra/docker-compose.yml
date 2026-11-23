@@ -2,7 +2,7 @@ name: nexus
 
 services:
   postgres:
-    image: postgres:18.6-alpine
+    image: postgres:19.0-alpine
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-nexus}
       POSTGRES_USER: ${POSTGRES_USER:-nexus}
@@ -10,7 +10,9 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql
+      # versione principale nella chiave: con una versione nuova il database riparte vuoto e i dati dimostrativi si
+      # ricaricano. Il volume vecchio si toglie con `docker volume rm nexus_postgres-data` (EN-10)
+      - postgres19-data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -39,4 +41,4 @@ services:
       start_period: 20s
 
 volumes:
-  postgres-data:
+  postgres19-data:

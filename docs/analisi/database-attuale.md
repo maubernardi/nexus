@@ -181,7 +181,7 @@ Una seconda esecuzione non duplica e non tocca le aziende che ci sono già.
 
 ```bash
 docker run -d --rm --name nexus-prova-pg -e POSTGRES_USER=nexus -e POSTGRES_PASSWORD=nexus -e POSTGRES_DB=nexus \
-  -p 55432:5432 postgres:18.6-alpine
+  -p 55432:5432 postgres:19.0-alpine
 cd backend
 DB_URL=jdbc:postgresql://localhost:55432/nexus PROFILES_ACTIVE=postgresql,security-mock,seed,legacy-import \
   NEXUS_LEGACY_IMPORT_FILE="$PWD/../documenti_base/nexus.mdb" ./mvnw -q spring-boot:run

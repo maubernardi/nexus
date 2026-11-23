@@ -12,7 +12,7 @@
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
 | US-1306 | Passaggio in produzione | 8 | 🔨 In corso | `prepare-production` | [#177](https://github.com/maubernardi/nexus/pull/177) (preparazione) |
-| EN-10 | Aggiornamento a PostgreSQL 19 | 5 | ✅ Ready | `upgrade-postgresql-19` | |
+| EN-10 | Aggiornamento a PostgreSQL 19 | 5 | 🔨 In corso | `upgrade-postgresql-19` | (in apertura) |
 
 **Ordine** (PO, 23/11):
 1. **EN-10 sulla demo, il 24/11**:
@@ -54,13 +54,21 @@ Dalla review dello Sprint 16, tutte del PO:
   - immagine del backup;
   - test;
   - ripristino di prova.
-- uno script per il server, `aggiorna-postgresql.sh`, lanciato da te con sudo, in due tempi:
-  - **prima del deploy**: backup su IONOS, copia dei due database sul server, fermo del sito;
-  - **dopo il deploy**: ripristino dei due database nella 19, con la procedura già provata per il backup
-    (`ricrea-database.sql`, poi `pg_restore`), e riavvio;
-- l'immagine di PostgreSQL tiene i dati in una cartella per versione: la 19 parte su una cartella nuova e quella della
-  18 resta, ed è il ritorno indietro. Lo verifico in locale prima della PR;
-- tra il deploy e il ripristino la demo resta ferma per qualche minuto.
+- **scoperta del 23/11**: la 19 non parte sul volume della 18. Trova i dati della 18 e si ferma, e chiede
+  `pg_upgrade`. Quindi la 19 va su un **volume nuovo**, `postgres19-data`, come proponeva la review (§8.3). La 18
+  resta intatta nel suo volume, ed è il ritorno indietro;
+- uno script per il server, `aggiorna-postgresql.sh`, lanciato da te con sudo **prima del deploy**:
+  - fermo del sito;
+  - backup su IONOS;
+  - copia dei due database;
+  - ripristino nella 19, sul volume nuovo;
+  - confronto dei numeri.
+
+  Il deploy poi trova la 19 già pronta: backend e Keycloak non partono mai su un database vuoto;
+- dopo il deploy: `verifica`, che rifà il confronto e un backup; dopo il passaggio in produzione: `pulisci`, che toglie
+  il volume della 18;
+- la CI prova lo script a ogni PR, ritorno alla 18 compreso. In locale è già verde;
+- il sito resta fermo dallo script alla fine del deploy: circa 10–15 minuti.
 
 **Passaggio in produzione (US-1306):** lo script e la procedura sono pronti e provati sul backup vero della demo
 (Sprint 16). Restano:
@@ -71,8 +79,9 @@ Dalla review dello Sprint 16, tutte del PO:
 ## Per il PO
 
 **Per EN-10 (24/11):**
-- due comandi con sudo sul server, uno prima e uno dopo il deploy: te li do nella PR;
-- la demo resta ferma qualche minuto.
+- il ripristino di prova dell'ultimo backup con la 19, sul PC;
+- sul server, con sudo: `prepara` prima del deploy e `verifica` dopo. I comandi sono nella PR;
+- la demo resta ferma per 10–15 minuti.
 
 **Prima del passaggio (25–26/11):**
 - il collaudo T-24, T-25, T-28 e T-29;

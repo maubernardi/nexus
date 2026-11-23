@@ -28,7 +28,7 @@ import org.testcontainers.utility.DockerImageName;
 class FlywayRollbackIT {
 
     @Container
-    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(DockerImageName.parse("postgres:18.6-alpine"));
+    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(DockerImageName.parse("postgres:19.0-alpine"));
 
     @ParameterizedTest(name = "profilo {0}")
     @ValueSource(strings = {"default", "seed"})
