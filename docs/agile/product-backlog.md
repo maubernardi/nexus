@@ -1431,8 +1431,9 @@ versioni aggiornate (regola dell'08/11). Decisa nella review dello Sprint 16 (§
 #182–#184 non si uniscono, perché l'immagine nuova partirebbe con un database vuoto.
 
 Criteri di accettazione:
-- **PostgreSQL 19 ovunque**, in una sola PR: compose del server e di sviluppo, immagine del backup, test (Testcontainers),
-  ripristino di prova. Il controllo delle immagini (EN-6) resta verde; le PR di Dependabot si chiudono.
+- **PostgreSQL 19 ovunque**, in una sola PR: compose del server e di sviluppo, immagine del backup, test
+  (Testcontainers), ripristino di prova. Il controllo delle immagini (EN-6) resta verde; le PR di Dependabot si
+  chiudono.
 - **Dati spostati con backup e ripristino**: prima un backup su IONOS e una copia dei due database sul server, poi
   PostgreSQL 19 su una cartella dei dati nuova, poi il ripristino. Uno script con i passi, lanciato dal PO con sudo,
   come quello del passaggio in produzione.
