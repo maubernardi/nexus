@@ -33,7 +33,7 @@ class KeycloakProfileContextIT {
         @Bean
         @ServiceConnection
         PostgreSQLContainer postgresContainer() {
-            return new PostgreSQLContainer(DockerImageName.parse("postgres:18.6-alpine"))
+            return new PostgreSQLContainer(DockerImageName.parse("postgres:19.0-alpine"))
                     .withDatabaseName("nexus").withUsername("nexus").withPassword("nexus");
         }
     }

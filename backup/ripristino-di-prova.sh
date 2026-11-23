@@ -10,7 +10,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-readonly IMAGE="postgres:18.6-alpine" # come infra/deploy/compose.yaml (controllo EN-6)
+readonly IMAGE="postgres:19.0-alpine" # come infra/deploy/compose.yaml (controllo EN-6)
 readonly NAME="nexus-ripristino"
 readonly PORT="${NEXUS_RIPRISTINO_PORT:-5433}"
 readonly AGE="${AGE:-age}"

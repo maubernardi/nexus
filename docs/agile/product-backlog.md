@@ -79,7 +79,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [EN-6](#en-6) | E13 | Dipendenze aggiornate e senza vulnerabilità note | Must | 8 | R4 | 🎉 Done (Sprint 11) |
 | [EN-7](#en-7) | E13 | Password comuni rifiutate | Must | 2 | R4 | 🎉 Done (Sprint 11) |
 | [EN-9](#en-9) | E13 | Test del frontend stabili | Must | 1 | R4 | 🎉 Done (Sprint 13) |
-| [EN-10](#en-10) | E13 | Aggiornamento a PostgreSQL 19 | Must | 5 | R4 | ✅ Ready (Sprint 17) |
+| [EN-10](#en-10) | E13 | Aggiornamento a PostgreSQL 19 | Must | 5 | R4 | 🔨 In corso (Sprint 17) |
 | [US-201](#us-201) | E2 | Inserimento beneficiario | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 🎉 Done (Sprint 3) |
@@ -1424,7 +1424,7 @@ Criteri di accettazione:
 - L'intera suite del frontend passa 10 volte di seguito in locale; la CI è verde.
 - Gli altri test con la stessa causa sono corretti allo stesso modo.
 #### EN-10
-**Aggiornamento a PostgreSQL 19** · Must · 5 punti · R4 · ✅ Ready (Sprint 17)
+**Aggiornamento a PostgreSQL 19** · Must · 5 punti · R4 · 🔨 In corso (Sprint 17)
 
 Come **team** voglio passare a PostgreSQL 19, l'ultima versione principale, senza perdere dati, per restare sulle
 versioni aggiornate (regola dell'08/11). Decisa nella review dello Sprint 16 (§8.3, PO 23/11): le tre PR di Dependabot
@@ -1435,8 +1435,8 @@ Criteri di accettazione:
   (Testcontainers), ripristino di prova. Il controllo delle immagini (EN-6) resta verde; le PR di Dependabot si
   chiudono.
 - **Dati spostati con backup e ripristino**: prima un backup su IONOS e una copia dei due database sul server, poi
-  PostgreSQL 19 su una cartella dei dati nuova, poi il ripristino. Uno script con i passi, lanciato dal PO con sudo,
-  come quello del passaggio in produzione.
+  PostgreSQL 19 su un volume nuovo, perché la 19 non parte sul volume della 18 (prova del 23/11), poi il ripristino.
+  Uno script con i passi, lanciato dal PO con sudo, come quello del passaggio in produzione.
 - **Si può tornare indietro**: i dati della 18 restano sul server finché il PO non decide di toglierli; il deploy del
   commit precedente riparte dalla 18.
 - **Provato prima in locale** sul backup vero, con lo script di ripristino su PostgreSQL 19: stesse righe, stessi

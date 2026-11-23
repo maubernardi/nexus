@@ -22,7 +22,7 @@ import org.testcontainers.utility.DockerImageName;
 class CompanyContactsMigrationIT {
 
     @Container
-    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(DockerImageName.parse("postgres:18.6-alpine"));
+    static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(DockerImageName.parse("postgres:19.0-alpine"));
 
     private static Flyway flyway(String target) {
         return Flyway.configure()

@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | https://portalenexus.it |
 | **Versione della demo** | `e8223da` (23/11/2026): Sprint 1–16 completi, tranne il passaggio in produzione: backup notturno su IONOS, avvisi di fine tirocinio, testi dei messaggi; l'importazione dal database attuale si prova in locale |
-| **Ultimo aggiornamento** | 23/11/2026 (T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 23/11/2026 (T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, da fare con EN-10; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -1305,3 +1305,34 @@ passa in produzione così com'è.
   2. Apri «Codice per il nuovo indirizzo email». **Atteso:** due campi, oggetto e testo, con i segnaposto {codice} e
      {ora}; l'anteprima dell'oggetto non ha il numero della segnalazione.
 
+
+## 30. Aggiornamento a PostgreSQL 19 (Sprint 17)
+
+Si fanno con l'aggiornamento della demo (README, «Aggiornare PostgreSQL»). Nelle note solo numeri e codici.
+
+- [ ] **T-30.1 Prova sul backup vero, sul PC (EN-10)**
+  1. Scarica dalla console di IONOS l'ultimo backup della demo.
+  2. In WSL, nella cartella del progetto aggiornata a `main`: `backup/ripristino-di-prova.sh --tieni <file scaricato>
+     ~/nexus-backup-chiave.txt`. **Atteso:**
+     - «PostgreSQL temporaneo (postgres:19.0-alpine, …)»;
+     - le righe per tabella, «Ultima migrazione: V51» e gli utenti di Keycloak, come nel ripristino del 23/11;
+     - in fondo «Fatto: il ripristino riesce».
+  3. Lascia il database acceso: lo uso per avviare backend e Keycloak sulla 19, poi lo spengo io.
+
+- [ ] **T-30.2 Aggiornamento sul server (EN-10)**
+  1. `sudo bash aggiorna-postgresql.sh prepara`, con «SI». **Atteso:**
+     - i passi da 1 a 7 senza errori;
+     - al passo 7 «Stessi numeri:», con tabelle, righe, trigger, «ultima migrazione: V51» e utenti di Keycloak;
+     - in fondo «Fatto: la PostgreSQL 19 è pronta».
+  2. Deploy di `main` dalle Actions. **Atteso:** il run è verde e il sito risponde.
+  3. `sudo bash aggiorna-postgresql.sh verifica`. **Atteso:** «Stessi numeri di prima dell'aggiornamento», il backup
+     riuscito e «Blocco: GOVERNANCE fino al …».
+
+- [ ] **T-30.3 La demo sulla 19 (EN-10)**
+  1. Accedi come `tutor1`. **Atteso:** le segnalazioni di prima, con lo stesso stato.
+  2. Apri «Aziende» e un'azienda, e aggiungi una nota al diario. **Atteso:** la nota si salva e compare.
+  3. Esci e rientra come `admin`, poi apri «Utenti». **Atteso:** gli utenti di prima.
+
+- [ ] **T-30.4 Backup della notte sulla 19 (EN-10)**
+  1. Il giorno dopo l'aggiornamento, verso le 9:30, apri Actions → «Backup del database». **Atteso:** il run delle
+     9:07 è verde, con il backup delle 3:30 (può partire in ritardo, come il 22/11).

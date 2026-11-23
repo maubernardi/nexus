@@ -152,6 +152,8 @@ jobs:
         run: sudo apt-get update -q && sudo apt-get install -y -q age
       - name: Backup, caricamento su S3 di prova e ripristino (US-1302)
         run: tools/ci/backup-e2e.sh
+      - name: Aggiornamento di PostgreSQL a una nuova versione principale (EN-10)
+        run: tools/ci/aggiorna-postgresql-e2e.sh
 
   openspec:
     name: OpenSpec
