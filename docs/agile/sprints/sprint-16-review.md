@@ -39,7 +39,8 @@ Sulla demo (`e8223da`), con le prove del collaudo:
 
 - **T-26.1** backup subito e stato: fatto insieme il 21/11 (1 MB, blocco fino al 21/12). ✅ da spuntare
 - **T-26.2** ripristino di prova sul tuo PC: riuscito il 21/11 e di nuovo il 23/11. ✅ da spuntare
-- **T-26.3** controllo del mattino: il 22/11 GitHub l'ha fatto partire alle 17:06; ora è alle 9:07. ⏳
+- **T-26.3** controllo del mattino: il 22/11 GitHub l'ha fatto partire alle 17:06; ora è alle 9:07. Il 23/11 alle
+  10:25 non era ancora partito: GitHub ritarda i workflow pianificati anche fuori dallo scoccare dell'ora. ⏳
 - **T-28** avvisi di fine tirocinio e blocco: con un tirocinio avviato e la fine prevista a ieri. ⏳
 - **T-29** testi dei messaggi: modifica, controlli, ripristino. ⏳
 - **T-27** prove della produzione: dopo il passaggio. ⏳
@@ -168,6 +169,8 @@ fatta (§8.5). Da aggiungere, se accetti: **EN-10** Aggiornamento a PostgreSQL 1
 *Proposta:* Sprint 16 chiuso con velocity **18**. US-1302, US-1203 e US-1204 fatte; US-1306 passa allo Sprint 17 con
 la stessa stima (8). La chiusura è nella [PR #186](https://github.com/maubernardi/nexus/pull/186).
 
+> ✅ **Deciso (PO, 23/11): proposta accettata.**
+
 ### 8.2 Data del passaggio in produzione
 Lo script è pronto e provato. Servono:
 - la tua preparazione: dati dell'ADMIN nel `.env`, file Access sul server, `nexus-deploy` reinstallato, controllo in
@@ -177,6 +180,8 @@ Lo script è pronto e provato. Servono:
 *Proposta:* prima del passaggio T-24, T-25, T-28 e T-29, cioè le funzioni che userete dal primo giorno. Il resto può
 seguire sulla produzione, con dati di prova da togliere a mano. Ti chiedo una data indicativa, anche solo il giorno
 della settimana.
+
+> ✅ **Deciso (PO, 23/11): prima il collaudo; passaggio indicativamente il 25–26/11.**
 
 ### 8.3 PostgreSQL 19
 Dependabot propone PostgreSQL 19 in tre PR (#182–#184). Un salto di versione principale non legge i dati della 18:
@@ -195,13 +200,20 @@ Aggiorna anche le immagini di test e del backup, e chiude le tre PR.
 
 *Alternativa:* restare sulla 18, supportata fino al 2030. Va però contro la regola delle versioni sempre aggiornate.
 
+> ✅ **Deciso (PO, 23/11): proposta accettata**, EN-10 nel backlog.
+
 ### 8.4 Contenuto dello Sprint 17
 *Proposta:* finire la produzione, poi l'aggiornamento: US-1306 (il passaggio e la seconda PR) ed EN-10, 13 punti (§9).
 Con meno punti della media resta tempo per quello che emerge dal collaudo e dal primo uso.
 
+> ✅ **Deciso (PO, 23/11): proposta accettata, con l'aggiornamento a PostgreSQL 19 nello Sprint 17.** L'ordine fra
+> EN-10 e passaggio si fissa al planning (vedi il planning dello Sprint 17).
+
 ### 8.5 Analisi di US-507 (richiesta di contatto di un'azienda dal Tutor)
 Era prevista in questo sprint (review dello Sprint 15, §8.6) e non si è fatta: lo sprint si è riempito con US-1203 e
 US-1204. *Proposta:* la sessione nello Sprint 17, dopo il passaggio. La storia si stima dopo.
+
+> ✅ **Deciso (PO, 23/11): proposta accettata.**
 
 ## 9. Proposta per lo Sprint 17
 
@@ -218,8 +230,8 @@ Prossima migrazione: **V52**. Nello sprint anche l'analisi di US-507 (§8.5).
 
 ## 10. Azioni a carico del PO
 
-- [ ] Decidere i punti §8.1 … §8.5.
-- [ ] Unire la [PR #186](https://github.com/maubernardi/nexus/pull/186) con la chiusura dello Sprint 16.
+- [x] Decidere i punti §8.1 … §8.5 (23/11).
+- [x] Unire la [PR #186](https://github.com/maubernardi/nexus/pull/186) con la chiusura dello Sprint 16.
 - [ ] Unire la #181 (aggiornamenti minori del backend); **non** unire #182–#184 (§8.3).
 - [ ] Collaudo: T-26.1 e T-26.2 da spuntare, T-26.3 domani, poi T-24, T-25, T-28 e T-29 prima del passaggio (§8.2).
 - [ ] Preparare il passaggio: dati dell'ADMIN nel `.env`, file Access sul server, `nexus-deploy` reinstallato,
