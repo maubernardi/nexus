@@ -1,6 +1,6 @@
-name: Controllo della demo
+name: Controllo del sito
 
-# US-1307: ogni 10 minuti, dalle 8 alle 20 ora italiana, controlla da fuori che la demo risponda. Se un controllo
+# US-1307: ogni 10 minuti, dalle 8 alle 20 ora italiana, controlla da fuori che il sito risponda. Se un controllo
 # fallisce, il run fallisce e GitHub manda un'email al PO (notifiche delle Actions dell'account). Nessun segreto: solo
 # richieste pubbliche, come quelle di un browser.
 # Il cron di GitHub è in UTC e non conosce l'ora legale: gira dalle 6 alle 19:50 UTC e il primo passo salta i run fuori
@@ -51,12 +51,12 @@ jobs:
           }
           for attempt in 1 2 3; do
             if check; then
-              echo "Demo online (tentativo $attempt)"
+              echo "Sito online (tentativo $attempt)"
               exit 0
             fi
             [ "$attempt" -lt 3 ] && sleep 30
           done
-          echo "::error::La demo https://$NEXUS_DOMAIN non risponde: controlla con il workflow «Stato del server»"
+          echo "::error::Il sito https://$NEXUS_DOMAIN non risponde: controlla con il workflow «Stato del server»"
           exit 1
 
       - name: Scadenza del certificato

@@ -129,7 +129,7 @@ backup, questa revisione aggiornata).
 
 ## Monitoraggio (US-1307)
 
-Il workflow **«Controllo della demo»** (`.github/workflows/uptime.yml`) gira ogni 10 minuti dalle 8 alle 20 (ora
+Il workflow **«Controllo del sito»** (`.github/workflows/uptime.yml`) gira ogni 10 minuti dalle 8 alle 20 (ora
 italiana) e controlla da fuori la PWA, Keycloak e il backend (`/api/v1/me` deve rispondere `401`), con 3 tentativi a 30
 secondi; controlla anche che i certificati non scadano entro 14 giorni. Se fallisce, GitHub manda un'email al PO.
 Limiti: GitHub può ritardare i run pianificati di qualche minuto e li sospende dopo 60 giorni senza attività nel

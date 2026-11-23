@@ -25,3 +25,8 @@
       `nexus-deploy` fatti, controllo delle chiamate in Access fatto; il file Access il giorno del passaggio)
 - [ ] 4.3 `passaggio-in-produzione.sh`; invito, accesso dell'ADMIN, controllo della configurazione
 - [ ] 4.4 Seconda PR: profilo predefinito, realm e password demo, nomi «produzione», ASVS, chiusura della storia
+  - [x] in bozza dal 23/11: profilo predefinito `keycloak`, via il realm e le password demo, primo ADMIN in
+        `bootstrap.sh`, nomi visibili (workflow «Deploy» e «Controllo del sito», tag `:produzione`; file del workflow e
+        ambiente «demo» di GitHub invariati, PO 23/11)
+  - [ ] controllo ASVS sulla produzione, dopo il passaggio
+  - [ ] chiusura della storia

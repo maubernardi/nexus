@@ -1,6 +1,6 @@
 name: Stato del server
 
-# A16: stato dei container e log recenti della demo, in sola lettura, con la stessa chiave del deploy (forced command
+# A16: stato dei container e log recenti del server, in sola lettura, con la stessa chiave del deploy (forced command
 # nexus-deploy). Solo backend, postgres e backup: i log delle Actions di un repository pubblico sono pubblici, Keycloak e
 # Caddy registrano utenti e indirizzi IP. L'esito dei backup è nel workflow «Backup del database».
 on:

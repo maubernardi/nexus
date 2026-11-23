@@ -128,9 +128,10 @@ Gli aggiornamenti arrivano con le PR di Dependabot, le versioni principali in PR
 |---|---|---|---|---|---|---|---|---|
 | 25.0.5 | 4.1.2 | 26.13.0 | 12.18.0 | 19.3.1 | 8.3.6 | 7.0.2 (API 6.0 per typescript-eslint) | 19.0 | 26.8.2 |
 
-## Demo online
+## Produzione online
 
-La demo con dati fittizi è pubblicata su **https://portalenexus.it** (Keycloak su `https://auth.portalenexus.it`).
+NEXUS è in produzione su **https://portalenexus.it** (Keycloak su `https://auth.portalenexus.it`), con i dati veri,
+dal passaggio in produzione (US-1306, sotto). Prima, sullo stesso server, c'era la demo con dati fittizi.
 Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deployment/design.md`](openspec/changes/archive/2026-09-28-add-demo-deployment/design.md).
 
 | Cosa | Dove |
@@ -138,7 +139,7 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
 | Stack (Caddy, backend, Keycloak, PostgreSQL) | `infra/deploy/compose.yaml` |
 | Immagini | `backend/Dockerfile`, `frontend/Dockerfile` + `frontend/Caddyfile`, `keycloak/Dockerfile` (tema di accesso), `backup/Dockerfile` → `ghcr.io/maubernardi/nexus-{backend,web,keycloak,backup}` |
 | Preparazione del server (una volta) | `infra/deploy/bootstrap.sh` |
-| Deploy | GitHub → Actions → **Deploy demo** → *Run workflow* (`.github/workflows/deploy-demo.yml`) |
+| Deploy | GitHub → Actions → **Deploy** → *Run workflow* (`.github/workflows/deploy-demo.yml`) |
 | Backup | ogni notte alle 3:30; esito e backup subito: Actions → **Backup del database** ([sotto](#backup-del-database)) |
 
 - **Deploy su comando.** Il workflow costruisce le immagini del commit scelto, le pubblica su GHCR e le installa sul
@@ -146,8 +147,12 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
 - **Immagine nuova.** Il primo caricamento di un'immagine mai pubblicata può essere rifiutato da GHCR (`denied`): il
   pacchetto viene comunque creato e collegato al repository, quindi basta rilanciare il job fallito (successo con
   `nexus-keycloak` il 29/10). Il server non viene toccato finché il build non riesce.
-- **Segreti** in `/opt/nexus/.env` sul server (generati da `bootstrap.sh`, mai in git); le credenziali demo si
-  rileggono con `sudo cat /opt/nexus/.env`.
+- **Segreti** in `/opt/nexus/.env` sul server (generati da `bootstrap.sh`, mai in git); si rileggono con
+  `sudo cat /opt/nexus/.env`.
+- **Primo ADMIN (server nuovo).** Il realm di produzione non ha utenti di prova. `bootstrap.sh` lascia nel `.env` le
+  righe vuote `NEXUS_ADMIN_USERNAME`, `NEXUS_ADMIN_FIRST_NAME`, `NEXUS_ADMIN_LAST_NAME` e `NEXUS_ADMIN_EMAIL`, da
+  compilare prima del primo deploy. Al primo avvio il backend crea l'ADMIN e gli manda l'invito per email, valido 3
+  giorni (poi «Password dimenticata?»). Con un ADMIN già presente il backend ignora questi dati.
 - **Console di Keycloak** non esposta su Internet: `ssh -L 8081:127.0.0.1:8081 <server>`, poi
   `http://localhost:8081/admin` (utente `admin`, password `KEYCLOAK_ADMIN_PASSWORD` del `.env`).
 - **Tema e lingua del realm (una volta, dopo il primo deploy con il tema).** L'import all'avvio non modifica un realm
@@ -169,9 +174,8 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
   sudo nano /opt/nexus/.env      # aggiungere la riga NEXUS_SMTP_PASSWORD=<password della casella admin@>
   ```
   Senza la password le email restano spente e il log del backend lo dice all'avvio. Le email vanno all'indirizzo
-  dell'anagrafica utenti di NEXUS (`app_user.email`): gli utenti demo hanno indirizzi finti `@nexus.local`, che non le
-  ricevono (l'errore resta nel log, l'app continua). Per una prova si dà un indirizzo vero a un utente demo dal suo
-  profilo (US-110, punto seguente).
+  dell'anagrafica utenti di NEXUS (`app_user.email`). In locale gli utenti di prova hanno indirizzi finti
+  `@nexus.local`, che non le ricevono: l'errore resta nel log e l'app continua.
 - **Cambio dell'indirizzo email (US-110).** Ogni utente lo cambia da «Il mio profilo» (il proprio nome
   nell'intestazione) con un codice inviato al nuovo indirizzo; l'indirizzo cambia in NEXUS e in Keycloak. Il backend
   usa il client tecnico `nexus-backend-admin` (solo `view-users` e `manage-users`), con il segreto
