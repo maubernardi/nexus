@@ -247,7 +247,7 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
 
 ### Backup del database
 
-US-1302 ([design](openspec/changes/add-database-backup/design.md)). Il servizio `backup` del compose (`backup/`):
+US-1302 ([design](openspec/changes/archive/2026-11-23-add-database-backup/design.md)). Il servizio `backup` del compose (`backup/`):
 - ogni notte alle **3:30**, ora italiana, salva i database `nexus` e `keycloak`;
 - li cifra sul server con la **chiave pubblica age del PO**: la chiave privata non è mai sul server, quindi né IONOS né
   chi entrasse nel server può leggere i backup;
