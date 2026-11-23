@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 96 elementi, 393 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-15](sprints/sprint-15.md), il 20/11 ([review](sprints/sprint-15-review.md)); in corso: [sprint-16](sprints/sprint-16.md), dal 21/11 (planning confermato il 20/11).
+**Totale: 96 elementi, 393 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-16](sprints/sprint-16.md), il 23/11 ([review](sprints/sprint-16-review.md)); prossimo: sprint-17.
 
 ## Epiche
 
@@ -144,14 +144,14 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1103](#us-1103) | E11 | Motivo di chiusura del tirocinio | Must | 2 | R4 | 🎉 Done (Sprint 14) |
 | [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | 🎉 Done (Sprint 5) |
 | [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 🎉 Done (Sprint 8) |
-| [US-1203](#us-1203) | E12 | Avvisi di fine tirocinio e blocco delle nuove segnalazioni | Must | 5 | R4 | ✅ Ready (Sprint 16) |
-| [US-1204](#us-1204) | E12 | Testi delle notifiche e delle email modificabili dall'ADMIN | Must | 8 | R4 | ✅ Ready (Sprint 16) |
+| [US-1203](#us-1203) | E12 | Avvisi di fine tirocinio e blocco delle nuove segnalazioni | Must | 5 | R4 | 🎉 Done (Sprint 16) |
+| [US-1204](#us-1204) | E12 | Testi delle notifiche e delle email modificabili dall'ADMIN | Must | 8 | R4 | 🎉 Done (Sprint 16) |
 | [US-1301](#us-1301) | E13 | Verifica della PWA online | Must | 1 | R1 | 📋 Backlog |
-| [US-1302](#us-1302) | E13 | Backup del database | Must | 5 | R4 | ✅ Ready (Sprint 16) |
+| [US-1302](#us-1302) | E13 | Backup del database | Must | 5 | R4 | 🎉 Done (Sprint 16) |
 | [US-1303](#us-1303) | E13 | Anonimizzazione a scadenza | Must | 8 | R4 | 🎉 Done (Sprint 10) |
 | [US-1304](#us-1304) | E13 | Tema di Keycloak | Should | 3 | R4 | 🎉 Done (Sprint 7, fuori piano) |
 | [US-1305](#us-1305) | E13 | Revisione UX/UI | Should | 8 | R4 | 📋 Backlog |
-| [US-1306](#us-1306) | E13 | Passaggio in produzione | Must | 8 | R4 | ✅ Ready (Sprint 16) |
+| [US-1306](#us-1306) | E13 | Passaggio in produzione | Must | 8 | R4 | 🔨 In corso (Sprint 16 → 17) |
 | [US-1307](#us-1307) | E13 | Monitoraggio e revisione di sicurezza | Must | 5 | R4 | 🎉 Done (Sprint 10) |
 | [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | 🎉 Done (Sprint 10) |
 | [US-1309](#us-1309) | E13 | Importazione dal database attuale | Must | 8 | R4 | 🎉 Done (Sprint 15) |
@@ -1297,7 +1297,7 @@ Criteri di accettazione:
 - Dati SMTP dal PO (review dello Sprint 7): la password solo nel `.env` del server, mai nel repository.
 
 #### US-1203
-**Avvisi di fine tirocinio e blocco delle nuove segnalazioni** · Must · 5 punti · R4 · ✅ Ready (Sprint 16)
+**Avvisi di fine tirocinio e blocco delle nuove segnalazioni** · Must · 5 punti · R4 · 🎉 Done (Sprint 16)
 
 Come **Tutor** voglio essere avvisato quando la convenzione di un tirocinio sta per scadere e quando un tirocinio finito
 va chiuso, e come **cooperativa** vogliamo che chi ha tirocini finiti e non chiusi non apra nuove segnalazioni. Chiesta
@@ -1315,11 +1315,13 @@ Criteri di accettazione:
   apre segnalazioni, né dal modulo né dalla bacheca. Le pagine mostrano l'elenco dei tirocini da chiudere con il
   collegamento; il backend rifiuta comunque. Gli altri Tutor lavorano normalmente.
 - Il controllo delle 8 non fa fallire il salvataggio di un Tutor che ha la scheda aperta.
+- Fatto il 22/11: controllo alle 8; le fasi degli avvisi stanno sulla scheda (V50) e si scrivono senza toccarne la
+  versione; il blocco vale anche per la candidatura dalla bacheca. Sulla demo dal 22/11 (`2432f49`).
 
 Dipendenze: US-1003, US-1012, US-1101, US-1201, US-1202
 
 #### US-1204
-**Testi delle notifiche e delle email modificabili dall'ADMIN** · Must · 8 punti · R4 · ✅ Ready (Sprint 16)
+**Testi delle notifiche e delle email modificabili dall'ADMIN** · Must · 8 punti · R4 · 🎉 Done (Sprint 16)
 
 Come **ADMIN** voglio cambiare i testi delle notifiche e delle email di NEXUS da una pagina, senza aspettare una modifica
 del codice e un deploy. Chiesta dal PO il 22/11.
@@ -1339,6 +1341,9 @@ Criteri di accettazione:
 - **Audit** di modifiche e ripristini.
 - **Fuori**: le email di Keycloak, che restano nel tema e si ridefiniscono dalla console di Keycloak (provato il
   23/11). Il README dice come.
+- Fatto il 23/11: pagina «Testi dei messaggi»; i predefiniti restano nel codice e nel database ci sono solo i testi
+  cambiati (V51); le notifiche nell'app prendono il testo dal backend. Le email di Keycloak si ridefiniscono dalla
+  console di Keycloak, provato il 23/11. Sulla demo dal 23/11 (`e8223da`).
 
 Dipendenze: US-1201, US-1202, US-110
 
@@ -1426,7 +1431,7 @@ Criteri di accettazione:
 - L'app si installa su Android e iOS; offline si apre la shell con l'avviso.
 
 #### US-1302
-**Backup del database** · Must · 5 punti · R4 · ✅ Ready (Sprint 16)
+**Backup del database** · Must · 5 punti · R4 · 🎉 Done (Sprint 16)
 
 Come **ADMIN** voglio backup automatici giornalieri fuori dal server, con prova di ripristino per non perdere dati.
 Rinviato dal PO l'11/11 (review dello Sprint 13, §8.2); destinazione decisa il 20/11 (review dello Sprint 15, §8.3).
@@ -1450,6 +1455,9 @@ Criteri di accettazione:
   NEXUS e ritrovare i dati. La procedura è nel README.
 - Privacy: un dato cancellato o anonimizzato (US-1303) resta nei backup fino a 30 giorni. Va scritto nel registro dei
   trattamenti (PO e DPO).
+- Fatto il 21/11: servizio `backup` nel compose, archivio cifrato con age sul server e caricato su IONOS (Berlino,
+  `eu-central-3`), blocco *Governance* di 30 giorni e regola di conservazione accettata da IONOS; controllo delle 9:07.
+  Ripristino di prova riuscito sul PC del PO con l'archivio vero, il 21/11 e di nuovo il 23/11.
 
 Dipendenze: US-1307
 
@@ -1489,7 +1497,7 @@ Criteri di accettazione:
 - Decisione del PO dell'08/11: si farà in **uno sprint dedicato**, perché non sarà semplice.
 
 #### US-1306
-**Passaggio in produzione** · Must · 8 punti · R4 · ✅ Ready (Sprint 16)
+**Passaggio in produzione** · Must · 8 punti · R4 · 🔨 In corso (Sprint 16 → 17)
 
 Come **PO** voglio passare dalla demo alla produzione per usare NEXUS con dati reali.
 
@@ -1527,6 +1535,9 @@ Criteri di accettazione:
   in locale (review dello Sprint 15, §8.4).
 - Stima portata da 5 a 8 punti al planning del 20/11: il criterio unico di prima nascondeva la pulizia della demo, il
   realm senza utenti, la creazione dell'ADMIN, la procedura, l'importazione sul server e il cambio di nome.
+- Stato al 23/11: preparazione unita (#177) e provata sul backup vero della demo (pulizia, importazione, backend senza
+  `seed` con l'ADMIN, utenti di Keycloak). Restano il passaggio sul server, nel giorno scelto dal PO, e la seconda PR
+  (profilo predefinito, realm e password demo, nomi «produzione», ASVS): Sprint 17.
 
 Dipendenze: US-102..105, US-1302, US-1307, US-1309
 
