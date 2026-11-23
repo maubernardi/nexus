@@ -15,7 +15,7 @@
 | EN-10 | Aggiornamento a PostgreSQL 19 | 5 | 🔨 In corso | `upgrade-postgresql-19` | [#189](https://github.com/maubernardi/nexus/pull/189) |
 
 **Ordine** (PO, 23/11):
-1. **EN-10 sulla demo, il 24/11**:
+1. **EN-10 sulla demo**, anticipata al 23/11 sera (PO):
    - la PR, provata in locale sul backup vero della demo;
    - il deploy e lo script dell'aggiornamento sul server.
 2. **Collaudo T-24, T-25, T-28 e T-29** sulla demo già aggiornata, a cura tua (24–25/11).
@@ -103,3 +103,4 @@ una storia piccola.
 | Momento | Punti residui |
 |---|---|
 | Inizio (23/11, dopo la conferma del planning) | 13 |
+| EN-10 sulla demo (23/11, sera: `prepara`, deploy `47fe414`, `verifica` con gli stessi numeri e il backup); Done dopo il controllo del mattino del 24/11 | 13 |

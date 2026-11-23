@@ -9,8 +9,8 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | https://portalenexus.it |
-| **Versione della demo** | `e8223da` (23/11/2026): Sprint 1–16 completi, tranne il passaggio in produzione: backup notturno su IONOS, avvisi di fine tirocinio, testi dei messaggi; l'importazione dal database attuale si prova in locale |
-| **Ultimo aggiornamento** | 23/11/2026 (T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, da fare con EN-10; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Versione della demo** | `47fe414` (23/11/2026), su **PostgreSQL 19** (EN-10): Sprint 1–16 completi, tranne il passaggio in produzione: backup notturno su IONOS, avvisi di fine tirocinio, testi dei messaggi; l'importazione dal database attuale si prova in locale |
+| **Ultimo aggiornamento** | 23/11/2026 (T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, fatto il 23/11 sulla demo `47fe414`; T-30.3 corretta: le aziende si provano come `operatore.cc`; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
@@ -1330,7 +1330,8 @@ Si fanno con l'aggiornamento della demo (README, «Aggiornare PostgreSQL»). Nel
 
 - [ ] **T-30.3 La demo sulla 19 (EN-10)**
   1. Accedi come `tutor1`. **Atteso:** le segnalazioni di prima, con lo stesso stato.
-  2. Apri «Aziende» e un'azienda, e aggiungi una nota al diario. **Atteso:** la nota si salva e compare.
+  2. Esci e rientra come `operatore.cc`: «Aziende» è del Call Center e dell'ADMIN, il Tutor non ce l'ha. Apri
+     un'azienda e aggiungi una nota al diario. **Atteso:** la nota si salva e compare.
   3. Esci e rientra come `admin`, poi apri «Utenti». **Atteso:** gli utenti di prima.
 
 - [ ] **T-30.4 Backup della notte sulla 19 (EN-10)**
