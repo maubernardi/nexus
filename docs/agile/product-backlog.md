@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 96 elementi, 393 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-16](sprints/sprint-16.md), il 23/11 ([review](sprints/sprint-16-review.md)); prossimo: sprint-17.
+**Totale: 97 elementi, 398 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-16](sprints/sprint-16.md), il 23/11 ([review](sprints/sprint-16-review.md)); in corso: [sprint-17](sprints/sprint-17.md), dal 24/11 (planning confermato il 23/11).
 
 ## Epiche
 
@@ -21,7 +21,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione, Progetto Formativo e Relazione finale sui modelli reali in Word. | 13 | 70 |
 | E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 3 | 9 |
 | E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 4 | 23 |
-| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 15 | 66 |
+| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 16 | 71 |
 
 ## Release
 
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 38 | 201 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 39 | 206 |
 
 ## Domande aperte per il Product Owner
 
@@ -79,6 +79,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [EN-6](#en-6) | E13 | Dipendenze aggiornate e senza vulnerabilità note | Must | 8 | R4 | 🎉 Done (Sprint 11) |
 | [EN-7](#en-7) | E13 | Password comuni rifiutate | Must | 2 | R4 | 🎉 Done (Sprint 11) |
 | [EN-9](#en-9) | E13 | Test del frontend stabili | Must | 1 | R4 | 🎉 Done (Sprint 13) |
+| [EN-10](#en-10) | E13 | Aggiornamento a PostgreSQL 19 | Must | 5 | R4 | ✅ Ready (Sprint 17) |
 | [US-201](#us-201) | E2 | Inserimento beneficiario | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 🎉 Done (Sprint 3) |
@@ -151,7 +152,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1303](#us-1303) | E13 | Anonimizzazione a scadenza | Must | 8 | R4 | 🎉 Done (Sprint 10) |
 | [US-1304](#us-1304) | E13 | Tema di Keycloak | Should | 3 | R4 | 🎉 Done (Sprint 7, fuori piano) |
 | [US-1305](#us-1305) | E13 | Revisione UX/UI | Should | 8 | R4 | 📋 Backlog |
-| [US-1306](#us-1306) | E13 | Passaggio in produzione | Must | 8 | R4 | 🔨 In corso (Sprint 16 → 17) |
+| [US-1306](#us-1306) | E13 | Passaggio in produzione | Must | 8 | R4 | 🔨 In corso (Sprint 17) |
 | [US-1307](#us-1307) | E13 | Monitoraggio e revisione di sicurezza | Must | 5 | R4 | 🎉 Done (Sprint 10) |
 | [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | 🎉 Done (Sprint 10) |
 | [US-1309](#us-1309) | E13 | Importazione dal database attuale | Must | 8 | R4 | 🎉 Done (Sprint 15) |
@@ -1422,6 +1423,28 @@ Criteri di accettazione:
   ripetizioni automatiche.
 - L'intera suite del frontend passa 10 volte di seguito in locale; la CI è verde.
 - Gli altri test con la stessa causa sono corretti allo stesso modo.
+#### EN-10
+**Aggiornamento a PostgreSQL 19** · Must · 5 punti · R4 · ✅ Ready (Sprint 17)
+
+Come **team** voglio passare a PostgreSQL 19, l'ultima versione principale, senza perdere dati, per restare sulle
+versioni aggiornate (regola dell'08/11). Decisa nella review dello Sprint 16 (§8.3, PO 23/11): le tre PR di Dependabot
+#182–#184 non si uniscono, perché l'immagine nuova partirebbe con un database vuoto.
+
+Criteri di accettazione:
+- **PostgreSQL 19 ovunque**, in una sola PR: compose del server e di sviluppo, immagine del backup, test
+  (Testcontainers), ripristino di prova. Il controllo delle immagini (EN-6) resta verde; le PR di Dependabot si
+  chiudono.
+- **Dati spostati con backup e ripristino**: prima un backup su IONOS e una copia dei due database sul server, poi
+  PostgreSQL 19 su una cartella dei dati nuova, poi il ripristino. Uno script con i passi, lanciato dal PO con sudo,
+  come quello del passaggio in produzione.
+- **Si può tornare indietro**: i dati della 18 restano sul server finché il PO non decide di toglierli; il deploy del
+  commit precedente riparte dalla 18.
+- **Provato prima in locale** sul backup vero, con lo script di ripristino su PostgreSQL 19: stesse righe, stessi
+  trigger, backend e Keycloak che ripartono.
+- **Dopo**: il backup della notte e il controllo del mattino riescono con la 19.
+
+Dipendenze: US-1302
+
 #### US-1301
 **Verifica della PWA online** · Must · 1 punti · R1 · 📋 Backlog
 
@@ -1497,7 +1520,7 @@ Criteri di accettazione:
 - Decisione del PO dell'08/11: si farà in **uno sprint dedicato**, perché non sarà semplice.
 
 #### US-1306
-**Passaggio in produzione** · Must · 8 punti · R4 · 🔨 In corso (Sprint 16 → 17)
+**Passaggio in produzione** · Must · 8 punti · R4 · 🔨 In corso (Sprint 17)
 
 Come **PO** voglio passare dalla demo alla produzione per usare NEXUS con dati reali.
 
