@@ -9,8 +9,8 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | https://portalenexus.it |
-| **Versione della demo** | `765dec9` (21/11/2026): Sprint 1–15 completi e il backup notturno su IONOS (US-1302) (aziende da completare, categoria merceologica, referenti e recapiti, una mansione per più segnalazioni con il tipo di tirocinio; l'importazione dal database attuale si prova in locale) |
-| **Ultimo aggiornamento** | 22/11/2026 (T-29.1 … T-29.3: testi dei messaggi, da provare dopo il deploy di US-1204; T-28.1 … T-28.3: avvisi di fine tirocinio, sulla demo `2432f49`; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Versione della demo** | `e8223da` (23/11/2026): Sprint 1–16 completi, tranne il passaggio in produzione: backup notturno su IONOS, avvisi di fine tirocinio, testi dei messaggi; l'importazione dal database attuale si prova in locale |
+| **Ultimo aggiornamento** | 23/11/2026 (T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 ## Come prepararsi
 
