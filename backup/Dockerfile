@@ -1,7 +1,7 @@
 # Immagine nexus-backup (US-1302): backup notturno cifrato dei database di NEXUS e Keycloak su IONOS Object Storage.
 # Base: la stessa immagine di PostgreSQL del server, così pg_dump ha la stessa versione del database (EN-6).
 # Progetto: openspec/changes/archive/2026-11-23-add-database-backup/design.md; procedura nel README principale.
-FROM postgres:18.6-alpine
+FROM postgres:19.0-alpine
 LABEL org.opencontainers.image.source="https://github.com/maubernardi/nexus" \
       org.opencontainers.image.title="nexus-backup" \
       org.opencontainers.image.description="NEXUS — backup notturno cifrato dei database"
