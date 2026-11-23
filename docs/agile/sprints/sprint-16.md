@@ -117,7 +117,16 @@ Tutte del PO.
   - il profilo predefinito resta `keycloak,seed` fino al passaggio: lo script mette `keycloak` nel `.env`, e la
     seconda PR cambia il compose. Prima, un deploy della demo non partirebbe;
   - prova generale in locale (21/11): demo dai dati dimostrativi, pulizia, importazione del file vero (13.799 aziende,
-    38.789 chiamate, come il 19/11), backend senza `seed` con 49 migrazioni valide e l'ADMIN creato con l'invito.
+    38.789 chiamate, come il 19/11), backend senza `seed` con 49 migrazioni valide e l'ADMIN creato con l'invito;
+  - **prova generale sul backup vero della demo** (23/11), quello delle 3:30, ripristinato dal PO sul suo PC:
+    - pulizia riuscita. Tolte 39 voci dell'audit e 17 righe degli script dimostrativi; restano 7.896 comuni, 6
+      modelli, 4 enti e 13 voci dell'audit della configurazione;
+    - voci da controllare: il progetto POLIS e le 8 tipologie di mansione segnaposto. Gli enti hanno già i dati veri;
+    - importazione del file Access: 13.799 aziende, 38.789 chiamate. Backend senza `seed` con 51 migrazioni valide e
+      l'ADMIN creato con l'invito;
+    - Keycloak del backup: tolti i 5 utenti, l'account tecnico del backend resta;
+    - un difetto trovato e corretto: lo spegnimento del ripristino di prova lasciava sul disco il volume dei dati, cioè
+      il backup in chiaro. Ora gli script lo cancellano (`docker rm -f -v`).
 
 - **US-1203, aggiunta dal PO il 22/11**, da avere prima del passaggio in produzione. Decisioni del PO:
   - avvisi prima della fine solo al Tutor;
