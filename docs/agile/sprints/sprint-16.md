@@ -1,7 +1,7 @@
 # Sprint 16 — 21 – 23 novembre 2026
 
-**Stato:** 🏃 in corso: planning confermato dal PO il 20/11, 13 punti; 26 con US-1203 e US-1204, aggiunte dal PO
-il 22/11.
+**Stato:** 🎉 concluso il 23/11: 18 punti su 26 completati (US-1302, US-1203, US-1204). US-1306 è preparata e provata
+sul backup vero della demo; il passaggio sul server va allo Sprint 17. Demo a `e8223da`; [review](sprint-16-review.md).
 **Planning:** 20/11, dalla [review dello Sprint 15](sprint-15-review.md) (§8, §9).
 
 ## Obiettivo
@@ -14,10 +14,10 @@ il 22/11.
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-1302 | Backup del database | 5 | ✅ Ready | `add-database-backup` | [#174](https://github.com/maubernardi/nexus/pull/174) |
-| US-1306 | Passaggio in produzione | 8 (era 5) | ✅ Ready | `prepare-production` | [#177](https://github.com/maubernardi/nexus/pull/177) (preparazione) |
-| US-1203 | Avvisi di fine tirocinio e blocco delle nuove segnalazioni | 5 (aggiunta il 22/11) | ✅ Ready | `add-internship-end-reminders` | [#179](https://github.com/maubernardi/nexus/pull/179) |
-| US-1204 | Testi delle notifiche e delle email modificabili dall'ADMIN | 8 (aggiunta il 22/11) | ✅ Ready | `add-editable-message-texts` | [#180](https://github.com/maubernardi/nexus/pull/180) |
+| US-1302 | Backup del database | 5 | 🎉 Done | `add-database-backup` | [#174](https://github.com/maubernardi/nexus/pull/174) |
+| US-1306 | Passaggio in produzione | 8 (era 5) | 🔨 Preparata; il passaggio nello Sprint 17 | `prepare-production` | [#177](https://github.com/maubernardi/nexus/pull/177) (preparazione) |
+| US-1203 | Avvisi di fine tirocinio e blocco delle nuove segnalazioni | 5 (aggiunta il 22/11) | 🎉 Done | `add-internship-end-reminders` | [#179](https://github.com/maubernardi/nexus/pull/179) |
+| US-1204 | Testi delle notifiche e delle email modificabili dall'ADMIN | 8 (aggiunta il 22/11) | 🎉 Done | `add-editable-message-texts` | [#180](https://github.com/maubernardi/nexus/pull/180) |
 
 Alla review avevamo detto 10 punti. Scrivendo i criteri, US-1306 è salita a 8: il suo criterio unico nascondeva la
 pulizia della demo, il realm senza utenti, la creazione dell'ADMIN, la procedura, l'importazione sul server e il cambio
@@ -35,6 +35,10 @@ di nome. Resta sotto la velocity media (23,1), e il margine serve per correggere
    Se il collaudo non finisce in tre giorni, il passaggio slitta e la storia si chiude quando è fatto.
 
 Migrazioni: **V50** per US-1203, **V51** per US-1204; la prossima è **V52**.
+
+**Velocità:** 18 punti in tre giorni (21–23/11), su 26 dopo le due storie aggiunte dal PO il 22/11. Migrazioni V50 e
+V51, solo additive (A16). Deploy della demo: `765dec9` (21/11, poi rifatto per leggere il `.env` del backup),
+`2432f49` (22/11), `e8223da` (23/11), tutti controllati online.
 
 Ogni storia con interfaccia nuova si controlla in Chrome **prima** della PR (A26). Se l'estensione si blocca, il
 controllo si fa con Chrome senza finestra e un profilo pulito (A34). Per attendere la CI uso solo
@@ -117,7 +121,16 @@ Tutte del PO.
   - il profilo predefinito resta `keycloak,seed` fino al passaggio: lo script mette `keycloak` nel `.env`, e la
     seconda PR cambia il compose. Prima, un deploy della demo non partirebbe;
   - prova generale in locale (21/11): demo dai dati dimostrativi, pulizia, importazione del file vero (13.799 aziende,
-    38.789 chiamate, come il 19/11), backend senza `seed` con 49 migrazioni valide e l'ADMIN creato con l'invito.
+    38.789 chiamate, come il 19/11), backend senza `seed` con 49 migrazioni valide e l'ADMIN creato con l'invito;
+  - **prova generale sul backup vero della demo** (23/11), quello delle 3:30, ripristinato dal PO sul suo PC:
+    - pulizia riuscita. Tolte 39 voci dell'audit e 17 righe degli script dimostrativi; restano 7.896 comuni, 6
+      modelli, 4 enti e 13 voci dell'audit della configurazione;
+    - voci da controllare: il progetto POLIS e le 8 tipologie di mansione segnaposto. Gli enti hanno già i dati veri;
+    - importazione del file Access: 13.799 aziende, 38.789 chiamate. Backend senza `seed` con 51 migrazioni valide e
+      l'ADMIN creato con l'invito;
+    - Keycloak del backup: tolti i 5 utenti, l'account tecnico del backend resta;
+    - un difetto trovato e corretto: lo spegnimento del ripristino di prova lasciava sul disco il volume dei dati, cioè
+      il backup in chiaro. Ora gli script lo cancellano (`docker rm -f -v`).
 
 - **US-1203, aggiunta dal PO il 22/11**, da avere prima del passaggio in produzione. Decisioni del PO:
   - avvisi prima della fine solo al Tutor;
@@ -197,4 +210,15 @@ Tutte del PO.
 | US-1203 aggiunta dal PO (22/11) | 13 |
 | US-1203 unita (22/11) | 8 |
 | US-1204 aggiunta dal PO (22/11) | 16 |
-| US-1204 unita | 8 |
+| US-1204 unita (23/11) | 8 |
+| Fine dello sprint (23/11): resta US-1306 | 8 |
+
+## Per il PO dopo lo sprint
+
+- Unire la #181 (aggiornamenti minori del backend, CI verde). Le #182, #183 e #184 (PostgreSQL 19) **non** vanno unite:
+  l'aggiornamento è una storia a sé (review, §8.3).
+- Collaudo: T-22 … T-29 sulla demo `e8223da`; T-26.3 è il controllo delle 9:07.
+- Prima del passaggio: i dati dell'ADMIN nel `.env`, il file Access sul server, `nexus-deploy` reinstallato, il
+  controllo in Access delle 7 + 20 chiamate.
+- Nel registro dei trattamenti: i 30 giorni dei backup, con il DPO.
+
