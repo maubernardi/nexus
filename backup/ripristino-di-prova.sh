@@ -34,7 +34,8 @@ work=$(mktemp -d)
 chmod 700 "$work"
 cleanup() {
   rm -rf -- "$work"
-  if [[ $keep != true ]]; then docker rm -f "$NAME" >/dev/null 2>&1 || true; fi
+  # -v: anche il volume dei dati, che contiene il backup in chiaro (23/11: senza, restava sul disco)
+  if [[ $keep != true ]]; then docker rm -f -v "$NAME" >/dev/null 2>&1 || true; fi
 }
 trap cleanup EXIT
 
@@ -51,7 +52,7 @@ echo "Impronte corrette."
 sed 's/^/  /' "$work/MANIFEST.txt"
 
 step "PostgreSQL temporaneo ($IMAGE, 127.0.0.1:$PORT)"
-docker rm -f "$NAME" >/dev/null 2>&1 || true
+docker rm -f -v "$NAME" >/dev/null 2>&1 || true
 password=$(head -c 32 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 24)
 docker run -d --name "$NAME" -p "127.0.0.1:$PORT:5432" \
   -e POSTGRES_PASSWORD="$password" -e NEXUS_OWNER_PASSWORD="$password" -e NEXUS_APP_PASSWORD="$password" \
@@ -101,7 +102,7 @@ Il database ripristinato resta acceso su 127.0.0.1:$PORT. Password di prova di t
 Per vedere i dati con il backend in locale (cartella backend):
   PROFILES_ACTIVE=postgresql,security-mock DB_URL=jdbc:postgresql://localhost:$PORT/nexus DB_USERNAME=nexus_app \\
   DB_PASSWORD=$password FLYWAY_USERNAME=nexus_owner FLYWAY_PASSWORD=$password ./mvnw spring-boot:run
-Per spegnerlo e cancellarlo: docker rm -f $NAME
+Per spegnerlo e cancellarlo, dati compresi: docker rm -f -v $NAME
 EOF
 else
   echo "Database temporaneo e file decifrati cancellati."

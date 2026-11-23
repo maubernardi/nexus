@@ -15,13 +15,13 @@ export NEXUS_RIPRISTINO_PORT=54330
 tmp=$(mktemp -d)
 chmod 700 "$tmp"
 cleanup() {
-  docker rm -f "$PG" "$S3" nexus-ripristino >/dev/null 2>&1 || true
+  docker rm -f -v "$PG" "$S3" nexus-ripristino >/dev/null 2>&1 || true
   docker volume rm "$STATE" >/dev/null 2>&1 || true
   docker network rm "$NET" >/dev/null 2>&1 || true
   rm -rf -- "$tmp"
 }
 trap cleanup EXIT
-cleanup_start() { docker rm -f "$PG" "$S3" nexus-ripristino >/dev/null 2>&1 || true; }
+cleanup_start() { docker rm -f -v "$PG" "$S3" nexus-ripristino >/dev/null 2>&1 || true; }
 
 step() { printf '\n==> %s\n' "$*"; }
 ok() { echo "OK: $*"; }
@@ -139,7 +139,7 @@ docker run -d --name nexus-backup-e2e-lock --network "$NET" -v "$STATE:/var/lib/
 sleep 2
 out=$(nb "${base_env[@]}" "${s3_env[@]}" -e NEXUS_BACKUP_S3_SECRET_KEY="$S3_SECRET" -- backup 2>&1) \
   || ko "il secondo backup deve uscire senza errore"
-docker rm -f nexus-backup-e2e-lock >/dev/null
+docker rm -f -v nexus-backup-e2e-lock >/dev/null
 grep -q "già in corso" <<<"$out" || ko "backup concorrente: $out"
 ok "il secondo backup non parte"
 
@@ -174,7 +174,7 @@ if docker exec nexus-ripristino psql -X -q -U nexus_app -d nexus -c 'DELETE FROM
 fi
 [[ $(docker exec nexus-ripristino psql -X -U nexus_app -d nexus -At -c 'SELECT count(*) FROM nexus.prova') == 5000 ]] \
   || ko "l'utente dell'app non legge i dati ripristinati"
-docker rm -f nexus-ripristino >/dev/null
+docker rm -f -v nexus-ripristino >/dev/null
 ok "righe uguali, trigger e permessi dell'app ripristinati"
 
 step "Archivio alterato e chiave sbagliata"
