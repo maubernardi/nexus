@@ -1,6 +1,6 @@
 # Sprint 17 — 24 – 26 novembre 2026
 
-**Stato:** 📋 proposta di planning, 13 punti: da confermare l'ordine (§«Da confermare»).
+**Stato:** 🏃 in corso: planning confermato dal PO il 23/11, 13 punti.
 **Planning:** 23/11, dalla [review dello Sprint 16](sprint-16-review.md) (§8, §9).
 
 ## Obiettivo
@@ -14,7 +14,7 @@
 | US-1306 | Passaggio in produzione | 8 | 🔨 In corso | `prepare-production` | [#177](https://github.com/maubernardi/nexus/pull/177) (preparazione) |
 | EN-10 | Aggiornamento a PostgreSQL 19 | 5 | ✅ Ready | `upgrade-postgresql-19` | |
 
-**Ordine proposto:**
+**Ordine** (PO, 23/11):
 1. **EN-10 sulla demo, il 24/11**:
    - la PR, provata in locale sul backup vero della demo;
    - il deploy e lo script dell'aggiornamento sul server.
@@ -44,6 +44,7 @@ Dalla review dello Sprint 16, tutte del PO:
 - **PostgreSQL 19 come storia a sé**, EN-10, nello Sprint 17; le PR di Dependabot #182–#184 non si uniscono (§8.3,
   §8.4).
 - **Analisi di US-507** nello Sprint 17, dopo il passaggio (§8.5).
+- **Ordine**: EN-10 prima del passaggio, sulla demo; poi collaudo e passaggio, già su PostgreSQL 19 (planning, 23/11).
 
 ## Come li faccio
 
@@ -66,11 +67,6 @@ Dalla review dello Sprint 16, tutte del PO:
 - il passaggio, il giorno che scegli, seguendolo insieme;
 - l'invito all'ADMIN e i controlli del README;
 - la seconda PR.
-
-## Da confermare
-
-1. **Ordine**: EN-10 prima del passaggio, sulla demo (*proposta*), oppure dopo, sulla produzione. Dopo vorrebbe dire
-   spostare i dati veri da una versione all'altra, con il sito fermo qualche minuto.
 
 ## Per il PO
 
@@ -97,4 +93,4 @@ una storia piccola.
 
 | Momento | Punti residui |
 |---|---|
-| Inizio (dopo la conferma del planning) | 13 |
+| Inizio (23/11, dopo la conferma del planning) | 13 |
