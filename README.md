@@ -227,6 +227,15 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
   si aggiungono anche le variabili libere del progetto (es. `SEDE_OPERATIVA`), che diventano segnaposto
   (`{SEDE_OPERATIVA}`) dei modelli di quel progetto. Nel `.env` non serve niente: le variabili `NEXUS_PROMOTER_*` di
   US-1011 non ci sono più. Un dato che manca resta, nei documenti, una riga da completare a mano.
+- **Testi delle notifiche e delle email (US-1204).** I testi delle notifiche nell'app e delle email di NEXUS li cambia
+  l'ADMIN da «Testi dei messaggi», con l'anteprima e il ritorno al testo predefinito. I predefiniti sono nel codice
+  (`backend/.../services/messages/MessageDefaults.java`); nel database ci sono solo quelli cambiati.
+- **Testi delle email di Keycloak** (invito, password dimenticata, password cambiata). I predefiniti sono nel tema:
+  testi in `keycloak/themes/nexus/email/messages/messages_it.properties`, impaginazione nei file `.ftl`. Si possono
+  ridefinire anche **dalla console**, senza deploy: *Realm settings → Localization → Realm overrides*, lingua
+  Italiano, con la chiave del file (es. `executeActionsSubject` per l'oggetto dell'invito, `passwordResetSubject` per
+  la password dimenticata) e il testo nuovo. L'oggetto deve restare «PORTALE NEXUS - …». La ridefinizione sta nel
+  database di Keycloak (quindi nei backup) e vale finché non la si cancella; provata il 23/11 su Keycloak 26.8.2.
 - **Modelli reali di GOL (EN-8).** I 6 modelli della Regione (Extracurriculare: convenzione, progetto formativo,
   relazione finale; Inclusione: Allegati A, B e C) non stanno nel repository: si preparano in
   `documenti_base/modelli-nexus/` dai file della cooperativa e li carica l'ADMIN da «Modelli dei documenti», con

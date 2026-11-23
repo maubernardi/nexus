@@ -1,6 +1,7 @@
 # Sprint 16 — 21 – 23 novembre 2026
 
-**Stato:** 🏃 in corso: planning confermato dal PO il 20/11, 13 punti; 18 con US-1203, aggiunta dal PO il 22/11.
+**Stato:** 🏃 in corso: planning confermato dal PO il 20/11, 13 punti; 26 con US-1203 e US-1204, aggiunte dal PO
+il 22/11.
 **Planning:** 20/11, dalla [review dello Sprint 15](sprint-15-review.md) (§8, §9).
 
 ## Obiettivo
@@ -9,13 +10,14 @@
 > ripristino. La produzione tiene la configurazione della demo e prende le aziende dal database attuale; parte senza
 > segnalazioni, beneficiari e utenti, con la sola utenza dell'ADMIN.
 
-## Impegno (18 punti)
+## Impegno (26 punti)
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
 | US-1302 | Backup del database | 5 | ✅ Ready | `add-database-backup` | [#174](https://github.com/maubernardi/nexus/pull/174) |
 | US-1306 | Passaggio in produzione | 8 (era 5) | ✅ Ready | `prepare-production` | [#177](https://github.com/maubernardi/nexus/pull/177) (preparazione) |
 | US-1203 | Avvisi di fine tirocinio e blocco delle nuove segnalazioni | 5 (aggiunta il 22/11) | ✅ Ready | `add-internship-end-reminders` | [#179](https://github.com/maubernardi/nexus/pull/179) |
+| US-1204 | Testi delle notifiche e delle email modificabili dall'ADMIN | 8 (aggiunta il 22/11) | ✅ Ready | `add-editable-message-texts` | [#180](https://github.com/maubernardi/nexus/pull/180) |
 
 Alla review avevamo detto 10 punti. Scrivendo i criteri, US-1306 è salita a 8: il suo criterio unico nascondeva la
 pulizia della demo, il realm senza utenti, la creazione dell'ADMIN, la procedura, l'importazione sul server e il cambio
@@ -32,7 +34,7 @@ di nome. Resta sotto la velocity media (23,1), e il margine serve per correggere
 
    Se il collaudo non finisce in tre giorni, il passaggio slitta e la storia si chiude quando è fatto.
 
-Migrazioni: **V50** per US-1203; la prossima è **V51**.
+Migrazioni: **V50** per US-1203, **V51** per US-1204; la prossima è **V52**.
 
 Ogni storia con interfaccia nuova si controlla in Chrome **prima** della PR (A26). Se l'estensione si blocca, il
 controllo si fa con Chrome senza finestra e un profilo pulito (A34). Per attendere la CI uso solo
@@ -129,6 +131,19 @@ Tutte del PO.
   - dopo un giorno saltato parte solo l'avviso più recente;
   - il blocco vale anche per la candidatura dalla bacheca.
 
+- **US-1204, aggiunta dal PO il 22/11**, dopo la domanda su dove stanno i testi delle email. Decisioni del PO:
+  - per ogni notifica l'ADMIN cambia due testi distinti, quello nell'app e quello dell'email;
+  - l'oggetto resta «PORTALE NEXUS - Segnalazione n. N», con una parte distintiva per ogni tipo, modificabile;
+  - si fa subito, in questo sprint.
+
+  Lo sprint arriva a 26 punti, sopra la velocity media (23,1), come il PO ha messo in conto. Altre scelte:
+  - i predefiniti restano nel codice, e il database tiene solo i testi cambiati: dopo il deploy non cambia nulla,
+    tranne la parte distintiva dell'oggetto, che è nuova;
+  - le notifiche nell'app prendono il testo dal backend: il frontend non ha più una copia;
+  - pagina a parte, «Testi dei messaggi», nel menu di amministrazione;
+  - le email di Keycloak restano nel tema; si ridefiniscono dalla console di Keycloak (*Realm settings → Localization
+    → Realm overrides*), provato il 23/11 con l'oggetto dell'invito.
+
 ## Come li faccio
 
 **Backup (US-1302):**
@@ -180,4 +195,6 @@ Tutte del PO.
 | Inizio (20/11, dopo la conferma del planning) | 13 |
 | US-1302 unita (21/11) | 8 |
 | US-1203 aggiunta dal PO (22/11) | 13 |
-| US-1203 unita | 8 |
+| US-1203 unita (22/11) | 8 |
+| US-1204 aggiunta dal PO (22/11) | 16 |
+| US-1204 unita | 8 |

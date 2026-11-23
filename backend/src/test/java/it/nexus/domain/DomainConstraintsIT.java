@@ -322,6 +322,33 @@ class DomainConstraintsIT {
                     () -> contactRoles.saveAndFlush(new ContactRole(DomainFixtures.code("R"), "titolare")));
         }
 
+        private int insertMessageText(long id, String message, String part, String text) {
+            return jdbc.update("""
+                    INSERT INTO message_text (id, message, part, text, created_at, created_by, updated_at, updated_by)
+                    VALUES (?, ?, ?, ?, now(), 'test', now(), 'test')""", id, message, part, text);
+        }
+
+        @Test
+        void testoDelMessaggioRipetutoPerLaStessaParte() {
+            insertMessageText(1, "PROPOSAL_SENT", "APP", "Proposta {numero}");
+            assertViolates("uq_message_text", () -> insertMessageText(2, "PROPOSAL_SENT", "APP", "Altra {numero}"));
+        }
+
+        @Test
+        void testoDelMessaggioConUnaParteSconosciuta() {
+            assertViolates("ck_message_text_part", () -> insertMessageText(1, "PROPOSAL_SENT", "SMS", "Proposta"));
+        }
+
+        @Test
+        void testoDelMessaggioVuoto() {
+            assertViolates("ck_message_text_text", () -> insertMessageText(1, "PROPOSAL_SENT", "APP", "  "));
+        }
+
+        @Test
+        void testoDelMessaggioConUnNomeNonValido() {
+            assertViolates("ck_message_text_message", () -> insertMessageText(1, "proposta", "APP", "Proposta"));
+        }
+
         private int insertLegacyCall(long id, int number, Long companyId) {
             return jdbc.update("""
                     INSERT INTO legacy_call (id, legacy_number, company_id, legacy_company_number, handled, internship,
