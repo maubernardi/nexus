@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 97 elementi, 398 punti** (più US-507, da stimare). La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-16](sprints/sprint-16.md), il 23/11 ([review](sprints/sprint-16-review.md)); in corso: [sprint-17](sprints/sprint-17.md), dal 24/11 (planning confermato il 23/11).
+**Totale: 100 elementi, 413 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-16](sprints/sprint-16.md), il 23/11 ([review](sprints/sprint-16-review.md)); in corso: [sprint-17](sprints/sprint-17.md), dal 24/11 (planning confermato il 23/11).
 
 ## Epiche
 
@@ -13,7 +13,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 6 | 23 |
 | E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 8 | 31 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 5 | 17 |
-| E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 10 | 26 (+ US-507 da stimare) |
+| E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 12 | 41 |
 | E6 | Abbinamento (fase 4) | Il Call Center abbina il beneficiario a una mansione libera e la blocca. | 5 | 25 |
 | E7 | Proposta e timer (fase 5) | Il Tutor valuta la proposta; i tempi di risposta sono presidiati da un timer di 7 giorni lavorativi. | 5 | 15 |
 | E8 | Appuntamento e rilancio (fase 6) | Il Tutor registra l'esito dell'appuntamento; se fallisce, la mansione può essere rilanciata in bacheca. | 3 | 10 |
@@ -105,10 +105,12 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-504](#us-504) | E5 | Disattivazione impedita con mansioni bloccate | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [US-505](#us-505) | E5 | Diario delle note dell'azienda | Must | 2 | R1 | 🎉 Done (Sprint 4) |
 | [US-506](#us-506) | E5 | Legale rappresentante e codici ATECO dell'azienda | Must | 3 | R3 | 🎉 Done (Sprint 7) |
-| [US-507](#us-507) | E5 | Richiesta di contatto di un'azienda dal Tutor | Should | ? | — | 📋 Backlog (da analizzare) |
+| [US-507](#us-507) | E5 | Richiesta di contatto di un'azienda dal Tutor | Should | 5 | — | 📋 Backlog |
 | [US-508](#us-508) | E5 | Partita IVA e nome da completare | Must | 3 | R4 | 🎉 Done (Sprint 15) |
 | [US-509](#us-509) | E5 | Categoria merceologica e attività dell'azienda | Must | 3 | R4 | 🎉 Done (Sprint 15) |
 | [US-510](#us-510) | E5 | Referenti e recapiti dell'azienda | Must | 5 | R4 | 🎉 Done (Sprint 15) |
+| [US-511](#us-511) | E5 | Zona dell'azienda e aziende per il Tutor | Should | 5 | — | 📋 Backlog |
+| [US-512](#us-512) | E5 | Tentativi di contatto ed esito della richiesta | Should | 5 | — | 📋 Backlog |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 🎉 Done (Sprint 5) |
@@ -702,13 +704,26 @@ Criteri di accettazione:
 Dipendenze: US-501
 
 #### US-507
-**Richiesta di contatto di un'azienda dal Tutor** · Should · da stimare · release da decidere · 📋 Backlog (da analizzare)
+**Richiesta di contatto di un'azienda dal Tutor** · Should · 5 punti · release da decidere · 📋 Backlog
 
-Come **Tutor** voglio chiedere al Call Center di contattare un'azienda che conosco, indicando i dati minimi (nome e
-zona), così che il Call Center prenda in carico la richiesta e contatti l'azienda (PO, 15/11).
+Come **Tutor** voglio chiedere al Call Center di contattare un'azienda che conosco, così che la richiesta non si perda
+e un operatore la prenda in carico (PO, 15/11). Oggi passa tutto a voce o per email, senza traccia (analisi con il PO,
+23/11).
 
-Criteri di accettazione: da definire in una **sessione di analisi dedicata**, quando il PO decide di affrontarla
-(PO, 15/11).
+Criteri di accettazione:
+- La richiesta è **generale**: non riguarda un beneficiario né una segnalazione.
+- **Azienda nuova**: il Tutor scrive il nome e sceglie la zona del catalogo (US-106), tutti e due obbligatori; il
+  settore (categoria merceologica, US-509) è facoltativo. Se ci sono aziende con un nome simile, NEXUS le mostra prima
+  dell'invio, per evitare doppioni.
+- **Azienda già presente**: dalla scheda dell'azienda (US-511), «Chiedi di contattarla». La richiesta nasce collegata
+  all'azienda.
+- Il Call Center ha l'elenco **«Richieste di contatto»**, dalla più vecchia, con il numero di quelle aperte nel menu.
+  Nessuna email agli operatori.
+- Un **operatore qualsiasi** la prende in carico; la richiesta mostra chi ce l'ha.
+- Il Tutor vede le sue richieste in «Le mie richieste», con lo stato: aperta, in carico, chiusa.
+- Invio e presa in carico nell'audit (EN-2), con autore e istante.
+
+Dipendenze: US-511
 
 #### US-508
 **Partita IVA e nome da completare** · Must · 3 punti · R4 · 🎉 Done (Sprint 15)
@@ -765,6 +780,44 @@ Criteri di accettazione:
   ruolo); 12 ruoli iniziali; il referente di oggi entra come primo, senza ruolo.
 
 Dipendenze: US-501, US-1007
+
+
+#### US-511
+**Zona dell'azienda e aziende per il Tutor** · Should · 5 punti · release da decidere · 📋 Backlog
+
+Come **Tutor** voglio vedere le aziende del database con pochi dati essenziali, per sapere quali conosce già il Call
+Center prima di chiedere un contatto (analisi con il PO, 23/11).
+
+Criteri di accettazione:
+- **Zona dell'azienda**: una zona del catalogo (US-106), facoltativa, che il Call Center sceglie nella scheda; nel suo
+  elenco delle aziende è una colonna e un filtro. Le aziende importate (US-1309) partono senza: in Access il campo non
+  è mai stato usato. Il collegamento tra zone e comuni verrà in un secondo momento, non in questa storia (PO, 23/11).
+- **Aziende per il Tutor**: la voce «Aziende» nel menu del Tutor, in sola lettura, con le sole aziende attive. Per
+  ognuna: nome, settore, zona, indirizzo con il comune (sede operativa, altrimenti legale). Si cerca per nome e si
+  filtra per settore e zona.
+- Il Tutor non vede altro: niente partita IVA, recapiti, referenti, diario, mansioni o storico. L'API per il Tutor
+  restituisce solo quei campi (minimizzazione), e il Tutor non crea né modifica aziende.
+
+Dipendenze: US-106, US-509, US-1007
+
+#### US-512
+**Tentativi di contatto ed esito della richiesta** · Should · 5 punti · release da decidere · 📋 Backlog
+
+Come **Call Center** voglio registrare ogni tentativo di contatto con l'azienda e chiudere la richiesta con l'esito,
+così che il Tutor sappia com'è andata (analisi con il PO, 23/11).
+
+Criteri di accettazione:
+- Per ogni **tentativo** l'operatore segna data, esito e nota. Gli esiti sono fissi: «Disponibile a ospitare
+  tirocini», «Non interessata», «Non raggiungibile». La nota è facoltativa ed è per il Tutor: niente dati personali.
+- I tentativi non chiudono la richiesta: la **chiude a mano** l'operatore, quando decide, con l'esito finale e una
+  nota (PO, 23/11). Alla chiusura collega la richiesta all'azienda del database, se c'è o se l'ha appena creata.
+- Il Tutor vede **tutti i tentativi**, con data, esito e nota, in «Le mie richieste» (PO, 23/11).
+- Alla chiusura il Tutor riceve l'**avviso nell'app e per email**, con l'esito e la nota. I testi si cambiano da
+  «Testi dei messaggi» (US-1204). Email con oggetto «PORTALE NEXUS - Richiesta di contatto n. N - …» e firma «Portale
+  Nexus».
+- Tentativi e chiusura nell'audit (EN-2).
+
+Dipendenze: US-507, US-1204
 
 ### E6 — Abbinamento (fase 4)
 
