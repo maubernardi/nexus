@@ -28,6 +28,8 @@ ok() { echo "OK: $*"; }
 ko() { echo "::error::Prova del backup: $*"; exit 1; }
 
 cleanup_start
+# A37: i volumi che esistono già; alla fine non ne deve restare nessuno della prova (dati in chiaro)
+volumes_before=$(docker volume ls -q | sort)
 step "Immagine $IMAGE"
 docker build -q -t "$IMAGE" backup >/dev/null
 docker network create "$NET" >/dev/null
@@ -191,5 +193,12 @@ if backup/ripristino-di-prova.sh "$tmp/archivio.tar.age" "$tmp/altra-chiave.txt"
 fi
 grep -q "non riesco a decifrare" "$tmp/log" || ko "chiave sbagliata: $(cat "$tmp/log")"
 ok "archivio alterato e chiave sbagliata rifiutati"
+
+step "Nessun volume lasciato sul disco (A37)"
+docker rm -f -v "$PG" "$S3" nexus-ripristino >/dev/null 2>&1 || true
+docker volume rm "$STATE" >/dev/null 2>&1 || true
+left=$(comm -13 <(printf '%s\n' "$volumes_before") <(docker volume ls -q | sort))
+[[ -z $left ]] || ko "restano volumi della prova, che possono contenere dati in chiaro: $(tr '\n' ' ' <<<"$left")"
+ok "nessun volume della prova è rimasto"
 
 printf '\nProva del backup riuscita.\n'
