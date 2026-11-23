@@ -1131,7 +1131,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
      - cellulare e fax;
      - i referenti, ognuno con il ruolo e i recapiti.
 
-- [ ] **T-25.4 Importazione dal database attuale, in prova (US-1309)**
+- [x] **T-25.4 Importazione dal database attuale, in prova (US-1309)**
 
   Si fa sul PC, non sulla demo: il file Access ha dati personali e sulla demo restano i dati dimostrativi.
   L'importazione vera si fa con il passaggio in produzione (US-1306).
@@ -1184,7 +1184,7 @@ Serve la posta di Keycloak sul server (`keycloak-email.sh`) e, una volta, `keycl
 Si fanno dopo il deploy di US-1302 e la preparazione del README, «Backup del database», punti 1–5: contenitore su IONOS,
 chiavi age, variabili nel `.env` e `nexus-deploy` aggiornato. Sulla demo ci sono solo dati dimostrativi.
 
-- [ ] **T-26.1 Backup subito e stato (US-1302)**
+- [x] **T-26.1 Backup subito e stato (US-1302)**
   1. Su GitHub apri Actions → «Backup del database» → *Run workflow*, scegli «backup adesso». **Atteso:**
      - il run è verde;
      - nel log ci sono i passi (salvataggio di nexus e keycloak, cifratura, caricamento, verifica) e la riga «OK: …»
@@ -1199,7 +1199,7 @@ chiavi age, variabili nel `.env` e `nexus-deploy` aggiornato. Sulla demo ci sono
   4. Apri le proprietà del file. **Atteso:** il blocco è *Governance*, fino a 30 giorni dopo il backup. Non serve
      provare a cancellarlo: con *Governance* tu puoi farlo, scavalcando il blocco, e il backup andrebbe perso.
 
-- [ ] **T-26.2 Ripristino di prova sul PC (US-1302)**
+- [x] **T-26.2 Ripristino di prova sul PC (US-1302)**
   1. Scarica dalla console di IONOS il file del punto T-26.1.
   2. Sul PC, in WSL, nella cartella del progetto: `backup/ripristino-di-prova.sh <file scaricato>
      ~/nexus-backup-chiave.txt`. **Atteso:**
@@ -1310,7 +1310,7 @@ passa in produzione così com'è.
 
 Si fanno con l'aggiornamento della demo (README, «Aggiornare PostgreSQL»). Nelle note solo numeri e codici.
 
-- [ ] **T-30.1 Prova sul backup vero, sul PC (EN-10)**
+- [x] **T-30.1 Prova sul backup vero, sul PC (EN-10)**
   1. Scarica dalla console di IONOS l'ultimo backup della demo.
   2. In WSL, nella cartella del progetto aggiornata a `main`: `backup/ripristino-di-prova.sh --tieni <file scaricato>
      ~/nexus-backup-chiave.txt`. **Atteso:**
@@ -1319,7 +1319,7 @@ Si fanno con l'aggiornamento della demo (README, «Aggiornare PostgreSQL»). Nel
      - in fondo «Fatto: il ripristino riesce».
   3. Lascia il database acceso: lo uso per avviare backend e Keycloak sulla 19, poi lo spengo io.
 
-- [ ] **T-30.2 Aggiornamento sul server (EN-10)**
+- [x] **T-30.2 Aggiornamento sul server (EN-10)**
   1. `sudo bash aggiorna-postgresql.sh prepara`, con «SI». **Atteso:**
      - i passi da 1 a 7 senza errori;
      - al passo 7 «Stessi numeri:», con tabelle, righe, trigger, «ultima migrazione: V51» e utenti di Keycloak;
@@ -1327,6 +1327,8 @@ Si fanno con l'aggiornamento della demo (README, «Aggiornare PostgreSQL»). Nel
   2. Deploy di `main` dalle Actions. **Atteso:** il run è verde e il sito risponde.
   3. `sudo bash aggiorna-postgresql.sh verifica`. **Atteso:** «Stessi numeri di prima dell'aggiornamento», il backup
      riuscito e «Blocco: GOVERNANCE fino al …».
+  4. Si fa una volta sola. **Atteso:** rilanciato dopo, `prepara` si ferma al passo 1 con «PostgreSQL è già alla 19:
+     niente da aggiornare», senza fermare il sito né toccare i dati.
 
 - [ ] **T-30.3 La demo sulla 19 (EN-10)**
   1. Accedi come `tutor1`. **Atteso:** le segnalazioni di prima, con lo stesso stato.
