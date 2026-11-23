@@ -18,6 +18,7 @@ export const it = {
     board: 'Bacheca',
     catalogs: 'Cataloghi',
     documentTemplates: 'Modelli dei documenti',
+    messageTexts: 'Testi dei messaggi',
     calendar: 'Calendario',
     users: 'Utenti',
     coordination: 'Coordinamento',
@@ -339,39 +340,118 @@ export const it = {
     empty: 'Non hai notifiche.',
     listLabel: 'Notifiche dalla più recente',
     generic: 'Aggiornamento sulla segnalazione n. {{number}}.',
-    types: {
-      CATEGORY_CHANGED:
-        'Il Call Center ha scelto una tipologia diversa da quella che avevi proposto per la segnalazione n. {{number}}: il motivo è nella cronologia.',
-      CATEGORY_APPROVED:
-        'La nuova tipologia che avevi proposto per la segnalazione n. {{number}} è stata approvata.',
-      PROPOSAL_SENT: 'C’è una proposta di tirocinio per la segnalazione n. {{number}}: valutala e accettala.',
-      PROPOSAL_ACCEPTED:
-        'Il Tutor ha accettato la proposta della segnalazione n. {{number}}: è partito il timer.',
-      APPOINTMENT_SET:
-        'Il Tutor ha registrato l’appuntamento con l’azienda per la segnalazione n. {{number}}.',
-      APPOINTMENT_FAILED:
-        'L’appuntamento della segnalazione n. {{number}} non è andato a buon fine: la segnalazione è riaperta, il motivo è nella cronologia.',
-      PROPOSAL_REJECTED:
-        'Il Tutor ha rifiutato la proposta della segnalazione n. {{number}}: l’azienda è esclusa e la segnalazione è riaperta.',
-      TIMER_REMINDER:
-        'Promemoria: per la segnalazione n. {{number}} manca la registrazione dell’appuntamento con l’azienda. La scadenza del timer è nel dettaglio.',
-      TIMER_EXPIRED:
-        'Il timer della segnalazione n. {{number}} è scaduto senza appuntamento: la segnalazione è riaperta e la mansione è di nuovo libera.',
-      FAST_TRACK_REJECTED:
-        'Il Call Center non ha approvato la corsia veloce della segnalazione n. {{number}}: continua in lavorazione normale, il motivo è nella cronologia.',
-      FAST_TRACK_DROPPED:
-        'L’annuncio della segnalazione n. {{number}} non è più in bacheca: la corsia veloce è decaduta e la segnalazione continua in lavorazione normale.',
-      BOARD_RELAUNCH_REQUESTED:
-        'Il Tutor chiede di rilanciare in bacheca la mansione della segnalazione n. {{number}}: c’è una bozza di annuncio da controllare e pubblicare.',
-      INTERNSHIP_STARTED: 'Il Tutor ha avviato il tirocinio della segnalazione n. {{number}}.',
-      CLOSURE_REPORT_SUBMITTED:
-        'Il Tutor ha inviato il report di restituzione della segnalazione n. {{number}}: il percorso è concluso.',
-      TICKET_TRANSFERRED:
-        'Ti è stata affidata la segnalazione n. {{number}}, con il suo beneficiario: prima la seguiva un altro Tutor.',
-      INTERNSHIP_ENDING:
-        'Il tirocinio della segnalazione n. {{number}} sta per finire: la convenzione è in chiusura. Se serve, prorogalo; altrimenti ricordati di chiuderlo con il report di restituzione.',
-      INTERNSHIP_OVERDUE:
-        'Il tirocinio della segnalazione n. {{number}} è finito alla data prevista: chiudilo con il report di restituzione o prorogalo. Finché non chiudi i tirocini finiti non puoi aprire nuove segnalazioni.',
+  },
+  messageTexts: {
+    loading: 'Caricamento dei testi…',
+    groups: { notifications: 'Notifiche', emailChange: 'Email del cambio di indirizzo' },
+    changed: 'Testi cambiati',
+    parts: {
+      APP: 'Testo della notifica nell’app',
+      EMAIL_SUBJECT: 'Oggetto dell’email: parte distintiva',
+      EMAIL_BODY: 'Testo dell’email',
+    },
+    hints: {
+      APP: 'Lo vede chi riceve la notifica, nella campanella e nell’elenco delle notifiche.',
+      EMAIL_SUBJECT: 'Viene dopo l’inizio fisso dell’oggetto. Una riga, al massimo 100 caratteri.',
+      EMAIL_BODY: 'Dopo il testo NEXUS aggiunge da solo il collegamento, l’avvertenza e la firma.',
+    },
+    placeholders: 'Segnaposto: {{list}}.',
+    noPlaceholders: 'Nessun segnaposto.',
+    placeholderNames: {
+      numero: 'per il numero della segnalazione',
+      codice: 'per il codice da 6 cifre',
+      ora: 'per l’ora di scadenza del codice',
+    },
+    preview: 'Anteprima, con valori d’esempio',
+    previewSubjectNotification: 'PORTALE NEXUS - Segnalazione n. {{number}} - {{text}}',
+    previewSubject: 'PORTALE NEXUS - {{text}}',
+    footerNotification:
+      'Apri la segnalazione: (collegamento)\n\nMessaggio automatico di NEXUS, non rispondere. Trovi tutte le notifiche anche nell’app, alla voce Notifiche.\n\nPortale Nexus',
+    footerEmailChange: 'Messaggio automatico di NEXUS, non rispondere.\n\nPortale Nexus',
+    required: 'Scrivi il testo',
+    save: 'Salva',
+    saveLabel: 'Salva: {{part}}, «{{title}}»',
+    reset: 'Ripristina il testo predefinito',
+    resetLabel: 'Ripristina il testo predefinito: {{part}}, «{{title}}»',
+    saved: 'Testo salvato.',
+    resetDone: 'Ripristinato il testo predefinito.',
+    messages: {
+      CATEGORY_CHANGED: {
+        title: 'Tipologia cambiata dal Call Center',
+        when: 'Al Tutor, quando il Call Center sceglie una tipologia diversa da quella proposta.',
+      },
+      CATEGORY_APPROVED: {
+        title: 'Tipologia approvata',
+        when: 'Al Tutor, quando la nuova tipologia che ha proposto viene approvata.',
+      },
+      PROPOSAL_SENT: {
+        title: 'Proposta di tirocinio',
+        when: 'Al Tutor, quando il Call Center propone un’azienda per la segnalazione.',
+      },
+      PROPOSAL_ACCEPTED: {
+        title: 'Proposta accettata',
+        when: 'All’operatore, quando il Tutor accetta la proposta.',
+      },
+      APPOINTMENT_SET: {
+        title: 'Appuntamento fissato',
+        when: 'All’operatore, quando il Tutor registra l’appuntamento con l’azienda.',
+      },
+      APPOINTMENT_FAILED: {
+        title: 'Appuntamento non andato a buon fine',
+        when: 'All’operatore, quando l’appuntamento non va a buon fine e la segnalazione si riapre.',
+      },
+      PROPOSAL_REJECTED: {
+        title: 'Proposta rifiutata',
+        when: 'All’operatore, quando il Tutor rifiuta la proposta.',
+      },
+      TIMER_REMINDER: {
+        title: 'Promemoria del timer',
+        when: 'Al Tutor, al 4° giorno lavorativo dall’accettazione, se manca l’appuntamento.',
+      },
+      TIMER_EXPIRED: {
+        title: 'Timer scaduto',
+        when: 'Al Tutor e all’operatore, quando il timer scade senza appuntamento.',
+      },
+      BOARD_RELAUNCH_REQUESTED: {
+        title: 'Rilancio in bacheca',
+        when: 'All’operatore, quando il Tutor chiede di rilanciare la mansione in bacheca.',
+      },
+      FAST_TRACK_REJECTED: {
+        title: 'Corsia veloce non approvata',
+        when: 'Al Tutor, quando il Call Center non approva la corsia veloce.',
+      },
+      FAST_TRACK_DROPPED: {
+        title: 'Corsia veloce decaduta',
+        when: 'Al Tutor, quando l’annuncio esce dalla bacheca mentre la candidatura aspettava.',
+      },
+      INTERNSHIP_STARTED: {
+        title: 'Tirocinio avviato',
+        when: 'All’operatore, quando il Tutor avvia il tirocinio.',
+      },
+      CLOSURE_REPORT_SUBMITTED: {
+        title: 'Report di restituzione inviato',
+        when: 'All’operatore, quando il Tutor invia il report: il percorso è concluso.',
+      },
+      TICKET_TRANSFERRED: {
+        title: 'Segnalazione affidata',
+        when: 'Al Tutor, quando gli viene affidata la segnalazione di un altro Tutor.',
+      },
+      INTERNSHIP_ENDING: {
+        title: 'Convenzione in chiusura',
+        when: 'Al Tutor, 7 e 3 giorni prima della fine prevista del tirocinio.',
+      },
+      INTERNSHIP_OVERDUE: {
+        title: 'Tirocinio da chiudere o prorogare',
+        when: 'Al Tutor, 3 e 7 giorni dopo la fine prevista, se il tirocinio non è chiuso.',
+      },
+      EMAIL_CHANGE_CODE: {
+        title: 'Codice per il nuovo indirizzo email',
+        when: 'Al nuovo indirizzo, quando un utente cambia la propria email.',
+      },
+      EMAIL_CHANGE_NOTICE: {
+        title: 'Avviso di indirizzo cambiato',
+        when: 'Al vecchio indirizzo, dopo il cambio dell’email.',
+      },
     },
   },
   internshipsToClose: {
@@ -2069,6 +2149,12 @@ export const it = {
     notifications: {
       title: 'Notifiche',
       heading: 'Notifiche',
+    },
+    messageTexts: {
+      title: 'Testi dei messaggi',
+      heading: 'Testi dei messaggi',
+      intro:
+        'I testi delle notifiche e delle email che NEXUS manda da solo. Per ogni notifica cambi, separatamente, il testo nell’app, la parte distintiva dell’oggetto dell’email e il testo dell’email. Restano fissi l’inizio dell’oggetto («PORTALE NEXUS - Segnalazione n. …»), il collegamento alla segnalazione, l’avvertenza e la firma «Portale Nexus». Finché non li cambi valgono i testi predefiniti.',
     },
     documentTemplates: {
       title: 'Modelli dei documenti',

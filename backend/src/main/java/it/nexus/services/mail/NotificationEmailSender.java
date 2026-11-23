@@ -11,6 +11,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.util.StringUtils;
 
 import it.nexus.config.ApplicationProperties;
+import it.nexus.services.MessageTextService;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,10 +25,13 @@ public class NotificationEmailSender {
 
     private final JavaMailSender mailSender;
     private final ApplicationProperties.Mail properties;
+    private final MessageTextService messageTextService;
     private final boolean enabled;
 
-    public NotificationEmailSender(JavaMailSender mailSender, ApplicationProperties applicationProperties) {
+    public NotificationEmailSender(JavaMailSender mailSender, ApplicationProperties applicationProperties,
+            MessageTextService messageTextService) {
         this.mailSender = mailSender;
+        this.messageTextService = messageTextService;
         this.properties = applicationProperties.getMail();
         boolean passwordMissing = mailSender instanceof JavaMailSenderImpl impl && !StringUtils.hasText(impl.getPassword());
         this.enabled = properties.isEnabled() && !passwordMissing;
@@ -47,8 +51,8 @@ public class NotificationEmailSender {
         if (!enabled || !StringUtils.hasText(event.recipientEmail()) || event.ticketId() == null) {
             return;
         }
-        NotificationEmail email = NotificationEmail.of(event.type(), event.ticketId(), event.ticketNumber(),
-                properties.getAppUrl());
+        NotificationEmail email = NotificationEmail.of(messageTextService.current(), event.type(), event.ticketId(),
+                event.ticketNumber(), properties.getAppUrl());
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(properties.getFrom());
         message.setTo(event.recipientEmail());

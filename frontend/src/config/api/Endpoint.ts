@@ -13,6 +13,7 @@ export const ENDPOINTS = {
   projects: '/reference/projects',
   calendar: '/calendar',
   notifications: '/notifications',
+  messageTexts: '/message-texts',
   companies: '/companies',
   jobSlots: '/job-slots',
   boardPosts: '/board-posts',

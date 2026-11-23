@@ -5,6 +5,7 @@ import {
   ArrowLeftRight,
   ListOrdered,
   ListTree,
+  Mail,
   Megaphone,
   UserCog,
   Users,
@@ -23,6 +24,7 @@ export type NavItem = {
     | 'nav.users'
     | 'nav.catalogs'
     | 'nav.documentTemplates'
+    | 'nav.messageTexts'
     | 'nav.calendar'
     | 'nav.coordination';
   icon: LucideIcon;
@@ -51,5 +53,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { to: '/utenti', labelKey: 'nav.users', icon: UserCog, roles: ['ADMIN'], admin: true },
   { to: '/cataloghi', labelKey: 'nav.catalogs', icon: ListTree, roles: ['ADMIN'], admin: true },
   { to: '/modelli', labelKey: 'nav.documentTemplates', icon: FileText, roles: ['ADMIN'], admin: true },
+  // US-1204: testi delle notifiche e delle email
+  { to: '/testi', labelKey: 'nav.messageTexts', icon: Mail, roles: ['ADMIN'], admin: true },
   { to: '/calendario', labelKey: 'nav.calendar', icon: CalendarDays, roles: ['ADMIN'], admin: true },
 ];

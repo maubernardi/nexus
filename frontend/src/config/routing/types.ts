@@ -19,6 +19,7 @@ export type RouteHandle = {
     | 'pages.candidature.title'
     | 'pages.catalogs.title'
     | 'pages.documentTemplates.title'
+    | 'pages.messageTexts.title'
     | 'pages.calendar.title'
     | 'pages.notifications.title'
     | 'pages.profile.title'

@@ -14,6 +14,7 @@ import { BeneficiaryPage } from '@/pages/BeneficiaryPage/BeneficiaryPage';
 import { ClosureReportPage } from '@/pages/ClosureReportPage/ClosureReportPage';
 import { DevLoginPage } from '@/pages/DevLoginPage/DevLoginPage';
 import { DocumentTemplatesPage } from '@/pages/DocumentTemplatesPage/DocumentTemplatesPage';
+import { MessageTextsPage } from '@/pages/MessageTextsPage/MessageTextsPage';
 import { InternshipPage } from '@/pages/InternshipPage/InternshipPage';
 import { BeneficiariesAdminPage } from '@/pages/BeneficiariesAdminPage/BeneficiariesAdminPage';
 import { CoordinationPage } from '@/pages/CoordinationPage/CoordinationPage';
@@ -204,6 +205,15 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.documentTemplates.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'testi',
+        element: (
+          <RoleRoute roles={['ADMIN']}>
+            <MessageTextsPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.messageTexts.title' } satisfies RouteHandle,
       },
       {
         path: 'utenti',

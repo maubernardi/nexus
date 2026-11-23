@@ -17,6 +17,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import it.nexus.config.ApplicationProperties;
+import it.nexus.services.MessageTextService;
+import it.nexus.services.messages.MessageTexts;
 
 /** Email del cambio di indirizzo (US-110): codice al nuovo indirizzo, avviso al vecchio. */
 class EmailChangeMailerTest {
@@ -25,13 +27,19 @@ class EmailChangeMailerTest {
     private static final Instant EXPIRES_AT = Instant.parse("2026-11-05T10:30:00Z");
 
     private final JavaMailSenderImpl mailSender = mock(JavaMailSenderImpl.class);
+    /** Testi dei messaggi (US-1204): i predefiniti. */
+    private static final MessageTextService TEXTS = mock(MessageTextService.class);
+
+    static {
+        when(TEXTS.current()).thenReturn(MessageTexts.defaults());
+    }
 
     private EmailChangeMailer mailer(boolean enabled, String password, boolean logOtp) {
         when(mailSender.getPassword()).thenReturn(password);
         ApplicationProperties properties = new ApplicationProperties();
         properties.getMail().setEnabled(enabled);
         properties.getMail().setLogOtp(logOtp);
-        return new EmailChangeMailer(mailSender, properties);
+        return new EmailChangeMailer(mailSender, properties, TEXTS);
     }
 
     private SimpleMailMessage sent() {
