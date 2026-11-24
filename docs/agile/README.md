@@ -14,7 +14,7 @@ strumento esterno). Il *cosa* e il *perché* stanno nel backlog; il *come* nelle
 | Ruolo | Chi | Responsabilità |
 |---|---|---|
 | **Product Owner** | Mauro Bernardi | ordina il backlog, sceglie l'obiettivo dello sprint, chiarisce i requisiti, **accetta** le storie, esegue merge e deploy |
-| **Team di sviluppo** | Claude Code | raffina e stima le storie, le implementa (OpenSpec → codice → test → PR), prepara la demo, propone miglioramenti |
+| **Team di sviluppo** | Claude Code | raffina e stima le storie, le implementa (OpenSpec → codice → test → PR), avvia il collaudo sul PC del PO, propone miglioramenti |
 
 ## Cadenza (sprint corti di 3 giorni)
 
@@ -28,7 +28,7 @@ unito resta nelle PR.
 |---|---|---|
 | **Sprint Planning** | inizio sprint | obiettivo e storie impegnate in `sprints/sprint-NN.md` (il PO sceglie dalla cima del backlog *Ready*) |
 | **Lavoro dello sprint** | durante | una change OpenSpec e una PR per storia (o piccolo gruppo coeso); aggiornamenti di stato nel backlog |
-| **Sprint Review** | fine sprint | demo **online** su https://portalenexus.it; il PO accetta o rifiuta ogni storia |
+| **Sprint Review** | fine sprint | storie collaudate sul PC e online in produzione su https://portalenexus.it; il PO accetta o rifiuta ogni storia |
 | **Retrospettiva** | fine sprint | cosa ha funzionato, cosa migliorare, azioni (nel file dello sprint) |
 | **Raffinamento del backlog** | continuo | storie chiarite, stimate, spezzate; domande aperte risolte con il PO |
 
@@ -43,10 +43,11 @@ qualunque ordine.
 
 ```
 📋 Backlog → ✅ Ready → 🔨 In corso → 👀 In review → 🎉 Done
-                              │             │            │
-                   change OpenSpec      PR aperta    PR unita dal PO,
-                   (proposal, spec,     CI verde     deploy demo verificato,
-                    design, task)                    change archiviata
+                              │             │               │
+                   change OpenSpec      PR aperta,      PR unita dal PO,
+                   (proposal, spec,     CI verde,       deploy in produzione
+                    design, task)       collaudo sul    verificato,
+                                        PC riuscito     change archiviata
 ```
 
 - **ID**: `US-<epica><progressivo>` (es. `US-301`); abilitatori tecnici `EN-<n>`.
@@ -69,11 +70,13 @@ Una storia è *Done* quando:
 2. il codice ha test: unitari e d'integrazione nel backend, componenti nel frontend con **axe**; i criteri di accettazione sono coperti;
 3. le nuove schermate passano un audit **WCAG 2.2 AA** in browser reale (axe con contrasto, tema chiaro e scuro, mobile);
 4. la CI è verde e la PR è **unita dal PO** (regole Git inviolabili: nessun merge né push su `main` da parte del team);
-5. la demo è **deployata e verificata online**;
+5. il PO ha fatto il **collaudo sul suo PC, prima del merge**, con lo stack della produzione della PR e i dati finti
+   (EN-11, decisione del PO del 24/11); dopo il merge la produzione è **deployata e verificata online**, senza dati
+   finti;
 6. ogni cambio di stato e ogni scelta introdotti dalla storia sono registrati nell'audit (EN-2, decisione del PO del 01/10);
 7. backlog, README e `CLAUDE.md` sono aggiornati se serve;
 8. le prove manuali della storia sono in [docs/test/collaudo.md](../test/collaudo.md), passo per passo con la casella da
-   spuntare (aggiornato nella PR di documentazione dopo il merge, insieme alla versione della demo).
+   spuntare, nella PR stessa; le spunte del collaudo sul PC si aggiungono alla PR prima del merge.
 
 ## Metriche
 

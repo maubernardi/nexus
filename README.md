@@ -84,6 +84,34 @@ La password è la stessa per tutti in Keycloak: `password`. Per accedere un uten
 | `operatore.cc` | CALL_CENTER |
 | `admin` | ADMIN |
 
+## Collaudo sul PC
+
+Dal passaggio in produzione (24/11) sul server ci sono solo dati veri. Le storie nuove si collaudano sul PC del PO,
+**prima del merge**, con lo stack della produzione della PR e i dati finti del seed (EN-11):
+
+```bash
+infra/collaudo/collaudo.sh avvia 205      # numero della PR, oppure un branch o un commit
+infra/collaudo/collaudo.sh ferma          # i dati restano; «riprendi» lo riavvia, per esempio dopo aver spento il PC
+infra/collaudo/collaudo.sh stato
+infra/collaudo/collaudo.sh cancella       # toglie container, dati, immagini e sorgenti
+```
+
+| Cosa | Dove |
+|---|---|
+| NEXUS | http://localhost:8090 |
+| Email inviate (casella finta, nessuna esce dal PC) | http://localhost:8025 |
+| Console di Keycloak (utente `admin`) | http://localhost:8092/admin |
+| Utenti | `tutor1`, `tutor2`, `operatore.cc`, `admin`; password `collaudo-nexus-2026` |
+
+- **Come la produzione**: compose, realm e immagini sono quelli della PR, costruiti in locale dai suoi sorgenti.
+  Cambiano solo gli indirizzi (localhost, in HTTP) e la posta. Il Caddyfile del collaudo è `infra/collaudo/Caddyfile`:
+  chi cambia le regole di `frontend/Caddyfile` le cambia anche lì.
+- **Ogni avvio riparte dai dati finti**; il collaudo precedente si cancella.
+- **Fuori dal checkout**: i sorgenti si estraggono in `~/.cache/nexus-collaudo`, il lavoro in corso non cambia.
+- **Porte solo su 127.0.0.1**: 8090, 8091 (Keycloak), 8092 e 8025. La 8081 resta al tunnel verso la produzione.
+- **Serve** quello dello sviluppo: Docker, JDK, Node e pnpm. La prima build impiega qualche minuto.
+- La CI prova l'ambiente a ogni PR (job «Ambiente di collaudo»).
+
 ## Modello dati
 
 Schema PostgreSQL `nexus`, gestito solo da migrazioni Flyway (`backend/src/main/resources/db/migration`).

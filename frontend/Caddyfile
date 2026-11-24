@@ -1,6 +1,8 @@
 # NEXUS — reverse proxy di produzione (immagine nexus-web). HTTPS automatico con Let's Encrypt.
 # Variabili: NEXUS_DOMAIN (es. portalenexus.it), NEXUS_AUTH_DOMAIN (es. auth.portalenexus.it),
 # CADDY_GLOBAL_OPTIONS (vuota in produzione; "local_certs" per le prove in locale con CA interna).
+# Il collaudo sul PC (EN-11) usa infra/collaudo/Caddyfile, con le stesse regole in HTTP: se cambi le regole qui,
+# cambiale anche lì.
 {
 	{$CADDY_GLOBAL_OPTIONS}
 	admin off

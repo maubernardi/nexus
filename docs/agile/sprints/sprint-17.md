@@ -1,14 +1,14 @@
 # Sprint 17 — 24 – 26 novembre 2026
 
-**Stato:** 🏃 in corso: planning confermato dal PO il 23/11, 13 punti; 16 con US-1310 e 19 con US-513, aggiunte il
-24/11.
+**Stato:** 🏃 in corso: planning confermato dal PO il 23/11, 13 punti; 16 con US-1310, 19 con US-513 e 24 con EN-11,
+aggiunte il 24/11.
 **Planning:** 23/11, dalla [review dello Sprint 16](sprint-16-review.md) (§8, §9).
 
 ## Obiettivo
 
 > NEXUS è in produzione sul server di oggi, con i dati veri, il backup notturno e PostgreSQL 19.
 
-## Impegno (19 punti)
+## Impegno (24 punti)
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
@@ -16,6 +16,7 @@
 | EN-10 | Aggiornamento a PostgreSQL 19 | 5 | 🎉 Done | `upgrade-postgresql-19` (archiviata) | [#189](https://github.com/maubernardi/nexus/pull/189), [#190](https://github.com/maubernardi/nexus/pull/190) |
 | US-1310 | Sessione attiva finché NEXUS è aperto | 3 | 🎉 Done | `keep-session-alive` (archiviata) | [#197](https://github.com/maubernardi/nexus/pull/197), [#200](https://github.com/maubernardi/nexus/pull/200) |
 | US-513 | Elenco delle aziende a pagine | 3 | 🎉 Done | `paginate-company-list` (archiviata) | [#198](https://github.com/maubernardi/nexus/pull/198), [#199](https://github.com/maubernardi/nexus/pull/199) |
+| EN-11 | Ambiente di collaudo sul PC del PO | 5 | 🎉 Done | `add-local-acceptance-env` (archiviata) | [#201](https://github.com/maubernardi/nexus/pull/201) |
 
 **Ordine** (PO, 23/11):
 1. **EN-10 sulla demo**, anticipata al 23/11 sera (PO):
@@ -55,6 +56,13 @@ Dalla review dello Sprint 16, tutte del PO:
 - **US-513 nello sprint** (24/11): nel collaudo dopo il passaggio (T-27.2) il PO trova lento l'elenco delle 13.799
   aziende, che arrivano tutte insieme. Chiede le pagine, con 10, 25, 50 o 100 aziende scelte da un menu. Lo sprint passa
   a 19 punti.
+- **EN-11 nello sprint** (24/11): dopo il passaggio sul server ci sono solo dati veri, e le storie nuove non hanno più
+  dove essere collaudate. Il PO decide:
+  - il collaudo si fa **sul suo PC**: tra quattro strade (PC, prova sullo stesso server, secondo server, produzione);
+  - si fa **prima del merge**, dal branch della PR.
+
+  Lo sprint passa a 24 punti. Cambiano la Definition of Done e il collaudo: dopo il deploy resta un controllo veloce in
+  produzione, senza dati finti.
 
 ## Come li faccio
 
@@ -167,3 +175,5 @@ Le ho proposte io, da confermare:
 | US-513 aggiunta dal PO dopo il passaggio (24/11) | 14 |
 | US-513 Done: deploy `db4a4c5` e collaudo T-32 riuscito (24/11, pomeriggio) | 11 |
 | US-1310 Done: collaudo T-31 riuscito in produzione (24/11) | 8 |
+| EN-11 aggiunta dal PO (24/11) | 13 |
+| EN-11 Done: collaudo T-33 riuscito sul PC del PO (24/11, sera) | 8 |

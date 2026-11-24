@@ -1,6 +1,6 @@
 # NEXUS — Prove di collaudo
 
-Elenco delle prove manuali da eseguire sulla demo, passo per passo. Ogni prova ha una casella: segnala `[x]` quando
+Elenco delle prove manuali, passo per passo. Ogni prova ha una casella: segnala `[x]` quando
 l'esito è quello atteso. Se qualcosa non va, lascia la casella vuota e scrivi una nota sotto la prova
 (`> Nota: …`): la raccolgo nella review dello sprint.
 
@@ -8,17 +8,28 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 
 | | |
 |---|---|
-| **Ambiente** | https://portalenexus.it: la demo fino al passaggio in produzione, poi la produzione (US-1306) |
+| **Ambiente** | dal 24/11: le storie nuove sul **PC del PO**, prima del merge (`infra/collaudo/collaudo.sh`, EN-11); dopo il deploy, un controllo veloce in produzione su https://portalenexus.it, senza dati finti. Fino al 24/11: la demo su https://portalenexus.it |
 | **Versione della demo** | `47fe414` (23/11/2026), su **PostgreSQL 19** (EN-10): Sprint 1–16 completi, tranne il passaggio in produzione: backup notturno su IONOS, avvisi di fine tirocinio, testi dei messaggi; l'importazione dal database attuale si prova in locale |
 | **Ultimo aggiornamento** | 23/11/2026 (collaudo prima del passaggio finito dal PO il 23/11: T-24, T-25, T-28, T-29 e T-30.1 … T-30.3 riusciti; restano T-30.4, il backup della notte sulla 19, e dopo il passaggio T-26.3 e T-27; T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, fatto il 23/11 sulla demo `47fe414`; T-30.3 corretta: le aziende si provano come `operatore.cc`; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 > **Dopo il passaggio in produzione** (24/11) il sito ha i dati veri e gli utenti demo (`tutor1`, `operatore.cc`, …)
-> non ci sono più: le prove fino alla sezione 30 restano come storico. La sezione 31 (sessione) si fa con il proprio
-> account. Dove collaudare le storie nuove, senza toccare i dati veri, è da decidere nella review dello Sprint 17.
+> non ci sono più: le prove fino alla sezione 32 restano come storico. Le storie nuove si collaudano sul PC del PO, dal
+> branch della PR, prima del merge (decisione del PO del 24/11, EN-11): le prove dicono «sul collaudo», cioè su
+> http://localhost:8090. Gli indirizzi https://portalenexus.it nelle prove vecchie valgono, nel collaudo, come
+> http://localhost:8090.
 
 ## Come prepararsi
 
-- **Utenti demo** (password come da configurazione del server):
+- **Collaudo sul PC** (dal 24/11): lo avvio io con `infra/collaudo/collaudo.sh avvia <PR>` e ti scrivo che è pronto;
+  puoi avviarlo anche tu con lo stesso comando (README, «Collaudo sul PC»). Riparte sempre dai dati finti.
+
+  | Cosa | Dove |
+  |---|---|
+  | NEXUS | http://localhost:8090 |
+  | Email inviate, in una casella finta: nessuna esce dal PC | http://localhost:8025 |
+  | Password di tutti gli utenti qui sotto | `collaudo-nexus-2026` |
+
+- **Utenti finti** (sulla demo, fino al 24/11, la password era quella della configurazione del server):
 
   | Utente | Ruolo | Progetti |
   |---|---|---|
@@ -1404,3 +1415,25 @@ Si fanno dopo il deploy di US-513, come ADMIN, in produzione: si consulta soltan
   2. Cerca una ragione sociale che conosci. **Atteso:** la trovi; con pochi risultati i pulsanti delle pagine non ci
      sono.
   > Nota (24/11): T-32.1 … T-32.4 riuscite dal PO in produzione, dopo il deploy di `db4a4c5`.
+
+## 33. Collaudo sul PC (Sprint 17)
+
+Si fanno sul tuo PC, con il collaudo avviato da me (`infra/collaudo/collaudo.sh avvia <PR>`): dati e utenti finti, la
+password è `collaudo-nexus-2026`. Nessun dato vero, nessuna email esce dal PC.
+
+- [x] **T-33.1 Accesso al collaudo (EN-11)**
+  1. Apri http://localhost:8090. **Atteso:** la pagina «Accedi a NEXUS», con il tema, su http://localhost:8091.
+  2. Accedi come `operatore.cc`. **Atteso:** sei dentro; in «Segnalazioni» e in «Aziende» ci sono i dati finti del
+     seed (per esempio «Demo Bar del Centro»), nessun dato vero.
+  3. Esci ed entra come `tutor1`. **Atteso:** il menu del Tutor, con «Beneficiari».
+
+- [x] **T-33.2 Email nella casella finta (EN-11)**
+  1. Esci; nella pagina di accesso premi «Password dimenticata?» e scrivi `tutor2`.
+  2. Apri http://localhost:8025. **Atteso:** c'è l'email «PORTALE NEXUS - Reimposta la password» per
+     `tutor2@nexus.local`; nessuna email è arrivata davvero.
+
+- [x] **T-33.3 Tunnel e produzione intatti (EN-11)**
+  1. Con il collaudo avviato apri il tunnel verso la produzione (`ssh -L 8081:127.0.0.1:8081 <server>`). **Atteso:** si
+     apre senza errori di porta occupata; la console della produzione funziona come prima.
+  2. Apri https://portalenexus.it. **Atteso:** la produzione, con i dati veri, non è cambiata.
+  > Nota (24/11): T-33.1 … T-33.3 riuscite dal PO sul suo PC, con il collaudo della PR #201 (`ff59f76`).
