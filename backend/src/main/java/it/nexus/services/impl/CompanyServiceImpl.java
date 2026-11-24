@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.CompanyContactFormDTO;
 import it.nexus.domain.dto.CompanyDTO;
 import it.nexus.domain.dto.CompanyFormDTO;
+import it.nexus.domain.dto.CompanyPageDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
 import it.nexus.mapper.CompanyMapper;
 import it.nexus.mapper.MunicipalityMapper;
@@ -74,18 +76,25 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CompanyDTO> search(String search, boolean includeInactive, boolean toComplete,
-            String businessCategoryId) {
+    public CompanyPageDTO search(String search, boolean includeInactive, boolean toComplete,
+            String businessCategoryId, int page, int size) {
+        if (page < 0) {
+            throw new BadRequestException("Pagina non valida: %d", page);
+        }
+        if (!PAGE_SIZES.contains(size)) {
+            throw new BadRequestException("Aziende per pagina: una tra %s", PAGE_SIZES);
+        }
         String term = search == null || search.isBlank() ? null : search.strip();
         Long category = null;
         if (businessCategoryId != null && !businessCategoryId.isBlank()) {
             category = TsidMapper.toInternal(businessCategoryId.strip());
             if (category == null) {
                 // categoria non valida: nessuna azienda, come una ricerca senza risultati
-                return List.of();
+                return new CompanyPageDTO(List.of(), 0, page, size);
             }
         }
-        return repository.search(term, includeInactive, toComplete, category).stream().map(mapper::toDto).toList();
+        var result = repository.search(term, includeInactive, toComplete, category, PageRequest.of(page, size));
+        return new CompanyPageDTO(result.map(mapper::toDto).getContent(), result.getTotalElements(), page, size);
     }
 
     @Override

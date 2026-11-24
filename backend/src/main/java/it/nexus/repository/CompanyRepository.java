@@ -1,8 +1,9 @@
 package it.nexus.repository;
 
-import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,19 +19,21 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     Optional<Company> findByVatCode(String vatCode);
 
     /**
-     * Ricerca per ragione sociale (senza distinzione di maiuscole) o partita IVA, ordinata per nome; con il comune della
-     * sede legale (US-1007), la categoria merceologica e la sede operativa (US-510) già caricati; i referenti arrivano a
-     * lotti ({@code @BatchSize} su {@link Company#getContacts()}). Con {@code toComplete} solo le aziende con un dato
-     * da completare (US-508); con {@code businessCategoryId} solo quelle della categoria (US-509).
+     * Ricerca per ragione sociale (senza distinzione di maiuscole) o partita IVA, ordinata per nome, una pagina alla
+     * volta (US-513); con il comune della sede legale (US-1007), la categoria merceologica e la sede operativa (US-510)
+     * già caricati; i referenti arrivano a lotti ({@code @BatchSize} su {@link Company#getContacts()}). Con
+     * {@code toComplete} solo le aziende con un dato da completare (US-508); con {@code businessCategoryId} solo quelle
+     * della categoria (US-509). La pagina non deve avere un ordinamento suo: vale quello della query.
      */
-    default List<Company> search(String search, boolean includeInactive, boolean toComplete, Long businessCategoryId) {
+    default Page<Company> search(String search, boolean includeInactive, boolean toComplete, Long businessCategoryId,
+            Pageable page) {
         return search(search, includeInactive, toComplete, CompanyPlaceholders.VAT_CODE,
-                CompanyPlaceholders.NAME_PREFIX + "%", businessCategoryId);
+                CompanyPlaceholders.NAME_PREFIX + "%", businessCategoryId, page);
     }
 
     @EntityGraph(attributePaths = {"legalMunicipality", "legalMunicipality.province", "businessCategory",
             "operatingMunicipality", "operatingMunicipality.province"})
-    @Query("""
+    @Query(value = """
             select c from Company c
             where (:includeInactive = true or c.active = true)
               and (:search is null
@@ -39,9 +42,17 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
               and (:toComplete = false or c.vatCode = :missingVatCode or c.name like :missingNamePattern)
               and (:businessCategoryId is null or c.businessCategory.id = :businessCategoryId)
             order by lower(c.name), c.id
+            """, countQuery = """
+            select count(c) from Company c
+            where (:includeInactive = true or c.active = true)
+              and (:search is null
+                   or lower(c.name) like lower(concat('%', cast(:search as string), '%'))
+                   or c.vatCode like concat(cast(:search as string), '%'))
+              and (:toComplete = false or c.vatCode = :missingVatCode or c.name like :missingNamePattern)
+              and (:businessCategoryId is null or c.businessCategory.id = :businessCategoryId)
             """)
-    List<Company> search(@Param("search") String search, @Param("includeInactive") boolean includeInactive,
+    Page<Company> search(@Param("search") String search, @Param("includeInactive") boolean includeInactive,
             @Param("toComplete") boolean toComplete, @Param("missingVatCode") String missingVatCode,
             @Param("missingNamePattern") String missingNamePattern,
-            @Param("businessCategoryId") Long businessCategoryId);
+            @Param("businessCategoryId") Long businessCategoryId, Pageable page);
 }

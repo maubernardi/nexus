@@ -844,6 +844,14 @@ export const it = {
     empty: 'Nessuna nota.',
     listLabel: 'Note dalla più recente',
   },
+  /** Pagine di un elenco (US-513). */
+  pagination: {
+    first: 'Prima',
+    previous: 'Precedente',
+    current: 'Pagina {{page}} di {{pages}}',
+    next: 'Successiva',
+    last: 'Ultima',
+  },
   company: {
     fields: {
       name: 'Ragione sociale',
@@ -920,7 +928,11 @@ export const it = {
     caption: 'Aziende ospitanti, in ordine di ragione sociale',
     count_zero: 'Nessuna azienda trovata',
     count_one: '1 azienda',
-    count_other: '{{count}} aziende',
+    count_other: '{{total}} aziende',
+    /** Più di una pagina (US-513): quante sono in tutto e quali si vedono. */
+    countRange: '{{total}} aziende: dalla {{from}} alla {{to}}',
+    pageSize: 'Aziende per pagina',
+    pages: 'Pagine dell’elenco delle aziende',
     empty: 'Nessuna azienda corrisponde alla ricerca.',
     loadError: 'Impossibile caricare le aziende. Controlla la connessione e riprova.',
     notFound: 'Azienda non trovata',
