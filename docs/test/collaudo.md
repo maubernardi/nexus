@@ -1336,6 +1336,8 @@ Si fanno con l'aggiornamento della demo (README, «Aggiornare PostgreSQL»). Nel
      un'azienda e aggiungi una nota al diario. **Atteso:** la nota si salva e compare.
   3. Esci e rientra come `admin`, poi apri «Utenti». **Atteso:** gli utenti di prima.
 
-- [ ] **T-30.4 Backup della notte sulla 19 (EN-10)**
+- [x] **T-30.4 Backup della notte sulla 19 (EN-10)**
   1. Il giorno dopo l'aggiornamento, verso le 9:30, apri Actions → «Backup del database». **Atteso:** il run delle
      9:07 è verde, con il backup delle 3:30 (può partire in ritardo, come il 22/11).
+  > Nota (24/11): backup delle 3:30 riuscito sulla 19 (1 MB, blocco fino al 24/12). Il controllo pianificato non era
+  > ancora partito alle 9:40: lo stesso controllo, lanciato a mano alle 9:08 («stato»), è verde.
