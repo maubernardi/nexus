@@ -188,7 +188,7 @@ const DetailsForm = ({ user }: DetailsFormProps) => {
               id={fieldId('username')}
               label={t('users.fields.username')}
               hint={user.usernameEditable ? t('users.hints.username') : undefined}
-              required
+              required={user.usernameEditable}
               error={errors.username?.message}
             >
               {(p) =>

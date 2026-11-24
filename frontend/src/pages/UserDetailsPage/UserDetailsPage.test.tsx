@@ -97,6 +97,8 @@ describe('<UserDetailsPage>', () => {
 
     const username = await screen.findByLabelText(/^Username/);
     expect(username).toHaveAttribute('readonly');
+    // non si compila: niente «obbligatorio»
+    expect(username).not.toBeRequired();
     expect(username).toHaveValue('mario.rosi');
     expect(username).toHaveAccessibleDescription(/lo username non si cambia più/);
     expect(screen.getByLabelText(/^Telefono/)).toHaveValue('055 1234');

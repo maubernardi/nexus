@@ -30,9 +30,13 @@
 
 ## 4. Prove e documenti
 
-- [ ] 4.1 `collaudo-e2e.py`: l'ADMIN corregge username ed email di un utente nuovo; nuovo invito in Mailpit e vecchio
-      collegamento non più valido
-- [ ] 4.2 Prova in Chrome sul collaudo del PC (A26), con dati finti: correzione, sola lettura, axe nei temi chiaro e
-      scuro e su mobile
-- [ ] 4.3 Collaudo T-34; README (script una tantum); backlog US-116 e sprint 17
+- [x] 4.1 `collaudo-e2e.py`: l'ADMIN corregge username ed email di un utente nuovo; nuovo invito in Mailpit e vecchio
+      collegamento non più valido («Indirizzo email non valido»); riuscita due volte sul collaudo del PC il 24/11
+- [x] 4.2 Prova in Chrome sul collaudo del PC (A26), con dati finti: correzione, sola lettura, axe nei temi chiaro e
+      scuro e su mobile. Fatto il 24/11: sola lettura con il motivo collegato, errore sul campo con il riepilogo
+      a fuoco, contrasti nei due temi (8,8–15,9:1), pagina dell'account di Keycloak in sola lettura; axe nei test della
+      pagina. Corretti: pulsanti di «Utenti» che vanno a capo (l'email era schiacciata a 58 px) e username in sola
+      lettura non più «obbligatorio». La vista da smartphone non si è potuta provare (finestra di Chrome che non si
+      restringe): la prova il PO in T-34.2
+- [x] 4.3 Collaudo T-34; README (script una tantum); backlog US-116 e sprint 17
 - [ ] 4.4 Collaudo T-34 dal PO sul suo PC, poi spunte nella PR prima del merge

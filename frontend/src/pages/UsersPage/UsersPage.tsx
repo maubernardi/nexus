@@ -158,7 +158,7 @@ export const UsersPage = () => {
                       {name}
                     </th>
                     <td className={td}>{u.username}</td>
-                    <td className={`${td} break-all`}>{u.email}</td>
+                    <td className={`${td} min-w-48 break-all`}>{u.email}</td>
                     <td className={td}>{t(`roles.${u.role}`)}</td>
                     <td className={td}>
                       {u.role !== 'TUTOR'
@@ -174,57 +174,60 @@ export const UsersPage = () => {
                           : t('users.projects.none')}
                     </td>
                     <td className={td}>{t(u.active ? 'users.active' : 'users.inactive')}</td>
-                    <td className={`${td} space-x-2 whitespace-nowrap`}>
-                      <Button asChild variant="outline" size="sm">
-                        <Link to={`/utenti/${u.id}/dati`} aria-label={t('users.details.editFor', { name })}>
-                          {t('users.details.edit')}
-                        </Link>
-                      </Button>
-                      <Button asChild variant="outline" size="sm">
-                        <Link
-                          to={`/utenti/${u.id}/accesso`}
-                          aria-label={t('users.account.editFor', { name })}
-                        >
-                          {t('users.account.edit')}
-                        </Link>
-                      </Button>
-                      <Button asChild variant="outline" size="sm">
-                        <Link to={`/utenti/${u.id}/accessi`} aria-label={t('accessLog.editFor', { name })}>
-                          {t('accessLog.edit')}
-                        </Link>
-                      </Button>
-                      {u.role === 'TUTOR' && (
-                        <>
-                          <Button asChild variant="outline" size="sm">
-                            <Link
-                              to={`/utenti/${u.id}/progetti`}
-                              aria-label={t('users.projects.editFor', { name })}
-                            >
-                              {t('users.projects.edit')}
-                            </Link>
-                          </Button>
-                          <Button asChild variant="outline" size="sm">
-                            <Link
-                              to={`/utenti/${u.id}/segnalazioni`}
-                              aria-label={t('users.tickets.editFor', { name })}
-                            >
-                              {t('users.tickets.edit')}
-                            </Link>
-                          </Button>
-                        </>
-                      )}
-                      {u.active && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          disabled={resend.isPending}
-                          aria-label={t('users.resendFor', { name })}
-                          onClick={() => void onResend(u)}
-                        >
-                          {t('users.resend')}
+                    <td className={td}>
+                      {/* dallo schermo largo i pulsanti vanno a capo: con sei azioni l'email restava schiacciata */}
+                      <div className="flex gap-2 lg:w-80 lg:flex-wrap">
+                        <Button asChild variant="outline" size="sm">
+                          <Link to={`/utenti/${u.id}/dati`} aria-label={t('users.details.editFor', { name })}>
+                            {t('users.details.edit')}
+                          </Link>
                         </Button>
-                      )}
+                        <Button asChild variant="outline" size="sm">
+                          <Link
+                            to={`/utenti/${u.id}/accesso`}
+                            aria-label={t('users.account.editFor', { name })}
+                          >
+                            {t('users.account.edit')}
+                          </Link>
+                        </Button>
+                        <Button asChild variant="outline" size="sm">
+                          <Link to={`/utenti/${u.id}/accessi`} aria-label={t('accessLog.editFor', { name })}>
+                            {t('accessLog.edit')}
+                          </Link>
+                        </Button>
+                        {u.role === 'TUTOR' && (
+                          <>
+                            <Button asChild variant="outline" size="sm">
+                              <Link
+                                to={`/utenti/${u.id}/progetti`}
+                                aria-label={t('users.projects.editFor', { name })}
+                              >
+                                {t('users.projects.edit')}
+                              </Link>
+                            </Button>
+                            <Button asChild variant="outline" size="sm">
+                              <Link
+                                to={`/utenti/${u.id}/segnalazioni`}
+                                aria-label={t('users.tickets.editFor', { name })}
+                              >
+                                {t('users.tickets.edit')}
+                              </Link>
+                            </Button>
+                          </>
+                        )}
+                        {u.active && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            disabled={resend.isPending}
+                            aria-label={t('users.resendFor', { name })}
+                            onClick={() => void onResend(u)}
+                          >
+                            {t('users.resend')}
+                          </Button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );

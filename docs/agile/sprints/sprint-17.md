@@ -1,14 +1,14 @@
 # Sprint 17 — 24 – 26 novembre 2026
 
-**Stato:** 🏃 in corso: planning confermato dal PO il 23/11, 13 punti; 16 con US-1310, 19 con US-513 e 24 con EN-11,
-aggiunte il 24/11.
+**Stato:** 🏃 in corso: planning confermato dal PO il 23/11, 13 punti; 16 con US-1310, 19 con US-513, 24 con EN-11 e
+29 con US-116, aggiunte il 24/11.
 **Planning:** 23/11, dalla [review dello Sprint 16](sprint-16-review.md) (§8, §9).
 
 ## Obiettivo
 
 > NEXUS è in produzione sul server di oggi, con i dati veri, il backup notturno e PostgreSQL 19.
 
-## Impegno (24 punti)
+## Impegno (29 punti)
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
@@ -17,6 +17,7 @@ aggiunte il 24/11.
 | US-1310 | Sessione attiva finché NEXUS è aperto | 3 | 🎉 Done | `keep-session-alive` (archiviata) | [#197](https://github.com/maubernardi/nexus/pull/197), [#200](https://github.com/maubernardi/nexus/pull/200) |
 | US-513 | Elenco delle aziende a pagine | 3 | 🎉 Done | `paginate-company-list` (archiviata) | [#198](https://github.com/maubernardi/nexus/pull/198), [#199](https://github.com/maubernardi/nexus/pull/199) |
 | EN-11 | Ambiente di collaudo sul PC del PO | 5 | 🎉 Done | `add-local-acceptance-env` (archiviata) | [#201](https://github.com/maubernardi/nexus/pull/201) |
+| US-116 | Correzione dei dati di un utente | 5 | 🔨 In corso | `edit-user-details` | — |
 
 **Ordine** (PO, 23/11):
 1. **EN-10 sulla demo**, anticipata al 23/11 sera (PO):
@@ -63,6 +64,14 @@ Dalla review dello Sprint 16, tutte del PO:
 
   Lo sprint passa a 24 punti. Cambiano la Definition of Done e il collaudo: dopo il deploy resta un controllo veloce in
   produzione, senza dati finti.
+- **US-116 nello sprint** (24/11): il PO ha creato in produzione un utente con lo username sbagliato, e NEXUS non
+  permette di correggerlo. Decide:
+  - l'ADMIN corregge username, nome, cognome, email e telefono, in NEXUS e in Keycloak;
+  - lo username solo finché l'utente non è mai entrato, perché lo storico registra l'autore con lo username;
+  - l'utente sbagliato non è ancora entrato: si corregge con la storia, dopo il deploy.
+
+  Nelle prove sul collaudo esce anche un buco: dalla pagina «il mio account» di Keycloak un utente creato da NEXUS può
+  cambiare nome ed email senza passare da NEXUS. La storia lo chiude. Lo sprint passa a 29 punti.
 
 ## Come li faccio
 
@@ -177,3 +186,4 @@ Le ho proposte io, da confermare:
 | US-1310 Done: collaudo T-31 riuscito in produzione (24/11) | 8 |
 | EN-11 aggiunta dal PO (24/11) | 13 |
 | EN-11 Done: collaudo T-33 riuscito sul PC del PO (24/11, sera) | 8 |
+| US-116 aggiunta dal PO (24/11, sera) | 13 |
