@@ -72,7 +72,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-113](#us-113) | E1 | Registro degli accessi | Must | 7 | R4 | 🎉 Done (Sprint 10) |
 | [US-114](#us-114) | E1 | Comuni e province | Must | 8 | R4 | 🎉 Done (Sprint 12) |
 | [US-115](#us-115) | E1 | Sedi di competenza, tipi di tirocinio per progetto, enti di presa in carico | Must | 5 | R4 | 🎉 Done (Sprint 12) |
-| [US-116](#us-116) | E1 | Correzione dei dati di un utente | Must | 5 | R4 | 🔨 In corso (Sprint 17) |
+| [US-116](#us-116) | E1 | Correzione dei dati di un utente | Must | 5 | R4 | 🎉 Done (Sprint 17) |
 | [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
@@ -392,7 +392,7 @@ Criteri di accettazione:
   più quello già scelto. I dati reali degli enti li inserisce l'ADMIN dai Cataloghi.
 
 #### US-116
-**Correzione dei dati di un utente** · Must · 5 punti · R4 · 🔨 In corso (Sprint 17)
+**Correzione dei dati di un utente** · Must · 5 punti · R4 · 🎉 Done (Sprint 17)
 
 Come **ADMIN** voglio correggere i dati di un utente già creato per rimediare a un errore senza passare dalla console di
 Keycloak. Decisa dal PO il 24/11, dopo aver creato in produzione un utente con lo username sbagliato.
@@ -409,6 +409,8 @@ Criteri di accettazione:
 - Nome, cognome, username ed email si cambiano solo da NEXUS: la pagina «il mio account» di Keycloak li mostra in sola
   lettura (prima un utente poteva cambiare nome ed email da lì, senza passare da NEXUS). In produzione lo imposta uno
   script una tantum del PO.
+- Fatto il 24/11: PR #204, deploy `8139e84`; il PO ha lanciato `keycloak-user-profile.sh` sul server e corretto in
+  produzione l'utente con lo username sbagliato. «Mai entrato» vuol dire nessuna password in Keycloak.
 
 Dipendenze: US-103, US-110
 
