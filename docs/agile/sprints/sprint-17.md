@@ -15,7 +15,7 @@
 | US-1306 | Passaggio in produzione | 8 | 🔨 In corso | `prepare-production` | [#177](https://github.com/maubernardi/nexus/pull/177) (preparazione) |
 | EN-10 | Aggiornamento a PostgreSQL 19 | 5 | 🎉 Done | `upgrade-postgresql-19` (archiviata) | [#189](https://github.com/maubernardi/nexus/pull/189), [#190](https://github.com/maubernardi/nexus/pull/190) |
 | US-1310 | Sessione attiva finché NEXUS è aperto | 3 | 🔨 In corso | `keep-session-alive` | [#197](https://github.com/maubernardi/nexus/pull/197) |
-| US-513 | Elenco delle aziende a pagine | 3 | 🔨 In corso | `paginate-company-list` | in arrivo |
+| US-513 | Elenco delle aziende a pagine | 3 | 🔨 In corso | `paginate-company-list` | [#198](https://github.com/maubernardi/nexus/pull/198) |
 
 **Ordine** (PO, 23/11):
 1. **EN-10 sulla demo**, anticipata al 23/11 sera (PO):
