@@ -1,18 +1,19 @@
 # Sprint 17 — 24 – 26 novembre 2026
 
-**Stato:** 🏃 in corso: planning confermato dal PO il 23/11, 13 punti.
+**Stato:** 🏃 in corso: planning confermato dal PO il 23/11, 13 punti; 16 con US-1310, aggiunta il 24/11.
 **Planning:** 23/11, dalla [review dello Sprint 16](sprint-16-review.md) (§8, §9).
 
 ## Obiettivo
 
 > NEXUS è in produzione sul server di oggi, con i dati veri, il backup notturno e PostgreSQL 19.
 
-## Impegno (13 punti)
+## Impegno (16 punti)
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
 | US-1306 | Passaggio in produzione | 8 | 🔨 In corso | `prepare-production` | [#177](https://github.com/maubernardi/nexus/pull/177) (preparazione) |
 | EN-10 | Aggiornamento a PostgreSQL 19 | 5 | 🔨 In corso | `upgrade-postgresql-19` | [#189](https://github.com/maubernardi/nexus/pull/189) |
+| US-1310 | Sessione attiva finché NEXUS è aperto | 3 | 🔨 In corso | `keep-session-alive` | |
 
 **Ordine** (PO, 23/11):
 1. **EN-10 sulla demo**, anticipata al 23/11 sera (PO):
@@ -46,6 +47,9 @@ Dalla review dello Sprint 16, tutte del PO:
   §8.4).
 - **Analisi di US-507** nello Sprint 17, dopo il passaggio (§8.5).
 - **Ordine**: EN-10 prima del passaggio, sulla demo; poi collaudo e passaggio, già su PostgreSQL 19 (planning, 23/11).
+- **US-1310 nello sprint** (24/11): il PO segnala che dopo un po' di inattività NEXUS chiede di nuovo la password, un
+  problema per il Call Center. Tra tre strade sceglie la sessione attiva finché la pagina è aperta, con l'avviso prima
+  delle 10 ore. Lo sprint passa a 16 punti.
 
 ## Come li faccio
 
@@ -94,6 +98,7 @@ Dalla review dello Sprint 16, tutte del PO:
 
 **Dopo il passaggio:**
 - gli account degli utenti;
+- con US-1310: il blocco automatico dello schermo dei PC del Call Center, dopo pochi minuti, con chi gestisce i PC;
 - i 30 giorni dei backup nel registro dei trattamenti, con il DPO.
 
 **Da tenere d'occhio:** il controllo del backup delle 9:07. Il 22/11 GitHub l'ha fatto partire alle 17:06; il 23/11
@@ -130,3 +135,4 @@ Le ho proposte io, da confermare:
 |---|---|
 | Inizio (23/11, dopo la conferma del planning) | 13 |
 | EN-10 sulla demo (23/11, sera: `prepara`, deploy `47fe414`, `verifica` con gli stessi numeri e il backup); Done dopo il controllo del mattino del 24/11 | 13 |
+| US-1310 aggiunta dal PO (24/11, mattina) | 16 |

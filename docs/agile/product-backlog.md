@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 100 elementi, 413 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-16](sprints/sprint-16.md), il 23/11 ([review](sprints/sprint-16-review.md)); in corso: [sprint-17](sprints/sprint-17.md), dal 24/11 (planning confermato il 23/11).
+**Totale: 101 elementi, 416 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-16](sprints/sprint-16.md), il 23/11 ([review](sprints/sprint-16-review.md)); in corso: [sprint-17](sprints/sprint-17.md), dal 24/11 (planning confermato il 23/11).
 
 ## Epiche
 
@@ -21,7 +21,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione, Progetto Formativo e Relazione finale sui modelli reali in Word. | 13 | 70 |
 | E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 3 | 9 |
 | E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 4 | 23 |
-| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 16 | 71 |
+| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 17 | 74 |
 
 ## Release
 
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 39 | 206 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 40 | 209 |
 
 ## Domande aperte per il Product Owner
 
@@ -158,6 +158,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1307](#us-1307) | E13 | Monitoraggio e revisione di sicurezza | Must | 5 | R4 | 🎉 Done (Sprint 10) |
 | [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | 🎉 Done (Sprint 10) |
 | [US-1309](#us-1309) | E13 | Importazione dal database attuale | Must | 8 | R4 | 🎉 Done (Sprint 15) |
+| [US-1310](#us-1310) | E13 | Sessione attiva finché NEXUS è aperto | Must | 3 | R4 | 🔨 In corso (Sprint 17) |
 
 ## Dettaglio per epica
 
@@ -1666,3 +1667,24 @@ Criteri di accettazione:
   ([analisi, §9.3](../analisi/database-attuale.md)). Il comando sul server si prova con US-1306.
 
 Dipendenze: US-508, US-509, US-510, US-114
+
+#### US-1310
+**Sessione attiva finché NEXUS è aperto** · Must · 3 punti · R4 · 🔨 In corso (Sprint 17)
+
+Come **operatore del Call Center** voglio che NEXUS resti collegato finché la pagina è aperta, anche se per un po' non
+la uso, per non dover rientrare con la password più volte al giorno (PO, 24/11). Oggi la sessione scade dopo 30 minuti
+senza richieste al server, e con la scheda in secondo piano o lo schermo bloccato le richieste si fermano.
+
+Criteri di accettazione:
+- Finché la pagina di NEXUS è aperta, anche in secondo piano o con lo schermo bloccato, la sessione si rinnova da sola:
+  si accede una volta al giorno. Il limite resta di **10 ore** (ASVS 3.3.2).
+- Con il browser chiuso, o il PC in sospensione, per più di 30 minuti la sessione scade come oggi. Al ritorno, se la
+  sessione è scaduta, NEXUS torna alla pagina di accesso senza lasciare dati sullo schermo.
+- **Avviso prima delle 10 ore** (WCAG 2.2.1): pochi minuti prima NEXUS dice a che ora scade la sessione e offre
+  «Accedi di nuovo adesso», che apre una sessione nuova. L'avviso si chiude e non copre il contenuto.
+- La sicurezza dei PC lasciati soli si affida al blocco automatico dello schermo: lo verifica il PO con chi gestisce i
+  PC della cooperativa.
+- Decisione del PO del 24/11, tra tre strade presentate con le conseguenze (A40): 10 ore di inattività in Keycloak,
+  oppure 30 minuti con il solo avviso.
+
+Dipendenze: US-1307
