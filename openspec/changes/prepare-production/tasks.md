@@ -37,5 +37,6 @@
         bloccarlo. Caddy risponde `403` su `/realms/master`, il deploy lo verifica; il realm `master` prende
         l'indirizzo del tunnel con `keycloak-admin-tunnel.sh`, provato in locale (console dal tunnel e `kcadm`
         funzionano, realm `nexus` invariato)
-  - [ ] sul server: `keycloak-admin-tunnel.sh` prima del deploy di questa PR; dopo il deploy, console dal tunnel (T-27.4)
+  - [x] sul server: `keycloak-admin-tunnel.sh` prima del deploy di questa PR; dopo il deploy, console dal tunnel (T-27.4:
+        script e deploy `388e8c2` il 24/11, riuscita dal PO)
   - [ ] chiusura della storia
