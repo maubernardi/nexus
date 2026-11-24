@@ -55,7 +55,7 @@ updates:
         update-types: [version-update:semver-major]
 
   - package-ecosystem: docker-compose
-    directories: [/infra, /infra/deploy]
+    directories: [/infra, /infra/deploy, /infra/collaudo]
     schedule:
       interval: weekly
       day: monday

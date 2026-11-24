@@ -1,0 +1,41 @@
+# NEXUS — collaudo sul PC del PO (EN-11). Si aggiunge a infra/deploy/compose.yaml, lo stack della produzione, del
+# commit da provare: stessi servizi e stesse immagini, costruite in locale da collaudo.sh. Cambia solo quello che lega
+# la produzione a Internet:
+#   - indirizzi su localhost, in HTTP: NEXUS su 8090, Keycloak su 8091, la sua console su 8092;
+#   - email nella casella finta Mailpit (http://localhost:8025): nessuna email esce dal PC;
+#   - porte solo su 127.0.0.1, mai la 8081 (sul PC del PO è il tunnel verso la console della produzione).
+# Il servizio backup non parte: collaudo.sh avvia solo web e mailpit, con le loro dipendenze.
+services:
+  keycloak:
+    environment:
+      KC_HOSTNAME: http://localhost:8091
+      KC_HOSTNAME_ADMIN: http://localhost:8092
+    ports: !override
+      - "127.0.0.1:8092:8080"
+
+  backend:
+    environment:
+      KEYCLOAK_ISSUER_URI: http://localhost:8091/realms/nexus
+      APP_URL: http://localhost:8090
+      MAIL_HOST: mailpit
+      MAIL_PORT: "1025"
+      # Mailpit accetta la posta senza TLS né autenticazione
+      SPRING_APPLICATION_JSON: >-
+        {"spring":{"mail":{"properties":{"mail.smtp.auth":"false","mail.smtp.starttls.enable":"false","mail.smtp.starttls.required":"false"}}}}
+    depends_on:
+      mailpit:
+        condition: service_started
+
+  web:
+    ports: !override
+      - "127.0.0.1:8090:8090"
+      - "127.0.0.1:8091:8091"
+    volumes:
+      - ./collaudo/Caddyfile:/etc/caddy/Caddyfile:ro
+
+  mailpit:
+    image: axllent/mailpit:v1.34.0
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8025:8025"
+    mem_limit: 128m

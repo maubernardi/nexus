@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 102 elementi, 419 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-16](sprints/sprint-16.md), il 23/11 ([review](sprints/sprint-16-review.md)); in corso: [sprint-17](sprints/sprint-17.md), dal 24/11 (planning confermato il 23/11).
+**Totale: 103 elementi, 424 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-16](sprints/sprint-16.md), il 23/11 ([review](sprints/sprint-16-review.md)); in corso: [sprint-17](sprints/sprint-17.md), dal 24/11 (planning confermato il 23/11).
 
 ## Epiche
 
@@ -21,7 +21,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione, Progetto Formativo e Relazione finale sui modelli reali in Word. | 13 | 70 |
 | E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 3 | 9 |
 | E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 4 | 23 |
-| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 17 | 74 |
+| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 18 | 79 |
 
 ## Release
 
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 41 | 212 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 42 | 217 |
 
 ## Domande aperte per il Product Owner
 
@@ -80,6 +80,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [EN-7](#en-7) | E13 | Password comuni rifiutate | Must | 2 | R4 | 🎉 Done (Sprint 11) |
 | [EN-9](#en-9) | E13 | Test del frontend stabili | Must | 1 | R4 | 🎉 Done (Sprint 13) |
 | [EN-10](#en-10) | E13 | Aggiornamento a PostgreSQL 19 | Must | 5 | R4 | 🎉 Done (Sprint 17) |
+| [EN-11](#en-11) | E13 | Ambiente di collaudo sul PC del PO | Must | 5 | R4 | 🔨 In corso (Sprint 17) |
 | [US-201](#us-201) | E2 | Inserimento beneficiario | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 🎉 Done (Sprint 3) |
@@ -1518,6 +1519,30 @@ Criteri di accettazione:
 - **Dopo**: il backup della notte e il controllo del mattino riescono con la 19.
 
 Dipendenze: US-1302
+
+#### EN-11
+**Ambiente di collaudo sul PC del PO** · Must · 5 punti · R4 · 🔨 In corso (Sprint 17)
+
+Come **PO** voglio collaudare le storie nuove sul mio PC, con lo stack della produzione e dati finti, per provarle prima
+del merge senza toccare i dati veri. Decisa dal PO il 24/11, dopo il passaggio in produzione. Tra quattro strade (PC,
+prova sullo stesso server, secondo server, produzione) sceglie il PC; il collaudo si fa **prima del merge**, dal branch
+della PR.
+
+Criteri di accettazione:
+- **Un comando** avvia il collaudo di una PR, di un branch o di un commit: lo stack della produzione, con immagini
+  costruite in locale dai sorgenti di quel commit e i dati e gli utenti finti del seed. Il lavoro in corso nel
+  repository non cambia.
+- **Come la produzione**: stessa pagina di accesso, stessa policy delle password, stesse durate di sessione, stesse
+  regole del proxy (`/realms/master` bloccato).
+- **Email in una casella finta**, leggibile nel browser: nessuna email esce dal PC.
+- **Porte solo sul PC**, mai la 8081 del tunnel verso la produzione.
+- Ogni avvio **riparte dai dati finti**; si può fermare e riprendere; `cancella` non lascia container, volumi né
+  immagini (A37).
+- **La CI lo prova** a ogni PR: accesso dalla pagina di Keycloak, email del backend e di Keycloak nella casella finta.
+- Definition of Done e collaudo descrivono il processo nuovo: collaudo sul PC prima del merge, poi deploy e controllo
+  veloce in produzione.
+
+Dipendenze: US-1306
 
 #### US-1301
 **Verifica della PWA online** · Must · 1 punti · R1 · 📋 Backlog
