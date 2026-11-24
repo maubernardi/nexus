@@ -39,4 +39,5 @@
       lettura non più «obbligatorio». La vista da smartphone non si è potuta provare (finestra di Chrome che non si
       restringe): la prova il PO in T-34.2
 - [x] 4.3 Collaudo T-34; README (script una tantum); backlog US-116 e sprint 17
-- [ ] 4.4 Collaudo T-34 dal PO sul suo PC, poi spunte nella PR prima del merge
+- [x] 4.4 Collaudo T-34 dal PO sul suo PC, poi spunte nella PR prima del merge (T-34.1 … T-34.4 riuscite il 24/11;
+      T-34.5 in produzione dopo il deploy)

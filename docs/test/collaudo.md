@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | dal 24/11: le storie nuove sul **PC del PO**, prima del merge (`infra/collaudo/collaudo.sh`, EN-11); dopo il deploy, un controllo veloce in produzione su https://portalenexus.it, senza dati finti. Fino al 24/11: la demo su https://portalenexus.it |
 | **Versione della demo** | `47fe414` (23/11/2026), su **PostgreSQL 19** (EN-10): Sprint 1–16 completi, tranne il passaggio in produzione: backup notturno su IONOS, avvisi di fine tirocinio, testi dei messaggi; l'importazione dal database attuale si prova in locale |
-| **Ultimo aggiornamento** | 24/11/2026 (T-34.1 … T-34.4: correzione dei dati di un utente, da provare sul collaudo del PC prima del merge, e T-34.5 in produzione dopo il deploy; T-33.1 … T-33.3 riuscite il 24/11); 23/11/2026 (collaudo prima del passaggio finito dal PO il 23/11: T-24, T-25, T-28, T-29 e T-30.1 … T-30.3 riusciti; restano T-30.4, il backup della notte sulla 19, e dopo il passaggio T-26.3 e T-27; T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, fatto il 23/11 sulla demo `47fe414`; T-30.3 corretta: le aziende si provano come `operatore.cc`; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 24/11/2026 (T-34.1 … T-34.4: correzione dei dati di un utente, riuscite sul collaudo del PC prima del merge; T-34.5 in produzione dopo il deploy; T-33.1 … T-33.3 riuscite il 24/11); 23/11/2026 (collaudo prima del passaggio finito dal PO il 23/11: T-24, T-25, T-28, T-29 e T-30.1 … T-30.3 riusciti; restano T-30.4, il backup della notte sulla 19, e dopo il passaggio T-26.3 e T-27; T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, fatto il 23/11 sulla demo `47fe414`; T-30.3 corretta: le aziende si provano come `operatore.cc`; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 > **Dopo il passaggio in produzione** (24/11) il sito ha i dati veri e gli utenti demo (`tutor1`, `operatore.cc`, …)
 > non ci sono più: le prove fino alla sezione 32 restano come storico. Le storie nuove si collaudano sul PC del PO, dal
@@ -1443,7 +1443,7 @@ password è `collaudo-nexus-2026`. Nessun dato vero, nessuna email esce dal PC.
 Sul collaudo del PC, prima del merge (http://localhost:8090, password `collaudo-nexus-2026`; email su
 http://localhost:8025). Gli utenti qui sotto sono finti: in produzione, dopo il deploy, c'è solo T-34.5.
 
-- [ ] **T-34.1 Username di un utente mai entrato (US-116)**
+- [x] **T-34.1 Username di un utente mai entrato (US-116)**
   1. Entra come `admin`; in «Utenti» → «Nuovo utente» crea un Tutor: nome `Mario`, cognome `Rosi`, username
      `mario.rosi`, email `mario.rosi@nexus.local`. **Atteso:** l'utente è creato e l'invito è nella casella finta.
   2. Nella riga di Mario Rosi premi «Dati». **Atteso:** la pagina «Dati di Mario Rosi» dice che non è ancora entrato;
@@ -1456,7 +1456,7 @@ http://localhost:8025). Gli utenti qui sotto sono finti: in produzione, dopo il 
   5. Apri l'invito arrivato a `mario.rossi@nexus.local`, imposta la password `collaudo-nexus-2026` ed entra come
      `mario.rossi`. **Atteso:** sei dentro, con il menu del Tutor.
 
-- [ ] **T-34.2 Username bloccato dopo il primo accesso (US-116)**
+- [x] **T-34.2 Username bloccato dopo il primo accesso (US-116)**
   1. Esci ed entra come `admin`; in «Utenti» premi «Dati» di Mario Rossi. **Atteso:** lo username è in sola lettura,
      con il motivo «È già entrato in NEXUS: lo username non si cambia più…»; gli altri campi si possono cambiare.
   2. Scrivi un telefono, per esempio `055 123456`, e salva. **Atteso:** «Dati di Mario Rossi salvati.»
@@ -1464,15 +1464,16 @@ http://localhost:8025). Gli utenti qui sotto sono finti: in produzione, dopo il 
   4. Restringi la finestra alla larghezza di uno smartphone (o F12 → vista dispositivo). **Atteso:** i campi stanno uno
      sotto l'altro, leggibili, senza scorrere di lato; in «Utenti» la tabella scorre di lato dentro il suo riquadro.
 
-- [ ] **T-34.3 Email di un utente già entrato (US-116)**
+- [x] **T-34.3 Email di un utente già entrato (US-116)**
   1. In «Dati» di Mario Rossi scrivi l'email di un altro utente, `tutor2@nexus.local`, e salva. **Atteso:** errore sul
      campo, «Indirizzo già usato da un altro utente»; niente cambia.
   2. Scrivi `mario.rossi2@nexus.local` e salva. **Atteso:** «Dati di Mario Rossi salvati.»; nella casella finta il
      vecchio indirizzo `mario.rossi@nexus.local` riceve «PORTALE NEXUS - Il tuo indirizzo email è stato cambiato».
 
-- [ ] **T-34.4 Dati dell'account solo da NEXUS (US-116)**
+- [x] **T-34.4 Dati dell'account solo da NEXUS (US-116)**
   1. Esci ed entra come `mario.rossi`; poi apri http://localhost:8091/realms/nexus/account. **Atteso:** la pagina
      «il mio account» di Keycloak mostra username, email, nome e cognome, ma non li fa cambiare.
+  > Nota (24/11): T-34.1 … T-34.4 riuscite dal PO sul suo PC, con il collaudo della PR #204 (`dc015d5`).
 
 - [ ] **T-34.5 In produzione, dopo il deploy (US-116)**
   1. Sul server, una volta: lo script `keycloak-user-profile.sh` (README, «Dati degli utenti solo da NEXUS»; ti scrivo
