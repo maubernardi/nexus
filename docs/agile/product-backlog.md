@@ -111,7 +111,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-510](#us-510) | E5 | Referenti e recapiti dell'azienda | Must | 5 | R4 | 🎉 Done (Sprint 15) |
 | [US-511](#us-511) | E5 | Zona dell'azienda e aziende per il Tutor | Should | 5 | — | 📋 Backlog |
 | [US-512](#us-512) | E5 | Tentativi di contatto ed esito della richiesta | Should | 5 | — | 📋 Backlog |
-| [US-513](#us-513) | E5 | Elenco delle aziende a pagine | Must | 3 | R4 | 🔨 In corso (Sprint 17) |
+| [US-513](#us-513) | E5 | Elenco delle aziende a pagine | Must | 3 | R4 | 🎉 Done (Sprint 17) |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 🎉 Done (Sprint 5) |
@@ -822,7 +822,7 @@ Criteri di accettazione:
 Dipendenze: US-507, US-1204
 
 #### US-513
-**Elenco delle aziende a pagine** · Must · 3 punti · R4 · 🔨 In corso (Sprint 17)
+**Elenco delle aziende a pagine** · Must · 3 punti · R4 · 🎉 Done (Sprint 17)
 
 Come **operatore del Call Center** voglio sfogliare l'elenco delle aziende una pagina alla volta, per non aspettare che
 arrivino tutte (PO, 24/11, collaudo T-27.2). Dal passaggio in produzione le aziende sono 13.799, e l'elenco le carica
