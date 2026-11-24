@@ -17,7 +17,7 @@
 | US-1310 | Sessione attiva finché NEXUS è aperto | 3 | 🎉 Done | `keep-session-alive` (archiviata) | [#197](https://github.com/maubernardi/nexus/pull/197), [#200](https://github.com/maubernardi/nexus/pull/200) |
 | US-513 | Elenco delle aziende a pagine | 3 | 🎉 Done | `paginate-company-list` (archiviata) | [#198](https://github.com/maubernardi/nexus/pull/198), [#199](https://github.com/maubernardi/nexus/pull/199) |
 | EN-11 | Ambiente di collaudo sul PC del PO | 5 | 🎉 Done | `add-local-acceptance-env` (archiviata) | [#201](https://github.com/maubernardi/nexus/pull/201) |
-| US-116 | Correzione dei dati di un utente | 5 | 🔨 In corso | `edit-user-details` | — |
+| US-116 | Correzione dei dati di un utente | 5 | 🔨 In corso | `edit-user-details` | [#204](https://github.com/maubernardi/nexus/pull/204) |
 
 **Ordine** (PO, 23/11):
 1. **EN-10 sulla demo**, anticipata al 23/11 sera (PO):
