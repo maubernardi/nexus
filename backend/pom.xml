@@ -21,7 +21,7 @@
         <maven.compiler.release>25</maven.compiler.release>
         <mapstruct.version>1.6.3</mapstruct.version>
         <lombok.version>1.18.48</lombok.version>
-        <springdoc.version>3.2.0</springdoc.version>
+        <springdoc.version>3.2.1</springdoc.version>
         <hypersistence-tsid.version>2.1.4</hypersistence-tsid.version>
         <poi.version>6.0.0</poi.version>
         <jackcess.version>5.0.4</jackcess.version>
