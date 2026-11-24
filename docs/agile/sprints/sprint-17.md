@@ -1,19 +1,21 @@
 # Sprint 17 — 24 – 26 novembre 2026
 
-**Stato:** 🏃 in corso: planning confermato dal PO il 23/11, 13 punti; 16 con US-1310, aggiunta il 24/11.
+**Stato:** 🏃 in corso: planning confermato dal PO il 23/11, 13 punti; 16 con US-1310 e 19 con US-513, aggiunte il
+24/11.
 **Planning:** 23/11, dalla [review dello Sprint 16](sprint-16-review.md) (§8, §9).
 
 ## Obiettivo
 
 > NEXUS è in produzione sul server di oggi, con i dati veri, il backup notturno e PostgreSQL 19.
 
-## Impegno (16 punti)
+## Impegno (19 punti)
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
 | US-1306 | Passaggio in produzione | 8 | 🔨 In corso | `prepare-production` | [#177](https://github.com/maubernardi/nexus/pull/177) (preparazione) |
 | EN-10 | Aggiornamento a PostgreSQL 19 | 5 | 🎉 Done | `upgrade-postgresql-19` (archiviata) | [#189](https://github.com/maubernardi/nexus/pull/189), [#190](https://github.com/maubernardi/nexus/pull/190) |
 | US-1310 | Sessione attiva finché NEXUS è aperto | 3 | 🔨 In corso | `keep-session-alive` | [#197](https://github.com/maubernardi/nexus/pull/197) |
+| US-513 | Elenco delle aziende a pagine | 3 | 🔨 In corso | `paginate-company-list` | in arrivo |
 
 **Ordine** (PO, 23/11):
 1. **EN-10 sulla demo**, anticipata al 23/11 sera (PO):
@@ -50,6 +52,9 @@ Dalla review dello Sprint 16, tutte del PO:
 - **US-1310 nello sprint** (24/11): il PO segnala che dopo un po' di inattività NEXUS chiede di nuovo la password, un
   problema per il Call Center. Tra tre strade sceglie la sessione attiva finché la pagina è aperta, con l'avviso prima
   delle 10 ore. Lo sprint passa a 16 punti.
+- **US-513 nello sprint** (24/11): nel collaudo dopo il passaggio (T-27.2) il PO trova lento l'elenco delle 13.799
+  aziende, che arrivano tutte insieme. Chiede le pagine, con 10, 25, 50 o 100 aziende scelte da un menu. Lo sprint passa
+  a 19 punti.
 
 ## Come li faccio
 
@@ -137,3 +142,4 @@ Le ho proposte io, da confermare:
 | EN-10 sulla demo (23/11, sera: `prepara`, deploy `47fe414`, `verifica` con gli stessi numeri e il backup); Done dopo il controllo del mattino del 24/11 | 13 |
 | US-1310 aggiunta dal PO (24/11, mattina) | 16 |
 | EN-10 Done: backup delle 3:30 riuscito sulla 19 e controllo verde (24/11) | 11 |
+| US-513 aggiunta dal PO dopo il passaggio (24/11) | 14 |

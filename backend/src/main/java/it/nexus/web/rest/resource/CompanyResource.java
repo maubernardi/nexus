@@ -1,7 +1,6 @@
 package it.nexus.web.rest.resource;
 
 import java.net.URI;
-import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import it.nexus.domain.dto.CompanyDTO;
 import it.nexus.domain.dto.CompanyHistoryDTO;
 import it.nexus.domain.dto.CompanyFormDTO;
+import it.nexus.domain.dto.CompanyPageDTO;
 import it.nexus.domain.dto.VersionDTO;
 import it.nexus.services.CompanyHistoryService;
 import it.nexus.services.CompanyService;
@@ -37,12 +37,16 @@ public class CompanyResource {
 
     @GetMapping
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
-    @Operation(summary = "Cerca aziende per ragione sociale o partita IVA; filtri: da completare, categoria merceologica")
-    public ResponseEntity<List<CompanyDTO>> search(@RequestParam(required = false) String search,
+    @Operation(summary = "Cerca aziende per ragione sociale o partita IVA, una pagina alla volta (page da 0; size 10, "
+            + "25, 50 o 100); filtri: da completare, categoria merceologica")
+    public ResponseEntity<CompanyPageDTO> search(@RequestParam(required = false) String search,
             @RequestParam(defaultValue = "false") boolean includeInactive,
             @RequestParam(defaultValue = "false") boolean toComplete,
-            @RequestParam(required = false) String businessCategoryId) {
-        return ResponseEntity.ok(companyService.search(search, includeInactive, toComplete, businessCategoryId));
+            @RequestParam(required = false) String businessCategoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "" + CompanyService.DEFAULT_PAGE_SIZE) int size) {
+        return ResponseEntity.ok(companyService.search(search, includeInactive, toComplete, businessCategoryId, page,
+                size));
     }
 
     @GetMapping("/{id}")

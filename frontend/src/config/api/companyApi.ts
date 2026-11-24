@@ -79,11 +79,28 @@ export type CompanySearch = {
   toComplete?: boolean;
   /** Solo le aziende della categoria merceologica (US-509). */
   businessCategoryId?: string;
+  /** Pagina, da 0 (US-513). */
+  page: number;
+  /** Aziende per pagina: una di {@link COMPANY_PAGE_SIZES}. */
+  size: number;
 };
 
-export const searchCompanies = async (params: CompanySearch): Promise<Company[]> => {
-  const { data } = await axiosInstance.get<Company[]>(ENDPOINTS.companies, { params });
-  return data;
+/** Aziende per pagina che si possono scegliere, come nel backend (US-513, PO 24/11). */
+export const COMPANY_PAGE_SIZES = [10, 25, 50, 100] as const;
+export const DEFAULT_COMPANY_PAGE_SIZE = 25;
+
+/** Una pagina dell'elenco: `total` conta tutte le aziende che rispondono ai filtri. */
+export type CompanyPage = {
+  companies: Company[];
+  total: number;
+  page: number;
+  size: number;
+};
+
+export const searchCompanies = async (params: CompanySearch): Promise<CompanyPage> => {
+  const { data } = await axiosInstance.get<CompanyPage>(ENDPOINTS.companies, { params });
+  // l'API omette i campi vuoti
+  return { ...data, companies: data.companies ?? [] };
 };
 
 export const fetchCompany = async (id: string): Promise<Company> => {

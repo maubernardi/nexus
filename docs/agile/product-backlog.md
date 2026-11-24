@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 101 elementi, 416 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-16](sprints/sprint-16.md), il 23/11 ([review](sprints/sprint-16-review.md)); in corso: [sprint-17](sprints/sprint-17.md), dal 24/11 (planning confermato il 23/11).
+**Totale: 102 elementi, 419 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-16](sprints/sprint-16.md), il 23/11 ([review](sprints/sprint-16-review.md)); in corso: [sprint-17](sprints/sprint-17.md), dal 24/11 (planning confermato il 23/11).
 
 ## Epiche
 
@@ -13,7 +13,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 6 | 23 |
 | E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 8 | 31 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 5 | 17 |
-| E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 12 | 41 |
+| E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 13 | 44 |
 | E6 | Abbinamento (fase 4) | Il Call Center abbina il beneficiario a una mansione libera e la blocca. | 5 | 25 |
 | E7 | Proposta e timer (fase 5) | Il Tutor valuta la proposta; i tempi di risposta sono presidiati da un timer di 7 giorni lavorativi. | 5 | 15 |
 | E8 | Appuntamento e rilancio (fase 6) | Il Tutor registra l'esito dell'appuntamento; se fallisce, la mansione può essere rilanciata in bacheca. | 3 | 10 |
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 40 | 209 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 41 | 212 |
 
 ## Domande aperte per il Product Owner
 
@@ -111,6 +111,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-510](#us-510) | E5 | Referenti e recapiti dell'azienda | Must | 5 | R4 | 🎉 Done (Sprint 15) |
 | [US-511](#us-511) | E5 | Zona dell'azienda e aziende per il Tutor | Should | 5 | — | 📋 Backlog |
 | [US-512](#us-512) | E5 | Tentativi di contatto ed esito della richiesta | Should | 5 | — | 📋 Backlog |
+| [US-513](#us-513) | E5 | Elenco delle aziende a pagine | Must | 3 | R4 | 🔨 In corso (Sprint 17) |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 🎉 Done (Sprint 5) |
@@ -819,6 +820,25 @@ Criteri di accettazione:
 - Tentativi e chiusura nell'audit (EN-2).
 
 Dipendenze: US-507, US-1204
+
+#### US-513
+**Elenco delle aziende a pagine** · Must · 3 punti · R4 · 🔨 In corso (Sprint 17)
+
+Come **operatore del Call Center** voglio sfogliare l'elenco delle aziende una pagina alla volta, per non aspettare che
+arrivino tutte (PO, 24/11, collaudo T-27.2). Dal passaggio in produzione le aziende sono 13.799, e l'elenco le carica
+tutte insieme.
+
+Criteri di accettazione:
+- L'elenco mostra una pagina alla volta, in ordine di ragione sociale, con i filtri di oggi: ricerca, disattivate, da
+  completare, categoria.
+- **10, 25, 50 o 100 aziende per pagina**, da un menu a tendina (PO, 24/11); 25 se non si sceglie.
+- Pulsanti Prima, Precedente, Successiva e Ultima, con «Pagina 3 di 552»; sopra la tabella quante aziende in tutto e
+  quali si vedono.
+- Pagina e aziende per pagina restano nell'indirizzo, come i filtri; un filtro nuovo riparte dalla prima pagina.
+- Accessibile (WCAG 2.2 AA): etichette visibili, navigazione con un nome, focus all'inizio della tabella dopo un cambio
+  di pagina.
+
+Dipendenze: US-501, US-1309
 
 ### E6 — Abbinamento (fase 4)
 
