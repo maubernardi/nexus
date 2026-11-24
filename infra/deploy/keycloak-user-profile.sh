@@ -72,8 +72,10 @@ print(json.dumps(profile))' "$profile" "$ATTRIBUTES")" || fail "profilo utente n
 printf '%s' "$updated" | kc "$KCADM update users/profile --config $KCCONFIG -r nexus -f - >/dev/null"
 
 step "Controllo"
-kc "$KCADM get realms/nexus --config $KCCONFIG --fields editUsernameAllowed" | grep -q '"editUsernameAllowed" : true' \
-  || fail "editUsernameAllowed non è attivo"
+# prima tutta la risposta, poi il controllo: con pipefail, `kc … | grep -q` falliva a caso quando grep si fermava
+# prima della fine dell'output (SIGPIPE), anche con il valore giusto
+realm="$(kc "$KCADM get realms/nexus --config $KCCONFIG --fields editUsernameAllowed")"
+grep -q '"editUsernameAllowed" : true' <<<"$realm" || fail "editUsernameAllowed non è attivo"
 kc "$KCADM get users/profile --config $KCCONFIG -r nexus" | python3 -I -c '
 import json, sys
 names = sys.argv[1].split()
