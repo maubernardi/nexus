@@ -138,6 +138,43 @@ public class KeycloakIdentityProviderUsers implements IdentityProviderUsers {
     }
 
     @Override
+    public void updateDetails(String externalId, IdentityUserDetails details) {
+        call("correzione dei dati", token -> {
+            // come updateEmail: si riscrive l'utente intero. Lo username si cambia solo con «Edit username» del realm
+            Map<String, Object> user = restClient.get().uri(USER, realm(), externalId)
+                    .headers(h -> h.setBearerAuth(token))
+                    .retrieve().body(JSON_OBJECT);
+            if (user == null) {
+                throw new IdentityProviderException("Utente Keycloak senza dati", Conflict.NONE, null);
+            }
+            user.put("username", details.username());
+            user.put("firstName", details.firstName());
+            user.put("lastName", details.lastName());
+            if (!details.email().equalsIgnoreCase(String.valueOf(user.get("email")))) {
+                user.put("email", details.email());
+                // corretto dall'ADMIN: l'utente lo conferma aprendo l'invito, o lo usa già se è entrato
+                user.put("emailVerified", true);
+            }
+            restClient.put().uri(USER, realm(), externalId)
+                    .headers(h -> h.setBearerAuth(token))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(user)
+                    .retrieve().toBodilessEntity();
+            return null;
+        });
+    }
+
+    @Override
+    public boolean hasPassword(String externalId) {
+        return call("lettura delle credenziali", token -> {
+            List<Map<String, Object>> credentials = restClient.get().uri(USER + "/credentials", realm(), externalId)
+                    .headers(h -> h.setBearerAuth(token))
+                    .retrieve().body(JSON_ARRAY);
+            return credentials != null && credentials.stream().anyMatch(c -> "password".equals(c.get("type")));
+        });
+    }
+
+    @Override
     public void deleteUser(String externalId) {
         call("cancellazione utente", token -> {
             restClient.delete().uri(USER, realm(), externalId)

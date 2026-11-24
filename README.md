@@ -264,6 +264,19 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
   sudo bash keycloak-access-log.sh   # nessun segreto: attiva il registro e il permesso di lettura
   ```
   Finché manca, le pagine dicono che il registro non è disponibile.
+- **Dati degli utenti solo da NEXUS (US-116).** L'ADMIN corregge nome, cognome, username, email e telefono da
+  «Utenti → Dati». Lo username si corregge solo finché l'utente non ha impostato la password. Nel realm:
+  - «Edit username» è attivo, così NEXUS può correggere lo username;
+  - username, email, nome e cognome li modifica solo l'amministrazione: dalla pagina «il mio account» di Keycloak
+    l'utente li vede soltanto.
+
+  Sulle nuove installazioni è già così nel realm importato. Sul server già installato, **una volta**, prima o dopo il
+  deploy:
+  ```bash
+  curl -fsSLO https://raw.githubusercontent.com/maubernardi/nexus/main/infra/deploy/keycloak-user-profile.sh
+  sudo bash keycloak-user-profile.sh   # nessun segreto; mostra solo quanti utenti non hanno email, nome o cognome
+  ```
+  Finché manca, la correzione dello username risponde «non disponibile»; il resto funziona.
 - **Soggetto promotore e variabili nei documenti (US-1013).** I dati della cooperativa che promuove i tirocini
   (denominazione, sede, codice fiscale, legale rappresentante, contatti, INAIL, polizza RC) stanno nel database, **per
   progetto**: li inserisce l'ADMIN in «Cataloghi» → «Dati dei documenti dei progetti», con intestazione e avviso. Lì
