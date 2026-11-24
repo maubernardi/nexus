@@ -1834,6 +1834,13 @@ export const it = {
     offlineReady: 'NEXUS è pronta per essere usata anche offline.',
     close: 'Chiudi',
   },
+  session: {
+    // US-1310: avviso prima della durata massima della sessione (WCAG 2.2.1)
+    expiring:
+      'La sessione scade alle {{time}}: per sicurezza poi serve un nuovo accesso. Salva quello che stai facendo.',
+    reloginNow: 'Accedi di nuovo adesso',
+    dismiss: 'Ho capito',
+  },
   candidature: {
     heading: 'Candidatura all’annuncio #{{number}}',
     intro:

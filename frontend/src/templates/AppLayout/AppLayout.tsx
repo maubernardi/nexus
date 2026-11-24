@@ -4,6 +4,7 @@ import { Outlet } from 'react-router';
 import { SkipLink } from '@/atoms/SkipLink/SkipLink';
 import type { CurrentUser } from '@/config/auth/types';
 import { OfflineBanner } from '@/molecules/OfflineBanner/OfflineBanner';
+import { SessionExpiryBanner } from '@/molecules/SessionExpiryBanner/SessionExpiryBanner';
 import { UpdatePrompt } from '@/molecules/UpdatePrompt/UpdatePrompt';
 import { AppHeader } from '@/organisms/AppHeader/AppHeader';
 import { RouteAnnouncer } from '@/organisms/RouteAnnouncer/RouteAnnouncer';
@@ -22,6 +23,7 @@ export const AppLayout = ({ user }: AppLayoutProps) => {
       <AppHeader user={user} />
       <OfflineBanner />
       <UpdatePrompt />
+      <SessionExpiryBanner />
       <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:py-8">
         <Outlet />
       </main>

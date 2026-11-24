@@ -48,7 +48,7 @@ Legenda: ✅ soddisfatto · ⚠️ lacuna, con azione proposta · — non applic
 | 3.2.1 Token nuovo a ogni accesso | ✅ | OIDC con PKCE (Keycloak) |
 | 3.2.3 Token non in archivi del browser | ✅ | Token solo in memoria (keycloak-js); in `localStorage` c'è solo l'utente mock dello sviluppo locale |
 | 3.3.1 Uscita che invalida la sessione | ✅ | «Esci» chiama il logout di Keycloak |
-| 3.3.2 Scadenza per inattività | ✅ | Token 5 minuti, sessione 30 minuti di inattività, 10 ore al massimo |
+| 3.3.2 Scadenza per inattività | ✅ | Token 5 minuti, sessione 30 minuti di inattività, 10 ore al massimo. Con NEXUS aperto il token si rinnova da solo, anche in secondo piano (US-1310, PO 24/11): il PC lasciato solo si affida al blocco automatico dello schermo. Avviso 5 minuti prima delle 10 ore, con un nuovo accesso subito (WCAG 2.2.1) |
 | 3.4.x Cookie `Secure`/`HttpOnly`/`SameSite` | ✅ | Cookie di sessione solo di Keycloak, con questi attributi; l'API è senza stato (`STATELESS`) |
 | 3.5.x Revoca | ✅ | Disattivazione e cambio di ruolo chiudono le sessioni (US-105) |
 
