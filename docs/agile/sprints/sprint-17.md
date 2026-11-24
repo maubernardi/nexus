@@ -1,24 +1,25 @@
 # Sprint 17 — 24 – 26 novembre 2026
 
-**Stato:** 🏃 in corso: planning confermato dal PO il 23/11, 13 punti.
+**Stato:** 🏃 in corso: planning confermato dal PO il 23/11, 13 punti; 16 con US-1310, aggiunta il 24/11.
 **Planning:** 23/11, dalla [review dello Sprint 16](sprint-16-review.md) (§8, §9).
 
 ## Obiettivo
 
 > NEXUS è in produzione sul server di oggi, con i dati veri, il backup notturno e PostgreSQL 19.
 
-## Impegno (13 punti)
+## Impegno (16 punti)
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
 | US-1306 | Passaggio in produzione | 8 | 🔨 In corso | `prepare-production` | [#177](https://github.com/maubernardi/nexus/pull/177) (preparazione) |
-| EN-10 | Aggiornamento a PostgreSQL 19 | 5 | 🔨 In corso | `upgrade-postgresql-19` | [#189](https://github.com/maubernardi/nexus/pull/189) |
+| EN-10 | Aggiornamento a PostgreSQL 19 | 5 | 🎉 Done | `upgrade-postgresql-19` (archiviata) | [#189](https://github.com/maubernardi/nexus/pull/189), [#190](https://github.com/maubernardi/nexus/pull/190) |
+| US-1310 | Sessione attiva finché NEXUS è aperto | 3 | 🔨 In corso | `keep-session-alive` | [#197](https://github.com/maubernardi/nexus/pull/197) |
 
 **Ordine** (PO, 23/11):
 1. **EN-10 sulla demo**, anticipata al 23/11 sera (PO):
    - la PR, provata in locale sul backup vero della demo;
    - il deploy e lo script dell'aggiornamento sul server.
-2. **Collaudo T-24, T-25, T-28 e T-29** sulla demo già aggiornata, a cura tua (24–25/11).
+2. **Collaudo T-24, T-25, T-28 e T-29** sulla demo già aggiornata, a cura tua: finito il 23/11 sera, tutto riuscito.
 3. **US-1306 il 25 o il 26/11**:
    - il passaggio sul server, già su PostgreSQL 19;
    - l'invito all'ADMIN;
@@ -46,6 +47,9 @@ Dalla review dello Sprint 16, tutte del PO:
   §8.4).
 - **Analisi di US-507** nello Sprint 17, dopo il passaggio (§8.5).
 - **Ordine**: EN-10 prima del passaggio, sulla demo; poi collaudo e passaggio, già su PostgreSQL 19 (planning, 23/11).
+- **US-1310 nello sprint** (24/11): il PO segnala che dopo un po' di inattività NEXUS chiede di nuovo la password, un
+  problema per il Call Center. Tra tre strade sceglie la sessione attiva finché la pagina è aperta, con l'avviso prima
+  delle 10 ore. Lo sprint passa a 16 punti.
 
 ## Come li faccio
 
@@ -85,14 +89,16 @@ Dalla review dello Sprint 16, tutte del PO:
 - la demo resta ferma per 10–15 minuti.
 
 **Prima del passaggio (25–26/11):**
-- il collaudo T-24, T-25, T-28 e T-29;
-- i dati dell'ADMIN nel `.env`;
-- il file Access sul server;
-- `nexus-deploy` reinstallato;
-- il controllo in Access delle 7 chiamate con nome e cognome e delle 20 con possibili nomi.
+- ✅ il collaudo T-24, T-25, T-28 e T-29 (23/11);
+- ✅ i dati dell'ADMIN nel `.env`, arrivati al backend con il deploy `1890dd9` (23/11);
+- ✅ `nexus-deploy` reinstallato, con il realm di produzione (23/11);
+- ✅ il controllo in Access delle 7 chiamate con nome e cognome e delle 20 con possibili nomi: nessun nome di
+  beneficiario (23/11);
+- ⏳ il file Access sul server: una copia fresca, il giorno del passaggio.
 
 **Dopo il passaggio:**
 - gli account degli utenti;
+- con US-1310: il blocco automatico dello schermo dei PC del Call Center, dopo pochi minuti, con chi gestisce i PC;
 - i 30 giorni dei backup nel registro dei trattamenti, con il DPO.
 
 **Da tenere d'occhio:** il controllo del backup delle 9:07. Il 22/11 GitHub l'ha fatto partire alle 17:06; il 23/11
@@ -129,3 +135,5 @@ Le ho proposte io, da confermare:
 |---|---|
 | Inizio (23/11, dopo la conferma del planning) | 13 |
 | EN-10 sulla demo (23/11, sera: `prepara`, deploy `47fe414`, `verifica` con gli stessi numeri e il backup); Done dopo il controllo del mattino del 24/11 | 13 |
+| US-1310 aggiunta dal PO (24/11, mattina) | 16 |
+| EN-10 Done: backup delle 3:30 riuscito sulla 19 e controllo verde (24/11) | 11 |
