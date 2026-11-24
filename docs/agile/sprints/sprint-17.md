@@ -175,3 +175,5 @@ Le ho proposte io, da confermare:
 | US-513 aggiunta dal PO dopo il passaggio (24/11) | 14 |
 | US-513 Done: deploy `db4a4c5` e collaudo T-32 riuscito (24/11, pomeriggio) | 11 |
 | US-1310 Done: collaudo T-31 riuscito in produzione (24/11) | 8 |
+| EN-11 aggiunta dal PO (24/11) | 13 |
+| EN-11 Done: collaudo T-33 riuscito sul PC del PO (24/11, sera) | 8 |
