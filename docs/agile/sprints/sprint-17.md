@@ -94,6 +94,9 @@ Dalla review dello Sprint 16, tutte del PO:
   segnaposto;
 - il sito è rimasto fermo circa 2 minuti.
 
+Il PO ha fatto T-27.1 e T-27.2 lo stesso giorno: riuscite. I Cataloghi sono controllati; l'elenco delle aziende era
+lento e ha portato a US-513.
+
 **Controllo ASVS sulla produzione (24/11):** tutto come nella revisione del 07/11, tranne l'accesso degli
 amministratori di Keycloak (realm `master`), raggiungibile da Internet. Il PO sceglie di bloccarlo: Caddy risponde `403`
 e il realm `master` prende l'indirizzo del tunnel, perché la console continui a funzionare. Lo script

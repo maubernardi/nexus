@@ -1235,7 +1235,7 @@ note scrivi solo numeri e codici, mai nomi o recapiti.
   4. Prova ad accedere come `tutor1` con la password della demo. **Atteso:** l'accesso è rifiutato: l'utente non
      esiste più.
 
-- [ ] **T-27.2 Dati della produzione (US-1306)**
+- [x] **T-27.2 Dati della produzione (US-1306)**
   1. Apri la bacheca e l'elenco delle segnalazioni. **Atteso:** sono vuoti.
   2. Apri «Aziende». **Atteso:**
      - 13.799 aziende, quelle del database attuale; nessuna azienda «Demo»;
@@ -1244,6 +1244,8 @@ note scrivi solo numeri e codici, mai nomi o recapiti.
      attuale».
   4. Apri i Cataloghi. **Atteso:** progetti, tipologie di mansione, sedi, enti, comuni e i 6 modelli dei documenti
      sono quelli della demo. Correggi o disattiva le voci che la pulizia ha elencato come dimostrative.
+  > Nota (24/11): riuscita dal PO, con la nota di Access nel diario e i Cataloghi controllati. La velocità dell'elenco
+  > delle aziende si prova con T-32, dopo il deploy di US-513.
 
 - [ ] **T-27.3 Backup della produzione (US-1302, US-1306)**
   1. Il giorno dopo il passaggio, alle 9, controlla Actions → «Backup del database». **Atteso:** verde, con il backup
