@@ -141,6 +141,8 @@ e il realm `master` prende l'indirizzo del tunnel, perché la console continui a
   servizio è in ristrutturazione.
 
 **Dopo il passaggio:**
+- ✅ `sudo bash aggiorna-postgresql.sh pulisci`: tolto il volume della 18 (24/11, sera; EN-10, task 5.4);
+- ✅ tolte dal `.env` le variabili `NEXUS_DEMO_PASSWORD_*`, che non usa più nessuno (24/11, sera);
 - gli account degli utenti;
 - con US-1310: il blocco automatico dello schermo dei PC del Call Center, dopo pochi minuti, con chi gestisce i PC;
 - i 30 giorni dei backup nel registro dei trattamenti, con il DPO.
