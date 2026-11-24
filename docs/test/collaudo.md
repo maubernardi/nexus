@@ -1223,13 +1223,14 @@ chiavi age, variabili nel `.env` e `nexus-deploy` aggiornato. Sulla demo ci sono
 Si fanno subito dopo lo script del passaggio (README, «Passaggio in produzione»), sul sito vero, con i dati veri: nelle
 note scrivi solo numeri e codici, mai nomi o recapiti.
 
-- [ ] **T-27.1 Primo accesso dell'ADMIN (US-1306)**
+- [x] **T-27.1 Primo accesso dell'ADMIN (US-1306)**
   1. Entro qualche minuto dal passo 7 dello script controlla la casella di `NEXUS_ADMIN_EMAIL`. **Atteso:** l'email
      di Keycloak per impostare la password. Se non arriva, usa «Password dimenticata?» nella pagina di accesso.
   2. Imposta la password e accedi. **Atteso:** sei dentro come ADMIN.
   3. Apri «Utenti». **Atteso:** ci sei solo tu, con il ruolo ADMIN.
   4. Prova ad accedere come `tutor1` con la password della demo. **Atteso:** l'accesso è rifiutato: l'utente non
      esiste più.
+  > Nota (24/11): riuscita dal PO, subito dopo il passaggio.
 
 - [ ] **T-27.2 Dati della produzione (US-1306)**
   1. Apri la bacheca e l'elenco delle segnalazioni. **Atteso:** sono vuoti.
