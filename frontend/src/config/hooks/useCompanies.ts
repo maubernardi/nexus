@@ -15,12 +15,13 @@ import {
   updateCompany,
   type Company,
   type CompanyForm,
+  type CompanyPage,
   type CompanySearch,
 } from '@/config/api/companyApi';
 
 export const COMPANIES_KEY = ['companies'] as const;
 
-export const useCompanySearch = (params: CompanySearch): UseQueryResult<Company[]> =>
+export const useCompanySearch = (params: CompanySearch): UseQueryResult<CompanyPage> =>
   useQuery({
     queryKey: [...COMPANIES_KEY, 'search', params],
     queryFn: () => searchCompanies(params),

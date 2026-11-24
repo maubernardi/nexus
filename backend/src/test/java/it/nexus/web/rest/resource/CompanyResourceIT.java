@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -39,6 +40,7 @@ import it.nexus.domain.AuditEvent;
 import it.nexus.domain.BusinessCategory;
 import it.nexus.domain.Company;
 import it.nexus.domain.CompanyPlaceholders;
+import it.nexus.domain.DomainFixtures;
 import it.nexus.domain.ContactRole;
 import it.nexus.domain.JobCategory;
 import it.nexus.domain.JobSlot;
@@ -145,7 +147,7 @@ class CompanyResourceIT {
                 TsidMapper.toInternal(id)).getFirst().getChanges().get("legalMunicipality"))
                 .extracting("after").isEqualTo("Firenze (FI)");
         mockMvc.perform(get(API).header(USER, "operatore.cc").param("search", "Officina"))
-                .andExpect(jsonPath("$[0].legalMunicipality.name").value("Firenze"));
+                .andExpect(jsonPath("$.companies[0].legalMunicipality.name").value("Firenze"));
 
         // la versione salvata resta anche se chiusa; una versione chiusa non si sceglie di nuovo
         firenze.close(LocalDate.of(2026, 6, 1));
@@ -192,11 +194,51 @@ class CompanyResourceIT {
                 .contentType(MediaType.APPLICATION_JSON).content("{\"version\": 0}")).andExpect(status().isOk());
 
         mockMvc.perform(get(API).param("search", "BIANCHI").header(USER, "operatore.cc"))
-                .andExpect(jsonPath("$[*].name", contains("Panificio Bianchi")));
+                .andExpect(jsonPath("$.companies[*].name", contains("Panificio Bianchi")));
         mockMvc.perform(get(API).param("search", "bianchi").param("includeInactive", "true").header(USER, "admin"))
-                .andExpect(jsonPath("$[*].name", contains("Bianchi Logistica", "Panificio Bianchi")));
+                .andExpect(jsonPath("$.companies[*].name", contains("Bianchi Logistica", "Panificio Bianchi")));
         mockMvc.perform(get(API).param("search", "3333").header(USER, "operatore.cc"))
-                .andExpect(jsonPath("$[*].name", contains("Officina Verdi")));
+                .andExpect(jsonPath("$.companies[*].name", contains("Officina Verdi")));
+    }
+
+    @Test
+    void elencoAPagine_totaleEOrdinePerNome_dimensioniAmmesse() throws Exception {
+        // inserite al contrario: l'ordine per nome vale su tutte le pagine (US-513)
+        for (int i = 12; i >= 1; i--) {
+            Company company = TestEntities.company(DomainFixtures.vatCode());
+            company.setName("Paginata %02d".formatted(i));
+            companies.saveAndFlush(company);
+        }
+
+        mockMvc.perform(get(API).param("search", "paginata").param("size", "10").header(USER, "operatore.cc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(12))
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.size").value(10))
+                .andExpect(jsonPath("$.companies", hasSize(10)))
+                .andExpect(jsonPath("$.companies[0].name").value("Paginata 01"))
+                .andExpect(jsonPath("$.companies[9].name").value("Paginata 10"));
+        mockMvc.perform(get(API).param("search", "paginata").param("size", "10").param("page", "1")
+                        .header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.total").value(12))
+                .andExpect(jsonPath("$.companies[*].name", contains("Paginata 11", "Paginata 12")));
+        // oltre l'ultima pagina: nessuna azienda, ma il totale c'è
+        mockMvc.perform(get(API).param("search", "paginata").param("size", "10").param("page", "5")
+                        .header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.companies").isEmpty())
+                .andExpect(jsonPath("$.total").value(12));
+        // senza indicazioni: la prima pagina da 25
+        mockMvc.perform(get(API).param("search", "paginata").header(USER, "admin"))
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.size").value(25))
+                .andExpect(jsonPath("$.companies", hasSize(12)));
+        // solo 10, 25, 50 o 100 per pagina; niente pagine negative
+        for (String size : new String[] {"0", "1", "26", "1000"}) {
+            mockMvc.perform(get(API).param("size", size).header(USER, "operatore.cc"))
+                    .andExpect(status().isBadRequest());
+        }
+        mockMvc.perform(get(API).param("page", "-1").header(USER, "operatore.cc")).andExpect(status().isBadRequest());
+        mockMvc.perform(get(API).param("size", "100").header(USER, "operatore.cc")).andExpect(status().isOk());
     }
 
     @Test
@@ -281,12 +323,12 @@ class CompanyResourceIT {
         createdId("Bar Completo", "12345678901");
 
         mockMvc.perform(get(API).param("search", "bar").header(USER, "operatore.cc"))
-                .andExpect(jsonPath("$[*].name", contains("Bar Centrale", "Bar Completo")))
-                .andExpect(jsonPath("$[0].missingData", contains("VAT_CODE")))
-                .andExpect(jsonPath("$[1].missingData").isEmpty());
+                .andExpect(jsonPath("$.companies[*].name", contains("Bar Centrale", "Bar Completo")))
+                .andExpect(jsonPath("$.companies[0].missingData", contains("VAT_CODE")))
+                .andExpect(jsonPath("$.companies[1].missingData").isEmpty());
         mockMvc.perform(get(API).param("toComplete", "true").header(USER, "operatore.cc"))
-                .andExpect(jsonPath("$[*].name", contains("Azienda senza nome n. 1234", "Bar Centrale")))
-                .andExpect(jsonPath("$[0].missingData", contains("NAME", "VAT_CODE")));
+                .andExpect(jsonPath("$.companies[*].name", contains("Azienda senza nome n. 1234", "Bar Centrale")))
+                .andExpect(jsonPath("$.companies[0].missingData", contains("NAME", "VAT_CODE")));
 
         String id = TsidMapper.toExternal(noName.getId());
         mockMvc.perform(put(API + "/" + id).header(USER, "operatore.cc").contentType(MediaType.APPLICATION_JSON)
@@ -294,7 +336,7 @@ class CompanyResourceIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.missingData").isEmpty());
         mockMvc.perform(get(API).param("toComplete", "true").header(USER, "operatore.cc"))
-                .andExpect(jsonPath("$[*].name", contains("Bar Centrale")));
+                .andExpect(jsonPath("$.companies[*].name", contains("Bar Centrale")));
         assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.COMPANY, noName.getId()))
                 .last()
                 .satisfies(e -> assertThat(e.getChanges())
@@ -327,9 +369,9 @@ class CompanyResourceIT {
                 });
 
         mockMvc.perform(get(API).param("businessCategoryId", ristorante).header(USER, "operatore.cc"))
-                .andExpect(jsonPath("$[*].name", contains("Pizzeria Napoli")));
+                .andExpect(jsonPath("$.companies[*].name", contains("Pizzeria Napoli")));
         mockMvc.perform(get(API).param("businessCategoryId", "non-un-id").header(USER, "operatore.cc"))
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(jsonPath("$.companies").isEmpty()).andExpect(jsonPath("$.total").value(0));
 
         // categoria disattivata dall'ADMIN: resta sull'azienda che l'ha, non si sceglie per le altre
         mockMvc.perform(post("/api/v1/catalogs/business-categories/" + ristorante + "/deactivate").header(USER, "admin"))
@@ -403,7 +445,7 @@ class CompanyResourceIT {
                 .andExpect(jsonPath("$.contacts[1].email").value("personale@azienda.test"))
                 .andReturn().getResponse().getContentAsString(), "$.id");
         mockMvc.perform(get(API).param("search", "Bellavista").header(USER, "operatore.cc"))
-                .andExpect(jsonPath("$[0].contacts[*].role.name", contains("Titolare", "Responsabile del personale")));
+                .andExpect(jsonPath("$.companies[0].contacts[*].role.name", contains("Titolare", "Responsabile del personale")));
         assertThat(companyAudit(id)).singleElement().satisfies(e -> {
             assertThat(e.getChanges()).containsEntry("contacts", Map.of("redacted", true));
             assertThat(e.getChanges().toString()).doesNotContain("Paola", "333 1234567", "personale@");
@@ -552,7 +594,13 @@ class CompanyResourceIT {
         mockMvc.perform(post(API + "/" + id + "/deactivate").header(USER, "operatore.cc")
                         .contentType(MediaType.APPLICATION_JSON).content("{\"version\": 0}"))
                 .andExpect(jsonPath("$.active").value(false));
-        mockMvc.perform(get(API).header(USER, "operatore.cc")).andExpect(jsonPath("$[*].id", not(hasItem(id))));
+        // con la ricerca: l'elenco è a pagine e senza la ricerca l'azienda potrebbe essere in un'altra (US-513)
+        mockMvc.perform(get(API).param("search", "Officina Rossi").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.total").value(0))
+                .andExpect(jsonPath("$.companies[*].id", not(hasItem(id))));
+        mockMvc.perform(get(API).param("search", "Officina Rossi").param("includeInactive", "true")
+                        .header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.companies[*].id", contains(id)));
         mockMvc.perform(post(API + "/" + id + "/activate").header(USER, "operatore.cc")
                         .contentType(MediaType.APPLICATION_JSON).content("{\"version\": 1}"))
                 .andExpect(jsonPath("$.active").value(true));
