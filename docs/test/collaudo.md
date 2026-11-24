@@ -1341,3 +1341,22 @@ Si fanno con l'aggiornamento della demo (README, «Aggiornare PostgreSQL»). Nel
      9:07 è verde, con il backup delle 3:30 (può partire in ritardo, come il 22/11).
   > Nota (24/11): backup delle 3:30 riuscito sulla 19 (1 MB, blocco fino al 24/12). Il controllo pianificato non era
   > ancora partito alle 9:40: lo stesso controllo, lanciato a mano alle 9:08 («stato»), è verde.
+
+## 31. Sessione attiva finché NEXUS è aperto (Sprint 17)
+
+Si fanno dopo il deploy di US-1310, con un utente qualsiasi.
+
+- [ ] **T-31.1 Pagina aperta in secondo piano (US-1310)**
+  1. Accedi a NEXUS, poi passa a un'altra scheda o a un altro programma, oppure blocca lo schermo (Windows+L).
+  2. Dopo almeno 45 minuti torna a NEXUS e apri una pagina qualsiasi. **Atteso:** sei ancora dentro, senza password.
+
+- [ ] **T-31.2 PC in sospensione (US-1310)**
+  1. Con NEXUS aperto, metti il PC in sospensione (o chiudi il coperchio) per più di 40 minuti.
+  2. Riaccendilo. **Atteso:** entro un minuto NEXUS mostra la pagina di accesso, senza i dati di prima sullo schermo.
+
+- [ ] **T-31.3 Avviso prima delle 10 ore (US-1310)**
+  1. Facoltativo, a fine giornata: resta collegato quasi 10 ore. **Atteso:** 5 minuti prima sotto l'intestazione compare
+     «La sessione scade alle …», con «Accedi di nuovo adesso» e «Ho capito».
+  2. Premi «Accedi di nuovo adesso». **Atteso:** la pagina di accesso chiede la password; dopo l'accesso sei di nuovo
+     dentro.
+
