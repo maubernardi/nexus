@@ -1,4 +1,5 @@
-# NEXUS — stack di produzione/demo. Sul server: /opt/nexus/app (file scaricati dal deploy per il commit pubblicato).
+# NEXUS — stack di produzione. Sul server: /opt/nexus/releases/<commit>, file scaricati dal deploy per il commit
+# pubblicato; /opt/nexus/current punta alla release in esecuzione.
 # Variabili da /opt/nexus/.env (segreti, generati da bootstrap.sh) e /opt/nexus/release.env (NEXUS_VERSION).
 # Solo `web` pubblica porte verso Internet; gli altri servizi stanno sulla rete interna.
 name: nexus-server
@@ -53,13 +54,8 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?}
       JAVA_OPTS_KC_HEAP: "-Xms64m -Xmx512m"
       # variabili lette dal realm durante l'import (${...} nel JSON), solo se il realm non esiste ancora. Il realm di
-      # produzione (keycloak/nexus-realm.json, US-1306) non ha utenti di prova: le password demo restano facoltative
-      # finché gli script di deploy dei server non scaricano solo quello
+      # produzione (keycloak/nexus-realm.json, US-1306) non ha utenti di prova: il primo ADMIN lo crea il backend
       NEXUS_DOMAIN: ${NEXUS_DOMAIN:?}
-      NEXUS_DEMO_PASSWORD_TUTOR1: ${NEXUS_DEMO_PASSWORD_TUTOR1:-}
-      NEXUS_DEMO_PASSWORD_TUTOR2: ${NEXUS_DEMO_PASSWORD_TUTOR2:-}
-      NEXUS_DEMO_PASSWORD_OPERATORE: ${NEXUS_DEMO_PASSWORD_OPERATORE:-}
-      NEXUS_DEMO_PASSWORD_ADMIN: ${NEXUS_DEMO_PASSWORD_ADMIN:-}
       # segreto del client tecnico del backend (US-110); sui server installati prima lo crea keycloak-backend-client.sh
       NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET: ${NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET:-}
       # email del realm (invito dei nuovi utenti, US-103): stesso SMTP IONOS del backend; sui server installati prima
@@ -86,7 +82,8 @@ services:
     image: ${NEXUS_REGISTRY:-ghcr.io/maubernardi}/nexus-backend:${NEXUS_VERSION:?}
     restart: unless-stopped
     environment:
-      PROFILES_ACTIVE: ${NEXUS_BACKEND_PROFILES:-keycloak,seed}
+      # produzione: senza i dati dimostrativi (US-1306); il profilo seed resta solo per lo sviluppo in locale
+      PROFILES_ACTIVE: ${NEXUS_BACKEND_PROFILES:-keycloak}
       DB_URL: jdbc:postgresql://postgres:5432/nexus
       DB_USERNAME: nexus_app
       DB_PASSWORD: ${NEXUS_APP_PASSWORD:?}
@@ -106,7 +103,7 @@ services:
       KEYCLOAK_ADMIN_URL: http://keycloak:8080
       KEYCLOAK_ADMIN_CLIENT_SECRET: ${NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET:-}
       # primo ADMIN della produzione (US-1306): se in NEXUS non c'è nessun ADMIN, il backend lo crea con questi dati e
-      # gli manda l'invito per email. Li mette il PO nel .env; sulla demo, che ha già gli ADMIN, non servono
+      # gli manda l'invito per email. Li mette il PO nel .env; con un ADMIN già presente il backend li ignora
       NEXUS_ADMIN_USERNAME: ${NEXUS_ADMIN_USERNAME:-}
       NEXUS_ADMIN_FIRST_NAME: ${NEXUS_ADMIN_FIRST_NAME:-}
       NEXUS_ADMIN_LAST_NAME: ${NEXUS_ADMIN_LAST_NAME:-}

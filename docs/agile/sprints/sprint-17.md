@@ -12,7 +12,7 @@
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-1306 | Passaggio in produzione | 8 | 🔨 In corso | `prepare-production` | [#177](https://github.com/maubernardi/nexus/pull/177) (preparazione) |
+| US-1306 | Passaggio in produzione | 8 | 🔨 In corso: passaggio fatto il 24/11 | `prepare-production` | [#177](https://github.com/maubernardi/nexus/pull/177) (preparazione), [#194](https://github.com/maubernardi/nexus/pull/194) (dopo il passaggio) |
 | EN-10 | Aggiornamento a PostgreSQL 19 | 5 | 🎉 Done | `upgrade-postgresql-19` (archiviata) | [#189](https://github.com/maubernardi/nexus/pull/189), [#190](https://github.com/maubernardi/nexus/pull/190) |
 | US-1310 | Sessione attiva finché NEXUS è aperto | 3 | 🔨 In corso | `keep-session-alive` | [#197](https://github.com/maubernardi/nexus/pull/197) |
 | US-513 | Elenco delle aziende a pagine | 3 | 🔨 In corso | `paginate-company-list` | [#198](https://github.com/maubernardi/nexus/pull/198) |
@@ -82,9 +82,30 @@ Dalla review dello Sprint 16, tutte del PO:
 
 **Passaggio in produzione (US-1306):** lo script e la procedura sono pronti e provati sul backup vero della demo
 (Sprint 16). Restano:
-- il passaggio, il giorno che scegli, seguendolo insieme;
+- il passaggio, il giorno che scegli, seguendolo insieme: **fatto il 24/11**, anticipato dal PO (sotto);
 - l'invito all'ADMIN e i controlli del README;
 - la seconda PR.
+
+**Il passaggio del 24/11**, sulla release `433f234` (solo numeri):
+- prova d'importazione sul PC con lo stesso file: conteggi identici alla prova generale; le 20 chiamate con possibili
+  nomi sono tutte tra quelle già controllate dal PO;
+- il file è passato dalla home del PO: `/opt/nexus` è riservata all'utente `deploy`. README corretto;
+- backup della demo alle 11:07 (1,0 MB); pulizia in una transazione; 5 utenti tolti da Keycloak, resta l'account
+  tecnico del backend;
+- importazione: 13.799 aziende, 7.786 referenti, 6.980 note, 38.789 chiamate, 1.106 comuni non trovati, come nella
+  prova;
+- produzione avviata senza dati dimostrativi; primo backup alle 11:09 (4,3 MB); file Access cancellato dal server;
+- voci rimaste come le ha messe la demo, da controllare dai Cataloghi: il progetto POLIS e 8 tipologie di mansione
+  segnaposto;
+- il sito è rimasto fermo circa 2 minuti.
+
+Il PO ha fatto T-27.1 e T-27.2 lo stesso giorno: riuscite. I Cataloghi sono controllati; l'elenco delle aziende era
+lento e ha portato a US-513.
+
+**Controllo ASVS sulla produzione (24/11):** tutto come nella revisione del 07/11, tranne l'accesso degli
+amministratori di Keycloak (realm `master`), raggiungibile da Internet. Il PO sceglie di bloccarlo: Caddy risponde `403`
+e il realm `master` prende l'indirizzo del tunnel, perché la console continui a funzionare. Lo script
+`keycloak-admin-tunnel.sh` va eseguito sul server prima del deploy della seconda PR (T-27.4).
 
 ## Per il PO
 
@@ -99,7 +120,8 @@ Dalla review dello Sprint 16, tutte del PO:
 - ✅ `nexus-deploy` reinstallato, con il realm di produzione (23/11);
 - ✅ il controllo in Access delle 7 chiamate con nome e cognome e delle 20 con possibili nomi: nessun nome di
   beneficiario (23/11);
-- ⏳ il file Access sul server: una copia fresca, il giorno del passaggio.
+- ✅ il file Access sul server (24/11): il PO tiene la copia del 4/11, senza le chiamate più recenti, perché il
+  servizio è in ristrutturazione.
 
 **Dopo il passaggio:**
 - gli account degli utenti;

@@ -246,7 +246,7 @@ cmd_prepara() {
 
   step "Fatto: la PostgreSQL $new_major è pronta"
   cat <<EOF
-Il sito è fermo. Ora il deploy di main dalle Actions («Deploy demo»): parte la $new_major sul volume nuovo.
+Il sito è fermo. Ora il deploy di main dalle Actions («Deploy»): parte la $new_major sul volume nuovo.
 Dopo il deploy:  sudo bash $0 verifica
 Per annullare invece, e tornare alla $old_major com'era:
   cd $release && sudo docker compose --env-file $ENV_FILE --env-file release.env up -d

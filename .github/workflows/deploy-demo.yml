@@ -1,6 +1,6 @@
-name: Deploy demo
+name: Deploy
 
-# Deploy su comando (Actions -> Deploy demo -> Run workflow): costruisce le immagini del commit scelto,
+# Deploy su comando (Actions -> Deploy -> Run workflow): costruisce le immagini del commit scelto,
 # le pubblica su GHCR e le installa sul server tramite la chiave di deploy (forced command `nexus-deploy`).
 # Versioni congelate: action fissate per SHA (commento = tag).
 
@@ -73,9 +73,9 @@ jobs:
           printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
           for image in backend:backend web:frontend keycloak:keycloak backup:backup; do
             name="${image%%:*}"; dir="${image##*:}"
-            docker build -t "$REGISTRY/nexus-$name:$SHA" -t "$REGISTRY/nexus-$name:demo" "$dir"
+            docker build -t "$REGISTRY/nexus-$name:$SHA" -t "$REGISTRY/nexus-$name:produzione" "$dir"
             docker push "$REGISTRY/nexus-$name:$SHA"
-            docker push "$REGISTRY/nexus-$name:demo"
+            docker push "$REGISTRY/nexus-$name:produzione"
           done
           docker logout ghcr.io
 
@@ -118,6 +118,8 @@ jobs:
           done
           test "$(curl -s -o /dev/null -w '%{http_code}' "https://$NEXUS_DOMAIN/api/v1/me")" = 401
           test "$(curl -s -o /dev/null -w '%{http_code}' "https://auth.$NEXUS_DOMAIN/admin/")" = 403
+          test "$(curl -s -o /dev/null -w '%{http_code}' \
+            "https://auth.$NEXUS_DOMAIN/realms/master/protocol/openid-connect/token")" = 403
           test "$(curl -s -o /dev/null -w '%{http_code}' "https://$NEXUS_DOMAIN/actuator/health")" = 404
           curl -sI "https://$NEXUS_DOMAIN/" | grep -qi '^strict-transport-security'
-          echo "Demo online: https://$NEXUS_DOMAIN"
+          echo "Online: https://$NEXUS_DOMAIN"

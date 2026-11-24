@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# EN-6: le immagini dei test (Testcontainers, nel codice Java) devono essere le stesse della demo. Dependabot aggiorna
+# EN-6: le immagini dei test (Testcontainers, nel codice Java) devono essere le stesse della produzione. Dependabot aggiorna
 # compose e Dockerfile ma non le stringhe nel codice: questo controllo fa fallire la CI se divergono. Il backup
 # (US-1302) usa la stessa immagine di PostgreSQL del server, così pg_dump ha la stessa versione del database; lo
 # script dell'aggiornamento (EN-10) la usa per il ripristino.

@@ -104,7 +104,7 @@ else
       echo "==> Ripristino riuscito: in esecuzione $(basename "$previous")" >&2
     else
       # A16: il 05/11 il ripristino è fallito senza lasciare traccia del motivo
-      echo "==> ERRORE: anche il ripristino è fallito, la demo è ferma. Stato e log:" >&2
+      echo "==> ERRORE: anche il ripristino è fallito, il sito è fermo. Stato e log:" >&2
       compose "$previous" ps -a >&2 || true
       safe_logs "$previous" 120 >&2
     fi

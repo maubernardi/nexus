@@ -197,8 +197,12 @@ Lo fa lo script del passaggio (`infra/deploy/passaggio-in-produzione.sh`, passo 
 subito dopo la pulizia della demo. Il comando è questo; provato in locale il 21/11 su una demo pulita, con lo stesso
 esito del §9.3.
 
+**Eseguita il 24/11/2026** con il passaggio in produzione, sullo stesso file del §9.3 (copia del 4/11, dati fino al
+09/09): gli stessi conteggi. Il PO ha scelto di non prendere una copia più recente, perché il servizio è in
+ristrutturazione. Il file Access è stato cancellato dal server dopo il primo backup della produzione.
+
 ```bash
-sudo install -d -o "$USER" -m 700 /opt/nexus/import   # poi copiare il file con scp in /opt/nexus/import/nexus.mdb
+sudo install -d -o "$USER" -m 700 /opt/nexus/import   # il file ci arriva come dice il README (scp nella home, poi sudo mv)
 cd /opt/nexus/current
 docker compose --project-directory . -f compose.yaml --env-file /opt/nexus/.env --env-file release.env \
   run --rm --user "$(id -u):$(id -g)" -v /opt/nexus/import:/import \

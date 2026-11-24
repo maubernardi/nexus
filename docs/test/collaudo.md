@@ -8,9 +8,13 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 
 | | |
 |---|---|
-| **Ambiente** | https://portalenexus.it |
+| **Ambiente** | https://portalenexus.it: la demo fino al passaggio in produzione, poi la produzione (US-1306) |
 | **Versione della demo** | `47fe414` (23/11/2026), su **PostgreSQL 19** (EN-10): Sprint 1–16 completi, tranne il passaggio in produzione: backup notturno su IONOS, avvisi di fine tirocinio, testi dei messaggi; l'importazione dal database attuale si prova in locale |
 | **Ultimo aggiornamento** | 23/11/2026 (collaudo prima del passaggio finito dal PO il 23/11: T-24, T-25, T-28, T-29 e T-30.1 … T-30.3 riusciti; restano T-30.4, il backup della notte sulla 19, e dopo il passaggio T-26.3 e T-27; T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, fatto il 23/11 sulla demo `47fe414`; T-30.3 corretta: le aziende si provano come `operatore.cc`; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+
+> **Dopo il passaggio in produzione** (24/11) il sito ha i dati veri e gli utenti demo (`tutor1`, `operatore.cc`, …)
+> non ci sono più: le prove fino alla sezione 30 restano come storico. La sezione 31 (sessione) si fa con il proprio
+> account. Dove collaudare le storie nuove, senza toccare i dati veri, è da decidere nella review dello Sprint 17.
 
 ## Come prepararsi
 
@@ -1216,7 +1220,7 @@ chiavi age, variabili nel `.env` e `nexus-deploy` aggiornato. Sulla demo ci sono
      9:07, verde, con l'esito del backup delle 3:30. GitHub può ritardarlo: il 22/11 è partito alle 17:06.
   2. Nello stesso giorno c'è un solo run pianificato che ha controllato davvero; l'altro, se c'è, dice «Cron
      dell'altra stagione».
-  3. Facoltativo: se un giorno il run fallisce, arriva l'email di GitHub, come per «Controllo della demo».
+  3. Facoltativo: se un giorno il run fallisce, arriva l'email di GitHub, come per «Controllo del sito».
 
 ## 27. Passaggio in produzione (Sprint 16)
 
@@ -1232,7 +1236,7 @@ note scrivi solo numeri e codici, mai nomi o recapiti.
      esiste più.
   > Nota (24/11): riuscita dal PO, subito dopo il passaggio.
 
-- [ ] **T-27.2 Dati della produzione (US-1306)**
+- [x] **T-27.2 Dati della produzione (US-1306)**
   1. Apri la bacheca e l'elenco delle segnalazioni. **Atteso:** sono vuoti.
   2. Apri «Aziende». **Atteso:**
      - 13.799 aziende, quelle del database attuale; nessuna azienda «Demo»;
@@ -1243,10 +1247,20 @@ note scrivi solo numeri e codici, mai nomi o recapiti.
      attuale».
   4. Apri i Cataloghi. **Atteso:** progetti, tipologie di mansione, sedi, enti, comuni e i 6 modelli dei documenti
      sono quelli della demo. Correggi o disattiva le voci che la pulizia ha elencato come dimostrative.
+  > Nota (24/11): riuscita dal PO, con la nota di Access nel diario e i Cataloghi controllati. La velocità dell'elenco
+  > delle aziende si prova con T-32, dopo il deploy di US-513.
 
 - [ ] **T-27.3 Backup della produzione (US-1302, US-1306)**
   1. Il giorno dopo il passaggio, alle 9, controlla Actions → «Backup del database». **Atteso:** verde, con il backup
      della notte.
+
+- [ ] **T-27.4 Console di Keycloak solo dal tunnel (US-1306, controllo ASVS del 24/11)** 🆕
+  1. Prima del deploy della seconda PR di US-1306, sul server: `sudo bash keycloak-admin-tunnel.sh` (README, «Console
+     di Keycloak»). **Atteso:** «impostato: il realm master risponde come http://localhost:8081».
+  2. Dopo il deploy, dal PC: `ssh -L 8081:127.0.0.1:8081 <server>`, poi apri `http://localhost:8081/admin` e accedi
+     come `admin`. **Atteso:** la console si apre; in «Users» del realm nexus vedi gli utenti.
+  3. Senza tunnel apri `https://auth.portalenexus.it/realms/master/account`. **Atteso:** «Accesso non consentito».
+  4. Esci e rientra in NEXUS. **Atteso:** l'accesso funziona come prima.
 
 ## 28. Avvisi di fine tirocinio (Sprint 16)
 

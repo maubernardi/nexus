@@ -128,9 +128,10 @@ Gli aggiornamenti arrivano con le PR di Dependabot, le versioni principali in PR
 |---|---|---|---|---|---|---|---|---|
 | 25.0.5 | 4.1.2 | 26.13.0 | 12.18.0 | 19.3.1 | 8.3.6 | 7.0.2 (API 6.0 per typescript-eslint) | 19.0 | 26.8.2 |
 
-## Demo online
+## Produzione online
 
-La demo con dati fittizi è pubblicata su **https://portalenexus.it** (Keycloak su `https://auth.portalenexus.it`).
+NEXUS è in produzione su **https://portalenexus.it** (Keycloak su `https://auth.portalenexus.it`), con i dati veri,
+dal passaggio in produzione (US-1306, sotto). Prima, sullo stesso server, c'era la demo con dati fittizi.
 Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deployment/design.md`](openspec/changes/archive/2026-09-28-add-demo-deployment/design.md).
 
 | Cosa | Dove |
@@ -138,7 +139,7 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
 | Stack (Caddy, backend, Keycloak, PostgreSQL) | `infra/deploy/compose.yaml` |
 | Immagini | `backend/Dockerfile`, `frontend/Dockerfile` + `frontend/Caddyfile`, `keycloak/Dockerfile` (tema di accesso), `backup/Dockerfile` → `ghcr.io/maubernardi/nexus-{backend,web,keycloak,backup}` |
 | Preparazione del server (una volta) | `infra/deploy/bootstrap.sh` |
-| Deploy | GitHub → Actions → **Deploy demo** → *Run workflow* (`.github/workflows/deploy-demo.yml`) |
+| Deploy | GitHub → Actions → **Deploy** → *Run workflow* (`.github/workflows/deploy-demo.yml`) |
 | Backup | ogni notte alle 3:30; esito e backup subito: Actions → **Backup del database** ([sotto](#backup-del-database)) |
 
 - **Deploy su comando.** Il workflow costruisce le immagini del commit scelto, le pubblica su GHCR e le installa sul
@@ -146,10 +147,23 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
 - **Immagine nuova.** Il primo caricamento di un'immagine mai pubblicata può essere rifiutato da GHCR (`denied`): il
   pacchetto viene comunque creato e collegato al repository, quindi basta rilanciare il job fallito (successo con
   `nexus-keycloak` il 29/10). Il server non viene toccato finché il build non riesce.
-- **Segreti** in `/opt/nexus/.env` sul server (generati da `bootstrap.sh`, mai in git); le credenziali demo si
-  rileggono con `sudo cat /opt/nexus/.env`.
+- **Segreti** in `/opt/nexus/.env` sul server (generati da `bootstrap.sh`, mai in git); si rileggono con
+  `sudo cat /opt/nexus/.env`.
+- **Primo ADMIN (server nuovo).** Il realm di produzione non ha utenti di prova. `bootstrap.sh` lascia nel `.env` le
+  righe vuote `NEXUS_ADMIN_USERNAME`, `NEXUS_ADMIN_FIRST_NAME`, `NEXUS_ADMIN_LAST_NAME` e `NEXUS_ADMIN_EMAIL`, da
+  compilare prima del primo deploy. Al primo avvio il backend crea l'ADMIN e gli manda l'invito per email, valido 3
+  giorni (poi «Password dimenticata?»). Con un ADMIN già presente il backend ignora questi dati.
 - **Console di Keycloak** non esposta su Internet: `ssh -L 8081:127.0.0.1:8081 <server>`, poi
-  `http://localhost:8081/admin` (utente `admin`, password `KEYCLOAK_ADMIN_PASSWORD` del `.env`).
+  `http://localhost:8081/admin` (utente `admin`, password `KEYCLOAK_ADMIN_PASSWORD` del `.env`). Da fuori Caddy
+  blocca anche l'accesso degli amministratori (`/realms/master`, controllo ASVS del 24/11): per questo il realm `master`
+  ha l'indirizzo del tunnel, `http://localhost:8081`, e la console fa accedere senza passare dal dominio pubblico. Lo
+  imposta, **una volta**, lo script qui sotto: sul server già installato **prima** del deploy che porta il blocco,
+  altrimenti la console si ferma con «Timeout when waiting for 3rd party check iframe message»; su un server nuovo
+  dopo il primo deploy.
+  ```bash
+  curl -fsSLO https://raw.githubusercontent.com/maubernardi/nexus/main/infra/deploy/keycloak-admin-tunnel.sh
+  sudo bash keycloak-admin-tunnel.sh   # nessun segreto; il realm nexus non cambia
+  ```
 - **Tema e lingua del realm (una volta, dopo il primo deploy con il tema).** L'import all'avvio non modifica un realm
   già esistente: sulla demo tema `nexus` e sola lingua italiana si impostano con
   ```bash
@@ -169,9 +183,8 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
   sudo nano /opt/nexus/.env      # aggiungere la riga NEXUS_SMTP_PASSWORD=<password della casella admin@>
   ```
   Senza la password le email restano spente e il log del backend lo dice all'avvio. Le email vanno all'indirizzo
-  dell'anagrafica utenti di NEXUS (`app_user.email`): gli utenti demo hanno indirizzi finti `@nexus.local`, che non le
-  ricevono (l'errore resta nel log, l'app continua). Per una prova si dà un indirizzo vero a un utente demo dal suo
-  profilo (US-110, punto seguente).
+  dell'anagrafica utenti di NEXUS (`app_user.email`). In locale gli utenti di prova hanno indirizzi finti
+  `@nexus.local`, che non le ricevono: l'errore resta nel log e l'app continua.
 - **Cambio dell'indirizzo email (US-110).** Ogni utente lo cambia da «Il mio profilo» (il proprio nome
   nell'intestazione) con un codice inviato al nuovo indirizzo; l'indirizzo cambia in NEXUS e in Keycloak. Il backend
   usa il client tecnico `nexus-backend-admin` (solo `view-users` e `manage-users`), con il segreto
@@ -370,6 +383,10 @@ US-1306 ([design](openspec/changes/prepare-production/design.md)). Decisione del
 demo tranne segnalazioni, utenti e beneficiari; le aziende vengono dal database attuale (US-1309). Lo fa lo script
 `infra/deploy/passaggio-in-produzione.sh`, provato in locale; il PO lo lancia sul server.
 
+> **Fatto il 24/11/2026**, sulla release `433f234`, con il file Access del 4/11: aziende 13.799, referenti 7.786,
+> note 6.980, chiamate 38.789, come nella prova. Il PO ha accettato di perdere le chiamate successive: il servizio è in
+> ristrutturazione. Il resto della sezione resta come riferimento.
+
 **Prima (il PO):**
 1. Collaudo finito. Dai Cataloghi si tolgono le voci create solo per prova: la configurazione passa così com'è.
 2. Prova generale sul backup vero della demo, insieme: ripristino con `backup/ripristino-di-prova.sh --tieni`, poi
@@ -389,9 +406,12 @@ demo tranne segnalazioni, utenti e beneficiari; le aziende vengono dal database 
 5. Deploy di `main` dalle Actions: il backend riceve i dati dell'ADMIN. Sulla demo non li usa, perché gli ADMIN ci
    sono già.
 6. Il file Access sul server, dopo i controlli in Access delle chiamate con possibili nomi (analisi, §7 e §9.3):
+   `/opt/nexus` è riservata all'utente `deploy` (`750`): il file passa dalla tua home e lo sposta `sudo`.
    ```bash
-   sudo install -d -o "$USER" -m 700 /opt/nexus/import                # sul server
-   scp documenti_base/nexus.mdb <server>:/opt/nexus/import/nexus.mdb   # dal PC
+   scp documenti_base/nexus.mdb <server>:nexus.mdb                      # dal PC
+   sudo install -d -o "$USER" -m 700 /opt/nexus/import                  # sul server
+   sudo mv ~/nexus.mdb /opt/nexus/import/nexus.mdb && sudo chmod 600 /opt/nexus/import/nexus.mdb
+   sudo sha256sum /opt/nexus/import/nexus.mdb                           # la stessa impronta del file sul PC
    ```
 
 **Passaggio (sul server, una volta sola):**

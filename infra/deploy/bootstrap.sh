@@ -62,7 +62,6 @@ step "Directory $BASE e segreti"
 install -d -m 750 -o deploy -g deploy "$BASE" "$BASE/releases"
 gen() { openssl rand -base64 48 | tr -dc 'A-Za-z0-9' | head -c "${1:-32}"; }
 if [[ ! -f $BASE/.env ]]; then
-  demo_tutor1="Demo-$(gen 14)"; demo_tutor2="Demo-$(gen 14)"; demo_op="Demo-$(gen 14)"; demo_admin="Demo-$(gen 14)"
   kc_admin="$(gen 24)"
   umask 077
   cat >"$BASE/.env" <<ENV
@@ -74,21 +73,18 @@ NEXUS_OWNER_PASSWORD=$(gen)
 NEXUS_APP_PASSWORD=$(gen)
 KEYCLOAK_DB_PASSWORD=$(gen)
 KEYCLOAK_ADMIN_PASSWORD=$kc_admin
-NEXUS_DEMO_PASSWORD_TUTOR1=$demo_tutor1
-NEXUS_DEMO_PASSWORD_TUTOR2=$demo_tutor2
-NEXUS_DEMO_PASSWORD_OPERATORE=$demo_op
-NEXUS_DEMO_PASSWORD_ADMIN=$demo_admin
 NEXUS_KEYCLOAK_ADMIN_CLIENT_SECRET=$(gen 40)
+# primo ADMIN (US-1306): lo crea il backend al primo avvio e gli manda l'invito per email. Da compilare prima del
+# primo deploy (README, «Produzione online», «Primo ADMIN»)
+NEXUS_ADMIN_USERNAME=
+NEXUS_ADMIN_FIRST_NAME=
+NEXUS_ADMIN_LAST_NAME=
+NEXUS_ADMIN_EMAIL=
 ENV
   chown deploy:deploy "$BASE/.env" && chmod 600 "$BASE/.env"
   cat <<INFO
 
   Credenziali generate (mostrate SOLO ora; restano in $BASE/.env, leggibile con sudo):
-    App demo  https://$NEXUS_DOMAIN
-      tutor1        $demo_tutor1
-      tutor2        $demo_tutor2
-      operatore.cc  $demo_op
-      admin         $demo_admin
     Console Keycloak (tunnel: ssh -L 8081:127.0.0.1:8081 <server>, poi http://localhost:8081/admin)
       admin         $kc_admin
   Salvale nel tuo gestore di password.
@@ -106,4 +102,5 @@ firewall-cmd --list-services
 firewall-cmd --list-ports
 
 step "Fatto"
-echo "Il server è pronto: il primo deploy si avvia da GitHub (Actions -> Deploy demo -> Run workflow)."
+echo "Il server è pronto. Prima del primo deploy: i dati del primo ADMIN (NEXUS_ADMIN_*) in $BASE/.env, con sudo nano."
+echo "Poi il deploy da GitHub (Actions -> Deploy -> Run workflow): il backend crea l'ADMIN e gli manda l'invito."

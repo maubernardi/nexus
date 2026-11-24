@@ -2,7 +2,8 @@
 
 **Storia:** US-1307 (Sprint 10) · **Data:** 07/11/2026 · **Versione esaminata:** demo `0c42db6` su
 https://portalenexus.it · **Chi:** team di sviluppo (Claude Code), da rivedere con il PO prima del passaggio in
-produzione (US-1306).
+produzione (US-1306). **Ricontrollata sulla produzione** il 24/11/2026, release `433f234`, subito dopo il passaggio
+(sotto, «Controllo sulla produzione»).
 
 Metodo: lettura del codice e della configurazione (backend, PWA, Keycloak, Caddy, deploy), test automatici esistenti,
 richieste dall'esterno alla demo (intestazioni HTTP, percorsi pubblici, certificati). Sono riportati i requisiti di
@@ -38,7 +39,7 @@ Legenda: ✅ soddisfatto · ⚠️ lacuna, con azione proposta · — non applic
 | 2.2.3 Avviso dopo il cambio delle credenziali | ✅ | Email «PORTALE NEXUS - Le tue credenziali sono state cambiate» con data, ora e IP (US-1308) |
 | 2.5.1 Recupero senza rivelare la password | ✅ | Collegamento monouso per email, valido 30 minuti (US-1308) |
 | 2.5.2 Niente domande segrete | ✅ | Non esistono |
-| 2.5.4 Nessun account condiviso o predefinito | ✅ | Gli utenti li crea l'ADMIN (US-103); gli utenti demo esistono solo sulla demo e si eliminano con US-1306 |
+| 2.5.4 Nessun account condiviso o predefinito | ✅ | Gli utenti li crea l'ADMIN (US-103); gli utenti demo sono stati eliminati con il passaggio in produzione del 24/11 (US-1306), e il realm di produzione non ne ha |
 | 2.7/2.8 Codici monouso | ✅ | Codice del cambio email: 6 cifre, 30 minuti, 5 tentativi (US-110) |
 
 ## V3 — Sessioni
@@ -59,7 +60,7 @@ Legenda: ✅ soddisfatto · ⚠️ lacuna, con azione proposta · — non applic
 | 4.1.1 Regole applicate sul server | ✅ | `@PreAuthorize` + controlli nei servizi |
 | 4.1.3 Minimo privilegio | ✅ | Tutor: solo i propri beneficiari e i progetti assegnati (US-104, US-204); Coordinatore solo nei progetti che coordina (US-112); client tecnico Keycloak con `view-users`, `manage-users`, `view-events` |
 | 4.2.1 Accesso diretto agli oggetti (IDOR) | ✅ | Visibilità per proprietario/progetto nei servizi; un oggetto non visibile risponde `404`; test di integrazione `403`/`404` per ogni storia |
-| 4.3.1 Interfacce di amministrazione protette | ✅ | Console di Keycloak raggiungibile solo da localhost (dall'esterno `403`, verificato a ogni deploy) |
+| 4.3.1 Interfacce di amministrazione protette | ✅ | Console di Keycloak e accesso dei suoi amministratori (realm `master`) raggiungibili solo dal tunnel SSH: dall'esterno `403` su `/admin` e `/realms/master`, verificato a ogni deploy (il secondo dal 24/11) |
 
 ## V5 — Validazione, sanificazione, codifica
 
@@ -124,12 +125,38 @@ Legenda: ✅ soddisfatto · ⚠️ lacuna, con azione proposta · — non applic
 | L1 | Password comuni accettate (2.1.7) | Policy `passwordBlacklist` di Keycloak con un elenco pubblico di password comuni (es. le 100 000 più usate), nel tema/immagine e attivata da uno script | Team | ✅ fatto con EN-7 (Sprint 11) |
 | L2 | Nessun avviso per dipendenze vulnerabili (14.2.1) | Attivare gli **avvisi di sicurezza di Dependabot** del repository (solo avvisi, senza PR automatiche: le versioni restano congelate e si aggiorna solo su decisione) | PO (impostazione di GitHub) | ✅ fatto l'08/11 |
 
-Da rivedere quando cambiano: caricamento dei file (US-205), passaggio in produzione (US-1306: utenti demo eliminati,
-backup, questa revisione aggiornata).
+Da rivedere quando cambiano: caricamento dei file (US-205), passaggio in produzione (US-1306: fatto il 24/11, sotto).
+
+## Controllo sulla produzione (24/11/2026)
+
+Da fuori, sulla release `433f234`, subito dopo il passaggio in produzione (US-1306):
+
+| Cosa | Esito |
+|---|---|
+| TLS | ✅ solo 1.2 e 1.3 (1.0 e 1.1 rifiutati); certificato Let's Encrypt valido fino al 27/12, rinnovato da Caddy |
+| HTTP | ✅ reindirizzato a HTTPS (`308`) |
+| Intestazioni della PWA | ✅ HSTS, CSP rigida, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, `frame-ancestors 'none'` |
+| Intestazioni di Keycloak | ✅ HSTS, `nosniff`, `Referrer-Policy`, `X-Frame-Options: SAMEORIGIN` |
+| API | ✅ `401` senza token, `Cache-Control: no-store` |
+| Endpoint tecnici | ✅ actuator, OpenAPI e Swagger: `404` dal dominio, `401` sotto `/api` |
+| Console e API di amministrazione di Keycloak | ✅ `403` |
+| Pagina di accesso | ✅ senza registrazione, con «Password dimenticata?» |
+| Utenti demo | ✅ eliminati dallo script del passaggio (5); resta l'account tecnico del backend, e il primo ADMIN lo crea il backend con l'invito (T-27.1) |
+| Accesso degli amministratori di Keycloak (realm `master`) | ⚠️ → ✅ raggiungibile da Internet: token, pagina di accesso e «il mio account». Si poteva provare la password dell'amministratore da fuori (24 caratteri casuali, quindi rischio basso), anche se console e API restavano bloccate |
+
+**Azione (decisione del PO, 24/11):** bloccare anche `/realms/master` da fuori.
+- Caddy risponde `403`, anche con percorsi alterati (maiuscole, doppie barre, `..`, caratteri codificati; il `;` lo
+  rifiuta Keycloak), e il deploy lo verifica.
+- La console, aperta dal tunnel, faceva accedere l'amministratore dal dominio pubblico: con il solo blocco si fermava
+  («Timeout when waiting for 3rd party check iframe message», provato in locale). Il realm `master` prende quindi
+  l'indirizzo del tunnel, `http://localhost:8081`, con `infra/deploy/keycloak-admin-tunnel.sh`. Provato in locale:
+  - la console si apre e funziona tutta su `localhost`;
+  - `kcadm` degli script funziona;
+  - l'accesso a NEXUS (realm `nexus`) non cambia.
 
 ## Monitoraggio (US-1307)
 
-Il workflow **«Controllo della demo»** (`.github/workflows/uptime.yml`) gira ogni 10 minuti dalle 8 alle 20 (ora
+Il workflow **«Controllo del sito»** (`.github/workflows/uptime.yml`) gira ogni 10 minuti dalle 8 alle 20 (ora
 italiana) e controlla da fuori la PWA, Keycloak e il backend (`/api/v1/me` deve rispondere `401`), con 3 tentativi a 30
 secondi; controlla anche che i certificati non scadano entro 14 giorni. Se fallisce, GitHub manda un'email al PO.
 Limiti: GitHub può ritardare i run pianificati di qualche minuto e li sospende dopo 60 giorni senza attività nel
