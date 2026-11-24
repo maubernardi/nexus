@@ -28,6 +28,7 @@ export type RouteHandle = {
     | 'pages.userProjects.title'
     | 'pages.userTickets.title'
     | 'pages.userAccount.title'
+    | 'pages.userDetails.title'
     | 'pages.coordination.title'
     | 'pages.userAccessLog.title'
     | 'pages.failedLogins.title'

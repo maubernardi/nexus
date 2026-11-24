@@ -31,6 +31,17 @@ public class LocalIdentityProviderUsers implements IdentityProviderUsers {
     }
 
     @Override
+    public void updateDetails(String externalId, IdentityUserDetails details) {
+        log.info("Identity provider assente (profilo senza keycloak): dati aggiornati solo in NEXUS");
+    }
+
+    /** Senza Keycloak nessun account ha una password: lo username resta correggibile. */
+    @Override
+    public boolean hasPassword(String externalId) {
+        return false;
+    }
+
+    @Override
     public void deleteUser(String externalId) {
         // nulla da annullare
     }

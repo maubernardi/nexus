@@ -5,6 +5,9 @@ import java.util.List;
 import it.nexus.domain.dto.UserCreateDTO;
 import it.nexus.domain.dto.UserCreatedDTO;
 import it.nexus.domain.dto.UserDTO;
+import it.nexus.domain.dto.UserDetailsDTO;
+import it.nexus.domain.dto.UserDetailsSavedDTO;
+import it.nexus.domain.dto.UserDetailsUpdateDTO;
 import it.nexus.domain.dto.UserImpactDTO;
 import it.nexus.domain.dto.UserProjectsDTO;
 import it.nexus.domain.enumeration.Role;
@@ -40,6 +43,23 @@ public interface UserAdminService {
      * @throws it.nexus.web.errors.FieldValidationException progetto inesistente o disattivato
      */
     UserDTO updateProjects(String id, UserProjectsDTO dto);
+
+    /**
+     * Dati che l'ADMIN può correggere (US-116), con l'indicazione se lo username è ancora correggibile.
+     *
+     * @throws it.nexus.web.errors.ServiceUnavailableException Keycloak non raggiungibile
+     */
+    UserDetailsDTO details(String id);
+
+    /**
+     * Corregge nome, cognome, username, email e telefono in NEXUS e in Keycloak (US-116). Lo username solo se l'utente
+     * non ha ancora la password. Se cambia l'email: nuovo invito a chi non ha la password, avviso al vecchio indirizzo
+     * a chi ce l'ha.
+     *
+     * @throws it.nexus.web.errors.FieldValidationException username o email già usati, username non più correggibile
+     * @throws it.nexus.web.errors.ServiceUnavailableException Keycloak non raggiungibile: nulla cambia
+     */
+    UserDetailsSavedDTO updateDetails(String id, UserDetailsUpdateDTO dto);
 
     /** Che cosa tocca disattivare l'utente o cambiargli il ruolo (US-105). */
     UserImpactDTO impact(String id);

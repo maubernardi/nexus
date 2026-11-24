@@ -88,7 +88,12 @@ describe('<UsersPage>', () => {
       within(rows[2])
         .getAllByRole('link')
         .map((l) => l.textContent),
-    ).toEqual(['Accesso e ruolo', 'Accessi']);
+    ).toEqual(['Dati', 'Accesso e ruolo', 'Accessi']);
+    // dati dell'utente per tutti (US-116)
+    expect(within(rows[2]).getByRole('link', { name: 'Dati di Verdi Anna' })).toHaveAttribute(
+      'href',
+      '/utenti/U2/dati',
+    );
     // registro degli accessi per tutti (US-113)
     expect(within(rows[2]).getByRole('link', { name: 'Accessi di Verdi Anna' })).toHaveAttribute(
       'href',
@@ -142,5 +147,12 @@ describe('<UsersPage>', () => {
   it('esito di «Accesso e ruolo»', async () => {
     renderPage({ notice: 'Mario Rossi è disattivato: non può più accedere.' });
     expect(await screen.findByRole('status')).toHaveTextContent('Mario Rossi è disattivato');
+  });
+
+  it('esito di «Dati» come avviso: invito non partito (US-116)', async () => {
+    renderPage({ notice: 'Dati di Mario Rossi salvati, ma il nuovo invito non è partito.', alert: true });
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('Dati di Mario Rossi salvati, ma il nuovo invito non è partito.');
+    await waitFor(() => expect(alert).toHaveFocus());
   });
 });

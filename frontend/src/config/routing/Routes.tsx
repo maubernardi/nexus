@@ -27,6 +27,7 @@ import { CompanyNewPage } from '@/pages/CompanyNewPage/CompanyNewPage';
 import { NotificationsPage } from '@/pages/NotificationsPage/NotificationsPage';
 import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
 import { UserAccountPage } from '@/pages/UserAccountPage/UserAccountPage';
+import { UserDetailsPage } from '@/pages/UserDetailsPage/UserDetailsPage';
 import { UserNewPage } from '@/pages/UserNewPage/UserNewPage';
 import { UserProjectsPage } from '@/pages/UserProjectsPage/UserProjectsPage';
 import { UserTicketsPage } from '@/pages/UserTicketsPage/UserTicketsPage';
@@ -277,6 +278,15 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.userAccount.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'utenti/:id/dati',
+        element: (
+          <RoleRoute roles={['ADMIN']}>
+            <UserDetailsPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.userDetails.title' } satisfies RouteHandle,
       },
       {
         path: 'beneficiari/tutti',

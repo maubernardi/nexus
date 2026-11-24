@@ -94,3 +94,48 @@ export const changeUserRole = async ({ id, role }: { id: string; role: Role }): 
   const { data } = await axiosInstance.put<AdminUser>(`${ENDPOINTS.users}/${id}/role`, { role });
   return data;
 };
+
+/** Dati che l'ADMIN può correggere (US-116); lo username solo se l'utente non ha ancora impostato la password. */
+export type UserDetails = {
+  id: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  active: boolean;
+  usernameEditable: boolean;
+};
+
+export type UserDetailsForm = {
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+};
+
+/**
+ * `invitationSent` c'è solo se l'email è cambiata a un utente che non ha ancora la password: vero se il nuovo invito è
+ * partito.
+ */
+export type UserDetailsSaved = {
+  user: UserDetails;
+  invitationSent?: boolean;
+};
+
+export const fetchUserDetails = async (id: string): Promise<UserDetails> => {
+  const { data } = await axiosInstance.get<UserDetails>(`${ENDPOINTS.users}/${id}/details`);
+  return data;
+};
+
+export const updateUserDetails = async ({
+  id,
+  form,
+}: {
+  id: string;
+  form: UserDetailsForm;
+}): Promise<UserDetailsSaved> => {
+  const { data } = await axiosInstance.put<UserDetailsSaved>(`${ENDPOINTS.users}/${id}/details`, form);
+  return data;
+};

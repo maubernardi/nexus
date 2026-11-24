@@ -154,6 +154,17 @@ Da fuori, sulla release `433f234`, subito dopo il passaggio in produzione (US-13
   - `kcadm` degli script funziona;
   - l'accesso a NEXUS (realm `nexus`) non cambia.
 
+### Dati dell'account dalla pagina di Keycloak (24/11, US-116)
+
+| Cosa | Esito |
+|---|---|
+| Pagina «il mio account» del realm `nexus` | ⚠️ → ✅ un utente creato da NEXUS (ruolo `manage-account`) poteva cambiare da lì nome, cognome ed email. Il cambio dell'email saltava il codice di US-110 (ASVS 3.7.1: le modifiche all'account richiedono una verifica), e NEXUS e Keycloak restavano con dati diversi. Trovato sul collaudo del PC, con dati finti |
+
+**Azione (US-116, decisione del PO del 24/11):** nel profilo utente del realm username, email, nome e cognome sono
+modificabili solo dall'amministrazione, cioè da NEXUS; dalla pagina dell'account si vedono soltanto. In produzione
+con `infra/deploy/keycloak-user-profile.sh`. La CI prova lo script: prima nome ed email cambiano, dopo i tre cambi sono
+rifiutati.
+
 ## Monitoraggio (US-1307)
 
 Il workflow **«Controllo del sito»** (`.github/workflows/uptime.yml`) gira ogni 10 minuti dalle 8 alle 20 (ora

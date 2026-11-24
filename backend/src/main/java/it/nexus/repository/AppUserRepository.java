@@ -27,6 +27,9 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
 
     boolean existsByUsernameIgnoreCase(String username);
 
+    /** Username già usato da un altro utente (US-116). */
+    boolean existsByUsernameIgnoreCaseAndIdNot(String username, Long id);
+
     /** C'è almeno un utente con il ruolo, attivo o no: per il primo ADMIN della produzione (US-1306). */
     boolean existsByRole(Role role);
 
