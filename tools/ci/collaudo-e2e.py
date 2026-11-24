@@ -3,8 +3,10 @@
 Con il collaudo già avviato (infra/collaudo/collaudo.sh avvia ...) fa da utente, solo dall'esterno:
   1. accesso di tutor1 dalla pagina di Keycloak, come la PWA (codice con PKCE): /api/v1/me risponde con il ruolo TUTOR;
   2. email del backend: il cambio dell'indirizzo manda il codice, e arriva nella casella finta (Mailpit);
-  3. email di Keycloak: «Password dimenticata?» per operatore.cc arriva nella casella finta.
-Nessuna email esce: Mailpit le tiene tutte.
+  3. email di Keycloak: «Password dimenticata?» per operatore.cc arriva nella casella finta;
+  4. correzione dei dati (US-116): l'ADMIN crea un utente con username ed email sbagliati e li corregge prima che entri;
+     l'invito ripartito arriva al nuovo indirizzo e il collegamento di quello vecchio non vale più.
+Nessuna email esce: Mailpit le tiene tutte. Il passo 4 lascia nel collaudo un utente finto nuovo a ogni giro.
 
 Uso: python3 -I collaudo-e2e.py <password del collaudo>
 """
@@ -25,6 +27,9 @@ from http.cookiejar import CookieJar, DefaultCookiePolicy
 APP = "http://localhost:8090"
 AUTH = "http://localhost:8091"
 MAIL = "http://localhost:8025"
+# pagine di Keycloak aperte dal collegamento dell'invito (in italiano, la lingua del realm)
+VALID_INVITATION = "Esegui la/le seguenti azione/i"
+STALE_INVITATION = "Indirizzo email non valido"
 
 
 class LocalhostPolicy(DefaultCookiePolicy):
@@ -107,6 +112,25 @@ def wait_for_mail(address: str, timeout: float = 60) -> dict:
     sys.exit(f"Nessuna email per {address} nella casella del collaudo")
 
 
+def invitation_link(message: dict) -> str:
+    with urllib.request.urlopen(f"{MAIL}/api/v1/message/{message['ID']}") as response:
+        text = json.load(response).get("Text", "")
+    match = re.search(r"https?://\S+/login-actions/action-token\?\S+", text)
+    if not match:
+        sys.exit(f"Nessun collegamento nell'invito «{message.get('Subject')}»")
+    return match.group(0)
+
+
+def open_link(link: str) -> str:
+    """La pagina di Keycloak che apre il collegamento di un'email, anche se è una pagina di errore."""
+    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(CookieJar(policy=LocalhostPolicy())))
+    try:
+        with opener.open(link) as response:
+            return response.read().decode()
+    except urllib.error.HTTPError as error:
+        return error.read().decode()
+
+
 def main() -> None:
     password = sys.argv[1]
 
@@ -141,6 +165,31 @@ def main() -> None:
         pass
     message = wait_for_mail("operatore.cc@nexus.local")
     print(f"3. Email di Keycloak nella casella finta: «{message.get('Subject')}»")
+
+    # un utente nuovo a ogni giro: la prova si può ripetere sullo stesso collaudo
+    suffix = secrets.token_hex(3)
+    wrong, right = f"mario.rosi.{suffix}", f"mario.rossi.{suffix}"
+    admin = login("admin", password)
+    status, body = call("POST", f"{APP}/api/v1/users", admin, {
+        "username": wrong, "firstName": "Mario", "lastName": "Rosi", "email": f"{wrong}@nexus.local", "role": "TUTOR"})
+    if status != 201:
+        sys.exit(f"Creazione dell'utente: {status} {body[:500]}")
+    user_id = json.loads(body)["user"]["id"]
+    old_link = invitation_link(wait_for_mail(f"{wrong}@nexus.local"))
+    status, body = call("GET", f"{APP}/api/v1/users/{user_id}/details", admin)
+    if status != 200 or json.loads(body).get("usernameEditable") is not True:
+        sys.exit(f"Dati dell'utente mai entrato: {status} {body[:500]}")
+    status, body = call("PUT", f"{APP}/api/v1/users/{user_id}/details", admin, {
+        "username": right, "firstName": "Mario", "lastName": "Rossi", "email": f"{right}@nexus.local", "phone": None})
+    saved = json.loads(body) if status == 200 else {}
+    if saved.get("invitationSent") is not True or saved["user"]["username"] != right:
+        sys.exit(f"Correzione dei dati: {status} {body[:500]}")
+    new_link = invitation_link(wait_for_mail(f"{right}@nexus.local"))
+    if VALID_INVITATION not in open_link(new_link):
+        sys.exit("Il nuovo invito non apre la pagina per impostare la password")
+    if STALE_INVITATION not in open_link(old_link):
+        sys.exit("Il collegamento dell'invito al vecchio indirizzo vale ancora")
+    print(f"4. Correzione dei dati: {wrong} → {right}, nuovo invito nella casella finta, il vecchio non vale più")
     print("Ambiente di collaudo: OK")
 
 

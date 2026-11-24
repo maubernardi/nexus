@@ -1799,6 +1799,26 @@ export const it = {
         noTutor: 'Scegli il Tutor che riceve le segnalazioni.',
       },
     },
+    details: {
+      heading: 'Dati di {{name}}',
+      edit: 'Dati',
+      editFor: 'Dati di {{name}}',
+      intro: 'Correggi i dati scritti alla creazione: valgono subito in NEXUS e nell’account di accesso.',
+      notEntered:
+        'Non è ancora entrato in NEXUS: se correggi l’email, il nuovo indirizzo riceve un altro invito e il collegamento inviato prima non vale più.',
+      entered:
+        'È già entrato in NEXUS: se correggi l’email, il vecchio indirizzo riceve un avviso del cambio.',
+      usernameLocked:
+        'È già entrato in NEXUS: lo username non si cambia più, perché lo storico registra con lo username chi ha fatto ogni operazione.',
+      save: 'Salva i dati',
+      saving: 'Salvataggio in corso…',
+      saved: 'Dati di {{name}} salvati.',
+      savedInvitation:
+        'Dati di {{name}} salvati. Abbiamo inviato a {{email}} un nuovo invito per impostare la password, valido 3 giorni.',
+      savedNoInvitation:
+        'Dati di {{name}} salvati, ma il nuovo invito per impostare la password non è partito. Usa «Invia di nuovo l’invito» quando la posta di Keycloak funziona.',
+      loadError: 'Impossibile caricare i dati dell’utente. Controlla la connessione e riprova.',
+    },
     hints: {
       username:
         'Serve per accedere, insieme all’email. Proposto come nome.cognome; solo lettere, cifre e i separatori . _ -',
@@ -2160,6 +2180,9 @@ export const it = {
     },
     userAccount: {
       title: 'Accesso e ruolo dell’utente',
+    },
+    userDetails: {
+      title: 'Dati dell’utente',
     },
     tickets: {
       title: 'Segnalazioni',

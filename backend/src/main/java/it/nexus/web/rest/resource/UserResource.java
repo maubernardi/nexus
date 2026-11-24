@@ -19,6 +19,9 @@ import it.nexus.domain.dto.UserCreateDTO;
 import it.nexus.domain.dto.UserCreatedDTO;
 import it.nexus.domain.dto.UserActiveDTO;
 import it.nexus.domain.dto.UserDTO;
+import it.nexus.domain.dto.UserDetailsDTO;
+import it.nexus.domain.dto.UserDetailsSavedDTO;
+import it.nexus.domain.dto.UserDetailsUpdateDTO;
 import it.nexus.domain.dto.UserImpactDTO;
 import it.nexus.domain.dto.UserProjectsDTO;
 import it.nexus.domain.dto.UserRoleDTO;
@@ -62,6 +65,21 @@ public class UserResource {
     @Operation(summary = "Un utente con i progetti assegnati (US-104)")
     public ResponseEntity<UserDTO> get(@PathVariable String id) {
         return ResponseEntity.ok(userAdminService.get(id));
+    }
+
+    @GetMapping("/{id}/details")
+    @PreAuthorize("hasRole(@requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Dati correggibili dell'utente; lo username solo se non ha ancora la password (US-116)")
+    public ResponseEntity<UserDetailsDTO> details(@PathVariable String id) {
+        return ResponseEntity.ok(userAdminService.details(id));
+    }
+
+    @PutMapping("/{id}/details")
+    @PreAuthorize("hasRole(@requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Corregge nome, cognome, username, email e telefono in NEXUS e in Keycloak (US-116)")
+    public ResponseEntity<UserDetailsSavedDTO> updateDetails(@PathVariable String id,
+            @RequestBody @Valid UserDetailsUpdateDTO dto) {
+        return ResponseEntity.ok(userAdminService.updateDetails(id, dto));
     }
 
     @PutMapping("/{id}/projects")

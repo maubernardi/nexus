@@ -10,14 +10,19 @@ import {
   changeUserRole,
   createUser,
   fetchUser,
+  fetchUserDetails,
   fetchUsers,
   fetchUserImpact,
   resendInvitation,
   setUserActive,
+  updateUserDetails,
   updateUserProjects,
   type AdminUser,
   type NewUserForm,
   type UserCreated,
+  type UserDetails,
+  type UserDetailsForm,
+  type UserDetailsSaved,
   type UserImpact,
   type UserProjectsVars,
 } from '@/config/api/userAdminApi';
@@ -77,3 +82,19 @@ export const useSetUserActive = (): UseMutationResult<AdminUser, unknown, { id: 
 
 export const useChangeUserRole = (): UseMutationResult<AdminUser, unknown, { id: string; role: Role }> =>
   useUserMutation((vars: { id: string; role: Role }) => changeUserRole(vars));
+
+/** Dati correggibili di un utente (US-116). */
+export const useUserDetails = (id: string): UseQueryResult<UserDetails> =>
+  useQuery({ queryKey: [...USERS_KEY, id, 'details'], queryFn: () => fetchUserDetails(id) });
+
+export const useUpdateUserDetails = (): UseMutationResult<
+  UserDetailsSaved,
+  unknown,
+  { id: string; form: UserDetailsForm }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (vars: { id: string; form: UserDetailsForm }) => updateUserDetails(vars),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: USERS_KEY }),
+  });
+};
