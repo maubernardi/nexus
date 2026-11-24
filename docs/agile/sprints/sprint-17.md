@@ -16,7 +16,7 @@ aggiunte il 24/11.
 | EN-10 | Aggiornamento a PostgreSQL 19 | 5 | 🎉 Done | `upgrade-postgresql-19` (archiviata) | [#189](https://github.com/maubernardi/nexus/pull/189), [#190](https://github.com/maubernardi/nexus/pull/190) |
 | US-1310 | Sessione attiva finché NEXUS è aperto | 3 | 🔨 In corso | `keep-session-alive` | [#197](https://github.com/maubernardi/nexus/pull/197) |
 | US-513 | Elenco delle aziende a pagine | 3 | 🎉 Done | `paginate-company-list` (archiviata) | [#198](https://github.com/maubernardi/nexus/pull/198), [#199](https://github.com/maubernardi/nexus/pull/199) |
-| EN-11 | Ambiente di collaudo sul PC del PO | 5 | 🔨 In corso | `add-local-acceptance-env` | [#201](https://github.com/maubernardi/nexus/pull/201) |
+| EN-11 | Ambiente di collaudo sul PC del PO | 5 | 🎉 Done | `add-local-acceptance-env` (archiviata) | [#201](https://github.com/maubernardi/nexus/pull/201) |
 
 **Ordine** (PO, 23/11):
 1. **EN-10 sulla demo**, anticipata al 23/11 sera (PO):

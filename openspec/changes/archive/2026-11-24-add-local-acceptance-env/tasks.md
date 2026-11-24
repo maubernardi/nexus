@@ -29,4 +29,5 @@
 
 - [x] 3.1 README «Collaudo sul PC»; Definition of Done e flusso della storia (`docs/agile/README.md`, D8)
 - [x] 3.2 Collaudo: ambiente e preparazione, T-33; backlog EN-11 e sprint 17
-- [ ] 3.3 Collaudo T-33 dal PO, poi spunte nella PR prima del merge
+- [x] 3.3 Collaudo T-33 dal PO, poi spunte nella PR prima del merge: riuscito il 24/11, sul PC del PO, con il collaudo
+      della PR #201 (`ff59f76`)

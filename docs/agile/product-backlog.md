@@ -80,7 +80,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [EN-7](#en-7) | E13 | Password comuni rifiutate | Must | 2 | R4 | 🎉 Done (Sprint 11) |
 | [EN-9](#en-9) | E13 | Test del frontend stabili | Must | 1 | R4 | 🎉 Done (Sprint 13) |
 | [EN-10](#en-10) | E13 | Aggiornamento a PostgreSQL 19 | Must | 5 | R4 | 🎉 Done (Sprint 17) |
-| [EN-11](#en-11) | E13 | Ambiente di collaudo sul PC del PO | Must | 5 | R4 | 🔨 In corso (Sprint 17) |
+| [EN-11](#en-11) | E13 | Ambiente di collaudo sul PC del PO | Must | 5 | R4 | 🎉 Done (Sprint 17) |
 | [US-201](#us-201) | E2 | Inserimento beneficiario | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-202](#us-202) | E2 | I miei beneficiari | Must | 3 | R1 | 🎉 Done (Sprint 3) |
 | [US-203](#us-203) | E2 | Modifica beneficiario | Must | 2 | R1 | 🎉 Done (Sprint 3) |
@@ -1521,7 +1521,7 @@ Criteri di accettazione:
 Dipendenze: US-1302
 
 #### EN-11
-**Ambiente di collaudo sul PC del PO** · Must · 5 punti · R4 · 🔨 In corso (Sprint 17)
+**Ambiente di collaudo sul PC del PO** · Must · 5 punti · R4 · 🎉 Done (Sprint 17)
 
 Come **PO** voglio collaudare le storie nuove sul mio PC, con lo stack della produzione e dati finti, per provarle prima
 del merge senza toccare i dati veri. Decisa dal PO il 24/11, dopo il passaggio in produzione. Tra quattro strade (PC,

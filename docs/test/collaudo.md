@@ -1419,18 +1419,19 @@ Si fanno dopo il deploy di US-513, come ADMIN, in produzione: si consulta soltan
 Si fanno sul tuo PC, con il collaudo avviato da me (`infra/collaudo/collaudo.sh avvia <PR>`): dati e utenti finti, la
 password è `collaudo-nexus-2026`. Nessun dato vero, nessuna email esce dal PC.
 
-- [ ] **T-33.1 Accesso al collaudo (EN-11)** 🆕
+- [x] **T-33.1 Accesso al collaudo (EN-11)**
   1. Apri http://localhost:8090. **Atteso:** la pagina «Accedi a NEXUS», con il tema, su http://localhost:8091.
   2. Accedi come `operatore.cc`. **Atteso:** sei dentro; in «Segnalazioni» e in «Aziende» ci sono i dati finti del
      seed (per esempio «Demo Bar del Centro»), nessun dato vero.
   3. Esci ed entra come `tutor1`. **Atteso:** il menu del Tutor, con «Beneficiari».
 
-- [ ] **T-33.2 Email nella casella finta (EN-11)** 🆕
+- [x] **T-33.2 Email nella casella finta (EN-11)**
   1. Esci; nella pagina di accesso premi «Password dimenticata?» e scrivi `tutor2`.
   2. Apri http://localhost:8025. **Atteso:** c'è l'email «PORTALE NEXUS - Reimposta la password» per
      `tutor2@nexus.local`; nessuna email è arrivata davvero.
 
-- [ ] **T-33.3 Tunnel e produzione intatti (EN-11)** 🆕
+- [x] **T-33.3 Tunnel e produzione intatti (EN-11)**
   1. Con il collaudo avviato apri il tunnel verso la produzione (`ssh -L 8081:127.0.0.1:8081 <server>`). **Atteso:** si
      apre senza errori di porta occupata; la console della produzione funziona come prima.
   2. Apri https://portalenexus.it. **Atteso:** la produzione, con i dati veri, non è cambiata.
+  > Nota (24/11): T-33.1 … T-33.3 riuscite dal PO sul suo PC, con il collaudo della PR #201 (`ff59f76`).
