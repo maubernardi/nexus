@@ -1265,13 +1265,14 @@ note scrivi solo numeri e codici, mai nomi o recapiti.
   1. Il giorno dopo il passaggio, alle 9, controlla Actions → «Backup del database». **Atteso:** verde, con il backup
      della notte.
 
-- [ ] **T-27.4 Console di Keycloak solo dal tunnel (US-1306, controllo ASVS del 24/11)** 🆕
+- [x] **T-27.4 Console di Keycloak solo dal tunnel (US-1306, controllo ASVS del 24/11)**
   1. Prima del deploy della seconda PR di US-1306, sul server: `sudo bash keycloak-admin-tunnel.sh` (README, «Console
      di Keycloak»). **Atteso:** «impostato: il realm master risponde come http://localhost:8081».
   2. Dopo il deploy, dal PC: `ssh -L 8081:127.0.0.1:8081 <server>`, poi apri `http://localhost:8081/admin` e accedi
      come `admin`. **Atteso:** la console si apre; in «Users» del realm nexus vedi gli utenti.
   3. Senza tunnel apri `https://auth.portalenexus.it/realms/master/account`. **Atteso:** «Accesso non consentito».
   4. Esci e rientra in NEXUS. **Atteso:** l'accesso funziona come prima.
+  > Nota (24/11): riuscita dal PO, con lo script eseguito prima del deploy di `388e8c2`.
 
 ## 28. Avvisi di fine tirocinio (Sprint 16)
 
@@ -1374,19 +1375,20 @@ Si fanno con l'aggiornamento della demo (README, «Aggiornare PostgreSQL»). Nel
 
 Si fanno dopo il deploy di US-1310, con un utente qualsiasi.
 
-- [ ] **T-31.1 Pagina aperta in secondo piano (US-1310)**
+- [x] **T-31.1 Pagina aperta in secondo piano (US-1310)**
   1. Accedi a NEXUS, poi passa a un'altra scheda o a un altro programma, oppure blocca lo schermo (Windows+L).
   2. Dopo almeno 45 minuti torna a NEXUS e apri una pagina qualsiasi. **Atteso:** sei ancora dentro, senza password.
 
-- [ ] **T-31.2 PC in sospensione (US-1310)**
+- [x] **T-31.2 PC in sospensione (US-1310)**
   1. Con NEXUS aperto, metti il PC in sospensione (o chiudi il coperchio) per più di 40 minuti.
   2. Riaccendilo. **Atteso:** entro un minuto NEXUS mostra la pagina di accesso, senza i dati di prima sullo schermo.
 
-- [ ] **T-31.3 Avviso prima delle 10 ore (US-1310)**
+- [x] **T-31.3 Avviso prima delle 10 ore (US-1310)**
   1. Facoltativo, a fine giornata: resta collegato quasi 10 ore. **Atteso:** 5 minuti prima sotto l'intestazione compare
      «La sessione scade alle …», con «Accedi di nuovo adesso» e «Ho capito».
   2. Premi «Accedi di nuovo adesso». **Atteso:** la pagina di accesso chiede la password; dopo l'accesso sei di nuovo
      dentro.
+  > Nota (24/11): T-31.1 … T-31.3 riuscite dal PO in produzione.
 
 ## 32. Elenco delle aziende a pagine (Sprint 17)
 
