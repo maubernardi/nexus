@@ -3,13 +3,13 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 103 elementi, 424 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-16](sprints/sprint-16.md), il 23/11 ([review](sprints/sprint-16-review.md)); in corso: [sprint-17](sprints/sprint-17.md), dal 24/11 (planning confermato il 23/11).
+**Totale: 104 elementi, 429 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-16](sprints/sprint-16.md), il 23/11 ([review](sprints/sprint-16-review.md)); in corso: [sprint-17](sprints/sprint-17.md), dal 24/11 (planning confermato il 23/11).
 
 ## Epiche
 
 | Epica | Titolo | Obiettivo | Storie | Punti |
 |---|---|---|---|---|
-| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, il calendario e i cataloghi senza passare dalla console di Keycloak. | 16 | 65 |
+| E1 | Utenti e progetti | L'ADMIN gestisce utenti, ruoli, progetti, il calendario e i cataloghi senza passare dalla console di Keycloak. | 17 | 70 |
 | E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 6 | 23 |
 | E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 8 | 31 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 5 | 17 |
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 42 | 217 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 43 | 222 |
 
 ## Domande aperte per il Product Owner
 
@@ -72,6 +72,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-113](#us-113) | E1 | Registro degli accessi | Must | 7 | R4 | 🎉 Done (Sprint 10) |
 | [US-114](#us-114) | E1 | Comuni e province | Must | 8 | R4 | 🎉 Done (Sprint 12) |
 | [US-115](#us-115) | E1 | Sedi di competenza, tipi di tirocinio per progetto, enti di presa in carico | Must | 5 | R4 | 🎉 Done (Sprint 12) |
+| [US-116](#us-116) | E1 | Correzione dei dati di un utente | Must | 5 | R4 | 🔨 In corso (Sprint 17) |
 | [US-107](#us-107) | E1 | Calendario unico (patrono e chiusure) | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [EN-3](#en-3) | E1 | Zone iniziali: Firenze e hinterland | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [EN-4](#en-4) | E13 | Contatti dei referenti aziendali nell'audit senza valori | Must | 1 | R1 | 🎉 Done (Sprint 3) |
@@ -389,6 +390,27 @@ Criteri di accettazione:
 - Ogni modifica è registrata nell'audit (EN-2).
 - Fatto il 10/11: un progetto senza tipi indicati ammette tutti i tipi; la scheda del tirocinio propone i tipi ammessi
   più quello già scelto. I dati reali degli enti li inserisce l'ADMIN dai Cataloghi.
+
+#### US-116
+**Correzione dei dati di un utente** · Must · 5 punti · R4 · 🔨 In corso (Sprint 17)
+
+Come **ADMIN** voglio correggere i dati di un utente già creato per rimediare a un errore senza passare dalla console di
+Keycloak. Decisa dal PO il 24/11, dopo aver creato in produzione un utente con lo username sbagliato.
+
+Criteri di accettazione:
+- Dalla pagina «Utenti», pulsante «Dati»: l'ADMIN corregge **nome, cognome, username, email e telefono**; NEXUS li
+  aggiorna anche in Keycloak, in un'unica operazione (o tutto o niente).
+- **Lo username si corregge solo finché l'utente non è mai entrato** (in Keycloak nessuna password impostata): lo storico
+  registra con lo username chi ha fatto cosa. Dopo, è in sola lettura e la pagina dice perché.
+- Username ed email restano unici, come alla creazione.
+- Se cambia l'email di un utente non ancora entrato, l'invito riparte verso il nuovo indirizzo e quello vecchio non vale
+  più; se l'utente era già entrato, il vecchio indirizzo riceve un avviso, come in US-110.
+- Ogni correzione è nell'audit: lo username prima e dopo, gli altri dati oscurati, come alla creazione.
+- Nome, cognome, username ed email si cambiano solo da NEXUS: la pagina «il mio account» di Keycloak li mostra in sola
+  lettura (prima un utente poteva cambiare nome ed email da lì, senza passare da NEXUS). In produzione lo imposta uno
+  script una tantum del PO.
+
+Dipendenze: US-103, US-110
 
 ### E2 — Anagrafica beneficiari
 

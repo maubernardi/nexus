@@ -7,11 +7,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,9 @@ import it.nexus.domain.dto.UserCreateDTO;
 import it.nexus.domain.dto.UserCreatedDTO;
 import it.nexus.domain.dto.ReferenceItemDTO;
 import it.nexus.domain.dto.UserDTO;
+import it.nexus.domain.dto.UserDetailsDTO;
+import it.nexus.domain.dto.UserDetailsSavedDTO;
+import it.nexus.domain.dto.UserDetailsUpdateDTO;
 import it.nexus.domain.dto.UserImpactDTO;
 import it.nexus.domain.dto.UserProjectsDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
@@ -32,6 +37,7 @@ import it.nexus.domain.enumeration.Role;
 import it.nexus.domain.enumeration.TicketStatus;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.AppUserRepository;
+import it.nexus.repository.EmailChangeRequestRepository;
 import it.nexus.repository.ProjectRepository;
 import it.nexus.repository.TicketRepository;
 import it.nexus.repository.UserProjectRepository;
@@ -40,7 +46,9 @@ import it.nexus.services.CurrentAppUserService;
 import it.nexus.services.UserAdminService;
 import it.nexus.services.identity.IdentityProviderException;
 import it.nexus.services.identity.IdentityProviderUsers;
+import it.nexus.services.identity.IdentityUserDetails;
 import it.nexus.services.identity.NewIdentityUser;
+import it.nexus.services.mail.EmailChangedEvent;
 import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.FieldValidationException;
 import it.nexus.web.errors.NotFoundException;
@@ -67,6 +75,8 @@ public class UserAdminServiceImpl implements UserAdminService {
     private final IdentityProviderUsers identityProviderUsers;
     private final AuditService auditService;
     private final ApplicationProperties applicationProperties;
+    private final EmailChangeRequestRepository emailChangeRequestRepository;
+    private final ApplicationEventPublisher events;
 
     @Override
     @Transactional(readOnly = true)
@@ -234,6 +244,105 @@ public class UserAdminServiceImpl implements UserAdminService {
         } catch (IdentityProviderException e) {
             log.error("Account Keycloak {} creato ma utente NEXUS non salvato: va rimosso dalla console", externalId);
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserDetailsDTO details(String id) {
+        AppUser user = findUser(id);
+        return toDetails(user, !hasPassword(user));
+    }
+
+    @Override
+    public UserDetailsSavedDTO updateDetails(String id, UserDetailsUpdateDTO dto) {
+        AppUser user = findUser(id);
+        // come alla creazione: username ed email in minuscolo, come li salva Keycloak; un cambio solo di maiuscole non
+        // è un cambio
+        String username = dto.username().strip().toLowerCase(Locale.ROOT);
+        String email = dto.email().strip().toLowerCase(Locale.ROOT);
+        boolean usernameChanged = !username.equalsIgnoreCase(user.getUsername());
+        boolean emailChanged = !email.equalsIgnoreCase(user.getEmail());
+        username = usernameChanged ? username : user.getUsername();
+        email = emailChanged ? email : user.getEmail();
+        String firstName = dto.firstName().strip();
+        String lastName = dto.lastName().strip();
+        String phone = dto.phone() == null || dto.phone().isBlank() ? null : dto.phone().strip();
+        boolean accountChanged = usernameChanged || emailChanged || !firstName.equals(user.getFirstName())
+                || !lastName.equals(user.getLastName());
+        boolean passwordSet = hasPassword(user);
+        if (!accountChanged && Objects.equals(phone, user.getPhone())) {
+            return new UserDetailsSavedDTO(toDetails(user, !passwordSet), null);
+        }
+        if (usernameChanged && appUserRepository.existsByUsernameIgnoreCaseAndIdNot(username, user.getId())) {
+            throw new FieldValidationException("username", "Username già usato da un altro utente");
+        }
+        if (emailChanged && appUserRepository.existsByEmailIgnoreCaseAndIdNot(email, user.getId())) {
+            throw new FieldValidationException("email", "Indirizzo già usato da un altro utente");
+        }
+        // l'audit registra l'autore con lo username: chi è già entrato può avere righe con quello attuale
+        if (usernameChanged && passwordSet) {
+            throw new FieldValidationException("username",
+                    "È già entrato in NEXUS: lo username non si può più cambiare");
+        }
+
+        AuditChanges changes = AuditChanges.of()
+                .value("username", user.getUsername(), username)
+                .redactedIfChanged("firstName", user.getFirstName(), firstName)
+                .redactedIfChanged("lastName", user.getLastName(), lastName)
+                .redactedIfChanged("email", user.getEmail(), email)
+                .redactedIfChanged("phone", user.getPhone(), phone);
+        String previousEmail = user.getEmail();
+        user.setUsername(username);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setEmail(email);
+        user.setPhone(phone);
+        appUserRepository.saveAndFlush(user);
+        if (emailChanged) {
+            // un cambio chiesto dall'utente (US-110) e non ancora confermato non vale più
+            emailChangeRequestRepository.findByUserId(user.getId()).ifPresent(emailChangeRequestRepository::delete);
+        }
+        auditService.record(AuditEntityType.APP_USER, user.getId(), "DETAILS_CHANGED", changes, null);
+        // Keycloak per ultimo: se rifiuta o non risponde la transazione si annulla e in NEXUS non cambia nulla
+        if (accountChanged) {
+            try {
+                identityProviderUsers.updateDetails(user.getExternalId(),
+                        new IdentityUserDetails(username, firstName, lastName, email));
+            } catch (IdentityProviderException e) {
+                if (e.isUsernameTaken()) {
+                    throw new FieldValidationException("username", "Username già usato da un account di accesso");
+                }
+                if (e.isEmailTaken()) {
+                    throw new FieldValidationException("email", "Indirizzo già usato da un account di accesso");
+                }
+                throw new ServiceUnavailableException(
+                        "Non è stato possibile aggiornare l'account di accesso: i dati non sono cambiati, riprova più tardi");
+            }
+        }
+        Boolean invitationSent = null;
+        if (emailChanged && !passwordSet && user.isActive()) {
+            // il collegamento inviato al vecchio indirizzo non vale più (contiene l'email): ne serve uno nuovo
+            invitationSent = invite(user);
+        } else if (emailChanged && passwordSet) {
+            events.publishEvent(new EmailChangedEvent(user.getId(), previousEmail));
+        }
+        log.info("Dati di {} corretti: {}", user, changes.asMap().keySet());
+        return new UserDetailsSavedDTO(toDetails(user, !passwordSet), invitationSent);
+    }
+
+    /** Senza password l'utente non è mai entrato: nessuna riga dell'audit ha il suo username come autore. */
+    private boolean hasPassword(AppUser user) {
+        try {
+            return identityProviderUsers.hasPassword(user.getExternalId());
+        } catch (IdentityProviderException e) {
+            throw new ServiceUnavailableException(
+                    "Non è stato possibile leggere l'account di accesso: riprova più tardi");
+        }
+    }
+
+    private static UserDetailsDTO toDetails(AppUser user, boolean usernameEditable) {
+        return new UserDetailsDTO(TsidMapper.toExternal(user.getId()), user.getUsername(), user.getFirstName(),
+                user.getLastName(), user.getEmail(), user.getPhone(), user.isActive(), usernameEditable);
     }
 
     @Override

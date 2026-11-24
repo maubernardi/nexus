@@ -137,6 +137,54 @@ class KeycloakIdentityProviderUsersIT {
     }
 
     @Test
+    void correzioneDeiDati_usernameCognomeEEmail_ilRestoNonCambia() {
+        // US-116: lo username si corregge solo con «Edit username» del realm (infra/keycloak/nexus-realm.json)
+        KeycloakIdentityProviderUsers users = users(DEV_SECRET);
+        String id = users.createUser(new NewIdentityUser("mario.rosi", "Mario", "Rosi", "mario.rosi@example.org",
+                Role.TUTOR));
+
+        users.updateDetails(id, new IdentityUserDetails("mario.rossi", "Mario", "Rossi", "mario.rossi@example.org"));
+
+        assertThat(readUser(id)).containsEntry("username", "mario.rossi")
+                .containsEntry("firstName", "Mario")
+                .containsEntry("lastName", "Rossi")
+                .containsEntry("email", "mario.rossi@example.org")
+                .containsEntry("emailVerified", true)
+                .containsEntry("enabled", true);
+        assertThat(realmRoles(id)).contains("TUTOR");
+        users.deleteUser(id);
+    }
+
+    @Test
+    void correzioneDeiDati_usernameOEmailGiaUsati_rifiutatiConIlMotivo() {
+        KeycloakIdentityProviderUsers users = users(DEV_SECRET);
+        String id = users.createUser(new NewIdentityUser("da.correggere", "Da", "Correggere",
+                "da.correggere@example.org", Role.TUTOR));
+
+        assertThatThrownBy(() -> users.updateDetails(id,
+                new IdentityUserDetails("tutor1", "Da", "Correggere", "da.correggere@example.org")))
+                .isInstanceOfSatisfying(IdentityProviderException.class,
+                        e -> assertThat(e.isUsernameTaken()).isTrue());
+        assertThatThrownBy(() -> users.updateDetails(id,
+                new IdentityUserDetails("da.correggere", "Da", "Correggere", "admin@nexus.local")))
+                .isInstanceOfSatisfying(IdentityProviderException.class, e -> assertThat(e.isEmailTaken()).isTrue());
+        assertThat(readUser(id)).containsEntry("username", "da.correggere")
+                .containsEntry("email", "da.correggere@example.org");
+        users.deleteUser(id);
+    }
+
+    @Test
+    void password_soloDopoCheLUtenteLHaImpostata() {
+        KeycloakIdentityProviderUsers users = users(DEV_SECRET);
+        String id = users.createUser(new NewIdentityUser("senza.password", "Senza", "Password",
+                "senza.password@example.org", Role.TUTOR));
+
+        assertThat(users.hasPassword(id)).isFalse();
+        assertThat(users.hasPassword(TUTOR2)).isTrue();
+        users.deleteUser(id);
+    }
+
+    @Test
     void emailPerLaPassword_senzaServerDiPostaNelRealm_errore() {
         KeycloakIdentityProviderUsers users = users(DEV_SECRET);
         String id = users.createUser(new NewIdentityUser("senza.posta", "Senza", "Posta", "senza.posta@example.org",

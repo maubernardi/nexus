@@ -136,6 +136,16 @@ jobs:
           kcadm get "clients/$client/service-account-user" -r nexus --fields username --format csv --noquotes \
             | grep -qx service-account-nexus-backend-admin
           echo "Realm di produzione: nessun utente, account tecnico del backend presente"
+          # US-116: lo username si corregge, ma username, email, nome e cognome li cambia solo l'amministrazione
+          kcadm get realms/nexus --fields editUsernameAllowed | grep -q '"editUsernameAllowed" : true'
+          kcadm get users/profile -r nexus | python3 -I -c '
+          import json, sys
+          edit = {a["name"]: a["permissions"]["edit"] for a in json.load(sys.stdin)["attributes"]}
+          wrong = [n for n in ("username", "email", "firstName", "lastName") if edit[n] != ["admin"]]
+          sys.exit(f"modificabili non solo dall amministrazione: {wrong}" if wrong else 0)'
+          echo "Realm di produzione: username correggibile, dati dell'account modificabili solo dall'amministrazione"
+      - name: Script una tantum sul profilo utente (US-116)
+        run: tools/ci/keycloak-user-profile-e2e.sh nexus-keycloak:ci
       - name: Log di Keycloak
         if: failure()
         run: |

@@ -26,6 +26,18 @@ public interface IdentityProviderUsers {
      */
     String createUser(NewIdentityUser user);
 
+    /**
+     * Corregge username, nome, cognome ed email dell'account (US-116). Un conflitto (username o email già usati da un
+     * altro account) ha il motivo nell'eccezione.
+     */
+    void updateDetails(String externalId, IdentityUserDetails details);
+
+    /**
+     * L'account ha già una password: l'utente può essere entrato in NEXUS, e l'audit può avere righe con il suo
+     * username come autore (US-116).
+     */
+    boolean hasPassword(String externalId);
+
     /** Cancella l'account: serve solo ad annullare una creazione non completata in NEXUS (US-103). */
     void deleteUser(String externalId);
 
