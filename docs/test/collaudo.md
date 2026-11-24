@@ -1381,23 +1381,24 @@ Si fanno dopo il deploy di US-1310, con un utente qualsiasi.
 
 Si fanno dopo il deploy di US-513, come ADMIN, in produzione: si consulta soltanto, senza modificare niente.
 
-- [ ] **T-32.1 Prima pagina (US-513)** 🆕
+- [x] **T-32.1 Prima pagina (US-513)**
   1. Apri «Aziende». **Atteso:**
      - l'elenco compare in un paio di secondi;
      - sopra la tabella «13.799 aziende: dalla 1 alla 25», e 25 righe in ordine di ragione sociale;
      - sotto la tabella «Pagina 1 di 552», con «Prima» e «Precedente» disattivati e il menu «Aziende per pagina» su 25.
 
-- [ ] **T-32.2 Sfogliare (US-513)** 🆕
+- [x] **T-32.2 Sfogliare (US-513)**
   1. Premi «Successiva». **Atteso:** «dalla 26 alla 50», «Pagina 2 di 552»; la pagina torna all'inizio della tabella.
   2. Premi «Ultima». **Atteso:** «Pagina 552 di 552», con «Successiva» e «Ultima» disattivati.
   3. Premi Indietro del browser. **Atteso:** torni alla pagina 2.
 
-- [ ] **T-32.3 Aziende per pagina (US-513)** 🆕
+- [x] **T-32.3 Aziende per pagina (US-513)**
   1. Nel menu «Aziende per pagina» scegli 100. **Atteso:** 100 righe, «dalla 1 alla 100», «Pagina 1 di 138».
   2. Prova anche 10 e 50. **Atteso:** le righe e le pagine cambiano di conseguenza.
 
-- [ ] **T-32.4 Filtri e pagine (US-513)** 🆕
+- [x] **T-32.4 Filtri e pagine (US-513)**
   1. Con 50 aziende per pagina vai alla pagina 3, poi spunta «Solo le aziende da completare». **Atteso:** sei alla
      pagina 1 delle aziende da completare, sempre con 50 per pagina.
   2. Cerca una ragione sociale che conosci. **Atteso:** la trovi; con pochi risultati i pulsanti delle pagine non ci
      sono.
+  > Nota (24/11): T-32.1 … T-32.4 riuscite dal PO in produzione, dopo il deploy di `db4a4c5`.

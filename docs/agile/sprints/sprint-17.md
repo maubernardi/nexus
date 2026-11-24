@@ -15,7 +15,7 @@
 | US-1306 | Passaggio in produzione | 8 | 🔨 In corso: passaggio fatto il 24/11 | `prepare-production` | [#177](https://github.com/maubernardi/nexus/pull/177) (preparazione), [#194](https://github.com/maubernardi/nexus/pull/194) (dopo il passaggio) |
 | EN-10 | Aggiornamento a PostgreSQL 19 | 5 | 🎉 Done | `upgrade-postgresql-19` (archiviata) | [#189](https://github.com/maubernardi/nexus/pull/189), [#190](https://github.com/maubernardi/nexus/pull/190) |
 | US-1310 | Sessione attiva finché NEXUS è aperto | 3 | 🔨 In corso | `keep-session-alive` | [#197](https://github.com/maubernardi/nexus/pull/197) |
-| US-513 | Elenco delle aziende a pagine | 3 | 🔨 In corso | `paginate-company-list` | [#198](https://github.com/maubernardi/nexus/pull/198) |
+| US-513 | Elenco delle aziende a pagine | 3 | 🎉 Done | `paginate-company-list` (archiviata) | [#198](https://github.com/maubernardi/nexus/pull/198), [#199](https://github.com/maubernardi/nexus/pull/199) |
 
 **Ordine** (PO, 23/11):
 1. **EN-10 sulla demo**, anticipata al 23/11 sera (PO):
@@ -165,3 +165,4 @@ Le ho proposte io, da confermare:
 | US-1310 aggiunta dal PO (24/11, mattina) | 16 |
 | EN-10 Done: backup delle 3:30 riuscito sulla 19 e controllo verde (24/11) | 11 |
 | US-513 aggiunta dal PO dopo il passaggio (24/11) | 14 |
+| US-513 Done: deploy `db4a4c5` e collaudo T-32 riuscito (24/11, pomeriggio) | 11 |
