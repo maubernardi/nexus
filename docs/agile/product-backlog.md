@@ -159,7 +159,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1307](#us-1307) | E13 | Monitoraggio e revisione di sicurezza | Must | 5 | R4 | 🎉 Done (Sprint 10) |
 | [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | 🎉 Done (Sprint 10) |
 | [US-1309](#us-1309) | E13 | Importazione dal database attuale | Must | 8 | R4 | 🎉 Done (Sprint 15) |
-| [US-1310](#us-1310) | E13 | Sessione attiva finché NEXUS è aperto | Must | 3 | R4 | 🔨 In corso (Sprint 17) |
+| [US-1310](#us-1310) | E13 | Sessione attiva finché NEXUS è aperto | Must | 3 | R4 | 🎉 Done (Sprint 17) |
 
 ## Dettaglio per epica
 
@@ -1689,7 +1689,7 @@ Criteri di accettazione:
 Dipendenze: US-508, US-509, US-510, US-114
 
 #### US-1310
-**Sessione attiva finché NEXUS è aperto** · Must · 3 punti · R4 · 🔨 In corso (Sprint 17)
+**Sessione attiva finché NEXUS è aperto** · Must · 3 punti · R4 · 🎉 Done (Sprint 17)
 
 Come **operatore del Call Center** voglio che NEXUS resti collegato finché la pagina è aperta, anche se per un po' non
 la uso, per non dover rientrare con la password più volte al giorno (PO, 24/11). Oggi la sessione scade dopo 30 minuti
