@@ -118,6 +118,8 @@ jobs:
           done
           test "$(curl -s -o /dev/null -w '%{http_code}' "https://$NEXUS_DOMAIN/api/v1/me")" = 401
           test "$(curl -s -o /dev/null -w '%{http_code}' "https://auth.$NEXUS_DOMAIN/admin/")" = 403
+          test "$(curl -s -o /dev/null -w '%{http_code}' \
+            "https://auth.$NEXUS_DOMAIN/realms/master/protocol/openid-connect/token")" = 403
           test "$(curl -s -o /dev/null -w '%{http_code}' "https://$NEXUS_DOMAIN/actuator/health")" = 404
           curl -sI "https://$NEXUS_DOMAIN/" | grep -qi '^strict-transport-security'
           echo "Online: https://$NEXUS_DOMAIN"

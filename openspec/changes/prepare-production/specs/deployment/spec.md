@@ -65,6 +65,33 @@ di un server nuovo MUST NOT creare utenti di prova né le loro password.
 - **THEN** il `.env` non ha password di utenti di prova e ha le righe vuote dei dati del primo ADMIN, da compilare
   prima del primo deploy
 
+### Requirement: Superficie esposta minima
+Dal server SHALL essere raggiungibili da Internet solo SSH e le porte web 80/443. Database, backend e identity provider
+MUST NOT essere raggiungibili direttamente. Le API SHALL essere servite sotto `/api` dello stesso dominio dell'app e gli
+endpoint tecnici del backend (actuator, documentazione OpenAPI) MUST NOT essere esposti. La console di amministrazione
+dell'identity provider e l'accesso dei suoi amministratori (realm `master`) MUST NOT essere esposti su Internet: si
+usano solo con un tunnel SSH.
+
+#### Scenario: Database non raggiungibile
+- **WHEN** da Internet si tenta una connessione alla porta di PostgreSQL del server
+- **THEN** la connessione non riesce
+
+#### Scenario: Console di amministrazione
+- **WHEN** da Internet si apre `https://auth.portalenexus.it/admin/`
+- **THEN** l'accesso è negato
+
+#### Scenario: Accesso degli amministratori dell'identity provider
+- **WHEN** da Internet si chiede un token o la pagina di accesso del realm `master` (`https://auth.portalenexus.it/realms/master/...`)
+- **THEN** l'accesso è negato, mentre l'accesso degli utenti di NEXUS (realm `nexus`) resta raggiungibile
+
+#### Scenario: Console dal tunnel SSH
+- **WHEN** il PO apre la console con il tunnel SSH (`http://localhost:8081/admin`) e accede come amministratore
+- **THEN** l'accesso riesce, perché il tunnel raggiunge l'identity provider senza passare dal reverse proxy
+
+#### Scenario: Endpoint tecnici
+- **WHEN** da Internet si apre `https://portalenexus.it/actuator/health` o `https://portalenexus.it/v3/api-docs`
+- **THEN** la risorsa non è disponibile
+
 ### Requirement: Controllo della disponibilità
 Un controllo esterno SHALL verificare ogni 10 minuti, dalle 8 alle 20 ora italiana, che la PWA, Keycloak e il backend
 del sito rispondano e che i certificati non scadano entro 14 giorni. Un controllo fallito dopo 3 tentativi SHALL

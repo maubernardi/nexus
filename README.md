@@ -154,7 +154,16 @@ Architettura e decisioni: [`openspec/changes/archive/2026-09-28-add-demo-deploym
   compilare prima del primo deploy. Al primo avvio il backend crea l'ADMIN e gli manda l'invito per email, valido 3
   giorni (poi «Password dimenticata?»). Con un ADMIN già presente il backend ignora questi dati.
 - **Console di Keycloak** non esposta su Internet: `ssh -L 8081:127.0.0.1:8081 <server>`, poi
-  `http://localhost:8081/admin` (utente `admin`, password `KEYCLOAK_ADMIN_PASSWORD` del `.env`).
+  `http://localhost:8081/admin` (utente `admin`, password `KEYCLOAK_ADMIN_PASSWORD` del `.env`). Da fuori Caddy
+  blocca anche l'accesso degli amministratori (`/realms/master`, controllo ASVS del 24/11): per questo il realm `master`
+  ha l'indirizzo del tunnel, `http://localhost:8081`, e la console fa accedere senza passare dal dominio pubblico. Lo
+  imposta, **una volta**, lo script qui sotto: sul server già installato **prima** del deploy che porta il blocco,
+  altrimenti la console si ferma con «Timeout when waiting for 3rd party check iframe message»; su un server nuovo
+  dopo il primo deploy.
+  ```bash
+  curl -fsSLO https://raw.githubusercontent.com/maubernardi/nexus/main/infra/deploy/keycloak-admin-tunnel.sh
+  sudo bash keycloak-admin-tunnel.sh   # nessun segreto; il realm nexus non cambia
+  ```
 - **Tema e lingua del realm (una volta, dopo il primo deploy con il tema).** L'import all'avvio non modifica un realm
   già esistente: sulla demo tema `nexus` e sola lingua italiana si impostano con
   ```bash

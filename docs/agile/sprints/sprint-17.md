@@ -94,6 +94,11 @@ Dalla review dello Sprint 16, tutte del PO:
   segnaposto;
 - il sito è rimasto fermo circa 2 minuti.
 
+**Controllo ASVS sulla produzione (24/11):** tutto come nella revisione del 07/11, tranne l'accesso degli
+amministratori di Keycloak (realm `master`), raggiungibile da Internet. Il PO sceglie di bloccarlo: Caddy risponde `403`
+e il realm `master` prende l'indirizzo del tunnel, perché la console continui a funzionare. Lo script
+`keycloak-admin-tunnel.sh` va eseguito sul server prima del deploy della seconda PR (T-27.4).
+
 ## Per il PO
 
 **Per EN-10 (24/11):**

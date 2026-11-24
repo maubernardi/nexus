@@ -32,5 +32,10 @@
   - [x] in bozza dal 23/11: profilo predefinito `keycloak`, via il realm e le password demo, primo ADMIN in
         `bootstrap.sh`, nomi visibili (workflow «Deploy» e «Controllo del sito», tag `:produzione`; file del workflow e
         ambiente «demo» di GitHub invariati, PO 23/11)
-  - [ ] controllo ASVS sulla produzione, dopo il passaggio
+  - [x] controllo ASVS sulla produzione, dopo il passaggio (24/11, da fuori): tutto come nella revisione, tranne
+        l'accesso degli amministratori di Keycloak (realm `master`) raggiungibile da Internet. PO (24/11, A40):
+        bloccarlo. Caddy risponde `403` su `/realms/master`, il deploy lo verifica; il realm `master` prende
+        l'indirizzo del tunnel con `keycloak-admin-tunnel.sh`, provato in locale (console dal tunnel e `kcadm`
+        funzionano, realm `nexus` invariato)
+  - [ ] sul server: `keycloak-admin-tunnel.sh` prima del deploy di questa PR; dopo il deploy, console dal tunnel (T-27.4)
   - [ ] chiusura della storia

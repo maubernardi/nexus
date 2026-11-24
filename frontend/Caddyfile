@@ -50,10 +50,13 @@ www.{$NEXUS_DOMAIN} {
 	redir https://{$NEXUS_DOMAIN}{uri} permanent
 }
 
-# Keycloak. La console di amministrazione non è esposta: si usa con un tunnel SSH.
+# Keycloak. La console di amministrazione non è esposta: si usa con un tunnel SSH. Neanche l'accesso degli
+# amministratori (realm master: token, pagina di accesso, «il mio account»; ASVS 4.3.1, controllo sulla produzione del
+# 24/11). Il realm master ha l'indirizzo del tunnel (infra/deploy/keycloak-admin-tunnel.sh): la console lo raggiunge
+# direttamente su 127.0.0.1:8081, senza passare da qui.
 {$NEXUS_AUTH_DOMAIN} {
 	import security_headers
-	@admin path /admin /admin/*
+	@admin path /admin /admin/* /realms/master /realms/master/*
 	respond @admin "Accesso non consentito" 403
 	reverse_proxy keycloak:8080
 }
