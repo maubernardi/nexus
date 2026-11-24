@@ -374,6 +374,10 @@ US-1306 ([design](openspec/changes/prepare-production/design.md)). Decisione del
 demo tranne segnalazioni, utenti e beneficiari; le aziende vengono dal database attuale (US-1309). Lo fa lo script
 `infra/deploy/passaggio-in-produzione.sh`, provato in locale; il PO lo lancia sul server.
 
+> **Fatto il 24/11/2026**, sulla release `433f234`, con il file Access del 4/11: aziende 13.799, referenti 7.786,
+> note 6.980, chiamate 38.789, come nella prova. Il PO ha accettato di perdere le chiamate successive: il servizio è in
+> ristrutturazione. Il resto della sezione resta come riferimento.
+
 **Prima (il PO):**
 1. Collaudo finito. Dai Cataloghi si tolgono le voci create solo per prova: la configurazione passa così com'è.
 2. Prova generale sul backup vero della demo, insieme: ripristino con `backup/ripristino-di-prova.sh --tieni`, poi
@@ -393,9 +397,12 @@ demo tranne segnalazioni, utenti e beneficiari; le aziende vengono dal database 
 5. Deploy di `main` dalle Actions: il backend riceve i dati dell'ADMIN. Sulla demo non li usa, perché gli ADMIN ci
    sono già.
 6. Il file Access sul server, dopo i controlli in Access delle chiamate con possibili nomi (analisi, §7 e §9.3):
+   `/opt/nexus` è riservata all'utente `deploy` (`750`): il file passa dalla tua home e lo sposta `sudo`.
    ```bash
-   sudo install -d -o "$USER" -m 700 /opt/nexus/import                # sul server
-   scp documenti_base/nexus.mdb <server>:/opt/nexus/import/nexus.mdb   # dal PC
+   scp documenti_base/nexus.mdb <server>:nexus.mdb                      # dal PC
+   sudo install -d -o "$USER" -m 700 /opt/nexus/import                  # sul server
+   sudo mv ~/nexus.mdb /opt/nexus/import/nexus.mdb && sudo chmod 600 /opt/nexus/import/nexus.mdb
+   sudo sha256sum /opt/nexus/import/nexus.mdb                           # la stessa impronta del file sul PC
    ```
 
 **Passaggio (sul server, una volta sola):**

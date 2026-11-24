@@ -21,9 +21,13 @@
 ## 4. Passaggio (con il PO, dopo il merge)
 
 - [x] 4.1 Deploy sulla demo; prova generale sul backup vero della demo
-- [ ] 4.2 Dati dell'ADMIN nel `.env`, file Access sul server, `nexus-deploy` reinstallato (23/11: dati dell'ADMIN e
-      `nexus-deploy` fatti, controllo delle chiamate in Access fatto; il file Access il giorno del passaggio)
+- [x] 4.2 Dati dell'ADMIN nel `.env`, file Access sul server, `nexus-deploy` reinstallato (23/11: dati dell'ADMIN e
+      `nexus-deploy`, controllo delle chiamate in Access; 24/11: il file Access del 4/11, scelto dal PO, passato dalla
+      home perché `/opt/nexus` è riservata a `deploy`)
 - [ ] 4.3 `passaggio-in-produzione.sh`; invito, accesso dell'ADMIN, controllo della configurazione
+  - [x] script eseguito il 24/11 sulla release `433f234`: backup della demo, pulizia, 5 utenti tolti da Keycloak,
+        importazione con i conteggi della prova, primo backup della produzione, file Access cancellato
+  - [ ] invito e accesso dell'ADMIN, configurazione (T-27.1, T-27.2)
 - [ ] 4.4 Seconda PR: profilo predefinito, realm e password demo, nomi «produzione», ASVS, chiusura della storia
   - [x] in bozza dal 23/11: profilo predefinito `keycloak`, via il realm e le password demo, primo ADMIN in
         `bootstrap.sh`, nomi visibili (workflow «Deploy» e «Controllo del sito», tag `:produzione`; file del workflow e
