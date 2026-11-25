@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 104 elementi, 429 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-17](sprints/sprint-17.md), il 25/11 ([review](sprints/sprint-17-review.md)); il prossimo, lo Sprint 18, è da pianificare.
+**Totale: 105 elementi, 432 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-17](sprints/sprint-17.md), il 25/11 ([review](sprints/sprint-17-review.md)); il prossimo, lo Sprint 18, è da pianificare.
 
 ## Epiche
 
@@ -21,7 +21,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione, Progetto Formativo e Relazione finale sui modelli reali in Word. | 13 | 70 |
 | E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 3 | 9 |
 | E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 4 | 23 |
-| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 18 | 79 |
+| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 19 | 82 |
 
 ## Release
 
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 43 | 222 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 44 | 225 |
 
 ## Domande aperte per il Product Owner
 
@@ -107,12 +107,12 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-504](#us-504) | E5 | Disattivazione impedita con mansioni bloccate | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [US-505](#us-505) | E5 | Diario delle note dell'azienda | Must | 2 | R1 | 🎉 Done (Sprint 4) |
 | [US-506](#us-506) | E5 | Legale rappresentante e codici ATECO dell'azienda | Must | 3 | R3 | 🎉 Done (Sprint 7) |
-| [US-507](#us-507) | E5 | Richiesta di contatto di un'azienda dal Tutor | Should | 5 | — | 📋 Backlog |
+| [US-507](#us-507) | E5 | Richiesta di contatto di un'azienda dal Tutor | Should | 5 | — | ✅ Ready |
 | [US-508](#us-508) | E5 | Partita IVA e nome da completare | Must | 3 | R4 | 🎉 Done (Sprint 15) |
 | [US-509](#us-509) | E5 | Categoria merceologica e attività dell'azienda | Must | 3 | R4 | 🎉 Done (Sprint 15) |
 | [US-510](#us-510) | E5 | Referenti e recapiti dell'azienda | Must | 5 | R4 | 🎉 Done (Sprint 15) |
-| [US-511](#us-511) | E5 | Zona dell'azienda e aziende per il Tutor | Should | 5 | — | 📋 Backlog |
-| [US-512](#us-512) | E5 | Tentativi di contatto ed esito della richiesta | Should | 5 | — | 📋 Backlog |
+| [US-511](#us-511) | E5 | Zona dell'azienda e aziende per il Tutor | Should | 5 | — | ✅ Ready |
+| [US-512](#us-512) | E5 | Tentativi di contatto ed esito della richiesta | Should | 5 | — | ✅ Ready |
 | [US-513](#us-513) | E5 | Elenco delle aziende a pagine | Must | 3 | R4 | 🎉 Done (Sprint 17) |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
@@ -162,6 +162,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | 🎉 Done (Sprint 10) |
 | [US-1309](#us-1309) | E13 | Importazione dal database attuale | Must | 8 | R4 | 🎉 Done (Sprint 15) |
 | [US-1310](#us-1310) | E13 | Sessione attiva finché NEXUS è aperto | Must | 3 | R4 | 🎉 Done (Sprint 17) |
+| [US-1311](#us-1311) | E13 | Avvisi affidabili su sito e backup | Must | 3 | R4 | 📋 Backlog |
 
 ## Dettaglio per epica
 
@@ -731,7 +732,7 @@ Criteri di accettazione:
 Dipendenze: US-501
 
 #### US-507
-**Richiesta di contatto di un'azienda dal Tutor** · Should · 5 punti · release da decidere · 📋 Backlog
+**Richiesta di contatto di un'azienda dal Tutor** · Should · 5 punti · release da decidere · ✅ Ready
 
 Come **Tutor** voglio chiedere al Call Center di contattare un'azienda che conosco, così che la richiesta non si perda
 e un operatore la prenda in carico (PO, 15/11). Oggi passa tutto a voce o per email, senza traccia (analisi con il PO,
@@ -810,7 +811,7 @@ Dipendenze: US-501, US-1007
 
 
 #### US-511
-**Zona dell'azienda e aziende per il Tutor** · Should · 5 punti · release da decidere · 📋 Backlog
+**Zona dell'azienda e aziende per il Tutor** · Should · 5 punti · release da decidere · ✅ Ready
 
 Come **Tutor** voglio vedere le aziende del database con pochi dati essenziali, per sapere quali conosce già il Call
 Center prima di chiedere un contatto (analisi con il PO, 23/11).
@@ -828,7 +829,7 @@ Criteri di accettazione:
 Dipendenze: US-106, US-509, US-1007
 
 #### US-512
-**Tentativi di contatto ed esito della richiesta** · Should · 5 punti · release da decidere · 📋 Backlog
+**Tentativi di contatto ed esito della richiesta** · Should · 5 punti · release da decidere · ✅ Ready
 
 Come **Call Center** voglio registrare ogni tentativo di contatto con l'azienda e chiudere la richiesta con l'esito,
 così che il Tutor sappia com'è andata (analisi con il PO, 23/11).
@@ -1760,3 +1761,23 @@ Criteri di accettazione:
   oppure 30 minuti con il solo avviso.
 
 Dipendenze: US-1307
+
+#### US-1311
+**Avvisi affidabili su sito e backup** · Must · 3 punti · R4 · 📋 Backlog
+
+Come **PO** voglio un avviso in pochi minuti se il sito non risponde, e entro le 9 se manca il backup della notte, per
+saperlo prima di chi usa NEXUS. I controlli pianificati di GitHub non bastano: dall'8/11 il controllo del sito parte 2
+o 3 volte al giorno invece di 72, e quello del backup delle 9:07 parte tra le 16 e le 21 (review dello Sprint 17,
+§8.2).
+
+Criteri di accettazione:
+- Un **servizio esterno** controlla il sito ogni pochi minuti, giorno e notte, con le tre verifiche di oggi: la PWA
+  risponde, Keycloak risponde, l'API risponde 401 senza accesso. Se una fallisce, il PO riceve un'email.
+- Dopo ogni backup riuscito il server manda un **segnale** al servizio. Se il segnale non arriva entro le 9, ora
+  italiana, il PO riceve un'email. Se il backup fallisce, l'avviso parte subito.
+- Al servizio arrivano solo gli indirizzi pubblici del sito e il segnale, senza dati. L'account lo crea il PO;
+  l'indirizzo del segnale va solo nel `.env` del server, mai nel repository.
+- I controlli di GitHub (US-1307, US-1302) restano come seconda rete. T-26.3 si riscrive con il servizio scelto.
+- Domanda aperta, da chiudere al planning: Better Stack oppure Healthchecks.io (review dello Sprint 17, §8.2).
+
+Dipendenze: US-1302, US-1307

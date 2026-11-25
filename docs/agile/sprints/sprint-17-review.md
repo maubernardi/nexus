@@ -187,7 +187,7 @@ Da segnalare:
 |---|---|---|
 | A41 | Un workflow pianificato si verifica contando i run dei primi giorni, non guardandone uno | Team |
 | A42 | Prima che arrivino gli utenti, cerco i dati che si inseriscono ma non si correggono dall'app, e te ne porto l'elenco | Team |
-| A43 | In produzione i deploy si fanno negli orari che decidi (§8.4); quelli urgenti fuori orario si concordano prima | Team e PO |
+| A43 | Nessun orario fisso per i deploy: li decidi tu volta per volta (§8.4). Quando ne propongo uno, ricordo il breve fermo | Team e PO |
 | A44 | Negli script con `pipefail`, mai `comando \| grep -q`: prima l'output in una variabile, poi il controllo | Team |
 | A36, A37 | (confermate) Attesa della CI solo con `--watch`; container di prova con dati spenti con `docker rm -f -v` | Team |
 
@@ -196,6 +196,8 @@ Da segnalare:
 ### 8.1 Chiusura dello Sprint 17
 *Proposta:* Sprint 17 chiuso con velocity **29**: tutte le sei storie sono fatte, collaudate e in produzione. Questa PR
 aggiorna il file dello sprint e il backlog.
+
+> ✅ **Deciso (PO, 25/11):** Sprint 17 chiuso con velocity 29.
 
 ### 8.2 Avvisi su sito e backup
 Dalle esecuzioni dei workflow (Actions):
@@ -218,6 +220,17 @@ correggere. Le strade:
 servizio lo scegliamo insieme quando raffiniamo la storia, dopo aver letto piani e privacy. I controlli di GitHub
 restano come seconda rete, e T-26.3 si riscrive con la soluzione scelta.
 
+> ✅ **Deciso (PO, 25/11):** **A**. US-1311 entra nel backlog: 3 punti, R4. Il servizio si sceglie al planning tra i
+> due qui sotto. Con entrambi, al servizio arrivano solo gli indirizzi pubblici del sito e un segnale senza dati;
+> l'account lo crea il PO, e l'indirizzo segreto del segnale va solo nel `.env` del server.
+>
+> | | Servizio | Cosa fa | A favore | Contro |
+> |---|---|---|---|---|
+> | **1** | **Better Stack**, piano gratuito: 10 controlli e 10 segnali, ogni 3 minuti | Controlla da fuori le tre pagine di oggi (sito, Keycloak, API che risponde 401) e aspetta il segnale del backup | Un solo account fa tutto; controlli veri da fuori, come oggi da GitHub | Servizio commerciale: sede dei dati e condizioni da leggere prima |
+> | **2** | **Healthchecks.io**, piano gratuito: 20 segnali | Aspetta solo segnali: il server controlla le proprie pagine ogni 5 minuti e manda il segnale se rispondono, e uno dopo il backup | Europeo, a codice aperto; nessun controllo da configurare sul sito del servizio | I controlli partono dal server: se il server è spento o isolato il segnale manca e l'avviso arriva, ma un blocco che ferma solo chi arriva da fuori non si vede |
+>
+> *Proposta:* **1**, perché sostituisce il controllo di oggi senza cambiarne la natura.
+
 ### 8.3 Prove vecchie prima che arrivino gli utenti
 Le prove sono 158 e ne sono spuntate 54. Nelle sezioni 1–23 (Sprint 1–15) ne restano 103: il flusso dal beneficiario
 alla proposta, l'appuntamento, la bacheca, il tirocinio, i documenti e il report. In produzione non si possono più
@@ -232,6 +245,9 @@ fare, ma sul tuo PC sì (EN-11).
 *Proposta:* **A**. Preparo la sezione con le 15 prove e avvio il collaudo dall'ultima versione di `main`
 (`collaudo.sh avvia main`).
 
+> ✅ **Deciso (PO, 25/11):** **C**, nessuna prova vecchia. Per ora la produzione è una **pre-produzione**: più avanti
+> si azzera tutto. Le 103 prove restano come storico.
+
 ### 8.4 Orari dei deploy e arrivo degli utenti
 Durante un deploy i servizi ripartono, e per un breve momento NEXUS non risponde: chi sta salvando può ricevere un
 errore.
@@ -241,6 +257,9 @@ concordiamo prima (A43). Ti chiedo:
 - gli orari del Call Center, se diversi;
 - quando pensi di dare gli account a Tutor e Call Center. Da questa data dipendono la prova del §8.3 e la revisione
   UX/UI (US-1305).
+
+> ✅ **Deciso (PO, 25/11):** nessun orario fisso: il PO decide volta per volta quando fare un deploy. Per ora la
+> produzione è una pre-produzione (§8.3). A43 cambia di conseguenza.
 
 ### 8.5 Avviso SSH «post-quantum»
 Dal 04/11, a ogni accesso al server, il programma SSH del tuo PC avvisa che lo scambio delle chiavi non è
@@ -263,6 +282,14 @@ ssh portalenexus 'rpm -q openssh-server; update-crypto-policies --show; ssh -Q k
 
 Se l'algoritmo c'è, ti preparo i comandi con sudo, senza punti di sprint.
 
+> ✅ **Deciso (PO, 25/11):** **A**. Il risultato del controllo:
+> - sul server c'è OpenSSH 9.9 di Rocky 9.8, con i criteri di cifratura `DEFAULT`;
+> - OpenSSH ha due algoritmi post-quantum, `mlkem768x25519-sha256` e `sntrup761x25519-sha512`;
+> - OpenSSH 10.2, sul PC, li chiede per primi.
+>
+> L'avviso viene quindi dai criteri `DEFAULT` di Rocky 9, che non li attivano. Da Rocky 9.7 esiste il sottocriterio
+> `PQ`, che li aggiunge senza togliere nulla. Il PO ha ricevuto i comandi il 25/11. Esito: ⏳.
+
 ### 8.6 US-511, US-507 e US-512: due proposte da confermare
 Dall'analisi del 23/11 restano due proposte mie, che bloccano la *Definition of Ready*:
 - prima di inviare una richiesta per un'azienda nuova, il Tutor vede i **nomi simili** già presenti, contro i doppioni;
@@ -270,11 +297,16 @@ Dall'analisi del 23/11 restano due proposte mie, che bloccano la *Definition of 
 
 *Proposta:* confermarle entrambe: le tre storie diventano Ready.
 
+> ✅ **Deciso (PO, 25/11):** confermate entrambe. US-511, US-507 e US-512 sono ✅ Ready.
+
 ### 8.7 Contenuto dello Sprint 18
 *Proposta:* prima gli avvisi (US-1311), poi il gruppo della richiesta di contatto: US-511, US-507 e US-512, 18 punti
 in tutto (§9). Sotto la media, per lasciare spazio a quello che arriverà dal primo uso degli utenti, come in questo
 sprint. Nello sprint anche la ricerca dei dati non correggibili (A42) e la prova del flusso completo (§8.3), senza
 punti.
+
+> ⏳ **PO, 25/11:** prima di partire, il PO propone una modifica sui dati da bonificare. Il contenuto dello sprint si
+> decide dopo. La prova del flusso completo non c'è più (§8.3).
 
 ## 9. Proposta per lo Sprint 18
 
@@ -291,14 +323,15 @@ traccia di ogni tentativo.*
 | | | **Totale** | **18** |
 
 Prossima migrazione: **V52**; probabilmente ne servirà una per ciascuna di US-511, US-507 e US-512. Ogni storia
-passa dal collaudo sul tuo PC prima del merge (EN-11), e i deploy si fanno negli orari del §8.4.
+passa dal collaudo sul tuo PC prima del merge (EN-11), e i deploy li decidi tu (§8.4).
 
 ## 10. Azioni a carico del PO
 
 - [ ] Decidere i punti §8.1 … §8.7.
-- [ ] Lanciare il comando del §8.5 e incollarmi il risultato.
+- [x] Lanciare il comando del §8.5 e incollarmi il risultato (25/11).
+- [ ] Attivare il sottocriterio `PQ` di SSH sul server (§8.5) e incollarmi il risultato.
 - [ ] Unire questa PR dopo le decisioni.
-- [ ] Gli account degli utenti, dopo la prova del §8.3 se l'accetti.
+- [ ] Gli account degli utenti.
 - [ ] Il blocco automatico dello schermo dei PC del Call Center, dopo pochi minuti, con chi gestisce i PC (US-1310).
 - [ ] I 30 giorni dei backup nel registro dei trattamenti, con il DPO (dallo Sprint 16).
 - [ ] US-1301: la prova T-10.1 della PWA sullo smartphone.
