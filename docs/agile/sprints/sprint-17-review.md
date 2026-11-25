@@ -305,25 +305,35 @@ in tutto (§9). Sotto la media, per lasciare spazio a quello che arriverà dal p
 sprint. Nello sprint anche la ricerca dei dati non correggibili (A42) e la prova del flusso completo (§8.3), senza
 punti.
 
-> ⏳ **PO, 25/11:** prima di partire, il PO propone una modifica sui dati da bonificare. Il contenuto dello sprint si
-> decide dopo. La prova del flusso completo non c'è più (§8.3).
+> ⏳ **PO, 25/11:** prima di partire, il PO chiede tre storie nuove sulle aziende, già nel backlog:
+> - **US-514**: affidabilità (1–4 stelle) e interesse al progetto (1–2 pollici), presi dai simboli `$` e `£` all'inizio
+>   dei nomi importati, che si ripuliscono senza perdere il dato;
+> - **US-1104**: tre voti del Tutor alla fine del tirocinio, mostrati come faccina, con la media nella scheda
+>   dell'azienda;
+> - **US-515**: l'azienda «nave scuola», proposta dal Tutor e segnata dall'operatore, con il simbolo 🚢 accanto al nome.
+>
+> Hanno la precedenza sul gruppo della richiesta di contatto: nuova proposta al §9. La prova del flusso completo non c'è
+> più (§8.3).
 
 ## 9. Proposta per lo Sprint 18
 
-**Date:** tre giorni dalla conferma del planning, indicativamente 26 – 28 novembre 2026. **Obiettivo proposto:** *gli
-avvisi su sito e backup arrivano in tempo, e il Tutor può chiedere al Call Center di contattare un'azienda, con la
-traccia di ogni tentativo.*
+**Date:** tre giorni dalla conferma del planning, indicativamente 26 – 28 novembre 2026. **Obiettivo proposto:** *la
+scheda dell'azienda dice quanto è affidabile e interessata, come si sono trovati i tirocinanti e se è una nave scuola;
+gli avvisi su sito e backup arrivano in tempo.*
 
 | Ordine | ID | Storia | Punti |
 |---|---|---|---|
-| 1 | US-1311 | Avvisi affidabili su sito e backup (§8.2) | 3 |
-| 2 | US-511 | Zona dell'azienda e aziende per il Tutor | 5 |
-| 3 | US-507 | Richiesta di contatto di un'azienda dal Tutor | 5 |
-| 4 | US-512 | Tentativi di contatto ed esito della richiesta | 5 |
+| 1 | US-514 | Affidabilità e interesse al progetto dell'azienda | 5 |
+| 2 | US-1104 | Valutazione dell'azienda alla fine del tirocinio | 5 |
+| 3 | US-515 | Azienda «nave scuola» | 5 |
+| 4 | US-1311 | Avvisi affidabili su sito e backup (§8.2) | 3 |
 | | | **Totale** | **18** |
 
-Prossima migrazione: **V52**; probabilmente ne servirà una per ciascuna di US-511, US-507 e US-512. Ogni storia
-passa dal collaudo sul tuo PC prima del merge (EN-11), e i deploy li decidi tu (§8.4).
+Nello Sprint 19 il gruppo della richiesta di contatto: US-511, che porta al Tutor anche le valutazioni, US-507 e
+US-512.
+
+Prossima migrazione: **V52**; probabilmente ne servirà una per ciascuna delle prime tre storie. Ogni storia passa dal
+collaudo sul tuo PC prima del merge (EN-11), e i deploy li decidi tu (§8.4).
 
 ## 10. Azioni a carico del PO
 
