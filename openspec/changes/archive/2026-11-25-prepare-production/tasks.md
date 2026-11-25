@@ -28,7 +28,7 @@
   - [x] script eseguito il 24/11 sulla release `433f234`: backup della demo, pulizia, 5 utenti tolti da Keycloak,
         importazione con i conteggi della prova, primo backup della produzione, file Access cancellato
   - [x] invito e accesso dell'ADMIN, configurazione (T-27.1, T-27.2: riuscite dal PO il 24/11)
-- [ ] 4.4 Seconda PR: profilo predefinito, realm e password demo, nomi «produzione», ASVS, chiusura della storia
+- [x] 4.4 Seconda PR: profilo predefinito, realm e password demo, nomi «produzione», ASVS, chiusura della storia
   - [x] in bozza dal 23/11: profilo predefinito `keycloak`, via il realm e le password demo, primo ADMIN in
         `bootstrap.sh`, nomi visibili (workflow «Deploy» e «Controllo del sito», tag `:produzione`; file del workflow e
         ambiente «demo» di GitHub invariati, PO 23/11)
@@ -39,4 +39,5 @@
         funzionano, realm `nexus` invariato)
   - [x] sul server: `keycloak-admin-tunnel.sh` prima del deploy di questa PR; dopo il deploy, console dal tunnel (T-27.4:
         script e deploy `388e8c2` il 24/11, riuscita dal PO)
-  - [ ] chiusura della storia
+  - [x] chiusura della storia: T-27.3 riuscita il 25/11 (backup della notte, 4,3 MB); il PO ha tolto il volume della 18
+        (`pulisci`) e le variabili `NEXUS_DEMO_PASSWORD_*` dal `.env` il 24/11

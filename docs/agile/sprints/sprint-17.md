@@ -12,7 +12,7 @@
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-1306 | Passaggio in produzione | 8 | 🔨 In corso: passaggio fatto il 24/11 | `prepare-production` | [#177](https://github.com/maubernardi/nexus/pull/177) (preparazione), [#194](https://github.com/maubernardi/nexus/pull/194) (dopo il passaggio) |
+| US-1306 | Passaggio in produzione | 8 | 🎉 Done | `prepare-production` (archiviata) | [#177](https://github.com/maubernardi/nexus/pull/177) (preparazione), [#194](https://github.com/maubernardi/nexus/pull/194) (dopo il passaggio), [#206](https://github.com/maubernardi/nexus/pull/206) (chiusura) |
 | EN-10 | Aggiornamento a PostgreSQL 19 | 5 | 🎉 Done | `upgrade-postgresql-19` (archiviata) | [#189](https://github.com/maubernardi/nexus/pull/189), [#190](https://github.com/maubernardi/nexus/pull/190) |
 | US-1310 | Sessione attiva finché NEXUS è aperto | 3 | 🎉 Done | `keep-session-alive` (archiviata) | [#197](https://github.com/maubernardi/nexus/pull/197), [#200](https://github.com/maubernardi/nexus/pull/200) |
 | US-513 | Elenco delle aziende a pagine | 3 | 🎉 Done | `paginate-company-list` (archiviata) | [#198](https://github.com/maubernardi/nexus/pull/198), [#199](https://github.com/maubernardi/nexus/pull/199) |
@@ -190,3 +190,4 @@ Le ho proposte io, da confermare:
 | EN-11 Done: collaudo T-33 riuscito sul PC del PO (24/11, sera) | 8 |
 | US-116 aggiunta dal PO (24/11, sera) | 13 |
 | US-116 Done: collaudo T-34 sul PC, deploy `8139e84`, script sul server e utente corretto in produzione (24/11, sera) | 8 |
+| US-1306 Done: T-27.3, primo backup notturno della produzione riuscito (25/11, mattina) | 0 |
