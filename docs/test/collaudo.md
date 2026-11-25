@@ -9,8 +9,8 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | dal 24/11: le storie nuove sul **PC del PO**, prima del merge (`infra/collaudo/collaudo.sh`, EN-11); dopo il deploy, un controllo veloce in produzione su https://portalenexus.it, senza dati finti. Fino al 24/11: la demo su https://portalenexus.it |
-| **Versione della demo** | `47fe414` (23/11/2026), su **PostgreSQL 19** (EN-10): Sprint 1–16 completi, tranne il passaggio in produzione: backup notturno su IONOS, avvisi di fine tirocinio, testi dei messaggi; l'importazione dal database attuale si prova in locale |
-| **Ultimo aggiornamento** | 24/11/2026 (T-34.1 … T-34.4: correzione dei dati di un utente, riuscite sul collaudo del PC prima del merge; T-34.5 riuscita in produzione dopo il deploy `8139e84`; T-33.1 … T-33.3 riuscite il 24/11); 23/11/2026 (collaudo prima del passaggio finito dal PO il 23/11: T-24, T-25, T-28, T-29 e T-30.1 … T-30.3 riusciti; restano T-30.4, il backup della notte sulla 19, e dopo il passaggio T-26.3 e T-27; T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, fatto il 23/11 sulla demo `47fe414`; T-30.3 corretta: le aziende si provano come `operatore.cc`; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Versione in produzione** | `8139e84` (24/11/2026), su **PostgreSQL 19**, con i dati veri dal passaggio del 24/11 (US-1306): Sprint 1–16 e, dello Sprint 17, sessione attiva (US-1310), aziende a pagine (US-513), collaudo sul PC (EN-11) e correzione dei dati di un utente (US-116). Fino al 23/11, la demo `47fe414` |
+| **Ultimo aggiornamento** | 25/11/2026 (T-27.3 riuscita: backup della notte dopo il passaggio, US-1306 chiusa); 24/11/2026 (T-34.1 … T-34.4: correzione dei dati di un utente, riuscite sul collaudo del PC prima del merge; T-34.5 riuscita in produzione dopo il deploy `8139e84`; T-33.1 … T-33.3 riuscite il 24/11); 23/11/2026 (collaudo prima del passaggio finito dal PO il 23/11: T-24, T-25, T-28, T-29 e T-30.1 … T-30.3 riusciti; restano T-30.4, il backup della notte sulla 19, e dopo il passaggio T-26.3 e T-27; T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, fatto il 23/11 sulla demo `47fe414`; T-30.3 corretta: le aziende si provano come `operatore.cc`; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 > **Dopo il passaggio in produzione** (24/11) il sito ha i dati veri e gli utenti demo (`tutor1`, `operatore.cc`, …)
 > non ci sono più: le prove fino alla sezione 32 restano come storico. Le storie nuove si collaudano sul PC del PO, dal
@@ -1261,9 +1261,11 @@ note scrivi solo numeri e codici, mai nomi o recapiti.
   > Nota (24/11): riuscita dal PO, con la nota di Access nel diario e i Cataloghi controllati. La velocità dell'elenco
   > delle aziende si prova con T-32, dopo il deploy di US-513.
 
-- [ ] **T-27.3 Backup della produzione (US-1302, US-1306)**
+- [x] **T-27.3 Backup della produzione (US-1302, US-1306)**
   1. Il giorno dopo il passaggio, alle 9, controlla Actions → «Backup del database». **Atteso:** verde, con il backup
      della notte.
+  > Nota (25/11): riuscita, con il controllo «stato» lanciato a mano alle 9:25 (run 45576089761): backup delle 3:30,
+  > 4,3 MB, cifrato, bloccato su IONOS fino al 25/12; release in esecuzione `8139e84`.
 
 - [x] **T-27.4 Console di Keycloak solo dal tunnel (US-1306, controllo ASVS del 24/11)**
   1. Prima del deploy della seconda PR di US-1306, sul server: `sudo bash keycloak-admin-tunnel.sh` (README, «Console

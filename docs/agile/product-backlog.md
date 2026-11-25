@@ -157,7 +157,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1303](#us-1303) | E13 | Anonimizzazione a scadenza | Must | 8 | R4 | 🎉 Done (Sprint 10) |
 | [US-1304](#us-1304) | E13 | Tema di Keycloak | Should | 3 | R4 | 🎉 Done (Sprint 7, fuori piano) |
 | [US-1305](#us-1305) | E13 | Revisione UX/UI | Should | 8 | R4 | 📋 Backlog |
-| [US-1306](#us-1306) | E13 | Passaggio in produzione | Must | 8 | R4 | 🔨 In corso (Sprint 17) |
+| [US-1306](#us-1306) | E13 | Passaggio in produzione | Must | 8 | R4 | 🎉 Done (Sprint 17) |
 | [US-1307](#us-1307) | E13 | Monitoraggio e revisione di sicurezza | Must | 5 | R4 | 🎉 Done (Sprint 10) |
 | [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | 🎉 Done (Sprint 10) |
 | [US-1309](#us-1309) | E13 | Importazione dal database attuale | Must | 8 | R4 | 🎉 Done (Sprint 15) |
@@ -1643,7 +1643,7 @@ Criteri di accettazione:
 - Decisione del PO dell'08/11: si farà in **uno sprint dedicato**, perché non sarà semplice.
 
 #### US-1306
-**Passaggio in produzione** · Must · 8 punti · R4 · 🔨 In corso (Sprint 17)
+**Passaggio in produzione** · Must · 8 punti · R4 · 🎉 Done (Sprint 17)
 
 Come **PO** voglio passare dalla demo alla produzione per usare NEXUS con dati reali.
 
@@ -1684,6 +1684,9 @@ Criteri di accettazione:
 - Stato al 23/11: preparazione unita (#177) e provata sul backup vero della demo (pulizia, importazione, backend senza
   `seed` con l'ADMIN, utenti di Keycloak). Restano il passaggio sul server, nel giorno scelto dal PO, e la seconda PR
   (profilo predefinito, realm e password demo, nomi «produzione», ASVS): Sprint 17.
+- Fatto il 24/11: passaggio sul server (release `433f234`), aziende importate dal database attuale, invito all'ADMIN;
+  seconda PR (#194) con la console di Keycloak solo dal tunnel, dopo il controllo ASVS. Il 25/11 il primo backup
+  notturno della produzione è riuscito (T-27.3). Dal 24/11 le storie nuove si collaudano sul PC del PO (EN-11).
 
 Dipendenze: US-102..105, US-1302, US-1307, US-1309
 

@@ -32,4 +32,5 @@
 - [x] 5.2 Controllo del mattino del giorno dopo: verde con il backup della notte sulla 19 (24/11, lanciato a mano alle
       9:08 perché GitHub ritardava quello pianificato)
 - [x] 5.3 PR di Dependabot #182–#184 chiuse (da Dependabot, dopo il merge della #189)
-- [ ] 5.4 Dopo il passaggio in produzione: `pulisci` (resta al PO, nello Sprint 17: README, «Aggiornare PostgreSQL»)
+- [x] 5.4 Dopo il passaggio in produzione: `pulisci` (resta al PO, nello Sprint 17: README, «Aggiornare PostgreSQL»):
+      fatto dal PO il 24/11, sera
