@@ -1,7 +1,8 @@
 # Sprint 17 — 24 – 26 novembre 2026
 
-**Stato:** 🏃 in corso: planning confermato dal PO il 23/11, 13 punti; 16 con US-1310, 19 con US-513, 24 con EN-11 e
-29 con US-116, aggiunte il 24/11.
+**Stato:** 🎉 concluso il 25/11: 29 punti su 29 completati (EN-10, US-1306, US-1310, US-513, EN-11, US-116). Al
+planning del 23/11 erano 13 punti; 16 con US-1310, 19 con US-513, 24 con EN-11 e 29 con US-116, aggiunte il 24/11.
+NEXUS è in produzione dal 24/11, a `8139e84`; [review](sprint-17-review.md).
 **Planning:** 23/11, dalla [review dello Sprint 16](sprint-16-review.md) (§8, §9).
 
 ## Obiettivo
