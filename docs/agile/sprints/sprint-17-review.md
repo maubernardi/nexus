@@ -305,15 +305,16 @@ in tutto (§9). Sotto la media, per lasciare spazio a quello che arriverà dal p
 sprint. Nello sprint anche la ricerca dei dati non correggibili (A42) e la prova del flusso completo (§8.3), senza
 punti.
 
-> ⏳ **PO, 25/11:** prima di partire, il PO chiede tre storie nuove sulle aziende, già nel backlog:
+> ✅ **Deciso (PO, 25 – 26/11):** prima di partire, il PO chiede tre storie nuove sulle aziende, già nel backlog:
 > - **US-514**: affidabilità (1–4 stelle) e interesse al progetto (1–2 pollici), presi dai simboli `$` e `£` all'inizio
 >   dei nomi importati, che si ripuliscono senza perdere il dato;
 > - **US-1104**: tre voti del Tutor alla fine del tirocinio, mostrati come faccina, con la media nella scheda
 >   dell'azienda;
 > - **US-515**: l'azienda «nave scuola», proposta dal Tutor e segnata dall'operatore, con il simbolo 🚢 accanto al nome.
 >
-> Hanno la precedenza sul gruppo della richiesta di contatto: nuova proposta al §9. La prova del flusso completo non c'è
-> più (§8.3).
+> Hanno la precedenza sul gruppo della richiesta di contatto: lo Sprint 18 è quello del §9, US-514 subito, anche nel
+> collaudo ([sprint-18](sprint-18.md)). Il servizio di US-1311 si sceglie dopo un approfondimento. La prova del flusso
+> completo non c'è più (§8.3).
 
 ## 9. Proposta per lo Sprint 18
 
@@ -337,7 +338,7 @@ collaudo sul tuo PC prima del merge (EN-11), e i deploy li decidi tu (§8.4).
 
 ## 10. Azioni a carico del PO
 
-- [ ] Decidere i punti §8.1 … §8.7.
+- [x] Decidere i punti §8.1 … §8.7 (25 – 26/11).
 - [x] Lanciare il comando del §8.5 e incollarmi il risultato (25/11).
 - [ ] Attivare il sottocriterio `PQ` di SSH sul server (§8.5) e incollarmi il risultato.
 - [ ] Unire questa PR dopo le decisioni.

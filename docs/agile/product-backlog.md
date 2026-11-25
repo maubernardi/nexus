@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 108 elementi, 447 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-17](sprints/sprint-17.md), il 25/11 ([review](sprints/sprint-17-review.md)); il prossimo, lo Sprint 18, è da pianificare.
+**Totale: 108 elementi, 447 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-17](sprints/sprint-17.md), il 25/11 ([review](sprints/sprint-17-review.md)); in corso lo [Sprint 18](sprints/sprint-18.md), dal 26/11.
 
 ## Epiche
 
@@ -114,8 +114,8 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-511](#us-511) | E5 | Zona dell'azienda e aziende per il Tutor | Should | 5 | — | ✅ Ready |
 | [US-512](#us-512) | E5 | Tentativi di contatto ed esito della richiesta | Should | 5 | — | ✅ Ready |
 | [US-513](#us-513) | E5 | Elenco delle aziende a pagine | Must | 3 | R4 | 🎉 Done (Sprint 17) |
-| [US-514](#us-514) | E5 | Affidabilità e interesse al progetto dell'azienda | Must | 5 | R4 | 📋 Backlog |
-| [US-515](#us-515) | E5 | Azienda «nave scuola» | Must | 5 | R4 | 📋 Backlog |
+| [US-514](#us-514) | E5 | Affidabilità e interesse al progetto dell'azienda | Must | 5 | R4 | 🔨 In corso (Sprint 18) |
+| [US-515](#us-515) | E5 | Azienda «nave scuola» | Must | 5 | R4 | ✅ Ready |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 🎉 Done (Sprint 5) |
@@ -150,7 +150,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1101](#us-1101) | E11 | Report di restituzione | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1102](#us-1102) | E11 | Esito sulla mansione e audit trail | Must | 2 | R3 | 🎉 Done (Sprint 8) |
 | [US-1103](#us-1103) | E11 | Motivo di chiusura del tirocinio | Must | 2 | R4 | 🎉 Done (Sprint 14) |
-| [US-1104](#us-1104) | E11 | Valutazione dell'azienda alla fine del tirocinio | Must | 5 | R4 | 📋 Backlog |
+| [US-1104](#us-1104) | E11 | Valutazione dell'azienda alla fine del tirocinio | Must | 5 | R4 | ✅ Ready |
 | [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | 🎉 Done (Sprint 5) |
 | [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1203](#us-1203) | E12 | Avvisi di fine tirocinio e blocco delle nuove segnalazioni | Must | 5 | R4 | 🎉 Done (Sprint 16) |
@@ -829,9 +829,10 @@ Criteri di accettazione:
 - Il Tutor non vede altro: niente partita IVA, recapiti, referenti, diario, mansioni o storico. L'API per il Tutor
   restituisce solo quei campi (minimizzazione), e il Tutor non crea né modifica aziende.
 - Il Tutor vede anche le **valutazioni dei tirocini** (US-1104): la faccina media nella lista e, nella scheda in sola
-  lettura, l'elenco a pagine con data, faccina e nota (PO, 25/11).
+  lettura, l'elenco a pagine con data, faccina, nota e nome del Tutor che l'ha data (PO, 25 e 26/11).
+- Vede anche **stelle e pollici** (US-514) e il simbolo **🚢** della nave scuola (US-515) (PO, 26/11).
 
-Dipendenze: US-106, US-509, US-1007, US-1104
+Dipendenze: US-106, US-509, US-1007, US-514, US-515, US-1104
 
 #### US-512
 **Tentativi di contatto ed esito della richiesta** · Should · 5 punti · release da decidere · ✅ Ready
@@ -872,7 +873,7 @@ Criteri di accettazione:
 Dipendenze: US-501, US-1309
 
 #### US-514
-**Affidabilità e interesse al progetto dell'azienda** · Must · 5 punti · R4 · 📋 Backlog
+**Affidabilità e interesse al progetto dell'azienda** · Must · 5 punti · R4 · 🔨 In corso (Sprint 18)
 
 Come **operatore del Call Center** voglio segnare nella scheda dell'azienda quanto è affidabile e quanto è interessata
 al progetto, per capire a colpo d'occhio chi chiamare (PO, 25/11). Nel database attuale lo si scrive con dei simboli
@@ -895,12 +896,16 @@ Criteri di accettazione:
   Lo fa una migrazione sulle aziende già in NEXUS, e la stessa regola entra nell'importazione (US-1309) per quando si
   azzera la pre-produzione. Nel database attuale: 271 aziende con le stelle, 90 con i pollici, 4 con la `&` e 1 con il
   `^` all'inizio; nessun nome resta vuoto.
-- Domanda aperta: il Tutor vede stelle e pollici nella sua lista delle aziende (US-511)?
+- Un nome nuovo o corretto non può iniziare con `$`, `£`, `&` o `^`: NEXUS lo dice e indica stelle e pollici. Così
+  l'abitudine del database attuale non sporca di nuovo i nomi.
+- Il Tutor vede stelle e pollici nella sua lista delle aziende, con US-511 (PO, 26/11).
+- Subito, anche nel collaudo (PO, 26/11): i dati finti del collaudo (EN-11) hanno alcune aziende con i vecchi simboli,
+  ripulite con la stessa regola della migrazione.
 
 Dipendenze: US-513, US-1309
 
 #### US-515
-**Azienda «nave scuola»** · Must · 5 punti · R4 · 📋 Backlog
+**Azienda «nave scuola»** · Must · 5 punti · R4 · ✅ Ready
 
 Come **operatore del Call Center** voglio sapere quali aziende sono adatte come «nave scuola», per vederle subito
 quando scelgo dove proporre un beneficiario (PO, 25/11).
@@ -915,7 +920,7 @@ Criteri di accettazione:
 - Il simbolo 🚢, un'icona disegnata da NEXUS con il testo «Nave scuola» per il lettore di schermo, sta accanto al nome
   dell'azienda **ovunque la si sceglie**: elenco delle aziende (con un filtro), abbinamento, proposta, bacheca del Call
   Center. Non nella bacheca dei Tutor, che è anonima (E9).
-- Domanda aperta: il Tutor vede il simbolo nella sua lista delle aziende (US-511)?
+- Il Tutor vede il simbolo nella sua lista delle aziende, con US-511 (PO, 26/11).
 
 Dipendenze: US-1101, US-1204, US-513
 
@@ -1425,7 +1430,7 @@ Criteri di accettazione:
 Dipendenze: US-1009, US-109
 
 #### US-1104
-**Valutazione dell'azienda alla fine del tirocinio** · Must · 5 punti · R4 · 📋 Backlog
+**Valutazione dell'azienda alla fine del tirocinio** · Must · 5 punti · R4 · ✅ Ready
 
 Come **Tutor** voglio valutare l'azienda alla fine del tirocinio, così che chi propone di nuovo quell'azienda sappia
 come si sono trovati i tirocinanti (PO, 25/11).
@@ -1434,16 +1439,17 @@ Criteri di accettazione:
 - Nel report di restituzione (US-1101) **tre voti da 1 a 5**, obbligatori, ognuno con cinque faccine da 😞 a 😄:
   1. soddisfazione nell'interazione con l'azienda;
   2. capacità dell'azienda di accogliere il beneficiario;
-  3. capacità dell'azienda e del tutor aziendale di insegnare al beneficiario come si lavora (formula da confermare).
+  3. capacità formativa dell'azienda e del tutor aziendale (PO, 26/11).
 
   Sono una cosa nuova: la «Soddisfazione dell'azienda» del report resta com'è (PO, 25/11).
 - Mentre il Tutor sceglie, NEXUS mostra la **media** dei tre voti come faccina: quella del numero intero più vicino,
   per esempio 4,33 → 🙂 e 4,67 → 😄.
 - Se la faccina non è 😄 compare la **nota**: una sola per le tre domande, al massimo 500 caratteri, senza dati
-  personali (PO, 25/11). Domanda aperta: obbligatoria o facoltativa?
+  personali (PO, 25/11). Sempre facoltativa (PO, 26/11).
 - Nella **scheda dell'azienda** la media delle medie, come faccina con il numero di tirocini valutati, e l'elenco **a
-  pagine** delle valutazioni, dalla più recente: data di fine del tirocinio, faccina, nota. Senza il nome del Tutor né
-  del beneficiario.
+  pagine** delle valutazioni, dalla più recente: data di fine del tirocinio, faccina, nota e **nome del Tutor** che
+  l'ha data, perché chi ricontatta l'azienda possa chiedergli che cosa non è andato (PO, 26/11). Senza il nome del
+  beneficiario.
 - Le valutazioni le vedono operatori, ADMIN e Tutor (PO, 25/11); il Tutor nella sua lista delle aziende (US-511).
 - Faccine disegnate da NEXUS, con il testo per il lettore di schermo, per esempio «Media 4,3 su 5».
 - Dopo l'invio del report la valutazione non si modifica. I voti entrano nell'audit; la nota, testo libero, no. I report
