@@ -225,6 +225,27 @@ class DomainConstraintsIT {
         }
 
         @Test
+        void stelleEPolliciFuoriIntervallo() {
+            Company stars = company(DomainFixtures.vatCode());
+            stars.setReliability(5);
+            assertViolates("ck_company_reliability", () -> companies.saveAndFlush(stars));
+        }
+
+        @Test
+        void polliciFuoriIntervallo() {
+            Company thumbs = company(DomainFixtures.vatCode());
+            thumbs.setProjectInterest(0);
+            assertViolates("ck_company_project_interest", () -> companies.saveAndFlush(thumbs));
+        }
+
+        @Test
+        void nomeConISimboliDelDatabaseAttuale() {
+            Company marked = company(DomainFixtures.vatCode());
+            marked.setName("£$ Officina");
+            assertViolates("ck_company_name_legacy_marks", () -> companies.saveAndFlush(marked));
+        }
+
+        @Test
         void codiceAtecoDuplicatoPerAzienda() {
             Company c = companies.saveAndFlush(company(DomainFixtures.vatCode()));
             atecoCodes.saveAndFlush(new CompanyAtecoCode(c, "56.10.11", null));

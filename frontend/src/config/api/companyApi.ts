@@ -46,6 +46,10 @@ export type Company = {
   secondaryEmail?: string | null;
   /** Referenti in ordine (US-510). */
   contacts?: CompanyContact[];
+  /** Affidabilità, da 1 a 4 stelle (US-514); assente se non valutata. */
+  reliability?: number | null;
+  /** Interesse al progetto, 1 o 2 pollici (US-514); assente se non valutato. */
+  projectInterest?: number | null;
   active: boolean;
   version: number;
   updatedAt: string;
@@ -68,6 +72,9 @@ export type CompanyForm = {
   email: string | null;
   secondaryEmail: string | null;
   contacts: CompanyContactForm[];
+  /** Stelle e pollici (US-514); null = non valutata. */
+  reliability: number | null;
+  projectInterest: number | null;
   /** Solo in modifica: versione vista (blocco ottimistico). */
   version?: number;
 };
@@ -79,6 +86,9 @@ export type CompanySearch = {
   toComplete?: boolean;
   /** Solo le aziende della categoria merceologica (US-509). */
   businessCategoryId?: string;
+  /** Solo le aziende con almeno queste stelle (1–4) e questi pollici (1–2) (US-514). */
+  minReliability?: number;
+  minProjectInterest?: number;
   /** Pagina, da 0 (US-513). */
   page: number;
   /** Aziende per pagina: una di {@link COMPANY_PAGE_SIZES}. */

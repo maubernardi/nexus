@@ -21,6 +21,7 @@ import it.nexus.domain.dto.CompanyFormDTO;
 import it.nexus.domain.dto.CompanyPageDTO;
 import it.nexus.domain.dto.VersionDTO;
 import it.nexus.services.CompanyHistoryService;
+import it.nexus.services.CompanySearch;
 import it.nexus.services.CompanyService;
 import it.nexus.web.rest.PathAPI;
 import jakarta.validation.Valid;
@@ -38,15 +39,17 @@ public class CompanyResource {
     @GetMapping
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
     @Operation(summary = "Cerca aziende per ragione sociale o partita IVA, una pagina alla volta (page da 0; size 10, "
-            + "25, 50 o 100); filtri: da completare, categoria merceologica")
+            + "25, 50 o 100); filtri: da completare, categoria merceologica, stelle (1–4) e pollici (1–2) minimi")
     public ResponseEntity<CompanyPageDTO> search(@RequestParam(required = false) String search,
             @RequestParam(defaultValue = "false") boolean includeInactive,
             @RequestParam(defaultValue = "false") boolean toComplete,
             @RequestParam(required = false) String businessCategoryId,
+            @RequestParam(required = false) Integer minReliability,
+            @RequestParam(required = false) Integer minProjectInterest,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "" + CompanyService.DEFAULT_PAGE_SIZE) int size) {
-        return ResponseEntity.ok(companyService.search(search, includeInactive, toComplete, businessCategoryId, page,
-                size));
+        return ResponseEntity.ok(companyService.search(new CompanySearch(search, includeInactive, toComplete,
+                businessCategoryId, minReliability, minProjectInterest), page, size));
     }
 
     @GetMapping("/{id}")

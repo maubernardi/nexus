@@ -216,6 +216,48 @@ class LegacyImportIT {
     }
 
     @Test
+    void simboliDelDatabaseAttuale_stelleEPollici_nomeRipulito_conteggiNelResoconto() throws Exception {
+        municipalities();
+        Path file = dir.resolve("simboli.mdb");
+        try (LegacyAccessFile access = LegacyAccessFile.create(file)) {
+            access.company(21, Map.of("NomeSocietà", "£$$ Officina Rossi"));
+            access.company(22, Map.of("NomeSocietà", "$$$$$ Bar Centrale"));
+            access.company(23, Map.of("NomeSocietà", "&Ferramenta Bianchi"));
+            access.company(24, Map.of("NomeSocietà", "$$"));
+            access.company(25, Map.of("NomeSocietà", "Rossi & C. S.n.c."));
+        }
+        String text = service.importFile(file).toText();
+        em.clear();
+
+        assertThat(company(21)).satisfies(c -> {
+            assertThat(c.getName()).isEqualTo("Officina Rossi");
+            assertThat(c.getReliability()).isEqualTo(2);
+            assertThat(c.getProjectInterest()).isEqualTo(1);
+        });
+        assertThat(company(22)).satisfies(c -> {
+            assertThat(c.getName()).isEqualTo("Bar Centrale");
+            assertThat(c.getReliability()).isEqualTo(4);
+            assertThat(c.getProjectInterest()).isNull();
+        });
+        assertThat(company(23).getName()).isEqualTo("Ferramenta Bianchi");
+        assertThat(company(24)).satisfies(c -> {
+            assertThat(c.getName()).isEqualTo("Azienda senza nome n. 24");
+            assertThat(c.getReliability()).isEqualTo(2);
+            assertThat(c.missingData()).contains(CompanyMissingData.NAME);
+        });
+        assertThat(company(25)).satisfies(c -> {
+            assertThat(c.getName()).isEqualTo("Rossi & C. S.n.c.");
+            assertThat(c.getReliability()).isNull();
+        });
+
+        assertThat(text).contains("- Stelle di affidabilità dai $ all'inizio del nome: 3 (2: 2, 4: 1)",
+                "- Pollici di interesse dalle £ all'inizio del nome: 1 (1: 1)",
+                "- Aziende con solo un refuso all'inizio del nome (& o ^, tolto): 1",
+                "### Aziende senza nome (1)");
+        assertThat(text).doesNotContain("Officina", "Bar Centrale", "Ferramenta", "Rossi");
+    }
+
+    @Test
     void resoconto_daRivedereSenzaDatiPersonali() throws Exception {
         municipalities();
         String text = service.importFile(accessFile()).toText();

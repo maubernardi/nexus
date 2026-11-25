@@ -3,6 +3,7 @@ package it.nexus.web.rest.resource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
@@ -607,6 +608,91 @@ class CompanyResourceIT {
 
         assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.COMPANY, TsidMapper.toInternal(id)))
                 .extracting(e -> e.getAction()).containsExactly("CREATE", "DEACTIVATE", "ACTIVATE");
+    }
+
+    @Test
+    void stelleEPollici_auditConPrimaEDopo_siTolgono() throws Exception {
+        String id = JsonPath.read(create("operatore.cc", body("Officina Rossi", "12345678901",
+                        ", \"reliability\": 3, \"projectInterest\": 1"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.reliability").value(3))
+                .andExpect(jsonPath("$.projectInterest").value(1))
+                .andReturn().getResponse().getContentAsString(), "$.id");
+        assertThat(companyAudit(id)).singleElement().satisfies(e -> {
+            assertThat(e.getChanges().get("reliability")).asInstanceOf(InstanceOfAssertFactories.MAP)
+                    .containsEntry("after", 3);
+            assertThat(e.getChanges().get("projectInterest")).asInstanceOf(InstanceOfAssertFactories.MAP)
+                    .containsEntry("after", 1);
+        });
+
+        newRequest();
+        update(id, body("Officina Rossi", "12345678901", ", \"reliability\": 4, \"version\": 0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.reliability").value(4))
+                // l'API omette i campi vuoti: interesse tolto
+                .andExpect(jsonPath("$.projectInterest").doesNotExist());
+        assertThat(companyAudit(id)).last().satisfies(e -> {
+            assertThat(e.getAction()).isEqualTo("UPDATE");
+            assertThat(e.getChanges()).containsOnlyKeys("reliability", "projectInterest")
+                    .containsEntry("reliability", Map.of("before", 3, "after", 4));
+            assertThat(e.getChanges().get("projectInterest")).asInstanceOf(InstanceOfAssertFactories.MAP)
+                    .containsEntry("before", 1);
+        });
+        assertThat(companies.findById(TsidMapper.toInternal(id))).get()
+                .satisfies(c -> assertThat(c.getProjectInterest()).isNull());
+    }
+
+    @Test
+    void stelleEPolliciFuoriIntervallo_nomeConISimboliDelDatabaseAttuale_400SulCampo() throws Exception {
+        create("operatore.cc", body("Officina Rossi", "12345678901", ", \"reliability\": 5"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("reliability"));
+        create("operatore.cc", body("Officina Rossi", "12345678901", ", \"projectInterest\": 3"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("projectInterest"));
+        create("operatore.cc", body("Officina Rossi", "12345678901", ", \"reliability\": 0"))
+                .andExpect(status().isBadRequest());
+        for (String name : List.of("$$ Officina Rossi", "£ Officina Rossi", "&Officina Rossi", " ^Officina Rossi")) {
+            create("operatore.cc", body(name, "12345678901", ""))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.fieldErrors[0].field").value("name"))
+                    .andExpect(jsonPath("$.fieldErrors[0].message").value(containsString("stelle e pollici")));
+        }
+        // la & dentro il nome va bene
+        create("operatore.cc", body("Rossi & C. S.n.c.", "12345678901", ""))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Rossi & C. S.n.c."))
+                .andExpect(jsonPath("$.reliability").doesNotExist());
+    }
+
+    @Test
+    void filtriPerStelleEPollici_siSommanoAgliAltri_fuoriIntervallo400() throws Exception {
+        create("operatore.cc", body("Quattro stelle", "11111111111", ", \"reliability\": 4, \"projectInterest\": 2"))
+                .andExpect(status().isCreated());
+        create("operatore.cc", body("Tre stelle", "22222222222", ", \"reliability\": 3, \"projectInterest\": 1"))
+                .andExpect(status().isCreated());
+        create("operatore.cc", body("Una stella", "33333333333", ", \"reliability\": 1")).andExpect(status().isCreated());
+        create("operatore.cc", body("Senza valutazioni", "44444444444", "")).andExpect(status().isCreated());
+
+        mockMvc.perform(get(API).param("minReliability", "3").header(USER, "operatore.cc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(2))
+                .andExpect(jsonPath("$.companies[*].name", contains("Quattro stelle", "Tre stelle")))
+                .andExpect(jsonPath("$.companies[0].reliability").value(4))
+                .andExpect(jsonPath("$.companies[0].projectInterest").value(2));
+        mockMvc.perform(get(API).param("minProjectInterest", "1").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.companies[*].name", contains("Quattro stelle", "Tre stelle")));
+        mockMvc.perform(get(API).param("minProjectInterest", "2").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.companies[*].name", contains("Quattro stelle")));
+        mockMvc.perform(get(API).param("minReliability", "1").param("search", "stell").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.companies[*].name", contains("Quattro stelle", "Tre stelle", "Una stella")));
+        mockMvc.perform(get(API).header(USER, "operatore.cc")).andExpect(jsonPath("$.total").value(4));
+
+        for (String[] wrong : List.of(new String[] {"minReliability", "0"}, new String[] {"minReliability", "5"},
+                new String[] {"minProjectInterest", "3"})) {
+            mockMvc.perform(get(API).param(wrong[0], wrong[1]).header(USER, "operatore.cc"))
+                    .andExpect(status().isBadRequest());
+        }
     }
 
     @Test

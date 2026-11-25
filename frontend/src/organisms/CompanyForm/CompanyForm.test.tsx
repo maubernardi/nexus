@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AxiosError, AxiosHeaders } from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -104,8 +104,63 @@ describe('<CompanyForm>', () => {
       email: null,
       secondaryEmail: null,
       contacts: [],
+      reliability: null,
+      projectInterest: null,
       version: undefined,
     });
+  });
+
+  it('stelle e pollici: vuoti all’inizio, si sceglie con un clic e si tolgono (US-514)', async () => {
+    const user = userEvent.setup();
+    const { onSubmit } = renderForm();
+    const stars = screen.getByRole('group', { name: 'Affidabilità' });
+    const thumbs = screen.getByRole('group', { name: 'Interesse al progetto' });
+    expect(within(stars).getAllByRole('radio')).toHaveLength(4);
+    expect(within(thumbs).getAllByRole('radio')).toHaveLength(2);
+    for (const radio of screen.getAllByRole('radio')) expect(radio).not.toBeChecked();
+
+    await user.click(within(stars).getByRole('radio', { name: '3 stelle su 4' }));
+    await user.click(within(thumbs).getByRole('radio', { name: '2 pollici alzati su 2' }));
+    await user.click(screen.getByRole('button', { name: 'Togli: Interesse al progetto' }));
+    expect(within(thumbs).queryByRole('button')).not.toBeInTheDocument();
+    await expectNoAxeViolations();
+
+    await user.type(screen.getByLabelText(/^Ragione sociale/), 'Officina Rossi');
+    await user.type(screen.getByLabelText(/^Partita IVA/), '12345678901');
+    await user.click(screen.getByRole('button', { name: 'Registra azienda' }));
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ reliability: 3, projectInterest: null }),
+      ),
+    );
+  });
+
+  it('azienda con stelle e pollici: il modulo parte con i valori salvati (US-514)', () => {
+    renderWithProviders(
+      <main>
+        <CompanyForm
+          company={{ ...saved, reliability: 2, projectInterest: 1 }}
+          submitLabel="Salva modifiche"
+          onSubmit={vi.fn()}
+          onSuccess={vi.fn()}
+        />
+      </main>,
+    );
+    expect(screen.getByRole('radio', { name: '2 stelle su 4' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: '1 pollice alzato su 2' })).toBeChecked();
+  });
+
+  it('il nome non può iniziare con i simboli del database attuale (US-514)', async () => {
+    const user = userEvent.setup();
+    const { onSubmit } = renderForm();
+    await user.type(screen.getByLabelText(/^Ragione sociale/), '$$ Officina Rossi');
+    await user.type(screen.getByLabelText(/^Partita IVA/), '12345678901');
+    await user.click(screen.getByRole('button', { name: 'Registra azienda' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'La ragione sociale non può iniziare con $, £, & o ^: per affidabilità e interesse al progetto usa stelle e pollici',
+    );
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 
   it('categoria merceologica dal catalogo e attività (US-509)', async () => {

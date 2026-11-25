@@ -270,6 +270,42 @@ describe('<CompaniesPage>', () => {
     await expectNoAxeViolations();
   });
 
+  it('stelle e pollici nelle colonne e nei filtri dell’indirizzo (US-514)', async () => {
+    vi.mocked(searchCompanies).mockResolvedValue(
+      pageOf([
+        { ...company('C7', 'Officina Rossi'), reliability: 3, projectInterest: 2 },
+        company('C8', 'Officina Verdi'),
+      ]),
+    );
+    const user = userEvent.setup();
+    const { router } = renderPage('/aziende?stelle=9&interesse=x');
+
+    const table = await screen.findByRole('table', { name: /Aziende ospitanti/ });
+    expect(within(table).getByRole('columnheader', { name: 'Affidabilità' })).toBeInTheDocument();
+    expect(within(table).getByRole('columnheader', { name: 'Interesse al progetto' })).toBeInTheDocument();
+    const [, first, second] = within(table).getAllByRole('row');
+    expect(within(first).getAllByRole('cell')[2]).toHaveTextContent('3 stelle su 4');
+    expect(within(first).getAllByRole('cell')[3]).toHaveTextContent('2 pollici alzati su 2');
+    expect(within(second).getAllByRole('cell')[2]).toHaveTextContent('—Nessuna valutazione');
+    // valori non validi nell'indirizzo: nessun filtro
+    expect(searchCompanies).toHaveBeenLastCalledWith({ includeInactive: false, page: 0, size: 25 });
+
+    const stars = screen.getByRole('combobox', { name: 'Affidabilità' });
+    expect(stars).toHaveDisplayValue('Qualunque');
+    await user.selectOptions(stars, 'Almeno 3 stelle');
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Interesse al progetto' }), 'Due pollici');
+
+    await waitFor(() => expect(router.state.location.search).toBe('?stelle=3&interesse=2'));
+    expect(searchCompanies).toHaveBeenLastCalledWith({
+      includeInactive: false,
+      minReliability: 3,
+      minProjectInterest: 2,
+      page: 0,
+      size: 25,
+    });
+    await expectNoAxeViolations();
+  });
+
   it('nessun risultato: lo dice', async () => {
     vi.mocked(searchCompanies).mockResolvedValue(pageOf([]));
     renderPage('/aziende?q=zzz');
@@ -294,10 +330,10 @@ describe('<CompaniesPage>', () => {
     const table = await screen.findByRole('table', { name: /Aziende ospitanti/ });
     expect(within(table).getByRole('columnheader', { name: 'Referente' })).toBeInTheDocument();
     const [, bellavista, miramare, stella] = within(table).getAllByRole('row');
-    expect(within(bellavista).getAllByRole('cell')[2]).toHaveTextContent(/^Paola Neri e altri 2$/);
-    expect(within(miramare).getAllByRole('cell')[2]).toHaveTextContent(
+    expect(within(bellavista).getAllByRole('cell')[4]).toHaveTextContent(/^Paola Neri e altri 2$/);
+    expect(within(miramare).getAllByRole('cell')[4]).toHaveTextContent(
       /^Responsabile del personale e un altro$/,
     );
-    expect(within(stella).getAllByRole('cell')[2]).toHaveTextContent(/^—$/);
+    expect(within(stella).getAllByRole('cell')[4]).toHaveTextContent(/^—$/);
   });
 });

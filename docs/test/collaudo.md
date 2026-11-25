@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | dal 24/11: le storie nuove sul **PC del PO**, prima del merge (`infra/collaudo/collaudo.sh`, EN-11); dopo il deploy, un controllo veloce in produzione su https://portalenexus.it, senza dati finti. Fino al 24/11: la demo su https://portalenexus.it |
 | **Versione in produzione** | `8139e84` (24/11/2026), su **PostgreSQL 19**, con i dati veri dal passaggio del 24/11 (US-1306): Sprint 1–16 e, dello Sprint 17, sessione attiva (US-1310), aziende a pagine (US-513), collaudo sul PC (EN-11) e correzione dei dati di un utente (US-116). Fino al 23/11, la demo `47fe414` |
-| **Ultimo aggiornamento** | 25/11/2026 (T-27.3 riuscita: backup della notte dopo il passaggio, US-1306 chiusa); 24/11/2026 (T-34.1 … T-34.4: correzione dei dati di un utente, riuscite sul collaudo del PC prima del merge; T-34.5 riuscita in produzione dopo il deploy `8139e84`; T-33.1 … T-33.3 riuscite il 24/11); 23/11/2026 (collaudo prima del passaggio finito dal PO il 23/11: T-24, T-25, T-28, T-29 e T-30.1 … T-30.3 riusciti; restano T-30.4, il backup della notte sulla 19, e dopo il passaggio T-26.3 e T-27; T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, fatto il 23/11 sulla demo `47fe414`; T-30.3 corretta: le aziende si provano come `operatore.cc`; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 26/11/2026 (T-35.1 … T-35.5: affidabilità e interesse al progetto delle aziende, da provare sul collaudo prima del merge; T-35.6 in produzione dopo il deploy); 25/11/2026 (T-27.3 riuscita: backup della notte dopo il passaggio, US-1306 chiusa); 24/11/2026 (T-34.1 … T-34.4: correzione dei dati di un utente, riuscite sul collaudo del PC prima del merge; T-34.5 riuscita in produzione dopo il deploy `8139e84`; T-33.1 … T-33.3 riuscite il 24/11); 23/11/2026 (collaudo prima del passaggio finito dal PO il 23/11: T-24, T-25, T-28, T-29 e T-30.1 … T-30.3 riusciti; restano T-30.4, il backup della notte sulla 19, e dopo il passaggio T-26.3 e T-27; T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, fatto il 23/11 sulla demo `47fe414`; T-30.3 corretta: le aziende si provano come `operatore.cc`; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 > **Dopo il passaggio in produzione** (24/11) il sito ha i dati veri e gli utenti demo (`tutor1`, `operatore.cc`, …)
 > non ci sono più: le prove fino alla sezione 32 restano come storico. Le storie nuove si collaudano sul PC del PO, dal
@@ -1486,3 +1486,63 @@ http://localhost:8025). Gli utenti qui sotto sono finti: in produzione, dopo il 
      l'email non cambia.
   > Nota (24/11, sera): deploy `8139e84`; lo script ha trovato 4 utenti, nessuno senza email, nome o cognome, e ha
   > applicato le regole; il PO ha corretto l'utente in produzione e l'ha riattivato.
+
+## 35. Affidabilità e interesse al progetto delle aziende (Sprint 18)
+
+Sul collaudo del PC, prima del merge (http://localhost:8090, password `collaudo-nexus-2026`), come `operatore.cc`. Nei
+dati finti tre aziende hanno già una valutazione, come le aziende convertite dal database attuale: «Demo Logistica
+S.r.l.» con 3 stelle e 2 pollici, «Demo Ristorazione S.n.c.» con 2 stelle, «Demo Bar del Centro» con un pollice. In
+produzione, dopo il deploy, c'è solo T-35.6.
+
+- [ ] **T-35.1 Stelle e pollici nell'elenco (US-514)**
+  1. Apri «Aziende». **Atteso:** due colonne nuove, «Affidabilità» e «Interesse al progetto»:
+     - «Demo Logistica S.r.l.»: tre stelle piene e una vuota, due pollici pieni;
+     - «Demo Ristorazione S.n.c.»: due stelle piene e due vuote, un trattino per l'interesse;
+     - «Demo Bar del Centro»: un trattino per l'affidabilità, un pollice pieno e uno vuoto;
+     - le altre aziende: due trattini.
+
+- [ ] **T-35.2 Filtri (US-514)**
+  1. Nel menu «Affidabilità» scegli «Almeno 2 stelle». **Atteso:** solo «Demo Logistica S.r.l.» e «Demo Ristorazione
+     S.n.c.».
+  2. Scegli «Almeno 3 stelle». **Atteso:** solo «Demo Logistica S.r.l.».
+  3. Rimetti «Qualunque»; nel menu «Interesse al progetto» scegli «Almeno un pollice». **Atteso:** «Demo Logistica
+     S.r.l.» e «Demo Bar del Centro». Con «Due pollici», solo «Demo Logistica S.r.l.».
+  4. Premi Indietro del browser. **Atteso:** torni al filtro di prima.
+
+- [ ] **T-35.3 Stelle e pollici nella scheda (US-514)**
+  1. Apri «Demo Servizi Pulizia Soc. Coop.». **Atteso:** nella sezione «Valutazione del Call Center» quattro stelle
+     vuote, bianche con il contorno, e due pollici vuoti.
+  2. Clicca la terza stella e il primo pollice, poi «Salva modifiche». **Atteso:** le prime tre stelle e il primo
+     pollice si riempiono; dopo il salvataggio «Modifiche salvate.», e nell'elenco l'azienda ha tre stelle e un
+     pollice.
+  3. Riapri la scheda, premi «Togli» accanto ai pollici e salva. **Atteso:** i pollici tornano vuoti; nell'elenco
+     l'interesse è un trattino.
+  4. Con F12 passa al tema scuro (o usa il tema scuro del PC). **Atteso:** stelle e pollici, pieni e vuoti, si vedono
+     bene anche lì.
+
+- [ ] **T-35.4 Da tastiera (US-514)**
+  1. Nella scheda di un'azienda arriva alle stelle con il tasto Tab. **Atteso:** un riquadro evidenzia la stella su cui
+     sei.
+  2. Premi le frecce a destra e a sinistra. **Atteso:** la scelta si sposta di una stella alla volta e le stelle si
+     riempiono fino a lì.
+
+- [ ] **T-35.5 Nome senza i simboli del database attuale (US-514)**
+  1. Nella scheda di un'azienda scrivi come ragione sociale `$$ Demo Servizi` e salva. **Atteso:** il modulo non salva
+     e dice «La ragione sociale non può iniziare con $, £, & o ^: per affidabilità e interesse al progetto usa stelle e
+     pollici».
+  2. Prova anche con `& Demo Servizi`. **Atteso:** lo stesso messaggio. Una «&» dentro il nome, come `Rossi & C.`, va
+     bene.
+
+- [ ] **T-35.6 In produzione, dopo il deploy (US-514)**
+  Il deploy converte i nomi delle aziende importate: i simboli all'inizio diventano stelle e pollici. Si consulta
+  soltanto, come ADMIN, senza modificare niente.
+  1. In «Aziende», menu «Affidabilità». **Atteso**, se nel frattempo nessuno le ha cambiate:
+     - «Almeno 1 stella»: 271 aziende;
+     - «Almeno 2 stelle»: 128;
+     - «Almeno 3 stelle»: 21.
+  2. Rimetti «Qualunque»; nel menu «Interesse al progetto» scegli «Almeno un pollice», poi «Due pollici». **Atteso:** 90
+     aziende, poi 1.
+  3. Rimetti i menu su «Qualunque» e cerca `$`, poi `£`. **Atteso:** nessuna azienda trovata: nessun nome contiene più
+     i simboli.
+  4. Apri un'azienda che conosci e che nel database attuale aveva i simboli. **Atteso:** il nome è pulito, con le
+     stelle e i pollici di prima.

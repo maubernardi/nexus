@@ -18,6 +18,9 @@ export type CompanyFormValues = {
   email: string;
   secondaryEmail: string;
   contacts: ContactValues[];
+  /** Stelle e pollici (US-514); null = non valutata. */
+  reliability: number | null;
+  projectInterest: number | null;
 };
 
 /** Massimo dei referenti, come nel server (US-510). */
@@ -32,6 +35,9 @@ export const CONTACT_PARTS = [
   'email',
 ] as const satisfies readonly (keyof ContactValues)[];
 export type ContactPart = (typeof CONTACT_PARTS)[number];
+
+/** Simboli del database attuale all'inizio del nome (US-514): il nome non può iniziare così, come nel server. */
+export const LEGACY_MARKS_PATTERN = /^\s*[$£&^]/;
 
 /** Telefono, cellulare e fax: come nel server. */
 export const PHONE_PATTERN = /^[0-9 +().\-/]*$/;

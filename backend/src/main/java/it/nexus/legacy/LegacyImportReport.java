@@ -25,6 +25,10 @@ public final class LegacyImportReport {
     int companiesRead;
     int companiesAdded;
     int unnamed;
+    /** Simboli all'inizio del nome (US-514): aziende con stelle, con pollici, con un refuso tolto. */
+    final Map<Integer, Integer> reliability = new TreeMap<>();
+    final Map<Integer, Integer> projectInterest = new TreeMap<>();
+    int typos;
     final Map<MunicipalityMatcher.Rule, Integer> legalByRule = new EnumMap<>(MunicipalityMatcher.Rule.class);
     final Map<MunicipalityMatcher.Rule, Integer> operatingByRule = new EnumMap<>(MunicipalityMatcher.Rule.class);
     int categories;
@@ -47,6 +51,19 @@ public final class LegacyImportReport {
 
     LegacyImportReport(Instant startedAt) {
         this.startedAt = startedAt;
+    }
+
+    /** Conta stelle, pollici e refusi del nome di un'azienda letta. */
+    void count(LegacyCompanyMarks marks) {
+        if (marks.reliability() != null) {
+            reliability.merge(marks.reliability(), 1, Integer::sum);
+        }
+        if (marks.projectInterest() != null) {
+            projectInterest.merge(marks.projectInterest(), 1, Integer::sum);
+        }
+        if (marks.marked() && marks.reliability() == null && marks.projectInterest() == null) {
+            typos++;
+        }
     }
 
     public int companiesAdded() {
@@ -75,6 +92,9 @@ public final class LegacyImportReport {
         line(out, "Aziende lette", companiesRead);
         line(out, "Aziende nuove (le altre c'erano già)", companiesAdded);
         line(out, "  senza nome («Azienda senza nome n. …»)", unnamed);
+        out.append("- Stelle di affidabilità dai $ all'inizio del nome: ").append(marks(reliability)).append('\n');
+        out.append("- Pollici di interesse dalle £ all'inizio del nome: ").append(marks(projectInterest)).append('\n');
+        line(out, "Aziende con solo un refuso all'inizio del nome (& o ^, tolto)", typos);
         out.append("- Comune della sede legale abbinato: ").append(rules(legalByRule)).append('\n');
         out.append("- Comune della sede operativa abbinato: ").append(rules(operatingByRule)).append('\n');
         line(out, "Comuni non trovati (sede legale e operativa)", unmatchedCount());
@@ -111,6 +131,13 @@ public final class LegacyImportReport {
     private static void line(StringBuilder out, String label, int value) {
         out.append(label.startsWith("  ") ? "  - " + label.strip() : "- " + label).append(": ").append(value)
                 .append('\n');
+    }
+
+    /** «271 (1: 143, 2: 107, …)»: aziende in tutto e per numero di stelle o pollici. */
+    private static String marks(Map<Integer, Integer> byValue) {
+        int total = byValue.values().stream().mapToInt(Integer::intValue).sum();
+        return total + (byValue.isEmpty() ? "" : " (" + byValue.entrySet().stream()
+                .map(e -> e.getKey() + ": " + e.getValue()).collect(Collectors.joining(", ")) + ")");
     }
 
     private static String rules(Map<MunicipalityMatcher.Rule, Integer> byRule) {
