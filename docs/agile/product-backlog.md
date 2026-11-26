@@ -1441,8 +1441,8 @@ Dipendenze: US-1009, US-109
 #### US-1104
 **Valutazione dell'azienda alla fine del tirocinio** · Must · 5 punti · R4 · 🔨 In corso (Sprint 18)
 
-Come **Tutor** voglio valutare l'azienda alla fine del tirocinio, così che chi propone di nuovo quell'azienda sappia
-come si sono trovati i tirocinanti (PO, 25/11).
+Come **Tutor** voglio valutare l'azienda alla fine del tirocinio, così che chi propone di nuovo quell'azienda conosca
+la valutazione dei Tutor che hanno seguito i tirocini fatti lì (PO, 25/11).
 
 Criteri di accettazione:
 - Nel report di restituzione (US-1101) **tre voti da 1 a 5**, obbligatori, ognuno con cinque faccine da 😞 a 😄:
@@ -1453,8 +1453,8 @@ Criteri di accettazione:
   Sono una cosa nuova: la «Soddisfazione dell'azienda» del report resta com'è (PO, 25/11).
 - Mentre il Tutor sceglie, NEXUS mostra la **media** dei tre voti come faccina: quella del numero intero più vicino,
   per esempio 4,33 → 🙂 e 4,67 → 😄.
-- Se la faccina non è 😄 compare la **nota**: una sola per le tre domande, al massimo 500 caratteri, senza dati
-  personali (PO, 25/11). Sempre facoltativa (PO, 26/11).
+- La **nota**: una sola per le tre domande, al massimo 500 caratteri, senza dati personali (PO, 25/11), sempre
+  facoltativa (PO, 26/11). C'è sempre, anche con 😄 (PO, 26/11, dal collaudo).
 - Nella **scheda dell'azienda** la media delle medie, come faccina con il numero di tirocini valutati, e l'elenco **a
   pagine** delle valutazioni, dalla più recente: data di fine del tirocinio, faccina, nota e **nome del Tutor** che
   l'ha data, perché chi ricontatta l'azienda possa chiedergli che cosa non è andato (PO, 26/11). Senza il nome del

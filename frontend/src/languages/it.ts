@@ -807,7 +807,7 @@ export const it = {
     },
     hints: {
       companyReviewNote:
-        'Facoltativa, al massimo 500 caratteri: che cosa non è andato bene? Niente dati personali del beneficiario.',
+        'Facoltativa, al massimo 500 caratteri: che cosa è andato bene o male? Niente dati personali del beneficiario.',
       actualEndDate:
         'L’ultimo giorno di tirocinio, anche se diverso da quello previsto. Serve per la relazione finale: la scheda del tirocinio non cambia.',
       actualEndDatePrefilled:
@@ -880,7 +880,7 @@ export const it = {
   /** Valutazioni dei tirocini nella scheda dell'azienda (US-1104). */
   companyReviews: {
     heading: 'Valutazioni dei tirocini',
-    intro: 'Come si sono trovati i tirocinanti, secondo i Tutor che hanno seguito i tirocini.',
+    intro: 'Le valutazioni dei Tutor alla fine di ogni tirocinio presso l’azienda.',
     summary_one: 'Media di {{count}} tirocinio valutato',
     summary_other: 'Media di {{count}} tirocini valutati',
     empty: 'Nessun tirocinio valutato.',

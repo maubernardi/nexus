@@ -201,7 +201,7 @@ describe('<ClosureReportPage>', () => {
     await expectNoAxeViolations();
   });
 
-  it('valutazione dell’azienda: media come faccina, nota solo se non è ottima (US-1104)', async () => {
+  it('valutazione dell’azienda: media come faccina, nota sempre presente e facoltativa (US-1104)', async () => {
     const user = userEvent.setup();
     vi.mocked(submitClosureReport).mockResolvedValue(closed);
     renderPage();
@@ -212,19 +212,15 @@ describe('<ClosureReportPage>', () => {
     expect(note).toHaveAccessibleDescription(/Niente dati personali del beneficiario/);
     await expectNoAxeViolations();
 
-    // 5, 5, 4: media 4,7, «Ottima», la nota sparisce
+    // 5, 5, 4: media 4,7, «Ottima»; la nota resta (PO, 26/11, dal collaudo)
     await chooseReview(user, ['Ottima', 'Ottima', 'Buona']);
     expect(screen.getByText('Media:').parentElement).toHaveTextContent('Ottima · 4,7');
-    expect(screen.queryByRole('textbox', { name: /Nota sulla valutazione/ })).not.toBeInTheDocument();
-
-    // di nuovo 4, 5, 4, con la nota
-    await chooseReview(user, ['Buona', 'Ottima', 'Buona']);
     await user.type(screen.getByRole('textbox', { name: /Nota sulla valutazione/ }), ' Poca formazione ');
     await user.click(screen.getByRole('button', { name: 'Invia il report' }));
     await user.click(await screen.findByRole('button', { name: 'Sì, invia il report' }));
     expect(vi.mocked(submitClosureReport).mock.calls[0][0].report).toEqual(
       expect.objectContaining({
-        companyInteraction: 4,
+        companyInteraction: 5,
         companyWelcome: 5,
         companyTraining: 4,
         companyReviewNote: 'Poca formazione',

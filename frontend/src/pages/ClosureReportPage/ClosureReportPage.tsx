@@ -17,7 +17,7 @@ import { useHiringFormulas, useInterruptionReasons, useNoHireReasons } from '@/c
 import { useSubmitClosureReport, useTicket } from '@/config/hooks/useTickets';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { formatIsoDate } from '@/lib/isoDate';
-import { REVIEW_LEVELS, reviewAverage, reviewLevel } from '@/lib/reviews';
+import { REVIEW_LEVELS, reviewAverage } from '@/lib/reviews';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
 import { FormField } from '@/molecules/FormField/FormField';
 import { ClosureReportView } from '@/organisms/ClosureReportView/ClosureReportView';
@@ -120,8 +120,8 @@ const toPayload = (v: ReportValues): ClosureReportForm => ({
   companyInteraction: Number(v.companyInteraction),
   companyWelcome: Number(v.companyWelcome),
   companyTraining: Number(v.companyTraining),
-  // la nota c'è solo se la media non è ottima (PO, 26/11)
-  companyReviewNote: reviewLevel(votesAverage(v) ?? 5) < 5 ? v.companyReviewNote.trim() || null : null,
+  // la nota c'è sempre ed è facoltativa, anche con la media ottima (PO, 26/11, dal collaudo)
+  companyReviewNote: v.companyReviewNote.trim() || null,
 });
 
 /**
@@ -476,29 +476,25 @@ const ReportForm = ({ ticket: d, dates, onSent }: ReportFormProps) => {
               <ReviewFace average={average} withWord />
             </p>
           )}
-          {average !== null && reviewLevel(average) < 5 && (
-            <FormField
-              id={fieldId('companyReviewNote')}
-              label={t('closureReport.fields.companyReviewNote')}
-              hint={t('closureReport.hints.companyReviewNote')}
-              error={errors.companyReviewNote?.message}
-            >
-              {(p) => (
-                <Textarea
-                  {...p}
-                  rows={3}
-                  {...register('companyReviewNote', {
-                    // nascosta (media ottima), la nota esce dal modulo
-                    shouldUnregister: true,
-                    maxLength: {
-                      value: MAX_REVIEW_NOTE,
-                      message: t('form.errors.maxLength', { max: MAX_REVIEW_NOTE }),
-                    },
-                  })}
-                />
-              )}
-            </FormField>
-          )}
+          <FormField
+            id={fieldId('companyReviewNote')}
+            label={t('closureReport.fields.companyReviewNote')}
+            hint={t('closureReport.hints.companyReviewNote')}
+            error={errors.companyReviewNote?.message}
+          >
+            {(p) => (
+              <Textarea
+                {...p}
+                rows={3}
+                {...register('companyReviewNote', {
+                  maxLength: {
+                    value: MAX_REVIEW_NOTE,
+                    message: t('form.errors.maxLength', { max: MAX_REVIEW_NOTE }),
+                  },
+                })}
+              />
+            )}
+          </FormField>
         </fieldset>
         <RadioField
           name="hired"
