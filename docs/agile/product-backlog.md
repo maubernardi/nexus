@@ -150,7 +150,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1101](#us-1101) | E11 | Report di restituzione | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1102](#us-1102) | E11 | Esito sulla mansione e audit trail | Must | 2 | R3 | 🎉 Done (Sprint 8) |
 | [US-1103](#us-1103) | E11 | Motivo di chiusura del tirocinio | Must | 2 | R4 | 🎉 Done (Sprint 14) |
-| [US-1104](#us-1104) | E11 | Valutazione dell'azienda alla fine del tirocinio | Must | 5 | R4 | ✅ Ready |
+| [US-1104](#us-1104) | E11 | Valutazione dell'azienda alla fine del tirocinio | Must | 5 | R4 | 🔨 In corso (Sprint 18) |
 | [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | 🎉 Done (Sprint 5) |
 | [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1203](#us-1203) | E12 | Avvisi di fine tirocinio e blocco delle nuove segnalazioni | Must | 5 | R4 | 🎉 Done (Sprint 16) |
@@ -1439,10 +1439,10 @@ Criteri di accettazione:
 Dipendenze: US-1009, US-109
 
 #### US-1104
-**Valutazione dell'azienda alla fine del tirocinio** · Must · 5 punti · R4 · ✅ Ready
+**Valutazione dell'azienda alla fine del tirocinio** · Must · 5 punti · R4 · 🔨 In corso (Sprint 18)
 
-Come **Tutor** voglio valutare l'azienda alla fine del tirocinio, così che chi propone di nuovo quell'azienda sappia
-come si sono trovati i tirocinanti (PO, 25/11).
+Come **Tutor** voglio valutare l'azienda alla fine del tirocinio, così che chi propone di nuovo quell'azienda conosca
+la valutazione dei Tutor che hanno seguito i tirocini fatti lì (PO, 25/11).
 
 Criteri di accettazione:
 - Nel report di restituzione (US-1101) **tre voti da 1 a 5**, obbligatori, ognuno con cinque faccine da 😞 a 😄:
@@ -1453,8 +1453,8 @@ Criteri di accettazione:
   Sono una cosa nuova: la «Soddisfazione dell'azienda» del report resta com'è (PO, 25/11).
 - Mentre il Tutor sceglie, NEXUS mostra la **media** dei tre voti come faccina: quella del numero intero più vicino,
   per esempio 4,33 → 🙂 e 4,67 → 😄.
-- Se la faccina non è 😄 compare la **nota**: una sola per le tre domande, al massimo 500 caratteri, senza dati
-  personali (PO, 25/11). Sempre facoltativa (PO, 26/11).
+- La **nota**: una sola per le tre domande, al massimo 500 caratteri, senza dati personali (PO, 25/11), sempre
+  facoltativa (PO, 26/11). C'è sempre, anche con 😄 (PO, 26/11, dal collaudo).
 - Nella **scheda dell'azienda** la media delle medie, come faccina con il numero di tirocini valutati, e l'elenco **a
   pagine** delle valutazioni, dalla più recente: data di fine del tirocinio, faccina, nota e **nome del Tutor** che
   l'ha data, perché chi ricontatta l'azienda possa chiedergli che cosa non è andato (PO, 26/11). Senza il nome del

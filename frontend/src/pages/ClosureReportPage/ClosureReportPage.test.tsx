@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AxiosError, AxiosHeaders } from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -88,6 +88,18 @@ const fillRequired = async (user: ReturnType<typeof userEvent.setup>): Promise<v
     'Tempo indeterminato',
   );
   await user.click(screen.getAllByRole('radio', { name: 'No' })[1]);
+  await chooseReview(user, ['Buona', 'Ottima', 'Buona']);
+};
+
+/** Valutazione dell'azienda (US-1104): una faccina per ognuna delle tre domande, nell'ordine del modulo. */
+const chooseReview = async (
+  user: ReturnType<typeof userEvent.setup>,
+  words: [string, string, string],
+): Promise<void> => {
+  const groups = [/interazione con l’azienda/, /accogliere il beneficiario/, /Capacità formativa/];
+  for (const [i, name] of groups.entries()) {
+    await user.click(within(screen.getByRole('group', { name })).getByRole('radio', { name: words[i] }));
+  }
 };
 
 describe('<ClosureReportPage>', () => {
@@ -175,6 +187,10 @@ describe('<ClosureReportPage>', () => {
         hiringFormulaId: 'F2',
         noHireReasonId: null,
         jobSlotStillAvailable: false,
+        companyInteraction: 4,
+        companyWelcome: 5,
+        companyTraining: 4,
+        companyReviewNote: null,
       },
     });
     const sent = await screen.findByRole('status');
@@ -183,6 +199,44 @@ describe('<ClosureReportPage>', () => {
     expect(screen.getByRole('region', { name: 'Report di restituzione' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Invia il report' })).not.toBeInTheDocument();
     await expectNoAxeViolations();
+  });
+
+  it('valutazione dell’azienda: media come faccina, nota sempre presente e facoltativa (US-1104)', async () => {
+    const user = userEvent.setup();
+    vi.mocked(submitClosureReport).mockResolvedValue(closed);
+    renderPage();
+    await fillRequired(user);
+    // 4, 5, 4: media 4,3, «Buona», con la nota
+    expect(screen.getByText('Media:').parentElement).toHaveTextContent('Buona · 4,3');
+    const note = screen.getByRole('textbox', { name: /Nota sulla valutazione/ });
+    expect(note).toHaveAccessibleDescription(/Niente dati personali del beneficiario/);
+    await expectNoAxeViolations();
+
+    // 5, 5, 4: media 4,7, «Ottima»; la nota resta (PO, 26/11, dal collaudo)
+    await chooseReview(user, ['Ottima', 'Ottima', 'Buona']);
+    expect(screen.getByText('Media:').parentElement).toHaveTextContent('Ottima · 4,7');
+    await user.type(screen.getByRole('textbox', { name: /Nota sulla valutazione/ }), ' Poca formazione ');
+    await user.click(screen.getByRole('button', { name: 'Invia il report' }));
+    await user.click(await screen.findByRole('button', { name: 'Sì, invia il report' }));
+    expect(vi.mocked(submitClosureReport).mock.calls[0][0].report).toEqual(
+      expect.objectContaining({
+        companyInteraction: 5,
+        companyWelcome: 5,
+        companyTraining: 4,
+        companyReviewNote: 'Poca formazione',
+      }),
+    );
+  });
+
+  it('valutazione mancante: il riepilogo indica le domande senza faccina (US-1104)', async () => {
+    const user = userEvent.setup();
+    renderPage();
+    const [companyFour] = await screen.findAllByRole('radio', { name: '4' });
+    await user.click(companyFour);
+    await user.click(screen.getByRole('button', { name: 'Invia il report' }));
+    const summary = await screen.findByRole('alert');
+    expect(summary).toHaveTextContent('Capacità formativa dell’azienda e del tutor aziendale');
+    expect(submitClosureReport).not.toHaveBeenCalled();
   });
 
   it('fine effettiva: precompilata con la fine prevista, obbligatoria e non prima dell’inizio', async () => {

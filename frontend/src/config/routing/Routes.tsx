@@ -21,8 +21,7 @@ import { CoordinationPage } from '@/pages/CoordinationPage/CoordinationPage';
 import { FailedLoginsPage } from '@/pages/FailedLoginsPage/FailedLoginsPage';
 import { UserAccessLogPage } from '@/pages/UserAccessLogPage/UserAccessLogPage';
 import { CalendarPage } from '@/pages/CalendarPage/CalendarPage';
-import { CompaniesRoute } from '@/config/routing/CompaniesRoute';
-import { CompanyEditPage } from '@/pages/CompanyEditPage/CompanyEditPage';
+import { CompaniesRoute, CompanyRoute } from '@/config/routing/CompaniesRoute';
 import { CompanyNewPage } from '@/pages/CompanyNewPage/CompanyNewPage';
 import { NotificationsPage } from '@/pages/NotificationsPage/NotificationsPage';
 import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
@@ -142,11 +141,8 @@ export const routes: RouteObject[] = [
       },
       {
         path: 'aziende/:id',
-        element: (
-          <RoleRoute roles={['CALL_CENTER', 'ADMIN']}>
-            <CompanyEditPage />
-          </RoleRoute>
-        ),
+        // Call Center e ADMIN: scheda modificabile; Tutor: in sola lettura, con le valutazioni (US-1104)
+        element: <CompanyRoute />,
         handle: { titleKey: 'pages.companyEdit.title' } satisfies RouteHandle,
       },
       {

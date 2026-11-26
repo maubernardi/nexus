@@ -1,7 +1,10 @@
+import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { FaceIcon, ReviewFace } from '@/atoms/ReviewFace/ReviewFace';
 import type { ClosureReport } from '@/config/api/ticketApi';
 import { formatIsoDate } from '@/lib/isoDate';
+import { reviewAverage, reviewLevel } from '@/lib/reviews';
 
 const dateTime = new Intl.DateTimeFormat('it-IT', { dateStyle: 'short', timeStyle: 'short' });
 
@@ -12,7 +15,41 @@ type ClosureReportViewProps = {
 /** Report di restituzione inviato (US-1101), in sola lettura per chi vede la segnalazione: non si modifica più. */
 export const ClosureReportView = ({ report }: ClosureReportViewProps) => {
   const { t } = useTranslation();
-  const rows: { label: string; value: string }[] = [
+  /** Un voto della valutazione dell'azienda (US-1104): faccina e parola. */
+  const vote = (value: number): ReactNode => {
+    const level = reviewLevel(value);
+    return (
+      <span className="inline-flex items-center gap-1.5">
+        <FaceIcon level={level} className="size-5" />
+        {t(`review.level${level}`)}
+      </span>
+    );
+  };
+  // assente nei report inviati prima di US-1104
+  const average =
+    report.companyInteraction !== undefined
+      ? reviewAverage([
+          report.companyInteraction,
+          report.companyWelcome ?? null,
+          report.companyTraining ?? null,
+        ])
+      : null;
+  const reviewRows: { label: string; value: ReactNode }[] =
+    average === null
+      ? []
+      : [
+          {
+            label: t('closureReport.fields.companyInteraction'),
+            value: vote(report.companyInteraction ?? 1),
+          },
+          { label: t('closureReport.fields.companyWelcome'), value: vote(report.companyWelcome ?? 1) },
+          { label: t('closureReport.fields.companyTraining'), value: vote(report.companyTraining ?? 1) },
+          { label: t('closureReport.view.companyReview'), value: <ReviewFace average={average} withWord /> },
+          ...(report.companyReviewNote
+            ? [{ label: t('closureReport.fields.companyReviewNote'), value: report.companyReviewNote }]
+            : []),
+        ];
+  const rows: { label: string; value: ReactNode }[] = [
     // assente nei report inviati prima di US-1009
     ...(report.actualEndDate
       ? [{ label: t('closureReport.fields.actualEndDate'), value: formatIsoDate(report.actualEndDate) }]
@@ -32,6 +69,7 @@ export const ClosureReportView = ({ report }: ClosureReportViewProps) => {
       label: t('closureReport.fields.beneficiarySatisfaction'),
       value: t('closureReport.view.score', { value: report.beneficiarySatisfaction }),
     },
+    ...reviewRows,
     {
       label: t('closureReport.fields.hired'),
       value: report.hired

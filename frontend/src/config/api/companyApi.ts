@@ -133,6 +133,9 @@ export type CompanyDirectoryItem = {
   municipality?: string | null;
   reliability?: number | null;
   projectInterest?: number | null;
+  /** Media delle valutazioni dei tirocini e quante sono (US-1104); assenti senza valutazioni. */
+  reviewAverage?: number | null;
+  reviewCount?: number | null;
 };
 
 export type CompanyDirectorySearch = {
@@ -161,6 +164,38 @@ export const searchCompanyDirectory = async (
   });
   // l'API omette i campi vuoti
   return { ...data, companies: data.companies ?? [] };
+};
+
+/** Un'azienda attiva per la scheda in sola lettura del Tutor (US-1104). */
+export const fetchCompanyDirectoryItem = async (id: string): Promise<CompanyDirectoryItem> => {
+  const { data } = await axiosInstance.get<CompanyDirectoryItem>(`${ENDPOINTS.companies}/directory/${id}`);
+  return data;
+};
+
+/** Valutazione di un tirocinio nella scheda dell'azienda (US-1104); la nota è assente se il Tutor non l'ha scritta. */
+export type CompanyReview = {
+  /** Data di fine del tirocinio, ISO. */
+  endDate: string;
+  average: number;
+  note?: string | null;
+  tutorName: string;
+};
+
+/** Una pagina delle valutazioni, dalla più recente; `average` è la media delle medie, assente senza valutazioni. */
+export type CompanyReviews = {
+  average?: number | null;
+  reviews: CompanyReview[];
+  total: number;
+  page: number;
+  size: number;
+};
+
+export const fetchCompanyReviews = async (id: string, page: number): Promise<CompanyReviews> => {
+  const { data } = await axiosInstance.get<CompanyReviews>(`${ENDPOINTS.companies}/${id}/reviews`, {
+    params: { page },
+  });
+  // l'API omette i campi vuoti
+  return { ...data, reviews: data.reviews ?? [] };
 };
 
 export const fetchCompany = async (id: string): Promise<Company> => {

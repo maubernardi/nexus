@@ -65,4 +65,31 @@ describe('<ClosureReportView>', () => {
     expect(screen.queryByText('Fine effettiva del tirocinio')).not.toBeInTheDocument();
     expect(screen.queryByText('Motivo di chiusura')).not.toBeInTheDocument();
   });
+
+  it('con la valutazione dell’azienda: tre faccine con la parola, la media e la nota (US-1104)', async () => {
+    renderWithProviders(
+      <main>
+        <ClosureReportView
+          report={{
+            ...report,
+            companyInteraction: 4,
+            companyWelcome: 5,
+            companyTraining: 4,
+            companyReviewNote: 'Poca formazione',
+          }}
+        />
+      </main>,
+    );
+    expect(value('Soddisfazione nell’interazione con l’azienda')).toBe('Buona');
+    expect(value('Capacità dell’azienda di accogliere il beneficiario')).toBe('Ottima');
+    expect(value('Capacità formativa dell’azienda e del tutor aziendale')).toBe('Buona');
+    expect(value('Valutazione dell’azienda')).toContain('Buona · 4,3');
+    expect(value('Nota sulla valutazione')).toBe('Poca formazione');
+    await expectNoAxeViolations();
+  });
+
+  it('report inviati prima: nessuna valutazione dell’azienda', () => {
+    renderWithProviders(<ClosureReportView report={report} />);
+    expect(screen.queryByText('Valutazione dell’azienda')).not.toBeInTheDocument();
+  });
 });

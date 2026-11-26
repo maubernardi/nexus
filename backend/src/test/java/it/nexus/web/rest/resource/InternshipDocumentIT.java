@@ -437,7 +437,7 @@ class InternshipDocumentIT {
         closureReports.save(new ClosureReport(ticket, LocalDate.of(2027, 6, 20),
                 closureReasons.findByCode("INTERRUZIONE_AZIENDA").orElseThrow(), "Il reparto ha chiuso",
                 (short) 4, (short) 4, "Obiettivi", null, null,
-                noHireReasons.findAllByOrderByActiveDescNameAsc().getFirst(), false));
+                noHireReasons.findAllByOrderByActiveDescNameAsc().getFirst(), false, null));
         ticket.setStatus(TicketStatus.FORM_RESTITUZIONE);
         em.flush();
 

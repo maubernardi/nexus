@@ -29,5 +29,13 @@ public record ClosureReportFormDTO(
         @NotNull(message = "Indica se il beneficiario è stato assunto") Boolean hired,
         String hiringFormulaId,
         String noHireReasonId,
-        @NotNull(message = "Indica se la mansione è ancora disponibile") Boolean jobSlotStillAvailable) {
+        @NotNull(message = "Indica se la mansione è ancora disponibile") Boolean jobSlotStillAvailable,
+        /** Valutazione dell'azienda (US-1104): tre voti da 1 a 5 obbligatori e una nota facoltativa. */
+        @NotNull(message = "Scegli una faccina") @Min(value = 1, message = "Da 1 a 5") @Max(value = 5, message = "Da 1 a 5")
+        Integer companyInteraction,
+        @NotNull(message = "Scegli una faccina") @Min(value = 1, message = "Da 1 a 5") @Max(value = 5, message = "Da 1 a 5")
+        Integer companyWelcome,
+        @NotNull(message = "Scegli una faccina") @Min(value = 1, message = "Da 1 a 5") @Max(value = 5, message = "Da 1 a 5")
+        Integer companyTraining,
+        @Size(max = 500, message = "Massimo 500 caratteri") String companyReviewNote) {
 }

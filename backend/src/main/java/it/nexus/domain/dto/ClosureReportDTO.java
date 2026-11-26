@@ -23,5 +23,10 @@ public record ClosureReportDTO(
         ReferenceItemDTO noHireReason,
         boolean jobSlotStillAvailable,
         Instant submittedAt,
-        String submittedBy) {
+        String submittedBy,
+        /** Valutazione dell'azienda (US-1104): voti da 1 a 5 e nota; assenti nei report inviati prima. */
+        Integer companyInteraction,
+        Integer companyWelcome,
+        Integer companyTraining,
+        String companyReviewNote) {
 }

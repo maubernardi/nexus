@@ -16,12 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.nexus.domain.dto.CompanyDTO;
+import it.nexus.domain.dto.CompanyDirectoryItemDTO;
 import it.nexus.domain.dto.CompanyDirectoryPageDTO;
+import it.nexus.domain.dto.CompanyReviewsDTO;
 import it.nexus.domain.dto.CompanyHistoryDTO;
 import it.nexus.domain.dto.CompanyFormDTO;
 import it.nexus.domain.dto.CompanyPageDTO;
 import it.nexus.domain.dto.VersionDTO;
 import it.nexus.services.CompanyHistoryService;
+import it.nexus.services.CompanyReviewService;
 import it.nexus.services.CompanySearch;
 import it.nexus.services.CompanyService;
 import it.nexus.web.rest.PathAPI;
@@ -36,6 +39,7 @@ public class CompanyResource {
 
     private final CompanyService companyService;
     private final CompanyHistoryService companyHistoryService;
+    private final CompanyReviewService companyReviewService;
 
     @GetMapping
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
@@ -64,6 +68,22 @@ public class CompanyResource {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "" + CompanyService.DEFAULT_PAGE_SIZE) int size) {
         return ResponseEntity.ok(companyService.directory(search, businessCategoryId, zoneId, page, size));
+    }
+
+    @GetMapping("/directory/{id}")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Un'azienda attiva per la scheda in sola lettura del Tutor, con i dati dell'elenco (US-1104)")
+    public ResponseEntity<CompanyDirectoryItemDTO> directoryItem(@PathVariable String id) {
+        return ResponseEntity.ok(companyService.directoryItem(id));
+    }
+
+    @GetMapping("/{id}/reviews")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Valutazioni dei tirocini dell'azienda, dalla più recente, 10 per pagina (page da 0), con la "
+            + "media delle medie (US-1104)")
+    public ResponseEntity<CompanyReviewsDTO> reviews(@PathVariable String id,
+            @RequestParam(defaultValue = "0") int page) {
+        return ResponseEntity.ok(companyReviewService.reviews(id, page));
     }
 
     @GetMapping("/{id}")

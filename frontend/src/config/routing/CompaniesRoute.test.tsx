@@ -3,13 +3,19 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { fetchCurrentUser } from '@/config/api/userApi';
 import type { Role } from '@/config/auth/types';
-import { CompaniesRoute } from '@/config/routing/CompaniesRoute';
+import { CompaniesRoute, CompanyRoute } from '@/config/routing/CompaniesRoute';
 import { renderRoutes } from '@/tests/renderWithProviders';
 
 vi.mock('@/config/api/userApi', () => ({ fetchCurrentUser: vi.fn() }));
 vi.mock('@/pages/CompaniesPage/CompaniesPage', () => ({ CompaniesPage: () => <p>anagrafica completa</p> }));
 vi.mock('@/pages/TutorCompaniesPage/TutorCompaniesPage', () => ({
   TutorCompaniesPage: () => <p>elenco del Tutor</p>,
+}));
+vi.mock('@/pages/CompanyEditPage/CompanyEditPage', () => ({
+  CompanyEditPage: () => <p>scheda modificabile</p>,
+}));
+vi.mock('@/pages/TutorCompanyPage/TutorCompanyPage', () => ({
+  TutorCompanyPage: () => <p>scheda del Tutor</p>,
 }));
 
 const renderAs = (roles: Role[]) => {
@@ -32,5 +38,20 @@ describe('<CompaniesRoute>', () => {
   it('Tutor: elenco in sola lettura (US-511)', async () => {
     renderAs(['TUTOR']);
     expect(await screen.findByText('elenco del Tutor')).toBeInTheDocument();
+  });
+
+  it('scheda: modificabile per il Call Center, in sola lettura per il Tutor (US-1104)', async () => {
+    vi.mocked(fetchCurrentUser).mockResolvedValue({
+      id: 'u',
+      username: 'u',
+      firstName: 'U',
+      lastName: 'P',
+      roles: ['TUTOR'],
+    });
+    renderRoutes({
+      routes: [{ path: '/aziende/:id', element: <CompanyRoute /> }],
+      initialPath: '/aziende/C1',
+    });
+    expect(await screen.findByText('scheda del Tutor')).toBeInTheDocument();
   });
 });

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
+import { FaceIcon, ReviewFace } from '@/atoms/ReviewFace/ReviewFace';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
@@ -16,6 +17,7 @@ import { useHiringFormulas, useInterruptionReasons, useNoHireReasons } from '@/c
 import { useSubmitClosureReport, useTicket } from '@/config/hooks/useTickets';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { formatIsoDate } from '@/lib/isoDate';
+import { REVIEW_LEVELS, reviewAverage } from '@/lib/reviews';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
 import { FormField } from '@/molecules/FormField/FormField';
 import { ClosureReportView } from '@/organisms/ClosureReportView/ClosureReportView';
@@ -30,6 +32,11 @@ type ReportValues = {
   interruptionDetails: string;
   companySatisfaction: string;
   beneficiarySatisfaction: string;
+  /** Valutazione dell'azienda (US-1104): voti da '1' a '5', '' = non scelto. */
+  companyInteraction: string;
+  companyWelcome: string;
+  companyTraining: string;
+  companyReviewNote: string;
   objectives: string;
   difficulties: string;
   hired: YesNo;
@@ -44,6 +51,10 @@ const EMPTY: ReportValues = {
   interruptionDetails: '',
   companySatisfaction: '',
   beneficiarySatisfaction: '',
+  companyInteraction: '',
+  companyWelcome: '',
+  companyTraining: '',
+  companyReviewNote: '',
   objectives: '',
   difficulties: '',
   hired: '',
@@ -58,6 +69,10 @@ const FIELDS = [
   'interruptionDetails',
   'companySatisfaction',
   'beneficiarySatisfaction',
+  'companyInteraction',
+  'companyWelcome',
+  'companyTraining',
+  'companyReviewNote',
   'hired',
   'hiringFormulaId',
   'noHireReasonId',
@@ -68,12 +83,20 @@ const FIELDS = [
 
 const SCORES = ['1', '2', '3', '4', '5'] as const;
 const MAX_TEXT = 2000;
+/** I tre voti della valutazione dell'azienda (US-1104), nell'ordine del modulo. */
+const REVIEW_VOTES = ['companyInteraction', 'companyWelcome', 'companyTraining'] as const;
+const MAX_REVIEW_NOTE = 500;
+
+/** Media dei voti scelti, oppure null finché ne manca uno. */
+const votesAverage = (v: Pick<ReportValues, (typeof REVIEW_VOTES)[number]>): number | null =>
+  reviewAverage(REVIEW_VOTES.map((name) => (v[name] === '' ? null : Number(v[name]))));
 
 const fieldId = (name: keyof ReportValues): string => `closure-${name}`;
 /** Le scelte a pallini si raggiungono dal riepilogo degli errori tramite la prima opzione. */
 const RADIO_FIELDS: readonly (keyof ReportValues)[] = [
   'companySatisfaction',
   'beneficiarySatisfaction',
+  ...REVIEW_VOTES,
   'hired',
   'jobSlotStillAvailable',
 ];
@@ -94,6 +117,11 @@ const toPayload = (v: ReportValues): ClosureReportForm => ({
   hiringFormulaId: v.hired === 'yes' ? v.hiringFormulaId : null,
   noHireReasonId: v.hired === 'no' ? v.noHireReasonId : null,
   jobSlotStillAvailable: v.jobSlotStillAvailable === 'yes',
+  companyInteraction: Number(v.companyInteraction),
+  companyWelcome: Number(v.companyWelcome),
+  companyTraining: Number(v.companyTraining),
+  // la nota c'è sempre ed è facoltativa, anche con la media ottima (PO, 26/11, dal collaudo)
+  companyReviewNote: v.companyReviewNote.trim() || null,
 });
 
 /**
@@ -231,6 +259,13 @@ const ReportForm = ({ ticket: d, dates, onSent }: ReportFormProps) => {
   });
   const { summaryRef, requestSummaryFocus } = useErrorSummaryFocus(submitCount, errors);
   const hired = useWatch({ control, name: 'hired' });
+  const [interaction, welcome, training] = useWatch({ control, name: REVIEW_VOTES });
+  // media della valutazione dell'azienda, appena ci sono i tre voti (US-1104)
+  const average = votesAverage({
+    companyInteraction: interaction,
+    companyWelcome: welcome,
+    companyTraining: training,
+  });
   const actualEnd = useWatch({ control, name: 'actualEndDate' });
   // interruzione anticipata (US-1103): la fine effettiva precede la fine prevista della scheda
   const isEarly = (end: string): boolean =>
@@ -255,6 +290,15 @@ const ReportForm = ({ ticket: d, dates, onSent }: ReportFormProps) => {
     { value: 'no', label: t('beneficiary.no') },
   ];
   const scores = SCORES.map((s) => ({ value: s, label: s }));
+  const faces = REVIEW_LEVELS.map((level) => ({
+    value: String(level),
+    label: (
+      <span className="inline-flex items-center gap-1.5">
+        <FaceIcon level={level} className="size-6" />
+        {t(`review.level${level}`)}
+      </span>
+    ),
+  }));
 
   const summary: SummaryError[] = FIELDS.flatMap((name) => {
     const message = errors[name]?.message;
@@ -413,6 +457,45 @@ const ReportForm = ({ ticket: d, dates, onSent }: ReportFormProps) => {
           error={errors.beneficiarySatisfaction?.message}
           registration={register('beneficiarySatisfaction', { required })}
         />
+        <fieldset className="space-y-4 rounded-lg border border-border p-4">
+          <legend className="px-1 font-semibold">{t('closureReport.review.heading')}</legend>
+          <p className="text-sm text-muted-foreground">{t('closureReport.review.intro')}</p>
+          {REVIEW_VOTES.map((name) => (
+            <RadioField
+              key={name}
+              name={name}
+              legend={t(`closureReport.fields.${name}`)}
+              options={faces}
+              error={errors[name]?.message}
+              registration={register(name, { required })}
+            />
+          ))}
+          {average !== null && (
+            <p className="flex flex-wrap items-center gap-2 font-medium">
+              {t('closureReport.review.average')}
+              <ReviewFace average={average} withWord />
+            </p>
+          )}
+          <FormField
+            id={fieldId('companyReviewNote')}
+            label={t('closureReport.fields.companyReviewNote')}
+            hint={t('closureReport.hints.companyReviewNote')}
+            error={errors.companyReviewNote?.message}
+          >
+            {(p) => (
+              <Textarea
+                {...p}
+                rows={3}
+                {...register('companyReviewNote', {
+                  maxLength: {
+                    value: MAX_REVIEW_NOTE,
+                    message: t('form.errors.maxLength', { max: MAX_REVIEW_NOTE }),
+                  },
+                })}
+              />
+            )}
+          </FormField>
+        </fieldset>
         <RadioField
           name="hired"
           legend={t('closureReport.fields.hired')}
@@ -530,7 +613,8 @@ type RadioFieldProps = {
   name: keyof ReportValues;
   legend: string;
   hint?: string;
-  options: readonly { value: string; label: string }[];
+  /** Etichetta di ogni opzione: un testo, oppure faccina e parola (US-1104). */
+  options: readonly { value: string; label: ReactNode }[];
   error?: string;
   registration: UseFormRegisterReturn;
 };
