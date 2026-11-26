@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 104 elementi, 429 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-16](sprints/sprint-16.md), il 23/11 ([review](sprints/sprint-16-review.md)); in corso: [sprint-17](sprints/sprint-17.md), dal 24/11 (planning confermato il 23/11).
+**Totale: 109 elementi, 450 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-17](sprints/sprint-17.md), il 25/11 ([review](sprints/sprint-17-review.md)); in corso lo [Sprint 18](sprints/sprint-18.md), dal 26/11.
 
 ## Epiche
 
@@ -13,15 +13,15 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E2 | Anagrafica beneficiari | Il Tutor registra e mantiene i dati dei tirocinanti, nel rispetto della minimizzazione GDPR. | 6 | 23 |
 | E3 | Segnalazioni (fase 1) | Il Tutor segnala un beneficiario per un percorso di tirocinio e ne segue lo stato. | 8 | 31 |
 | E4 | Coda Call Center e fast-track (fase 3) | Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali. | 5 | 17 |
-| E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 13 | 44 |
+| E5 | Aziende e mansioni | Il Call Center mantiene il database delle aziende ospitanti e delle mansioni offerte. | 15 | 54 |
 | E6 | Abbinamento (fase 4) | Il Call Center abbina il beneficiario a una mansione libera e la blocca. | 5 | 25 |
 | E7 | Proposta e timer (fase 5) | Il Tutor valuta la proposta; i tempi di risposta sono presidiati da un timer di 7 giorni lavorativi. | 5 | 15 |
 | E8 | Appuntamento e rilancio (fase 6) | Il Tutor registra l'esito dell'appuntamento; se fallisce, la mansione può essere rilanciata in bacheca. | 3 | 10 |
 | E9 | Bacheca opportunità | Le mansioni disponibili sono visibili ai Tutor in forma anonima e gestite dal Call Center. | 4 | 13 |
 | E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione, Progetto Formativo e Relazione finale sui modelli reali in Word. | 13 | 70 |
-| E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 3 | 9 |
+| E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 4 | 14 |
 | E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 4 | 23 |
-| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 18 | 79 |
+| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 20 | 85 |
 
 ## Release
 
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 43 | 222 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 48 | 243 |
 
 ## Domande aperte per il Product Owner
 
@@ -107,13 +107,15 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-504](#us-504) | E5 | Disattivazione impedita con mansioni bloccate | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [US-505](#us-505) | E5 | Diario delle note dell'azienda | Must | 2 | R1 | 🎉 Done (Sprint 4) |
 | [US-506](#us-506) | E5 | Legale rappresentante e codici ATECO dell'azienda | Must | 3 | R3 | 🎉 Done (Sprint 7) |
-| [US-507](#us-507) | E5 | Richiesta di contatto di un'azienda dal Tutor | Should | 5 | — | 📋 Backlog |
+| [US-507](#us-507) | E5 | Richiesta di contatto di un'azienda dal Tutor | Should | 5 | — | ✅ Ready |
 | [US-508](#us-508) | E5 | Partita IVA e nome da completare | Must | 3 | R4 | 🎉 Done (Sprint 15) |
 | [US-509](#us-509) | E5 | Categoria merceologica e attività dell'azienda | Must | 3 | R4 | 🎉 Done (Sprint 15) |
 | [US-510](#us-510) | E5 | Referenti e recapiti dell'azienda | Must | 5 | R4 | 🎉 Done (Sprint 15) |
-| [US-511](#us-511) | E5 | Zona dell'azienda e aziende per il Tutor | Should | 5 | — | 📋 Backlog |
-| [US-512](#us-512) | E5 | Tentativi di contatto ed esito della richiesta | Should | 5 | — | 📋 Backlog |
+| [US-511](#us-511) | E5 | Zona dell'azienda e aziende per il Tutor | Should | 5 | — | ✅ Ready |
+| [US-512](#us-512) | E5 | Tentativi di contatto ed esito della richiesta | Should | 5 | — | ✅ Ready |
 | [US-513](#us-513) | E5 | Elenco delle aziende a pagine | Must | 3 | R4 | 🎉 Done (Sprint 17) |
+| [US-514](#us-514) | E5 | Affidabilità e interesse al progetto dell'azienda | Must | 5 | R4 | 🎉 Done (Sprint 18) |
+| [US-515](#us-515) | E5 | Azienda «nave scuola» | Must | 5 | R4 | ✅ Ready |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 🎉 Done (Sprint 5) |
@@ -148,6 +150,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1101](#us-1101) | E11 | Report di restituzione | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1102](#us-1102) | E11 | Esito sulla mansione e audit trail | Must | 2 | R3 | 🎉 Done (Sprint 8) |
 | [US-1103](#us-1103) | E11 | Motivo di chiusura del tirocinio | Must | 2 | R4 | 🎉 Done (Sprint 14) |
+| [US-1104](#us-1104) | E11 | Valutazione dell'azienda alla fine del tirocinio | Must | 5 | R4 | ✅ Ready |
 | [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | 🎉 Done (Sprint 5) |
 | [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1203](#us-1203) | E12 | Avvisi di fine tirocinio e blocco delle nuove segnalazioni | Must | 5 | R4 | 🎉 Done (Sprint 16) |
@@ -162,6 +165,8 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | 🎉 Done (Sprint 10) |
 | [US-1309](#us-1309) | E13 | Importazione dal database attuale | Must | 8 | R4 | 🎉 Done (Sprint 15) |
 | [US-1310](#us-1310) | E13 | Sessione attiva finché NEXUS è aperto | Must | 3 | R4 | 🎉 Done (Sprint 17) |
+| [US-1311](#us-1311) | E13 | Avvisi affidabili su sito e backup | Must | 3 | R4 | 📋 Backlog |
+| [US-1312](#us-1312) | E13 | Tema chiaro o scuro a scelta e intestazione fissa delle schede | Must | 3 | R4 | 🎉 Done (Sprint 18) |
 
 ## Dettaglio per epica
 
@@ -731,7 +736,7 @@ Criteri di accettazione:
 Dipendenze: US-501
 
 #### US-507
-**Richiesta di contatto di un'azienda dal Tutor** · Should · 5 punti · release da decidere · 📋 Backlog
+**Richiesta di contatto di un'azienda dal Tutor** · Should · 5 punti · release da decidere · ✅ Ready
 
 Come **Tutor** voglio chiedere al Call Center di contattare un'azienda che conosco, così che la richiesta non si perda
 e un operatore la prenda in carico (PO, 15/11). Oggi passa tutto a voce o per email, senza traccia (analisi con il PO,
@@ -810,7 +815,7 @@ Dipendenze: US-501, US-1007
 
 
 #### US-511
-**Zona dell'azienda e aziende per il Tutor** · Should · 5 punti · release da decidere · 📋 Backlog
+**Zona dell'azienda e aziende per il Tutor** · Should · 5 punti · release da decidere · ✅ Ready
 
 Come **Tutor** voglio vedere le aziende del database con pochi dati essenziali, per sapere quali conosce già il Call
 Center prima di chiedere un contatto (analisi con il PO, 23/11).
@@ -824,11 +829,14 @@ Criteri di accettazione:
   filtra per settore e zona.
 - Il Tutor non vede altro: niente partita IVA, recapiti, referenti, diario, mansioni o storico. L'API per il Tutor
   restituisce solo quei campi (minimizzazione), e il Tutor non crea né modifica aziende.
+- Il Tutor vede anche le **valutazioni dei tirocini** (US-1104): la faccina media nella lista e, nella scheda in sola
+  lettura, l'elenco a pagine con data, faccina, nota e nome del Tutor che l'ha data (PO, 25 e 26/11).
+- Vede anche **stelle e pollici** (US-514) e il simbolo **🚢** della nave scuola (US-515) (PO, 26/11).
 
-Dipendenze: US-106, US-509, US-1007
+Dipendenze: US-106, US-509, US-1007, US-514, US-515, US-1104
 
 #### US-512
-**Tentativi di contatto ed esito della richiesta** · Should · 5 punti · release da decidere · 📋 Backlog
+**Tentativi di contatto ed esito della richiesta** · Should · 5 punti · release da decidere · ✅ Ready
 
 Come **Call Center** voglio registrare ogni tentativo di contatto con l'azienda e chiudere la richiesta con l'esito,
 così che il Tutor sappia com'è andata (analisi con il PO, 23/11).
@@ -864,6 +872,61 @@ Criteri di accettazione:
   di pagina.
 
 Dipendenze: US-501, US-1309
+
+#### US-514
+**Affidabilità e interesse al progetto dell'azienda** · Must · 5 punti · R4 · 🎉 Done (Sprint 18)
+
+Come **operatore del Call Center** voglio segnare nella scheda dell'azienda quanto è affidabile e quanto è interessata
+al progetto, per capire a colpo d'occhio chi chiamare (PO, 25/11). Nel database attuale lo si scrive con dei simboli
+all'inizio del nome: `$` per l'affidabilità, `£` per l'interesse.
+
+Criteri di accettazione:
+- **Affidabilità**: da 1 a 4 stelle, facoltativa. L'operatore vede 4 stelle vuote, bianche, e clicca quella che vuole:
+  si riempiono fino a lì. Si può togliere.
+- **Interesse al progetto**: uno o due pollici alzati, facoltativo, nello stesso modo.
+- Icone disegnate da NEXUS, non emoji: le stelle vuote sono davvero bianche e si vedono uguali su ogni PC. Si usano da
+  tastiera, e il lettore di schermo legge per esempio «Affidabilità: 3 stelle su 4».
+- Le cambiano gli operatori e l'ADMIN; ogni cambio entra nell'audit (EN-2), con prima e dopo.
+- **Elenco delle aziende** (US-513): una colonna per le stelle e una per i pollici, e i filtri «almeno N stelle» e
+  «interessata al progetto» (PO, 25/11).
+- **Nomi ripuliti, senza perdere il dato** (PO, 25/11). I simboli all'inizio del nome passano nei campi nuovi:
+  - ogni `$` è una stella; i cinque `$` di un'azienda valgono 4 stelle;
+  - ogni `£` è un pollice, al massimo due;
+  - `&` e `^` sono refusi e si tolgono. La `&` dentro il nome resta, come in «Rossi & C.».
+
+  Lo fa una migrazione sulle aziende già in NEXUS, e la stessa regola entra nell'importazione (US-1309) per quando si
+  azzera la pre-produzione. Nel database attuale: 271 aziende con le stelle, 90 con i pollici, 4 con la `&` e 1 con il
+  `^` all'inizio; nessun nome resta vuoto.
+- Un nome nuovo o corretto non può iniziare con `$`, `£`, `&` o `^`: NEXUS lo dice e indica stelle e pollici. Così
+  l'abitudine del database attuale non sporca di nuovo i nomi.
+- Il Tutor vede stelle e pollici nella sua lista delle aziende, con US-511 (PO, 26/11).
+- Subito, anche nel collaudo (PO, 26/11): i dati finti del collaudo (EN-11) hanno alcune aziende con stelle e pollici,
+  come dopo la conversione.
+- Fatto il 26/11 (V52, deploy `1603fcc`). La conversione, provata prima sui nomi veri del file Access con i soli
+  conteggi, ha dato 143 aziende con 1 stella, 107 con 2, 20 con 3 e 1 con 4; 89 con un pollice e 1 con due; 343 nomi
+  ripuliti, ognuno con la sua voce di audit. In produzione i conteggi tornano (T-35.6).
+
+Dipendenze: US-513, US-1309
+
+#### US-515
+**Azienda «nave scuola»** · Must · 5 punti · R4 · ✅ Ready
+
+Come **operatore del Call Center** voglio sapere quali aziende sono adatte come «nave scuola», per vederle subito
+quando scelgo dove proporre un beneficiario (PO, 25/11).
+
+Criteri di accettazione:
+- Nel report di restituzione (US-1101) il Tutor può indicare, se vuole, che l'azienda è adatta come nave scuola.
+- Se lo indica, l'**operatore della segnalazione** riceve l'avviso nell'app e per email, con il collegamento alla
+  scheda dell'azienda. I testi si cambiano da «Testi dei messaggi» (US-1204); email con oggetto «PORTALE NEXUS - …» e
+  firma «Portale Nexus». La proposta resta anche nel diario dell'azienda.
+- Nella **scheda dell'azienda** operatori e ADMIN segnano o tolgono «Nave scuola»: decidono loro, anche senza una
+  proposta del Tutor. Il cambio entra nell'audit (EN-2).
+- Il simbolo 🚢, un'icona disegnata da NEXUS con il testo «Nave scuola» per il lettore di schermo, sta accanto al nome
+  dell'azienda **ovunque la si sceglie**: elenco delle aziende (con un filtro), abbinamento, proposta, bacheca del Call
+  Center. Non nella bacheca dei Tutor, che è anonima (E9).
+- Il Tutor vede il simbolo nella sua lista delle aziende, con US-511 (PO, 26/11).
+
+Dipendenze: US-1101, US-1204, US-513
 
 ### E6 — Abbinamento (fase 4)
 
@@ -1370,6 +1433,34 @@ Criteri di accettazione:
 
 Dipendenze: US-1009, US-109
 
+#### US-1104
+**Valutazione dell'azienda alla fine del tirocinio** · Must · 5 punti · R4 · ✅ Ready
+
+Come **Tutor** voglio valutare l'azienda alla fine del tirocinio, così che chi propone di nuovo quell'azienda sappia
+come si sono trovati i tirocinanti (PO, 25/11).
+
+Criteri di accettazione:
+- Nel report di restituzione (US-1101) **tre voti da 1 a 5**, obbligatori, ognuno con cinque faccine da 😞 a 😄:
+  1. soddisfazione nell'interazione con l'azienda;
+  2. capacità dell'azienda di accogliere il beneficiario;
+  3. capacità formativa dell'azienda e del tutor aziendale (PO, 26/11).
+
+  Sono una cosa nuova: la «Soddisfazione dell'azienda» del report resta com'è (PO, 25/11).
+- Mentre il Tutor sceglie, NEXUS mostra la **media** dei tre voti come faccina: quella del numero intero più vicino,
+  per esempio 4,33 → 🙂 e 4,67 → 😄.
+- Se la faccina non è 😄 compare la **nota**: una sola per le tre domande, al massimo 500 caratteri, senza dati
+  personali (PO, 25/11). Sempre facoltativa (PO, 26/11).
+- Nella **scheda dell'azienda** la media delle medie, come faccina con il numero di tirocini valutati, e l'elenco **a
+  pagine** delle valutazioni, dalla più recente: data di fine del tirocinio, faccina, nota e **nome del Tutor** che
+  l'ha data, perché chi ricontatta l'azienda possa chiedergli che cosa non è andato (PO, 26/11). Senza il nome del
+  beneficiario.
+- Le valutazioni le vedono operatori, ADMIN e Tutor (PO, 25/11); il Tutor nella sua lista delle aziende (US-511).
+- Faccine disegnate da NEXUS, con il testo per il lettore di schermo, per esempio «Media 4,3 su 5».
+- Dopo l'invio del report la valutazione non si modifica. I voti entrano nell'audit; la nota, testo libero, no. I report
+  già inviati restano senza valutazione.
+
+Dipendenze: US-1101, US-513
+
 ### E12 — Notifiche
 
 _Le persone giuste sono avvisate al momento giusto, in app e via email._
@@ -1760,3 +1851,44 @@ Criteri di accettazione:
   oppure 30 minuti con il solo avviso.
 
 Dipendenze: US-1307
+
+#### US-1311
+**Avvisi affidabili su sito e backup** · Must · 3 punti · R4 · 📋 Backlog
+
+Come **PO** voglio un avviso in pochi minuti se il sito non risponde, e entro le 9 se manca il backup della notte, per
+saperlo prima di chi usa NEXUS. I controlli pianificati di GitHub non bastano: dall'8/11 il controllo del sito parte 2
+o 3 volte al giorno invece di 72, e quello del backup delle 9:07 parte tra le 16 e le 21 (review dello Sprint 17,
+§8.2).
+
+Criteri di accettazione:
+- Un **servizio esterno** controlla il sito ogni pochi minuti, giorno e notte, con le tre verifiche di oggi: la PWA
+  risponde, Keycloak risponde, l'API risponde 401 senza accesso. Se una fallisce, il PO riceve un'email.
+- Dopo ogni backup riuscito il server manda un **segnale** al servizio. Se il segnale non arriva entro le 9, ora
+  italiana, il PO riceve un'email. Se il backup fallisce, l'avviso parte subito.
+- Al servizio arrivano solo gli indirizzi pubblici del sito e il segnale, senza dati. L'account lo crea il PO;
+  l'indirizzo del segnale va solo nel `.env` del server, mai nel repository.
+- I controlli di GitHub (US-1307, US-1302) restano come seconda rete. T-26.3 si riscrive con il servizio scelto.
+- Domanda aperta, da chiudere al planning: Better Stack oppure Healthchecks.io (review dello Sprint 17, §8.2).
+
+Dipendenze: US-1302, US-1307
+
+#### US-1312
+**Tema chiaro o scuro a scelta e intestazione fissa delle schede** · Must · 3 punti · R4 · 🎉 Done (Sprint 18)
+
+Come **utente** voglio scegliere io il tema chiaro o scuro, e tornare all'elenco anche dall'inizio di una scheda lunga,
+senza scorrerla tutta (PO, 26/11, dal collaudo di US-514). Oggi il tema segue solo l'impostazione del sistema
+operativo, e il collegamento per tornare all'elenco sta solo in fondo alla scheda.
+
+Criteri di accettazione:
+- **Tema**: nella barra in alto, accanto all'utente, un pulsante 🌙/☀️: con il tema chiaro mostra la luna e passa al
+  tema scuro, con quello scuro mostra il sole e passa al chiaro. La scelta resta nel browser, anche dopo la chiusura;
+  finché non si sceglie vale il tema del sistema operativo. Il pulsante ha un nome per il lettore di schermo («Passa al
+  tema scuro»), e la pagina non lampeggia nel tema sbagliato all'apertura.
+- **Intestazione fissa delle schede** (PO, 26/11, dopo la prima prova): nelle schede che avevano il ritorno in fondo
+  (aziende, segnalazioni, beneficiari, annunci della bacheca, tirocinio, report di restituzione, pagine degli utenti)
+  ritorno all'elenco e titolo stanno in cima e restano fermi sotto la barra in alto mentre la scheda scorre. Il ritorno
+  in fondo non c'è più: nelle pagine degli utenti stava accanto al pulsante del modulo e si vedeva male.
+- Sugli schermi bassi l'intestazione scorre con la pagina; barra e intestazione non coprono l'elemento con il focus
+  (WCAG 2.4.11). Soglia confermata dal PO dopo il collaudo: sotto circa 512 px di altezza (26/11).
+- Fatto il 26/11 (deploy `1603fcc`). Sotto i 375 px di larghezza la barra in alto mostra solo il logo, senza la
+  scritta: a 320 px i pulsanti si sovrapponevano.
