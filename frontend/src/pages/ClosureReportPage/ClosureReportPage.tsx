@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { CircleAlert } from 'lucide-react';
 import { useForm, useWatch, type UseFormRegisterReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ import { formatIsoDate } from '@/lib/isoDate';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
 import { FormField } from '@/molecules/FormField/FormField';
 import { ClosureReportView } from '@/organisms/ClosureReportView/ClosureReportView';
+import { BackLink } from '@/molecules/BackLink/BackLink';
 
 type YesNo = '' | 'yes' | 'no';
 
@@ -111,14 +112,7 @@ export const ClosureReportPage = () => {
     if (sent) sentRef.current?.focus();
   }, [sent]);
 
-  const backLink = (
-    <Link
-      to={`/segnalazioni/${id}`}
-      className="inline-block font-medium text-primary underline underline-offset-4"
-    >
-      {t('closureReport.backToTicket')}
-    </Link>
-  );
+  const backLink = <BackLink to={`/segnalazioni/${id}`}>{t('closureReport.backToTicket')}</BackLink>;
 
   if (ticket.isError) {
     return (
@@ -138,6 +132,7 @@ export const ClosureReportPage = () => {
   if (d.closureReport) {
     return (
       <div className="space-y-6">
+        {backLink}
         <PageHeading>{t('closureReport.heading', { number: d.number })}</PageHeading>
         {sent && (
           <p
@@ -165,6 +160,7 @@ export const ClosureReportPage = () => {
 
   return (
     <div className="space-y-6">
+      {backLink}
       <PageHeading>{t('closureReport.heading', { number: d.number })}</PageHeading>
       <p className="text-muted-foreground">
         {t('closureReport.who', {

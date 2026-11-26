@@ -9,6 +9,7 @@ import { apiError } from '@/config/api/errors';
 import { useBeneficiary } from '@/config/hooks/useBeneficiaries';
 import { isoName } from '@/lib/isoNames';
 import { BeneficiaryCvSection } from '@/organisms/BeneficiaryCvSection/BeneficiaryCvSection';
+import { BackLink } from '@/molecules/BackLink/BackLink';
 
 type Row = { label: string; value: ReactNode };
 
@@ -68,8 +69,19 @@ export const BeneficiaryPage = () => {
   const yesNo = (value: boolean): string => t(value ? 'beneficiary.yes' : 'beneficiary.no');
   const notSpecified = t('beneficiary.notSpecified');
 
+  const back = fromTicket ? (
+    <BackLink to={`/segnalazioni/${fromTicket.id}`}>
+      {t('beneficiary.backToTicket', { number: fromTicket.number })}
+    </BackLink>
+  ) : (
+    <BackLink to={b.editable ? '/beneficiari' : '/'}>
+      {t(b.editable ? 'beneficiary.backToList' : 'beneficiary.backToHome')}
+    </BackLink>
+  );
+
   return (
     <div className="space-y-6">
+      {back}
       <PageHeading>
         {b.firstName} {b.lastName}
       </PageHeading>
@@ -173,21 +185,7 @@ export const BeneficiaryPage = () => {
       />
       <BeneficiaryCvSection beneficiary={b} />
 
-      {fromTicket ? (
-        <Link
-          to={`/segnalazioni/${fromTicket.id}`}
-          className="inline-block font-medium text-primary underline underline-offset-4"
-        >
-          {t('beneficiary.backToTicket', { number: fromTicket.number })}
-        </Link>
-      ) : (
-        <Link
-          to={b.editable ? '/beneficiari' : '/'}
-          className="inline-block font-medium text-primary underline underline-offset-4"
-        >
-          {t(b.editable ? 'beneficiary.backToList' : 'beneficiary.backToHome')}
-        </Link>
-      )}
+      {back}
     </div>
   );
 };

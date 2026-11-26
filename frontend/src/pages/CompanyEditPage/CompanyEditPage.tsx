@@ -13,6 +13,7 @@ import { CompanyHistorySection } from '@/organisms/CompanyHistorySection/Company
 import { CompanyNotesSection } from '@/organisms/CompanyNotesSection/CompanyNotesSection';
 import { JobSlotsSection } from '@/organisms/JobSlotsSection/JobSlotsSection';
 import { LegalRepresentativeSection } from '@/organisms/LegalRepresentativeSection/LegalRepresentativeSection';
+import { BackLink } from '@/molecules/BackLink/BackLink';
 
 type Outcome = 'created' | 'saved' | 'activated' | 'deactivated' | 'conflict' | 'error';
 
@@ -72,8 +73,11 @@ export const CompanyEditPage = () => {
   const isError = outcome === 'conflict' || outcome === 'error';
   const missing = c.missingData ?? [];
 
+  const back = <BackLink to="/aziende">{t('company.backToList')}</BackLink>;
+
   return (
     <div className="space-y-6">
+      {back}
       <PageHeading>{c.name}</PageHeading>
       <p className="text-muted-foreground">
         {isMissing(c, 'VAT_CODE') ? t('company.vatMissing') : t('company.vatLine', { vat: c.vatCode })} ·{' '}
@@ -141,9 +145,7 @@ export const CompanyEditPage = () => {
         </Button>
       </section>
 
-      <Link to="/aziende" className="inline-block font-medium text-primary underline underline-offset-4">
-        {t('company.backToList')}
-      </Link>
+      {back}
     </div>
   );
 };

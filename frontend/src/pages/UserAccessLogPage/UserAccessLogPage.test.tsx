@@ -55,7 +55,10 @@ describe('<UserAccessLogPage>', () => {
     ).toBeInTheDocument();
     expect(await screen.findByText('Nessun accesso registrato.')).toBeInTheDocument();
     expect(fetchUserAccessLog).toHaveBeenCalledWith('U3', 0);
-    expect(screen.getByRole('link', { name: 'Torna agli utenti' })).toHaveAttribute('href', '/utenti');
+    // in cima e in fondo alla scheda (US-1312)
+    const back = screen.getAllByRole('link', { name: 'Torna agli utenti' });
+    expect(back).toHaveLength(2);
+    for (const link of back) expect(link).toHaveAttribute('href', '/utenti');
     await expectNoAxeViolations();
   });
 });

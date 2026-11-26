@@ -12,6 +12,7 @@ import { useCatalog } from '@/config/hooks/useCatalogs';
 import { useUpdateUserProjects, useUser } from '@/config/hooks/useUsers';
 import { useFocusAfterRender } from '@/hooks/useFocusAfterRender';
 import type { UsersPageState } from '@/pages/UsersPage/UsersPage';
+import { BackLink } from '@/molecules/BackLink/BackLink';
 
 const backLink = 'font-medium text-primary underline underline-offset-4';
 
@@ -30,6 +31,7 @@ export const UserProjectsPage = () => {
 
   return (
     <div className="space-y-6">
+      <BackLink to="/utenti">{t('users.backToList')}</BackLink>
       <PageHeading>
         {user.data
           ? t('users.projects.heading', { name: `${user.data.firstName} ${user.data.lastName}` })

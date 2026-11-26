@@ -844,6 +844,11 @@ export const it = {
     empty: 'Nessuna nota.',
     listLabel: 'Note dalla più recente',
   },
+  /** Pulsante del tema nella barra in alto (US-1312). */
+  theme: {
+    toDark: 'Passa al tema scuro',
+    toLight: 'Passa al tema chiaro',
+  },
   /** Stelle e pollici dell'azienda (US-514): testo per il lettore di schermo e scelta. */
   rating: {
     stars_one: '{{count}} stella su {{max}}',

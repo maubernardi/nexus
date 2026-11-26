@@ -1010,7 +1010,10 @@ describe('<TicketPage>', () => {
     expect(screen.queryByRole('heading', { name: 'Mansioni compatibili' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Prendila in carico tu' })).not.toBeInTheDocument();
     expect(fetchCompatibleJobSlots).not.toHaveBeenCalled();
-    expect(screen.getByRole('link', { name: 'Torna alle segnalazioni' })).toHaveAttribute('href', '/');
+    // in cima e in fondo alla scheda (US-1312)
+    for (const link of screen.getAllByRole('link', { name: 'Torna alle segnalazioni' })) {
+      expect(link).toHaveAttribute('href', '/');
+    }
     // il nome del beneficiario apre la sua scheda; il nome accessibile comincia con il testo visibile
     expect(
       screen.getByRole('link', { name: /^Bianchi Anna \(\d{4}\), apri la scheda del beneficiario$/ }),

@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import type { CurrentUser } from '@/config/auth/types';
 import { UserIdentity } from '@/molecules/UserIdentity/UserIdentity';
 import { NotificationsBell } from '@/molecules/NotificationsBell/NotificationsBell';
+import { ThemeToggle } from '@/molecules/ThemeToggle/ThemeToggle';
 import { UserMenu } from '@/molecules/UserMenu/UserMenu';
 import { MainNav } from '@/organisms/MainNav/MainNav';
 
@@ -26,7 +27,10 @@ export const AppHeader = ({ user }: AppHeaderProps) => {
             className="flex min-h-11 shrink-0 items-center gap-2 rounded-md text-lg font-bold tracking-wide"
           >
             <img src="/favicon.svg" alt="" className="size-8" />
-            <span aria-hidden="true">{t('app.name')}</span>
+            {/* sotto i 375 px resta solo il logo: serve spazio per menu, notifiche, tema ed Esci (US-1312) */}
+            <span aria-hidden="true" className="max-[374px]:hidden">
+              {t('app.name')}
+            </span>
           </Link>
           <MainNav
             roles={user.roles}
@@ -36,6 +40,7 @@ export const AppHeader = ({ user }: AppHeaderProps) => {
         </div>
         <div className="flex shrink-0 items-center gap-1 md:gap-2">
           <NotificationsBell />
+          <ThemeToggle />
           <UserMenu user={user} />
         </div>
       </div>

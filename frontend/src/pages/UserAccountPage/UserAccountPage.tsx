@@ -11,6 +11,7 @@ import type { Role } from '@/config/auth/types';
 import { useChangeUserRole, useSetUserActive, useUser, useUserImpact } from '@/config/hooks/useUsers';
 import { useFocusAfterRender } from '@/hooks/useFocusAfterRender';
 import type { UsersPageState } from '@/pages/UsersPage/UsersPage';
+import { BackLink } from '@/molecules/BackLink/BackLink';
 
 const ROLES: readonly Role[] = ['TUTOR', 'CALL_CENTER', 'ADMIN'];
 const link = 'font-medium text-primary underline underline-offset-4';
@@ -29,6 +30,7 @@ export const UserAccountPage = () => {
 
   return (
     <div className="space-y-6">
+      <BackLink to="/utenti">{t('users.backToList')}</BackLink>
       <PageHeading>
         {user.data
           ? t('users.account.heading', { name: `${user.data.firstName} ${user.data.lastName}` })
@@ -54,9 +56,7 @@ export const UserAccountPage = () => {
       ) : (
         <AccountForms user={user.data} impact={impact.data} />
       )}
-      <Link to="/utenti" className={link}>
-        {t('users.backToList')}
-      </Link>
+      <BackLink to="/utenti">{t('users.backToList')}</BackLink>
     </div>
   );
 };

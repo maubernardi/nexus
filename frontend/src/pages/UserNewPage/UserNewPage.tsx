@@ -16,6 +16,7 @@ import { suggestUsername } from '@/lib/username';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
 import { FormField } from '@/molecules/FormField/FormField';
 import type { UsersPageState } from '@/pages/UsersPage/UsersPage';
+import { BackLink } from '@/molecules/BackLink/BackLink';
 
 type Values = {
   firstName: string;
@@ -110,6 +111,7 @@ export const UserNewPage = () => {
 
   return (
     <div className="space-y-6">
+      <BackLink to="/utenti">{t('users.backToList')}</BackLink>
       <PageHeading>{t('users.newHeading')}</PageHeading>
       <p className="text-muted-foreground">{t('users.newIntro')}</p>
       <form noValidate onSubmit={handleSubmit(onValid, requestSummaryFocus)} className="space-y-6">

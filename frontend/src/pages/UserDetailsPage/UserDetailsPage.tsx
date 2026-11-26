@@ -13,6 +13,7 @@ import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
 import { FormField } from '@/molecules/FormField/FormField';
 import type { UsersPageState } from '@/pages/UsersPage/UsersPage';
+import { BackLink } from '@/molecules/BackLink/BackLink';
 
 type Values = {
   firstName: string;
@@ -42,6 +43,7 @@ export const UserDetailsPage = () => {
 
   return (
     <div className="space-y-6">
+      <BackLink to="/utenti">{t('users.backToList')}</BackLink>
       <PageHeading>
         {details.data
           ? t('users.details.heading', { name: `${details.data.firstName} ${details.data.lastName}` })

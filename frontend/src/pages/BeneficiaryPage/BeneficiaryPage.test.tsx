@@ -88,17 +88,17 @@ describe('<BeneficiaryPage>', () => {
 
     await screen.findByRole('heading', { level: 1, name: 'Mario Rossi' });
     expect(screen.queryByRole('link', { name: 'Modifica' })).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Torna alla Home' })).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: 'Torna alla Home' })).toHaveLength(2);
   });
 
   it('arrivando da una segnalazione, il ritorno riporta alla segnalazione', async () => {
     vi.mocked(fetchBeneficiary).mockResolvedValue({ ...mario, editable: false });
     renderPage({ pathname: '/beneficiari/B1', state: { fromTicket: { id: 'T9', number: 24 } } });
 
-    expect(await screen.findByRole('link', { name: 'Torna alla segnalazione n. 24' })).toHaveAttribute(
-      'href',
-      '/segnalazioni/T9',
-    );
+    // in cima e in fondo alla scheda (US-1312)
+    const back = await screen.findAllByRole('link', { name: 'Torna alla segnalazione n. 24' });
+    expect(back).toHaveLength(2);
+    for (const link of back) expect(link).toHaveAttribute('href', '/segnalazioni/T9');
   });
 
   it('beneficiario non visibile: stesso messaggio di inesistente', async () => {
