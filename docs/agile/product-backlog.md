@@ -166,7 +166,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1309](#us-1309) | E13 | Importazione dal database attuale | Must | 8 | R4 | 🎉 Done (Sprint 15) |
 | [US-1310](#us-1310) | E13 | Sessione attiva finché NEXUS è aperto | Must | 3 | R4 | 🎉 Done (Sprint 17) |
 | [US-1311](#us-1311) | E13 | Avvisi affidabili su sito e backup | Must | 3 | R4 | 📋 Backlog |
-| [US-1312](#us-1312) | E13 | Tema chiaro o scuro a scelta e «Torna all'elenco» in cima alle schede | Must | 3 | R4 | 🔨 In corso (Sprint 18) |
+| [US-1312](#us-1312) | E13 | Tema chiaro o scuro a scelta e intestazione fissa delle schede | Must | 3 | R4 | 🔨 In corso (Sprint 18) |
 
 ## Dettaglio per epica
 
@@ -1870,7 +1870,7 @@ Criteri di accettazione:
 Dipendenze: US-1302, US-1307
 
 #### US-1312
-**Tema chiaro o scuro a scelta e «Torna all'elenco» in cima alle schede** · Must · 3 punti · R4 · 🔨 In corso (Sprint 18)
+**Tema chiaro o scuro a scelta e intestazione fissa delle schede** · Must · 3 punti · R4 · 🔨 In corso (Sprint 18)
 
 Come **utente** voglio scegliere io il tema chiaro o scuro, e tornare all'elenco anche dall'inizio di una scheda lunga,
 senza scorrerla tutta (PO, 26/11, dal collaudo di US-514). Oggi il tema segue solo l'impostazione del sistema
@@ -1881,8 +1881,9 @@ Criteri di accettazione:
   tema scuro, con quello scuro mostra il sole e passa al chiaro. La scelta resta nel browser, anche dopo la chiusura;
   finché non si sceglie vale il tema del sistema operativo. Il pulsante ha un nome per il lettore di schermo («Passa al
   tema scuro»), e la pagina non lampeggia nel tema sbagliato all'apertura.
-- **Torna all'elenco**: in tutte le schede che lo hanno in fondo (aziende, segnalazioni, beneficiari, annunci della
-  bacheca, tirocinio, report di restituzione, pagine degli utenti) lo stesso collegamento c'è anche in cima, sopra il
-  titolo.
-
-Dipendenze: US-1304
+- **Intestazione fissa delle schede** (PO, 26/11, dopo la prima prova): nelle schede che avevano il ritorno in fondo
+  (aziende, segnalazioni, beneficiari, annunci della bacheca, tirocinio, report di restituzione, pagine degli utenti)
+  ritorno all'elenco e titolo stanno in cima e restano fermi sotto la barra in alto mentre la scheda scorre. Il ritorno
+  in fondo non c'è più: nelle pagine degli utenti stava accanto al pulsante del modulo e si vedeva male.
+- Sugli schermi bassi l'intestazione scorre con la pagina; barra e intestazione non coprono l'elemento con il focus
+  (WCAG 2.4.11).

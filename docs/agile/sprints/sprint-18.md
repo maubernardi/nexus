@@ -12,17 +12,17 @@
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-514 | Affidabilità e interesse al progetto dell'azienda | 5 | 🔨 In corso | `add-company-reliability-interest` | — |
+| US-514 | Affidabilità e interesse al progetto dell'azienda | 5 | 👀 In review | `add-company-reliability-interest` | [#208](https://github.com/maubernardi/nexus/pull/208) |
 | US-1104 | Valutazione dell'azienda alla fine del tirocinio | 5 | ✅ Ready | — | — |
 | US-515 | Azienda «nave scuola» | 5 | ✅ Ready | — | — |
 | US-1311 | Avvisi affidabili su sito e backup | 3 | 📋 Servizio da scegliere | — | — |
-| US-1312 | Tema chiaro o scuro a scelta e «Torna all'elenco» in cima alle schede | 3 | 🔨 In corso | `add-theme-toggle-and-top-back-links` | — |
+| US-1312 | Tema chiaro o scuro a scelta e intestazione fissa delle schede | 3 | 👀 In review | `add-theme-toggle-and-top-back-links` | [#209](https://github.com/maubernardi/nexus/pull/209) |
 
 **Ordine** (PO, 26/11):
 1. **US-514 subito, anche nel collaudo**: i dati finti del collaudo hanno alcune aziende con i vecchi simboli.
 2. **US-1104, poi US-515**: toccano tutte e due il report di restituzione e la scheda dell'azienda.
-3. **US-1312** (PO, 26/11, dal collaudo di US-514): pulsante 🌙/☀️ nella barra in alto e «Torna all'elenco» anche in
-   cima alle schede.
+3. **US-1312** (PO, 26/11, dal collaudo di US-514): pulsante 🌙/☀️ nella barra in alto e intestazione fissa delle
+   schede (ritorno all'elenco e titolo), senza il ritorno in fondo.
 4. **US-1311** dopo la scelta del servizio: Better Stack o Healthchecks.io, da approfondire (review, §8.2).
 
 Il gruppo della richiesta di contatto (US-511, US-507, US-512) va nello Sprint 19. Con US-511 il Tutor vedrà nella sua
