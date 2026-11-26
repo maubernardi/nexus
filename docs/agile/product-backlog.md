@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 108 elementi, 447 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-17](sprints/sprint-17.md), il 25/11 ([review](sprints/sprint-17-review.md)); in corso lo [Sprint 18](sprints/sprint-18.md), dal 26/11.
+**Totale: 109 elementi, 450 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-17](sprints/sprint-17.md), il 25/11 ([review](sprints/sprint-17-review.md)); in corso lo [Sprint 18](sprints/sprint-18.md), dal 26/11.
 
 ## Epiche
 
@@ -21,7 +21,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | E10 | Tirocinio e documenti (fase 7) | I dati amministrativi del tirocinio producono Convenzione, Progetto Formativo e Relazione finale sui modelli reali in Word. | 13 | 70 |
 | E11 | Chiusura e restituzione | Il percorso si chiude con un report e la traccia immodificabile nell'audit trail dell'azienda. | 4 | 14 |
 | E12 | Notifiche | Le persone giuste sono avvisate al momento giusto, in app e via email. | 4 | 23 |
-| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 19 | 82 |
+| E13 | Trasversali e produzione | Qualità, sicurezza, audit, GDPR e passaggio dalla demo alla produzione. | 20 | 85 |
 
 ## Release
 
@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 47 | 240 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 48 | 243 |
 
 ## Domande aperte per il Product Owner
 
@@ -166,6 +166,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1309](#us-1309) | E13 | Importazione dal database attuale | Must | 8 | R4 | 🎉 Done (Sprint 15) |
 | [US-1310](#us-1310) | E13 | Sessione attiva finché NEXUS è aperto | Must | 3 | R4 | 🎉 Done (Sprint 17) |
 | [US-1311](#us-1311) | E13 | Avvisi affidabili su sito e backup | Must | 3 | R4 | 📋 Backlog |
+| [US-1312](#us-1312) | E13 | Tema chiaro o scuro a scelta e «Torna all'elenco» in cima alle schede | Must | 3 | R4 | 🔨 In corso (Sprint 18) |
 
 ## Dettaglio per epica
 
@@ -1867,3 +1868,21 @@ Criteri di accettazione:
 - Domanda aperta, da chiudere al planning: Better Stack oppure Healthchecks.io (review dello Sprint 17, §8.2).
 
 Dipendenze: US-1302, US-1307
+
+#### US-1312
+**Tema chiaro o scuro a scelta e «Torna all'elenco» in cima alle schede** · Must · 3 punti · R4 · 🔨 In corso (Sprint 18)
+
+Come **utente** voglio scegliere io il tema chiaro o scuro, e tornare all'elenco anche dall'inizio di una scheda lunga,
+senza scorrerla tutta (PO, 26/11, dal collaudo di US-514). Oggi il tema segue solo l'impostazione del sistema
+operativo, e il collegamento per tornare all'elenco sta solo in fondo alla scheda.
+
+Criteri di accettazione:
+- **Tema**: nella barra in alto, accanto all'utente, un pulsante 🌙/☀️: con il tema chiaro mostra la luna e passa al
+  tema scuro, con quello scuro mostra il sole e passa al chiaro. La scelta resta nel browser, anche dopo la chiusura;
+  finché non si sceglie vale il tema del sistema operativo. Il pulsante ha un nome per il lettore di schermo («Passa al
+  tema scuro»), e la pagina non lampeggia nel tema sbagliato all'apertura.
+- **Torna all'elenco**: in tutte le schede che lo hanno in fondo (aziende, segnalazioni, beneficiari, annunci della
+  bacheca, tirocinio, report di restituzione, pagine degli utenti) lo stesso collegamento c'è anche in cima, sopra il
+  titolo.
+
+Dipendenze: US-1304

@@ -8,7 +8,7 @@
 > La scheda dell'azienda dice quanto è affidabile e interessata al progetto, come si sono trovati i tirocinanti e se è
 > una nave scuola; gli avvisi su sito e backup arrivano in tempo.
 
-## Impegno (18 punti)
+## Impegno (21 punti)
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
@@ -16,11 +16,14 @@
 | US-1104 | Valutazione dell'azienda alla fine del tirocinio | 5 | ✅ Ready | — | — |
 | US-515 | Azienda «nave scuola» | 5 | ✅ Ready | — | — |
 | US-1311 | Avvisi affidabili su sito e backup | 3 | 📋 Servizio da scegliere | — | — |
+| US-1312 | Tema chiaro o scuro a scelta e «Torna all'elenco» in cima alle schede | 3 | 🔨 In corso | `add-theme-toggle-and-top-back-links` | — |
 
 **Ordine** (PO, 26/11):
 1. **US-514 subito, anche nel collaudo**: i dati finti del collaudo hanno alcune aziende con i vecchi simboli.
 2. **US-1104, poi US-515**: toccano tutte e due il report di restituzione e la scheda dell'azienda.
-3. **US-1311** dopo la scelta del servizio: Better Stack o Healthchecks.io, da approfondire (review, §8.2).
+3. **US-1312** (PO, 26/11, dal collaudo di US-514): pulsante 🌙/☀️ nella barra in alto e «Torna all'elenco» anche in
+   cima alle schede.
+4. **US-1311** dopo la scelta del servizio: Better Stack o Healthchecks.io, da approfondire (review, §8.2).
 
 Il gruppo della richiesta di contatto (US-511, US-507, US-512) va nello Sprint 19. Con US-511 il Tutor vedrà nella sua
 lista delle aziende stelle, pollici, 🚢 e valutazioni.
@@ -53,3 +56,4 @@ lista delle aziende stelle, pollici, 🚢 e valutazioni.
 | Momento | Punti residui |
 |---|---|
 | Inizio (26/11) | 18 |
+| US-1312 aggiunta dal PO dal collaudo di US-514 (26/11) | 21 |
