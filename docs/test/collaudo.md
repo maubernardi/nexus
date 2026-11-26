@@ -1672,4 +1672,4 @@ Sul collaudo del PC, prima del merge (http://localhost:8090, password `collaudo-
      lato.
   > Nota (26/11): T-38.1 … T-38.4 riuscite dal PO sul suo PC, con il collaudo della PR #214 (`e35941e`). Richieste dal
   > collaudo: un testo neutro sotto «Valutazioni dei tirocini» e la nota sempre presente nel report, anche con
-  > «Ottima» (fatte nella stessa PR). Unita con la #214 (`5095004`) e in produzione con il deploy del 26/11 sera.
+  > «Ottima» (fatte nella stessa PR).
