@@ -12,6 +12,10 @@ vi.mock('@/config/api/referenceApi', () => ({
     { id: 'K14', code: 'BAR_PUB', name: 'Bar / Pub' },
     { id: 'K11', code: 'RISTORANTE_TRATTORIA_BISTR', name: 'Ristorante / Trattoria / Bistrot' },
   ]),
+  fetchZones: vi.fn().mockResolvedValue([
+    { id: 'Z1', code: 'RIFREDI', name: 'Rifredi' },
+    { id: 'Z2', code: 'NOVOLI', name: 'Novoli' },
+  ]),
 }));
 vi.mock('@/config/api/companyApi', async (importOriginal) => ({
   // costanti vere (aziende per pagina), funzioni finte
@@ -284,9 +288,9 @@ describe('<CompaniesPage>', () => {
     expect(within(table).getByRole('columnheader', { name: 'Affidabilità' })).toBeInTheDocument();
     expect(within(table).getByRole('columnheader', { name: 'Interesse al progetto' })).toBeInTheDocument();
     const [, first, second] = within(table).getAllByRole('row');
-    expect(within(first).getAllByRole('cell')[2]).toHaveTextContent('3 stelle su 4');
-    expect(within(first).getAllByRole('cell')[3]).toHaveTextContent('2 pollici alzati su 2');
-    expect(within(second).getAllByRole('cell')[2]).toHaveTextContent('—Nessuna valutazione');
+    expect(within(first).getAllByRole('cell')[3]).toHaveTextContent('3 stelle su 4');
+    expect(within(first).getAllByRole('cell')[4]).toHaveTextContent('2 pollici alzati su 2');
+    expect(within(second).getAllByRole('cell')[3]).toHaveTextContent('—Nessuna valutazione');
     // valori non validi nell'indirizzo: nessun filtro
     expect(searchCompanies).toHaveBeenLastCalledWith({ includeInactive: false, page: 0, size: 25 });
 
@@ -300,6 +304,35 @@ describe('<CompaniesPage>', () => {
       includeInactive: false,
       minReliability: 3,
       minProjectInterest: 2,
+      page: 0,
+      size: 25,
+    });
+    await expectNoAxeViolations();
+  });
+
+  it('zona nella colonna e filtro per zona nell’indirizzo (US-511)', async () => {
+    vi.mocked(searchCompanies).mockResolvedValue(
+      pageOf([
+        { ...company('C9', 'Officina Rossi'), zone: { id: 'Z1', code: 'RIFREDI', name: 'Rifredi' } },
+        company('C10', 'Officina Verdi'),
+      ]),
+    );
+    const user = userEvent.setup();
+    const { router } = renderPage('/aziende');
+
+    const table = await screen.findByRole('table', { name: /Aziende ospitanti/ });
+    expect(within(table).getByRole('columnheader', { name: 'Zona' })).toBeInTheDocument();
+    const [, first, second] = within(table).getAllByRole('row');
+    expect(within(first).getAllByRole('cell')[2]).toHaveTextContent('Rifredi');
+    expect(within(second).getAllByRole('cell')[2]).toHaveTextContent('—');
+
+    const filter = screen.getByRole('combobox', { name: 'Zona' });
+    await waitFor(() => expect(filter).toBeEnabled());
+    await user.selectOptions(filter, 'Novoli');
+    await waitFor(() => expect(router.state.location.search).toBe('?zona=Z2'));
+    expect(searchCompanies).toHaveBeenLastCalledWith({
+      includeInactive: false,
+      zoneId: 'Z2',
       page: 0,
       size: 25,
     });
@@ -330,10 +363,10 @@ describe('<CompaniesPage>', () => {
     const table = await screen.findByRole('table', { name: /Aziende ospitanti/ });
     expect(within(table).getByRole('columnheader', { name: 'Referente' })).toBeInTheDocument();
     const [, bellavista, miramare, stella] = within(table).getAllByRole('row');
-    expect(within(bellavista).getAllByRole('cell')[4]).toHaveTextContent(/^Paola Neri e altri 2$/);
-    expect(within(miramare).getAllByRole('cell')[4]).toHaveTextContent(
+    expect(within(bellavista).getAllByRole('cell')[5]).toHaveTextContent(/^Paola Neri e altri 2$/);
+    expect(within(miramare).getAllByRole('cell')[5]).toHaveTextContent(
       /^Responsabile del personale e un altro$/,
     );
-    expect(within(stella).getAllByRole('cell')[4]).toHaveTextContent(/^—$/);
+    expect(within(stella).getAllByRole('cell')[5]).toHaveTextContent(/^—$/);
   });
 });

@@ -7,6 +7,7 @@ import it.nexus.domain.Company;
 import it.nexus.domain.CompanyContact;
 import it.nexus.domain.dto.CompanyContactDTO;
 import it.nexus.domain.dto.CompanyDTO;
+import it.nexus.domain.dto.CompanyDirectoryItemDTO;
 
 @Mapper(uses = ReferenceMapper.class, imports = {TsidMapper.class, MunicipalityMapper.class})
 public interface CompanyMapper {
@@ -22,4 +23,17 @@ public interface CompanyMapper {
 
     /** Referente (US-510), con il ruolo anche se disattivato. */
     CompanyContactDTO toDto(CompanyContact contact);
+
+    /** Azienda nell'elenco del Tutor (US-511): solo i dati essenziali, con la sede operativa se indicata. */
+    @Mapping(target = "id", expression = "java(TsidMapper.toExternal(company.getId()))")
+    @Mapping(target = "address", expression = "java(hasOperatingSeat(company) ? company.getOperatingAddress() "
+            + ": company.getLegalAddress())")
+    @Mapping(target = "municipality", expression = "java(MunicipalityMapper.label(hasOperatingSeat(company) "
+            + "? company.getOperatingMunicipality() : company.getLegalMunicipality()))")
+    CompanyDirectoryItemDTO toDirectoryItem(Company company);
+
+    /** La sede operativa vale se ha l'indirizzo o il comune (US-510); altrimenti la sede legale. */
+    default boolean hasOperatingSeat(Company company) {
+        return company.getOperatingAddress() != null || company.getOperatingMunicipality() != null;
+    }
 }

@@ -14,6 +14,10 @@ vi.mock('@/config/api/municipalityApi', () => ({ searchMunicipalities: vi.fn() }
 vi.mock('@/config/api/referenceApi', () => ({
   fetchBusinessCategories: vi.fn(),
   fetchContactRoles: vi.fn(),
+  fetchZones: vi.fn().mockResolvedValue([
+    { id: 'Z1', code: 'RIFREDI', name: 'Rifredi' },
+    { id: 'Z2', code: 'NOVOLI', name: 'Novoli' },
+  ]),
 }));
 
 const RISTORANTE = {
@@ -106,6 +110,7 @@ describe('<CompanyForm>', () => {
       contacts: [],
       reliability: null,
       projectInterest: null,
+      zoneId: null,
       version: undefined,
     });
   });
@@ -133,6 +138,36 @@ describe('<CompanyForm>', () => {
         expect.objectContaining({ reliability: 3, projectInterest: null }),
       ),
     );
+  });
+
+  it('zona dal catalogo, con quella già dell’azienda anche se disattivata (US-511)', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn().mockResolvedValue(saved);
+    renderWithProviders(
+      <main>
+        <CompanyForm
+          company={{ ...saved, zone: { id: 'Z9', code: 'VECCHIA', name: 'Zona chiusa' } }}
+          submitLabel="Salva modifiche"
+          onSubmit={onSubmit}
+          onSuccess={vi.fn()}
+        />
+      </main>,
+    );
+    const zone = screen.getByRole('combobox', { name: 'Zona' });
+    await waitFor(() => expect(zone).toBeEnabled());
+    expect(zone).toHaveDisplayValue('Zona chiusa');
+    expect(Array.from(zone.querySelectorAll('option')).map((o) => o.textContent)).toEqual([
+      'Nessuna',
+      'Zona chiusa',
+      'Rifredi',
+      'Novoli',
+    ]);
+    expect(zone).toHaveAccessibleDescription(
+      'La zona del territorio: il Tutor la usa per cercare le aziende.',
+    );
+    await user.selectOptions(zone, 'Rifredi');
+    await user.click(screen.getByRole('button', { name: 'Salva modifiche' }));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ zoneId: 'Z1' })));
   });
 
   it('azienda con stelle e pollici: il modulo parte con i valori salvati (US-514)', () => {
@@ -206,7 +241,7 @@ describe('<CompanyForm>', () => {
     const category = screen.getByRole('combobox', { name: 'Categoria merceologica' });
     await waitFor(() => expect(category).toBeEnabled());
     expect(category).toHaveDisplayValue('Pensione');
-    expect(screen.getAllByRole('option').map((o) => o.textContent)).toEqual([
+    expect(Array.from(category.querySelectorAll('option')).map((o) => o.textContent)).toEqual([
       'Nessuna',
       'Pensione',
       'Bar / Pub',
@@ -480,11 +515,10 @@ describe('<CompanyForm>', () => {
     expect(screen.getByRole('textbox', { name: 'Referente 1: cellulare' })).toHaveValue('333 1');
     expect(screen.getByRole('textbox', { name: 'Referente 2: nome' })).toHaveValue('');
     expect(
-      screen
-        .getAllByRole('option')
-        .slice(0, 4)
-        .map((o) => o.textContent),
-    ).toEqual(['Nessuna', 'Bar / Pub', 'Ristorante / Trattoria / Bistrot', 'Nessuno']);
+      Array.from(
+        screen.getByRole('combobox', { name: 'Categoria merceologica' }).querySelectorAll('option'),
+      ).map((o) => o.textContent),
+    ).toEqual(['Nessuna', 'Bar / Pub', 'Ristorante / Trattoria / Bistrot']);
     expect(Array.from(first.querySelectorAll('option')).map((o) => o.textContent)).toEqual([
       'Nessuno',
       'Socio',

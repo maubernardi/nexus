@@ -844,6 +844,13 @@ export const it = {
     empty: 'Nessuna nota.',
     listLabel: 'Note dalla più recente',
   },
+  /** Aziende per il Tutor (US-511): elenco in sola lettura con i dati essenziali. */
+  companyDirectory: {
+    intro: 'Le aziende attive che il Call Center conosce, con i dati essenziali.',
+    search: 'Cerca per ragione sociale',
+    caption: 'Aziende attive, in ordine di ragione sociale',
+    address: 'Indirizzo',
+  },
   /** Pulsante del tema nella barra in alto (US-1312). */
   theme: {
     toDark: 'Passa al tema scuro',
@@ -884,6 +891,7 @@ export const it = {
       secondaryEmail: 'Seconda email',
       reliability: 'Affidabilità',
       projectInterest: 'Interesse al progetto',
+      zone: 'Zona',
     },
     hints: {
       vatCode: '11 cifre, senza prefisso IT.',
@@ -893,6 +901,7 @@ export const it = {
       legalAddress: 'Via e numero civico.',
       activity: 'Che cosa fa l’azienda, in breve: per esempio «Pizzeria».',
       operatingSeat: 'Se l’azienda lavora in un posto diverso dalla sede legale.',
+      zone: 'La zona del territorio: il Tutor la usa per cercare le aziende.',
       reliability: 'Da 1 a 4 stelle: clicca la stella che vuoi.',
       projectInterest: 'Uno o due pollici alzati.',
     },
@@ -941,6 +950,11 @@ export const it = {
     includeInactive: 'Mostra anche le aziende disattivate',
     onlyToComplete: 'Solo le aziende da completare',
     noCategory: 'Nessuna',
+    noZone: 'Nessuna',
+    /** Filtro per zona (US-511). */
+    zoneFilter: 'Zona',
+    allZones: 'Tutte le zone',
+    otherZone: 'Zona non più attiva',
     allCategories: 'Tutte le categorie',
     categoryFilter: 'Categoria merceologica',
     category: 'Categoria',

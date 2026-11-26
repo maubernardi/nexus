@@ -239,6 +239,14 @@ class DomainConstraintsIT {
         }
 
         @Test
+        void zonaInesistenteDellAzienda() {
+            Company withZone = company(DomainFixtures.vatCode());
+            companies.saveAndFlush(withZone);
+            assertViolates("fk_company_zone", () -> jdbc.update("UPDATE company SET zone_id = -5 WHERE id = ?",
+                    withZone.getId()));
+        }
+
+        @Test
         void nomeConISimboliDelDatabaseAttuale() {
             Company marked = company(DomainFixtures.vatCode());
             marked.setName("£$ Officina");

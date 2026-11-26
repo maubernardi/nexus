@@ -82,3 +82,16 @@ FROM (VALUES (892398395572130067, 3, 2),
 WHERE c.id = demo.company_id
   AND c.reliability IS NULL
   AND c.project_interest IS NULL;
+
+-- Zona delle aziende dimostrative (US-511): tre con la zona delle loro mansioni, le altre senza. Solo per le aziende
+-- ancora senza zona, così quelle cambiate a mano non cambiano.
+UPDATE company c
+SET zone_id = (SELECT z.id FROM zone z WHERE z.code = demo.zone_code),
+    updated_at = now(),
+    updated_by = 'seed'
+FROM (VALUES (892398395572130067, 'RIFREDI'),
+             (892398395572130068, 'SAN_LORENZO'),
+             (892398395572130069, 'GALLUZZO'))
+         AS demo (company_id, zone_code)
+WHERE c.id = demo.company_id
+  AND c.zone_id IS NULL;

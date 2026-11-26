@@ -62,8 +62,9 @@ public class ReferenceDataResource {
     }
 
     @GetMapping("/business-categories")
-    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
-    @Operation(summary = "Categorie merceologiche attive, per il modulo e l'elenco delle aziende (US-509)")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Categorie merceologiche attive, per il modulo e gli elenchi delle aziende, anche del Tutor "
+            + "(US-509, US-511)")
     public ResponseEntity<List<ReferenceItemDTO>> businessCategories() {
         return ResponseEntity.ok(referenceDataService.activeBusinessCategories());
     }

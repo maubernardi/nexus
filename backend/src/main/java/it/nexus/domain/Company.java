@@ -57,6 +57,11 @@ public class Company extends AbstractTsidEntity {
     @JoinColumn(name = "business_category_id")
     private BusinessCategory businessCategory;
 
+    /** Zona del catalogo (US-511), facoltativa: la sceglie il Call Center, il Tutor la usa come filtro. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "zone_id")
+    private Zone zone;
+
     /** Descrizione dell'attività, testo libero (US-509): in Access il campo «Paese». */
     @Column(name = "activity", length = 200)
     private String activity;

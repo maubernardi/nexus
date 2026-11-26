@@ -269,8 +269,10 @@ class CatalogResourceIT {
                 .andExpect(jsonPath("$.length()").value(53))
                 .andExpect(jsonPath("$[*].name", hasItem("Agenzia immobiliare")))
                 .andExpect(jsonPath("$[*].name", not(hasItem("Pensione"))));
+        // anche il Tutor, per il filtro della sua lista delle aziende (US-511)
         mockMvc.perform(get("/api/v1/reference/business-categories").header(USER, "tutor1"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(53));
         assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.BUSINESS_CATEGORY,
                 TsidMapper.toInternal(added))).extracting(e -> e.getAction()).containsExactly("CREATE");
     }

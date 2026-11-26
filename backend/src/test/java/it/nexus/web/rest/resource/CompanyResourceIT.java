@@ -696,6 +696,92 @@ class CompanyResourceIT {
     }
 
     @Test
+    void zona_auditConIlNome_filtro_zonaDisattivataRestaSoloSullAzienda() throws Exception {
+        Zone rifredi = zones.save(TestEntities.zone("Z511A"));
+        Zone novoli = zones.save(TestEntities.zone("Z511B"));
+        em.flush();
+        String rifrediId = TsidMapper.toExternal(rifredi.getId());
+        String id = JsonPath.read(create("operatore.cc", body("Officina Rossi", "12345678901",
+                        ", \"zoneId\": \"" + rifrediId + "\""))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.zone.name").value("Zona Z511A"))
+                .andReturn().getResponse().getContentAsString(), "$.id");
+        createdId("Bar Sport", "22222222222");
+        assertThat(companyAudit(id)).singleElement().satisfies(e -> assertThat(e.getChanges().get("zone"))
+                .asInstanceOf(InstanceOfAssertFactories.MAP).containsEntry("after", "Zona Z511A"));
+
+        mockMvc.perform(get(API).param("zoneId", rifrediId).header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.companies[*].name", contains("Officina Rossi")));
+        mockMvc.perform(get(API).param("zoneId", "non-un-id").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.total").value(0));
+
+        // zona disattivata dall'ADMIN: resta sull'azienda che l'ha, non si sceglie per le altre
+        rifredi.setActive(false);
+        newRequest();
+        update(id, body("Officina Rossi", "12345678901", ", \"zoneId\": \"" + rifrediId + "\", \"version\": 0"))
+                .andExpect(status().isOk());
+        create("operatore.cc", body("Officina Bianchi", "33333333333", ", \"zoneId\": \"" + rifrediId + "\""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("zoneId"));
+
+        update(id, body("Officina Rossi", "12345678901",
+                ", \"zoneId\": \"" + TsidMapper.toExternal(novoli.getId()) + "\", \"version\": 0"))
+                .andExpect(status().isOk());
+        assertThat(companyAudit(id)).last().satisfies(e -> assertThat(e.getChanges()).containsOnlyKeys("zone")
+                .containsEntry("zone", Map.of("before", "Zona Z511A", "after", "Zona Z511B")));
+    }
+
+    @Test
+    void elencoDelTutor_soloDatiEssenziali_sedeOperativa_ricercaSulNome_filtri_disattivateEscluse() throws Exception {
+        Municipality firenze = scenarios.municipality("Firenze", "FI");
+        Municipality prato = scenarios.municipality("Prato", "PO");
+        Zone rifredi = zones.save(TestEntities.zone("Z511C"));
+        em.flush();
+        String zoneId = TsidMapper.toExternal(rifredi.getId());
+        create("operatore.cc", body("Officina Rossi", "11111111111", ", \"zoneId\": \"%s\", \"reliability\": 3, "
+                .formatted(zoneId) + "\"legalMunicipalityId\": \"%s\", \"operatingAddress\": \"Via Pratese 9\", "
+                .formatted(TsidMapper.toExternal(firenze.getId())) + "\"operatingMunicipalityId\": \"%s\""
+                .formatted(TsidMapper.toExternal(prato.getId())))).andExpect(status().isCreated());
+        create("operatore.cc", body("Bar Sport", "22222222222",
+                ", \"legalMunicipalityId\": \"%s\"".formatted(TsidMapper.toExternal(firenze.getId()))))
+                .andExpect(status().isCreated());
+        String closed = createdId("Officina Chiusa", "33333333333");
+        mockMvc.perform(post(API + "/" + closed + "/deactivate").header(USER, "operatore.cc")
+                .contentType(MediaType.APPLICATION_JSON).content("{\"version\": 0}")).andExpect(status().isOk());
+
+        String json = mockMvc.perform(get(API + "/directory").header(USER, "tutor1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(2))
+                .andExpect(jsonPath("$.companies[*].name", contains("Bar Sport", "Officina Rossi")))
+                // sede legale se manca l'operativa; altrimenti l'operativa
+                .andExpect(jsonPath("$.companies[0].address").value("Via Roma 1, Firenze"))
+                .andExpect(jsonPath("$.companies[0].municipality").value("Firenze (FI)"))
+                .andExpect(jsonPath("$.companies[1].address").value("Via Pratese 9"))
+                .andExpect(jsonPath("$.companies[1].municipality").value("Prato (PO)"))
+                .andExpect(jsonPath("$.companies[1].zone.name").value("Zona Z511C"))
+                .andExpect(jsonPath("$.companies[1].reliability").value(3))
+                .andReturn().getResponse().getContentAsString();
+        // minimizzazione: niente partita IVA, recapiti, referenti, stato o versione
+        List<Map<String, Object>> items = JsonPath.read(json, "$.companies");
+        for (Map<String, Object> item : items) {
+            assertThat(item.keySet()).isSubsetOf("id", "name", "businessCategory", "zone", "address", "municipality",
+                    "reliability", "projectInterest");
+        }
+        assertThat(json).doesNotContain("11111111111", "055 123456", "info@azienda.test", "Paola Neri");
+
+        // ricerca sul solo nome: la partita IVA non trova nulla
+        mockMvc.perform(get(API + "/directory").param("search", "1111111").header(USER, "tutor1"))
+                .andExpect(jsonPath("$.total").value(0));
+        mockMvc.perform(get(API + "/directory").param("search", "officina").param("zoneId", zoneId)
+                        .header(USER, "tutor1"))
+                .andExpect(jsonPath("$.companies[*].name", contains("Officina Rossi")));
+        mockMvc.perform(get(API + "/directory").param("size", "7").header(USER, "tutor1"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get(API + "/directory").header(USER, "admin")).andExpect(status().isOk());
+        mockMvc.perform(get(API + "/directory").header(USER, "operatore.cc")).andExpect(status().isForbidden());
+    }
+
+    @Test
     void tutor403_inesistente404() throws Exception {
         create("tutor1", body("X", "12345678901", "")).andExpect(status().isForbidden());
         mockMvc.perform(get(API).header(USER, "tutor1")).andExpect(status().isForbidden());

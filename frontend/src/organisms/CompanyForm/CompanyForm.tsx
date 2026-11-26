@@ -8,7 +8,7 @@ import { NativeSelect } from '@/components/ui/native-select';
 import type { Company, CompanyForm as CompanyPayload } from '@/config/api/companyApi';
 import { apiError, toFormPath } from '@/config/api/errors';
 import type { ReferenceItem } from '@/config/api/referenceApi';
-import { useBusinessCategories, useContactRoles } from '@/config/hooks/useReferenceData';
+import { useBusinessCategories, useContactRoles, useZones } from '@/config/hooks/useReferenceData';
 import { isMissing, isNamePlaceholder, isVatCodePlaceholder } from '@/lib/companyCompletion';
 import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
@@ -37,6 +37,7 @@ const FIELDS = [
   'name',
   'vatCode',
   'businessCategoryId',
+  'zoneId',
   'activity',
   'legalAddress',
   'legalMunicipality',
@@ -81,6 +82,7 @@ const toValues = (company?: Company): CompanyFormValues => ({
   vatCode: company && !isMissing(company, 'VAT_CODE') ? company.vatCode : '',
   businessCategoryId: company?.businessCategory?.id ?? '',
   activity: company?.activity ?? '',
+  zoneId: company?.zone?.id ?? '',
   legalAddress: company?.legalAddress ?? '',
   legalMunicipality: toMunicipalityValue(company?.legalMunicipality ?? undefined),
   operatingAddress: company?.operatingAddress ?? '',
@@ -110,6 +112,7 @@ const toPayload = (v: CompanyFormValues): CompanyPayload => ({
   legalMunicipalityId: v.legalMunicipality.municipality?.id ?? null,
   businessCategoryId: v.businessCategoryId || null,
   activity: text(v.activity),
+  zoneId: v.zoneId || null,
   operatingAddress: text(v.operatingAddress),
   operatingMunicipalityId: v.operatingMunicipality.municipality?.id ?? null,
   phone: text(v.phone),
@@ -144,6 +147,7 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
   const { t } = useTranslation();
   const [formError, setFormError] = useState<'generic' | 'conflict' | null>(null);
   const categories = useBusinessCategories();
+  const zones = useZones();
   const roles = useContactRoles();
   const {
     register,
@@ -165,6 +169,7 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
     vatCode: t('company.fields.vatCode'),
     businessCategoryId: t('company.fields.businessCategory'),
     activity: t('company.fields.activity'),
+    zoneId: t('company.fields.zone'),
     legalAddress: t('company.fields.legalAddress'),
     legalMunicipality: t('company.fields.legalMunicipality'),
     operatingAddress: t('company.fields.operatingAddress'),
@@ -308,6 +313,23 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
               {withCurrent(categories.data, [company?.businessCategory]).map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
+                </option>
+              ))}
+            </NativeSelect>
+          )}
+        </FormField>
+        <FormField
+          id={fieldId('zoneId')}
+          label={labels.zoneId}
+          hint={t('company.hints.zone')}
+          error={errors.zoneId?.message}
+        >
+          {(p) => (
+            <NativeSelect {...p} disabled={!zones.data} {...register('zoneId')}>
+              <option value="">{t('company.noZone')}</option>
+              {withCurrent(zones.data, [company?.zone]).map((z) => (
+                <option key={z.id} value={z.id}>
+                  {z.name}
                 </option>
               ))}
             </NativeSelect>

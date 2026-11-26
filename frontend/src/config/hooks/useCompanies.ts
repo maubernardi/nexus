@@ -11,9 +11,12 @@ import {
   createCompany,
   fetchCompany,
   searchCompanies,
+  searchCompanyDirectory,
   setCompanyActive,
   updateCompany,
   type Company,
+  type CompanyDirectoryPage,
+  type CompanyDirectorySearch,
   type CompanyForm,
   type CompanyPage,
   type CompanySearch,
@@ -25,6 +28,14 @@ export const useCompanySearch = (params: CompanySearch): UseQueryResult<CompanyP
   useQuery({
     queryKey: [...COMPANIES_KEY, 'search', params],
     queryFn: () => searchCompanies(params),
+    placeholderData: keepPreviousData,
+  });
+
+/** Elenco del Tutor (US-511), una pagina alla volta. */
+export const useCompanyDirectory = (params: CompanyDirectorySearch): UseQueryResult<CompanyDirectoryPage> =>
+  useQuery({
+    queryKey: [...COMPANIES_KEY, 'directory', params],
+    queryFn: () => searchCompanyDirectory(params),
     placeholderData: keepPreviousData,
   });
 

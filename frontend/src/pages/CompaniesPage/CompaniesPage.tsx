@@ -12,9 +12,10 @@ import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
 import { COMPANY_PAGE_SIZES, DEFAULT_COMPANY_PAGE_SIZE, type Company } from '@/config/api/companyApi';
 import { useCompanySearch } from '@/config/hooks/useCompanies';
-import { useBusinessCategories } from '@/config/hooks/useReferenceData';
+import { useBusinessCategories, useZones } from '@/config/hooks/useReferenceData';
 import { isMissing } from '@/lib/companyCompletion';
 import { contactName } from '@/lib/companyContacts';
+import { parsePage, parsePageSize } from '@/lib/pageParams';
 import { RATING_MAX } from '@/lib/rating';
 import { Pagination } from '@/molecules/Pagination/Pagination';
 
@@ -23,24 +24,13 @@ const SEARCH_PARAM = 'q';
 const INACTIVE_PARAM = 'disattivate';
 const TO_COMPLETE_PARAM = 'daCompletare';
 const CATEGORY_PARAM = 'categoria';
+const ZONE_PARAM = 'zona';
 const RELIABILITY_PARAM = 'stelle';
 const PROJECT_INTEREST_PARAM = 'interesse';
 const PAGE_PARAM = 'pagina';
 const PAGE_SIZE_PARAM = 'perPagina';
 
 const number = new Intl.NumberFormat('it-IT');
-
-/** Pagina dell'indirizzo, da 1: un valore non valido vale la prima. */
-const parsePage = (value: string | null): number => {
-  const page = Number(value);
-  return Number.isInteger(page) && page >= 1 ? page : 1;
-};
-
-/** Aziende per pagina dell'indirizzo: solo 10, 25, 50 o 100, altrimenti 25. */
-const parsePageSize = (value: string | null): number => {
-  const size = Number(value);
-  return COMPANY_PAGE_SIZES.some((s) => s === size) ? size : DEFAULT_COMPANY_PAGE_SIZE;
-};
 
 /** Stelle o pollici minimi dell'indirizzo (US-514): da 1 al massimo, altrimenti nessun filtro. */
 const parseMin = (value: string | null, max: number): number | null => {
@@ -56,6 +46,7 @@ type Filters = {
   inactive: boolean;
   toComplete: boolean;
   category: string;
+  zone: string;
   minReliability: number | null;
   minProjectInterest: number | null;
 };
@@ -80,16 +71,19 @@ export const CompaniesPage = () => {
   const includeInactive = searchParams.get(INACTIVE_PARAM) === '1';
   const toComplete = searchParams.get(TO_COMPLETE_PARAM) === '1';
   const category = searchParams.get(CATEGORY_PARAM) ?? '';
+  const zone = searchParams.get(ZONE_PARAM) ?? '';
   const minReliability = parseMin(searchParams.get(RELIABILITY_PARAM), RATING_MAX.stars);
   const minProjectInterest = parseMin(searchParams.get(PROJECT_INTEREST_PARAM), RATING_MAX.thumbs);
   const page = parsePage(searchParams.get(PAGE_PARAM));
   const pageSize = parsePageSize(searchParams.get(PAGE_SIZE_PARAM));
   const categories = useBusinessCategories();
+  const zones = useZones();
   const companies = useCompanySearch({
     search: search || undefined,
     includeInactive,
     toComplete: toComplete || undefined,
     businessCategoryId: category || undefined,
+    zoneId: zone || undefined,
     minReliability: minReliability ?? undefined,
     minProjectInterest: minProjectInterest ?? undefined,
     page: page - 1,
@@ -100,6 +94,7 @@ export const CompaniesPage = () => {
     inactive: includeInactive,
     toComplete,
     category,
+    zone,
     minReliability,
     minProjectInterest,
   };
@@ -115,6 +110,7 @@ export const CompaniesPage = () => {
       inactive,
       toComplete: onlyToComplete,
       category: categoryId,
+      zone: zoneId,
       minReliability: stars,
       minProjectInterest: thumbs,
     }: Filters,
@@ -124,6 +120,7 @@ export const CompaniesPage = () => {
     const next = new URLSearchParams();
     if (q.trim()) next.set(SEARCH_PARAM, q.trim());
     if (categoryId) next.set(CATEGORY_PARAM, categoryId);
+    if (zoneId) next.set(ZONE_PARAM, zoneId);
     if (stars) next.set(RELIABILITY_PARAM, String(stars));
     if (thumbs) next.set(PROJECT_INTEREST_PARAM, String(thumbs));
     if (inactive) next.set(INACTIVE_PARAM, '1');
@@ -237,6 +234,28 @@ export const CompaniesPage = () => {
             </NativeSelect>
           </div>
           <div className="w-full max-w-3xs space-y-1">
+            <label htmlFor="company-zone" className="block text-sm font-medium">
+              {t('company.zoneFilter')}
+            </label>
+            <NativeSelect
+              id="company-zone"
+              value={zone}
+              disabled={!zones.data}
+              onChange={(e) => update({ ...current, zone: e.target.value })}
+            >
+              <option value="">{t('company.allZones')}</option>
+              {/* una zona nell'indirizzo ma non più attiva resta scelta: l'elenco la filtra comunque */}
+              {zone && zones.data && !zones.data.some((z) => z.id === zone) && (
+                <option value={zone}>{t('company.otherZone')}</option>
+              )}
+              {(zones.data ?? []).map((z) => (
+                <option key={z.id} value={z.id}>
+                  {z.name}
+                </option>
+              ))}
+            </NativeSelect>
+          </div>
+          <div className="w-full max-w-3xs space-y-1">
             <label htmlFor="company-reliability" className="block text-sm font-medium">
               {t('company.reliabilityFilter')}
             </label>
@@ -340,6 +359,9 @@ export const CompaniesPage = () => {
                     {t('company.category')}
                   </th>
                   <th scope="col" className={th}>
+                    {t('company.fields.zone')}
+                  </th>
+                  <th scope="col" className={th}>
                     {t('company.fields.reliability')}
                   </th>
                   <th scope="col" className={th}>
@@ -377,6 +399,7 @@ export const CompaniesPage = () => {
                       {isMissing(c, 'VAT_CODE') ? <ToCompleteBadge /> : c.vatCode}
                     </td>
                     <td className={td}>{c.businessCategory?.name ?? '—'}</td>
+                    <td className={td}>{c.zone?.name ?? '—'}</td>
                     <td className={td}>
                       <RatingDisplay kind="stars" value={c.reliability} />
                     </td>

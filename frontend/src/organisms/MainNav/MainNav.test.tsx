@@ -11,6 +11,8 @@ describe('<MainNav>', () => {
     renderWithProviders(<MainNav roles={['TUTOR']} />);
     expect(screen.getByRole('navigation', { name: 'Navigazione principale' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Segnalazioni' })).toHaveAttribute('aria-current', 'page');
+    // il Tutor vede le aziende, in sola lettura (US-511)
+    expect(screen.getByRole('link', { name: 'Aziende' })).toHaveAttribute('href', '/aziende');
     await expectNoAxeViolations();
   });
 
