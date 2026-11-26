@@ -33,6 +33,7 @@ import it.nexus.repository.ContactRoleRepository;
 import it.nexus.repository.JobSlotRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BoardPostService;
+import it.nexus.services.CompanySearch;
 import it.nexus.services.CompanyService;
 import it.nexus.services.JobSlotAssignments;
 import it.nexus.services.MunicipalityService;
@@ -76,14 +77,23 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     @Transactional(readOnly = true)
-    public CompanyPageDTO search(String search, boolean includeInactive, boolean toComplete,
-            String businessCategoryId, int page, int size) {
+    public CompanyPageDTO search(CompanySearch filters, int page, int size) {
         if (page < 0) {
             throw new BadRequestException("Pagina non valida: %d", page);
         }
         if (!PAGE_SIZES.contains(size)) {
             throw new BadRequestException("Aziende per pagina: una tra %s", PAGE_SIZES);
         }
+        Integer minReliability = filters.minReliability();
+        if (minReliability != null && (minReliability < 1 || minReliability > 4)) {
+            throw new BadRequestException("Stelle minime: da 1 a 4");
+        }
+        Integer minProjectInterest = filters.minProjectInterest();
+        if (minProjectInterest != null && (minProjectInterest < 1 || minProjectInterest > 2)) {
+            throw new BadRequestException("Pollici minimi: 1 o 2");
+        }
+        String search = filters.search();
+        String businessCategoryId = filters.businessCategoryId();
         String term = search == null || search.isBlank() ? null : search.strip();
         Long category = null;
         if (businessCategoryId != null && !businessCategoryId.isBlank()) {
@@ -93,7 +103,8 @@ public class CompanyServiceImpl implements CompanyService {
                 return new CompanyPageDTO(List.of(), 0, page, size);
             }
         }
-        var result = repository.search(term, includeInactive, toComplete, category, PageRequest.of(page, size));
+        var result = repository.search(term, filters.includeInactive(), filters.toComplete(), category,
+                minReliability, minProjectInterest, PageRequest.of(page, size));
         return new CompanyPageDTO(result.map(mapper::toDto).getContent(), result.getTotalElements(), page, size);
     }
 
@@ -125,6 +136,8 @@ public class CompanyServiceImpl implements CompanyService {
                 .value("operatingMunicipality", null, MunicipalityMapper.label(saved.getOperatingMunicipality()))
                 .value("businessCategory", null, name(saved.getBusinessCategory()))
                 .value("activity", null, saved.getActivity())
+                .value("reliability", null, saved.getReliability())
+                .value("projectInterest", null, saved.getProjectInterest())
                 // recapiti e referenti: dati personali, nell'audit senza valori (EN-4, US-510)
                 .redactedIfChanged("phone", null, saved.getPhone())
                 .redactedIfChanged("mobile", null, saved.getMobile())
@@ -167,6 +180,8 @@ public class CompanyServiceImpl implements CompanyService {
                         MunicipalityMapper.label(operatingMunicipality))
                 .value("businessCategory", name(company.getBusinessCategory()), name(category))
                 .value("activity", company.getActivity(), blankToNull(dto.activity()))
+                .value("reliability", company.getReliability(), dto.reliability())
+                .value("projectInterest", company.getProjectInterest(), dto.projectInterest())
                 .redactedIfChanged("phone", company.getPhone(), blankToNull(dto.phone()))
                 .redactedIfChanged("mobile", company.getMobile(), blankToNull(dto.mobile()))
                 .redactedIfChanged("fax", company.getFax(), blankToNull(dto.fax()))
@@ -318,6 +333,8 @@ public class CompanyServiceImpl implements CompanyService {
         company.setFax(blankToNull(dto.fax()));
         company.setEmail(blankToNull(dto.email()));
         company.setSecondaryEmail(blankToNull(dto.secondaryEmail()));
+        company.setReliability(dto.reliability());
+        company.setProjectInterest(dto.projectInterest());
     }
 
     private static String blankToNull(String value) {

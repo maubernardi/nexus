@@ -1,9 +1,12 @@
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import type { CurrentUser } from '@/config/auth/types';
 import { UserIdentity } from '@/molecules/UserIdentity/UserIdentity';
+import { useHeightVariable } from '@/hooks/useHeightVariable';
 import { NotificationsBell } from '@/molecules/NotificationsBell/NotificationsBell';
+import { ThemeToggle } from '@/molecules/ThemeToggle/ThemeToggle';
 import { UserMenu } from '@/molecules/UserMenu/UserMenu';
 import { MainNav } from '@/organisms/MainNav/MainNav';
 
@@ -13,10 +16,16 @@ type AppHeaderProps = {
 
 export const AppHeader = ({ user }: AppHeaderProps) => {
   const { t } = useTranslation();
+  // altezza nella variabile --header-height: sotto si fermano le intestazioni delle schede (US-1312)
+  const ref = useRef<HTMLElement>(null);
+  useHeightVariable(ref, '--header-height');
 
   return (
     // fondo Deep Emerald con filetto oro; dentro l'intestazione il focus è oro (il verde non si vedrebbe)
-    <header className="sticky top-0 z-30 border-b-2 border-gold bg-brand text-brand-foreground [--ring:var(--gold)]">
+    <header
+      ref={ref}
+      className="sticky top-0 z-30 border-b-2 border-gold bg-brand text-brand-foreground [--ring:var(--gold)]"
+    >
       {/* una sola riga anche su mobile: logo, menu, Esci (nome e ruolo stanno nel menu a tendina) */}
       <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-2 md:gap-3 md:py-3">
         <div className="flex min-w-0 items-center gap-2 md:gap-4">
@@ -26,7 +35,10 @@ export const AppHeader = ({ user }: AppHeaderProps) => {
             className="flex min-h-11 shrink-0 items-center gap-2 rounded-md text-lg font-bold tracking-wide"
           >
             <img src="/favicon.svg" alt="" className="size-8" />
-            <span aria-hidden="true">{t('app.name')}</span>
+            {/* sotto i 375 px resta solo il logo: serve spazio per menu, notifiche, tema ed Esci (US-1312) */}
+            <span aria-hidden="true" className="max-[374px]:hidden">
+              {t('app.name')}
+            </span>
           </Link>
           <MainNav
             roles={user.roles}
@@ -36,6 +48,7 @@ export const AppHeader = ({ user }: AppHeaderProps) => {
         </div>
         <div className="flex shrink-0 items-center gap-1 md:gap-2">
           <NotificationsBell />
+          <ThemeToggle />
           <UserMenu user={user} />
         </div>
       </div>

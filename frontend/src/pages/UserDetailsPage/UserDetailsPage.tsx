@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useForm, type FieldPath } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
-import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiError } from '@/config/api/errors';
@@ -13,6 +12,8 @@ import { useErrorSummaryFocus } from '@/hooks/useErrorSummaryFocus';
 import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorSummary';
 import { FormField } from '@/molecules/FormField/FormField';
 import type { UsersPageState } from '@/pages/UsersPage/UsersPage';
+import { BackLink } from '@/molecules/BackLink/BackLink';
+import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 
 type Values = {
   firstName: string;
@@ -27,7 +28,6 @@ const FIELDS = ['firstName', 'lastName', 'username', 'email', 'phone'] as const;
 const USERNAME_PATTERN = /^\s*[A-Za-z0-9]+([._-][A-Za-z0-9]+)*\s*$/;
 const EMAIL_PATTERN = /^\s*[^@\s]+@[^@\s]+\.[^@\s]+\s*$/;
 const LOCKED_ID = 'user-username-locked';
-const link = 'font-medium text-primary underline underline-offset-4';
 
 const fieldId = (field: keyof Values): string => `user-${field}`;
 
@@ -42,11 +42,11 @@ export const UserDetailsPage = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeading>
+      <PageHeader back={<BackLink to="/utenti">{t('users.backToList')}</BackLink>}>
         {details.data
           ? t('users.details.heading', { name: `${details.data.firstName} ${details.data.lastName}` })
           : t('pages.userDetails.title')}
-      </PageHeading>
+      </PageHeader>
       {details.isError && !details.data ? (
         <div role="alert" className="space-y-3 rounded-md border-2 border-destructive bg-card p-4">
           <p className="font-medium text-destructive">
@@ -261,9 +261,6 @@ const DetailsForm = ({ user }: DetailsFormProps) => {
           <Button type="submit" size="lg" disabled={isSubmitting}>
             {isSubmitting ? t('users.details.saving') : t('users.details.save')}
           </Button>
-          <Link to="/utenti" className={link}>
-            {t('users.backToList')}
-          </Link>
         </div>
       </form>
     </>

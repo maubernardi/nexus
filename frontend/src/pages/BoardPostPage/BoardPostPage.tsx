@@ -14,6 +14,8 @@ import {
   useUpdateBoardPost,
 } from '@/config/hooks/useBoardPosts';
 import { BoardPostForm } from '@/organisms/BoardPostForm/BoardPostForm';
+import { BackLink } from '@/molecules/BackLink/BackLink';
+import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 
 type Outcome =
   | { kind: 'created' | 'saved' | 'published' | 'archived' | 'madePublic'; number: number }
@@ -63,9 +65,11 @@ export const BoardPostPage = () => {
   // il server verifica di nuovo i 7 giorni: qui si decide solo se mostrare il comando (US-903)
   const canMakePublic = Boolean(p.makePublicFrom) && new Date(p.makePublicFrom as string) <= new Date();
 
+  const back = <BackLink to="/bacheca">{t('board.backToList')}</BackLink>;
+
   return (
     <div className="space-y-6">
-      <PageHeading>{t('board.numbered', { number: p.number })}</PageHeading>
+      <PageHeader back={back}>{t('board.numbered', { number: p.number })}</PageHeader>
       <p className="text-muted-foreground">
         {t('board.statusLine', { status: t(`board.status.${p.status}`) })}
         {p.publishedAt && (
@@ -188,10 +192,6 @@ export const BoardPostPage = () => {
           })}
         </p>
       )}
-
-      <Button asChild size="lg" variant="outline">
-        <Link to="/bacheca">{t('board.backToList')}</Link>
-      </Button>
     </div>
   );
 };

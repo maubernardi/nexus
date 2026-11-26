@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
-import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
 import type { TransferResult } from '@/config/api/ticketTransferApi';
 import { useOpenTickets } from '@/config/hooks/useTicketTransfer';
 import { useUser } from '@/config/hooks/useUsers';
 import { TransferGroupForm } from '@/organisms/TransferGroupForm/TransferGroupForm';
-
-const link = 'font-medium text-primary underline underline-offset-4';
+import { BackLink } from '@/molecules/BackLink/BackLink';
+import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 
 /**
  * Segnalazioni aperte di un Tutor (US-111): l'ADMIN le sposta, progetto per progetto, su un altro Tutor attivo dello
@@ -34,11 +33,11 @@ export const UserTicketsPage = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeading>
+      <PageHeader back={<BackLink to="/utenti">{t('users.backToList')}</BackLink>}>
         {user.data
           ? t('users.tickets.heading', { name: `${user.data.firstName} ${user.data.lastName}` })
           : t('pages.userTickets.title')}
-      </PageHeading>
+      </PageHeader>
       <p className="text-muted-foreground">{t('users.tickets.intro')}</p>
       {done && (
         <p
@@ -76,9 +75,6 @@ export const UserTicketsPage = () => {
           />
         ))
       )}
-      <Link to="/utenti" className={link}>
-        {t('users.backToList')}
-      </Link>
     </div>
   );
 };

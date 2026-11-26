@@ -96,6 +96,11 @@ describe('<CompanyEditPage>', () => {
 
     const name = await screen.findByLabelText(/^Ragione sociale/);
     expect(name).toHaveValue('Officina Rossi');
+    // un solo ritorno all'elenco, sopra il titolo, nell'intestazione fissa della scheda (US-1312)
+    const back = screen.getByRole('link', { name: 'Torna all’elenco delle aziende' });
+    const heading = screen.getByRole('heading', { level: 1 });
+    expect(back.compareDocumentPosition(heading)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(back.closest('[data-page-header]')).toBe(heading.closest('[data-page-header]'));
     await user.clear(name);
     await user.type(name, 'Officina Rossi S.r.l.');
     await user.click(screen.getByRole('button', { name: 'Salva modifiche' }));

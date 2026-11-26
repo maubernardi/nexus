@@ -55,6 +55,7 @@ describe('<UserAccessLogPage>', () => {
     ).toBeInTheDocument();
     expect(await screen.findByText('Nessun accesso registrato.')).toBeInTheDocument();
     expect(fetchUserAccessLog).toHaveBeenCalledWith('U3', 0);
+    // un solo ritorno, nell'intestazione fissa della scheda (US-1312)
     expect(screen.getByRole('link', { name: 'Torna agli utenti' })).toHaveAttribute('href', '/utenti');
     await expectNoAxeViolations();
   });

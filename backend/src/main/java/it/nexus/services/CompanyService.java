@@ -16,15 +16,12 @@ public interface CompanyService {
     int DEFAULT_PAGE_SIZE = 25;
 
     /**
-     * Una pagina dell'elenco, ordinato per nome; {@code page} parte da 0 (US-513). Con {@code toComplete} solo le aziende
-     * con un dato da completare (US-508); con {@code businessCategoryId} solo quelle della categoria merceologica
-     * (US-509).
+     * Una pagina dell'elenco con i filtri, ordinato per nome; {@code page} parte da 0 (US-513).
      *
-     * @throws it.nexus.web.errors.BadRequestException se la pagina è negativa o la dimensione non è tra
-     *         {@link #PAGE_SIZES}
+     * @throws it.nexus.web.errors.BadRequestException se la pagina è negativa, la dimensione non è tra
+     *         {@link #PAGE_SIZES}, o stelle e pollici minimi sono fuori da 1–4 e 1–2 (US-514)
      */
-    CompanyPageDTO search(String search, boolean includeInactive, boolean toComplete, String businessCategoryId,
-            int page, int size);
+    CompanyPageDTO search(CompanySearch filters, int page, int size);
 
     CompanyDTO getById(String id);
 

@@ -844,6 +844,21 @@ export const it = {
     empty: 'Nessuna nota.',
     listLabel: 'Note dalla più recente',
   },
+  /** Pulsante del tema nella barra in alto (US-1312). */
+  theme: {
+    toDark: 'Passa al tema scuro',
+    toLight: 'Passa al tema chiaro',
+  },
+  /** Stelle e pollici dell'azienda (US-514): testo per il lettore di schermo e scelta. */
+  rating: {
+    stars_one: '{{count}} stella su {{max}}',
+    stars_other: '{{count}} stelle su {{max}}',
+    thumbs_one: '{{count}} pollice alzato su {{max}}',
+    thumbs_other: '{{count}} pollici alzati su {{max}}',
+    none: 'Nessuna valutazione',
+    clear: 'Togli',
+    clearLabel: 'Togli: {{legend}}',
+  },
   /** Pagine di un elenco (US-513). */
   pagination: {
     first: 'Prima',
@@ -867,6 +882,8 @@ export const it = {
       fax: 'Fax',
       email: 'Email',
       secondaryEmail: 'Seconda email',
+      reliability: 'Affidabilità',
+      projectInterest: 'Interesse al progetto',
     },
     hints: {
       vatCode: '11 cifre, senza prefisso IT.',
@@ -876,6 +893,13 @@ export const it = {
       legalAddress: 'Via e numero civico.',
       activity: 'Che cosa fa l’azienda, in breve: per esempio «Pizzeria».',
       operatingSeat: 'Se l’azienda lavora in un posto diverso dalla sede legale.',
+      reliability: 'Da 1 a 4 stelle: clicca la stella che vuoi.',
+      projectInterest: 'Uno o due pollici alzati.',
+    },
+    /** Valutazione del Call Center (US-514). */
+    rating: {
+      heading: 'Valutazione del Call Center',
+      intro: 'Facoltativa.',
     },
     legalSeat: 'Sede legale',
     operatingSeat: 'Sede operativa',
@@ -902,6 +926,8 @@ export const it = {
       vatCode: 'La partita IVA è composta da 11 cifre',
       vatCodePlaceholder: 'Inserisci la partita IVA vera: «00000000000» vuol dire che manca',
       namePlaceholder: 'Inserisci la ragione sociale vera: «Azienda senza nome n. …» vuol dire che manca',
+      nameLegacyMarks:
+        'La ragione sociale non può iniziare con $, £, & o ^: per affidabilità e interesse al progetto usa stelle e pollici',
       phone: 'Usa solo cifre, spazi e i simboli + ( ) . - /',
       email: 'Indirizzo email non valido',
       contactNameOrRole: 'Inserisci il nome o scegli il ruolo',
@@ -919,6 +945,15 @@ export const it = {
     categoryFilter: 'Categoria merceologica',
     category: 'Categoria',
     otherCategory: 'Categoria non più attiva',
+    /** Filtri per stelle e pollici (US-514). */
+    reliabilityFilter: 'Affidabilità',
+    anyReliability: 'Qualunque',
+    minReliability_one: 'Almeno {{count}} stella',
+    minReliability_other: 'Almeno {{count}} stelle',
+    projectInterestFilter: 'Interesse al progetto',
+    anyProjectInterest: 'Qualunque',
+    minProjectInterest_one: 'Almeno un pollice',
+    minProjectInterest_other: 'Due pollici',
     toComplete: 'Da completare',
     missingData: { NAME: 'la ragione sociale', VAT_CODE: 'la partita IVA' },
     toCompleteNotice_one:
