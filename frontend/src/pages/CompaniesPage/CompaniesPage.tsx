@@ -165,6 +165,29 @@ export const CompaniesPage = () => {
         })
       : t('company.count', { count: total, total: number.format(total) });
 
+  /** Filtri o ricerca attivi: solo allora c'è «Azzera i filtri». */
+  const filtered =
+    Boolean(search || category || zone || minReliability || minProjectInterest) ||
+    includeInactive ||
+    toComplete;
+
+  /**
+   * Toglie ricerca e filtri, dalla prima pagina; le aziende per pagina restano. Il pulsante sparisce: il focus va al
+   * campo di ricerca, ricreato dall'indirizzo nuovo.
+   */
+  const resetFilters = (): void => {
+    update({
+      q: '',
+      inactive: false,
+      toComplete: false,
+      category: '',
+      zone: '',
+      minReliability: null,
+      minProjectInterest: null,
+    });
+    window.requestAnimationFrame(() => document.getElementById('company-search')?.focus());
+  };
+
   const onSearch = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     const value = new FormData(event.currentTarget).get('q');
@@ -316,6 +339,11 @@ export const CompaniesPage = () => {
             </label>
           </div>
         </div>
+        {filtered && (
+          <Button type="button" variant="outline" onClick={resetFilters}>
+            {t('company.resetFilters')}
+          </Button>
+        )}
       </form>
 
       <p role="status" className="font-medium">

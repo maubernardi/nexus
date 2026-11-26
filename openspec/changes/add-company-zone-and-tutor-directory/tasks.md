@@ -15,6 +15,9 @@
 - [x] 2.3 `TutorCompaniesPage` su `/aziende` per il Tutor (scelta in base al ruolo), voce «Aziende» nel suo menu;
       testi in `it.ts`; test con axe
 
+- [x] 2.4 «Azzera i filtri» nei due elenchi (PO, 26/11, dal collaudo), con il focus sulla ricerca; nell'elenco del
+      Tutor, come in quello del Call Center, una categoria o una zona non più attiva resta scelta; test
+
 ## 3. Dati dimostrativi e prove
 
 - [x] 3.1 Seed: zona di alcune aziende dimostrative, solo se senza
@@ -22,5 +25,5 @@
       temi. Trovato e corretto: il catalogo delle categorie era solo per Call Center e ADMIN, e per il Tutor il filtro
       restava disattivato; ora lo legge anche il Tutor (`CatalogResourceIT`)
 - [x] 3.3 Collaudo T-37 in `docs/test/collaudo.md`
-- [x] 3.4 `./mvnw verify` (249 test unitari, 586 di integrazione); `pnpm lint`, `format:check`, `test --run` (346),
+- [x] 3.4 `./mvnw verify` (249 test unitari, 586 di integrazione); `pnpm lint`, `format:check`, `test --run` (350),
       `build`

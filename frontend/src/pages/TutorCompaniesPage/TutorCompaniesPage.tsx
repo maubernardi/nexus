@@ -108,6 +108,15 @@ export const TutorCompaniesPage = () => {
         })
       : t('company.count', { count: total, total: number.format(total) });
 
+  /** Ricerca o filtri attivi: solo allora c'è «Azzera i filtri». */
+  const filtered = Boolean(search || category || zone);
+
+  /** Toglie ricerca e filtri, dalla prima pagina; il focus va al campo di ricerca, come nell'elenco del Call Center. */
+  const resetFilters = (): void => {
+    update({ q: '', category: '', zone: '' });
+    window.requestAnimationFrame(() => document.getElementById('directory-search')?.focus());
+  };
+
   const onSearch = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     const value = new FormData(event.currentTarget).get('q');
@@ -156,6 +165,10 @@ export const TutorCompaniesPage = () => {
               onChange={(e) => update({ ...current, category: e.target.value })}
             >
               <option value="">{t('company.allCategories')}</option>
+              {/* una categoria nell'indirizzo ma non più attiva resta scelta, come nell'elenco del Call Center */}
+              {category && categories.data && !categories.data.some((c) => c.id === category) && (
+                <option value={category}>{t('company.otherCategory')}</option>
+              )}
               {(categories.data ?? []).map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -174,6 +187,9 @@ export const TutorCompaniesPage = () => {
               onChange={(e) => update({ ...current, zone: e.target.value })}
             >
               <option value="">{t('company.allZones')}</option>
+              {zone && zones.data && !zones.data.some((z) => z.id === zone) && (
+                <option value={zone}>{t('company.otherZone')}</option>
+              )}
               {(zones.data ?? []).map((z) => (
                 <option key={z.id} value={z.id}>
                   {z.name}
@@ -182,6 +198,11 @@ export const TutorCompaniesPage = () => {
             </NativeSelect>
           </div>
         </div>
+        {filtered && (
+          <Button type="button" variant="outline" onClick={resetFilters}>
+            {t('company.resetFilters')}
+          </Button>
+        )}
       </form>
 
       <p role="status" className="font-medium">

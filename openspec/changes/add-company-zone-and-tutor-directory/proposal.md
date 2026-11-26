@@ -16,6 +16,8 @@ il Tutor ragiona per zone.
     c'è, altrimenti la legale), stelle e pollici (US-514);
   - ricerca per ragione sociale e filtri per settore e zona, nell'indirizzo;
   - pagine come nell'elenco del Call Center (US-513).
+- **«Azzera i filtri»** (PO, 26/11, dal collaudo): nei due elenchi delle aziende, quando c'è almeno un filtro o una
+  ricerca, un pulsante li toglie tutti e riparte dalla prima pagina; le aziende per pagina restano.
 - **Minimizzazione**: un'API a parte per il Tutor, che restituisce solo quei campi. Niente partita IVA, recapiti,
   referenti, note, mansioni o storico; la ricerca non guarda la partita IVA. Il Tutor non crea né modifica aziende.
 

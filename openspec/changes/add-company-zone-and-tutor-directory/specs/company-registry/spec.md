@@ -54,3 +54,17 @@ aziende, né usare l'API completa delle aziende.
 #### Scenario: Solo lettura
 - **WHEN** un Tutor chiama l'API completa delle aziende, o prova a crearne o modificarne una
 - **THEN** la risposta è `403`
+
+### Requirement: Azzeramento dei filtri dell'elenco delle aziende
+Negli elenchi delle aziende, del Call Center e del Tutor, quando è attiva almeno una ricerca o un filtro SHALL esserci
+il pulsante «Azzera i filtri». Il pulsante SHALL togliere ricerca e filtri e riportare l'elenco alla prima pagina,
+lasciando le aziende per pagina scelte; poi il focus SHALL andare al campo di ricerca. Senza filtri il pulsante MUST NOT
+esserci.
+
+#### Scenario: Azzeramento
+- **WHEN** l'operatore ha una ricerca, il filtro «Almeno 2 stelle» e 50 aziende per pagina, e preme «Azzera i filtri»
+- **THEN** vede la prima pagina di tutte le aziende attive, 50 per pagina, con il cursore nel campo di ricerca
+
+#### Scenario: Nessun filtro
+- **WHEN** l'elenco non ha ricerca né filtri
+- **THEN** il pulsante «Azzera i filtri» non c'è

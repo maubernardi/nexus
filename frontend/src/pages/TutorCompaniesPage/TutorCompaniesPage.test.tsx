@@ -107,6 +107,32 @@ describe('<TutorCompaniesPage>', () => {
     });
   });
 
+  it('«Azzera i filtri» toglie ricerca e filtri e riporta il focus sulla ricerca', async () => {
+    const user = userEvent.setup();
+    const { router } = renderPage('/aziende?q=officina&categoria=K14&zona=Z1');
+    await screen.findByRole('table');
+    await user.click(screen.getByRole('button', { name: 'Azzera i filtri' }));
+
+    await waitFor(() => expect(router.state.location.search).toBe(''));
+    expect(searchCompanyDirectory).toHaveBeenLastCalledWith({ page: 0, size: 25 });
+    await waitFor(() =>
+      expect(screen.getByRole('searchbox', { name: 'Cerca per ragione sociale' })).toHaveFocus(),
+    );
+    expect(screen.queryByRole('button', { name: 'Azzera i filtri' })).not.toBeInTheDocument();
+  });
+
+  it('una zona dell’indirizzo non più attiva resta scelta, con il suo nome', async () => {
+    renderPage('/aziende?zona=VECCHIA');
+    const zone = screen.getByRole('combobox', { name: 'Zona' });
+    await waitFor(() => expect(zone).toHaveDisplayValue('Zona non più attiva'));
+  });
+
+  it('senza filtri non c’è «Azzera i filtri»', async () => {
+    renderPage();
+    await screen.findByRole('table');
+    expect(screen.queryByRole('button', { name: 'Azzera i filtri' })).not.toBeInTheDocument();
+  });
+
   it('nessun risultato: lo dice', async () => {
     vi.mocked(searchCompanyDirectory).mockResolvedValue({ companies: [], total: 0, page: 0, size: 25 });
     renderPage('/aziende?q=nulla');

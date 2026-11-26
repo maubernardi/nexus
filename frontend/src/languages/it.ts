@@ -951,6 +951,8 @@ export const it = {
     onlyToComplete: 'Solo le aziende da completare',
     noCategory: 'Nessuna',
     noZone: 'Nessuna',
+    /** Toglie ricerca e filtri dell'elenco (US-511, PO 26/11). */
+    resetFilters: 'Azzera i filtri',
     /** Filtro per zona (US-511). */
     zoneFilter: 'Zona',
     allZones: 'Tutte le zone',

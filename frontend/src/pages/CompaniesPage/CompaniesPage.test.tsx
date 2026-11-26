@@ -339,6 +339,23 @@ describe('<CompaniesPage>', () => {
     await expectNoAxeViolations();
   });
 
+  it('«Azzera i filtri»: solo con filtri attivi; toglie tutto, tiene le aziende per pagina, focus sulla ricerca', async () => {
+    const user = userEvent.setup();
+    const { router } = renderPage(
+      '/aziende?q=rossi&categoria=K14&zona=Z1&stelle=2&interesse=1&disattivate=1&daCompletare=1&pagina=3&perPagina=50',
+    );
+    await screen.findByRole('table');
+    await user.click(screen.getByRole('button', { name: 'Azzera i filtri' }));
+
+    await waitFor(() => expect(router.state.location.search).toBe('?perPagina=50'));
+    expect(searchCompanies).toHaveBeenLastCalledWith({ includeInactive: false, page: 0, size: 50 });
+    await waitFor(() =>
+      expect(screen.getByRole('searchbox', { name: /Cerca per ragione sociale/ })).toHaveFocus(),
+    );
+    expect(screen.queryByRole('button', { name: 'Azzera i filtri' })).not.toBeInTheDocument();
+    await expectNoAxeViolations();
+  });
+
   it('nessun risultato: lo dice', async () => {
     vi.mocked(searchCompanies).mockResolvedValue(pageOf([]));
     renderPage('/aziende?q=zzz');

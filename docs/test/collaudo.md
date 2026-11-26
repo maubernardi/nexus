@@ -10,7 +10,7 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 |---|---|
 | **Ambiente** | dal 24/11: le storie nuove sul **PC del PO**, prima del merge (`infra/collaudo/collaudo.sh`, EN-11); dopo il deploy, un controllo veloce in produzione su https://portalenexus.it, senza dati finti. Fino al 24/11: la demo su https://portalenexus.it |
 | **Versione in produzione** | `1603fcc` (26/11/2026), su **PostgreSQL 19**, con i dati veri dal passaggio del 24/11 (US-1306): Sprint 1–17 e, dello Sprint 18, affidabilità e interesse al progetto delle aziende (US-514, migrazione V52) e tema a scelta con l'intestazione fissa delle schede (US-1312). Prima, dal 24/11, `8139e84` |
-| **Ultimo aggiornamento** | 26/11/2026 (T-37.1 … T-37.3: zona dell'azienda e aziende per il Tutor, da provare sul collaudo prima del merge; T-35.6 riuscita in produzione dopo il deploy `1603fcc`; T-36.1 … T-36.3: tema a scelta e intestazione fissa delle schede, riuscite sul collaudo del PC prima del merge; T-35.1 … T-35.5: affidabilità e interesse al progetto delle aziende, riuscite sul collaudo del PC prima del merge; T-35.6 in produzione dopo il deploy); 25/11/2026 (T-27.3 riuscita: backup della notte dopo il passaggio, US-1306 chiusa); 24/11/2026 (T-34.1 … T-34.4: correzione dei dati di un utente, riuscite sul collaudo del PC prima del merge; T-34.5 riuscita in produzione dopo il deploy `8139e84`; T-33.1 … T-33.3 riuscite il 24/11); 23/11/2026 (collaudo prima del passaggio finito dal PO il 23/11: T-24, T-25, T-28, T-29 e T-30.1 … T-30.3 riusciti; restano T-30.4, il backup della notte sulla 19, e dopo il passaggio T-26.3 e T-27; T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, fatto il 23/11 sulla demo `47fe414`; T-30.3 corretta: le aziende si provano come `operatore.cc`; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Ultimo aggiornamento** | 26/11/2026 (T-37.1 … T-37.3: zona dell'azienda e aziende per il Tutor, riuscite sul collaudo prima del merge; T-37.4, «Azzera i filtri», da provare; T-35.6 riuscita in produzione dopo il deploy `1603fcc`; T-36.1 … T-36.3: tema a scelta e intestazione fissa delle schede, riuscite sul collaudo del PC prima del merge; T-35.1 … T-35.5: affidabilità e interesse al progetto delle aziende, riuscite sul collaudo del PC prima del merge; T-35.6 in produzione dopo il deploy); 25/11/2026 (T-27.3 riuscita: backup della notte dopo il passaggio, US-1306 chiusa); 24/11/2026 (T-34.1 … T-34.4: correzione dei dati di un utente, riuscite sul collaudo del PC prima del merge; T-34.5 riuscita in produzione dopo il deploy `8139e84`; T-33.1 … T-33.3 riuscite il 24/11); 23/11/2026 (collaudo prima del passaggio finito dal PO il 23/11: T-24, T-25, T-28, T-29 e T-30.1 … T-30.3 riusciti; restano T-30.4, il backup della notte sulla 19, e dopo il passaggio T-26.3 e T-27; T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, fatto il 23/11 sulla demo `47fe414`; T-30.3 corretta: le aziende si provano come `operatore.cc`; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 > **Dopo il passaggio in produzione** (24/11) il sito ha i dati veri e gli utenti demo (`tutor1`, `operatore.cc`, …)
 > non ci sono più: le prove fino alla sezione 32 restano come storico. Le storie nuove si collaudano sul PC del PO, dal
@@ -1595,14 +1595,14 @@ Sul collaudo del PC, prima del merge (http://localhost:8090, password `collaudo-
 hanno già una zona: «Demo Logistica S.r.l.» Firenze Rifredi, «Demo Ristorazione S.n.c.» Firenze San Lorenzo, «Demo
 Servizi Pulizia Soc. Coop.» Firenze Galluzzo.
 
-- [ ] **T-37.1 Zona nella scheda e nell'elenco del Call Center (US-511)**
+- [x] **T-37.1 Zona nella scheda e nell'elenco del Call Center (US-511)**
   1. Entra come `operatore.cc` e apri «Aziende». **Atteso:** una colonna «Zona», con le tre zone dei dati finti e un
      trattino per le altre aziende.
   2. Nel menu «Zona» scegli «Firenze Rifredi». **Atteso:** solo «Demo Logistica S.r.l.».
   3. Rimetti «Tutte le zone», apri «Demo Commercio al Dettaglio S.p.A.», scegli la zona «Firenze Isolotto» e salva.
      **Atteso:** «Modifiche salvate.»; nell'elenco l'azienda ha la zona Firenze Isolotto.
 
-- [ ] **T-37.2 Aziende per il Tutor (US-511)**
+- [x] **T-37.2 Aziende per il Tutor (US-511)**
   1. Esci ed entra come `tutor1`. **Atteso:** nel menu c'è «Aziende».
   2. Apri «Aziende». **Atteso:** l'elenco delle aziende attive, con ragione sociale, categoria, zona, indirizzo con il
      comune, stelle e pollici. Non ci sono partita IVA, telefoni, email, referenti né il pulsante «Nuova azienda», e i
@@ -1613,8 +1613,18 @@ Servizi Pulizia Soc. Coop.» Firenze Galluzzo.
   5. Rimetti «Tutte le zone» e cerca la partita IVA `99000000001`. **Atteso:** «Nessuna azienda corrisponde alla
      ricerca.»: il Tutor non cerca per partita IVA.
 
-- [ ] **T-37.3 Aziende disattivate e sede operativa (US-511)**
+- [x] **T-37.3 Aziende disattivate e sede operativa (US-511)**
   1. Come `operatore.cc` disattiva «Demo Commercio al Dettaglio S.p.A.» (in fondo alla scheda, «Disattiva azienda»).
   2. Come `tutor1` riapri «Aziende». **Atteso:** «Demo Commercio al Dettaglio S.p.A.» non c'è più.
   3. Guarda «Demo Logistica S.r.l.», che ha una sede operativa. **Atteso:** l'indirizzo è quello della sede operativa,
      «Via del Magazzino 10, Prato (PO)», non quello della sede legale. Le altre aziende mostrano la sede legale.
+  > Nota (26/11): T-37.1 … T-37.3 riuscite dal PO sul suo PC, con il collaudo della PR #212 (`a6cbc78`). Richiesta dal
+  > collaudo: un pulsante per azzerare i filtri, che sono parecchi (T-37.4).
+
+- [ ] **T-37.4 «Azzera i filtri» (US-511)**
+  1. Come `operatore.cc`, in «Aziende» cerca «demo», scegli «Almeno 2 stelle», spunta «Mostra anche le aziende
+     disattivate» e scegli 50 aziende per pagina. **Atteso:** sotto i filtri compare «Azzera i filtri».
+  2. Premi «Azzera i filtri». **Atteso:** ricerca e filtri tornano vuoti, l'elenco riparte dalla prima pagina con tutte
+     le aziende attive, sempre 50 per pagina; il cursore è nel campo di ricerca; il pulsante sparisce.
+  3. Senza filtri. **Atteso:** «Azzera i filtri» non c'è.
+  4. Come `tutor1`, in «Aziende» scegli una zona e una categoria, poi «Azzera i filtri». **Atteso:** lo stesso.
