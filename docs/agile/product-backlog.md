@@ -150,7 +150,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1101](#us-1101) | E11 | Report di restituzione | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1102](#us-1102) | E11 | Esito sulla mansione e audit trail | Must | 2 | R3 | 🎉 Done (Sprint 8) |
 | [US-1103](#us-1103) | E11 | Motivo di chiusura del tirocinio | Must | 2 | R4 | 🎉 Done (Sprint 14) |
-| [US-1104](#us-1104) | E11 | Valutazione dell'azienda alla fine del tirocinio | Must | 5 | R4 | 🔨 In corso (Sprint 18) |
+| [US-1104](#us-1104) | E11 | Valutazione dell'azienda alla fine del tirocinio | Must | 5 | R4 | 🎉 Done (Sprint 18) |
 | [US-1201](#us-1201) | E12 | Notifiche in app | Must | 5 | R2 | 🎉 Done (Sprint 5) |
 | [US-1202](#us-1202) | E12 | Email transazionali | Must | 5 | R3 | 🎉 Done (Sprint 8) |
 | [US-1203](#us-1203) | E12 | Avvisi di fine tirocinio e blocco delle nuove segnalazioni | Must | 5 | R4 | 🎉 Done (Sprint 16) |
@@ -1439,7 +1439,7 @@ Criteri di accettazione:
 Dipendenze: US-1009, US-109
 
 #### US-1104
-**Valutazione dell'azienda alla fine del tirocinio** · Must · 5 punti · R4 · 🔨 In corso (Sprint 18)
+**Valutazione dell'azienda alla fine del tirocinio** · Must · 5 punti · R4 · 🎉 Done (Sprint 18)
 
 Come **Tutor** voglio valutare l'azienda alla fine del tirocinio, così che chi propone di nuovo quell'azienda conosca
 la valutazione dei Tutor che hanno seguito i tirocini fatti lì (PO, 25/11).

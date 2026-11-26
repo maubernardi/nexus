@@ -1,6 +1,6 @@
 # Sprint 18 — 26 – 28 novembre 2026
 
-**Stato:** 🔨 in corso dal 26/11. In produzione dal 26/11, a `3a64364`: US-514, US-1312 e US-511 (13 punti su 23).
+**Stato:** 🔨 in corso dal 26/11. In produzione dal 26/11, a `5095004`: US-514, US-1312, US-511 e US-1104 (18 punti su 23).
 **Planning:** 25 – 26/11, dalla [review dello Sprint 17](sprint-17-review.md) (§8, §9).
 
 ## Obiettivo
@@ -15,8 +15,8 @@
 |---|---|---|---|---|---|
 | US-514 | Affidabilità e interesse al progetto dell'azienda | 5 | 🎉 Done | `add-company-reliability-interest` (archiviata) | [#208](https://github.com/maubernardi/nexus/pull/208) |
 | US-511 | Zona dell'azienda e aziende per il Tutor | 5 | 🎉 Done | `add-company-zone-and-tutor-directory` (archiviata) | [#212](https://github.com/maubernardi/nexus/pull/212) |
-| US-1104 | Valutazione dell'azienda alla fine del tirocinio | 5 | 🔨 In corso | `add-company-reviews` | — |
-| US-515 | Azienda «nave scuola» | 5 | ✅ Ready | — | — |
+| US-1104 | Valutazione dell'azienda alla fine del tirocinio | 5 | 🎉 Done | `add-company-reviews` (archiviata) | [#214](https://github.com/maubernardi/nexus/pull/214) |
+| US-515 | Azienda «nave scuola» | 5 | 🔨 In corso | `add-training-ship-company` | — |
 | US-1312 | Tema chiaro o scuro a scelta e intestazione fissa delle schede | 3 | 🎉 Done | `add-theme-toggle-and-top-back-links` (archiviata) | [#209](https://github.com/maubernardi/nexus/pull/209), [#210](https://github.com/maubernardi/nexus/pull/210) (la #209 era finita nel branch di US-514) |
 
 **Ordine** (PO, 26/11):
@@ -64,3 +64,4 @@ il 🚢 e US-1104 le valutazioni.
 | US-1312 Done: collaudo T-36.1 … T-36.3 sul PC e deploy `1603fcc` (26/11) | 13 |
 | US-511 anticipata, US-1311 allo Sprint 19 (PO, 26/11) | 15 |
 | US-511 Done: collaudo T-37.1 … T-37.4 sul PC e deploy `3a64364` (26/11) | 10 |
+| US-1104 Done: collaudo T-38.1 … T-38.4 sul PC e deploy `5095004` (26/11) | 5 |
