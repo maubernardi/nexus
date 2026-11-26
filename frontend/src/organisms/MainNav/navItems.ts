@@ -41,7 +41,8 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { to: '/beneficiari', labelKey: 'nav.beneficiaries', icon: Users, roles: ['TUTOR'] },
   // US-1303: l'ADMIN vede i beneficiari di tutti, con la conservazione dei dati
   { to: '/beneficiari/tutti', labelKey: 'nav.beneficiaries', icon: Users, roles: ['ADMIN'] },
-  { to: '/aziende', labelKey: 'nav.companies', icon: Building2, roles: ['CALL_CENTER', 'ADMIN'] },
+  // il Tutor vede l'elenco in sola lettura (US-511)
+  { to: '/aziende', labelKey: 'nav.companies', icon: Building2, roles: ['TUTOR', 'CALL_CENTER', 'ADMIN'] },
   {
     to: '/coordinamento',
     labelKey: 'nav.coordination',

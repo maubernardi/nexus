@@ -8,6 +8,8 @@ export type CompanyFormValues = {
   vatCode: string;
   businessCategoryId: string;
   activity: string;
+  /** Zona del catalogo (US-511): id, '' = nessuna. */
+  zoneId: string;
   legalAddress: string;
   legalMunicipality: MunicipalityValue;
   operatingAddress: string;

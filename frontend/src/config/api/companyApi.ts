@@ -35,6 +35,8 @@ export type Company = {
   businessCategory?: ReferenceItem | null;
   /** Descrizione dell'attività (US-509). */
   activity?: string | null;
+  /** Zona del catalogo (US-511); assente se non indicata. */
+  zone?: ReferenceItem | null;
   /** Sede operativa (US-510). */
   operatingAddress?: string | null;
   operatingMunicipality?: Municipality | null;
@@ -64,6 +66,8 @@ export type CompanyForm = {
   legalMunicipalityId: string | null;
   businessCategoryId: string | null;
   activity: string | null;
+  /** Zona del catalogo (US-511); null = nessuna. */
+  zoneId: string | null;
   operatingAddress: string | null;
   operatingMunicipalityId: string | null;
   phone: string | null;
@@ -86,6 +90,8 @@ export type CompanySearch = {
   toComplete?: boolean;
   /** Solo le aziende della categoria merceologica (US-509). */
   businessCategoryId?: string;
+  /** Solo le aziende della zona (US-511). */
+  zoneId?: string;
   /** Solo le aziende con almeno queste stelle (1–4) e questi pollici (1–2) (US-514). */
   minReliability?: number;
   minProjectInterest?: number;
@@ -109,6 +115,50 @@ export type CompanyPage = {
 
 export const searchCompanies = async (params: CompanySearch): Promise<CompanyPage> => {
   const { data } = await axiosInstance.get<CompanyPage>(ENDPOINTS.companies, { params });
+  // l'API omette i campi vuoti
+  return { ...data, companies: data.companies ?? [] };
+};
+
+/**
+ * Azienda nell'elenco del Tutor (US-511): solo i dati essenziali. Indirizzo e comune sono della sede operativa, se
+ * indicata, altrimenti della legale. I campi vuoti sono assenti.
+ */
+export type CompanyDirectoryItem = {
+  id: string;
+  name: string;
+  businessCategory?: ReferenceItem | null;
+  zone?: ReferenceItem | null;
+  address?: string | null;
+  /** Comune con la sigla della provincia, per esempio «Prato (PO)». */
+  municipality?: string | null;
+  reliability?: number | null;
+  projectInterest?: number | null;
+};
+
+export type CompanyDirectorySearch = {
+  /** Ricerca sul solo nome. */
+  search?: string;
+  businessCategoryId?: string;
+  zoneId?: string;
+  /** Pagina, da 0. */
+  page: number;
+  size: number;
+};
+
+export type CompanyDirectoryPage = {
+  companies: CompanyDirectoryItem[];
+  total: number;
+  page: number;
+  size: number;
+};
+
+/** Elenco delle aziende per il Tutor (US-511): sole aziende attive, una pagina alla volta. */
+export const searchCompanyDirectory = async (
+  params: CompanyDirectorySearch,
+): Promise<CompanyDirectoryPage> => {
+  const { data } = await axiosInstance.get<CompanyDirectoryPage>(`${ENDPOINTS.companies}/directory`, {
+    params,
+  });
   // l'API omette i campi vuoti
   return { ...data, companies: data.companies ?? [] };
 };

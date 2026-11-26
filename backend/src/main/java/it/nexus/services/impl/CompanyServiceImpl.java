@@ -12,15 +12,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import it.nexus.domain.AbstractReferenceEntity;
 import it.nexus.domain.BusinessCategory;
 import it.nexus.domain.Company;
 import it.nexus.domain.CompanyContact;
 import it.nexus.domain.ContactRole;
 import it.nexus.domain.JobSlot;
 import it.nexus.domain.Municipality;
+import it.nexus.domain.Zone;
 import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.CompanyContactFormDTO;
 import it.nexus.domain.dto.CompanyDTO;
+import it.nexus.domain.dto.CompanyDirectoryPageDTO;
 import it.nexus.domain.dto.CompanyFormDTO;
 import it.nexus.domain.dto.CompanyPageDTO;
 import it.nexus.domain.enumeration.AuditEntityType;
@@ -31,6 +34,7 @@ import it.nexus.repository.BusinessCategoryRepository;
 import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.ContactRoleRepository;
 import it.nexus.repository.JobSlotRepository;
+import it.nexus.repository.ZoneRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BoardPostService;
 import it.nexus.services.CompanySearch;
@@ -53,6 +57,9 @@ public class CompanyServiceImpl implements CompanyService {
     private static final String DUPLICATE_VAT = "Esiste già un'azienda con questa partita IVA";
     private static final String LEGAL_MUNICIPALITY = "legalMunicipalityId";
     private static final String BUSINESS_CATEGORY = "businessCategoryId";
+    private static final String ZONE = "zoneId";
+    /** Id di filtro che non corrisponde a nessuna voce: gli id sono positivi. */
+    private static final long NO_MATCH = -1L;
     private static final String OPERATING_MUNICIPALITY = "operatingMunicipalityId";
 
     private final CompanyRepository repository;
@@ -62,6 +69,7 @@ public class CompanyServiceImpl implements CompanyService {
     private final CompanyMapper mapper;
     private final MunicipalityService municipalityService;
     private final BusinessCategoryRepository businessCategoryRepository;
+    private final ZoneRepository zoneRepository;
     private final ContactRoleRepository contactRoleRepository;
     private final EntityManager entityManager;
     private final JobSlotAssignments jobSlotAssignments;
@@ -78,12 +86,7 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     @Transactional(readOnly = true)
     public CompanyPageDTO search(CompanySearch filters, int page, int size) {
-        if (page < 0) {
-            throw new BadRequestException("Pagina non valida: %d", page);
-        }
-        if (!PAGE_SIZES.contains(size)) {
-            throw new BadRequestException("Aziende per pagina: una tra %s", PAGE_SIZES);
-        }
+        requirePage(page, size);
         Integer minReliability = filters.minReliability();
         if (minReliability != null && (minReliability < 1 || minReliability > 4)) {
             throw new BadRequestException("Stelle minime: da 1 a 4");
@@ -92,20 +95,46 @@ public class CompanyServiceImpl implements CompanyService {
         if (minProjectInterest != null && (minProjectInterest < 1 || minProjectInterest > 2)) {
             throw new BadRequestException("Pollici minimi: 1 o 2");
         }
-        String search = filters.search();
-        String businessCategoryId = filters.businessCategoryId();
-        String term = search == null || search.isBlank() ? null : search.strip();
-        Long category = null;
-        if (businessCategoryId != null && !businessCategoryId.isBlank()) {
-            category = TsidMapper.toInternal(businessCategoryId.strip());
-            if (category == null) {
-                // categoria non valida: nessuna azienda, come una ricerca senza risultati
-                return new CompanyPageDTO(List.of(), 0, page, size);
-            }
-        }
-        var result = repository.search(term, filters.includeInactive(), filters.toComplete(), category,
-                minReliability, minProjectInterest, PageRequest.of(page, size));
+        var result = repository.search(term(filters.search()), filters.includeInactive(), filters.toComplete(),
+                filterId(filters.businessCategoryId()), filterId(filters.zoneId()), minReliability, minProjectInterest,
+                PageRequest.of(page, size));
         return new CompanyPageDTO(result.map(mapper::toDto).getContent(), result.getTotalElements(), page, size);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CompanyDirectoryPageDTO directory(String search, String businessCategoryId, String zoneId, int page,
+            int size) {
+        requirePage(page, size);
+        var result = repository.directory(term(search), filterId(businessCategoryId), filterId(zoneId),
+                PageRequest.of(page, size));
+        return new CompanyDirectoryPageDTO(result.map(mapper::toDirectoryItem).getContent(), result.getTotalElements(),
+                page, size);
+    }
+
+    private static void requirePage(int page, int size) {
+        if (page < 0) {
+            throw new BadRequestException("Pagina non valida: %d", page);
+        }
+        if (!PAGE_SIZES.contains(size)) {
+            throw new BadRequestException("Aziende per pagina: una tra %s", PAGE_SIZES);
+        }
+    }
+
+    private static String term(String search) {
+        return search == null || search.isBlank() ? null : search.strip();
+    }
+
+    /**
+     * Id interno di un filtro dell'elenco (categoria, zona): {@code null} se il filtro non c'è. Un id non valido diventa
+     * {@link #NO_MATCH}, che non è di nessuna voce: nessuna azienda, come una ricerca senza risultati.
+     */
+    private static Long filterId(String id) {
+        if (id == null || id.isBlank()) {
+            return null;
+        }
+        Long internal = TsidMapper.toInternal(id.strip());
+        return internal == null ? NO_MATCH : internal;
     }
 
     @Override
@@ -125,6 +154,7 @@ public class CompanyServiceImpl implements CompanyService {
         apply(company, dto, municipalityService.forAddress(dto.legalMunicipalityId(), null, LEGAL_MUNICIPALITY),
                 municipalityService.forAddress(dto.operatingMunicipalityId(), null, OPERATING_MUNICIPALITY),
                 businessCategory(dto.businessCategoryId(), null));
+        company.setZone(zone(dto.zoneId(), null));
         contacts.forEach(c -> company.addContact(c.name(), c.role(), c.phone(), c.mobile(), c.email()));
         Company saved = repository.saveAndFlush(company);
         auditService.record(AuditEntityType.COMPANY, saved.getId(), "CREATE", AuditChanges.of()
@@ -136,6 +166,7 @@ public class CompanyServiceImpl implements CompanyService {
                 .value("operatingMunicipality", null, MunicipalityMapper.label(saved.getOperatingMunicipality()))
                 .value("businessCategory", null, name(saved.getBusinessCategory()))
                 .value("activity", null, saved.getActivity())
+                .value("zone", null, name(saved.getZone()))
                 .value("reliability", null, saved.getReliability())
                 .value("projectInterest", null, saved.getProjectInterest())
                 // recapiti e referenti: dati personali, nell'audit senza valori (EN-4, US-510)
@@ -165,6 +196,7 @@ public class CompanyServiceImpl implements CompanyService {
         Municipality operatingMunicipality = municipalityService.forAddress(dto.operatingMunicipalityId(),
                 company.getOperatingMunicipality(), OPERATING_MUNICIPALITY);
         BusinessCategory category = businessCategory(dto.businessCategoryId(), company.getBusinessCategory());
+        Zone zone = zone(dto.zoneId(), company.getZone());
         List<Object> contactsBefore = keys(company.getContacts().stream().map(CompanyServiceImpl::contact).toList());
         List<Contact> contacts = contacts(dto.contacts(), company.getContacts().stream()
                 .map(CompanyContact::getRole).filter(Objects::nonNull).map(ContactRole::getId)
@@ -180,6 +212,7 @@ public class CompanyServiceImpl implements CompanyService {
                         MunicipalityMapper.label(operatingMunicipality))
                 .value("businessCategory", name(company.getBusinessCategory()), name(category))
                 .value("activity", company.getActivity(), blankToNull(dto.activity()))
+                .value("zone", name(company.getZone()), name(zone))
                 .value("reliability", company.getReliability(), dto.reliability())
                 .value("projectInterest", company.getProjectInterest(), dto.projectInterest())
                 .redactedIfChanged("phone", company.getPhone(), blankToNull(dto.phone()))
@@ -191,6 +224,7 @@ public class CompanyServiceImpl implements CompanyService {
         company.setName(dto.name().strip());
         company.setVatCode(vatCode);
         apply(company, dto, municipality, operatingMunicipality, category);
+        company.setZone(zone);
         boolean contactsChanged = !contactsBefore.equals(keys(contacts));
         if (contactsChanged) {
             replaceContacts(company, contacts);
@@ -259,6 +293,17 @@ public class CompanyServiceImpl implements CompanyService {
                 .orElseThrow(() -> new FieldValidationException(BUSINESS_CATEGORY, "Categoria non valida"));
     }
 
+    /** Zona attiva del catalogo, oppure quella che l'azienda ha già anche se disattivata (US-511); vuoto = nessuna. */
+    private Zone zone(String id, Zone current) {
+        if (id == null || id.isBlank()) {
+            return null;
+        }
+        return Optional.ofNullable(TsidMapper.toInternal(id.strip()))
+                .flatMap(zoneRepository::findById)
+                .filter(z -> z.isActive() || z.equals(current))
+                .orElseThrow(() -> new FieldValidationException(ZONE, "Zona non valida"));
+    }
+
     /**
      * Referenti del modulo, normalizzati e controllati (US-510): serve il nome o il ruolo; il ruolo è una voce attiva
      * oppure uno che un referente dell'azienda ha già ({@code currentRoles}). Errori sul campo del referente.
@@ -316,8 +361,8 @@ public class CompanyServiceImpl implements CompanyService {
         contacts.forEach(c -> company.addContact(c.name(), c.role(), c.phone(), c.mobile(), c.email()));
     }
 
-    private static String name(BusinessCategory category) {
-        return category == null ? null : category.getName();
+    private static String name(AbstractReferenceEntity item) {
+        return item == null ? null : item.getName();
     }
 
     private static void apply(Company company, CompanyFormDTO dto, Municipality legalMunicipality,

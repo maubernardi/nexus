@@ -29,6 +29,8 @@ public record CompanyFormDTO(
         /** Categoria merceologica (US-509): voce attiva o quella che l'azienda ha già; vuoto = nessuna. */
         String businessCategoryId,
         @Size(max = 200, message = "Massimo 200 caratteri") String activity,
+        /** Zona del catalogo (US-511): voce attiva o quella che l'azienda ha già; vuoto = nessuna. */
+        String zoneId,
         /** Sede operativa (US-510): indirizzo e versione del comune; vuoti = non indicati. */
         @Size(max = 300, message = "Massimo 300 caratteri") String operatingAddress,
         String operatingMunicipalityId,

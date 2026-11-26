@@ -27,12 +27,13 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
      * stelle e quei pollici (US-514). La pagina non deve avere un ordinamento suo: vale quello della query.
      */
     default Page<Company> search(String search, boolean includeInactive, boolean toComplete, Long businessCategoryId,
-            Integer minReliability, Integer minProjectInterest, Pageable page) {
+            Long zoneId, Integer minReliability, Integer minProjectInterest, Pageable page) {
         return search(search, includeInactive, toComplete, CompanyPlaceholders.VAT_CODE,
-                CompanyPlaceholders.NAME_PREFIX + "%", businessCategoryId, minReliability, minProjectInterest, page);
+                CompanyPlaceholders.NAME_PREFIX + "%", businessCategoryId, zoneId, minReliability, minProjectInterest,
+                page);
     }
 
-    @EntityGraph(attributePaths = {"legalMunicipality", "legalMunicipality.province", "businessCategory",
+    @EntityGraph(attributePaths = {"legalMunicipality", "legalMunicipality.province", "businessCategory", "zone",
             "operatingMunicipality", "operatingMunicipality.province"})
     @Query(value = """
             select c from Company c
@@ -42,6 +43,7 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
                    or c.vatCode like concat(cast(:search as string), '%'))
               and (:toComplete = false or c.vatCode = :missingVatCode or c.name like :missingNamePattern)
               and (:businessCategoryId is null or c.businessCategory.id = :businessCategoryId)
+              and (:zoneId is null or c.zone.id = :zoneId)
               and (:minReliability is null or c.reliability >= :minReliability)
               and (:minProjectInterest is null or c.projectInterest >= :minProjectInterest)
             order by lower(c.name), c.id
@@ -53,12 +55,37 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
                    or c.vatCode like concat(cast(:search as string), '%'))
               and (:toComplete = false or c.vatCode = :missingVatCode or c.name like :missingNamePattern)
               and (:businessCategoryId is null or c.businessCategory.id = :businessCategoryId)
+              and (:zoneId is null or c.zone.id = :zoneId)
               and (:minReliability is null or c.reliability >= :minReliability)
               and (:minProjectInterest is null or c.projectInterest >= :minProjectInterest)
             """)
     Page<Company> search(@Param("search") String search, @Param("includeInactive") boolean includeInactive,
             @Param("toComplete") boolean toComplete, @Param("missingVatCode") String missingVatCode,
             @Param("missingNamePattern") String missingNamePattern,
-            @Param("businessCategoryId") Long businessCategoryId, @Param("minReliability") Integer minReliability,
-            @Param("minProjectInterest") Integer minProjectInterest, Pageable page);
+            @Param("businessCategoryId") Long businessCategoryId, @Param("zoneId") Long zoneId,
+            @Param("minReliability") Integer minReliability, @Param("minProjectInterest") Integer minProjectInterest,
+            Pageable page);
+
+    /**
+     * Elenco del Tutor (US-511): sole aziende attive, ricerca sul solo nome (mai sulla partita IVA, per
+     * minimizzazione), filtri per categoria e zona; ordine per nome, una pagina alla volta.
+     */
+    @EntityGraph(attributePaths = {"legalMunicipality", "legalMunicipality.province", "businessCategory", "zone",
+            "operatingMunicipality", "operatingMunicipality.province"})
+    @Query(value = """
+            select c from Company c
+            where c.active = true
+              and (:search is null or lower(c.name) like lower(concat('%', cast(:search as string), '%')))
+              and (:businessCategoryId is null or c.businessCategory.id = :businessCategoryId)
+              and (:zoneId is null or c.zone.id = :zoneId)
+            order by lower(c.name), c.id
+            """, countQuery = """
+            select count(c) from Company c
+            where c.active = true
+              and (:search is null or lower(c.name) like lower(concat('%', cast(:search as string), '%')))
+              and (:businessCategoryId is null or c.businessCategory.id = :businessCategoryId)
+              and (:zoneId is null or c.zone.id = :zoneId)
+            """)
+    Page<Company> directory(@Param("search") String search, @Param("businessCategoryId") Long businessCategoryId,
+            @Param("zoneId") Long zoneId, Pageable page);
 }

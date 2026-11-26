@@ -21,7 +21,7 @@ import { CoordinationPage } from '@/pages/CoordinationPage/CoordinationPage';
 import { FailedLoginsPage } from '@/pages/FailedLoginsPage/FailedLoginsPage';
 import { UserAccessLogPage } from '@/pages/UserAccessLogPage/UserAccessLogPage';
 import { CalendarPage } from '@/pages/CalendarPage/CalendarPage';
-import { CompaniesPage } from '@/pages/CompaniesPage/CompaniesPage';
+import { CompaniesRoute } from '@/config/routing/CompaniesRoute';
 import { CompanyEditPage } from '@/pages/CompanyEditPage/CompanyEditPage';
 import { CompanyNewPage } from '@/pages/CompanyNewPage/CompanyNewPage';
 import { NotificationsPage } from '@/pages/NotificationsPage/NotificationsPage';
@@ -127,11 +127,8 @@ export const routes: RouteObject[] = [
       { path: 'lavorazioni/:id', element: <LegacyWorkRedirect /> },
       {
         path: 'aziende',
-        element: (
-          <RoleRoute roles={['CALL_CENTER', 'ADMIN']}>
-            <CompaniesPage />
-          </RoleRoute>
-        ),
+        // Call Center e ADMIN: anagrafica completa; Tutor: elenco in sola lettura (US-511)
+        element: <CompaniesRoute />,
         handle: { titleKey: 'pages.companies.title' } satisfies RouteHandle,
       },
       {

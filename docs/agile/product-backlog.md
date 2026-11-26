@@ -30,7 +30,7 @@ Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md).
 | R1 | Flusso base: dalla segnalazione alla proposta | 25 | 78 |
 | R2 | Proposta, timer, appuntamenti, bacheca e fast-track | 21 | 69 |
 | R3 | Tirocinio, documenti Word, chiusura, email | 11 | 40 |
-| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 48 | 243 |
+| R4 | Produzione: utenti, backup, GDPR, UX, sicurezza | 49 | 248 |
 
 ## Domande aperte per il Product Owner
 
@@ -111,7 +111,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-508](#us-508) | E5 | Partita IVA e nome da completare | Must | 3 | R4 | 🎉 Done (Sprint 15) |
 | [US-509](#us-509) | E5 | Categoria merceologica e attività dell'azienda | Must | 3 | R4 | 🎉 Done (Sprint 15) |
 | [US-510](#us-510) | E5 | Referenti e recapiti dell'azienda | Must | 5 | R4 | 🎉 Done (Sprint 15) |
-| [US-511](#us-511) | E5 | Zona dell'azienda e aziende per il Tutor | Should | 5 | — | ✅ Ready |
+| [US-511](#us-511) | E5 | Zona dell'azienda e aziende per il Tutor | Must | 5 | R4 | 🔨 In corso (Sprint 18) |
 | [US-512](#us-512) | E5 | Tentativi di contatto ed esito della richiesta | Should | 5 | — | ✅ Ready |
 | [US-513](#us-513) | E5 | Elenco delle aziende a pagine | Must | 3 | R4 | 🎉 Done (Sprint 17) |
 | [US-514](#us-514) | E5 | Affidabilità e interesse al progetto dell'azienda | Must | 5 | R4 | 🎉 Done (Sprint 18) |
@@ -815,10 +815,11 @@ Dipendenze: US-501, US-1007
 
 
 #### US-511
-**Zona dell'azienda e aziende per il Tutor** · Should · 5 punti · release da decidere · ✅ Ready
+**Zona dell'azienda e aziende per il Tutor** · Must · 5 punti · R4 · 🔨 In corso (Sprint 18)
 
 Come **Tutor** voglio vedere le aziende del database con pochi dati essenziali, per sapere quali conosce già il Call
-Center prima di chiedere un contatto (analisi con il PO, 23/11).
+Center prima di chiedere un contatto (analisi con il PO, 23/11). Anticipata nello Sprint 18 dal PO il 26/11: il Tutor
+deve vedere le aziende subito.
 
 Criteri di accettazione:
 - **Zona dell'azienda**: una zona del catalogo (US-106), facoltativa, che il Call Center sceglie nella scheda; nel suo
@@ -829,11 +830,12 @@ Criteri di accettazione:
   filtra per settore e zona.
 - Il Tutor non vede altro: niente partita IVA, recapiti, referenti, diario, mansioni o storico. L'API per il Tutor
   restituisce solo quei campi (minimizzazione), e il Tutor non crea né modifica aziende.
-- Il Tutor vede anche le **valutazioni dei tirocini** (US-1104): la faccina media nella lista e, nella scheda in sola
-  lettura, l'elenco a pagine con data, faccina, nota e nome del Tutor che l'ha data (PO, 25 e 26/11).
-- Vede anche **stelle e pollici** (US-514) e il simbolo **🚢** della nave scuola (US-515) (PO, 26/11).
+- Vede anche **stelle e pollici** (US-514) (PO, 26/11).
+- Nella stessa lista arriveranno il simbolo **🚢** della nave scuola, con US-515, e le **valutazioni dei tirocini**,
+  con US-1104: la faccina media nella lista e, nella scheda in sola lettura, l'elenco a pagine con data, faccina, nota
+  e nome del Tutor che l'ha data (PO, 25 e 26/11).
 
-Dipendenze: US-106, US-509, US-1007, US-514, US-515, US-1104
+Dipendenze: US-106, US-509, US-1007, US-514
 
 #### US-512
 **Tentativi di contatto ed esito della richiesta** · Should · 5 punti · release da decidere · ✅ Ready

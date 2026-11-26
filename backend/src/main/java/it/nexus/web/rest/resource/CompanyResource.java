@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.nexus.domain.dto.CompanyDTO;
+import it.nexus.domain.dto.CompanyDirectoryPageDTO;
 import it.nexus.domain.dto.CompanyHistoryDTO;
 import it.nexus.domain.dto.CompanyFormDTO;
 import it.nexus.domain.dto.CompanyPageDTO;
@@ -39,17 +40,30 @@ public class CompanyResource {
     @GetMapping
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
     @Operation(summary = "Cerca aziende per ragione sociale o partita IVA, una pagina alla volta (page da 0; size 10, "
-            + "25, 50 o 100); filtri: da completare, categoria merceologica, stelle (1–4) e pollici (1–2) minimi")
+            + "25, 50 o 100); filtri: da completare, categoria merceologica, zona, stelle (1–4) e pollici (1–2) minimi")
     public ResponseEntity<CompanyPageDTO> search(@RequestParam(required = false) String search,
             @RequestParam(defaultValue = "false") boolean includeInactive,
             @RequestParam(defaultValue = "false") boolean toComplete,
             @RequestParam(required = false) String businessCategoryId,
+            @RequestParam(required = false) String zoneId,
             @RequestParam(required = false) Integer minReliability,
             @RequestParam(required = false) Integer minProjectInterest,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "" + CompanyService.DEFAULT_PAGE_SIZE) int size) {
         return ResponseEntity.ok(companyService.search(new CompanySearch(search, includeInactive, toComplete,
-                businessCategoryId, minReliability, minProjectInterest), page, size));
+                businessCategoryId, zoneId, minReliability, minProjectInterest), page, size));
+    }
+
+    @GetMapping("/directory")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Aziende attive per il Tutor, con i soli dati essenziali, una pagina alla volta (US-511): "
+            + "ricerca sul nome, filtri per categoria merceologica e zona")
+    public ResponseEntity<CompanyDirectoryPageDTO> directory(@RequestParam(required = false) String search,
+            @RequestParam(required = false) String businessCategoryId,
+            @RequestParam(required = false) String zoneId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "" + CompanyService.DEFAULT_PAGE_SIZE) int size) {
+        return ResponseEntity.ok(companyService.directory(search, businessCategoryId, zoneId, page, size));
     }
 
     @GetMapping("/{id}")

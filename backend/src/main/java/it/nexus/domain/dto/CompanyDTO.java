@@ -16,6 +16,8 @@ public record CompanyDTO(
         ReferenceItemDTO businessCategory,
         /** Descrizione dell'attività (US-509). */
         String activity,
+        /** Zona del catalogo (US-511); assente se non indicata. */
+        ReferenceItemDTO zone,
         /** Sede operativa (US-510). */
         String operatingAddress,
         MunicipalityDTO operatingMunicipality,
