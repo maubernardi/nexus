@@ -97,6 +97,16 @@ public class Company extends AbstractTsidEntity {
     @Setter(AccessLevel.NONE)
     private List<CompanyContact> contacts = new ArrayList<>();
 
+    /** Affidabilità per il Call Center, da 1 a 4 stelle (US-514); {@code null} = non valutata. */
+    @JdbcTypeCode(SqlTypes.SMALLINT)
+    @Column(name = "reliability")
+    private Integer reliability;
+
+    /** Interesse al progetto, uno o due pollici alzati (US-514); {@code null} = non valutato. */
+    @JdbcTypeCode(SqlTypes.SMALLINT)
+    @Column(name = "project_interest")
+    private Integer projectInterest;
+
     @Column(name = "active", nullable = false)
     private boolean active = true;
 

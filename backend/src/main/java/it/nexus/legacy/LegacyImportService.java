@@ -55,8 +55,9 @@ public class LegacyImportService {
     private static final String INSERT_COMPANY = """
             INSERT INTO company (id, name, vat_code, legal_address, legal_municipality_id, operating_address,
                                  operating_municipality_id, business_category_id, activity, phone, mobile, fax, email,
-                                 secondary_email, active, version, created_at, created_by, updated_at, updated_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, true, 0, ?, ?, ?, ?)
+                                 secondary_email, reliability, project_interest, active, version, created_at,
+                                 created_by, updated_at, updated_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, true, 0, ?, ?, ?, ?)
             ON CONFLICT (id) DO NOTHING""";
     private static final String INSERT_CONTACT = """
             INSERT INTO company_contact (id, company_id, position, name, role_id, created_at, created_by)
@@ -112,7 +113,10 @@ public class LegacyImportService {
             report.companiesRead++;
             long id = LegacyIds.company(c.number());
             boolean added = !existing.contains(id);
-            String name = LegacyText.clean(c.name());
+            // simboli del database attuale all'inizio del nome: stelle e pollici (US-514)
+            LegacyCompanyMarks marks = LegacyCompanyMarks.of(LegacyText.clean(c.name()));
+            report.count(marks);
+            String name = marks.name();
             if (name == null) {
                 report.unnamed++;
                 report.unnamedNumbers.add(c.number());
@@ -132,7 +136,8 @@ public class LegacyImportService {
             companies.add(new Object[] {id, name, CompanyPlaceholders.VAT_CODE, LegacyText.clean(c.legalAddress()),
                     legal, LegacyText.clean(c.operatingAddress()), operating, category, LegacyText.clean(c.activity()),
                     details.phone(), details.mobile(), details.fax(), details.email(), details.secondaryEmail(),
-                    created, LegacyIds.AUTHOR, Timestamp.from(now), LegacyIds.AUTHOR});
+                    marks.reliability(), marks.projectInterest(), created, LegacyIds.AUTHOR, Timestamp.from(now),
+                    LegacyIds.AUTHOR});
 
             List<Object[]> companyContacts = contacts(c, id, roles, created, report);
             String note = LegacyText.clean(c.note());

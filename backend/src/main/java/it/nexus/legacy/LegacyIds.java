@@ -15,6 +15,8 @@ public final class LegacyIds {
     static final long NOTE = 893700000030000000L;
     static final long AUDIT = 893700000040000000L;
     static final long CALL = 893700000050000000L;
+    /** Audit della conversione dei simboli nei nomi delle aziende già importate (V52, US-514): riservato. */
+    static final long MARKS_AUDIT = 893700000060000000L;
     /** Voci iniziali dei cataloghi (V46, V47): base + numero di Access. */
     static final long BUSINESS_CATEGORY = 893700000000000400L;
     static final long CONTACT_ROLE = 893700000000000500L;

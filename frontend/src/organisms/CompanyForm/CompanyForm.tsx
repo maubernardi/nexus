@@ -19,9 +19,11 @@ import {
   toMunicipalityValue,
   type MunicipalityValue,
 } from '@/molecules/MunicipalityField/municipalityValue';
+import { RatingInput } from '@/molecules/RatingInput/RatingInput';
 import {
   CONTACT_PARTS,
   EMAIL_PATTERN,
+  LEGACY_MARKS_PATTERN,
   PHONE_PATTERN,
   type CompanyFormValues,
   type ContactValues,
@@ -45,6 +47,8 @@ const FIELDS = [
   'fax',
   'email',
   'secondaryEmail',
+  'reliability',
+  'projectInterest',
 ] as const satisfies readonly Field[];
 
 /** Il server parla degli id dei comuni, il modulo dei campi dei comuni (US-1007). */
@@ -93,6 +97,8 @@ const toValues = (company?: Company): CompanyFormValues => ({
     mobile: c.mobile ?? '',
     email: c.email ?? '',
   })),
+  reliability: company?.reliability ?? null,
+  projectInterest: company?.projectInterest ?? null,
 });
 
 const text = (v: string): string | null => v.trim() || null;
@@ -118,6 +124,8 @@ const toPayload = (v: CompanyFormValues): CompanyPayload => ({
     mobile: text(c.mobile),
     email: text(c.email),
   })),
+  reliability: v.reliability,
+  projectInterest: v.projectInterest,
 });
 
 type CompanyFormProps = {
@@ -166,6 +174,8 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
     fax: t('company.fields.fax'),
     email: t('company.fields.email'),
     secondaryEmail: t('company.fields.secondaryEmail'),
+    reliability: t('company.fields.reliability'),
+    projectInterest: t('company.fields.projectInterest'),
   };
   const contactErrors = errors.contacts;
   const summary: SummaryError[] = [
@@ -260,7 +270,9 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
                 validate: (v) =>
                   v.trim() === ''
                     ? t('form.errors.required')
-                    : !isNamePlaceholder(v) || t('company.errors.namePlaceholder'),
+                    : isNamePlaceholder(v)
+                      ? t('company.errors.namePlaceholder')
+                      : !LEGACY_MARKS_PATTERN.test(v) || t('company.errors.nameLegacyMarks'),
               })}
             />
           )}
@@ -311,6 +323,41 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
           {(p) => <Input {...p} autoComplete="off" {...register('activity', { maxLength: max(200) })} />}
         </FormField>
       </div>
+
+      <Group legend={t('company.rating.heading')} intro={t('company.rating.intro')}>
+        <Controller
+          control={control}
+          name="reliability"
+          render={({ field }) => (
+            <RatingInput
+              ref={field.ref}
+              id={fieldId('reliability')}
+              legend={labels.reliability}
+              hint={t('company.hints.reliability')}
+              kind="stars"
+              value={field.value}
+              onChange={field.onChange}
+              error={errors.reliability?.message}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="projectInterest"
+          render={({ field }) => (
+            <RatingInput
+              ref={field.ref}
+              id={fieldId('projectInterest')}
+              legend={labels.projectInterest}
+              hint={t('company.hints.projectInterest')}
+              kind="thumbs"
+              value={field.value}
+              onChange={field.onChange}
+              error={errors.projectInterest?.message}
+            />
+          )}
+        />
+      </Group>
 
       <Group legend={t('company.legalSeat')}>
         <FormField

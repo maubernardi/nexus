@@ -66,3 +66,19 @@ FROM (VALUES (892398395572130101, 892398395572130067, 0, 'Referente Logistica', 
 JOIN company c ON c.id = demo.company_id
 WHERE NOT EXISTS (SELECT 1 FROM company_contact cc WHERE cc.company_id = demo.company_id)
 ON CONFLICT DO NOTHING;
+
+-- Affidabilità (stelle) e interesse al progetto (pollici) delle aziende dimostrative (US-514), come dopo la conversione
+-- dei simboli del database attuale: una con stelle e pollici, una con le sole stelle, una con il solo pollice; le altre
+-- senza. Solo per le aziende ancora senza l'una e l'altro, così quelle valutate a mano non cambiano.
+UPDATE company c
+SET reliability = demo.reliability,
+    project_interest = demo.project_interest,
+    updated_at = now(),
+    updated_by = 'seed'
+FROM (VALUES (892398395572130067, 3, 2),
+             (892398395572130068, 2, NULL),
+             (892398395572130095, NULL, 1))
+         AS demo (company_id, reliability, project_interest)
+WHERE c.id = demo.company_id
+  AND c.reliability IS NULL
+  AND c.project_interest IS NULL;
