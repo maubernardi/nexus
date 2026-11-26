@@ -14,21 +14,27 @@ import it.nexus.domain.AbstractReferenceEntity;
 import it.nexus.domain.ClosureReason;
 import it.nexus.domain.Company;
 import it.nexus.domain.ClosureReport;
+import it.nexus.domain.CompanyNote;
 import it.nexus.domain.HiringFormula;
 import it.nexus.domain.Internship;
 import it.nexus.domain.NoHireReason;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.audit.AuditChanges;
+import it.nexus.domain.enumeration.AuditEntityType;
+import it.nexus.domain.enumeration.NotificationType;
 import it.nexus.domain.dto.ClosureReportDTO;
 import it.nexus.domain.dto.ClosureReportFormDTO;
 import it.nexus.mapper.ReferenceMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.ClosureReasonRepository;
 import it.nexus.repository.ClosureReportRepository;
+import it.nexus.repository.CompanyNoteRepository;
 import it.nexus.repository.HiringFormulaRepository;
 import it.nexus.repository.InternshipRepository;
 import it.nexus.repository.NoHireReasonRepository;
+import it.nexus.services.AuditService;
 import it.nexus.services.ClosureReportService;
+import it.nexus.services.NotificationService;
 import it.nexus.services.UserDisplayNameService;
 import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.FieldValidationException;
@@ -48,6 +54,9 @@ public class ClosureReportServiceImpl implements ClosureReportService {
     private final ClosureReasonRepository closureReasonRepository;
     private final UserDisplayNameService userDisplayNameService;
     private final ReferenceMapper referenceMapper;
+    private final CompanyNoteRepository companyNoteRepository;
+    private final AuditService auditService;
+    private final NotificationService notificationService;
 
     @Override
     public AuditChanges create(Ticket ticket, ClosureReportFormDTO form) {
@@ -73,12 +82,16 @@ public class ClosureReportServiceImpl implements ClosureReportService {
         if (company == null) {
             throw new BadRequestException("La segnalazione non ha un'azienda da valutare");
         }
+        boolean trainingShipProposed = Boolean.TRUE.equals(form.trainingShipProposed());
         ClosureReport.CompanyReview review = new ClosureReport.CompanyReview(company, form.companyInteraction(),
-                form.companyWelcome(), form.companyTraining(), text(form.companyReviewNote()));
+                form.companyWelcome(), form.companyTraining(), text(form.companyReviewNote()), trainingShipProposed);
         ClosureReport report = repository.save(new ClosureReport(ticket, form.actualEndDate(), closureReason,
                 interruptionDetails, form.companySatisfaction().shortValue(),
                 form.beneficiarySatisfaction().shortValue(), text(form.objectives()), text(form.difficulties()), formula,
                 reason, form.jobSlotStillAvailable(), review));
+        if (trainingShipProposed) {
+            proposeTrainingShip(ticket, company);
+        }
         return AuditChanges.of()
                 .value("actualEndDate", null, form.actualEndDate().toString())
                 .value("closureReason", null, closureReason.getCode())
@@ -91,7 +104,21 @@ public class ClosureReportServiceImpl implements ClosureReportService {
                 // valutazione dell'azienda: i voti sì, la nota (testo libero) no
                 .value("companyInteraction", null, form.companyInteraction())
                 .value("companyWelcome", null, form.companyWelcome())
-                .value("companyTraining", null, form.companyTraining());
+                .value("companyTraining", null, form.companyTraining())
+                .value("trainingShipProposed", null, trainingShipProposed);
+    }
+
+    /**
+     * Proposta di nave scuola (US-515): la nota nel diario dell'azienda e l'avviso all'operatore della segnalazione, che
+     * porta alla scheda dell'azienda. L'azienda non cambia: decide l'operatore.
+     */
+    private void proposeTrainingShip(Ticket ticket, Company company) {
+        companyNoteRepository.save(new CompanyNote(company,
+                "Proposta come nave scuola dal Tutor, nel report di restituzione della segnalazione n. %d."
+                        .formatted(ticket.getNumber())));
+        auditService.record(AuditEntityType.COMPANY, company.getId(), "NOTE_ADD", AuditChanges.none(), null);
+        notificationService.notify(ticket.getAssignedCcOperator(), NotificationType.TRAINING_SHIP_PROPOSED, ticket,
+                company);
     }
 
     @Override
@@ -114,7 +141,8 @@ public class ClosureReportServiceImpl implements ClosureReportService {
                 r.getCompanyInteraction(),
                 r.getCompanyWelcome(),
                 r.getCompanyTraining(),
-                r.getCompanyReviewNote()));
+                r.getCompanyReviewNote(),
+                r.isTrainingShipProposed()));
     }
 
     @Override

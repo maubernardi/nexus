@@ -48,6 +48,11 @@ export const ClosureReportView = ({ report }: ClosureReportViewProps) => {
           ...(report.companyReviewNote
             ? [{ label: t('closureReport.fields.companyReviewNote'), value: report.companyReviewNote }]
             : []),
+          // proposta di nave scuola (US-515)
+          {
+            label: t('closureReport.view.trainingShipProposed'),
+            value: report.trainingShipProposed ? t('beneficiary.yes') : t('beneficiary.no'),
+          },
         ];
   const rows: { label: string; value: ReactNode }[] = [
     // assente nei report inviati prima di US-1009

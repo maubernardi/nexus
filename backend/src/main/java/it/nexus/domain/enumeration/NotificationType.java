@@ -41,5 +41,10 @@ public enum NotificationType {
      * Al Tutor: 3 e 7 giorni dopo la fine prevista, il tirocinio va chiuso o prorogato; intanto non apre nuove
      * segnalazioni (US-1203).
      */
-    INTERNSHIP_OVERDUE
+    INTERNSHIP_OVERDUE,
+    /**
+     * All'operatore: nel report di restituzione il Tutor propone l'azienda come nave scuola (US-515). L'avviso porta alla
+     * scheda dell'azienda.
+     */
+    TRAINING_SHIP_PROPOSED
 }

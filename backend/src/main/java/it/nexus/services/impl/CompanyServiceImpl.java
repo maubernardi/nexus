@@ -101,7 +101,7 @@ public class CompanyServiceImpl implements CompanyService {
         }
         var result = repository.search(term(filters.search()), filters.includeInactive(), filters.toComplete(),
                 filterId(filters.businessCategoryId()), filterId(filters.zoneId()), minReliability, minProjectInterest,
-                PageRequest.of(page, size));
+                filters.trainingShip(), PageRequest.of(page, size));
         return new CompanyPageDTO(result.map(mapper::toDto).getContent(), result.getTotalElements(), page, size);
     }
 
@@ -192,6 +192,7 @@ public class CompanyServiceImpl implements CompanyService {
                 .value("zone", null, name(saved.getZone()))
                 .value("reliability", null, saved.getReliability())
                 .value("projectInterest", null, saved.getProjectInterest())
+                .value("trainingShip", null, saved.isTrainingShip() ? true : null)
                 // recapiti e referenti: dati personali, nell'audit senza valori (EN-4, US-510)
                 .redactedIfChanged("phone", null, saved.getPhone())
                 .redactedIfChanged("mobile", null, saved.getMobile())
@@ -238,6 +239,7 @@ public class CompanyServiceImpl implements CompanyService {
                 .value("zone", name(company.getZone()), name(zone))
                 .value("reliability", company.getReliability(), dto.reliability())
                 .value("projectInterest", company.getProjectInterest(), dto.projectInterest())
+                .value("trainingShip", company.isTrainingShip(), Boolean.TRUE.equals(dto.trainingShip()))
                 .redactedIfChanged("phone", company.getPhone(), blankToNull(dto.phone()))
                 .redactedIfChanged("mobile", company.getMobile(), blankToNull(dto.mobile()))
                 .redactedIfChanged("fax", company.getFax(), blankToNull(dto.fax()))
@@ -403,6 +405,7 @@ public class CompanyServiceImpl implements CompanyService {
         company.setSecondaryEmail(blankToNull(dto.secondaryEmail()));
         company.setReliability(dto.reliability());
         company.setProjectInterest(dto.projectInterest());
+        company.setTrainingShip(Boolean.TRUE.equals(dto.trainingShip()));
     }
 
     private static String blankToNull(String value) {

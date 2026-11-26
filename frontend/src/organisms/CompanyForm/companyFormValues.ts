@@ -23,6 +23,8 @@ export type CompanyFormValues = {
   /** Stelle e pollici (US-514); null = non valutata. */
   reliability: number | null;
   projectInterest: number | null;
+  /** Nave scuola (US-515). */
+  trainingShip: boolean;
 };
 
 /** Massimo dei referenti, come nel server (US-510). */

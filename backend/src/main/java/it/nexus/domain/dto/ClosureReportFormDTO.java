@@ -37,5 +37,7 @@ public record ClosureReportFormDTO(
         Integer companyWelcome,
         @NotNull(message = "Scegli una faccina") @Min(value = 1, message = "Da 1 a 5") @Max(value = 5, message = "Da 1 a 5")
         Integer companyTraining,
-        @Size(max = 500, message = "Massimo 500 caratteri") String companyReviewNote) {
+        @Size(max = 500, message = "Massimo 500 caratteri") String companyReviewNote,
+        /** «L'azienda è adatta come nave scuola?» (US-515): facoltativa; assente o falsa = nessuna proposta. */
+        Boolean trainingShipProposed) {
 }

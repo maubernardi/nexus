@@ -116,8 +116,16 @@ public class ClosureReport extends AbstractCreationAuditingEntity {
     @Column(name = "company_review_note", updatable = false, length = 500)
     private String companyReviewNote;
 
-    /** Valutazione dell'azienda del tirocinio (US-1104): tre voti da 1 a 5 e la nota facoltativa. */
-    public record CompanyReview(Company company, int interaction, int welcome, int training, String note) {
+    /** Il Tutor propone l'azienda come nave scuola (US-515); decide poi l'operatore. Falso nei report inviati prima. */
+    @Column(name = "training_ship_proposed", nullable = false, updatable = false)
+    private boolean trainingShipProposed;
+
+    /**
+     * Valutazione dell'azienda del tirocinio (US-1104): tre voti da 1 a 5, la nota facoltativa e la proposta di nave
+     * scuola (US-515).
+     */
+    public record CompanyReview(Company company, int interaction, int welcome, int training, String note,
+            boolean trainingShipProposed) {
     }
 
     public ClosureReport(Ticket ticket, LocalDate actualEndDate, ClosureReason closureReason, String interruptionDetails,
@@ -142,6 +150,7 @@ public class ClosureReport extends AbstractCreationAuditingEntity {
             this.companyWelcome = review.welcome();
             this.companyTraining = review.training();
             this.companyReviewNote = review.note();
+            this.trainingShipProposed = review.trainingShipProposed();
         }
     }
 

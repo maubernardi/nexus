@@ -146,6 +146,8 @@ class BoardPostResourceIT {
                 .andExpect(jsonPath("$[*].title", contains("Magazziniere")))
                 .andExpect(jsonPath("$[0].status").value("DRAFT"))
                 .andExpect(jsonPath("$[0].jobSlot.companyName").isNotEmpty())
+                // nave scuola (US-515): per il Call Center c'è, qui l'azienda non lo è
+                .andExpect(jsonPath("$[0].jobSlot.companyTrainingShip").value(false))
                 .andExpect(jsonPath("$[0].jobSlot.zone.code").value("BNORD"))
                 .andExpect(jsonPath("$[0].project.code").value("BGOL"));
         mockMvc.perform(get(POSTS).param("status", "PUBLISHED").header(USER, "admin"))

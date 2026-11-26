@@ -666,6 +666,42 @@ class CompanyResourceIT {
     }
 
     @Test
+    void naveScuola_auditConPrimaEDopo_filtro_listaDelTutor() throws Exception {
+        String id = JsonPath.read(create("operatore.cc", body("Trattoria Bianchi", "12345678901",
+                        ", \"trainingShip\": true"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.trainingShip").value(true))
+                .andReturn().getResponse().getContentAsString(), "$.id");
+        assertThat(companyAudit(id)).singleElement().satisfies(e -> assertThat(e.getChanges().get("trainingShip"))
+                .asInstanceOf(InstanceOfAssertFactories.MAP).containsEntry("after", true));
+        create("operatore.cc", body("Officina Rossi", "22222222222", "")).andExpect(status().isCreated())
+                .andExpect(jsonPath("$.trainingShip").value(false));
+
+        mockMvc.perform(get(API).param("trainingShip", "true").header(USER, "operatore.cc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(1))
+                .andExpect(jsonPath("$.companies[0].name").value("Trattoria Bianchi"))
+                .andExpect(jsonPath("$.companies[0].trainingShip").value(true));
+        mockMvc.perform(get(API).header(USER, "operatore.cc")).andExpect(jsonPath("$.total").value(2));
+        // il Tutor vede il 🚢 nella lista e nella scheda
+        mockMvc.perform(get(API + "/directory").header(USER, "tutor1"))
+                .andExpect(jsonPath("$.companies[?(@.id == '%s')].trainingShip".formatted(id), contains(true)));
+        mockMvc.perform(get(API + "/directory/" + id).header(USER, "tutor1"))
+                .andExpect(jsonPath("$.trainingShip").value(true));
+
+        // l'operatore la toglie: audit con prima e dopo
+        newRequest();
+        update(id, body("Trattoria Bianchi", "12345678901", ", \"version\": 0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.trainingShip").value(false));
+        assertThat(companyAudit(id)).last().satisfies(e -> assertThat(e.getChanges())
+                .containsOnlyKeys("trainingShip")
+                .containsEntry("trainingShip", Map.of("before", true, "after", false)));
+        mockMvc.perform(get(API).param("trainingShip", "true").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.total").value(0));
+    }
+
+    @Test
     void filtriPerStelleEPollici_siSommanoAgliAltri_fuoriIntervallo400() throws Exception {
         create("operatore.cc", body("Quattro stelle", "11111111111", ", \"reliability\": 4, \"projectInterest\": 2"))
                 .andExpect(status().isCreated());
@@ -765,7 +801,7 @@ class CompanyResourceIT {
         List<Map<String, Object>> items = JsonPath.read(json, "$.companies");
         for (Map<String, Object> item : items) {
             assertThat(item.keySet()).isSubsetOf("id", "name", "businessCategory", "zone", "address", "municipality",
-                    "reliability", "projectInterest");
+                    "reliability", "projectInterest", "trainingShip");
         }
         assertThat(json).doesNotContain("11111111111", "055 123456", "info@azienda.test", "Paola Neri");
 

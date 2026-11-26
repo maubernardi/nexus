@@ -50,6 +50,8 @@ public record CompanyFormDTO(
         /** Interesse al progetto, 1 o 2 pollici (US-514); vuoto = non valutato. */
         @Min(value = 1, message = PROJECT_INTEREST_MESSAGE) @Max(value = 2, message = PROJECT_INTEREST_MESSAGE)
         Integer projectInterest,
+        /** Nave scuola (US-515); assente = no. */
+        Boolean trainingShip,
         @PositiveOrZero Long version) {
 
     /** Massimo dei referenti di un'azienda (US-510). */

@@ -14,23 +14,26 @@ import it.nexus.services.messages.MessageTexts;
 public record NotificationEmail(String subject, String body) {
 
     /**
-     * Email della notifica, con il collegamento alla segnalazione ({@code appUrl} senza barra finale). Oggetto e testo
-     * vengono dai testi dei messaggi (US-1204): l'oggetto è «PORTALE NEXUS - Segnalazione n. N - » più la parte
-     * distintiva del tipo; collegamento, avvertenza e firma restano fissi.
+     * Email della notifica, con il collegamento alla segnalazione ({@code appUrl} senza barra finale) o, con
+     * {@code companyId}, alla scheda dell'azienda (US-515). Oggetto e testo vengono dai testi dei messaggi (US-1204):
+     * l'oggetto è «PORTALE NEXUS - Segnalazione n. N - » più la parte distintiva del tipo; collegamento, avvertenza e
+     * firma restano fissi.
      */
     public static NotificationEmail of(MessageTexts texts, NotificationType type, String ticketId, Long ticketNumber,
-            String appUrl) {
+            String companyId, String appUrl) {
         MessageKey key = MessageKey.of(type);
         Map<String, Object> values = Map.of("numero", ticketNumber);
         String text = texts.render(key, MessagePart.EMAIL_BODY, values);
+        String link = companyId == null ? "Apri la segnalazione: %s/segnalazioni/%s".formatted(appUrl, ticketId)
+                : "Apri la scheda dell'azienda: %s/aziende/%s".formatted(appUrl, companyId);
         String body = """
                 %s
 
-                Apri la segnalazione: %s/segnalazioni/%s
+                %s
 
                 Messaggio automatico di NEXUS, non rispondere. Trovi tutte le notifiche anche nell'app, alla voce \
                 Notifiche.
-                """.formatted(text, appUrl, ticketId) + EmailSignature.BLOCK;
+                """.formatted(text, link) + EmailSignature.BLOCK;
         String subject = EmailSignature.SUBJECT_PREFIX + "Segnalazione n. %d - %s".formatted(ticketNumber,
                 texts.render(key, MessagePart.EMAIL_SUBJECT, values));
         return new NotificationEmail(subject, body);

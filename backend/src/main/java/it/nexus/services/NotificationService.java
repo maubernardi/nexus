@@ -1,6 +1,7 @@
 package it.nexus.services;
 
 import it.nexus.domain.AppUser;
+import it.nexus.domain.Company;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.dto.NotificationsDTO;
 import it.nexus.domain.enumeration.NotificationType;
@@ -8,7 +9,12 @@ import it.nexus.domain.enumeration.NotificationType;
 public interface NotificationService {
 
     /** Avvisa il destinatario; nessuna notifica se manca (es. segnalazione non ancora in carico) o se è chi agisce. */
-    void notify(AppUser recipient, NotificationType type, Ticket ticket);
+    default void notify(AppUser recipient, NotificationType type, Ticket ticket) {
+        notify(recipient, type, ticket, null);
+    }
+
+    /** Come {@link #notify(AppUser, NotificationType, Ticket)}, con l'avviso che porta alla scheda dell'azienda (US-515). */
+    void notify(AppUser recipient, NotificationType type, Ticket ticket, Company company);
 
     /** Le notifiche più recenti dell'utente corrente e il numero delle non lette. */
     NotificationsDTO mine();

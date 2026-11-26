@@ -1672,4 +1672,73 @@ Sul collaudo del PC, prima del merge (http://localhost:8090, password `collaudo-
      lato.
   > Nota (26/11): T-38.1 … T-38.4 riuscite dal PO sul suo PC, con il collaudo della PR #214 (`e35941e`). Richieste dal
   > collaudo: un testo neutro sotto «Valutazioni dei tirocini» e la nota sempre presente nel report, anche con
-  > «Ottima» (fatte nella stessa PR).
+  > «Ottima» (fatte nella stessa PR). Unita con la #214 (`5095004`) e in produzione con il deploy del 26/11 sera.
+
+## 39. Azienda «nave scuola» (Sprint 18)
+
+Sul collaudo del PC, prima del merge (http://localhost:8090, password `collaudo-nexus-2026`; le email in Mailpit,
+http://localhost:8025). Nei dati finti «Demo Ristorazione S.n.c.» è già una nave scuola, e `tutor1` ha una segnalazione
+in tirocinio presso «Demo Servizi Pulizia Soc. Coop.» (beneficiaria «Demo Otto»), seguita da `operatore.cc`, con il
+report di restituzione da compilare. La nave scuola è un bollino oro con la nave verde, dopo il nome dell'azienda:
+passandoci sopra con il mouse compare «Nave scuola».
+
+- [x] **T-39.1 Nave scuola nella scheda e nell'elenco delle aziende (US-515)**
+  1. Entra come `operatore.cc` e apri «Aziende». **Atteso:** la nave accanto a «Demo Ristorazione S.n.c.», e a nessun
+     altro nome.
+  2. Spunta «Solo le navi scuola». **Atteso:** si vede solo «Demo Ristorazione S.n.c.»; compare «Azzera i filtri».
+  3. Azzera i filtri, apri «Demo Logistica S.r.l.» e nella «Valutazione del Call Center» spunta «Nave scuola», con il
+     suo aiuto sotto; salva. **Atteso:** la nave accanto al nome nel titolo della scheda e nell'elenco.
+  4. Togli la spunta e salva. **Atteso:** la nave non c'è più.
+
+- [x] **T-39.2 La nave dove si sceglie l'azienda (US-515)**
+  1. Come `operatore.cc` apri la bacheca e scegli «Pubblicati». **Atteso:** l'annuncio «Tirocinio cameriere di sala»
+     ha la nave accanto a «Demo Ristorazione S.n.c.», anche nel suo dettaglio.
+  2. Apri una segnalazione in lavorazione e cerca le mansioni compatibili in tutte le zone e tipologie. **Atteso:** le
+     mansioni di «Demo Ristorazione S.n.c.» hanno la nave accanto al nome dell'azienda.
+
+- [x] **T-39.3 Proposta nel report di restituzione (US-515)**
+  1. Esci ed entra come `tutor1`; apri la segnalazione di «Demo Otto» e il report di restituzione. **Atteso:** nella
+     «Valutazione dell'azienda», dopo la nota, la domanda «L'azienda è adatta come nave scuola?», senza «obbligatorio»,
+     con l'aiuto che spiega che cos'è una nave scuola e che decide il Call Center.
+  2. Compila il report rispondendo «Sì» e invialo. La «Fine effettiva del tirocinio» parte vuota: scrivi una data.
+     **Atteso:** il report inviato mostra «Proposta come nave scuola: Sì».
+
+- [x] **T-39.4 L'avviso all'operatore e il diario dell'azienda (US-515)**
+  1. Esci ed entra come `operatore.cc`; apri le notifiche. **Atteso:** «Nel report di restituzione della segnalazione
+     n. … il Tutor propone l'azienda del tirocinio come nave scuola: decidi tu dalla scheda dell'azienda.», con il
+     collegamento «Apri la scheda dell'azienda della segnalazione n. …».
+  2. Premi il collegamento. **Atteso:** la scheda di «Demo Servizi Pulizia Soc. Coop.», ancora senza la nave: decidi
+     tu. Nelle note c'è «Proposta come nave scuola dal Tutor, nel report di restituzione della segnalazione n. …», di
+     Tutor Uno, con la data di oggi.
+  3. Apri Mailpit. **Atteso:** l'email a `operatore.cc` con l'oggetto «PORTALE NEXUS - Segnalazione n. … - Proposta di
+     nave scuola», il collegamento alla scheda dell'azienda (non alla segnalazione) e la firma «Portale Nexus».
+  4. Come `admin`, apri «Testi dei messaggi». **Atteso:** c'è «Proposta di nave scuola», con il testo nell'app,
+     l'oggetto e il testo dell'email, che si possono cambiare come gli altri.
+
+- [x] **T-39.5 La nave per il Tutor (US-515)**
+  1. Come `tutor2` apri «Aziende». **Atteso:** la nave accanto a «Demo Ristorazione S.n.c.»; apri la sua scheda: la
+     nave anche nel titolo.
+  2. Apri la bacheca dei Tutor. **Atteso:** nessuna nave e nessun nome di azienda: la bacheca resta anonima.
+  3. Prova il tema scuro con il pulsante 🌙 in alto e restringi la finestra alla larghezza di uno smartphone.
+     **Atteso:** la nave si vede bene e i nomi non escono dalla pagina.
+  > Nota (26/11): T-39.1 … T-39.5 riuscite dal PO sul suo PC, con il collaudo della PR #216 (`874e48c`). Richiesta dal
+  > collaudo: il simbolo era troppo poco evidente; ora è un bollino oro con la nave verde scura, più grande e staccato
+  > dal nome, in tutti gli elenchi e nei titoli delle schede (fatto nella stessa PR, T-39.6).
+
+- [ ] **T-39.6 Il bollino della nave scuola ben visibile (US-515)**
+  1. Come `operatore.cc`, guarda «Demo Ristorazione S.n.c.» in «Aziende», nella bacheca («Pubblicati») e nelle mansioni
+     compatibili di una segnalazione in lavorazione. **Atteso:** dopo il nome, un po' staccato, un bollino rotondo oro
+     con il bordo e la nave verde scuro, ben visibile; nel titolo della scheda dell'azienda è più grande.
+  2. Come `tutor2`, in «Aziende» e nella scheda. **Atteso:** lo stesso bollino.
+  3. Passa al tema scuro con il pulsante 🌙. **Atteso:** il bollino oro si vede bene anche sul fondo scuro.
+
+- [ ] **T-39.7 La ragione sociale in evidenza negli elenchi (US-515)**
+  1. Come `operatore.cc`, in «Aziende» crea un'azienda finta con un nome lungo, per esempio «Prova Cooperativa Sociale
+     Servizi Integrati» (43 caratteri), con la spunta «Nave scuola». **Atteso:** nell'elenco non ci sono più le colonne
+     «Telefono» ed «Email»; la colonna «Ragione sociale» è la più larga e il nome sta su una riga, con il bollino.
+  2. Crea un'altra azienda finta con un nome di 50 caratteri, il massimo del database attuale. **Atteso:** solo questo
+     va a capo.
+  3. Come `tutor2`, apri «Aziende». **Atteso:** anche qui la colonna «Ragione sociale» è la più larga e i nomi stanno su
+     una riga.
+  4. Restringi la finestra alla larghezza di uno smartphone. **Atteso:** come prima, la tabella scorre di lato e i nomi
+     restano su una riga.

@@ -6,6 +6,7 @@ import { Link, useSearchParams } from 'react-router';
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { RatingDisplay } from '@/atoms/RatingDisplay/RatingDisplay';
 import { ToCompleteBadge } from '@/atoms/ToCompleteBadge/ToCompleteBadge';
+import { TrainingShipBadge } from '@/atoms/TrainingShipBadge/TrainingShipBadge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -13,10 +14,12 @@ import { NativeSelect } from '@/components/ui/native-select';
 import { COMPANY_PAGE_SIZES, DEFAULT_COMPANY_PAGE_SIZE, type Company } from '@/config/api/companyApi';
 import { useCompanySearch } from '@/config/hooks/useCompanies';
 import { useBusinessCategories, useZones } from '@/config/hooks/useReferenceData';
+import { COMPANY_NAME_COLUMN } from '@/lib/companyColumns';
 import { isMissing } from '@/lib/companyCompletion';
 import { contactName } from '@/lib/companyContacts';
 import { parsePage, parsePageSize } from '@/lib/pageParams';
 import { RATING_MAX } from '@/lib/rating';
+import { cn } from '@/lib/utils';
 import { Pagination } from '@/molecules/Pagination/Pagination';
 
 // parametri dell'indirizzo: Indietro e link condivisi mantengono la ricerca
@@ -27,6 +30,7 @@ const CATEGORY_PARAM = 'categoria';
 const ZONE_PARAM = 'zona';
 const RELIABILITY_PARAM = 'stelle';
 const PROJECT_INTEREST_PARAM = 'interesse';
+const TRAINING_SHIP_PARAM = 'naveScuola';
 const PAGE_PARAM = 'pagina';
 const PAGE_SIZE_PARAM = 'perPagina';
 
@@ -49,13 +53,14 @@ type Filters = {
   zone: string;
   minReliability: number | null;
   minProjectInterest: number | null;
+  trainingShip: boolean;
 };
 
 /**
  * Anagrafica aziende (US-501): ricerca ed elenco per Call Center e ADMIN, con le aziende da completare (US-508) e il
  * filtro per categoria merceologica (US-509). L'elenco arriva una pagina alla volta (US-513): pagina e aziende per
  * pagina stanno nell'indirizzo, come i filtri; un filtro nuovo riparte dalla prima pagina. Stelle e pollici hanno le
- * loro colonne e i loro filtri (US-514).
+ * loro colonne e i loro filtri (US-514); le navi scuola il 🚢 accanto al nome e il loro filtro (US-515).
  */
 export const CompaniesPage = () => {
   const { t } = useTranslation();
@@ -70,6 +75,7 @@ export const CompaniesPage = () => {
   const search = searchParams.get(SEARCH_PARAM) ?? '';
   const includeInactive = searchParams.get(INACTIVE_PARAM) === '1';
   const toComplete = searchParams.get(TO_COMPLETE_PARAM) === '1';
+  const trainingShip = searchParams.get(TRAINING_SHIP_PARAM) === '1';
   const category = searchParams.get(CATEGORY_PARAM) ?? '';
   const zone = searchParams.get(ZONE_PARAM) ?? '';
   const minReliability = parseMin(searchParams.get(RELIABILITY_PARAM), RATING_MAX.stars);
@@ -86,6 +92,7 @@ export const CompaniesPage = () => {
     zoneId: zone || undefined,
     minReliability: minReliability ?? undefined,
     minProjectInterest: minProjectInterest ?? undefined,
+    trainingShip: trainingShip || undefined,
     page: page - 1,
     size: pageSize,
   });
@@ -97,6 +104,7 @@ export const CompaniesPage = () => {
     zone,
     minReliability,
     minProjectInterest,
+    trainingShip,
   };
   const result = companies.data;
   const total = result?.total ?? 0;
@@ -113,6 +121,7 @@ export const CompaniesPage = () => {
       zone: zoneId,
       minReliability: stars,
       minProjectInterest: thumbs,
+      trainingShip: onlyTrainingShips,
     }: Filters,
     nextPage = 1,
     nextPageSize = pageSize,
@@ -125,6 +134,7 @@ export const CompaniesPage = () => {
     if (thumbs) next.set(PROJECT_INTEREST_PARAM, String(thumbs));
     if (inactive) next.set(INACTIVE_PARAM, '1');
     if (onlyToComplete) next.set(TO_COMPLETE_PARAM, '1');
+    if (onlyTrainingShips) next.set(TRAINING_SHIP_PARAM, '1');
     if (nextPage > 1) next.set(PAGE_PARAM, String(nextPage));
     if (nextPageSize !== DEFAULT_COMPANY_PAGE_SIZE) next.set(PAGE_SIZE_PARAM, String(nextPageSize));
     setSearchParams(next);
@@ -169,7 +179,8 @@ export const CompaniesPage = () => {
   const filtered =
     Boolean(search || category || zone || minReliability || minProjectInterest) ||
     includeInactive ||
-    toComplete;
+    toComplete ||
+    trainingShip;
 
   /**
    * Toglie ricerca e filtri, dalla prima pagina; le aziende per pagina restano. Il pulsante sparisce: il focus va al
@@ -184,6 +195,7 @@ export const CompaniesPage = () => {
       zone: '',
       minReliability: null,
       minProjectInterest: null,
+      trainingShip: false,
     });
     window.requestAnimationFrame(() => document.getElementById('company-search')?.focus());
   };
@@ -338,6 +350,16 @@ export const CompaniesPage = () => {
               {t('company.onlyToComplete')}
             </label>
           </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="company-training-ship"
+              checked={trainingShip}
+              onChange={(e) => update({ ...current, trainingShip: e.target.checked })}
+            />
+            <label htmlFor="company-training-ship" className="text-sm">
+              {t('company.onlyTrainingShips')}
+            </label>
+          </div>
         </div>
         {filtered && (
           <Button type="button" variant="outline" onClick={resetFilters}>
@@ -377,7 +399,8 @@ export const CompaniesPage = () => {
               </caption>
               <thead className="border-b border-border bg-muted">
                 <tr>
-                  <th scope="col" className={th}>
+                  {/* la colonna più importante: la più larga (PO, 26/11) */}
+                  <th scope="col" className={cn(th, COMPANY_NAME_COLUMN)}>
                     {t('company.fields.name')}
                   </th>
                   <th scope="col" className={th}>
@@ -399,12 +422,6 @@ export const CompaniesPage = () => {
                     {t('company.contacts.column')}
                   </th>
                   <th scope="col" className={th}>
-                    {t('company.fields.phone')}
-                  </th>
-                  <th scope="col" className={th}>
-                    {t('company.fields.email')}
-                  </th>
-                  <th scope="col" className={th}>
                     {t('company.status')}
                   </th>
                 </tr>
@@ -416,6 +433,12 @@ export const CompaniesPage = () => {
                       <Link to={`/aziende/${c.id}`} className="text-primary underline underline-offset-4">
                         {c.name}
                       </Link>
+                      {c.trainingShip && (
+                        <>
+                          {' '}
+                          <TrainingShipBadge />
+                        </>
+                      )}
                       {isMissing(c, 'NAME') && (
                         <>
                           {' '}
@@ -435,8 +458,6 @@ export const CompaniesPage = () => {
                       <RatingDisplay kind="thumbs" value={c.projectInterest} />
                     </td>
                     <td className={td}>{firstContact(c)}</td>
-                    <td className={`${td} whitespace-nowrap`}>{c.phone ?? '—'}</td>
-                    <td className={td}>{c.email ?? '—'}</td>
                     <td className={td}>{t(c.active ? 'company.active' : 'company.inactive')}</td>
                   </tr>
                 ))}

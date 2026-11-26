@@ -82,14 +82,18 @@ const fillRequired = async (user: ReturnType<typeof userEvent.setup>): Promise<v
   const [companyFour] = await screen.findAllByRole('radio', { name: '4' });
   await user.click(companyFour);
   await user.click(screen.getAllByRole('radio', { name: '5' })[1]);
-  await user.click(screen.getAllByRole('radio', { name: 'Sì' })[0]);
+  await user.click(choice(/stato assunto/, 'Sì'));
   await user.selectOptions(
     await screen.findByRole('combobox', { name: /Formula di assunzione/ }),
     'Tempo indeterminato',
   );
-  await user.click(screen.getAllByRole('radio', { name: 'No' })[1]);
+  await user.click(choice(/mansione è ancora disponibile/, 'No'));
   await chooseReview(user, ['Buona', 'Ottima', 'Buona']);
 };
+
+/** Una risposta di una domanda a pallini, cercata nel suo gruppo: le risposte «Sì» e «No» sono in più domande. */
+const choice = (question: RegExp, answer: string): HTMLElement =>
+  within(screen.getByRole('group', { name: question })).getByRole('radio', { name: answer });
 
 /** Valutazione dell'azienda (US-1104): una faccina per ognuna delle tre domande, nell'ordine del modulo. */
 const chooseReview = async (
@@ -191,6 +195,7 @@ describe('<ClosureReportPage>', () => {
         companyWelcome: 5,
         companyTraining: 4,
         companyReviewNote: null,
+        trainingShipProposed: null,
       },
     });
     const sent = await screen.findByRole('status');
@@ -225,6 +230,25 @@ describe('<ClosureReportPage>', () => {
         companyTraining: 4,
         companyReviewNote: 'Poca formazione',
       }),
+    );
+  });
+
+  it('nave scuola: domanda facoltativa, il sì diventa la proposta (US-515)', async () => {
+    const user = userEvent.setup();
+    vi.mocked(submitClosureReport).mockResolvedValue(closed);
+    renderPage();
+    await fillRequired(user);
+    const question = screen.getByRole('group', { name: 'L’azienda è adatta come nave scuola?' });
+    expect(question).toHaveAccessibleDescription(
+      /Facoltativa\. Una nave scuola è un’azienda adatta a un primo tirocinio/,
+    );
+    expect(question).not.toHaveTextContent('obbligatorio');
+    await user.click(choice(/nave scuola/, 'Sì'));
+    await expectNoAxeViolations();
+    await user.click(screen.getByRole('button', { name: 'Invia il report' }));
+    await user.click(await screen.findByRole('button', { name: 'Sì, invia il report' }));
+    expect(vi.mocked(submitClosureReport).mock.calls[0][0].report).toEqual(
+      expect.objectContaining({ trainingShipProposed: true, hired: true, jobSlotStillAvailable: false }),
     );
   });
 
@@ -412,7 +436,7 @@ describe('<ClosureReportPage>', () => {
     await screen.findByRole('heading', { level: 1 });
     await fillRequired(user);
     // ripensamento: la formula scelta prima non conta più
-    await user.click(screen.getAllByRole('radio', { name: 'No' })[0]);
+    await user.click(choice(/stato assunto/, 'No'));
     expect(screen.queryByRole('combobox', { name: /Formula di assunzione/ })).not.toBeInTheDocument();
     await user.selectOptions(
       screen.getByRole('combobox', { name: /Motivo della mancata assunzione/ }),

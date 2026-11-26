@@ -85,11 +85,29 @@ describe('<ClosureReportView>', () => {
     expect(value('Capacità formativa dell’azienda e del tutor aziendale')).toBe('Buona');
     expect(value('Valutazione dell’azienda')).toContain('Buona · 4,3');
     expect(value('Nota sulla valutazione')).toBe('Poca formazione');
+    // senza la proposta di nave scuola (US-515)
+    expect(value('Proposta come nave scuola')).toBe('No');
     await expectNoAxeViolations();
+  });
+
+  it('con la proposta di nave scuola: «Sì» (US-515)', () => {
+    renderWithProviders(
+      <ClosureReportView
+        report={{
+          ...report,
+          companyInteraction: 5,
+          companyWelcome: 5,
+          companyTraining: 5,
+          trainingShipProposed: true,
+        }}
+      />,
+    );
+    expect(value('Proposta come nave scuola')).toBe('Sì');
   });
 
   it('report inviati prima: nessuna valutazione dell’azienda', () => {
     renderWithProviders(<ClosureReportView report={report} />);
     expect(screen.queryByText('Valutazione dell’azienda')).not.toBeInTheDocument();
+    expect(screen.queryByText('Proposta come nave scuola')).not.toBeInTheDocument();
   });
 });

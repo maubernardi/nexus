@@ -112,6 +112,10 @@ public class Company extends AbstractTsidEntity {
     @Column(name = "project_interest")
     private Integer projectInterest;
 
+    /** Nave scuola (US-515): adatta a un primo tirocinio; la segnano operatori e ADMIN. */
+    @Column(name = "training_ship", nullable = false)
+    private boolean trainingShip;
+
     @Column(name = "active", nullable = false)
     private boolean active = true;
 

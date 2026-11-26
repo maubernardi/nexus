@@ -5,6 +5,7 @@ import { Link, useSearchParams } from 'react-router';
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { RatingDisplay } from '@/atoms/RatingDisplay/RatingDisplay';
 import { ReviewFace } from '@/atoms/ReviewFace/ReviewFace';
+import { TrainingShipBadge } from '@/atoms/TrainingShipBadge/TrainingShipBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
@@ -15,7 +16,9 @@ import {
 } from '@/config/api/companyApi';
 import { useCompanyDirectory } from '@/config/hooks/useCompanies';
 import { useBusinessCategories, useZones } from '@/config/hooks/useReferenceData';
+import { COMPANY_NAME_COLUMN } from '@/lib/companyColumns';
 import { parsePage, parsePageSize } from '@/lib/pageParams';
+import { cn } from '@/lib/utils';
 import { Pagination } from '@/molecules/Pagination/Pagination';
 
 // parametri dell'indirizzo, come nell'elenco del Call Center
@@ -237,7 +240,8 @@ export const TutorCompaniesPage = () => {
               </caption>
               <thead className="border-b border-border bg-muted">
                 <tr>
-                  <th scope="col" className={th}>
+                  {/* come nell'elenco del Call Center: la colonna del nome è la più larga (PO, 26/11) */}
+                  <th scope="col" className={cn(th, COMPANY_NAME_COLUMN)}>
                     {t('company.fields.name')}
                   </th>
                   <th scope="col" className={th}>
@@ -268,6 +272,12 @@ export const TutorCompaniesPage = () => {
                       <Link to={`/aziende/${c.id}`} className="text-primary underline underline-offset-4">
                         {c.name}
                       </Link>
+                      {c.trainingShip && (
+                        <>
+                          {' '}
+                          <TrainingShipBadge />
+                        </>
+                      )}
                     </th>
                     <td className={td}>{c.businessCategory?.name ?? '—'}</td>
                     <td className={td}>{c.zone?.name ?? '—'}</td>

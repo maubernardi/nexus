@@ -118,6 +118,8 @@ export type JobSlotMatch = {
   description: string | null;
   companyId: string;
   companyName: string;
+  /** L'azienda è una nave scuola (US-515): il 🚢 accanto al nome. */
+  companyTrainingShip?: boolean;
   jobCategory: ReferenceItem;
   zone: ReferenceItem;
   version: number;
@@ -194,6 +196,8 @@ export type ClosureReport = {
   companyWelcome?: number;
   companyTraining?: number;
   companyReviewNote?: string;
+  /** Il Tutor ha proposto l'azienda come nave scuola (US-515). */
+  trainingShipProposed?: boolean;
 };
 
 /** Report di restituzione dal modulo (US-1101): conta la formula se assunto, il motivo se non assunto. */
@@ -216,6 +220,8 @@ export type ClosureReportForm = {
   companyWelcome: number;
   companyTraining: number;
   companyReviewNote: string | null;
+  /** «L'azienda è adatta come nave scuola?» (US-515): null = nessuna risposta. */
+  trainingShipProposed: boolean | null;
 };
 
 export type CompatibleFilters = { zoneId?: string; jobCategoryId?: string };

@@ -252,6 +252,55 @@ class ClosureReportIT {
     }
 
     @Test
+    void propostaDiNaveScuola_avvisoAllOperatore_notaNelDiario_aziendaNonCambia() throws Exception {
+        String companyId = TsidMapper.toExternal(place.company().getId());
+        review = review + """
+                , "trainingShipProposed": true""";
+        send("tutor1", ticketVersion(), true, formulaId(), null)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.closureReport.trainingShipProposed").value(true));
+
+        // l'avviso porta alla scheda dell'azienda, con il numero della segnalazione
+        String proposal = "$.items[?(@.type == 'TRAINING_SHIP_PROPOSED')]";
+        mockMvc.perform(get("/api/v1/notifications").header(USER, "operatore.cc"))
+                .andExpect(jsonPath(proposal + ".companyId", contains(companyId)))
+                .andExpect(jsonPath(proposal + ".ticketNumber", contains(ticket.getNumber().intValue())))
+                .andExpect(jsonPath(proposal + ".text", contains("Nel report di restituzione della segnalazione n. "
+                        + ticket.getNumber() + " il Tutor propone l'azienda del tirocinio come nave scuola: decidi tu"
+                        + " dalla scheda dell'azienda.")));
+        // la proposta resta nel diario, a nome del Tutor
+        mockMvc.perform(get("/api/v1/companies/" + companyId + "/notes").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$[0].text").value("Proposta come nave scuola dal Tutor, nel report di restituzione"
+                        + " della segnalazione n. " + ticket.getNumber() + "."))
+                .andExpect(jsonPath("$[0].authorName").value(actors.tutor1().getFirstName() + " "
+                        + actors.tutor1().getLastName()));
+        // decide l'operatore: l'azienda non è ancora una nave scuola
+        mockMvc.perform(get("/api/v1/companies/" + companyId).header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.trainingShip").value(false));
+        em.flush();
+        String changes = jdbc.queryForObject(
+                "SELECT changes::text FROM audit_event WHERE entity_id = ? AND action = 'CLOSE'", String.class,
+                ticket.getId());
+        assertThat(changes).contains("\"trainingShipProposed\"");
+    }
+
+    @Test
+    void nessunaProposta_nessunAvvisoENessunaNota() throws Exception {
+        String companyId = TsidMapper.toExternal(place.company().getId());
+        review = review + """
+                , "trainingShipProposed": false""";
+        send("tutor1", ticketVersion(), true, formulaId(), null)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.closureReport.trainingShipProposed").value(false));
+
+        mockMvc.perform(get("/api/v1/notifications").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.items[*].type", hasItem("CLOSURE_REPORT_SUBMITTED")))
+                .andExpect(jsonPath("$.items[?(@.type == 'TRAINING_SHIP_PROPOSED')]").isEmpty());
+        mockMvc.perform(get("/api/v1/companies/" + companyId + "/notes").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
     void valutazioni_mediaDelleMedie_dallaPiuRecente_senzaValutazioni() throws Exception {
         String companyId = TsidMapper.toExternal(place.company().getId());
         mockMvc.perform(get("/api/v1/companies/" + companyId + "/reviews").header(USER, "operatore.cc"))

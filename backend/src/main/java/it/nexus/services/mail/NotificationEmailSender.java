@@ -52,7 +52,7 @@ public class NotificationEmailSender {
             return;
         }
         NotificationEmail email = NotificationEmail.of(messageTextService.current(), event.type(), event.ticketId(),
-                event.ticketNumber(), properties.getAppUrl());
+                event.ticketNumber(), event.companyId(), properties.getAppUrl());
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(properties.getFrom());
         message.setTo(event.recipientEmail());

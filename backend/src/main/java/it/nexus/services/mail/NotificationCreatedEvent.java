@@ -7,7 +7,7 @@ import it.nexus.domain.enumeration.NotificationType;
  * all'email; l'indirizzo è un dato personale, mai nei log né in {@link #toString()}.
  */
 public record NotificationCreatedEvent(Long notificationId, String recipientEmail, NotificationType type,
-        String ticketId, Long ticketNumber) {
+        String ticketId, Long ticketNumber, String companyId) {
 
     @Override
     public String toString() {

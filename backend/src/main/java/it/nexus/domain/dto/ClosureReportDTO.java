@@ -28,5 +28,7 @@ public record ClosureReportDTO(
         Integer companyInteraction,
         Integer companyWelcome,
         Integer companyTraining,
-        String companyReviewNote) {
+        String companyReviewNote,
+        /** Il Tutor ha proposto l'azienda come nave scuola (US-515). */
+        boolean trainingShipProposed) {
 }

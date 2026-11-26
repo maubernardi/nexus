@@ -337,6 +337,8 @@ export const it = {
     markRead: 'Segna come letta',
     new: 'Nuova:',
     open: 'Apri la segnalazione n. {{number}}',
+    /** Proposta di nave scuola (US-515): l'avviso porta alla scheda dell'azienda. */
+    openCompany: 'Apri la scheda dell’azienda della segnalazione n. {{number}}',
     empty: 'Non hai notifiche.',
     listLabel: 'Notifiche dalla più recente',
     generic: 'Aggiornamento sulla segnalazione n. {{number}}.',
@@ -443,6 +445,10 @@ export const it = {
       INTERNSHIP_OVERDUE: {
         title: 'Tirocinio da chiudere o prorogare',
         when: 'Al Tutor, 3 e 7 giorni dopo la fine prevista, se il tirocinio non è chiuso.',
+      },
+      TRAINING_SHIP_PROPOSED: {
+        title: 'Proposta di nave scuola',
+        when: 'All’operatore, quando il Tutor propone l’azienda come nave scuola nel report di restituzione: l’avviso porta alla scheda dell’azienda.',
       },
       EMAIL_CHANGE_CODE: {
         title: 'Codice per il nuovo indirizzo email',
@@ -797,6 +803,7 @@ export const it = {
       companyWelcome: 'Capacità dell’azienda di accogliere il beneficiario',
       companyTraining: 'Capacità formativa dell’azienda e del tutor aziendale',
       companyReviewNote: 'Nota sulla valutazione',
+      trainingShipProposed: 'L’azienda è adatta come nave scuola?',
     },
     /** Valutazione dell'azienda (US-1104). */
     review: {
@@ -808,6 +815,8 @@ export const it = {
     hints: {
       companyReviewNote:
         'Facoltativa, al massimo 500 caratteri: che cosa è andato bene o male? Niente dati personali del beneficiario.',
+      trainingShipProposed:
+        'Facoltativa. Una nave scuola è un’azienda adatta a un primo tirocinio. Se rispondi sì, il Call Center riceve la tua proposta e decide se segnarla.',
       actualEndDate:
         'L’ultimo giorno di tirocinio, anche se diverso da quello previsto. Serve per la relazione finale: la scheda del tirocinio non cambia.',
       actualEndDatePrefilled:
@@ -845,6 +854,7 @@ export const it = {
       hiredNo: 'No: {{reason}}',
       none: 'Non indicate',
       companyReview: 'Valutazione dell’azienda',
+      trainingShipProposed: 'Proposta come nave scuola',
     },
   },
   companyNote: {
@@ -932,6 +942,7 @@ export const it = {
       reliability: 'Affidabilità',
       projectInterest: 'Interesse al progetto',
       zone: 'Zona',
+      trainingShip: 'Nave scuola',
     },
     hints: {
       vatCode: '11 cifre, senza prefisso IT.',
@@ -944,7 +955,11 @@ export const it = {
       zone: 'La zona del territorio: il Tutor la usa per cercare le aziende.',
       reliability: 'Da 1 a 4 stelle: clicca la stella che vuoi.',
       projectInterest: 'Uno o due pollici alzati.',
+      trainingShip:
+        'Azienda adatta a un primo tirocinio: nella scelta dell’azienda ha la nave accanto al nome. Un Tutor la può proporre nel report di restituzione, ma decide il Call Center.',
     },
+    /** Nave scuola (US-515): il testo del simbolo accanto al nome. */
+    trainingShip: 'Nave scuola',
     /** Valutazione del Call Center (US-514). */
     rating: {
       heading: 'Valutazione del Call Center',
@@ -989,6 +1004,7 @@ export const it = {
     searchSubmit: 'Cerca',
     includeInactive: 'Mostra anche le aziende disattivate',
     onlyToComplete: 'Solo le aziende da completare',
+    onlyTrainingShips: 'Solo le navi scuola',
     noCategory: 'Nessuna',
     noZone: 'Nessuna',
     /** Toglie ricerca e filtri dell'elenco (US-511, PO 26/11). */
