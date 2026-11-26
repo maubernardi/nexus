@@ -891,10 +891,10 @@ export const it = {
       reliability: 'Da 1 a 4 stelle: clicca la stella che vuoi.',
       projectInterest: 'Uno o due pollici alzati.',
     },
-    /** Valutazione del Call Center (US-514): prima stava nei simboli $ e £ all'inizio del nome. */
+    /** Valutazione del Call Center (US-514). */
     rating: {
       heading: 'Valutazione del Call Center',
-      intro: 'Facoltativa. Nel database attuale si segnava con $ e £ all’inizio del nome.',
+      intro: 'Facoltativa.',
     },
     legalSeat: 'Sede legale',
     operatingSeat: 'Sede operativa',
