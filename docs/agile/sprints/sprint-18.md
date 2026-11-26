@@ -1,6 +1,6 @@
 # Sprint 18 — 26 – 28 novembre 2026
 
-**Stato:** 🔨 in corso dal 26/11.
+**Stato:** 🔨 in corso dal 26/11. In produzione dal 26/11, a `1603fcc`: US-514 e US-1312 (8 punti su 21).
 **Planning:** 25 – 26/11, dalla [review dello Sprint 17](sprint-17-review.md) (§8, §9).
 
 ## Obiettivo
@@ -12,14 +12,14 @@
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-514 | Affidabilità e interesse al progetto dell'azienda | 5 | 👀 In review | `add-company-reliability-interest` | [#208](https://github.com/maubernardi/nexus/pull/208) |
+| US-514 | Affidabilità e interesse al progetto dell'azienda | 5 | 🎉 Done | `add-company-reliability-interest` (archiviata) | [#208](https://github.com/maubernardi/nexus/pull/208) |
 | US-1104 | Valutazione dell'azienda alla fine del tirocinio | 5 | ✅ Ready | — | — |
 | US-515 | Azienda «nave scuola» | 5 | ✅ Ready | — | — |
 | US-1311 | Avvisi affidabili su sito e backup | 3 | 📋 Servizio da scegliere | — | — |
-| US-1312 | Tema chiaro o scuro a scelta e intestazione fissa delle schede | 3 | 👀 In review | `add-theme-toggle-and-top-back-links` | [#209](https://github.com/maubernardi/nexus/pull/209) |
+| US-1312 | Tema chiaro o scuro a scelta e intestazione fissa delle schede | 3 | 🎉 Done | `add-theme-toggle-and-top-back-links` (archiviata) | [#209](https://github.com/maubernardi/nexus/pull/209), [#210](https://github.com/maubernardi/nexus/pull/210) (la #209 era finita nel branch di US-514) |
 
 **Ordine** (PO, 26/11):
-1. **US-514 subito, anche nel collaudo**: i dati finti del collaudo hanno alcune aziende con i vecchi simboli.
+1. **US-514 subito, anche nel collaudo**: i dati finti del collaudo hanno alcune aziende con stelle e pollici.
 2. **US-1104, poi US-515**: toccano tutte e due il report di restituzione e la scheda dell'azienda.
 3. **US-1312** (PO, 26/11, dal collaudo di US-514): pulsante 🌙/☀️ nella barra in alto e intestazione fissa delle
    schede (ritorno all'elenco e titolo), senza il ritorno in fondo.
@@ -57,3 +57,5 @@ lista delle aziende stelle, pollici, 🚢 e valutazioni.
 |---|---|
 | Inizio (26/11) | 18 |
 | US-1312 aggiunta dal PO dal collaudo di US-514 (26/11) | 21 |
+| US-514 Done: collaudo T-35.1 … T-35.5 sul PC, deploy `1603fcc` e T-35.6 in produzione (26/11) | 16 |
+| US-1312 Done: collaudo T-36.1 … T-36.3 sul PC e deploy `1603fcc` (26/11) | 13 |

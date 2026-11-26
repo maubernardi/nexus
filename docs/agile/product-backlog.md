@@ -114,7 +114,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-511](#us-511) | E5 | Zona dell'azienda e aziende per il Tutor | Should | 5 | — | ✅ Ready |
 | [US-512](#us-512) | E5 | Tentativi di contatto ed esito della richiesta | Should | 5 | — | ✅ Ready |
 | [US-513](#us-513) | E5 | Elenco delle aziende a pagine | Must | 3 | R4 | 🎉 Done (Sprint 17) |
-| [US-514](#us-514) | E5 | Affidabilità e interesse al progetto dell'azienda | Must | 5 | R4 | 🔨 In corso (Sprint 18) |
+| [US-514](#us-514) | E5 | Affidabilità e interesse al progetto dell'azienda | Must | 5 | R4 | 🎉 Done (Sprint 18) |
 | [US-515](#us-515) | E5 | Azienda «nave scuola» | Must | 5 | R4 | ✅ Ready |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
@@ -166,7 +166,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1309](#us-1309) | E13 | Importazione dal database attuale | Must | 8 | R4 | 🎉 Done (Sprint 15) |
 | [US-1310](#us-1310) | E13 | Sessione attiva finché NEXUS è aperto | Must | 3 | R4 | 🎉 Done (Sprint 17) |
 | [US-1311](#us-1311) | E13 | Avvisi affidabili su sito e backup | Must | 3 | R4 | 📋 Backlog |
-| [US-1312](#us-1312) | E13 | Tema chiaro o scuro a scelta e intestazione fissa delle schede | Must | 3 | R4 | 🔨 In corso (Sprint 18) |
+| [US-1312](#us-1312) | E13 | Tema chiaro o scuro a scelta e intestazione fissa delle schede | Must | 3 | R4 | 🎉 Done (Sprint 18) |
 
 ## Dettaglio per epica
 
@@ -874,7 +874,7 @@ Criteri di accettazione:
 Dipendenze: US-501, US-1309
 
 #### US-514
-**Affidabilità e interesse al progetto dell'azienda** · Must · 5 punti · R4 · 🔨 In corso (Sprint 18)
+**Affidabilità e interesse al progetto dell'azienda** · Must · 5 punti · R4 · 🎉 Done (Sprint 18)
 
 Come **operatore del Call Center** voglio segnare nella scheda dell'azienda quanto è affidabile e quanto è interessata
 al progetto, per capire a colpo d'occhio chi chiamare (PO, 25/11). Nel database attuale lo si scrive con dei simboli
@@ -900,8 +900,11 @@ Criteri di accettazione:
 - Un nome nuovo o corretto non può iniziare con `$`, `£`, `&` o `^`: NEXUS lo dice e indica stelle e pollici. Così
   l'abitudine del database attuale non sporca di nuovo i nomi.
 - Il Tutor vede stelle e pollici nella sua lista delle aziende, con US-511 (PO, 26/11).
-- Subito, anche nel collaudo (PO, 26/11): i dati finti del collaudo (EN-11) hanno alcune aziende con i vecchi simboli,
-  ripulite con la stessa regola della migrazione.
+- Subito, anche nel collaudo (PO, 26/11): i dati finti del collaudo (EN-11) hanno alcune aziende con stelle e pollici,
+  come dopo la conversione.
+- Fatto il 26/11 (V52, deploy `1603fcc`). La conversione, provata prima sui nomi veri del file Access con i soli
+  conteggi, ha dato 143 aziende con 1 stella, 107 con 2, 20 con 3 e 1 con 4; 89 con un pollice e 1 con due; 343 nomi
+  ripuliti, ognuno con la sua voce di audit. In produzione i conteggi tornano (T-35.6).
 
 Dipendenze: US-513, US-1309
 
@@ -1870,7 +1873,7 @@ Criteri di accettazione:
 Dipendenze: US-1302, US-1307
 
 #### US-1312
-**Tema chiaro o scuro a scelta e intestazione fissa delle schede** · Must · 3 punti · R4 · 🔨 In corso (Sprint 18)
+**Tema chiaro o scuro a scelta e intestazione fissa delle schede** · Must · 3 punti · R4 · 🎉 Done (Sprint 18)
 
 Come **utente** voglio scegliere io il tema chiaro o scuro, e tornare all'elenco anche dall'inizio di una scheda lunga,
 senza scorrerla tutta (PO, 26/11, dal collaudo di US-514). Oggi il tema segue solo l'impostazione del sistema
@@ -1886,4 +1889,6 @@ Criteri di accettazione:
   ritorno all'elenco e titolo stanno in cima e restano fermi sotto la barra in alto mentre la scheda scorre. Il ritorno
   in fondo non c'è più: nelle pagine degli utenti stava accanto al pulsante del modulo e si vedeva male.
 - Sugli schermi bassi l'intestazione scorre con la pagina; barra e intestazione non coprono l'elemento con il focus
-  (WCAG 2.4.11).
+  (WCAG 2.4.11). Soglia confermata dal PO dopo il collaudo: sotto circa 512 px di altezza (26/11).
+- Fatto il 26/11 (deploy `1603fcc`). Sotto i 375 px di larghezza la barra in alto mostra solo il logo, senza la
+  scritta: a 320 px i pulsanti si sovrapponevano.
