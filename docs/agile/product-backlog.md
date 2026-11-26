@@ -111,7 +111,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-508](#us-508) | E5 | Partita IVA e nome da completare | Must | 3 | R4 | 🎉 Done (Sprint 15) |
 | [US-509](#us-509) | E5 | Categoria merceologica e attività dell'azienda | Must | 3 | R4 | 🎉 Done (Sprint 15) |
 | [US-510](#us-510) | E5 | Referenti e recapiti dell'azienda | Must | 5 | R4 | 🎉 Done (Sprint 15) |
-| [US-511](#us-511) | E5 | Zona dell'azienda e aziende per il Tutor | Must | 5 | R4 | 🔨 In corso (Sprint 18) |
+| [US-511](#us-511) | E5 | Zona dell'azienda e aziende per il Tutor | Must | 5 | R4 | 🎉 Done (Sprint 18) |
 | [US-512](#us-512) | E5 | Tentativi di contatto ed esito della richiesta | Should | 5 | — | ✅ Ready |
 | [US-513](#us-513) | E5 | Elenco delle aziende a pagine | Must | 3 | R4 | 🎉 Done (Sprint 17) |
 | [US-514](#us-514) | E5 | Affidabilità e interesse al progetto dell'azienda | Must | 5 | R4 | 🎉 Done (Sprint 18) |
@@ -815,7 +815,7 @@ Dipendenze: US-501, US-1007
 
 
 #### US-511
-**Zona dell'azienda e aziende per il Tutor** · Must · 5 punti · R4 · 🔨 In corso (Sprint 18)
+**Zona dell'azienda e aziende per il Tutor** · Must · 5 punti · R4 · 🎉 Done (Sprint 18)
 
 Come **Tutor** voglio vedere le aziende del database con pochi dati essenziali, per sapere quali conosce già il Call
 Center prima di chiedere un contatto (analisi con il PO, 23/11). Anticipata nello Sprint 18 dal PO il 26/11: il Tutor
@@ -834,6 +834,9 @@ Criteri di accettazione:
 - Nella stessa lista arriveranno il simbolo **🚢** della nave scuola, con US-515, e le **valutazioni dei tirocini**,
   con US-1104: la faccina media nella lista e, nella scheda in sola lettura, l'elenco a pagine con data, faccina, nota
   e nome del Tutor che l'ha data (PO, 25 e 26/11).
+- **«Azzera i filtri»** nei due elenchi delle aziende (PO, 26/11, dal collaudo).
+- Fatto il 26/11 (V53, deploy `3a64364`). Il catalogo delle categorie merceologiche si legge anche dal Tutor, per il
+  filtro.
 
 Dipendenze: US-106, US-509, US-1007, US-514
 
