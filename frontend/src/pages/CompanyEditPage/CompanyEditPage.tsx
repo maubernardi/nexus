@@ -85,7 +85,7 @@ export const CompanyEditPage = () => {
         {c.trainingShip && (
           <>
             {' '}
-            <TrainingShipBadge className="[&>svg]:size-6" />
+            <TrainingShipBadge size="lg" />
           </>
         )}
       </PageHeader>

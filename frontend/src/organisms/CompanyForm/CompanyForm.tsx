@@ -1,8 +1,8 @@
 import { useState, type ReactNode } from 'react';
-import { Ship } from 'lucide-react';
 import { Controller, useForm, type Control, type FieldPath } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { TrainingShipBadge } from '@/atoms/TrainingShipBadge/TrainingShipBadge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -389,16 +389,13 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
           <Checkbox
             id={fieldId('trainingShip')}
             aria-describedby={`${fieldId('trainingShip')}-hint`}
-            className="mt-0.5"
+            className="mt-1"
             {...register('trainingShip')}
           />
           <div className="space-y-1">
-            <label
-              htmlFor={fieldId('trainingShip')}
-              className="inline-flex items-center gap-1.5 text-sm font-medium"
-            >
+            <label htmlFor={fieldId('trainingShip')} className="inline-flex items-center text-sm font-medium">
               {labels.trainingShip}
-              <Ship aria-hidden="true" className="size-4 text-primary" />
+              <TrainingShipBadge decorative />
             </label>
             <p id={`${fieldId('trainingShip')}-hint`} className="text-sm text-muted-foreground">
               {t('company.hints.trainingShip')}
