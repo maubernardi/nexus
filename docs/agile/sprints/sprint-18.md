@@ -15,7 +15,7 @@
 |---|---|---|---|---|---|
 | US-514 | Affidabilità e interesse al progetto dell'azienda | 5 | 🎉 Done | `add-company-reliability-interest` (archiviata) | [#208](https://github.com/maubernardi/nexus/pull/208) |
 | US-511 | Zona dell'azienda e aziende per il Tutor | 5 | 🎉 Done | `add-company-zone-and-tutor-directory` (archiviata) | [#212](https://github.com/maubernardi/nexus/pull/212) |
-| US-1104 | Valutazione dell'azienda alla fine del tirocinio | 5 | ✅ Ready | — | — |
+| US-1104 | Valutazione dell'azienda alla fine del tirocinio | 5 | 🔨 In corso | `add-company-reviews` | — |
 | US-515 | Azienda «nave scuola» | 5 | ✅ Ready | — | — |
 | US-1312 | Tema chiaro o scuro a scelta e intestazione fissa delle schede | 3 | 🎉 Done | `add-theme-toggle-and-top-back-links` (archiviata) | [#209](https://github.com/maubernardi/nexus/pull/209), [#210](https://github.com/maubernardi/nexus/pull/210) (la #209 era finita nel branch di US-514) |
 

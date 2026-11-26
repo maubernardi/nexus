@@ -1,9 +1,10 @@
 import { useEffect, useRef, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { RatingDisplay } from '@/atoms/RatingDisplay/RatingDisplay';
+import { ReviewFace } from '@/atoms/ReviewFace/ReviewFace';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
@@ -254,13 +255,19 @@ export const TutorCompaniesPage = () => {
                   <th scope="col" className={th}>
                     {t('company.fields.projectInterest')}
                   </th>
+                  <th scope="col" className={th}>
+                    {t('companyReviews.heading')}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {result.companies.map((c) => (
                   <tr key={c.id} className="border-b border-border last:border-b-0">
                     <th scope="row" className={`${td} text-left font-semibold`}>
-                      {c.name}
+                      {/* la scheda in sola lettura, con le valutazioni dei tirocini (US-1104) */}
+                      <Link to={`/aziende/${c.id}`} className="text-primary underline underline-offset-4">
+                        {c.name}
+                      </Link>
                     </th>
                     <td className={td}>{c.businessCategory?.name ?? '—'}</td>
                     <td className={td}>{c.zone?.name ?? '—'}</td>
@@ -270,6 +277,18 @@ export const TutorCompaniesPage = () => {
                     </td>
                     <td className={td}>
                       <RatingDisplay kind="thumbs" value={c.projectInterest} />
+                    </td>
+                    <td className={td}>
+                      {c.reviewAverage ? (
+                        <span className="inline-flex items-center gap-2">
+                          <ReviewFace average={c.reviewAverage} />
+                          <span className="text-muted-foreground">
+                            ({t('companyDirectory.reviews', { count: c.reviewCount ?? 0 })})
+                          </span>
+                        </span>
+                      ) : (
+                        '—'
+                      )}
                     </td>
                   </tr>
                 ))}

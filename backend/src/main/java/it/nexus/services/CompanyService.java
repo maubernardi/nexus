@@ -3,6 +3,7 @@ package it.nexus.services;
 import java.util.List;
 
 import it.nexus.domain.dto.CompanyDTO;
+import it.nexus.domain.dto.CompanyDirectoryItemDTO;
 import it.nexus.domain.dto.CompanyDirectoryPageDTO;
 import it.nexus.domain.dto.CompanyFormDTO;
 import it.nexus.domain.dto.CompanyPageDTO;
@@ -32,6 +33,13 @@ public interface CompanyService {
      *         {@link #PAGE_SIZES}
      */
     CompanyDirectoryPageDTO directory(String search, String businessCategoryId, String zoneId, int page, int size);
+
+    /**
+     * Un'azienda dell'elenco del Tutor, per la sua scheda in sola lettura (US-1104): stessi dati dell'elenco.
+     *
+     * @throws it.nexus.web.errors.NotFoundException se non esiste o è disattivata
+     */
+    CompanyDirectoryItemDTO directoryItem(String id);
 
     CompanyDTO getById(String id);
 

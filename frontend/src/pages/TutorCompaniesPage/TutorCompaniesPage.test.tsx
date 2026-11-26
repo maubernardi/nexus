@@ -29,6 +29,8 @@ const rossi: CompanyDirectoryItem = {
   municipality: 'Prato (PO)',
   reliability: 3,
   projectInterest: 1,
+  reviewAverage: 13 / 3,
+  reviewCount: 2,
 };
 
 const renderPage = (path = '/aziende') =>
@@ -57,7 +59,7 @@ describe('<TutorCompaniesPage>', () => {
     });
   });
 
-  it('elenco in sola lettura con i dati essenziali: nessun collegamento alla scheda (US-511)', async () => {
+  it('elenco in sola lettura con i dati essenziali; il nome apre la scheda del Tutor (US-511, US-1104)', async () => {
     renderPage();
     const table = await screen.findByRole('table', { name: 'Aziende attive, in ordine di ragione sociale' });
     const headers = within(table)
@@ -70,6 +72,7 @@ describe('<TutorCompaniesPage>', () => {
       'Indirizzo',
       'Affidabilità',
       'Interesse al progetto',
+      'Valutazioni dei tirocini',
     ]);
     const [, first, second] = within(table).getAllByRole('row');
     expect(within(first).getByRole('rowheader')).toHaveTextContent('Officina Rossi');
@@ -79,9 +82,15 @@ describe('<TutorCompaniesPage>', () => {
     expect(cells[2]).toHaveTextContent('Via Pratese 9, Prato (PO)');
     expect(cells[3]).toHaveTextContent('3 stelle su 4');
     expect(cells[4]).toHaveTextContent('1 pollice alzato su 2');
+    expect(cells[5]).toHaveTextContent('Media 4,3 su 5: buona');
+    expect(cells[5]).toHaveTextContent('(2 tirocini)');
+    expect(within(second).getAllByRole('cell')[5]).toHaveTextContent('—');
     // senza dati: trattini
     expect(within(second).getAllByRole('cell')[2]).toHaveTextContent('—');
-    expect(within(table).queryByRole('link')).not.toBeInTheDocument();
+    expect(within(first).getByRole('link', { name: 'Officina Rossi' })).toHaveAttribute(
+      'href',
+      '/aziende/C1',
+    );
     expect(screen.queryByRole('link', { name: 'Nuova azienda' })).not.toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveTextContent('2 aziende');
     await expectNoAxeViolations();

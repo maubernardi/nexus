@@ -189,6 +189,11 @@ export type ClosureReport = {
   jobSlotStillAvailable: boolean;
   submittedAt: string;
   submittedBy: string;
+  /** Valutazione dell'azienda (US-1104): voti da 1 a 5 e nota; assenti nei report inviati prima. */
+  companyInteraction?: number;
+  companyWelcome?: number;
+  companyTraining?: number;
+  companyReviewNote?: string;
 };
 
 /** Report di restituzione dal modulo (US-1101): conta la formula se assunto, il motivo se non assunto. */
@@ -206,6 +211,11 @@ export type ClosureReportForm = {
   hiringFormulaId: string | null;
   noHireReasonId: string | null;
   jobSlotStillAvailable: boolean;
+  /** Valutazione dell'azienda (US-1104): tre voti da 1 a 5 e la nota facoltativa. */
+  companyInteraction: number;
+  companyWelcome: number;
+  companyTraining: number;
+  companyReviewNote: string | null;
 };
 
 export type CompatibleFilters = { zoneId?: string; jobCategoryId?: string };

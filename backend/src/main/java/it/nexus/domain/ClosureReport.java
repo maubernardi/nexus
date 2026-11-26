@@ -5,6 +5,8 @@ import java.time.LocalDate;
 
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Immutable;
+import org.hibernate.type.SqlTypes;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import it.nexus.domain.id.TsidId;
 import jakarta.persistence.Column;
@@ -89,9 +91,39 @@ public class ClosureReport extends AbstractCreationAuditingEntity {
     @Column(name = "interruption_details", updatable = false, length = 2000)
     private String interruptionDetails;
 
+    /**
+     * Azienda del tirocinio al momento della chiusura (US-1104): la valutazione resta sua. Assente nei report inviati
+     * prima.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", updatable = false)
+    private Company company;
+
+    /** Valutazione dell'azienda (US-1104): tre voti da 1 a 5; assenti nei report inviati prima. */
+    @JdbcTypeCode(SqlTypes.SMALLINT)
+    @Column(name = "company_interaction", updatable = false)
+    private Integer companyInteraction;
+
+    @JdbcTypeCode(SqlTypes.SMALLINT)
+    @Column(name = "company_welcome", updatable = false)
+    private Integer companyWelcome;
+
+    @JdbcTypeCode(SqlTypes.SMALLINT)
+    @Column(name = "company_training", updatable = false)
+    private Integer companyTraining;
+
+    /** Nota della valutazione, facoltativa e senza dati personali: si vede nella scheda dell'azienda, non nell'audit. */
+    @Column(name = "company_review_note", updatable = false, length = 500)
+    private String companyReviewNote;
+
+    /** Valutazione dell'azienda del tirocinio (US-1104): tre voti da 1 a 5 e la nota facoltativa. */
+    public record CompanyReview(Company company, int interaction, int welcome, int training, String note) {
+    }
+
     public ClosureReport(Ticket ticket, LocalDate actualEndDate, ClosureReason closureReason, String interruptionDetails,
             short companySatisfaction, short beneficiarySatisfaction, String objectives, String difficulties,
-            HiringFormula hiringFormula, NoHireReason noHireReason, boolean jobSlotStillAvailable) {
+            HiringFormula hiringFormula, NoHireReason noHireReason, boolean jobSlotStillAvailable,
+            CompanyReview review) {
         this.ticket = ticket;
         this.actualEndDate = actualEndDate;
         this.closureReason = closureReason;
@@ -104,6 +136,19 @@ public class ClosureReport extends AbstractCreationAuditingEntity {
         this.hiringFormula = hiringFormula;
         this.noHireReason = noHireReason;
         this.jobSlotStillAvailable = jobSlotStillAvailable;
+        if (review != null) {
+            this.company = review.company();
+            this.companyInteraction = review.interaction();
+            this.companyWelcome = review.welcome();
+            this.companyTraining = review.training();
+            this.companyReviewNote = review.note();
+        }
+    }
+
+    /** Media dei tre voti della valutazione (US-1104); {@code null} nei report senza valutazione. */
+    public Double companyReviewAverage() {
+        return companyInteraction == null ? null
+                : (companyInteraction + companyWelcome + companyTraining) / 3.0;
     }
 
     @Override

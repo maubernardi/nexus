@@ -30,6 +30,8 @@ public interface CompanyMapper {
             + ": company.getLegalAddress())")
     @Mapping(target = "municipality", expression = "java(MunicipalityMapper.label(hasOperatingSeat(company) "
             + "? company.getOperatingMunicipality() : company.getLegalMunicipality()))")
+    @Mapping(target = "reviewAverage", ignore = true)
+    @Mapping(target = "reviewCount", ignore = true)
     CompanyDirectoryItemDTO toDirectoryItem(Company company);
 
     /** La sede operativa vale se ha l'indirizzo o il comune (US-510); altrimenti la sede legale. */

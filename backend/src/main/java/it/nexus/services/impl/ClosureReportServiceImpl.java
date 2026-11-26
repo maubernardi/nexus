@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.domain.AbstractReferenceEntity;
 import it.nexus.domain.ClosureReason;
+import it.nexus.domain.Company;
 import it.nexus.domain.ClosureReport;
 import it.nexus.domain.HiringFormula;
 import it.nexus.domain.Internship;
@@ -29,6 +30,7 @@ import it.nexus.repository.InternshipRepository;
 import it.nexus.repository.NoHireReasonRepository;
 import it.nexus.services.ClosureReportService;
 import it.nexus.services.UserDisplayNameService;
+import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.FieldValidationException;
 import lombok.RequiredArgsConstructor;
 
@@ -66,10 +68,17 @@ public class ClosureReportServiceImpl implements ClosureReportService {
             reason = activeEntry(form.noHireReasonId(), noHireReasonRepository, "noHireReasonId",
                     "Scegli il motivo della mancata assunzione", "Motivo non valido");
         }
+        // valutazione dell'azienda del tirocinio (US-1104): resta sua anche se poi la mansione cambia
+        Company company = ticket.getJobSlot() == null ? null : ticket.getJobSlot().getCompany();
+        if (company == null) {
+            throw new BadRequestException("La segnalazione non ha un'azienda da valutare");
+        }
+        ClosureReport.CompanyReview review = new ClosureReport.CompanyReview(company, form.companyInteraction(),
+                form.companyWelcome(), form.companyTraining(), text(form.companyReviewNote()));
         ClosureReport report = repository.save(new ClosureReport(ticket, form.actualEndDate(), closureReason,
                 interruptionDetails, form.companySatisfaction().shortValue(),
                 form.beneficiarySatisfaction().shortValue(), text(form.objectives()), text(form.difficulties()), formula,
-                reason, form.jobSlotStillAvailable()));
+                reason, form.jobSlotStillAvailable(), review));
         return AuditChanges.of()
                 .value("actualEndDate", null, form.actualEndDate().toString())
                 .value("closureReason", null, closureReason.getCode())
@@ -78,7 +87,11 @@ public class ClosureReportServiceImpl implements ClosureReportService {
                 .value("hired", null, report.isHired())
                 .value("hiringFormula", null, formula == null ? null : formula.getCode())
                 .value("noHireReason", null, reason == null ? null : reason.getCode())
-                .value("jobSlotStillAvailable", null, report.isJobSlotStillAvailable());
+                .value("jobSlotStillAvailable", null, report.isJobSlotStillAvailable())
+                // valutazione dell'azienda: i voti sì, la nota (testo libero) no
+                .value("companyInteraction", null, form.companyInteraction())
+                .value("companyWelcome", null, form.companyWelcome())
+                .value("companyTraining", null, form.companyTraining());
     }
 
     @Override
@@ -97,7 +110,11 @@ public class ClosureReportServiceImpl implements ClosureReportService {
                 referenceMapper.toDto(r.getNoHireReason()),
                 r.isJobSlotStillAvailable(),
                 r.getCreatedAt(),
-                userDisplayNameService.displayNames(List.of(r.getCreatedBy())).get(r.getCreatedBy())));
+                userDisplayNameService.displayNames(List.of(r.getCreatedBy())).get(r.getCreatedBy()),
+                r.getCompanyInteraction(),
+                r.getCompanyWelcome(),
+                r.getCompanyTraining(),
+                r.getCompanyReviewNote()));
     }
 
     @Override

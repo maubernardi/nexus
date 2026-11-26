@@ -10,6 +10,7 @@ import { isMissing } from '@/lib/companyCompletion';
 import { AtecoCodesSection } from '@/organisms/AtecoCodesSection/AtecoCodesSection';
 import { CompanyForm } from '@/organisms/CompanyForm/CompanyForm';
 import { CompanyHistorySection } from '@/organisms/CompanyHistorySection/CompanyHistorySection';
+import { CompanyReviewsSection } from '@/organisms/CompanyReviewsSection/CompanyReviewsSection';
 import { CompanyNotesSection } from '@/organisms/CompanyNotesSection/CompanyNotesSection';
 import { JobSlotsSection } from '@/organisms/JobSlotsSection/JobSlotsSection';
 import { LegalRepresentativeSection } from '@/organisms/LegalRepresentativeSection/LegalRepresentativeSection';
@@ -127,6 +128,8 @@ export const CompanyEditPage = () => {
       <AtecoCodesSection companyId={c.id} />
 
       <JobSlotsSection companyId={c.id} companyActive={c.active} />
+
+      <CompanyReviewsSection companyId={c.id} />
 
       <CompanyNotesSection companyId={c.id} />
 

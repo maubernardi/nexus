@@ -1,6 +1,8 @@
 package it.nexus.web.rest.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -73,7 +75,14 @@ class ClosureReportIT {
 
     private Ticket ticket;
     private JobSlot slot;
+    private Place place;
+    private Project project;
+    private Actors actors;
     private String ticketPath;
+    /** Valutazione dell'azienda (US-1104) mandata con il report: si cambia nei test che la provano. */
+    private String review = """
+            "companyInteraction": 4, "companyWelcome": 5, "companyTraining": 4,
+            "companyReviewNote": " Accoglienza buona; poca formazione all'inizio \"""";
     private String companyHistoryPath;
     private HiringFormula formula;
     private NoHireReason reason;
@@ -81,8 +90,9 @@ class ClosureReportIT {
     @BeforeEach
     void setUp() {
         Actors a = scenarios.actors();
-        Place place = scenarios.place();
-        Project project = scenarios.project("GOL", a.tutor1(), a.tutor2());
+        actors = a;
+        place = scenarios.place();
+        project = scenarios.project("GOL", a.tutor1(), a.tutor2());
         slot = scenarios.freeSlot(place, "Aiuto cuoco");
         ticket = scenarios.appointmentTicket(a.tutor1(), project, slot, a.operator());
         companyHistoryPath = "/api/v1/companies/" + TsidMapper.toExternal(place.company().getId()) + "/history";
@@ -130,9 +140,10 @@ class ClosureReportIT {
                 {"version": %d, "actualEndDate": %s, "closureReasonId": %s, "interruptionDetails": %s,
                  "companySatisfaction": 5, "beneficiarySatisfaction": 4,
                  "objectives": "Autonomia in cucina raggiunta", "difficulties": "   ",
-                 "hired": %s, "hiringFormulaId": %s, "noHireReasonId": %s, "jobSlotStillAvailable": %s}"""
+                 "hired": %s, "hiringFormulaId": %s, "noHireReasonId": %s, "jobSlotStillAvailable": %s,
+                 %s}"""
                 .formatted(version, quoted(actualEndDate), quoted(closureReasonId), quoted(interruptionDetails),
-                        hired, quoted(formulaId), quoted(reasonId), jobSlotStillAvailable);
+                        hired, quoted(formulaId), quoted(reasonId), jobSlotStillAvailable, review);
         return mockMvc.perform(post(ticketPath + "/closure-report").header(USER, user)
                 .contentType(MediaType.APPLICATION_JSON).content(json));
     }
@@ -189,6 +200,106 @@ class ClosureReportIT {
         assertThat(changes).contains("hiringFormula", formula.getCode(), "jobSlotStillAvailable", "actualEndDate",
                         "2027-05-31", "closureReason", "CHIUSURA_REGOLARE")
                 .doesNotContain("Autonomia", "objectives", "noHireReason");
+    }
+
+    @Test
+    void valutazioneDellAzienda_nelReport_nellAuditSenzaLaNota_nellaSchedaDellAzienda() throws Exception {
+        send("tutor1", ticketVersion(), true, formulaId(), null)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.closureReport.companyInteraction").value(4))
+                .andExpect(jsonPath("$.closureReport.companyWelcome").value(5))
+                .andExpect(jsonPath("$.closureReport.companyTraining").value(4))
+                .andExpect(jsonPath("$.closureReport.companyReviewNote")
+                        .value("Accoglienza buona; poca formazione all'inizio"));
+        em.flush();
+        String changes = jdbc.queryForObject(
+                "SELECT changes::text FROM audit_event WHERE entity_id = ? AND action = 'CLOSE'", String.class,
+                ticket.getId());
+        assertThat(changes).contains("companyInteraction", "companyWelcome", "companyTraining")
+                .doesNotContain("Accoglienza", "companyReviewNote");
+
+        // la valutazione è dell'azienda del tirocinio: la vedono Call Center, ADMIN e Tutor, con il nome del Tutor
+        String companyId = TsidMapper.toExternal(place.company().getId());
+        for (String user : new String[] {"operatore.cc", "admin", "tutor2"}) {
+            mockMvc.perform(get("/api/v1/companies/" + companyId + "/reviews").header(USER, user))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.average").value(closeTo(13 / 3.0, 0.001)))
+                    .andExpect(jsonPath("$.total").value(1))
+                    .andExpect(jsonPath("$.size").value(10))
+                    .andExpect(jsonPath("$.reviews[0].endDate").value("2027-05-31"))
+                    .andExpect(jsonPath("$.reviews[0].average").value(closeTo(13 / 3.0, 0.001)))
+                    .andExpect(jsonPath("$.reviews[0].note").value("Accoglienza buona; poca formazione all'inizio"))
+                    .andExpect(jsonPath("$.reviews[0].tutorName").value(actors.tutor1().getFirstName() + " "
+                            + actors.tutor1().getLastName()));
+        }
+        // nessun dato del beneficiario nelle valutazioni
+        String reviews = mockMvc.perform(get("/api/v1/companies/" + companyId + "/reviews").header(USER, "tutor2"))
+                .andReturn().getResponse().getContentAsString();
+        assertThat(reviews).doesNotContain(ticket.getBeneficiary().getFirstName(),
+                ticket.getBeneficiary().getLastName(), "Autonomia");
+        // la media nella lista e nella scheda del Tutor
+        mockMvc.perform(get("/api/v1/companies/directory").header(USER, "tutor1"))
+                .andExpect(jsonPath("$.companies[?(@.id == '%s')].reviewCount".formatted(companyId), contains(1)));
+        mockMvc.perform(get("/api/v1/companies/directory/" + companyId).header(USER, "tutor1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(place.company().getName()))
+                .andExpect(jsonPath("$.reviewCount").value(1))
+                .andExpect(jsonPath("$.vatCode").doesNotExist());
+        mockMvc.perform(get("/api/v1/companies/directory/" + companyId).header(USER, "operatore.cc"))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/v1/companies/0000000000000/reviews").header(USER, "tutor1"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void valutazioni_mediaDelleMedie_dallaPiuRecente_senzaValutazioni() throws Exception {
+        String companyId = TsidMapper.toExternal(place.company().getId());
+        mockMvc.perform(get("/api/v1/companies/" + companyId + "/reviews").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.average").doesNotExist())
+                .andExpect(jsonPath("$.total").value(0))
+                .andExpect(jsonPath("$.reviews").isEmpty());
+
+        // primo tirocinio finito il 31/05/2027: 4, 5, 4 (media 4,33)
+        send("tutor1", ticketVersion(), true, formulaId(), null).andExpect(status().isOk());
+        // secondo, finito il 30/06/2027, di tutor2: 5, 5, 5 senza nota
+        Ticket second = scenarios.appointmentTicket(actors.tutor2(), project, scenarios.freeSlot(place, "Cameriere"),
+                actors.operator());
+        second.setStatus(TicketStatus.IN_TIROCINIO);
+        tickets.saveAndFlush(second);
+        ticket = second;
+        ticketPath = "/api/v1/tickets/" + TsidMapper.toExternal(second.getId());
+        review = """
+                "companyInteraction": 5, "companyWelcome": 5, "companyTraining": 5""";
+        send("tutor2", ticketVersion(), "2027-06-30", true, formulaId(), null, false).andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/companies/" + companyId + "/reviews").header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.average").value(closeTo((13 / 3.0 + 5) / 2, 0.001)))
+                .andExpect(jsonPath("$.total").value(2))
+                .andExpect(jsonPath("$.reviews[*].endDate", contains("2027-06-30", "2027-05-31")))
+                .andExpect(jsonPath("$.reviews[0].note").doesNotExist());
+        mockMvc.perform(get("/api/v1/companies/" + companyId + "/reviews").param("page", "1")
+                        .header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.reviews").isEmpty())
+                .andExpect(jsonPath("$.total").value(2));
+        mockMvc.perform(get("/api/v1/companies/" + companyId + "/reviews").param("page", "-1")
+                        .header(USER, "operatore.cc"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void valutazione_votiMancantiOFuoriIntervallo_notaTroppoLunga_400() throws Exception {
+        review = """
+                "companyInteraction": 4, "companyWelcome": 6""";
+        send("tutor1", ticketVersion(), true, formulaId(), null)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[*].field", hasItem("companyWelcome")))
+                .andExpect(jsonPath("$.fieldErrors[*].field", hasItem("companyTraining")));
+        review = """
+                "companyInteraction": 4, "companyWelcome": 4, "companyTraining": 4, "companyReviewNote": "%s\""""
+                .formatted("x".repeat(501));
+        send("tutor1", ticketVersion(), true, formulaId(), null)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[*].field", hasItem("companyReviewNote")));
     }
 
     @Test

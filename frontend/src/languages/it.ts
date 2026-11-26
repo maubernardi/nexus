@@ -793,8 +793,21 @@ export const it = {
       hiringFormulaId: 'Formula di assunzione',
       noHireReasonId: 'Motivo della mancata assunzione',
       jobSlotStillAvailable: 'La mansione è ancora disponibile?',
+      companyInteraction: 'Soddisfazione nell’interazione con l’azienda',
+      companyWelcome: 'Capacità dell’azienda di accogliere il beneficiario',
+      companyTraining: 'Capacità formativa dell’azienda e del tutor aziendale',
+      companyReviewNote: 'Nota sulla valutazione',
+    },
+    /** Valutazione dell'azienda (US-1104). */
+    review: {
+      heading: 'Valutazione dell’azienda',
+      intro:
+        'La vedono il Call Center e i Tutor nella scheda dell’azienda, con il tuo nome: aiuta chi la proporrà o la contatterà in futuro.',
+      average: 'Media:',
     },
     hints: {
+      companyReviewNote:
+        'Facoltativa, al massimo 500 caratteri: che cosa non è andato bene? Niente dati personali del beneficiario.',
       actualEndDate:
         'L’ultimo giorno di tirocinio, anche se diverso da quello previsto. Serve per la relazione finale: la scheda del tirocinio non cambia.',
       actualEndDatePrefilled:
@@ -831,6 +844,7 @@ export const it = {
       hiredYes: 'Sì, con {{formula}}',
       hiredNo: 'No: {{reason}}',
       none: 'Non indicate',
+      companyReview: 'Valutazione dell’azienda',
     },
   },
   companyNote: {
@@ -850,6 +864,32 @@ export const it = {
     search: 'Cerca per ragione sociale',
     caption: 'Aziende attive, in ordine di ragione sociale',
     address: 'Indirizzo',
+    reviews_one: '{{count}} tirocinio',
+    reviews_other: '{{count}} tirocini',
+  },
+  /** Valutazione dell'azienda alla fine del tirocinio (US-1104): faccine da 1 a 5. */
+  review: {
+    level1: 'Pessima',
+    level2: 'Scarsa',
+    level3: 'Sufficiente',
+    level4: 'Buona',
+    level5: 'Ottima',
+    wordAndAverage: '{{word}} · {{average}}',
+    averageLabel: 'Media {{average}} su 5: {{word}}',
+  },
+  /** Valutazioni dei tirocini nella scheda dell'azienda (US-1104). */
+  companyReviews: {
+    heading: 'Valutazioni dei tirocini',
+    intro: 'Come si sono trovati i tirocinanti, secondo i Tutor che hanno seguito i tirocini.',
+    summary_one: 'Media di {{count}} tirocinio valutato',
+    summary_other: 'Media di {{count}} tirocini valutati',
+    empty: 'Nessun tirocinio valutato.',
+    listLabel: 'Valutazioni, dalla più recente',
+    endDate: 'Tirocinio finito il {{date}}',
+    by: 'Valutazione di {{name}}',
+    pages: 'Pagine delle valutazioni',
+    pageSize: 'Valutazioni per pagina',
+    loadError: 'Impossibile caricare le valutazioni. Riprova più tardi.',
   },
   /** Pulsante del tema nella barra in alto (US-1312). */
   theme: {

@@ -10,15 +10,19 @@ import {
 import {
   createCompany,
   fetchCompany,
+  fetchCompanyDirectoryItem,
+  fetchCompanyReviews,
   searchCompanies,
   searchCompanyDirectory,
   setCompanyActive,
   updateCompany,
   type Company,
+  type CompanyDirectoryItem,
   type CompanyDirectoryPage,
   type CompanyDirectorySearch,
   type CompanyForm,
   type CompanyPage,
+  type CompanyReviews,
   type CompanySearch,
 } from '@/config/api/companyApi';
 
@@ -36,6 +40,21 @@ export const useCompanyDirectory = (params: CompanyDirectorySearch): UseQueryRes
   useQuery({
     queryKey: [...COMPANIES_KEY, 'directory', params],
     queryFn: () => searchCompanyDirectory(params),
+    placeholderData: keepPreviousData,
+  });
+
+/** Un'azienda per la scheda del Tutor (US-1104). */
+export const useCompanyDirectoryItem = (id: string): UseQueryResult<CompanyDirectoryItem> =>
+  useQuery({
+    queryKey: [...COMPANIES_KEY, 'directory', 'item', id],
+    queryFn: () => fetchCompanyDirectoryItem(id),
+  });
+
+/** Valutazioni dei tirocini di un'azienda, una pagina alla volta (US-1104). */
+export const useCompanyReviews = (id: string, page: number): UseQueryResult<CompanyReviews> =>
+  useQuery({
+    queryKey: [...COMPANIES_KEY, id, 'reviews', page],
+    queryFn: () => fetchCompanyReviews(id, page),
     placeholderData: keepPreviousData,
   });
 

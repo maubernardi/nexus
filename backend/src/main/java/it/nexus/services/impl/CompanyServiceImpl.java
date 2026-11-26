@@ -3,6 +3,7 @@ package it.nexus.services.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -23,6 +24,7 @@ import it.nexus.domain.Zone;
 import it.nexus.domain.audit.AuditChanges;
 import it.nexus.domain.dto.CompanyContactFormDTO;
 import it.nexus.domain.dto.CompanyDTO;
+import it.nexus.domain.dto.CompanyDirectoryItemDTO;
 import it.nexus.domain.dto.CompanyDirectoryPageDTO;
 import it.nexus.domain.dto.CompanyFormDTO;
 import it.nexus.domain.dto.CompanyPageDTO;
@@ -37,6 +39,7 @@ import it.nexus.repository.JobSlotRepository;
 import it.nexus.repository.ZoneRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.BoardPostService;
+import it.nexus.services.CompanyReviewService;
 import it.nexus.services.CompanySearch;
 import it.nexus.services.CompanyService;
 import it.nexus.services.JobSlotAssignments;
@@ -70,6 +73,7 @@ public class CompanyServiceImpl implements CompanyService {
     private final MunicipalityService municipalityService;
     private final BusinessCategoryRepository businessCategoryRepository;
     private final ZoneRepository zoneRepository;
+    private final CompanyReviewService companyReviewService;
     private final ContactRoleRepository contactRoleRepository;
     private final EntityManager entityManager;
     private final JobSlotAssignments jobSlotAssignments;
@@ -108,8 +112,27 @@ public class CompanyServiceImpl implements CompanyService {
         requirePage(page, size);
         var result = repository.directory(term(search), filterId(businessCategoryId), filterId(zoneId),
                 PageRequest.of(page, size));
-        return new CompanyDirectoryPageDTO(result.map(mapper::toDirectoryItem).getContent(), result.getTotalElements(),
-                page, size);
+        Map<Long, CompanyReviewService.Summary> reviews = companyReviewService.summaries(
+                result.getContent().stream().map(Company::getId).toList());
+        return new CompanyDirectoryPageDTO(result.getContent().stream().map(c -> withReviews(c, reviews)).toList(),
+                result.getTotalElements(), page, size);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CompanyDirectoryItemDTO directoryItem(String id) {
+        Company company = find(id);
+        if (!company.isActive()) {
+            throw new NotFoundException("Azienda non trovata");
+        }
+        return withReviews(company, companyReviewService.summaries(List.of(company.getId())));
+    }
+
+    /** Elemento dell'elenco del Tutor con la media delle valutazioni dei tirocini (US-1104), se ce ne sono. */
+    private CompanyDirectoryItemDTO withReviews(Company company, Map<Long, CompanyReviewService.Summary> reviews) {
+        CompanyReviewService.Summary summary = reviews.get(company.getId());
+        CompanyDirectoryItemDTO item = mapper.toDirectoryItem(company);
+        return summary == null ? item : item.withReviews(summary.average(), summary.count());
     }
 
     private static void requirePage(int page, int size) {

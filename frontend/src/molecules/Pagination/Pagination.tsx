@@ -43,21 +43,26 @@ export const Pagination = ({
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-center gap-2">
-        <label htmlFor={id} className="text-sm font-medium whitespace-nowrap">
-          {pageSizeLabel}
-        </label>
-        <NativeSelect
-          id={id}
-          value={pageSize}
-          onChange={(e) => onPageSizeChange(Number(e.target.value))}
-          className="w-24"
-        >
-          {pageSizes.map((size) => (
-            <option key={size} value={size}>
-              {size}
-            </option>
-          ))}
-        </NativeSelect>
+        {/* con una sola dimensione (per esempio le valutazioni, US-1104) il menu non serve */}
+        {pageSizes.length > 1 && (
+          <>
+            <label htmlFor={id} className="text-sm font-medium whitespace-nowrap">
+              {pageSizeLabel}
+            </label>
+            <NativeSelect
+              id={id}
+              value={pageSize}
+              onChange={(e) => onPageSizeChange(Number(e.target.value))}
+              className="w-24"
+            >
+              {pageSizes.map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </NativeSelect>
+          </>
+        )}
       </div>
       <nav aria-label={label}>
         <ul className="flex flex-wrap items-center gap-2">

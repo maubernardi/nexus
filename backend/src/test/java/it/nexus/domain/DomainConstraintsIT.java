@@ -1222,7 +1222,7 @@ class DomainConstraintsIT {
         private ClosureReport report(Ticket ticket, int companySatisfaction) {
             return new ClosureReport(ticket, LocalDate.of(2027, 5, 31), null, null, (short) companySatisfaction,
                     (short) 4, "Obiettivi raggiunti", null, hiringFormulas.findByActiveTrueOrderByNameAsc().getFirst(),
-                    null, true);
+                    null, true, null);
         }
 
         private Long addReport() {
@@ -1242,6 +1242,46 @@ class DomainConstraintsIT {
                     INSERT INTO closure_report (id, ticket_id, company_satisfaction, beneficiary_satisfaction, hired,
                         no_hire_reason_id, job_slot_still_available, created_at, created_by)
                     VALUES (1, ?, 3, 3, true, 893700000000000301, false, now(), 'test')""", ticketId));
+        }
+
+        @Test
+        void valutazioneDellAzienda_votoFuoriScala() {
+            Long ticketId = newTicket().getId();
+            assertViolates("ck_closure_report_company_welcome", () -> jdbc.update("""
+                    INSERT INTO closure_report (id, ticket_id, company_satisfaction, beneficiary_satisfaction, hired,
+                        no_hire_reason_id, job_slot_still_available, created_at, created_by, company_id,
+                        company_interaction, company_welcome, company_training)
+                    VALUES (1, ?, 3, 3, false, 893700000000000301, false, now(), 'test',
+                        (SELECT id FROM company LIMIT 1), 4, 6, 4)""", ticketId));
+        }
+
+        @Test
+        void valutazioneDellAzienda_votiIncompletiOSenzaAzienda() {
+            Long ticketId = newTicket().getId();
+            companies.saveAndFlush(company(DomainFixtures.vatCode()));
+            assertViolates("ck_closure_report_company_review", () -> jdbc.update("""
+                    INSERT INTO closure_report (id, ticket_id, company_satisfaction, beneficiary_satisfaction, hired,
+                        no_hire_reason_id, job_slot_still_available, created_at, created_by, company_id,
+                        company_interaction, company_welcome)
+                    VALUES (1, ?, 3, 3, false, 893700000000000301, false, now(), 'test',
+                        (SELECT id FROM company LIMIT 1), 4, 4)""", ticketId));
+            assertViolates("ck_closure_report_company_review", () -> jdbc.update("""
+                    INSERT INTO closure_report (id, ticket_id, company_satisfaction, beneficiary_satisfaction, hired,
+                        no_hire_reason_id, job_slot_still_available, created_at, created_by,
+                        company_interaction, company_welcome, company_training)
+                    VALUES (2, ?, 3, 3, false, 893700000000000301, false, now(), 'test', 4, 4, 4)""", ticketId));
+        }
+
+        @Test
+        void valutazioneDellAzienda_notaVuota() {
+            Long ticketId = newTicket().getId();
+            companies.saveAndFlush(company(DomainFixtures.vatCode()));
+            assertViolates("ck_closure_report_company_review_note", () -> jdbc.update("""
+                    INSERT INTO closure_report (id, ticket_id, company_satisfaction, beneficiary_satisfaction, hired,
+                        no_hire_reason_id, job_slot_still_available, created_at, created_by, company_id,
+                        company_interaction, company_welcome, company_training, company_review_note)
+                    VALUES (1, ?, 3, 3, false, 893700000000000301, false, now(), 'test',
+                        (SELECT id FROM company LIMIT 1), 4, 4, 4, '  ')""", ticketId));
         }
 
         @Test
