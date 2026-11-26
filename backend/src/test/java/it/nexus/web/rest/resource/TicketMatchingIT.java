@@ -111,7 +111,10 @@ class TicketMatchingIT {
 
         ticket = workingTicket(operator);
 
-        Company alfa = companies.save(named("Alfa Logistica", "99900000101"));
+        Company alfa = named("Alfa Logistica", "99900000101");
+        // nave scuola (US-515): il 🚢 accanto al nome nell'abbinamento e nella proposta
+        alfa.setTrainingShip(true);
+        alfa = companies.save(alfa);
         Company beta = companies.save(named("Beta Servizi", "99900000102"));
         Company chiusa = named("Chiusa S.r.l.", "99900000103");
         chiusa.setActive(false);
@@ -172,10 +175,12 @@ class TicketMatchingIT {
                         .param("jobCategoryId", TsidMapper.toExternal(wanted.getId())).header(USER, "operatore.cc"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[*].title", contains("Magazziniere")))
-                .andExpect(jsonPath("$[0].companyName").value("Alfa Logistica"));
+                .andExpect(jsonPath("$[0].companyName").value("Alfa Logistica"))
+                .andExpect(jsonPath("$[0].companyTrainingShip").value(true));
         // allargando a tutte le zone e tipologie: per azienda, poi per titolo
         mockMvc.perform(get(url).header(USER, "operatore.cc"))
-                .andExpect(jsonPath("$[*].title", contains("Magazziniere", "Cuoco", "Magazziniere notturno")));
+                .andExpect(jsonPath("$[*].title", contains("Magazziniere", "Cuoco", "Magazziniere notturno")))
+                .andExpect(jsonPath("$[*].companyTrainingShip", contains(true, false, false)));
     }
 
     @Test
@@ -196,7 +201,8 @@ class TicketMatchingIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("PROPOSTA_AZIENDA"))
                 .andExpect(jsonPath("$.proposal.id").value(id(match)))
-                .andExpect(jsonPath("$.proposal.companyName").value("Alfa Logistica"));
+                .andExpect(jsonPath("$.proposal.companyName").value("Alfa Logistica"))
+                .andExpect(jsonPath("$.proposal.companyTrainingShip").value(true));
         em.flush();
         em.clear();
 

@@ -86,6 +86,8 @@ class TutorBoardIT {
         JobCategory cleaning = categories.save(TestEntities.jobCategory("TPUL"));
         Company c = TestEntities.company("99900000066");
         c.setName(COMPANY_NAME);
+        // nave scuola (US-515): il Tutor non lo vede, la bacheca è anonima
+        c.setTrainingShip(true);
         company = companies.save(c);
 
         forAll = published(jobSlots.save(TestEntities.jobSlot(company, warehouse, north)), null, 3);
@@ -133,7 +135,8 @@ class TutorBoardIT {
                 .andExpect(jsonPath("$[0].jobSlot").doesNotExist())
                 .andReturn().getResponse().getContentAsString();
         // il nome dell'azienda non arriva mai al browser del Tutor, in nessun campo
-        assertThat(body).doesNotContain(COMPANY_NAME).doesNotContain(TsidMapper.toExternal(company.getId()));
+        assertThat(body).doesNotContain(COMPANY_NAME).doesNotContain(TsidMapper.toExternal(company.getId()))
+                .doesNotContain("trainingShip", "TrainingShip");
     }
 
     @Test

@@ -12,13 +12,15 @@ public record JobSlotMatchDTO(
         String description,
         String companyId,
         String companyName,
+        /** L'azienda è una nave scuola (US-515): il 🚢 accanto al nome. */
+        boolean companyTrainingShip,
         ReferenceItemDTO jobCategory,
         ReferenceItemDTO zone,
         long version,
         List<JobSlotAssignmentDTO> assignments) {
 
     public JobSlotMatchDTO withAssignments(List<JobSlotAssignmentDTO> list) {
-        return new JobSlotMatchDTO(id, title, description, companyId, companyName, jobCategory, zone, version,
-                List.copyOf(list));
+        return new JobSlotMatchDTO(id, title, description, companyId, companyName, companyTrainingShip, jobCategory,
+                zone, version, List.copyOf(list));
     }
 }

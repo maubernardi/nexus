@@ -27,10 +27,10 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
      * stelle e quei pollici (US-514). La pagina non deve avere un ordinamento suo: vale quello della query.
      */
     default Page<Company> search(String search, boolean includeInactive, boolean toComplete, Long businessCategoryId,
-            Long zoneId, Integer minReliability, Integer minProjectInterest, Pageable page) {
+            Long zoneId, Integer minReliability, Integer minProjectInterest, boolean trainingShip, Pageable page) {
         return search(search, includeInactive, toComplete, CompanyPlaceholders.VAT_CODE,
                 CompanyPlaceholders.NAME_PREFIX + "%", businessCategoryId, zoneId, minReliability, minProjectInterest,
-                page);
+                trainingShip, page);
     }
 
     @EntityGraph(attributePaths = {"legalMunicipality", "legalMunicipality.province", "businessCategory", "zone",
@@ -46,6 +46,7 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
               and (:zoneId is null or c.zone.id = :zoneId)
               and (:minReliability is null or c.reliability >= :minReliability)
               and (:minProjectInterest is null or c.projectInterest >= :minProjectInterest)
+              and (:trainingShip = false or c.trainingShip = true)
             order by lower(c.name), c.id
             """, countQuery = """
             select count(c) from Company c
@@ -58,13 +59,14 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
               and (:zoneId is null or c.zone.id = :zoneId)
               and (:minReliability is null or c.reliability >= :minReliability)
               and (:minProjectInterest is null or c.projectInterest >= :minProjectInterest)
+              and (:trainingShip = false or c.trainingShip = true)
             """)
     Page<Company> search(@Param("search") String search, @Param("includeInactive") boolean includeInactive,
             @Param("toComplete") boolean toComplete, @Param("missingVatCode") String missingVatCode,
             @Param("missingNamePattern") String missingNamePattern,
             @Param("businessCategoryId") Long businessCategoryId, @Param("zoneId") Long zoneId,
             @Param("minReliability") Integer minReliability, @Param("minProjectInterest") Integer minProjectInterest,
-            Pageable page);
+            @Param("trainingShip") boolean trainingShip, Pageable page);
 
     /**
      * Elenco del Tutor (US-511): sole aziende attive, ricerca sul solo nome (mai sulla partita IVA, per

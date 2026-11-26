@@ -6,6 +6,7 @@ import { Link, Navigate, useParams } from 'react-router';
 
 import { AssignmentWarning } from '@/atoms/AssignmentWarning/AssignmentWarning';
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
+import { TrainingShipBadge } from '@/atoms/TrainingShipBadge/TrainingShipBadge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -316,7 +317,15 @@ const FastTrackSection = ({
           <dt className="font-medium">{t('board.jobSlot.title')}</dt>
           <dd>{slot.title}</dd>
           <dt className="font-medium">{t('board.jobSlot.company')}</dt>
-          <dd>{slot.companyName}</dd>
+          <dd>
+            {slot.companyName}
+            {slot.companyTrainingShip && (
+              <>
+                {' '}
+                <TrainingShipBadge />
+              </>
+            )}
+          </dd>
           <dt className="font-medium">{t('board.jobSlot.jobCategory')}</dt>
           <dd>{slot.jobCategory.name}</dd>
           <dt className="font-medium">{t('board.jobSlot.zone')}</dt>
@@ -724,7 +733,15 @@ const ProposalSection = ({
       </h2>
       <dl className="grid gap-x-6 gap-y-2 sm:grid-cols-[max-content_1fr]">
         <dt className="font-medium">{t('work.fields.company')}</dt>
-        <dd>{proposal.companyName}</dd>
+        <dd>
+          {proposal.companyName}
+          {proposal.companyTrainingShip && (
+            <>
+              {' '}
+              <TrainingShipBadge />
+            </>
+          )}
+        </dd>
         <dt className="font-medium">{t('work.fields.jobSlot')}</dt>
         <dd>{proposal.title}</dd>
         <dt className="font-medium">{t('work.fields.jobCategory')}</dt>
@@ -1374,7 +1391,15 @@ const CompatibleSection = ({ ticket: d, onOutcome }: CompatibleSectionProps) => 
             <tbody>
               {compatible.data.map((s) => (
                 <tr key={s.id} className="border-b border-border last:border-b-0">
-                  <td className={td}>{s.companyName}</td>
+                  <td className={td}>
+                    {s.companyName}
+                    {s.companyTrainingShip && (
+                      <>
+                        {' '}
+                        <TrainingShipBadge />
+                      </>
+                    )}
+                  </td>
                   <th scope="row" className={`${td} text-left font-semibold`}>
                     {s.title}
                     <AssignmentWarning

@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { RatingDisplay } from '@/atoms/RatingDisplay/RatingDisplay';
+import { TrainingShipBadge } from '@/atoms/TrainingShipBadge/TrainingShipBadge';
 import { Button } from '@/components/ui/button';
 import { apiError } from '@/config/api/errors';
 import { useCompanyDirectoryItem } from '@/config/hooks/useCompanies';
@@ -48,7 +49,15 @@ export const TutorCompanyPage = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeader back={<BackLink to="/aziende">{t('company.backToList')}</BackLink>}>{c.name}</PageHeader>
+      <PageHeader back={<BackLink to="/aziende">{t('company.backToList')}</BackLink>}>
+        {c.name}
+        {c.trainingShip && (
+          <>
+            {' '}
+            <TrainingShipBadge className="[&>svg]:size-6" />
+          </>
+        )}
+      </PageHeader>
       <section
         aria-labelledby="tutor-company-data"
         className="space-y-3 rounded-xl border border-border bg-card p-4"

@@ -37,6 +37,8 @@ type ReportValues = {
   companyWelcome: string;
   companyTraining: string;
   companyReviewNote: string;
+  /** Proposta di nave scuola (US-515): facoltativa, '' = nessuna risposta. */
+  trainingShipProposed: YesNo;
   objectives: string;
   difficulties: string;
   hired: YesNo;
@@ -55,6 +57,7 @@ const EMPTY: ReportValues = {
   companyWelcome: '',
   companyTraining: '',
   companyReviewNote: '',
+  trainingShipProposed: '',
   objectives: '',
   difficulties: '',
   hired: '',
@@ -122,6 +125,7 @@ const toPayload = (v: ReportValues): ClosureReportForm => ({
   companyTraining: Number(v.companyTraining),
   // la nota c'è sempre ed è facoltativa, anche con la media ottima (PO, 26/11, dal collaudo)
   companyReviewNote: v.companyReviewNote.trim() || null,
+  trainingShipProposed: v.trainingShipProposed === '' ? null : v.trainingShipProposed === 'yes',
 });
 
 /**
@@ -495,6 +499,15 @@ const ReportForm = ({ ticket: d, dates, onSent }: ReportFormProps) => {
               />
             )}
           </FormField>
+          {/* proposta di nave scuola (US-515): con il sì il Call Center riceve l'avviso e decide */}
+          <RadioField
+            name="trainingShipProposed"
+            legend={t('closureReport.fields.trainingShipProposed')}
+            hint={t('closureReport.hints.trainingShipProposed')}
+            options={yesNo}
+            required={false}
+            registration={register('trainingShipProposed')}
+          />
         </fieldset>
         <RadioField
           name="hired"
@@ -616,11 +629,21 @@ type RadioFieldProps = {
   /** Etichetta di ogni opzione: un testo, oppure faccina e parola (US-1104). */
   options: readonly { value: string; label: ReactNode }[];
   error?: string;
+  /** Falso per le domande facoltative (US-515): senza «(obbligatorio)» nella legenda. */
+  required?: boolean;
   registration: UseFormRegisterReturn;
 };
 
-/** Scelta obbligatoria a pallini: legenda, aiuto ed errore collegati al gruppo (WCAG 1.3.1, 3.3.1, 3.3.2). */
-const RadioField = ({ name, legend, hint, options, error, registration }: RadioFieldProps) => {
+/** Scelta a pallini, obbligatoria salvo indicazione: legenda, aiuto ed errore collegati al gruppo (WCAG 1.3.1, 3.3.1, 3.3.2). */
+const RadioField = ({
+  name,
+  legend,
+  hint,
+  options,
+  error,
+  required = true,
+  registration,
+}: RadioFieldProps) => {
   const { t } = useTranslation();
   const id = fieldId(name);
   const hintId = hint ? `${id}-hint` : undefined;
@@ -632,8 +655,12 @@ const RadioField = ({ name, legend, hint, options, error, registration }: RadioF
     >
       <legend className="text-sm font-medium">
         {legend}
-        {/* spazio come nodo di testo a sé, come in FormField */}{' '}
-        <span className="font-normal text-muted-foreground">({t('form.required')})</span>
+        {required && (
+          <>
+            {/* spazio come nodo di testo a sé, come in FormField */}{' '}
+            <span className="font-normal text-muted-foreground">({t('form.required')})</span>
+          </>
+        )}
       </legend>
       {hint && (
         <p id={hintId} className="text-sm text-muted-foreground">

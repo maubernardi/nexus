@@ -31,6 +31,8 @@ const rossi: CompanyDirectoryItem = {
   projectInterest: 1,
   reviewAverage: 13 / 3,
   reviewCount: 2,
+  // nave scuola (US-515)
+  trainingShip: true,
 };
 
 const renderPage = (path = '/aziende') =>
@@ -75,7 +77,8 @@ describe('<TutorCompaniesPage>', () => {
       'Valutazioni dei tirocini',
     ]);
     const [, first, second] = within(table).getAllByRole('row');
-    expect(within(first).getByRole('rowheader')).toHaveTextContent('Officina Rossi');
+    expect(within(first).getByRole('rowheader')).toHaveTextContent(/^Officina Rossi Nave scuola$/);
+    expect(within(second).getByRole('rowheader')).toHaveTextContent(/^Bar Sport$/);
     const cells = within(first).getAllByRole('cell');
     expect(cells[0]).toHaveTextContent('Officine Auto-Moto');
     expect(cells[1]).toHaveTextContent('Rifredi');

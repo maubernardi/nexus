@@ -100,7 +100,7 @@ class MessageTextIT {
                 .andExpect(jsonPath("$.items[0].text")
                         .value("Proposta per la n. " + ticket.getNumber() + ": guardala"));
         NotificationEmail email = NotificationEmail.of(messageTextService.current(), NotificationType.PROPOSAL_SENT,
-                "T1", ticket.getNumber(), "https://portalenexus.it");
+                "T1", ticket.getNumber(), null, "https://portalenexus.it");
         assertThat(email.subject())
                 .isEqualTo("PORTALE NEXUS - Segnalazione n. " + ticket.getNumber() + " - Valuta la proposta");
         // il testo dell'email non è cambiato: è distinto da quello dell'app

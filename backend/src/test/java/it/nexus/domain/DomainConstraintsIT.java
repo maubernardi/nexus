@@ -1360,6 +1360,14 @@ class DomainConstraintsIT {
                     "INSERT INTO notification (id, recipient_id, type, created_at, created_by)"
                             + " VALUES (1, ?, 'tipo non valido', now(), 'test')", userId));
         }
+
+        @Test
+        void aziendaInesistente() {
+            Long userId = fixtures.graph().tutor().getId();
+            assertViolates("fk_notification_company", () -> jdbc.update(
+                    "INSERT INTO notification (id, recipient_id, type, company_id, created_at, created_by)"
+                            + " VALUES (1, ?, 'TRAINING_SHIP_PROPOSED', -5, now(), 'test')", userId));
+        }
     }
 
     @Nested

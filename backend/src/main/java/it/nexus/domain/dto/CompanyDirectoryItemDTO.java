@@ -18,6 +18,8 @@ public record CompanyDirectoryItemDTO(
         /** Stelle (1–4) e pollici (1–2) del Call Center (US-514); assenti se non valutata. */
         Integer reliability,
         Integer projectInterest,
+        /** Nave scuola (US-515). */
+        boolean trainingShip,
         /** Media delle valutazioni dei tirocini e quante sono (US-1104); assenti senza valutazioni. */
         Double reviewAverage,
         Long reviewCount) {
@@ -25,6 +27,6 @@ public record CompanyDirectoryItemDTO(
     /** Lo stesso elemento con la media e il numero delle valutazioni dei tirocini. */
     public CompanyDirectoryItemDTO withReviews(Double average, Long count) {
         return new CompanyDirectoryItemDTO(id, name, businessCategory, zone, address, municipality, reliability,
-                projectInterest, average, count);
+                projectInterest, trainingShip, average, count);
     }
 }

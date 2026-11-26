@@ -1672,4 +1672,52 @@ Sul collaudo del PC, prima del merge (http://localhost:8090, password `collaudo-
      lato.
   > Nota (26/11): T-38.1 … T-38.4 riuscite dal PO sul suo PC, con il collaudo della PR #214 (`e35941e`). Richieste dal
   > collaudo: un testo neutro sotto «Valutazioni dei tirocini» e la nota sempre presente nel report, anche con
-  > «Ottima» (fatte nella stessa PR).
+  > «Ottima» (fatte nella stessa PR). Unita con la #214 (`5095004`) e in produzione con il deploy del 26/11 sera.
+
+## 39. Azienda «nave scuola» (Sprint 18)
+
+Sul collaudo del PC, prima del merge (http://localhost:8090, password `collaudo-nexus-2026`; le email in Mailpit,
+http://localhost:8025). Nei dati finti «Demo Ristorazione S.n.c.» è già una nave scuola, e `tutor1` ha una segnalazione
+in tirocinio presso «Demo Servizi Pulizia Soc. Coop.» (beneficiaria «Demo Otto»), seguita da `operatore.cc`, con il
+report di restituzione da compilare. La nave accanto al nome è un'icona: passandoci sopra con il mouse compare «Nave
+scuola».
+
+- [ ] **T-39.1 Nave scuola nella scheda e nell'elenco delle aziende (US-515)**
+  1. Entra come `operatore.cc` e apri «Aziende». **Atteso:** la nave accanto a «Demo Ristorazione S.n.c.», e a nessun
+     altro nome.
+  2. Spunta «Solo le navi scuola». **Atteso:** si vede solo «Demo Ristorazione S.n.c.»; compare «Azzera i filtri».
+  3. Azzera i filtri, apri «Demo Logistica S.r.l.» e nella «Valutazione del Call Center» spunta «Nave scuola», con il
+     suo aiuto sotto; salva. **Atteso:** la nave accanto al nome nel titolo della scheda e nell'elenco.
+  4. Togli la spunta e salva. **Atteso:** la nave non c'è più.
+
+- [ ] **T-39.2 La nave dove si sceglie l'azienda (US-515)**
+  1. Come `operatore.cc` apri la bacheca e scegli «Pubblicati». **Atteso:** l'annuncio «Tirocinio cameriere di sala»
+     ha la nave accanto a «Demo Ristorazione S.n.c.», anche nel suo dettaglio.
+  2. Apri una segnalazione in lavorazione e cerca le mansioni compatibili in tutte le zone e tipologie. **Atteso:** le
+     mansioni di «Demo Ristorazione S.n.c.» hanno la nave accanto al nome dell'azienda.
+
+- [ ] **T-39.3 Proposta nel report di restituzione (US-515)**
+  1. Esci ed entra come `tutor1`; apri la segnalazione di «Demo Otto» e il report di restituzione. **Atteso:** nella
+     «Valutazione dell'azienda», dopo la nota, la domanda «L'azienda è adatta come nave scuola?», senza «obbligatorio»,
+     con l'aiuto che spiega che cos'è una nave scuola e che decide il Call Center.
+  2. Compila il report rispondendo «Sì» e invialo. La «Fine effettiva del tirocinio» parte vuota: scrivi una data.
+     **Atteso:** il report inviato mostra «Proposta come nave scuola: Sì».
+
+- [ ] **T-39.4 L'avviso all'operatore e il diario dell'azienda (US-515)**
+  1. Esci ed entra come `operatore.cc`; apri le notifiche. **Atteso:** «Nel report di restituzione della segnalazione
+     n. … il Tutor propone l'azienda del tirocinio come nave scuola: decidi tu dalla scheda dell'azienda.», con il
+     collegamento «Apri la scheda dell'azienda della segnalazione n. …».
+  2. Premi il collegamento. **Atteso:** la scheda di «Demo Servizi Pulizia Soc. Coop.», ancora senza la nave: decidi
+     tu. Nelle note c'è «Proposta come nave scuola dal Tutor, nel report di restituzione della segnalazione n. …», di
+     Tutor Uno, con la data di oggi.
+  3. Apri Mailpit. **Atteso:** l'email a `operatore.cc` con l'oggetto «PORTALE NEXUS - Segnalazione n. … - Proposta di
+     nave scuola», il collegamento alla scheda dell'azienda (non alla segnalazione) e la firma «Portale Nexus».
+  4. Come `admin`, apri «Testi dei messaggi». **Atteso:** c'è «Proposta di nave scuola», con il testo nell'app,
+     l'oggetto e il testo dell'email, che si possono cambiare come gli altri.
+
+- [ ] **T-39.5 La nave per il Tutor (US-515)**
+  1. Come `tutor2` apri «Aziende». **Atteso:** la nave accanto a «Demo Ristorazione S.n.c.»; apri la sua scheda: la
+     nave anche nel titolo.
+  2. Apri la bacheca dei Tutor. **Atteso:** nessuna nave e nessun nome di azienda: la bacheca resta anonima.
+  3. Prova il tema scuro con il pulsante 🌙 in alto e restringi la finestra alla larghezza di uno smartphone.
+     **Atteso:** la nave si vede bene e i nomi non escono dalla pagina.

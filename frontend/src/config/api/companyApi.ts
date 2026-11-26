@@ -52,6 +52,8 @@ export type Company = {
   reliability?: number | null;
   /** Interesse al progetto, 1 o 2 pollici (US-514); assente se non valutato. */
   projectInterest?: number | null;
+  /** Nave scuola (US-515): adatta a un primo tirocinio. */
+  trainingShip?: boolean;
   active: boolean;
   version: number;
   updatedAt: string;
@@ -79,6 +81,8 @@ export type CompanyForm = {
   /** Stelle e pollici (US-514); null = non valutata. */
   reliability: number | null;
   projectInterest: number | null;
+  /** Nave scuola (US-515). */
+  trainingShip: boolean;
   /** Solo in modifica: versione vista (blocco ottimistico). */
   version?: number;
 };
@@ -95,6 +99,8 @@ export type CompanySearch = {
   /** Solo le aziende con almeno queste stelle (1–4) e questi pollici (1–2) (US-514). */
   minReliability?: number;
   minProjectInterest?: number;
+  /** Solo le navi scuola (US-515). */
+  trainingShip?: boolean;
   /** Pagina, da 0 (US-513). */
   page: number;
   /** Aziende per pagina: una di {@link COMPANY_PAGE_SIZES}. */
@@ -133,6 +139,8 @@ export type CompanyDirectoryItem = {
   municipality?: string | null;
   reliability?: number | null;
   projectInterest?: number | null;
+  /** Nave scuola (US-515). */
+  trainingShip?: boolean;
   /** Media delle valutazioni dei tirocini e quante sono (US-1104); assenti senza valutazioni. */
   reviewAverage?: number | null;
   reviewCount?: number | null;

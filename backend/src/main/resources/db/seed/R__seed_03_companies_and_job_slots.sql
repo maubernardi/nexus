@@ -95,3 +95,13 @@ FROM (VALUES (892398395572130067, 'RIFREDI'),
          AS demo (company_id, zone_code)
 WHERE c.id = demo.company_id
   AND c.zone_id IS NULL;
+
+-- Nave scuola dimostrativa (US-515): Demo Ristorazione, per provare il 🚢 e il filtro. Solo se nessuno l'ha cambiata a
+-- mano (l'ultimo a modificarla è il seed), così una scelta fatta dalla scheda non cambia al riavvio.
+UPDATE company
+SET training_ship = true,
+    updated_at = now(),
+    updated_by = 'seed'
+WHERE id = 892398395572130068
+  AND updated_by = 'seed'
+  AND NOT training_ship;

@@ -71,6 +71,32 @@ describe('<NotificationsPage>', () => {
     await expectNoAxeViolations();
   });
 
+  it('proposta di nave scuola: il link porta alla scheda dell’azienda (US-515)', async () => {
+    vi.mocked(fetchNotifications).mockResolvedValue({
+      unread: 1,
+      items: [
+        {
+          id: 'N5',
+          type: 'TRAINING_SHIP_PROPOSED',
+          ticketId: 'T9',
+          ticketNumber: 9,
+          companyId: 'C7',
+          createdAt: '2026-11-26T09:00:00Z',
+          read: false,
+          text: 'Nel report di restituzione della segnalazione n. 9 il Tutor propone l’azienda del tirocinio come nave scuola: decidi tu dalla scheda dell’azienda.',
+        },
+      ],
+    });
+    renderPage();
+
+    const [item] = await screen.findAllByRole('listitem');
+    expect(
+      within(item).getByRole('link', { name: 'Apri la scheda dell’azienda della segnalazione n. 9' }),
+    ).toHaveAttribute('href', '/aziende/C7');
+    expect(within(item).queryByRole('link', { name: /Apri la segnalazione/ })).not.toBeInTheDocument();
+    await expectNoAxeViolations();
+  });
+
   it('segna come letta una notifica o tutte', async () => {
     const user = userEvent.setup();
     renderPage();

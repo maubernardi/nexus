@@ -5,6 +5,7 @@ import { Link, useSearchParams } from 'react-router';
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { RatingDisplay } from '@/atoms/RatingDisplay/RatingDisplay';
 import { ReviewFace } from '@/atoms/ReviewFace/ReviewFace';
+import { TrainingShipBadge } from '@/atoms/TrainingShipBadge/TrainingShipBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
@@ -268,6 +269,12 @@ export const TutorCompaniesPage = () => {
                       <Link to={`/aziende/${c.id}`} className="text-primary underline underline-offset-4">
                         {c.name}
                       </Link>
+                      {c.trainingShip && (
+                        <>
+                          {' '}
+                          <TrainingShipBadge />
+                        </>
+                      )}
                     </th>
                     <td className={td}>{c.businessCategory?.name ?? '—'}</td>
                     <td className={td}>{c.zone?.name ?? '—'}</td>

@@ -110,9 +110,35 @@ describe('<CompanyForm>', () => {
       contacts: [],
       reliability: null,
       projectInterest: null,
+      trainingShip: false,
       zoneId: null,
       version: undefined,
     });
+  });
+
+  it('nave scuola: casella con l’aiuto, parte dal valore salvato e si toglie (US-515)', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn().mockResolvedValue(saved);
+    renderWithProviders(
+      <main>
+        <CompanyForm
+          company={{ ...saved, trainingShip: true }}
+          submitLabel="Salva modifiche"
+          onSubmit={onSubmit}
+          onSuccess={vi.fn()}
+        />
+      </main>,
+    );
+    const box = screen.getByRole('checkbox', { name: 'Nave scuola' });
+    expect(box).toBeChecked();
+    expect(box).toHaveAccessibleDescription(/Azienda adatta a un primo tirocinio/);
+    await expectNoAxeViolations();
+
+    await user.click(box);
+    await user.click(screen.getByRole('button', { name: 'Salva modifiche' }));
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ trainingShip: false })),
+    );
   });
 
   it('stelle e pollici: vuoti all’inizio, si sceglie con un clic e si tolgono (US-514)', async () => {

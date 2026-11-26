@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
+import { TrainingShipBadge } from '@/atoms/TrainingShipBadge/TrainingShipBadge';
 import { Button } from '@/components/ui/button';
 import type { BoardPost } from '@/config/api/boardPostApi';
 import { apiError } from '@/config/api/errors';
@@ -135,6 +136,12 @@ export const BoardPostPage = () => {
             >
               {p.jobSlot.companyName}
             </Link>
+            {p.jobSlot.companyTrainingShip && (
+              <>
+                {' '}
+                <TrainingShipBadge />
+              </>
+            )}
           </dd>
           <dt className="font-medium">{t('board.jobSlot.jobCategory')}</dt>
           <dd>{p.jobSlot.jobCategory.name}</dd>

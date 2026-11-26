@@ -1,8 +1,10 @@
 import { useState, type ReactNode } from 'react';
+import { Ship } from 'lucide-react';
 import { Controller, useForm, type Control, type FieldPath } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
 import type { Company, CompanyForm as CompanyPayload } from '@/config/api/companyApi';
@@ -101,6 +103,7 @@ const toValues = (company?: Company): CompanyFormValues => ({
   })),
   reliability: company?.reliability ?? null,
   projectInterest: company?.projectInterest ?? null,
+  trainingShip: company?.trainingShip ?? false,
 });
 
 const text = (v: string): string | null => v.trim() || null;
@@ -129,6 +132,7 @@ const toPayload = (v: CompanyFormValues): CompanyPayload => ({
   })),
   reliability: v.reliability,
   projectInterest: v.projectInterest,
+  trainingShip: v.trainingShip,
 });
 
 type CompanyFormProps = {
@@ -181,6 +185,7 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
     secondaryEmail: t('company.fields.secondaryEmail'),
     reliability: t('company.fields.reliability'),
     projectInterest: t('company.fields.projectInterest'),
+    trainingShip: t('company.fields.trainingShip'),
   };
   const contactErrors = errors.contacts;
   const summary: SummaryError[] = [
@@ -379,6 +384,27 @@ export const CompanyForm = ({ company, submitLabel, onSubmit, onSuccess }: Compa
             />
           )}
         />
+        {/* nave scuola (US-515): la segna il Call Center, anche senza la proposta di un Tutor */}
+        <div className="flex items-start gap-2">
+          <Checkbox
+            id={fieldId('trainingShip')}
+            aria-describedby={`${fieldId('trainingShip')}-hint`}
+            className="mt-0.5"
+            {...register('trainingShip')}
+          />
+          <div className="space-y-1">
+            <label
+              htmlFor={fieldId('trainingShip')}
+              className="inline-flex items-center gap-1.5 text-sm font-medium"
+            >
+              {labels.trainingShip}
+              <Ship aria-hidden="true" className="size-4 text-primary" />
+            </label>
+            <p id={`${fieldId('trainingShip')}-hint`} className="text-sm text-muted-foreground">
+              {t('company.hints.trainingShip')}
+            </p>
+          </div>
+        </div>
       </Group>
 
       <Group legend={t('company.legalSeat')}>

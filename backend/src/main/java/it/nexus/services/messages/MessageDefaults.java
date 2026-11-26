@@ -83,6 +83,10 @@ final class MessageDefaults {
                 "Il tirocinio della segnalazione n. {numero} è finito alla data prevista: chiudilo con il report di restituzione o prorogalo. Finché non chiudi i tirocini finiti non puoi aprire nuove segnalazioni.",
                 "Tirocinio da chiudere o prorogare",
                 "Il tirocinio della segnalazione n. {numero} è finito alla data prevista: chiudilo con il report di restituzione o prorogalo. Finché non chiudi i tirocini finiti non puoi aprire nuove segnalazioni.");
+        notification(MessageKey.TRAINING_SHIP_PROPOSED,
+                "Nel report di restituzione della segnalazione n. {numero} il Tutor propone l'azienda del tirocinio come nave scuola: decidi tu dalla scheda dell'azienda.",
+                "Proposta di nave scuola",
+                "Nel report di restituzione della segnalazione n. {numero} il Tutor propone l'azienda del tirocinio come nave scuola, adatta a un primo tirocinio. Decidi tu se segnarla dalla scheda dell'azienda.");
         email(MessageKey.EMAIL_CHANGE_CODE, "Codice per confermare il nuovo indirizzo email", """
                 Ciao,
 

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import it.nexus.config.security.SecurityUtils;
 import it.nexus.domain.AppUser;
+import it.nexus.domain.Company;
 import it.nexus.domain.Notification;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.dto.NotificationDTO;
@@ -44,18 +45,19 @@ public class NotificationServiceImpl implements NotificationService {
     private final MessageTextService messageTextService;
 
     @Override
-    public void notify(AppUser recipient, NotificationType type, Ticket ticket) {
+    public void notify(AppUser recipient, NotificationType type, Ticket ticket, Company company) {
         // chi agisce non riceve la propria notifica; le attività pianificate agiscono senza utente (Sistema)
         boolean byRecipient = SecurityUtils.getCurrentUser().isPresent()
                 && recipient != null && recipient.getId().equals(currentAppUserService.getCurrentAppUser().getId());
         if (recipient == null || byRecipient) {
             return;
         }
-        Notification saved = repository.save(new Notification(recipient, type, ticket));
+        Notification saved = repository.save(new Notification(recipient, type, ticket, company));
         // anche via email, dopo il commit (US-1202)
         events.publishEvent(new NotificationCreatedEvent(saved.getId(), recipient.getEmail(), type,
                 ticket == null ? null : TsidMapper.toExternal(ticket.getId()),
-                ticket == null ? null : ticket.getNumber()));
+                ticket == null ? null : ticket.getNumber(),
+                company == null ? null : TsidMapper.toExternal(company.getId())));
     }
 
     @Override
@@ -95,8 +97,10 @@ public class NotificationServiceImpl implements NotificationService {
         Ticket t = n.getTicket();
         Map<String, Object> values = new HashMap<>();
         values.put("numero", t == null ? null : t.getNumber());
+        Company c = n.getCompany();
         return new NotificationDTO(TsidMapper.toExternal(n.getId()), n.getType(),
-                t == null ? null : TsidMapper.toExternal(t.getId()), t == null ? null : t.getNumber(), n.getCreatedAt(),
-                n.getReadAt() != null, texts.render(MessageKey.of(n.getType()), MessagePart.APP, values));
+                t == null ? null : TsidMapper.toExternal(t.getId()), t == null ? null : t.getNumber(),
+                c == null ? null : TsidMapper.toExternal(c.getId()), n.getCreatedAt(), n.getReadAt() != null,
+                texts.render(MessageKey.of(n.getType()), MessagePart.APP, values));
     }
 }

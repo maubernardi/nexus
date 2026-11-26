@@ -4,7 +4,10 @@ import java.time.Instant;
 
 import it.nexus.domain.enumeration.NotificationType;
 
-/** Notifica in app: il testo lo compone l'interfaccia dal tipo e dal numero della segnalazione. */
-public record NotificationDTO(String id, NotificationType type, String ticketId, Long ticketNumber, Instant createdAt,
-        boolean read, String text) {
+/**
+ * Notifica in app con il testo già composto. {@code companyId} c'è negli avvisi che portano alla scheda dell'azienda invece
+ * che alla segnalazione (US-515).
+ */
+public record NotificationDTO(String id, NotificationType type, String ticketId, Long ticketNumber, String companyId,
+        Instant createdAt, boolean read, String text) {
 }

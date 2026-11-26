@@ -234,6 +234,34 @@ describe('<CompaniesPage>', () => {
     });
   });
 
+  it('nave scuola: la nave accanto al nome e il filtro nell’indirizzo (US-515)', async () => {
+    vi.mocked(searchCompanies).mockResolvedValue(
+      pageOf([
+        { ...company('C5', 'Trattoria Bianchi'), trainingShip: true },
+        company('C6', 'Officina Rossi'),
+      ]),
+    );
+    const user = userEvent.setup();
+    const { router } = renderPage();
+
+    const table = await screen.findByRole('table', { name: /Aziende ospitanti/ });
+    const [, first, second] = within(table).getAllByRole('row');
+    expect(within(first).getByRole('rowheader')).toHaveTextContent(/^Trattoria Bianchi Nave scuola$/);
+    expect(within(first).getByTitle('Nave scuola')).toBeInTheDocument();
+    expect(within(second).getByRole('rowheader')).toHaveTextContent(/^Officina Rossi$/);
+    await expectNoAxeViolations();
+
+    await user.click(screen.getByRole('checkbox', { name: 'Solo le navi scuola' }));
+    await waitFor(() => expect(router.state.location.search).toBe('?naveScuola=1'));
+    expect(searchCompanies).toHaveBeenLastCalledWith({
+      includeInactive: false,
+      trainingShip: true,
+      page: 0,
+      size: 25,
+    });
+    expect(screen.getByRole('button', { name: 'Azzera i filtri' })).toBeInTheDocument();
+  });
+
   it('categoria nella colonna e filtro per categoria nell’indirizzo (US-509)', async () => {
     vi.mocked(searchCompanies).mockResolvedValue(
       pageOf([
@@ -342,7 +370,7 @@ describe('<CompaniesPage>', () => {
   it('«Azzera i filtri»: solo con filtri attivi; toglie tutto, tiene le aziende per pagina, focus sulla ricerca', async () => {
     const user = userEvent.setup();
     const { router } = renderPage(
-      '/aziende?q=rossi&categoria=K14&zona=Z1&stelle=2&interesse=1&disattivate=1&daCompletare=1&pagina=3&perPagina=50',
+      '/aziende?q=rossi&categoria=K14&zona=Z1&stelle=2&interesse=1&disattivate=1&daCompletare=1&naveScuola=1&pagina=3&perPagina=50',
     );
     await screen.findByRole('table');
     await user.click(screen.getByRole('button', { name: 'Azzera i filtri' }));

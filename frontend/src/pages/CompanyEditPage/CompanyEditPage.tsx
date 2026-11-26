@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
+import { TrainingShipBadge } from '@/atoms/TrainingShipBadge/TrainingShipBadge';
 import { Button } from '@/components/ui/button';
 import { apiError } from '@/config/api/errors';
 import { useCompany, useSetCompanyActive, useUpdateCompany } from '@/config/hooks/useCompanies';
@@ -79,7 +80,15 @@ export const CompanyEditPage = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeader back={back}>{c.name}</PageHeader>
+      <PageHeader back={back}>
+        {c.name}
+        {c.trainingShip && (
+          <>
+            {' '}
+            <TrainingShipBadge className="[&>svg]:size-6" />
+          </>
+        )}
+      </PageHeader>
       <p className="text-muted-foreground">
         {isMissing(c, 'VAT_CODE') ? t('company.vatMissing') : t('company.vatLine', { vat: c.vatCode })} ·{' '}
         {t(c.active ? 'company.active' : 'company.inactive')}

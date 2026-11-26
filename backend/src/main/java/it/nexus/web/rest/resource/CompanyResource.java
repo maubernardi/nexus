@@ -44,7 +44,8 @@ public class CompanyResource {
     @GetMapping
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
     @Operation(summary = "Cerca aziende per ragione sociale o partita IVA, una pagina alla volta (page da 0; size 10, "
-            + "25, 50 o 100); filtri: da completare, categoria merceologica, zona, stelle (1–4) e pollici (1–2) minimi")
+            + "25, 50 o 100); filtri: da completare, categoria merceologica, zona, stelle (1–4) e pollici (1–2) minimi, "
+            + "solo le navi scuola (US-515)")
     public ResponseEntity<CompanyPageDTO> search(@RequestParam(required = false) String search,
             @RequestParam(defaultValue = "false") boolean includeInactive,
             @RequestParam(defaultValue = "false") boolean toComplete,
@@ -52,10 +53,11 @@ public class CompanyResource {
             @RequestParam(required = false) String zoneId,
             @RequestParam(required = false) Integer minReliability,
             @RequestParam(required = false) Integer minProjectInterest,
+            @RequestParam(defaultValue = "false") boolean trainingShip,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "" + CompanyService.DEFAULT_PAGE_SIZE) int size) {
         return ResponseEntity.ok(companyService.search(new CompanySearch(search, includeInactive, toComplete,
-                businessCategoryId, zoneId, minReliability, minProjectInterest), page, size));
+                businessCategoryId, zoneId, minReliability, minProjectInterest, trainingShip), page, size));
     }
 
     @GetMapping("/directory")

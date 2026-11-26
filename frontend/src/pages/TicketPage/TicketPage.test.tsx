@@ -301,14 +301,16 @@ describe('<TicketPage>', () => {
 
   it('proposta: conferma con focus, poi esito con focus e versioni inviate', async () => {
     const user = userEvent.setup();
+    vi.mocked(fetchCompatibleJobSlots).mockResolvedValue([{ ...alfa, companyTrainingShip: true }]);
     vi.mocked(matchTicket).mockResolvedValue(
       detail({ status: 'PROPOSTA_AZIENDA', version: 3, proposal: alfa }),
     );
     renderPage();
 
-    await user.click(
-      await screen.findByRole('button', { name: 'Proponi Magazziniere presso Alfa Logistica' }),
-    );
+    const propose = await screen.findByRole('button', { name: 'Proponi Magazziniere presso Alfa Logistica' });
+    // nave scuola (US-515): la nave accanto al nome dell'azienda nell'elenco delle compatibili
+    expect(propose.closest('tr')?.querySelector('td')).toHaveTextContent(/^Alfa Logistica Nave scuola$/);
+    await user.click(propose);
     expect(screen.getByRole('heading', { name: 'Conferma la proposta' })).toHaveFocus();
     expect(
       screen.getByText(/Proporre Anna Bianchi per la mansione «Magazziniere» presso Alfa Logistica/),

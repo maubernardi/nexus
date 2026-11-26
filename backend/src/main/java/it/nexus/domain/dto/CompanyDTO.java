@@ -33,6 +33,8 @@ public record CompanyDTO(
         Integer reliability,
         /** Interesse al progetto, 1 o 2 pollici (US-514); assente se non valutato. */
         Integer projectInterest,
+        /** Nave scuola (US-515). */
+        boolean trainingShip,
         boolean active,
         long version,
         Instant updatedAt,

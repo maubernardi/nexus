@@ -103,14 +103,25 @@ export const NotificationsPage = () => {
                 <p className="text-sm text-muted-foreground">
                   <time dateTime={n.createdAt}>{dateTime.format(new Date(n.createdAt))}</time>
                 </p>
-                {n.ticketId && (
+                {/* la proposta di nave scuola porta alla scheda dell'azienda (US-515) */}
+                {n.companyId ? (
                   <Link
-                    to={`/segnalazioni/${n.ticketId}`}
+                    to={`/aziende/${n.companyId}`}
                     onClick={() => !n.read && markRead.mutate(n.id)}
                     className="inline-block font-medium text-primary underline underline-offset-4"
                   >
-                    {t('notifications.open', { number: n.ticketNumber })}
+                    {t('notifications.openCompany', { number: n.ticketNumber })}
                   </Link>
+                ) : (
+                  n.ticketId && (
+                    <Link
+                      to={`/segnalazioni/${n.ticketId}`}
+                      onClick={() => !n.read && markRead.mutate(n.id)}
+                      className="inline-block font-medium text-primary underline underline-offset-4"
+                    >
+                      {t('notifications.open', { number: n.ticketNumber })}
+                    </Link>
+                  )
                 )}
               </div>
               {!n.read && (

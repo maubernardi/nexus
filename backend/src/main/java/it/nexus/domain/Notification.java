@@ -20,7 +20,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/** Notifica in app (US-1201): destinatario, tipo e segnalazione collegata; nessun dato personale. */
+/**
+ * Notifica in app (US-1201): destinatario, tipo, segnalazione collegata e, per gli avvisi che portano alla scheda di
+ * un'azienda (US-515), l'azienda; nessun dato personale.
+ */
 @Getter
 @Entity
 @Table(name = "notification")
@@ -46,13 +49,23 @@ public class Notification extends AbstractCreationAuditingEntity {
     @JoinColumn(name = "ticket_id", updatable = false)
     private Ticket ticket;
 
+    /** Azienda a cui porta l'avviso, invece che alla segnalazione (US-515). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", updatable = false)
+    private Company company;
+
     @Column(name = "read_at")
     private Instant readAt;
 
     public Notification(AppUser recipient, NotificationType type, Ticket ticket) {
+        this(recipient, type, ticket, null);
+    }
+
+    public Notification(AppUser recipient, NotificationType type, Ticket ticket, Company company) {
         this.recipient = recipient;
         this.type = type;
         this.ticket = ticket;
+        this.company = company;
     }
 
     public void markRead(Instant at) {

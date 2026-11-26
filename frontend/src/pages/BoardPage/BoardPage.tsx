@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
+import { TrainingShipBadge } from '@/atoms/TrainingShipBadge/TrainingShipBadge';
 import { Button } from '@/components/ui/button';
 import type { BoardPostStatus } from '@/config/api/boardPostApi';
 import { useBoardPosts } from '@/config/hooks/useBoardPosts';
@@ -121,7 +122,15 @@ export const BoardPage = () => {
                     </Link>
                   </th>
                   <td className={td}>{p.title}</td>
-                  <td className={td}>{p.jobSlot.companyName}</td>
+                  <td className={td}>
+                    {p.jobSlot.companyName}
+                    {p.jobSlot.companyTrainingShip && (
+                      <>
+                        {' '}
+                        <TrainingShipBadge />
+                      </>
+                    )}
+                  </td>
                   <td className={td}>{p.jobSlot.jobCategory.name}</td>
                   <td className={td}>{p.jobSlot.zone.name}</td>
                   <td className={td}>{p.project?.name ?? t('board.allProjects')}</td>
