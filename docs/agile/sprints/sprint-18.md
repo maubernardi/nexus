@@ -1,7 +1,7 @@
 # Sprint 18 — 26 – 28 novembre 2026
 
 **Stato:** ✅ impegno completo il 26/11 (23 punti su 23), in produzione a `119cb88`: US-514, US-1312, US-511, US-1104 e
-US-515. Review alla fine dello sprint.
+US-515. **Review:** [sprint-18-review](sprint-18-review.md) (26/11), velocity 23.
 **Planning:** 25 – 26/11, dalla [review dello Sprint 17](sprint-17-review.md) (§8, §9).
 
 ## Obiettivo
@@ -51,7 +51,8 @@ il 🚢 e US-1104 le valutazioni.
 
 ## Per il PO
 
-- [ ] Attivare il sottocriterio `PQ` di SSH sul server (review, §8.5).
+- [x] Attivare il sottocriterio `PQ` di SSH sul server (review, §8.5): fatto il 26/11, il server offre
+  `mlkem768x25519-sha256`.
 - [ ] Scegliere il servizio degli avvisi (US-1311, Sprint 19).
 - [x] Collaudo di ogni storia sul PC prima del merge.
 

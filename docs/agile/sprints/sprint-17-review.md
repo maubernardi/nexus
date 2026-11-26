@@ -288,7 +288,11 @@ Se l'algoritmo c'è, ti preparo i comandi con sudo, senza punti di sprint.
 > - OpenSSH 10.2, sul PC, li chiede per primi.
 >
 > L'avviso viene quindi dai criteri `DEFAULT` di Rocky 9, che non li attivano. Da Rocky 9.7 esiste il sottocriterio
-> `PQ`, che li aggiunge senza togliere nulla. Il PO ha ricevuto i comandi il 25/11. Esito: ⏳.
+> `PQ`, che li aggiunge senza togliere nulla. Il PO ha ricevuto i comandi il 25/11.
+>
+> ✅ **Fatto (PO, 26/11):** `update-crypto-policies --set DEFAULT:PQ` e riavvio di sshd. Controllato dall'esterno,
+> senza login: il server offre per primo `mlkem768x25519-sha256`, gli algoritmi di prima restano e le chiavi
+> dell'host non cambiano. `sntrup761` non c'è, come previsto su Rocky 9.8: non serve.
 
 ### 8.6 US-511, US-507 e US-512: due proposte da confermare
 Dall'analisi del 23/11 restano due proposte mie, che bloccano la *Definition of Ready*:
@@ -340,7 +344,7 @@ collaudo sul tuo PC prima del merge (EN-11), e i deploy li decidi tu (§8.4).
 
 - [x] Decidere i punti §8.1 … §8.7 (25 – 26/11).
 - [x] Lanciare il comando del §8.5 e incollarmi il risultato (25/11).
-- [ ] Attivare il sottocriterio `PQ` di SSH sul server (§8.5) e incollarmi il risultato.
+- [x] Attivare il sottocriterio `PQ` di SSH sul server (§8.5) e incollarmi il risultato (26/11).
 - [ ] Unire questa PR dopo le decisioni.
 - [ ] Gli account degli utenti.
 - [ ] Il blocco automatico dello schermo dei PC del Call Center, dopo pochi minuti, con chi gestisce i PC (US-1310).
