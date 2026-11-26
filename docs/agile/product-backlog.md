@@ -115,7 +115,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-512](#us-512) | E5 | Tentativi di contatto ed esito della richiesta | Should | 5 | — | ✅ Ready |
 | [US-513](#us-513) | E5 | Elenco delle aziende a pagine | Must | 3 | R4 | 🎉 Done (Sprint 17) |
 | [US-514](#us-514) | E5 | Affidabilità e interesse al progetto dell'azienda | Must | 5 | R4 | 🎉 Done (Sprint 18) |
-| [US-515](#us-515) | E5 | Azienda «nave scuola» | Must | 5 | R4 | 🔨 In corso (Sprint 18) |
+| [US-515](#us-515) | E5 | Azienda «nave scuola» | Must | 5 | R4 | 🎉 Done (Sprint 18) |
 | [US-601](#us-601) | E6 | Ricerca mansioni compatibili | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-602](#us-602) | E6 | Abbinamento e proposta | Must | 5 | R1 | 🎉 Done (Sprint 2) |
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 🎉 Done (Sprint 5) |
@@ -914,7 +914,7 @@ Criteri di accettazione:
 Dipendenze: US-513, US-1309
 
 #### US-515
-**Azienda «nave scuola»** · Must · 5 punti · R4 · 🔨 In corso (Sprint 18)
+**Azienda «nave scuola»** · Must · 5 punti · R4 · 🎉 Done (Sprint 18)
 
 Come **operatore del Call Center** voglio sapere quali aziende sono adatte come «nave scuola», per vederle subito
 quando scelgo dove proporre un beneficiario (PO, 25/11).

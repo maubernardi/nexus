@@ -1,6 +1,7 @@
 # Sprint 18 — 26 – 28 novembre 2026
 
-**Stato:** 🔨 in corso dal 26/11. In produzione dal 26/11, a `5095004`: US-514, US-1312, US-511 e US-1104 (18 punti su 23).
+**Stato:** ✅ impegno completo il 26/11 (23 punti su 23), in produzione a `119cb88`: US-514, US-1312, US-511, US-1104 e
+US-515. Review alla fine dello sprint.
 **Planning:** 25 – 26/11, dalla [review dello Sprint 17](sprint-17-review.md) (§8, §9).
 
 ## Obiettivo
@@ -16,7 +17,7 @@
 | US-514 | Affidabilità e interesse al progetto dell'azienda | 5 | 🎉 Done | `add-company-reliability-interest` (archiviata) | [#208](https://github.com/maubernardi/nexus/pull/208) |
 | US-511 | Zona dell'azienda e aziende per il Tutor | 5 | 🎉 Done | `add-company-zone-and-tutor-directory` (archiviata) | [#212](https://github.com/maubernardi/nexus/pull/212) |
 | US-1104 | Valutazione dell'azienda alla fine del tirocinio | 5 | 🎉 Done | `add-company-reviews` (archiviata) | [#214](https://github.com/maubernardi/nexus/pull/214) |
-| US-515 | Azienda «nave scuola» | 5 | 🔨 In corso | `add-training-ship-company` | — |
+| US-515 | Azienda «nave scuola» | 5 | 🎉 Done | `add-training-ship-company` (archiviata) | [#216](https://github.com/maubernardi/nexus/pull/216) |
 | US-1312 | Tema chiaro o scuro a scelta e intestazione fissa delle schede | 3 | 🎉 Done | `add-theme-toggle-and-top-back-links` (archiviata) | [#209](https://github.com/maubernardi/nexus/pull/209), [#210](https://github.com/maubernardi/nexus/pull/210) (la #209 era finita nel branch di US-514) |
 
 **Ordine** (PO, 26/11):
@@ -52,7 +53,7 @@ il 🚢 e US-1104 le valutazioni.
 
 - [ ] Attivare il sottocriterio `PQ` di SSH sul server (review, §8.5).
 - [ ] Scegliere il servizio degli avvisi (US-1311, Sprint 19).
-- [ ] Collaudo di ogni storia sul PC prima del merge.
+- [x] Collaudo di ogni storia sul PC prima del merge.
 
 ## Burndown
 
@@ -65,3 +66,4 @@ il 🚢 e US-1104 le valutazioni.
 | US-511 anticipata, US-1311 allo Sprint 19 (PO, 26/11) | 15 |
 | US-511 Done: collaudo T-37.1 … T-37.4 sul PC e deploy `3a64364` (26/11) | 10 |
 | US-1104 Done: collaudo T-38.1 … T-38.4 sul PC e deploy `5095004` (26/11) | 5 |
+| US-515 Done: collaudo T-39.1 … T-39.7 sul PC e deploy `119cb88` (26/11) | 0 |
