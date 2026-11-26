@@ -407,6 +407,10 @@ describe('<CompaniesPage>', () => {
 
     const table = await screen.findByRole('table', { name: /Aziende ospitanti/ });
     expect(within(table).getByRole('columnheader', { name: 'Referente' })).toBeInTheDocument();
+    // telefono ed email non ci sono più: la colonna del nome è la più larga (PO, 26/11)
+    expect(within(table).queryByRole('columnheader', { name: 'Telefono' })).not.toBeInTheDocument();
+    expect(within(table).queryByRole('columnheader', { name: 'Email' })).not.toBeInTheDocument();
+    expect(within(table).getByRole('columnheader', { name: 'Ragione sociale' })).toHaveClass('lg:w-84');
     const [, bellavista, miramare, stella] = within(table).getAllByRole('row');
     expect(within(bellavista).getAllByRole('cell')[5]).toHaveTextContent(/^Paola Neri e altri 2$/);
     expect(within(miramare).getAllByRole('cell')[5]).toHaveTextContent(

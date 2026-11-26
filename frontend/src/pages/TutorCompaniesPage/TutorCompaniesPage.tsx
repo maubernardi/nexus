@@ -16,7 +16,9 @@ import {
 } from '@/config/api/companyApi';
 import { useCompanyDirectory } from '@/config/hooks/useCompanies';
 import { useBusinessCategories, useZones } from '@/config/hooks/useReferenceData';
+import { COMPANY_NAME_COLUMN } from '@/lib/companyColumns';
 import { parsePage, parsePageSize } from '@/lib/pageParams';
+import { cn } from '@/lib/utils';
 import { Pagination } from '@/molecules/Pagination/Pagination';
 
 // parametri dell'indirizzo, come nell'elenco del Call Center
@@ -238,7 +240,8 @@ export const TutorCompaniesPage = () => {
               </caption>
               <thead className="border-b border-border bg-muted">
                 <tr>
-                  <th scope="col" className={th}>
+                  {/* come nell'elenco del Call Center: la colonna del nome è la più larga (PO, 26/11) */}
+                  <th scope="col" className={cn(th, COMPANY_NAME_COLUMN)}>
                     {t('company.fields.name')}
                   </th>
                   <th scope="col" className={th}>

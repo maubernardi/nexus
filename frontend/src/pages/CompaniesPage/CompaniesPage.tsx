@@ -14,10 +14,12 @@ import { NativeSelect } from '@/components/ui/native-select';
 import { COMPANY_PAGE_SIZES, DEFAULT_COMPANY_PAGE_SIZE, type Company } from '@/config/api/companyApi';
 import { useCompanySearch } from '@/config/hooks/useCompanies';
 import { useBusinessCategories, useZones } from '@/config/hooks/useReferenceData';
+import { COMPANY_NAME_COLUMN } from '@/lib/companyColumns';
 import { isMissing } from '@/lib/companyCompletion';
 import { contactName } from '@/lib/companyContacts';
 import { parsePage, parsePageSize } from '@/lib/pageParams';
 import { RATING_MAX } from '@/lib/rating';
+import { cn } from '@/lib/utils';
 import { Pagination } from '@/molecules/Pagination/Pagination';
 
 // parametri dell'indirizzo: Indietro e link condivisi mantengono la ricerca
@@ -397,7 +399,8 @@ export const CompaniesPage = () => {
               </caption>
               <thead className="border-b border-border bg-muted">
                 <tr>
-                  <th scope="col" className={th}>
+                  {/* la colonna più importante: la più larga (PO, 26/11) */}
+                  <th scope="col" className={cn(th, COMPANY_NAME_COLUMN)}>
                     {t('company.fields.name')}
                   </th>
                   <th scope="col" className={th}>
@@ -417,12 +420,6 @@ export const CompaniesPage = () => {
                   </th>
                   <th scope="col" className={th}>
                     {t('company.contacts.column')}
-                  </th>
-                  <th scope="col" className={th}>
-                    {t('company.fields.phone')}
-                  </th>
-                  <th scope="col" className={th}>
-                    {t('company.fields.email')}
                   </th>
                   <th scope="col" className={th}>
                     {t('company.status')}
@@ -461,8 +458,6 @@ export const CompaniesPage = () => {
                       <RatingDisplay kind="thumbs" value={c.projectInterest} />
                     </td>
                     <td className={td}>{firstContact(c)}</td>
-                    <td className={`${td} whitespace-nowrap`}>{c.phone ?? '—'}</td>
-                    <td className={td}>{c.email ?? '—'}</td>
                     <td className={td}>{t(c.active ? 'company.active' : 'company.inactive')}</td>
                   </tr>
                 ))}

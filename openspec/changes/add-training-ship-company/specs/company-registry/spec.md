@@ -27,3 +27,14 @@ Il simbolo MUST NOT comparire nella bacheca dei Tutor, che è anonima.
 #### Scenario: Tutor
 - **WHEN** il Tutor apre la sua lista delle aziende
 - **THEN** le navi scuola hanno il 🚢 accanto al nome, e nella bacheca dei Tutor il simbolo non c'è
+
+### Requirement: Ragione sociale in evidenza negli elenchi
+Negli elenchi delle aziende, del Call Center e del Tutor, la colonna «Ragione sociale» SHALL essere la più larga: su uno
+schermo da computer i nomi fino a circa 42 caratteri, con il bollino della nave scuola, SHALL stare su una riga; solo i
+nomi più lunghi vanno a capo (PO, 26/11, dal collaudo). L'elenco del Call Center MUST NOT avere le colonne del telefono
+e dell'email, che restano nella scheda dell'azienda.
+
+#### Scenario: Nome su una riga
+- **WHEN** l'operatore apre «Aziende» su uno schermo da computer
+- **THEN** «Prova Cooperativa Sociale Servizi Integrati», nave scuola, sta su una riga con il bollino, e non ci sono le
+  colonne «Telefono» ed «Email»

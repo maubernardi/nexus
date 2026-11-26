@@ -1731,3 +1731,14 @@ passandoci sopra con il mouse compare «Nave scuola».
      con il bordo e la nave verde scuro, ben visibile; nel titolo della scheda dell'azienda è più grande.
   2. Come `tutor2`, in «Aziende» e nella scheda. **Atteso:** lo stesso bollino.
   3. Passa al tema scuro con il pulsante 🌙. **Atteso:** il bollino oro si vede bene anche sul fondo scuro.
+
+- [ ] **T-39.7 La ragione sociale in evidenza negli elenchi (US-515)**
+  1. Come `operatore.cc`, in «Aziende» crea un'azienda finta con un nome lungo, per esempio «Prova Cooperativa Sociale
+     Servizi Integrati» (43 caratteri), con la spunta «Nave scuola». **Atteso:** nell'elenco non ci sono più le colonne
+     «Telefono» ed «Email»; la colonna «Ragione sociale» è la più larga e il nome sta su una riga, con il bollino.
+  2. Crea un'altra azienda finta con un nome di 50 caratteri, il massimo del database attuale. **Atteso:** solo questo
+     va a capo.
+  3. Come `tutor2`, apri «Aziende». **Atteso:** anche qui la colonna «Ragione sociale» è la più larga e i nomi stanno su
+     una riga.
+  4. Restringi la finestra alla larghezza di uno smartphone. **Atteso:** come prima, la tabella scorre di lato e i nomi
+     restano su una riga.
