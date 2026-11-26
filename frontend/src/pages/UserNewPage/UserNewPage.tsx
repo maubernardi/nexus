@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useForm, type FieldPath } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 
-import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
@@ -17,6 +16,7 @@ import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorS
 import { FormField } from '@/molecules/FormField/FormField';
 import type { UsersPageState } from '@/pages/UsersPage/UsersPage';
 import { BackLink } from '@/molecules/BackLink/BackLink';
+import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 
 type Values = {
   firstName: string;
@@ -111,8 +111,9 @@ export const UserNewPage = () => {
 
   return (
     <div className="space-y-6">
-      <BackLink to="/utenti">{t('users.backToList')}</BackLink>
-      <PageHeading>{t('users.newHeading')}</PageHeading>
+      <PageHeader back={<BackLink to="/utenti">{t('users.backToList')}</BackLink>}>
+        {t('users.newHeading')}
+      </PageHeader>
       <p className="text-muted-foreground">{t('users.newIntro')}</p>
       <form noValidate onSubmit={handleSubmit(onValid, requestSummaryFocus)} className="space-y-6">
         {submitCount > 0 && <ErrorSummary ref={summaryRef} errors={summary} />}
@@ -241,9 +242,6 @@ export const UserNewPage = () => {
           <Button type="submit" size="lg" disabled={isSubmitting}>
             {isSubmitting ? t('users.creating') : t('users.create')}
           </Button>
-          <Link to="/utenti" className="font-medium text-primary underline underline-offset-4">
-            {t('users.backToList')}
-          </Link>
         </div>
       </form>
     </div>

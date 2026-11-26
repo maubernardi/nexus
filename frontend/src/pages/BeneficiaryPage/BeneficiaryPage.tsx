@@ -10,6 +10,7 @@ import { useBeneficiary } from '@/config/hooks/useBeneficiaries';
 import { isoName } from '@/lib/isoNames';
 import { BeneficiaryCvSection } from '@/organisms/BeneficiaryCvSection/BeneficiaryCvSection';
 import { BackLink } from '@/molecules/BackLink/BackLink';
+import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 
 type Row = { label: string; value: ReactNode };
 
@@ -81,10 +82,9 @@ export const BeneficiaryPage = () => {
 
   return (
     <div className="space-y-6">
-      {back}
-      <PageHeading>
+      <PageHeader back={back}>
         {b.firstName} {b.lastName}
-      </PageHeading>
+      </PageHeader>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-muted-foreground">{t('beneficiary.owner', { name: b.ownerTutorName })}</p>
         {b.editable && (
@@ -184,8 +184,6 @@ export const BeneficiaryPage = () => {
         ]}
       />
       <BeneficiaryCvSection beneficiary={b} />
-
-      {back}
     </div>
   );
 };

@@ -19,6 +19,7 @@ import { AtecoCodeForm } from '@/organisms/AtecoCodesSection/AtecoCodesSection';
 import { InternshipDocumentsSection } from '@/organisms/InternshipDocumentsSection/InternshipDocumentsSection';
 import { InternshipForm } from '@/organisms/InternshipForm/InternshipForm';
 import { BackLink } from '@/molecules/BackLink/BackLink';
+import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 import {
   LegalRepresentativeDetails,
   LegalRepresentativeForm,
@@ -89,8 +90,7 @@ export const InternshipPage = () => {
 
   return (
     <div className="space-y-6">
-      {backLink}
-      <PageHeading>{t('internship.heading', { number: ticket.data.number })}</PageHeading>
+      <PageHeader back={backLink}>{t('internship.heading', { number: ticket.data.number })}</PageHeader>
       <p className="text-muted-foreground">
         {t('internship.who', {
           beneficiary: `${b.firstName} ${b.lastName}`,
@@ -134,8 +134,6 @@ export const InternshipPage = () => {
           onConflict={(reason) => setOutcome({ text: t('internship.conflict', { reason }), error: true })}
         />
       </div>
-
-      {backLink}
     </div>
   );
 };

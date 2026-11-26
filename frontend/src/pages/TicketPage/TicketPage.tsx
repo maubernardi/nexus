@@ -47,6 +47,7 @@ import { InternshipTypeCorrection } from '@/organisms/InternshipTypeCorrection/I
 import { MatchDetailsDialog } from '@/organisms/MatchDetailsDialog/MatchDetailsDialog';
 import type { BeneficiaryLinkState } from '@/pages/BeneficiaryPage/BeneficiaryPage';
 import { BackLink } from '@/molecules/BackLink/BackLink';
+import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 
 const dateTime = new Intl.DateTimeFormat('it-IT', { dateStyle: 'short', timeStyle: 'short' });
 
@@ -139,8 +140,7 @@ export const TicketPage = () => {
 
   return (
     <div className="space-y-6">
-      {back}
-      <PageHeading>{t('pages.ticket.heading', { number: d.number })}</PageHeading>
+      <PageHeader back={back}>{t('pages.ticket.heading', { number: d.number })}</PageHeader>
       <p className="font-medium">
         {t('work.status', { status: t(`enums.ticketStatus.${d.status}`) })} · {assignment}
       </p>
@@ -225,8 +225,6 @@ export const TicketPage = () => {
       {canMatch && <CompatibleSection ticket={d} onOutcome={setOutcome} />}
 
       <TicketHistory ticketId={d.id} />
-
-      {back}
     </div>
   );
 };

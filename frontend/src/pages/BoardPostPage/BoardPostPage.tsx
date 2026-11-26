@@ -15,6 +15,7 @@ import {
 } from '@/config/hooks/useBoardPosts';
 import { BoardPostForm } from '@/organisms/BoardPostForm/BoardPostForm';
 import { BackLink } from '@/molecules/BackLink/BackLink';
+import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 
 type Outcome =
   | { kind: 'created' | 'saved' | 'published' | 'archived' | 'madePublic'; number: number }
@@ -68,8 +69,7 @@ export const BoardPostPage = () => {
 
   return (
     <div className="space-y-6">
-      {back}
-      <PageHeading>{t('board.numbered', { number: p.number })}</PageHeading>
+      <PageHeader back={back}>{t('board.numbered', { number: p.number })}</PageHeader>
       <p className="text-muted-foreground">
         {t('board.statusLine', { status: t(`board.status.${p.status}`) })}
         {p.publishedAt && (
@@ -192,8 +192,6 @@ export const BoardPostPage = () => {
           })}
         </p>
       )}
-
-      {back}
     </div>
   );
 };

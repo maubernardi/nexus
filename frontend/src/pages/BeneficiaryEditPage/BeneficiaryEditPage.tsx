@@ -7,6 +7,7 @@ import { apiError } from '@/config/api/errors';
 import { useBeneficiary, useUpdateBeneficiary } from '@/config/hooks/useBeneficiaries';
 import { BeneficiaryForm } from '@/organisms/BeneficiaryForm/BeneficiaryForm';
 import { BackLink } from '@/molecules/BackLink/BackLink';
+import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 
 /** Modifica del beneficiario (US-203), riservata al Tutor proprietario. */
 export const BeneficiaryEditPage = () => {
@@ -35,10 +36,9 @@ export const BeneficiaryEditPage = () => {
 
   return (
     <div className="space-y-6">
-      {backToDetail}
-      <PageHeading>
+      <PageHeader back={backToDetail}>
         {t('pages.beneficiaryEdit.heading', { name: `${b.firstName} ${b.lastName}` })}
-      </PageHeading>
+      </PageHeader>
       {b.editable ? (
         <BeneficiaryForm
           beneficiary={b}
@@ -52,7 +52,6 @@ export const BeneficiaryEditPage = () => {
           {t('beneficiary.notEditable')}
         </p>
       )}
-      {backToDetail}
     </div>
   );
 };

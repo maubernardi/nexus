@@ -20,6 +20,7 @@ import { ErrorSummary, type SummaryError } from '@/molecules/ErrorSummary/ErrorS
 import { FormField } from '@/molecules/FormField/FormField';
 import { ClosureReportView } from '@/organisms/ClosureReportView/ClosureReportView';
 import { BackLink } from '@/molecules/BackLink/BackLink';
+import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 
 type YesNo = '' | 'yes' | 'no';
 
@@ -132,8 +133,7 @@ export const ClosureReportPage = () => {
   if (d.closureReport) {
     return (
       <div className="space-y-6">
-        {backLink}
-        <PageHeading>{t('closureReport.heading', { number: d.number })}</PageHeading>
+        <PageHeader back={backLink}>{t('closureReport.heading', { number: d.number })}</PageHeader>
         {sent && (
           <p
             ref={sentRef}
@@ -145,7 +145,6 @@ export const ClosureReportPage = () => {
           </p>
         )}
         <ClosureReportView report={d.closureReport} />
-        {backLink}
       </div>
     );
   }
@@ -160,8 +159,7 @@ export const ClosureReportPage = () => {
 
   return (
     <div className="space-y-6">
-      {backLink}
-      <PageHeading>{t('closureReport.heading', { number: d.number })}</PageHeading>
+      <PageHeader back={backLink}>{t('closureReport.heading', { number: d.number })}</PageHeader>
       <p className="text-muted-foreground">
         {t('closureReport.who', {
           beneficiary: `${d.beneficiary.firstName} ${d.beneficiary.lastName}`,
@@ -172,7 +170,6 @@ export const ClosureReportPage = () => {
       <InternshipDates ticketId={d.id}>
         {(dates) => <ReportForm ticket={d} dates={dates} onSent={setSent} />}
       </InternshipDates>
-      {backLink}
     </div>
   );
 };

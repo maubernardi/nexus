@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next';
 
-import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { useFailedLogins } from '@/config/hooks/useAccessLog';
 import { AccessLogTable } from '@/organisms/AccessLogTable/AccessLogTable';
 import { BackLink } from '@/molecules/BackLink/BackLink';
+import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 
 /**
  * Accessi non riusciti (US-113): i tentativi falliti di tutti, anche con uno username che non esiste, per accorgersi
@@ -15,11 +15,11 @@ export const FailedLoginsPage = () => {
 
   return (
     <div className="space-y-6">
-      <BackLink to="/utenti">{t('users.backToList')}</BackLink>
-      <PageHeading>{t('accessLog.failedHeading')}</PageHeading>
+      <PageHeader back={<BackLink to="/utenti">{t('users.backToList')}</BackLink>}>
+        {t('accessLog.failedHeading')}
+      </PageHeader>
       <p className="text-muted-foreground">{t('accessLog.failedIntro')}</p>
       <AccessLogTable query={log} caption={t('accessLog.failedCaption')} allUsers />
-      <BackLink to="/utenti">{t('users.backToList')}</BackLink>
     </div>
   );
 };

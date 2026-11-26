@@ -160,9 +160,17 @@
     outline: none;
   }
 
-  /* Evita che header sticky copra l'elemento con focus (WCAG 2.4.11) */
+  /* Evita che la barra in alto e l'intestazione fissa della scheda coprano l'elemento con il focus (WCAG 2.4.11): le
+     altezze le scrivono AppHeader e PageHeader (US-1312) */
   html {
-    scroll-padding-top: 5rem;
+    scroll-padding-top: calc(var(--header-height, 4.5rem) + var(--page-header-height, 0px) + 0.5rem);
+  }
+
+  /* sugli schermi bassi l'intestazione della scheda scorre con la pagina (PageHeader) */
+  @media (max-height: 32rem) {
+    html {
+      scroll-padding-top: calc(var(--header-height, 4.5rem) + 0.5rem);
+    }
   }
 }
 

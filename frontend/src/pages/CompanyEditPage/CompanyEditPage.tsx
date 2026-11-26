@@ -14,6 +14,7 @@ import { CompanyNotesSection } from '@/organisms/CompanyNotesSection/CompanyNote
 import { JobSlotsSection } from '@/organisms/JobSlotsSection/JobSlotsSection';
 import { LegalRepresentativeSection } from '@/organisms/LegalRepresentativeSection/LegalRepresentativeSection';
 import { BackLink } from '@/molecules/BackLink/BackLink';
+import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 
 type Outcome = 'created' | 'saved' | 'activated' | 'deactivated' | 'conflict' | 'error';
 
@@ -77,8 +78,7 @@ export const CompanyEditPage = () => {
 
   return (
     <div className="space-y-6">
-      {back}
-      <PageHeading>{c.name}</PageHeading>
+      <PageHeader back={back}>{c.name}</PageHeader>
       <p className="text-muted-foreground">
         {isMissing(c, 'VAT_CODE') ? t('company.vatMissing') : t('company.vatLine', { vat: c.vatCode })} ·{' '}
         {t(c.active ? 'company.active' : 'company.inactive')}
@@ -144,8 +144,6 @@ export const CompanyEditPage = () => {
           {t(c.active ? 'company.deactivate' : 'company.activate')}
         </Button>
       </section>
-
-      {back}
     </div>
   );
 };
