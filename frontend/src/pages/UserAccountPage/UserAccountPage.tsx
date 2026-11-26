@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router';
 
-import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
 import { NativeSelect } from '@/components/ui/native-select';
 import { apiError } from '@/config/api/errors';
@@ -11,6 +10,8 @@ import type { Role } from '@/config/auth/types';
 import { useChangeUserRole, useSetUserActive, useUser, useUserImpact } from '@/config/hooks/useUsers';
 import { useFocusAfterRender } from '@/hooks/useFocusAfterRender';
 import type { UsersPageState } from '@/pages/UsersPage/UsersPage';
+import { BackLink } from '@/molecules/BackLink/BackLink';
+import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 
 const ROLES: readonly Role[] = ['TUTOR', 'CALL_CENTER', 'ADMIN'];
 const link = 'font-medium text-primary underline underline-offset-4';
@@ -29,11 +30,11 @@ export const UserAccountPage = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeading>
+      <PageHeader back={<BackLink to="/utenti">{t('users.backToList')}</BackLink>}>
         {user.data
           ? t('users.account.heading', { name: `${user.data.firstName} ${user.data.lastName}` })
           : t('pages.userAccount.title')}
-      </PageHeading>
+      </PageHeader>
       {failed ? (
         <div role="alert" className="space-y-3 rounded-md border-2 border-destructive bg-card p-4">
           <p className="font-medium text-destructive">{t('users.account.loadError')}</p>
@@ -54,9 +55,6 @@ export const UserAccountPage = () => {
       ) : (
         <AccountForms user={user.data} impact={impact.data} />
       )}
-      <Link to="/utenti" className={link}>
-        {t('users.backToList')}
-      </Link>
     </div>
   );
 };

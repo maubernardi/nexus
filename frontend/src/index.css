@@ -3,7 +3,7 @@
 
 /*
  * Token di colore verificati per WCAG 2.2 AA (testo >= 4.5:1, componenti UI >= 3:1)
- * sia in tema chiaro sia scuro. Il tema segue la preferenza di sistema.
+ * sia in tema chiaro sia scuro. Il tema segue la preferenza di sistema, se l'utente non ne sceglie uno (US-1312).
  */
 :root {
   --radius: 0.625rem;
@@ -38,8 +38,42 @@
   --ring: #019529;
 }
 
+/* Tema scuro (US-1312): scelto dal pulsante nella barra in alto (data-theme sulla pagina), altrimenti dal sistema */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --background: #0b1a10;
+  --foreground: #f4f1e8;
+  --card: #12261a;
+  --card-foreground: #f4f1e8;
+  --popover: #12261a;
+  --popover-foreground: #f4f1e8;
+  --brand: #0e3a1c;
+  --brand-foreground: #fdfbf7;
+  --gold: #d4af37;
+  --primary: #5ccb7c;
+  --primary-foreground: #0b1a10;
+  --secondary: #1e3a27;
+  --secondary-foreground: #cae5d1;
+  --muted: #16301f;
+  --muted-foreground: #b7cdbe;
+  --accent: #1e3a27;
+  --accent-foreground: #cae5d1;
+  --destructive: #f97066;
+  --destructive-foreground: #0b1a10;
+  --warning: #3b2a06;
+  --warning-foreground: #fde68a;
+  --border: #25402d;
+  --input: #7f9f88;
+  --ring: #d4af37;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+/* senza una scelta, il tema del sistema operativo: stessi valori del blocco qui sopra */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --background: #0b1a10;
     --foreground: #f4f1e8;
     --card: #12261a;
@@ -126,9 +160,17 @@
     outline: none;
   }
 
-  /* Evita che header sticky copra l'elemento con focus (WCAG 2.4.11) */
+  /* Evita che la barra in alto e l'intestazione fissa della scheda coprano l'elemento con il focus (WCAG 2.4.11): le
+     altezze le scrivono AppHeader e PageHeader (US-1312) */
   html {
-    scroll-padding-top: 5rem;
+    scroll-padding-top: calc(var(--header-height, 4.5rem) + var(--page-header-height, 0px) + 0.5rem);
+  }
+
+  /* sugli schermi bassi l'intestazione della scheda scorre con la pagina (PageHeader) */
+  @media (max-height: 32rem) {
+    html {
+      scroll-padding-top: calc(var(--header-height, 4.5rem) + 0.5rem);
+    }
   }
 }
 

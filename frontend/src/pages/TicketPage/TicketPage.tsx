@@ -46,6 +46,8 @@ import { CompetenceSiteCorrection } from '@/organisms/CompetenceSiteCorrection/C
 import { InternshipTypeCorrection } from '@/organisms/InternshipTypeCorrection/InternshipTypeCorrection';
 import { MatchDetailsDialog } from '@/organisms/MatchDetailsDialog/MatchDetailsDialog';
 import type { BeneficiaryLinkState } from '@/pages/BeneficiaryPage/BeneficiaryPage';
+import { BackLink } from '@/molecules/BackLink/BackLink';
+import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 
 const dateTime = new Intl.DateTimeFormat('it-IT', { dateStyle: 'short', timeStyle: 'short' });
 
@@ -134,9 +136,11 @@ export const TicketPage = () => {
       ? t('work.assignedTo', { name: d.assignedOperatorName })
       : t('work.unassigned');
 
+  const back = <BackLink to="/">{t('work.backToList')}</BackLink>;
+
   return (
     <div className="space-y-6">
-      <PageHeading>{t('pages.ticket.heading', { number: d.number })}</PageHeading>
+      <PageHeader back={back}>{t('pages.ticket.heading', { number: d.number })}</PageHeader>
       <p className="font-medium">
         {t('work.status', { status: t(`enums.ticketStatus.${d.status}`) })} · {assignment}
       </p>
@@ -221,10 +225,6 @@ export const TicketPage = () => {
       {canMatch && <CompatibleSection ticket={d} onOutcome={setOutcome} />}
 
       <TicketHistory ticketId={d.id} />
-
-      <Link to="/" className="inline-block font-medium text-primary underline underline-offset-4">
-        {t('work.backToList')}
-      </Link>
     </div>
   );
 };

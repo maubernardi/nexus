@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,8 @@ import { useStartInternship, useTicket } from '@/config/hooks/useTickets';
 import { AtecoCodeForm } from '@/organisms/AtecoCodesSection/AtecoCodesSection';
 import { InternshipDocumentsSection } from '@/organisms/InternshipDocumentsSection/InternshipDocumentsSection';
 import { InternshipForm } from '@/organisms/InternshipForm/InternshipForm';
+import { BackLink } from '@/molecules/BackLink/BackLink';
+import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 import {
   LegalRepresentativeDetails,
   LegalRepresentativeForm,
@@ -63,14 +65,7 @@ export const InternshipPage = () => {
     if (outcome) outcomeRef.current?.focus();
   }, [outcome]);
 
-  const backLink = (
-    <Link
-      to={`/segnalazioni/${id}`}
-      className="inline-block font-medium text-primary underline underline-offset-4"
-    >
-      {t('internship.backToTicket')}
-    </Link>
-  );
+  const backLink = <BackLink to={`/segnalazioni/${id}`}>{t('internship.backToTicket')}</BackLink>;
 
   if (internship.isError || ticket.isError) {
     const status = apiError(internship.error ?? ticket.error)?.status;
@@ -95,7 +90,7 @@ export const InternshipPage = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeading>{t('internship.heading', { number: ticket.data.number })}</PageHeading>
+      <PageHeader back={backLink}>{t('internship.heading', { number: ticket.data.number })}</PageHeader>
       <p className="text-muted-foreground">
         {t('internship.who', {
           beneficiary: `${b.firstName} ${b.lastName}`,
@@ -139,8 +134,6 @@ export const InternshipPage = () => {
           onConflict={(reason) => setOutcome({ text: t('internship.conflict', { reason }), error: true })}
         />
       </div>
-
-      {backLink}
     </div>
   );
 };

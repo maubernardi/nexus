@@ -2,7 +2,6 @@ import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router';
 
-import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { CatalogItem } from '@/config/api/catalogApi';
@@ -12,6 +11,8 @@ import { useCatalog } from '@/config/hooks/useCatalogs';
 import { useUpdateUserProjects, useUser } from '@/config/hooks/useUsers';
 import { useFocusAfterRender } from '@/hooks/useFocusAfterRender';
 import type { UsersPageState } from '@/pages/UsersPage/UsersPage';
+import { BackLink } from '@/molecules/BackLink/BackLink';
+import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 
 const backLink = 'font-medium text-primary underline underline-offset-4';
 
@@ -30,11 +31,11 @@ export const UserProjectsPage = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeading>
+      <PageHeader back={<BackLink to="/utenti">{t('users.backToList')}</BackLink>}>
         {user.data
           ? t('users.projects.heading', { name: `${user.data.firstName} ${user.data.lastName}` })
           : t('pages.userProjects.title')}
-      </PageHeading>
+      </PageHeader>
       {failed ? (
         <div role="alert" className="space-y-3 rounded-md border-2 border-destructive bg-card p-4">
           <p className="font-medium text-destructive">{t('users.projects.loadError')}</p>
@@ -53,9 +54,6 @@ export const UserProjectsPage = () => {
       ) : user.data.role !== 'TUTOR' ? (
         <>
           <p>{t('users.projects.notTutor', { role: t(`roles.${user.data.role}`) })}</p>
-          <Link to="/utenti" className={backLink}>
-            {t('users.backToList')}
-          </Link>
         </>
       ) : (
         <ProjectsForm user={user.data} catalog={catalog.data} />
@@ -171,9 +169,6 @@ const ProjectsForm = ({ user, catalog }: ProjectsFormProps) => {
         <Button type="submit" size="lg" disabled={update.isPending || options.length === 0}>
           {update.isPending ? t('users.projects.saving') : t('users.projects.save')}
         </Button>
-        <Link to="/utenti" className={backLink}>
-          {t('users.backToList')}
-        </Link>
       </div>
     </form>
   );
