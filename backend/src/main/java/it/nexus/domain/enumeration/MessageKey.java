@@ -11,7 +11,7 @@ public enum MessageKey {
     CATEGORY_CHANGED, CATEGORY_APPROVED, PROPOSAL_SENT, PROPOSAL_ACCEPTED, APPOINTMENT_SET, APPOINTMENT_FAILED,
     PROPOSAL_REJECTED, TIMER_REMINDER, TIMER_EXPIRED, BOARD_RELAUNCH_REQUESTED, FAST_TRACK_REJECTED,
     FAST_TRACK_DROPPED, INTERNSHIP_STARTED, CLOSURE_REPORT_SUBMITTED, TICKET_TRANSFERRED, INTERNSHIP_ENDING,
-    INTERNSHIP_OVERDUE, TRAINING_SHIP_PROPOSED,
+    INTERNSHIP_OVERDUE, TRAINING_SHIP_PROPOSED, CONTACT_REQUEST_CLOSED,
     /** Codice per confermare il nuovo indirizzo email (US-110). */
     EMAIL_CHANGE_CODE,
     /** Avviso al vecchio indirizzo dopo il cambio (US-110). */
@@ -37,6 +37,8 @@ public enum MessageKey {
         return switch (this) {
             case EMAIL_CHANGE_CODE -> List.of("codice", "ora");
             case EMAIL_CHANGE_NOTICE -> List.of();
+            // il numero è della richiesta di contatto, non di una segnalazione (US-512)
+            case CONTACT_REQUEST_CLOSED -> List.of("numero", "esito", "nota");
             default -> List.of("numero");
         };
     }

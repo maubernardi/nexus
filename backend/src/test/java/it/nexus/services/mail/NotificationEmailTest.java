@@ -20,7 +20,8 @@ import it.nexus.services.messages.MessageTexts;
 class NotificationEmailTest {
 
     @ParameterizedTest
-    @EnumSource(NotificationType.class)
+    // l'avviso della richiesta di contatto ha il suo oggetto e il suo collegamento (US-512): prova a parte
+    @EnumSource(value = NotificationType.class, mode = EnumSource.Mode.EXCLUDE, names = "CONTACT_REQUEST_CLOSED")
     void ogniTipoHaIlSuoTesto_conNumeroECollegamento(NotificationType type) {
         NotificationEmail email = NotificationEmail.of(MessageTexts.defaults(), type, "0S2CB3NATG1AY", 34L,
                 null, "https://portalenexus.it");
@@ -71,6 +72,22 @@ class NotificationEmailTest {
                 .startsWith("Nel report di restituzione della segnalazione n. 7 il Tutor propone l'azienda")
                 .contains("Apri la scheda dell'azienda: https://portalenexus.it/aziende/0S2CB3NATG1AZ")
                 .doesNotContain("/segnalazioni/")
+                .endsWith("\n\nPortale Nexus\n");
+    }
+
+    @Test
+    void chiusuraDellaRichiestaDiContatto_oggettoECollegamentoDellaRichiesta() {
+        NotificationEmail email = NotificationEmail.ofContactRequest(MessageTexts.defaults(),
+                NotificationType.CONTACT_REQUEST_CLOSED, "0S2CB3NATG1AY", 3L,
+                Map.of("numero", 3L, "esito", "Non interessata", "nota", "Hanno già tirocinanti fino a marzo."),
+                "https://portalenexus.it");
+
+        assertThat(email.subject()).isEqualTo("PORTALE NEXUS - Richiesta di contatto n. 3 - Esito della richiesta di contatto");
+        assertThat(email.body())
+                .startsWith("Il Call Center ha chiuso la tua richiesta di contatto n. 3 con l'esito «Non interessata».")
+                .contains("Nota del Call Center: Hanno già tirocinanti fino a marzo.")
+                .contains("Apri la richiesta: https://portalenexus.it/richieste/0S2CB3NATG1AY")
+                .doesNotContain("/segnalazioni/", "{esito}", "{nota}")
                 .endsWith("\n\nPortale Nexus\n");
     }
 }

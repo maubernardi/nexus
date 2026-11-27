@@ -97,6 +97,31 @@ describe('<NotificationsPage>', () => {
     await expectNoAxeViolations();
   });
 
+  it('chiusura della richiesta di contatto: il link porta alla richiesta (US-512)', async () => {
+    vi.mocked(fetchNotifications).mockResolvedValue({
+      unread: 1,
+      items: [
+        {
+          id: 'N6',
+          type: 'CONTACT_REQUEST_CLOSED',
+          ticketId: null,
+          ticketNumber: null,
+          contactRequestId: 'R3',
+          contactRequestNumber: 3,
+          createdAt: '2026-11-27T09:00:00Z',
+          read: false,
+          text: 'Il Call Center ha chiuso la tua richiesta di contatto n. 3: Non interessata. Nota: Hanno già tirocinanti.',
+        },
+      ],
+    });
+    renderPage();
+    const [item] = await screen.findAllByRole('listitem');
+    expect(within(item).getByRole('link', { name: 'Apri la richiesta di contatto n. 3' })).toHaveAttribute(
+      'href',
+      '/richieste/R3',
+    );
+  });
+
   it('segna come letta una notifica o tutte', async () => {
     const user = userEvent.setup();
     renderPage();

@@ -8,6 +8,9 @@ export type AppNotification = {
   ticketNumber: number | null;
   /** Azienda a cui porta l'avviso, invece che alla segnalazione (US-515); assente negli altri. */
   companyId?: string | null;
+  /** Richiesta di contatto a cui porta l'avviso (US-512). */
+  contactRequestId?: string | null;
+  contactRequestNumber?: number | null;
   createdAt: string;
   read: boolean;
   /** Testo della notifica, quello dell'ADMIN o il predefinito (US-1204); manca solo nelle risposte vecchie. */

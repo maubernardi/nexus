@@ -1787,3 +1787,45 @@ aperta, per «Officina Meccanica Demo del Ponte», e una in carico a `operatore.
   > Nota (27/11): dal collaudo della PR #219 (`d834151`) il PO ha trovato coerenti le prove. Ha chiesto che le richieste
   > da prendere in carico stiano in cima: per T-40.1 e T-40.3 resta da riprovare solo l'ordine dell'elenco (passi 2 e
   > 4). T-40.2 e T-40.4 riuscite.
+
+## 41. Tentativi di contatto ed esito della richiesta (Sprint 19)
+
+Sul collaudo del PC, prima del merge (http://localhost:8090, password `collaudo-nexus-2026`; le email in Mailpit,
+http://localhost:8025). Nei dati finti `tutor1` ha due richieste: «Officina Meccanica Demo del Ponte», aperta, e «Bar
+Pasticceria Demo Stella», in carico a `operatore.cc`, con un tentativo «Non raggiungibile» di ieri.
+
+- [ ] **T-41.1 La pagina della richiesta (US-512)**
+  1. Entra come `operatore.cc`, apri «Richieste di contatto» e premi il numero del bar. **Atteso:** la pagina «Richiesta
+     di contatto n. …» con i dati, il tentativo di ieri con la nota e chi l'ha segnato, e sotto «Nuovo tentativo» e
+     «Chiudi la richiesta».
+  2. Torna all'elenco e apri l'officina, ancora aperta. **Atteso:** il pulsante «Prendi in carico» e nessun modulo;
+     premilo. **Atteso:** «Hai preso in carico la richiesta di contatto n. …».
+
+- [ ] **T-41.2 Tentativi (US-512)**
+  1. Nella pagina del bar premi «Segna il tentativo» senza scegliere l'esito. **Atteso:** il riepilogo indica l'esito.
+  2. Scegli una data futura. **Atteso:** «La data non può essere futura».
+  3. Segna un tentativo di oggi «Disponibile a ospitare tirocini» con una nota. **Atteso:** «Tentativo segnato.» e il
+     tentativo in cima all'elenco; la richiesta resta in carico.
+  4. Come `admin`, apri la stessa richiesta da «Amministrazione» → «Richieste di contatto». **Atteso:** «In carico a
+     Operatore Call Center: …», senza moduli.
+
+- [ ] **T-41.3 Chiusura con l'esito e l'azienda (US-512)**
+  1. Come `operatore.cc`, in «Aziende» crea l'azienda finta «Bar Pasticceria Demo Stella», con una partita IVA finta.
+  2. Torna alla richiesta del bar e premi «Chiudi la richiesta» senza compilare. **Atteso:** il riepilogo indica
+     l'esito finale e la nota.
+  3. Scegli «Disponibile a ospitare tirocini», scrivi una nota, premi «Cerca» (parte dal nome della richiesta),
+     scegli l'azienda appena creata e premi «Chiudi la richiesta». **Atteso:** «Confermi la chiusura?» con l'esito e
+     il focus; «Torna al modulo» non chiude niente.
+  4. Conferma. **Atteso:** «Richiesta chiusa: il Tutor riceve l'avviso con l'esito e la nota.»; la pagina mostra
+     «Esito» con la nota e il collegamento all'azienda; la richiesta non è più in «Richieste di contatto».
+
+- [ ] **T-41.4 L'avviso e «Le mie richieste» del Tutor (US-512)**
+  1. Esci ed entra come `tutor1`; apri le notifiche. **Atteso:** «Il Call Center ha chiuso la tua richiesta di
+     contatto n. …: Disponibile a ospitare tirocini. Nota: …», con «Apri la richiesta di contatto n. …».
+  2. Premi il collegamento. **Atteso:** la pagina della richiesta in sola lettura, con l'esito, la nota, l'azienda e
+     tutti i tentativi.
+  3. Apri «Richieste». **Atteso:** il bar risulta «Chiusa: Disponibile a ospitare tirocini»; il numero apre la pagina.
+  4. Apri Mailpit. **Atteso:** l'email a `tutor1` con l'oggetto «PORTALE NEXUS - Richiesta di contatto n. … - Esito
+     della richiesta di contatto», l'esito, la nota, il collegamento alla richiesta e la firma «Portale Nexus».
+  5. Come `admin`, in «Testi dei messaggi» c'è «Esito della richiesta di contatto», con i segnaposto `{numero}`,
+     `{esito}` e `{nota}`.

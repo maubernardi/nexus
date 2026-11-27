@@ -91,6 +91,7 @@ export const ContactRequestsPage = () => {
             requests={requests.data}
             caption={t('contactRequest.queueCaption')}
             mode="callCenter"
+            detailBase="/richieste-contatto"
             onTake={onTake}
             pendingId={take.isPending ? (take.variables?.id ?? null) : null}
           />

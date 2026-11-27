@@ -17,6 +17,7 @@ export type RouteHandle = {
     | 'pages.myContactRequests.title'
     | 'pages.contactRequestNew.title'
     | 'pages.contactRequests.title'
+    | 'pages.contactRequest.title'
     | 'pages.board.title'
     | 'pages.boardPost.title'
     | 'pages.candidature.title'

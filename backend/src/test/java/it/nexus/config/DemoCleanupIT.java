@@ -47,7 +47,8 @@ class DemoCleanupIT {
     /** Tabelle che la pulizia svuota. */
     private static final List<String> REMOVED = List.of("ticket", "board_post", "ticket_status_history",
             "ticket_company_blacklist", "beneficiary", "beneficiary_language", "app_user", "user_project", "company",
-            "company_contact", "company_note", "company_audit_event", "job_slot", "contact_request");
+            "company_contact", "company_note", "company_audit_event", "job_slot", "contact_request",
+            "contact_request_attempt");
 
     /** Configurazione e cataloghi, che restano come sono. */
     private static final List<String> KEPT = List.of("project", "job_category", "zone", "competence_site",

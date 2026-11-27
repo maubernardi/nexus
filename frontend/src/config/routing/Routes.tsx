@@ -24,6 +24,7 @@ import { CalendarPage } from '@/pages/CalendarPage/CalendarPage';
 import { CompaniesRoute, CompanyRoute } from '@/config/routing/CompaniesRoute';
 import { CompanyNewPage } from '@/pages/CompanyNewPage/CompanyNewPage';
 import { ContactRequestNewPage } from '@/pages/ContactRequestNewPage/ContactRequestNewPage';
+import { ContactRequestPage } from '@/pages/ContactRequestPage/ContactRequestPage';
 import { ContactRequestsPage } from '@/pages/ContactRequestsPage/ContactRequestsPage';
 import { MyContactRequestsPage } from '@/pages/MyContactRequestsPage/MyContactRequestsPage';
 import { NotificationsPage } from '@/pages/NotificationsPage/NotificationsPage';
@@ -166,6 +167,25 @@ export const routes: RouteObject[] = [
           </RoleRoute>
         ),
         handle: { titleKey: 'pages.contactRequestNew.title' } satisfies RouteHandle,
+      },
+      {
+        // pagina della richiesta (US-512): dal Tutor, in sola lettura, e dal Call Center
+        path: 'richieste/:id',
+        element: (
+          <RoleRoute roles={['TUTOR']}>
+            <ContactRequestPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.contactRequest.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'richieste-contatto/:id',
+        element: (
+          <RoleRoute roles={['CALL_CENTER', 'ADMIN']}>
+            <ContactRequestPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.contactRequest.title' } satisfies RouteHandle,
       },
       {
         path: 'richieste-contatto',

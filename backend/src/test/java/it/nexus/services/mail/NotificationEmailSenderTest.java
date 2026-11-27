@@ -24,7 +24,7 @@ import it.nexus.domain.enumeration.NotificationType;
 class NotificationEmailSenderTest {
 
     private static final NotificationCreatedEvent EVENT = new NotificationCreatedEvent(1L, "operatore@nexus.local",
-            NotificationType.CLOSURE_REPORT_SUBMITTED, "T1", 34L, null);
+            NotificationType.CLOSURE_REPORT_SUBMITTED, "T1", 34L, null, null);
 
     private final JavaMailSenderImpl mailSender = mock(JavaMailSenderImpl.class);
     /** Testi dei messaggi (US-1204): i predefiniti. */
@@ -60,7 +60,7 @@ class NotificationEmailSenderTest {
     void spente_oSenzaPassword_oSenzaIndirizzo_nessunInvio() {
         sender(false, "segreta").send(EVENT);
         sender(true, "").send(EVENT);
-        sender(true, "segreta").send(new NotificationCreatedEvent(1L, " ", NotificationType.PROPOSAL_SENT, "T1", 34L, null));
+        sender(true, "segreta").send(new NotificationCreatedEvent(1L, " ", NotificationType.PROPOSAL_SENT, "T1", 34L, null, null));
 
         verify(mailSender, never()).send(any(SimpleMailMessage.class));
     }

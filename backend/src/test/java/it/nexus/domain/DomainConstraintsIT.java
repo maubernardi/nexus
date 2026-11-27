@@ -1375,8 +1375,8 @@ class DomainConstraintsIT {
         @Test
         void nomeEZona_lAziendaDellAnagraficaSoloSeCollegata() {
             insert(1, null, null, "Officina del Ponte", g.zone().getId(), "APERTA", null);
-            // collegata all'anagrafica alla chiusura (US-512)
-            insert(2, null, g.company().getId(), "Bar Centrale", g.zone().getId(), "CHIUSA", g.tutor().getId());
+            // con l'azienda dell'anagrafica, che l'operatore collega alla chiusura (US-512)
+            insert(2, null, g.company().getId(), "Bar Centrale", g.zone().getId(), "IN_CARICO", g.tutor().getId());
             assertThat(jdbc.queryForObject("SELECT count(*) FROM contact_request", Long.class)).isEqualTo(2);
         }
 
@@ -1424,6 +1424,44 @@ class DomainConstraintsIT {
         @Test
         void zonaInesistente() {
             assertViolates("fk_contact_request_zone", () -> insert(1, null, null, "Bar", -5L, "APERTA", null));
+        }
+
+        @Test
+        void chiusaSenzaEsito() {
+            assertViolates("ck_contact_request_closed",
+                    () -> insert(1, null, null, "Bar", g.zone().getId(), "CHIUSA", g.tutor().getId()));
+        }
+
+        @Test
+        void chiusaConEsitoENota() {
+            insert(1, null, null, "Bar", g.zone().getId(), "IN_CARICO", g.tutor().getId());
+            jdbc.update("UPDATE contact_request SET status = 'CHIUSA', outcome = 'DISPONIBILE', closing_note = 'Ok',"
+                    + " closed_at = now() WHERE id = 1");
+            assertViolates("ck_contact_request_closed", () -> jdbc.update(
+                    "UPDATE contact_request SET closing_note = '  ' WHERE id = 1"));
+        }
+
+        @Test
+        void esitoSconosciuto() {
+            insert(1, null, null, "Bar", g.zone().getId(), "IN_CARICO", g.tutor().getId());
+            assertViolates("ck_contact_request_outcome", () -> jdbc.update(
+                    "UPDATE contact_request SET status = 'CHIUSA', outcome = 'FORSE', closing_note = 'Ok',"
+                            + " closed_at = now() WHERE id = 1"));
+        }
+
+        @Test
+        void esitoDelTentativo() {
+            insert(1, null, null, "Bar", g.zone().getId(), "IN_CARICO", g.tutor().getId());
+            assertViolates("ck_contact_request_attempt_outcome", () -> jdbc.update(
+                    "INSERT INTO contact_request_attempt (id, contact_request_id, attempt_date, outcome, created_at,"
+                            + " created_by) VALUES (1, 1, current_date, 'FORSE', now(), 'test')"));
+        }
+
+        @Test
+        void avvisoVersoUnaRichiestaInesistente() {
+            assertViolates("fk_notification_contact_request", () -> jdbc.update(
+                    "INSERT INTO notification (id, recipient_id, type, contact_request_id, created_at, created_by)"
+                            + " VALUES (1, ?, 'CONTACT_REQUEST_CLOSED', -5, now(), 'test')", g.tutor().getId()));
         }
     }
 

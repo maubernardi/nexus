@@ -46,5 +46,7 @@ public enum NotificationType {
      * All'operatore: nel report di restituzione il Tutor propone l'azienda come nave scuola (US-515). L'avviso porta alla
      * scheda dell'azienda.
      */
-    TRAINING_SHIP_PROPOSED
+    TRAINING_SHIP_PROPOSED,
+    /** Al Tutor: il Call Center ha chiuso la sua richiesta di contatto, con l'esito e la nota (US-512). */
+    CONTACT_REQUEST_CLOSED
 }

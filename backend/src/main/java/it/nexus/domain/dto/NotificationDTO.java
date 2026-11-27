@@ -9,5 +9,6 @@ import it.nexus.domain.enumeration.NotificationType;
  * che alla segnalazione (US-515).
  */
 public record NotificationDTO(String id, NotificationType type, String ticketId, Long ticketNumber, String companyId,
-        Instant createdAt, boolean read, String text) {
+        /** Richiesta di contatto a cui porta l'avviso (US-512). */
+        String contactRequestId, Long contactRequestNumber, Instant createdAt, boolean read, String text) {
 }

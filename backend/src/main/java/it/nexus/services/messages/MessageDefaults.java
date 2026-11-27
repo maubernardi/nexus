@@ -83,6 +83,10 @@ final class MessageDefaults {
                 "Il tirocinio della segnalazione n. {numero} è finito alla data prevista: chiudilo con il report di restituzione o prorogalo. Finché non chiudi i tirocini finiti non puoi aprire nuove segnalazioni.",
                 "Tirocinio da chiudere o prorogare",
                 "Il tirocinio della segnalazione n. {numero} è finito alla data prevista: chiudilo con il report di restituzione o prorogalo. Finché non chiudi i tirocini finiti non puoi aprire nuove segnalazioni.");
+        notification(MessageKey.CONTACT_REQUEST_CLOSED,
+                "Il Call Center ha chiuso la tua richiesta di contatto n. {numero}: {esito}. Nota: {nota}",
+                "Esito della richiesta di contatto",
+                "Il Call Center ha chiuso la tua richiesta di contatto n. {numero} con l'esito «{esito}».\n\nNota del Call Center: {nota}");
         notification(MessageKey.TRAINING_SHIP_PROPOSED,
                 "Nel report di restituzione della segnalazione n. {numero} il Tutor propone l'azienda del tirocinio come nave scuola: decidi tu dalla scheda dell'azienda.",
                 "Proposta di nave scuola",
