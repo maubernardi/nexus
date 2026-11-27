@@ -149,6 +149,8 @@ pronta per lo Sprint 20 senza una tua decisione (§8.2).
 *Proposta:* Sprint 19 chiuso con velocity **10**: le due storie sono fatte, collaudate e in produzione. La velocity è
 bassa perché hai tolto US-1311 e lo sprint è finito in un giorno, non per un rallentamento.
 
+> ✅ **Deciso (PO, 27/11):** Sprint 19 chiuso con velocity 10.
+
 ### 8.2 Che cosa fare nello Sprint 20
 Il backlog pronto è finito. Delle 4 storie che restano, nessuna parte senza una tua decisione:
 - US-1311 la riprendi tu (D5);
@@ -165,11 +167,17 @@ Il backlog pronto è finito. Delle 4 storie che restano, nessuna parte senza una
 *Proposta:* **A**, con **C** in parallelo, quando hai tempo, per riempire il backlog degli sprint successivi. Se fissi
 la data dell'azzeramento, si aggiunge B.
 
+> ✅ **Deciso (PO, 27/11):** **A**. Il PO ha molte cose nuove da aggiungere: la raccolta (**C**) si fa, e le storie
+> nuove entrano nel backlog per gli sprint successivi. Lo Sprint 20 è quello del §9 ([sprint-20](sprint-20.md)).
+
 ### 8.3 Azzeramento della pre-produzione (US-1313)
 Per renderla pronta mi servono due risposte:
 - **la data**, anche indicativa;
 - **l'ADMIN di oggi**: lo teniamo con il suo accesso, oppure lo ricreiamo con un invito nuovo? *Proposta:* tenerlo,
   così non devi rifare la password. L'audit della pre-produzione si azzera comunque.
+
+> ✅ **Deciso (PO, 27/11):** siamo ancora nella fase di brainstorming: tutto resta com'è. US-1313 resta nel backlog,
+> senza data, e la domanda sull'ADMIN resta aperta.
 
 ## 9. Proposta per lo Sprint 20
 
@@ -188,7 +196,8 @@ richiesta di contatto (appendice, 4) la propongo dopo, se serve.
 
 ## 10. Azioni a carico del PO
 
-- [ ] Decidere i punti §8.1 … §8.3.
+- [x] Decidere i punti §8.1 … §8.3 (27/11).
+- [ ] Raccontarmi le cose nuove da aggiungere (§8.2, C).
 - [ ] Unire questa PR dopo le decisioni.
 - [ ] Gli account degli utenti, dopo l'azzeramento (§8.3).
 - [ ] Il blocco automatico dello schermo dei PC del Call Center, dopo pochi minuti, con chi gestisce i PC (US-1310).

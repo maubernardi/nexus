@@ -1,7 +1,7 @@
 # Sprint 19 — 27 – 29 novembre 2026
 
-**Stato:** ✅ impegno completo il 27/11 (10 punti su 10), in produzione a `16789ed`: US-507 e US-512. US-1311 tolta
-dallo sprint e rimessa nel backlog (PO, 27/11). **Review:** [sprint-19-review](sprint-19-review.md) (27/11).
+**Stato:** 🎉 concluso il 27/11: 10 punti su 10 (US-507 e US-512), in produzione a `16789ed`. US-1311 tolta dallo
+sprint e rimessa nel backlog (PO, 27/11). Chiuso dal PO il 27/11 con velocity 10; [review](sprint-19-review.md).
 **Planning:** 27/11, dalla [review dello Sprint 18](sprint-18-review.md) (§8, §9).
 
 ## Obiettivo
