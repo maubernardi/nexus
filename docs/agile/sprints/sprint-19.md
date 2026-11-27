@@ -1,7 +1,7 @@
 # Sprint 19 — 27 – 29 novembre 2026
 
 **Stato:** ✅ impegno completo il 27/11 (10 punti su 10), in produzione a `16789ed`: US-507 e US-512. US-1311 tolta
-dallo sprint e rimessa nel backlog (PO, 27/11). Review alla fine dello sprint.
+dallo sprint e rimessa nel backlog (PO, 27/11). **Review:** [sprint-19-review](sprint-19-review.md) (27/11).
 **Planning:** 27/11, dalla [review dello Sprint 18](sprint-18-review.md) (§8, §9).
 
 ## Obiettivo
@@ -37,7 +37,8 @@ Sotto la media (23,2), per lasciare spazio a quello che arriverà dall'uso.
 - Ogni storia: una change OpenSpec, una PR verso `main` (A45), il collaudo sul PC del PO prima del merge (EN-11).
 - Migrazioni: **V56** (US-507) e **V57** (US-512); la prossima è **V58**.
 - Elementi nuovi negli elenchi provati con testi lunghi come quelli veri, in chiaro e in scuro (A47).
-- Nello sprint, senza punti: la ricerca dei dati che si inseriscono ma non si correggono dall'app (A42).
+- Nello sprint, senza punti: la ricerca dei dati che si inseriscono ma non si correggono dall'app (A42), fatta per
+  la review (appendice).
 
 ## Per il PO
 
