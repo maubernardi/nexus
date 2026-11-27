@@ -2,6 +2,7 @@ package it.nexus.domain.dto;
 
 import java.time.Instant;
 
+import it.nexus.domain.enumeration.ContactOutcome;
 import it.nexus.domain.enumeration.ContactRequestStatus;
 
 /**
@@ -22,5 +23,8 @@ public record ContactRequestDTO(
         /** Nome e cognome dell'operatore che l'ha in carico. */
         String assignedOperatorName,
         Instant takenAt,
+        /** Esito finale e istante della chiusura (US-512); assenti finché non è chiusa. */
+        ContactOutcome outcome,
+        Instant closedAt,
         long version) {
 }

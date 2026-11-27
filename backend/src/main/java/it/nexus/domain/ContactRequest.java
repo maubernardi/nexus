@@ -5,6 +5,7 @@ import java.time.Instant;
 
 import org.hibernate.annotations.Generated;
 
+import it.nexus.domain.enumeration.ContactOutcome;
 import it.nexus.domain.enumeration.ContactRequestStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -69,6 +70,17 @@ public class ContactRequest extends AbstractTsidEntity {
     @Column(name = "taken_at")
     private Instant takenAt;
 
+    /** Chiusura (US-512): esito finale, nota per il Tutor e istante; assenti finché è aperta o in carico. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "outcome", length = 20)
+    private ContactOutcome outcome;
+
+    @Column(name = "closing_note", length = 500)
+    private String closingNote;
+
+    @Column(name = "closed_at")
+    private Instant closedAt;
+
     @Version
     @Column(name = "version", nullable = false)
     private long version;
@@ -91,6 +103,21 @@ public class ContactRequest extends AbstractTsidEntity {
         status = ContactRequestStatus.IN_CARICO;
         assignedOperator = operator;
         takenAt = at;
+    }
+
+    /**
+     * Chiusura a mano (US-512), solo da in carico: esito finale, nota per il Tutor e, se c'è, l'azienda dell'anagrafica.
+     * Una richiesta chiusa non si riapre.
+     */
+    public void close(ContactOutcome finalOutcome, String note, Company linkedCompany, Instant at) {
+        if (status != ContactRequestStatus.IN_CARICO) {
+            throw new IllegalStateException("Richiesta non in carico");
+        }
+        status = ContactRequestStatus.CHIUSA;
+        outcome = finalOutcome;
+        closingNote = note;
+        company = linkedCompany;
+        closedAt = at;
     }
 
     @Override

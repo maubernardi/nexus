@@ -54,6 +54,11 @@ public class Notification extends AbstractCreationAuditingEntity {
     @JoinColumn(name = "company_id", updatable = false)
     private Company company;
 
+    /** Richiesta di contatto a cui porta l'avviso (US-512). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contact_request_id", updatable = false)
+    private ContactRequest contactRequest;
+
     @Column(name = "read_at")
     private Instant readAt;
 
@@ -66,6 +71,14 @@ public class Notification extends AbstractCreationAuditingEntity {
         this.type = type;
         this.ticket = ticket;
         this.company = company;
+    }
+
+    /** Avviso che porta alla richiesta di contatto (US-512). */
+    public static Notification forContactRequest(AppUser recipient, NotificationType type,
+            ContactRequest contactRequest) {
+        Notification notification = new Notification(recipient, type, null, null);
+        notification.contactRequest = contactRequest;
+        return notification;
     }
 
     public void markRead(Instant at) {

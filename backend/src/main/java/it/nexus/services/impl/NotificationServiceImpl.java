@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import it.nexus.config.security.SecurityUtils;
 import it.nexus.domain.AppUser;
 import it.nexus.domain.Company;
+import it.nexus.domain.ContactRequest;
 import it.nexus.domain.Notification;
 import it.nexus.domain.Ticket;
 import it.nexus.domain.dto.NotificationDTO;
@@ -57,7 +58,29 @@ public class NotificationServiceImpl implements NotificationService {
         events.publishEvent(new NotificationCreatedEvent(saved.getId(), recipient.getEmail(), type,
                 ticket == null ? null : TsidMapper.toExternal(ticket.getId()),
                 ticket == null ? null : ticket.getNumber(),
-                company == null ? null : TsidMapper.toExternal(company.getId())));
+                company == null ? null : TsidMapper.toExternal(company.getId()), null));
+    }
+
+    @Override
+    public void notify(AppUser recipient, NotificationType type, ContactRequest contactRequest) {
+        boolean byRecipient = SecurityUtils.getCurrentUser().isPresent()
+                && recipient != null && recipient.getId().equals(currentAppUserService.getCurrentAppUser().getId());
+        if (recipient == null || byRecipient) {
+            return;
+        }
+        Notification saved = repository.save(Notification.forContactRequest(recipient, type, contactRequest));
+        events.publishEvent(new NotificationCreatedEvent(saved.getId(), recipient.getEmail(), type, null, null, null,
+                new NotificationCreatedEvent.ContactRequestTarget(TsidMapper.toExternal(contactRequest.getId()),
+                        contactRequest.getNumber(), contactRequestValues(contactRequest))));
+    }
+
+    /** Segnaposto dei testi sulla richiesta di contatto (US-512): numero, esito e nota della chiusura. */
+    private static Map<String, Object> contactRequestValues(ContactRequest r) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("numero", r.getNumber());
+        values.put("esito", r.getOutcome() == null ? null : r.getOutcome().label());
+        values.put("nota", r.getClosingNote());
+        return values;
     }
 
     @Override
@@ -95,12 +118,20 @@ public class NotificationServiceImpl implements NotificationService {
     /** Con il testo della notifica nell'app, quello dell'ADMIN o il predefinito (US-1204). */
     private static NotificationDTO toDto(Notification n, MessageTexts texts) {
         Ticket t = n.getTicket();
-        Map<String, Object> values = new HashMap<>();
-        values.put("numero", t == null ? null : t.getNumber());
+        ContactRequest r = n.getContactRequest();
+        Map<String, Object> values;
+        if (r != null) {
+            values = contactRequestValues(r);
+        } else {
+            values = new HashMap<>();
+            values.put("numero", t == null ? null : t.getNumber());
+        }
         Company c = n.getCompany();
         return new NotificationDTO(TsidMapper.toExternal(n.getId()), n.getType(),
                 t == null ? null : TsidMapper.toExternal(t.getId()), t == null ? null : t.getNumber(),
-                c == null ? null : TsidMapper.toExternal(c.getId()), n.getCreatedAt(), n.getReadAt() != null,
+                c == null ? null : TsidMapper.toExternal(c.getId()),
+                r == null ? null : TsidMapper.toExternal(r.getId()), r == null ? null : r.getNumber(),
+                n.getCreatedAt(), n.getReadAt() != null,
                 texts.render(MessageKey.of(n.getType()), MessagePart.APP, values));
     }
 }

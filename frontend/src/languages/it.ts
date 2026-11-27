@@ -345,6 +345,8 @@ export const it = {
     open: 'Apri la segnalazione n. {{number}}',
     /** Proposta di nave scuola (US-515): l'avviso porta alla scheda dell'azienda. */
     openCompany: 'Apri la scheda dell’azienda della segnalazione n. {{number}}',
+    /** Chiusura della richiesta di contatto (US-512): l'avviso porta alla richiesta. */
+    openContactRequest: 'Apri la richiesta di contatto n. {{number}}',
     empty: 'Non hai notifiche.',
     listLabel: 'Notifiche dalla più recente',
     generic: 'Aggiornamento sulla segnalazione n. {{number}}.',
@@ -451,6 +453,10 @@ export const it = {
       INTERNSHIP_OVERDUE: {
         title: 'Tirocinio da chiudere o prorogare',
         when: 'Al Tutor, 3 e 7 giorni dopo la fine prevista, se il tirocinio non è chiuso.',
+      },
+      CONTACT_REQUEST_CLOSED: {
+        title: 'Esito della richiesta di contatto',
+        when: 'Al Tutor, quando l’operatore chiude la sua richiesta di contatto: con l’esito e la nota, porta alla richiesta.',
       },
       TRAINING_SHIP_PROPOSED: {
         title: 'Proposta di nave scuola',
@@ -877,6 +883,85 @@ export const it = {
   /** Richieste di contatto di un'azienda dal Tutor al Call Center (US-507). */
   contactRequest: {
     status: { APERTA: 'Aperta', IN_CARICO: 'In carico', CHIUSA: 'Chiusa' },
+    /** Esiti fissi dei tentativi e della chiusura (US-512). */
+    outcome: {
+      DISPONIBILE: 'Disponibile a ospitare tirocini',
+      NON_INTERESSATA: 'Non interessata',
+      NON_RAGGIUNGIBILE: 'Non raggiungibile',
+    },
+    closedWith: 'Chiusa: {{outcome}}',
+    open: 'Apri la richiesta di contatto n. {{number}}',
+    /** Pagina della richiesta (US-512). */
+    detail: {
+      heading: 'Richiesta di contatto n. {{number}}',
+      dataHeading: 'Dati della richiesta',
+      company: 'Azienda',
+      linkedCompany: 'Azienda in NEXUS',
+      tutor: 'Tutor',
+      sentAt: 'Inviata il',
+      status: 'Stato',
+      operator: 'Operatore',
+      takenAt: 'Presa in carico il',
+      outcomeHeading: 'Esito',
+      outcome: 'Esito finale',
+      closingNote: 'Nota del Call Center',
+      closedAt: 'Chiusa il',
+      attemptsHeading: 'Tentativi di contatto',
+      attemptsIntro: 'Dal più recente. Il Tutor li vede tutti.',
+      noAttempts: 'Nessun tentativo.',
+      attemptBy: 'Segnato da {{name}}',
+      notMine: 'In carico a {{name}}: i tentativi e la chiusura li segna chi l’ha in carico.',
+      loadError: 'Impossibile caricare la richiesta di contatto. Controlla la connessione e riprova.',
+      notFound: 'Richiesta di contatto non trovata',
+      backTutor: 'Le mie richieste',
+      backCallCenter: 'Torna alle richieste di contatto',
+    },
+    attemptForm: {
+      heading: 'Nuovo tentativo',
+      date: 'Data',
+      outcome: 'Esito',
+      note: 'Nota per il Tutor',
+      noteHint: 'Facoltativa, al massimo 500 caratteri. Niente dati personali.',
+      chooseOutcome: 'Scegli l’esito',
+      submit: 'Segna il tentativo',
+      saving: 'Salvataggio in corso…',
+      saved: 'Tentativo segnato.',
+      error: 'Il tentativo non è stato segnato. Controlla la connessione e riprova.',
+      errors: {
+        date: 'Indica la data del tentativo',
+        future: 'La data non può essere futura',
+        outcome: 'Scegli l’esito',
+      },
+    },
+    closeForm: {
+      heading: 'Chiudi la richiesta',
+      intro:
+        'Quando hai finito i tentativi. Il Tutor riceve l’avviso con l’esito e la nota; la richiesta non si riapre.',
+      outcome: 'Esito finale',
+      note: 'Nota per il Tutor',
+      noteHint: 'Al massimo 500 caratteri: com’è andata e che cosa succede adesso. Niente dati personali.',
+      company: 'Azienda in NEXUS',
+      companyHint:
+        'Se l’azienda è in anagrafica, perché c’era o perché l’hai appena creata, cercala per nome e collegala. Facoltativo.',
+      search: 'Cerca',
+      searching: 'Ricerca in corso…',
+      noCompany: 'Nessuna: l’azienda non è in NEXUS',
+      noResults: 'Nessuna azienda attiva con questo nome.',
+      searchError: 'Ricerca non riuscita. Controlla la connessione e riprova.',
+      submit: 'Chiudi la richiesta',
+      confirmHeading: 'Confermi la chiusura?',
+      confirmText:
+        'La richiesta di contatto n. {{number}} si chiude con l’esito «{{outcome}}». Il Tutor riceve l’avviso con l’esito e la nota; la richiesta non si riapre.',
+      confirm: 'Sì, chiudi la richiesta',
+      back: 'Torna al modulo',
+      closing: 'Chiusura in corso…',
+      closed: 'Richiesta chiusa: il Tutor riceve l’avviso con l’esito e la nota.',
+      error: 'La richiesta non è stata chiusa. Controlla la connessione e riprova.',
+      errors: {
+        outcome: 'Scegli l’esito finale',
+        note: 'Scrivi la nota per il Tutor',
+      },
+    },
     columns: {
       number: 'N.',
       date: 'Inviata il',
@@ -2432,6 +2517,9 @@ export const it = {
       heading: 'Chiedi di contattare un’azienda nuova',
       intro:
         'Per un’azienda che non è ancora in NEXUS. Prima dell’invio ti mostriamo le aziende già in NEXUS con un nome simile, per evitare doppioni.',
+    },
+    contactRequest: {
+      title: 'Richiesta di contatto',
     },
     contactRequests: {
       title: 'Richieste di contatto',

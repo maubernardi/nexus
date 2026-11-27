@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import it.nexus.domain.dto.ContactAttemptFormDTO;
+import it.nexus.domain.dto.ContactRequestCloseDTO;
 import it.nexus.domain.dto.ContactRequestDTO;
+import it.nexus.domain.dto.ContactRequestDetailDTO;
 import it.nexus.domain.dto.ContactRequestFormDTO;
 import it.nexus.domain.dto.VersionDTO;
 import it.nexus.services.ContactRequestService;
@@ -57,6 +60,29 @@ public class ContactRequestResource {
     @Operation(summary = "Numero delle richieste ancora da prendere in carico, per il menu")
     public ResponseEntity<Long> openCount() {
         return ResponseEntity.ok(service.openCount());
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Pagina della richiesta con i tentativi (US-512): il Tutor solo le sue")
+    public ResponseEntity<ContactRequestDetailDTO> detail(@PathVariable String id) {
+        return ResponseEntity.ok(service.detail(id));
+    }
+
+    @PostMapping("/{id}/attempts")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Tentativo di contatto, solo da parte di chi ha la richiesta in carico (US-512)")
+    public ResponseEntity<ContactRequestDetailDTO> addAttempt(@PathVariable String id,
+            @RequestBody @Valid ContactAttemptFormDTO form) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.addAttempt(id, form));
+    }
+
+    @PostMapping("/{id}/close")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Chiusura con l'esito, solo da parte di chi ha la richiesta in carico; avvisa il Tutor (US-512)")
+    public ResponseEntity<ContactRequestDetailDTO> close(@PathVariable String id,
+            @RequestBody @Valid ContactRequestCloseDTO form) {
+        return ResponseEntity.ok(service.close(id, form));
     }
 
     @PostMapping("/{id}/take")

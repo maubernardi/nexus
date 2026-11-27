@@ -48,11 +48,16 @@ public class NotificationEmailSender {
 
     /** Invia l'email della notifica, se le email sono accese e la persona ha un indirizzo. */
     void send(NotificationCreatedEvent event) {
-        if (!enabled || !StringUtils.hasText(event.recipientEmail()) || event.ticketId() == null) {
+        if (!enabled || !StringUtils.hasText(event.recipientEmail())
+                || (event.ticketId() == null && event.contactRequest() == null)) {
             return;
         }
-        NotificationEmail email = NotificationEmail.of(messageTextService.current(), event.type(), event.ticketId(),
-                event.ticketNumber(), event.companyId(), properties.getAppUrl());
+        NotificationCreatedEvent.ContactRequestTarget request = event.contactRequest();
+        NotificationEmail email = request != null
+                ? NotificationEmail.ofContactRequest(messageTextService.current(), event.type(), request.id(),
+                        request.number(), request.values(), properties.getAppUrl())
+                : NotificationEmail.of(messageTextService.current(), event.type(), event.ticketId(),
+                        event.ticketNumber(), event.companyId(), properties.getAppUrl());
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(properties.getFrom());
         message.setTo(event.recipientEmail());

@@ -62,7 +62,12 @@ export const MyContactRequestsPage = () => {
       ) : requests.data.length === 0 ? (
         <p className="rounded-xl border border-border bg-card p-6">{t('contactRequest.myEmpty')}</p>
       ) : (
-        <ContactRequestsTable requests={requests.data} caption={t('contactRequest.myCaption')} mode="tutor" />
+        <ContactRequestsTable
+          requests={requests.data}
+          caption={t('contactRequest.myCaption')}
+          mode="tutor"
+          detailBase="/richieste"
+        />
       )}
     </div>
   );

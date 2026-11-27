@@ -38,4 +38,26 @@ public record NotificationEmail(String subject, String body) {
                 texts.render(key, MessagePart.EMAIL_SUBJECT, values));
         return new NotificationEmail(subject, body);
     }
+
+    /**
+     * Email di un avviso sulla richiesta di contatto (US-512): oggetto «PORTALE NEXUS - Richiesta di contatto n. N - »
+     * più la parte distintiva, il testo con i segnaposto ({@code numero}, {@code esito}, {@code nota}) e il collegamento
+     * alla richiesta.
+     */
+    public static NotificationEmail ofContactRequest(MessageTexts texts, NotificationType type, String requestId,
+            Long requestNumber, Map<String, ?> values, String appUrl) {
+        MessageKey key = MessageKey.of(type);
+        String text = texts.render(key, MessagePart.EMAIL_BODY, values);
+        String body = """
+                %s
+
+                Apri la richiesta: %s/richieste/%s
+
+                Messaggio automatico di NEXUS, non rispondere. Trovi tutte le notifiche anche nell'app, alla voce \
+                Notifiche.
+                """.formatted(text, appUrl, requestId) + EmailSignature.BLOCK;
+        String subject = EmailSignature.SUBJECT_PREFIX + "Richiesta di contatto n. %d - %s".formatted(requestNumber,
+                texts.render(key, MessagePart.EMAIL_SUBJECT, values));
+        return new NotificationEmail(subject, body);
+    }
 }

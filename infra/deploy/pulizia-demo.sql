@@ -20,9 +20,9 @@ ALTER TABLE company_note DISABLE TRIGGER USER;
 ALTER TABLE closure_report DISABLE TRIGGER USER;
 
 -- Segnalazioni (con bacheca, schede del tirocinio, report, storico, notifiche), beneficiari, utenti e aziende della
--- demo (con referenti, diario, storico e mansioni), e le richieste di contatto (US-507). TRUNCATE senza CASCADE: se una tabella che punta a queste mancasse
+-- demo (con referenti, diario, storico e mansioni), e le richieste di contatto con i tentativi (US-507, US-512). TRUNCATE senza CASCADE: se una tabella che punta a queste mancasse
 -- dall'elenco, PostgreSQL si fermerebbe invece di svuotarla di nascosto.
-TRUNCATE contact_request, closure_report, internship_training_project, internship_extension, internship_schedule_day,
+TRUNCATE contact_request_attempt, contact_request, closure_report, internship_training_project, internship_extension, internship_schedule_day,
     internship_suspension, internship_company_tutor, internship, notification, ticket_status_history,
     ticket_company_blacklist, company_audit_event, board_post, ticket, job_slot, company_contact, company_note,
     company_legal_representative, company_ateco_code, legacy_call, company, beneficiary_language, beneficiary,
@@ -52,7 +52,7 @@ DECLARE
 BEGIN
     FOREACH t IN ARRAY ARRAY['ticket', 'board_post', 'internship', 'closure_report', 'notification', 'beneficiary',
             'app_user', 'company', 'job_slot', 'company_contact', 'company_note', 'company_audit_event',
-            'contact_request'] LOOP
+            'contact_request', 'contact_request_attempt'] LOOP
         EXECUTE format('SELECT count(*) FROM nexus.%I', t) INTO n;
         IF n <> 0 THEN
             RAISE EXCEPTION 'pulizia incompleta: % righe in %', n, t;

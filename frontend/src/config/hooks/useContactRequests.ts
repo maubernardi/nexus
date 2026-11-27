@@ -7,12 +7,18 @@ import {
 } from '@tanstack/react-query';
 
 import {
+  addContactAttempt,
+  closeContactRequest,
   createContactRequest,
+  fetchContactRequest,
   fetchContactRequestQueue,
   fetchMyContactRequests,
   fetchOpenContactRequestCount,
   takeContactRequest,
+  type ContactAttemptForm,
   type ContactRequest,
+  type ContactRequestCloseForm,
+  type ContactRequestDetail,
   type ContactRequestForm,
 } from '@/config/api/contactRequestApi';
 
@@ -52,6 +58,34 @@ export const useTakeContactRequest = (): UseMutationResult<
   return useMutation({
     mutationFn: takeContactRequest,
     // anche se fallisce: un altro operatore potrebbe averla presa nel frattempo
+    onSettled: () => queryClient.invalidateQueries({ queryKey: CONTACT_REQUESTS_KEY }),
+  });
+};
+
+/** Pagina della richiesta (US-512). */
+export const useContactRequest = (id: string): UseQueryResult<ContactRequestDetail> =>
+  useQuery({ queryKey: [...CONTACT_REQUESTS_KEY, 'detail', id], queryFn: () => fetchContactRequest(id) });
+
+export const useAddContactAttempt = (): UseMutationResult<
+  ContactRequestDetail,
+  unknown,
+  { id: string; form: ContactAttemptForm }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: addContactAttempt,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: CONTACT_REQUESTS_KEY }),
+  });
+};
+
+export const useCloseContactRequest = (): UseMutationResult<
+  ContactRequestDetail,
+  unknown,
+  { id: string; form: ContactRequestCloseForm }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: closeContactRequest,
     onSettled: () => queryClient.invalidateQueries({ queryKey: CONTACT_REQUESTS_KEY }),
   });
 };

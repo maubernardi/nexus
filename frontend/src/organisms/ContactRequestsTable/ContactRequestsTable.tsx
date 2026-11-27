@@ -13,6 +13,8 @@ type ContactRequestsTableProps = {
   caption: string;
   /** `tutor`: le proprie richieste; `callCenter`: anche il Tutor e la presa in carico. */
   mode: 'tutor' | 'callCenter';
+  /** Dove si apre la pagina della richiesta (US-512): `/richieste` per il Tutor, `/richieste-contatto` per il Call Center. */
+  detailBase: '/richieste' | '/richieste-contatto';
   /** Solo per il Call Center: prende in carico una richiesta aperta. */
   onTake?: (request: ContactRequest) => void;
   /** Richiesta in corso di presa in carico: i pulsanti sono disattivati. */
@@ -28,6 +30,7 @@ export const ContactRequestsTable = ({
   requests,
   caption,
   mode,
+  detailBase,
   onTake,
   pendingId = null,
 }: ContactRequestsTableProps) => {
@@ -81,7 +84,16 @@ export const ContactRequestsTable = ({
         <tbody>
           {requests.map((r) => (
             <tr key={r.id} className="border-b border-border last:border-b-0">
-              <td className={`${td} tabular-nums`}>{r.number}</td>
+              <td className={`${td} tabular-nums`}>
+                {/* il numero apre la pagina della richiesta, con i tentativi (US-512) */}
+                <Link
+                  to={`${detailBase}/${r.id}`}
+                  aria-label={t('contactRequest.open', { number: r.number })}
+                  className="text-primary underline underline-offset-4"
+                >
+                  {r.number}
+                </Link>
+              </td>
               <th scope="row" className={`${td} text-left font-semibold`}>
                 {/* collegata all'anagrafica alla chiusura (US-512): il nome apre la scheda */}
                 {r.companyId ? (
@@ -98,7 +110,11 @@ export const ContactRequestsTable = ({
               <td className={`${td} whitespace-nowrap tabular-nums`}>
                 <time dateTime={r.createdAt}>{dateTime.format(new Date(r.createdAt))}</time>
               </td>
-              <td className={`${td} whitespace-nowrap`}>{t(`contactRequest.status.${r.status}`)}</td>
+              <td className={td}>
+                {r.status === 'CHIUSA' && r.outcome
+                  ? t('contactRequest.closedWith', { outcome: t(`contactRequest.outcome.${r.outcome}`) })
+                  : t(`contactRequest.status.${r.status}`)}
+              </td>
               <td className={td}>
                 {r.assignedOperatorName ??
                   (callCenter && onTake && r.status === 'APERTA' ? (

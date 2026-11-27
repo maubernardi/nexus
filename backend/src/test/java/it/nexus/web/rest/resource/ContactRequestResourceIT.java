@@ -269,4 +269,144 @@ class ContactRequestResourceIT {
                         .header(USER, "operatore.cc"))
                 .andExpect(status().isForbidden());
     }
+
+    // --- US-512: tentativi, chiusura con l'esito, pagina della richiesta, avviso al Tutor ---
+
+    /** Una richiesta di tutor1 presa in carico da operatore.cc: il suo id. */
+    private String takenRequest() throws Exception {
+        String id = JsonPath.read(send("tutor1", newCompany("Officina del Ponte"))
+                .andReturn().getResponse().getContentAsString(), "$.id");
+        take("operatore.cc", id, 0).andExpect(status().isOk());
+        return id;
+    }
+
+    private ResultActions attempt(String user, String id, String json) throws Exception {
+        return mockMvc.perform(post(API + "/" + id + "/attempts").header(USER, user)
+                .contentType(MediaType.APPLICATION_JSON).content(json));
+    }
+
+    private ResultActions close(String user, String id, String json) throws Exception {
+        return mockMvc.perform(post(API + "/" + id + "/close").header(USER, user)
+                .contentType(MediaType.APPLICATION_JSON).content(json));
+    }
+
+    @Test
+    void tentativi_dalPiuRecente_ancheIlTutorLiVede_laRichiestaRestaInCarico() throws Exception {
+        String id = takenRequest();
+        String yesterday = java.time.LocalDate.now().minusDays(1).toString();
+        String today = java.time.LocalDate.now().toString();
+        attempt("operatore.cc", id, """
+                {"date": "%s", "outcome": "NON_RAGGIUNGIBILE", "note": " Squilla a vuoto "}""".formatted(yesterday))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.attempts[0].outcome").value("NON_RAGGIUNGIBILE"))
+                .andExpect(jsonPath("$.attempts[0].note").value("Squilla a vuoto"));
+        attempt("operatore.cc", id, """
+                {"date": "%s", "outcome": "DISPONIBILE"}""".formatted(today))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.request.status").value("IN_CARICO"))
+                .andExpect(jsonPath("$.assignedToMe").value(true));
+
+        mockMvc.perform(get(API + "/" + id).header(USER, "tutor1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.attempts[*].date", contains(today, yesterday)))
+                .andExpect(jsonPath("$.attempts[1].operatorName").value("Olga Operatrice"))
+                .andExpect(jsonPath("$.assignedToMe").value(false));
+        // il Tutor vede solo le sue
+        mockMvc.perform(get(API + "/" + id).header(USER, "tutor2")).andExpect(status().isNotFound());
+        mockMvc.perform(get(API + "/" + id).header(USER, "admin")).andExpect(status().isOk());
+
+        em.flush();
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.CONTACT_REQUEST,
+                TsidMapper.toInternal(id))).extracting(e -> e.getAction()).containsExactly("CREATE", "TAKE", "ATTEMPT",
+                "ATTEMPT");
+        String changes = audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.CONTACT_REQUEST,
+                TsidMapper.toInternal(id)).get(2).getChanges().toString();
+        assertThat(changes).contains("NON_RAGGIUNGIBILE").doesNotContain("Squilla");
+    }
+
+    @Test
+    void tentativi_soloDiChiHaLaRichiesta_dataNonFutura() throws Exception {
+        String open = JsonPath.read(send("tutor1", newCompany("Bar Centrale"))
+                .andReturn().getResponse().getContentAsString(), "$.id");
+        String today = java.time.LocalDate.now().toString();
+        attempt("operatore.cc", open, "{\"date\": \"%s\", \"outcome\": \"DISPONIBILE\"}".formatted(today))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message", containsString("prima prendila in carico")));
+
+        String id = takenRequest();
+        // un altro utente del Call Center: avviso con chi ce l'ha
+        attempt("admin", id, "{\"date\": \"%s\", \"outcome\": \"DISPONIBILE\"}".formatted(today))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message", containsString("in carico a Olga Operatrice")));
+        attempt("tutor1", id, "{\"date\": \"%s\", \"outcome\": \"DISPONIBILE\"}".formatted(today))
+                .andExpect(status().isForbidden());
+        attempt("operatore.cc", id, "{\"date\": \"%s\", \"outcome\": \"DISPONIBILE\"}"
+                .formatted(java.time.LocalDate.now().plusDays(1)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("date"));
+        attempt("operatore.cc", id, "{\"date\": \"%s\"}".formatted(today))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("outcome"));
+    }
+
+    @Test
+    void chiusura_conLEsitoLaNotaELAzienda_avvisoAlTutor_sparisceDallElenco() throws Exception {
+        String id = takenRequest();
+        String version = String.valueOf((int) JsonPath.read(mockMvc.perform(get(API + "/" + id).header(USER,
+                "operatore.cc")).andReturn().getResponse().getContentAsString(), "$.request.version"));
+        // esito e nota obbligatori
+        close("operatore.cc", id, "{\"version\": %s, \"outcome\": \"DISPONIBILE\", \"note\": \" \"}"
+                .formatted(version))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("note"));
+        // un'azienda disattivata non si collega
+        Company closed = TestEntities.company("99050700009");
+        closed.setActive(false);
+        companies.save(closed);
+        close("operatore.cc", id, """
+                {"version": %s, "outcome": "DISPONIBILE", "note": "Ok", "companyId": "%s"}"""
+                .formatted(version, TsidMapper.toExternal(closed.getId())))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("companyId"));
+
+        close("operatore.cc", id, """
+                {"version": %s, "outcome": "DISPONIBILE", "note": " Ospitano un tirocinante da gennaio. ",
+                 "companyId": "%s"}""".formatted(version, TsidMapper.toExternal(ristorazione.getId())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.request.status").value("CHIUSA"))
+                .andExpect(jsonPath("$.request.outcome").value("DISPONIBILE"))
+                .andExpect(jsonPath("$.request.closedAt").exists())
+                .andExpect(jsonPath("$.request.companyId").value(TsidMapper.toExternal(ristorazione.getId())))
+                .andExpect(jsonPath("$.linkedCompanyName").value("Trattoria Bianchi S.n.c."))
+                .andExpect(jsonPath("$.closingNote").value("Ospitano un tirocinante da gennaio."))
+                .andExpect(jsonPath("$.assignedToMe").value(false));
+
+        // chiusa: niente più tentativi né chiusure, e non è più nell'elenco del Call Center
+        close("operatore.cc", id, "{\"version\": 1, \"outcome\": \"DISPONIBILE\", \"note\": \"Di nuovo\"}")
+                .andExpect(status().isConflict());
+        mockMvc.perform(get(API).header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$[*].id", not(hasItem(id))));
+        // il Tutor la vede chiusa, con l'esito
+        mockMvc.perform(get(API + "/mine").header(USER, "tutor1"))
+                .andExpect(jsonPath("$[0].status").value("CHIUSA"))
+                .andExpect(jsonPath("$[0].outcome").value("DISPONIBILE"));
+
+        // avviso al Tutor, con numero, esito e nota, che porta alla richiesta
+        String number = String.valueOf((int) JsonPath.read(mockMvc.perform(get(API + "/" + id).header(USER, "tutor1"))
+                .andReturn().getResponse().getContentAsString(), "$.request.number"));
+        mockMvc.perform(get("/api/v1/notifications").header(USER, "tutor1"))
+                .andExpect(jsonPath("$.items[0].type").value("CONTACT_REQUEST_CLOSED"))
+                .andExpect(jsonPath("$.items[0].contactRequestId").value(id))
+                .andExpect(jsonPath("$.items[0].contactRequestNumber").value(Integer.parseInt(number)))
+                .andExpect(jsonPath("$.items[0].text").value("Il Call Center ha chiuso la tua richiesta di contatto n. "
+                        + number + ": Disponibile a ospitare tirocini. Nota: Ospitano un tirocinante da gennaio."));
+
+        em.flush();
+        assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.CONTACT_REQUEST,
+                TsidMapper.toInternal(id))).last().satisfies(e -> {
+                    assertThat(e.getAction()).isEqualTo("CLOSE");
+                    assertThat(e.getChanges().toString()).contains("DISPONIBILE", "CHIUSA")
+                            .doesNotContain("gennaio");
+                });
+    }
 }

@@ -103,8 +103,17 @@ export const NotificationsPage = () => {
                 <p className="text-sm text-muted-foreground">
                   <time dateTime={n.createdAt}>{dateTime.format(new Date(n.createdAt))}</time>
                 </p>
-                {/* la proposta di nave scuola porta alla scheda dell'azienda (US-515) */}
-                {n.companyId ? (
+                {/* la proposta di nave scuola porta alla scheda dell'azienda (US-515), la chiusura della richiesta
+                    di contatto alla richiesta (US-512) */}
+                {n.contactRequestId ? (
+                  <Link
+                    to={`/richieste/${n.contactRequestId}`}
+                    onClick={() => !n.read && markRead.mutate(n.id)}
+                    className="inline-block font-medium text-primary underline underline-offset-4"
+                  >
+                    {t('notifications.openContactRequest', { number: n.contactRequestNumber })}
+                  </Link>
+                ) : n.companyId ? (
                   <Link
                     to={`/aziende/${n.companyId}`}
                     onClick={() => !n.read && markRead.mutate(n.id)}
