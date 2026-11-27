@@ -11,8 +11,9 @@ import { ContactRequestsTable } from '@/organisms/ContactRequestsTable/ContactRe
 type Outcome = { kind: 'taken' | 'error'; message: string };
 
 /**
- * «Richieste di contatto» del Call Center (US-507): le richieste aperte e in carico, dalla più vecchia. Un operatore
- * qualsiasi prende in carico una richiesta aperta; se un altro l'ha già presa, l'avviso dice chi ce l'ha.
+ * «Richieste di contatto» del Call Center (US-507): in cima quelle da prendere in carico, poi quelle in carico, dalla
+ * più vecchia (l'ordine lo dà il server). Un operatore qualsiasi prende in carico una richiesta aperta; se un altro
+ * l'ha già presa, l'avviso dice chi ce l'ha.
  */
 export const ContactRequestsPage = () => {
   const { t } = useTranslation();

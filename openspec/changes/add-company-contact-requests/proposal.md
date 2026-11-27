@@ -16,7 +16,8 @@ traccia, non si sa chi se ne occupa e a volte si perde.
   Il criterio «azienda già presente: «Chiedi di contattarla» dalla scheda» dell'analisi del 23/11 è tolto: per
   un'azienda in anagrafica il contatto non si chiede.
 - **Call Center**:
-  - la pagina «Richieste di contatto», dalla più vecchia;
+  - la pagina «Richieste di contatto»: in cima quelle da prendere in carico, poi quelle in carico, dalla più vecchia
+    (PO, 27/11);
   - nel menu il numero delle richieste ancora da prendere in carico;
   - nessuna email agli operatori;
   - un operatore qualsiasi prende in carico una richiesta aperta, e la richiesta mostra chi ce l'ha.

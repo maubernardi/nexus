@@ -34,30 +34,31 @@ const conflict = (message: string): AxiosError => {
 
 describe('<ContactRequestsPage>', () => {
   beforeEach(() => {
+    // come le manda il server: in cima quelle da prendere in carico (PO, 27/11)
     vi.mocked(fetchContactRequestQueue).mockResolvedValue([
+      contactRequest(2),
       contactRequest(1, {
         companyName: 'Bar Pasticceria Stella',
         status: 'IN_CARICO',
         assignedOperatorName: 'Olga Operatrice',
         requestedByName: 'Ugo Tutor',
       }),
-      contactRequest(2),
     ]);
     vi.mocked(takeContactRequest).mockReset();
   });
 
-  it('dalla più vecchia, con il Tutor, quante da prendere in carico e chi ce l’ha (US-507)', async () => {
+  it('in cima quelle da prendere in carico, con il Tutor, quante sono e chi ce l’ha (US-507)', async () => {
     renderPage();
-    const table = await screen.findByRole('table', { name: /Richieste di contatto aperte e in carico/ });
+    const table = await screen.findByRole('table', { name: /prima quelle da prendere in carico/ });
     expect(screen.getByText('2 richieste: 1 da prendere in carico')).toBeInTheDocument();
     const [, first, second] = within(table).getAllByRole('row');
-    expect(within(first).getByRole('rowheader')).toHaveTextContent('Bar Pasticceria Stella');
-    expect(within(first).getAllByRole('cell')[3]).toHaveTextContent('Ugo Tutor');
-    expect(within(first).getAllByRole('cell')[6]).toHaveTextContent('Olga Operatrice');
-    expect(within(first).queryByRole('button')).not.toBeInTheDocument();
     expect(
-      within(second).getByRole('button', { name: 'Prendi in carico la richiesta di contatto n. 2' }),
+      within(first).getByRole('button', { name: 'Prendi in carico la richiesta di contatto n. 2' }),
     ).toBeInTheDocument();
+    expect(within(second).getByRole('rowheader')).toHaveTextContent('Bar Pasticceria Stella');
+    expect(within(second).getAllByRole('cell')[3]).toHaveTextContent('Ugo Tutor');
+    expect(within(second).getAllByRole('cell')[6]).toHaveTextContent('Olga Operatrice');
+    expect(within(second).queryByRole('button')).not.toBeInTheDocument();
     await expectNoAxeViolations();
   });
 

@@ -14,7 +14,7 @@ public interface ContactRequestService {
     /** Le richieste del Tutor corrente, dalla più recente. */
     List<ContactRequestDTO> mine();
 
-    /** Le richieste aperte e in carico, dalla più vecchia, per il Call Center. */
+    /** Le richieste aperte e in carico per il Call Center: prima quelle da prendere in carico, dalla più vecchia. */
     List<ContactRequestDTO> queue();
 
     /** Richieste ancora da prendere in carico. */

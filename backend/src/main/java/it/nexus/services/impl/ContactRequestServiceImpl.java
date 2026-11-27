@@ -76,7 +76,7 @@ public class ContactRequestServiceImpl implements ContactRequestService {
     @Override
     @Transactional(readOnly = true)
     public List<ContactRequestDTO> queue() {
-        return repository.findByStatusInOrderByCreatedAtAscIdAsc(
+        return repository.queue(
                 EnumSet.of(ContactRequestStatus.APERTA, ContactRequestStatus.IN_CARICO))
                 .stream().map(this::toDto).toList();
     }

@@ -890,7 +890,8 @@ export const it = {
     },
     none: '—',
     myCaption: 'Le tue richieste di contatto, dalla più recente',
-    queueCaption: 'Richieste di contatto aperte e in carico, dalla più vecchia',
+    queueCaption:
+      'Richieste di contatto: prima quelle da prendere in carico, poi quelle in carico, dalla più vecchia',
     myEmpty: 'Non hai ancora chiesto di contattare un’azienda.',
     queueEmpty: 'Nessuna richiesta di contatto da seguire.',
     loadError: 'Impossibile caricare le richieste di contatto. Controlla la connessione e riprova.',
@@ -2436,7 +2437,7 @@ export const it = {
       title: 'Richieste di contatto',
       heading: 'Richieste di contatto',
       intro:
-        'Le aziende che i Tutor chiedono di contattare, dalla richiesta più vecchia. Un operatore qualsiasi la prende in carico.',
+        'Le aziende non ancora in NEXUS che i Tutor chiedono di contattare. In cima quelle da prendere in carico, dalla più vecchia; un operatore qualsiasi le prende in carico.',
     },
     companies: {
       title: 'Aziende',

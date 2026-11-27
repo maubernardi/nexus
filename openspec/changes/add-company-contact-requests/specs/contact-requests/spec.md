@@ -45,14 +45,15 @@ aziende, come nella sua lista.
 - **THEN** la richiesta parte senza passaggi in più
 
 ### Requirement: Richieste di contatto del Call Center
-Il Call Center e l'ADMIN SHALL vedere la pagina «Richieste di contatto» con le richieste aperte e in carico, dalla più
-vecchia: numero, data, Tutor, azienda (nome, zona e categoria scritti dal Tutor), stato e operatore. Nel menu, accanto alla voce, SHALL comparire il numero delle richieste aperte, cioè
-ancora da prendere in carico. Il numero MUST essere anche nel nome accessibile della voce. Per una richiesta nuova
+Il Call Center e l'ADMIN SHALL vedere la pagina «Richieste di contatto» con le richieste aperte e in carico: in cima
+quelle aperte, da prendere in carico, poi quelle in carico, ognuna dalla più vecchia (PO, 27/11). Per ognuna: numero,
+data, Tutor, azienda (nome, zona e categoria scritti dal Tutor), stato e operatore. Nel menu, accanto alla voce, SHALL
+comparire il numero delle richieste aperte, cioè ancora da prendere in carico. Il numero MUST essere anche nel nome accessibile della voce. Per una richiesta nuova
 MUST NOT partire nessuna email agli operatori.
 
 #### Scenario: Elenco e numero nel menu
 - **WHEN** ci sono due richieste aperte e una in carico
-- **THEN** l'operatore vede le tre richieste, dalla più vecchia, e nel menu il numero 2
+- **THEN** l'operatore vede in cima le due aperte, dalla più vecchia, poi quella in carico, e nel menu il numero 2
 
 ### Requirement: Presa in carico
 Un operatore qualsiasi del Call Center SHALL poter prendere in carico una richiesta aperta: la richiesta passa «in

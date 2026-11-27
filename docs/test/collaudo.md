@@ -1753,12 +1753,13 @@ aperta, per «Officina Meccanica Demo del Ponte», e una in carico a `operatore.
 
 - [ ] **T-40.1 Le richieste per il Call Center (US-507)**
   1. Entra come `operatore.cc`. **Atteso:** nel menu la voce «Richieste di contatto» con il numero 1.
-  2. Aprila. **Atteso:** le due richieste, dalla più vecchia, con il Tutor (Tutor Uno), la zona, lo stato e
-     l'operatore.
+  2. Aprila. **Atteso:** in cima l'officina, aperta, da prendere in carico; sotto il bar, già in carico. Per ognuna il
+     Tutor (Tutor Uno), la zona, lo stato e l'operatore. Dal 27/11, richiesta del PO: le richieste da prendere in carico
+     stanno in cima.
   3. Premi «Prendi in carico» sull'officina. **Atteso:** «Hai preso in carico la richiesta di contatto n. …»; la
      richiesta mostra il tuo nome e il numero nel menu sparisce.
 
-- [ ] **T-40.2 Nessuna richiesta per le aziende già in NEXUS (US-507)**
+- [x] **T-40.2 Nessuna richiesta per le aziende già in NEXUS (US-507)**
   1. Esci ed entra come `tutor2`; apri «Aziende» e la scheda di «Demo Ristorazione S.n.c.». **Atteso:** nessun pulsante
      per chiedere di contattarla: è già in anagrafica.
   2. Come `tutor1`, apri «Richieste» nel menu. **Atteso:** la pagina «Le mie richieste» con le sue due richieste, tutte
@@ -1773,13 +1774,16 @@ aperta, per «Officina Meccanica Demo del Ponte», e una in carico a `operatore.
      la richiesta» e «Correggi il nome».
   3. Premi «Correggi il nome», scrivi un nome che non somiglia a nessuno, per esempio «Ferramenta Lunghi e Figli», e
      invia. **Atteso:** la richiesta parte subito e compare in «Le mie richieste», aperta.
-  4. Come `operatore.cc`, apri «Richieste di contatto». **Atteso:** in fondo all'elenco la richiesta di `tutor2`,
-     aperta; nel menu il numero 1.
+  4. Come `operatore.cc`, apri «Richieste di contatto». **Atteso:** in cima la richiesta di `tutor2`, aperta, da
+     prendere in carico, sopra le due già in carico; nel menu il numero 1.
 
-- [ ] **T-40.4 Menu, smartphone e tema scuro (US-507)**
+- [x] **T-40.4 Menu, smartphone e tema scuro (US-507)**
   1. Come `admin`, apri «Amministrazione» nel menu. **Atteso:** in testa «Richieste di contatto», con il numero di
      quelle da prendere in carico; la riga del menu era piena.
   2. Con la finestra larga meno di 1280 pixel. **Atteso:** il menu è il pulsante ☰, con le voci, nome e ruolo dentro;
      prima, tra 1024 e 1279 pixel, le voci dell'ADMIN finivano sotto la campanella.
   3. Prova le due pagine delle richieste con la finestra stretta come uno smartphone e con il tema scuro (🌙).
      **Atteso:** tutto leggibile; la tabella scorre di lato e i nomi delle aziende restano su una riga.
+  > Nota (27/11): dal collaudo della PR #219 (`d834151`) il PO ha trovato coerenti le prove. Ha chiesto che le richieste
+  > da prendere in carico stiano in cima: per T-40.1 e T-40.3 resta da riprovare solo l'ordine dell'elenco (passi 2 e
+  > 4). T-40.2 e T-40.4 riuscite.

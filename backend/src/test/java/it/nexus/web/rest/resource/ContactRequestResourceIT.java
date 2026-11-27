@@ -181,7 +181,7 @@ class ContactRequestResourceIT {
     }
 
     @Test
-    void elencoDalPiuVecchio_numeroDelleAperte_presaInCarico_leMieRichieste() throws Exception {
+    void elencoConLeAperteInCima_numeroDelleAperte_presaInCarico_leMieRichieste() throws Exception {
         String first = JsonPath.read(send("tutor1", newCompany("Officina del Ponte"))
                 .andReturn().getResponse().getContentAsString(), "$.id");
         send("tutor2", newCompany("Trattoria Bianchi Due")).andExpect(status().isCreated());
@@ -200,10 +200,12 @@ class ContactRequestResourceIT {
                 .andExpect(jsonPath("$.assignedOperatorName").value("Olga Operatrice"))
                 .andExpect(jsonPath("$.takenAt").exists());
         mockMvc.perform(get(API + "/open-count").header(USER, "admin")).andExpect(jsonPath("$").value(2));
-        // in carico resta nell'elenco, con chi ce l'ha
+        // in cima quelle da prendere in carico, dalla più vecchia (PO, 27/11); quella in carico resta, in fondo
         mockMvc.perform(get(API).header(USER, "admin"))
-                .andExpect(jsonPath("$[0].status").value("IN_CARICO"))
-                .andExpect(jsonPath("$[0].assignedOperatorName").value("Olga Operatrice"));
+                .andExpect(jsonPath("$[*].companyName",
+                        contains("Trattoria Bianchi Due", "Bar Centrale", "Officina del Ponte")))
+                .andExpect(jsonPath("$[*].status", contains("APERTA", "APERTA", "IN_CARICO")))
+                .andExpect(jsonPath("$[2].assignedOperatorName").value("Olga Operatrice"));
 
         // già presa: avviso con il nome di chi ce l'ha
         take("admin", first, 1)

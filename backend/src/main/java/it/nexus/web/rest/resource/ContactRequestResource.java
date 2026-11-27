@@ -47,7 +47,7 @@ public class ContactRequestResource {
 
     @GetMapping
     @PreAuthorize("hasAnyRole(@requestsAuthorizer.CALL_CENTER, @requestsAuthorizer.ADMIN)")
-    @Operation(summary = "Richieste aperte e in carico, dalla più vecchia")
+    @Operation(summary = "Richieste aperte e in carico: prima quelle da prendere in carico, dalla più vecchia")
     public ResponseEntity<List<ContactRequestDTO>> queue() {
         return ResponseEntity.ok(service.queue());
     }
