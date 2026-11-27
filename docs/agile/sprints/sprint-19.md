@@ -1,6 +1,6 @@
 # Sprint 19 — 27 – 29 novembre 2026
 
-**Stato:** 🔨 in corso dal 27/11.
+**Stato:** 🔨 in corso dal 27/11. In produzione dal 27/11, a `6aa35c3`: US-507 (5 punti su 13).
 **Planning:** 27/11, dalla [review dello Sprint 18](sprint-18-review.md) (§8, §9).
 
 ## Obiettivo
@@ -12,7 +12,7 @@
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-507 | Richiesta di contatto di un'azienda dal Tutor | 5 | 🔨 In corso | `add-company-contact-requests` | — |
+| US-507 | Richiesta di contatto di un'azienda dal Tutor | 5 | 🎉 Done | `add-company-contact-requests` (archiviata) | [#219](https://github.com/maubernardi/nexus/pull/219) |
 | US-512 | Tentativi di contatto ed esito della richiesta | 5 | ✅ Ready | — | — |
 | US-1311 | Avvisi affidabili su sito e backup | 3 | ✅ Ready | — | — |
 
@@ -49,3 +49,4 @@ Sotto la media (23,2), per lasciare spazio a quello che arriverà dall'uso.
 | Momento | Punti residui |
 |---|---|
 | Inizio (27/11) | 13 |
+| US-507 Done: collaudo T-40.1 … T-40.4 sul PC e deploy `6aa35c3` (27/11) | 8 |
