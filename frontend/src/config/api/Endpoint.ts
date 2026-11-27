@@ -15,6 +15,7 @@ export const ENDPOINTS = {
   notifications: '/notifications',
   messageTexts: '/message-texts',
   companies: '/companies',
+  contactRequests: '/contact-requests',
   jobSlots: '/job-slots',
   boardPosts: '/board-posts',
   board: '/board',

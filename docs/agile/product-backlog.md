@@ -107,7 +107,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-504](#us-504) | E5 | Disattivazione impedita con mansioni bloccate | Must | 1 | R1 | 🎉 Done (Sprint 3) |
 | [US-505](#us-505) | E5 | Diario delle note dell'azienda | Must | 2 | R1 | 🎉 Done (Sprint 4) |
 | [US-506](#us-506) | E5 | Legale rappresentante e codici ATECO dell'azienda | Must | 3 | R3 | 🎉 Done (Sprint 7) |
-| [US-507](#us-507) | E5 | Richiesta di contatto di un'azienda dal Tutor | Should | 5 | — | ✅ Ready |
+| [US-507](#us-507) | E5 | Richiesta di contatto di un'azienda dal Tutor | Should | 5 | — | 🔨 In corso (Sprint 19) |
 | [US-508](#us-508) | E5 | Partita IVA e nome da completare | Must | 3 | R4 | 🎉 Done (Sprint 15) |
 | [US-509](#us-509) | E5 | Categoria merceologica e attività dell'azienda | Must | 3 | R4 | 🎉 Done (Sprint 15) |
 | [US-510](#us-510) | E5 | Referenti e recapiti dell'azienda | Must | 5 | R4 | 🎉 Done (Sprint 15) |
@@ -737,7 +737,7 @@ Criteri di accettazione:
 Dipendenze: US-501
 
 #### US-507
-**Richiesta di contatto di un'azienda dal Tutor** · Should · 5 punti · release da decidere · ✅ Ready
+**Richiesta di contatto di un'azienda dal Tutor** · Should · 5 punti · release da decidere · 🔨 In corso (Sprint 19)
 
 Come **Tutor** voglio chiedere al Call Center di contattare un'azienda che conosco, così che la richiesta non si perda
 e un operatore la prenda in carico (PO, 15/11). Oggi passa tutto a voce o per email, senza traccia (analisi con il PO,
@@ -745,11 +745,10 @@ e un operatore la prenda in carico (PO, 15/11). Oggi passa tutto a voce o per em
 
 Criteri di accettazione:
 - La richiesta è **generale**: non riguarda un beneficiario né una segnalazione.
-- **Azienda nuova**: il Tutor scrive il nome e sceglie la zona del catalogo (US-106), tutti e due obbligatori; il
-  settore (categoria merceologica, US-509) è facoltativo. Se ci sono aziende con un nome simile, NEXUS le mostra prima
-  dell'invio, per evitare doppioni.
-- **Azienda già presente**: dalla scheda dell'azienda (US-511), «Chiedi di contattarla». La richiesta nasce collegata
-  all'azienda.
+- **Solo aziende non ancora in anagrafica** (PO, 27/11): per un'azienda già in NEXUS il contatto non si chiede. Il
+  Tutor scrive il nome e sceglie la zona del catalogo (US-106), tutti e due obbligatori; il settore (categoria
+  merceologica, US-509) è facoltativo. Se ci sono aziende con un nome simile, NEXUS le mostra prima dell'invio, con la
+  loro scheda: se è una di quelle, la richiesta non serve.
 - Il Call Center ha l'elenco **«Richieste di contatto»**, dalla più vecchia, con il numero di quelle aperte nel menu.
   Nessuna email agli operatori.
 - Un **operatore qualsiasi** la prende in carico; la richiesta mostra chi ce l'ha.

@@ -1744,3 +1744,46 @@ passandoci sopra con il mouse compare «Nave scuola».
      restano su una riga.
   > Nota (26/11): T-39.6 e T-39.7 riuscite dal PO sul suo PC, con il collaudo della PR #216 (`8c610e8`). Unita con la
   > #216 (`119cb88`) e in produzione con il deploy del 26/11 sera.
+
+## 40. Richiesta di contatto di un'azienda dal Tutor (Sprint 19)
+
+Sul collaudo del PC, prima del merge (http://localhost:8090, password `collaudo-nexus-2026`). La richiesta di contatto
+si fa solo per un'azienda che non è ancora in NEXUS (PO, 27/11). Nei dati finti `tutor1` ha già due richieste: una
+aperta, per «Officina Meccanica Demo del Ponte», e una in carico a `operatore.cc`, per «Bar Pasticceria Demo Stella».
+
+- [ ] **T-40.1 Le richieste per il Call Center (US-507)**
+  1. Entra come `operatore.cc`. **Atteso:** nel menu la voce «Richieste di contatto» con il numero 1.
+  2. Aprila. **Atteso:** in cima l'officina, aperta, da prendere in carico; sotto il bar, già in carico. Per ognuna il
+     Tutor (Tutor Uno), la zona, lo stato e l'operatore. Dal 27/11, richiesta del PO: le richieste da prendere in carico
+     stanno in cima.
+  3. Premi «Prendi in carico» sull'officina. **Atteso:** «Hai preso in carico la richiesta di contatto n. …»; la
+     richiesta mostra il tuo nome e il numero nel menu sparisce.
+
+- [x] **T-40.2 Nessuna richiesta per le aziende già in NEXUS (US-507)**
+  1. Esci ed entra come `tutor2`; apri «Aziende» e la scheda di «Demo Ristorazione S.n.c.». **Atteso:** nessun pulsante
+     per chiedere di contattarla: è già in anagrafica.
+  2. Come `tutor1`, apri «Richieste» nel menu. **Atteso:** la pagina «Le mie richieste» con le sue due richieste, tutte
+     e due in carico all'operatore.
+
+- [ ] **T-40.3 Richiesta per un'azienda nuova, con i nomi simili (US-507)**
+  1. Come `tutor2`, apri «Richieste», premi «Chiedi di contattare un'azienda nuova» e poi «Invia la richiesta» senza
+     scrivere niente. **Atteso:** il riepilogo indica il nome e la zona; la categoria è facoltativa.
+  2. Scrivi «Demo Ristorazioni», scegli una zona e invia. **Atteso:** prima dell'invio compare «Aziende con un nome
+     simile», con «Demo Ristorazione S.n.c.», il suo bollino della nave scuola e il collegamento alla scheda. Il testo
+     dice che, se è quella, è già in anagrafica e la richiesta non serve. Ci sono solo «No, è un'azienda nuova: invia
+     la richiesta» e «Correggi il nome».
+  3. Premi «Correggi il nome», scrivi un nome che non somiglia a nessuno, per esempio «Ferramenta Lunghi e Figli», e
+     invia. **Atteso:** la richiesta parte subito e compare in «Le mie richieste», aperta.
+  4. Come `operatore.cc`, apri «Richieste di contatto». **Atteso:** in cima la richiesta di `tutor2`, aperta, da
+     prendere in carico, sopra le due già in carico; nel menu il numero 1.
+
+- [x] **T-40.4 Menu, smartphone e tema scuro (US-507)**
+  1. Come `admin`, apri «Amministrazione» nel menu. **Atteso:** in testa «Richieste di contatto», con il numero di
+     quelle da prendere in carico; la riga del menu era piena.
+  2. Con la finestra larga meno di 1280 pixel. **Atteso:** il menu è il pulsante ☰, con le voci, nome e ruolo dentro;
+     prima, tra 1024 e 1279 pixel, le voci dell'ADMIN finivano sotto la campanella.
+  3. Prova le due pagine delle richieste con la finestra stretta come uno smartphone e con il tema scuro (🌙).
+     **Atteso:** tutto leggibile; la tabella scorre di lato e i nomi delle aziende restano su una riga.
+  > Nota (27/11): dal collaudo della PR #219 (`d834151`) il PO ha trovato coerenti le prove. Ha chiesto che le richieste
+  > da prendere in carico stiano in cima: per T-40.1 e T-40.3 resta da riprovare solo l'ordine dell'elenco (passi 2 e
+  > 4). T-40.2 e T-40.4 riuscite.

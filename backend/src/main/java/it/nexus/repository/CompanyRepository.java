@@ -1,5 +1,6 @@
 package it.nexus.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -90,4 +91,22 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
             """)
     Page<Company> directory(@Param("search") String search, @Param("businessCategoryId") Long businessCategoryId,
             @Param("zoneId") Long zoneId, Pageable page);
+
+    /**
+     * Aziende attive con un nome simile (US-507), contro i doppioni prima di una richiesta di contatto: somiglianza dei
+     * trigrammi (pg_trgm) tra i nomi interi, oppure del nome scritto dentro quello dell'azienda; dalla più simile. Senza
+     * le aziende ancora senza nome (US-508).
+     */
+    @Query(value = """
+            select c.* from company c
+            where c.active
+              and c.name not like :placeholderPrefix
+              and (similarity(lower(c.name), lower(:name)) >= 0.3
+                   or word_similarity(lower(:name), lower(c.name)) >= 0.6)
+            order by greatest(similarity(lower(c.name), lower(:name)), word_similarity(lower(:name), lower(c.name))) desc,
+                     lower(c.name), c.id
+            limit :max
+            """, nativeQuery = true)
+    List<Company> findSimilarActive(@Param("name") String name, @Param("placeholderPrefix") String placeholderPrefix,
+            @Param("max") int max);
 }

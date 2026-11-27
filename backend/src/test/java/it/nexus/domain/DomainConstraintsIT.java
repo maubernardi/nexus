@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -1347,6 +1348,82 @@ class DomainConstraintsIT {
         void svuotamentoRifiutato() {
             addReport();
             assertViolates("closure_report non si modifica dopo l'invio", () -> jdbc.execute("TRUNCATE closure_report"));
+        }
+    }
+
+    @Nested
+    class RichiesteDiContatto {
+
+        private DomainFixtures.Graph g;
+
+        @BeforeEach
+        void graph() {
+            g = fixtures.graph();
+        }
+
+        /** Una richiesta scritta direttamente nel database, per provarne i vincoli (US-507). */
+        private void insert(long id, Long number, Long companyId, String name, Long zoneId, String status,
+                Long operatorId) {
+            jdbc.update("""
+                    INSERT INTO contact_request (id, number, requested_by_id, company_id, company_name, zone_id, status,
+                        assigned_operator_id, taken_at, created_at, created_by, updated_at, updated_by)
+                    VALUES (?, coalesce(?, nextval('contact_request_number_seq')), ?, ?, ?, ?, ?, ?,
+                        CASE WHEN ?::bigint IS NOT NULL THEN now() END, now(), 'test', now(), 'test')
+                    """, id, number, g.tutor().getId(), companyId, name, zoneId, status, operatorId, operatorId);
+        }
+
+        @Test
+        void nomeEZona_lAziendaDellAnagraficaSoloSeCollegata() {
+            insert(1, null, null, "Officina del Ponte", g.zone().getId(), "APERTA", null);
+            // collegata all'anagrafica alla chiusura (US-512)
+            insert(2, null, g.company().getId(), "Bar Centrale", g.zone().getId(), "CHIUSA", g.tutor().getId());
+            assertThat(jdbc.queryForObject("SELECT count(*) FROM contact_request", Long.class)).isEqualTo(2);
+        }
+
+        @Test
+        void senzaNome() {
+            assertViolates("company_name", () -> insert(1, null, null, null, g.zone().getId(), "APERTA", null));
+        }
+
+        @Test
+        void nomeVuoto() {
+            assertViolates("ck_contact_request_company_name",
+                    () -> insert(1, null, null, "  ", g.zone().getId(), "APERTA", null));
+        }
+
+        @Test
+        void senzaZona() {
+            assertViolates("zone_id", () -> insert(1, null, null, "Officina", null, "APERTA", null));
+        }
+
+        @Test
+        void statoSconosciuto() {
+            assertViolates("ck_contact_request_status",
+                    () -> insert(1, null, null, "Officina", g.zone().getId(), "SCONOSCIUTO", g.tutor().getId()));
+        }
+
+        @Test
+        void inCaricoSenzaOperatore() {
+            assertViolates("ck_contact_request_assigned",
+                    () -> insert(1, null, null, "Officina", g.zone().getId(), "IN_CARICO", null));
+        }
+
+        @Test
+        void apertaConOperatore() {
+            assertViolates("ck_contact_request_assigned",
+                    () -> insert(1, null, null, "Officina", g.zone().getId(), "APERTA", g.tutor().getId()));
+        }
+
+        @Test
+        void numeroDuplicato() {
+            insert(1, 90507L, null, "Officina", g.zone().getId(), "APERTA", null);
+            assertViolates("uq_contact_request_number",
+                    () -> insert(2, 90507L, null, "Bar", g.zone().getId(), "APERTA", null));
+        }
+
+        @Test
+        void zonaInesistente() {
+            assertViolates("fk_contact_request_zone", () -> insert(1, null, null, "Bar", -5L, "APERTA", null));
         }
     }
 

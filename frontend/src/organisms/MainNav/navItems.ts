@@ -7,6 +7,7 @@ import {
   ListTree,
   Mail,
   Megaphone,
+  PhoneOutgoing,
   UserCog,
   Users,
   type LucideIcon,
@@ -26,7 +27,9 @@ export type NavItem = {
     | 'nav.documentTemplates'
     | 'nav.messageTexts'
     | 'nav.calendar'
-    | 'nav.coordination';
+    | 'nav.coordination'
+    | 'nav.myContactRequests'
+    | 'nav.contactRequests';
   icon: LucideIcon;
   /** Ruoli abilitati; vuoto = tutti. */
   roles: readonly Role[];
@@ -34,6 +37,8 @@ export type NavItem = {
   coordinatorOnly?: boolean;
   /** Voce del sottomenu «Amministrazione» (decisione del PO, 08/11: il menu dell'ADMIN non ci stava). */
   admin?: boolean;
+  /** Numero accanto alla voce: le richieste di contatto da prendere in carico (US-507). */
+  count?: 'openContactRequests';
 };
 
 export const NAV_ITEMS: readonly NavItem[] = [
@@ -43,6 +48,15 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { to: '/beneficiari/tutti', labelKey: 'nav.beneficiaries', icon: Users, roles: ['ADMIN'] },
   // il Tutor vede l'elenco in sola lettura (US-511)
   { to: '/aziende', labelKey: 'nav.companies', icon: Building2, roles: ['TUTOR', 'CALL_CENTER', 'ADMIN'] },
+  // richieste di contatto di un'azienda (US-507); per l'ADMIN nel sottomenu, la riga è piena
+  { to: '/richieste', labelKey: 'nav.myContactRequests', icon: PhoneOutgoing, roles: ['TUTOR'] },
+  {
+    to: '/richieste-contatto',
+    labelKey: 'nav.contactRequests',
+    icon: PhoneOutgoing,
+    roles: ['CALL_CENTER'],
+    count: 'openContactRequests',
+  },
   {
     to: '/coordinamento',
     labelKey: 'nav.coordination',
@@ -51,6 +65,14 @@ export const NAV_ITEMS: readonly NavItem[] = [
     coordinatorOnly: true,
   },
   { to: '/bacheca', labelKey: 'nav.board', icon: Megaphone, roles: [] },
+  {
+    to: '/richieste-contatto',
+    labelKey: 'nav.contactRequests',
+    icon: PhoneOutgoing,
+    roles: ['ADMIN'],
+    admin: true,
+    count: 'openContactRequests',
+  },
   { to: '/utenti', labelKey: 'nav.users', icon: UserCog, roles: ['ADMIN'], admin: true },
   { to: '/cataloghi', labelKey: 'nav.catalogs', icon: ListTree, roles: ['ADMIN'], admin: true },
   { to: '/modelli', labelKey: 'nav.documentTemplates', icon: FileText, roles: ['ADMIN'], admin: true },
