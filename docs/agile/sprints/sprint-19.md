@@ -12,7 +12,7 @@
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-507 | Richiesta di contatto di un'azienda dal Tutor | 5 | ✅ Ready | — | — |
+| US-507 | Richiesta di contatto di un'azienda dal Tutor | 5 | 🔨 In corso | `add-company-contact-requests` | — |
 | US-512 | Tentativi di contatto ed esito della richiesta | 5 | ✅ Ready | — | — |
 | US-1311 | Avvisi affidabili su sito e backup | 3 | ✅ Ready | — | — |
 

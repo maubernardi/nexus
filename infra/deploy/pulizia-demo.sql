@@ -20,9 +20,9 @@ ALTER TABLE company_note DISABLE TRIGGER USER;
 ALTER TABLE closure_report DISABLE TRIGGER USER;
 
 -- Segnalazioni (con bacheca, schede del tirocinio, report, storico, notifiche), beneficiari, utenti e aziende della
--- demo (con referenti, diario, storico e mansioni). TRUNCATE senza CASCADE: se una tabella che punta a queste mancasse
+-- demo (con referenti, diario, storico e mansioni), e le richieste di contatto (US-507). TRUNCATE senza CASCADE: se una tabella che punta a queste mancasse
 -- dall'elenco, PostgreSQL si fermerebbe invece di svuotarla di nascosto.
-TRUNCATE closure_report, internship_training_project, internship_extension, internship_schedule_day,
+TRUNCATE contact_request, closure_report, internship_training_project, internship_extension, internship_schedule_day,
     internship_suspension, internship_company_tutor, internship, notification, ticket_status_history,
     ticket_company_blacklist, company_audit_event, board_post, ticket, job_slot, company_contact, company_note,
     company_legal_representative, company_ateco_code, legacy_call, company, beneficiary_language, beneficiary,
@@ -33,7 +33,7 @@ DELETE FROM stored_file f WHERE NOT EXISTS (SELECT 1 FROM document_template t WH
 
 -- audit: via la storia di quello che si è tolto; resta quella della configurazione (PO, 20/11)
 DELETE FROM audit_event
-WHERE entity_type IN ('TICKET', 'BENEFICIARY', 'APP_USER', 'COMPANY', 'JOB_SLOT', 'BOARD_POST');
+WHERE entity_type IN ('TICKET', 'BENEFICIARY', 'APP_USER', 'COMPANY', 'JOB_SLOT', 'BOARD_POST', 'CONTACT_REQUEST');
 
 -- Flyway: via gli script dimostrativi (R__seed_*), che in produzione non ci sono; con le loro righe nella cronologia
 -- il backend senza il profilo seed non partirebbe
@@ -51,14 +51,16 @@ DECLARE
     n bigint;
 BEGIN
     FOREACH t IN ARRAY ARRAY['ticket', 'board_post', 'internship', 'closure_report', 'notification', 'beneficiary',
-            'app_user', 'company', 'job_slot', 'company_contact', 'company_note', 'company_audit_event'] LOOP
+            'app_user', 'company', 'job_slot', 'company_contact', 'company_note', 'company_audit_event',
+            'contact_request'] LOOP
         EXECUTE format('SELECT count(*) FROM nexus.%I', t) INTO n;
         IF n <> 0 THEN
             RAISE EXCEPTION 'pulizia incompleta: % righe in %', n, t;
         END IF;
     END LOOP;
     IF EXISTS (SELECT 1 FROM nexus.audit_event
-               WHERE entity_type IN ('TICKET', 'BENEFICIARY', 'APP_USER', 'COMPANY', 'JOB_SLOT', 'BOARD_POST')) THEN
+               WHERE entity_type IN ('TICKET', 'BENEFICIARY', 'APP_USER', 'COMPANY', 'JOB_SLOT', 'BOARD_POST',
+                                     'CONTACT_REQUEST')) THEN
         RAISE EXCEPTION 'pulizia incompleta: audit di oggetti tolti';
     END IF;
     IF EXISTS (SELECT 1 FROM nexus.flyway_schema_history WHERE script LIKE 'R\_\_%') THEN

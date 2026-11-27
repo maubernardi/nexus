@@ -180,6 +180,17 @@ export const fetchCompanyDirectoryItem = async (id: string): Promise<CompanyDire
   return data;
 };
 
+/** Aziende attive con un nome simile a quello scritto (US-507), al massimo 5, con i dati essenziali. */
+export const fetchSimilarCompanies = async (name: string): Promise<CompanyDirectoryItem[]> => {
+  const { data } = await axiosInstance.get<CompanyDirectoryItem[]>(
+    `${ENDPOINTS.companies}/directory/similar`,
+    {
+      params: { name },
+    },
+  );
+  return data;
+};
+
 /** Valutazione di un tirocinio nella scheda dell'azienda (US-1104); la nota è assente se il Tutor non l'ha scritta. */
 export type CompanyReview = {
   /** Data di fine del tirocinio, ISO. */

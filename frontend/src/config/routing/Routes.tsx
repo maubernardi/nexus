@@ -23,6 +23,9 @@ import { UserAccessLogPage } from '@/pages/UserAccessLogPage/UserAccessLogPage';
 import { CalendarPage } from '@/pages/CalendarPage/CalendarPage';
 import { CompaniesRoute, CompanyRoute } from '@/config/routing/CompaniesRoute';
 import { CompanyNewPage } from '@/pages/CompanyNewPage/CompanyNewPage';
+import { ContactRequestNewPage } from '@/pages/ContactRequestNewPage/ContactRequestNewPage';
+import { ContactRequestsPage } from '@/pages/ContactRequestsPage/ContactRequestsPage';
+import { MyContactRequestsPage } from '@/pages/MyContactRequestsPage/MyContactRequestsPage';
 import { NotificationsPage } from '@/pages/NotificationsPage/NotificationsPage';
 import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
 import { UserAccountPage } from '@/pages/UserAccountPage/UserAccountPage';
@@ -144,6 +147,34 @@ export const routes: RouteObject[] = [
         // Call Center e ADMIN: scheda modificabile; Tutor: in sola lettura, con le valutazioni (US-1104)
         element: <CompanyRoute />,
         handle: { titleKey: 'pages.companyEdit.title' } satisfies RouteHandle,
+      },
+      {
+        // richieste di contatto di un'azienda (US-507): il Tutor le invia, il Call Center le prende in carico
+        path: 'richieste',
+        element: (
+          <RoleRoute roles={['TUTOR']}>
+            <MyContactRequestsPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.myContactRequests.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'richieste/nuova',
+        element: (
+          <RoleRoute roles={['TUTOR']}>
+            <ContactRequestNewPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.contactRequestNew.title' } satisfies RouteHandle,
+      },
+      {
+        path: 'richieste-contatto',
+        element: (
+          <RoleRoute roles={['CALL_CENTER', 'ADMIN']}>
+            <ContactRequestsPage />
+          </RoleRoute>
+        ),
+        handle: { titleKey: 'pages.contactRequests.title' } satisfies RouteHandle,
       },
       {
         path: 'bacheca',

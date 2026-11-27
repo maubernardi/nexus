@@ -23,5 +23,7 @@ public enum AuditEntityType {
     BUSINESS_CATEGORY,
     CONTACT_ROLE,
     /** Testi dei messaggi cambiati dall'ADMIN (US-1204). */
-    MESSAGE_TEXT
+    MESSAGE_TEXT,
+    /** Richieste di contatto di un'azienda (US-507). */
+    CONTACT_REQUEST
 }

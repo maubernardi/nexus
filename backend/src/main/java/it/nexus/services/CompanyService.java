@@ -41,6 +41,15 @@ public interface CompanyService {
      */
     CompanyDirectoryItemDTO directoryItem(String id);
 
+    /**
+     * Aziende attive con un nome simile a quello scritto (US-507), al massimo {@link #SIMILAR_MAX}, con i soli dati
+     * dell'elenco del Tutor; nessuna se il nome è più corto di 3 caratteri.
+     */
+    List<CompanyDirectoryItemDTO> similar(String name);
+
+    /** Quante aziende simili al massimo (US-507). */
+    int SIMILAR_MAX = 5;
+
     CompanyDTO getById(String id);
 
     CompanyDTO create(CompanyFormDTO dto);

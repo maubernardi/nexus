@@ -1,6 +1,7 @@
 package it.nexus.web.rest.resource;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -70,6 +71,13 @@ public class CompanyResource {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "" + CompanyService.DEFAULT_PAGE_SIZE) int size) {
         return ResponseEntity.ok(companyService.directory(search, businessCategoryId, zoneId, page, size));
+    }
+
+    @GetMapping("/directory/similar")
+    @PreAuthorize("hasAnyRole(@requestsAuthorizer.TUTOR, @requestsAuthorizer.ADMIN)")
+    @Operation(summary = "Aziende attive con un nome simile, al massimo 5, con i dati essenziali (US-507)")
+    public ResponseEntity<List<CompanyDirectoryItemDTO>> similar(@RequestParam String name) {
+        return ResponseEntity.ok(companyService.similar(name));
     }
 
     @GetMapping("/directory/{id}")

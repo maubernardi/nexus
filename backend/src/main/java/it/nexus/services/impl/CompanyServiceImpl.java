@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import it.nexus.domain.AbstractReferenceEntity;
 import it.nexus.domain.BusinessCategory;
 import it.nexus.domain.Company;
+import it.nexus.domain.CompanyPlaceholders;
 import it.nexus.domain.CompanyContact;
 import it.nexus.domain.ContactRole;
 import it.nexus.domain.JobSlot;
@@ -126,6 +127,18 @@ public class CompanyServiceImpl implements CompanyService {
             throw new NotFoundException("Azienda non trovata");
         }
         return withReviews(company, companyReviewService.summaries(List.of(company.getId())));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CompanyDirectoryItemDTO> similar(String name) {
+        String term = name == null ? "" : name.strip();
+        if (term.length() < 3) {
+            return List.of();
+        }
+        return repository.findSimilarActive(term, CompanyPlaceholders.NAME_PREFIX + "%", SIMILAR_MAX).stream()
+                .map(mapper::toDirectoryItem)
+                .toList();
     }
 
     /** Elemento dell'elenco del Tutor con la media delle valutazioni dei tirocini (US-1104), se ce ne sono. */

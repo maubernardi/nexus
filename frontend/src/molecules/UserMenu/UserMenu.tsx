@@ -23,7 +23,8 @@ export const UserMenu = ({ user }: UserMenuProps) => {
 
   return (
     <div className="flex shrink-0 items-center gap-3">
-      <UserIdentity user={user} linkToProfile className="hidden lg:flex" />
+      {/* come il menu (MainNav): sotto i 1280 px nome e ruolo stanno nel menu a tendina */}
+      <UserIdentity user={user} linkToProfile className="hidden xl:flex" />
       <Button variant="brand" size="sm" onClick={() => void handleLogout()}>
         <LogOut aria-hidden="true" />
         {t('user.logout')}

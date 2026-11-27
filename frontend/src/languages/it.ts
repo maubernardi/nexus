@@ -23,6 +23,12 @@ export const it = {
     users: 'Utenti',
     coordination: 'Coordinamento',
     admin: 'Amministrazione',
+    /** Richieste di contatto di un'azienda (US-507). */
+    /** Il Tutor ha già molte voci: «Richieste»; la pagina si chiama «Le mie richieste». */
+    myContactRequests: 'Richieste',
+    contactRequests: 'Richieste di contatto',
+    openContactRequests_one: '(1 da prendere in carico)',
+    openContactRequests_other: '({{count}} da prendere in carico)',
   },
   common: {
     loading: 'Caricamento in corso…',
@@ -867,6 +873,73 @@ export const it = {
     added: 'Nota aggiunta.',
     empty: 'Nessuna nota.',
     listLabel: 'Note dalla più recente',
+  },
+  /** Richieste di contatto di un'azienda dal Tutor al Call Center (US-507). */
+  contactRequest: {
+    status: { APERTA: 'Aperta', IN_CARICO: 'In carico', CHIUSA: 'Chiusa' },
+    columns: {
+      number: 'N.',
+      date: 'Inviata il',
+      tutor: 'Tutor',
+      company: 'Azienda',
+      zone: 'Zona',
+      category: 'Categoria',
+      status: 'Stato',
+      operator: 'Operatore',
+      actions: 'Azioni',
+    },
+    newCompany: 'nuova',
+    newCompanyLabel: 'Azienda nuova, non ancora in NEXUS',
+    none: '—',
+    myCaption: 'Le tue richieste di contatto, dalla più recente',
+    queueCaption: 'Richieste di contatto aperte e in carico, dalla più vecchia',
+    myEmpty: 'Non hai ancora chiesto di contattare un’azienda.',
+    queueEmpty: 'Nessuna richiesta di contatto da seguire.',
+    loadError: 'Impossibile caricare le richieste di contatto. Controlla la connessione e riprova.',
+    count_one: '1 richiesta',
+    count_other: '{{count}} richieste',
+    openCount_zero: 'nessuna da prendere in carico',
+    openCount_one: '1 da prendere in carico',
+    openCount_other: '{{count}} da prendere in carico',
+    newRequest: 'Chiedi di contattare un’azienda nuova',
+    askCompany: 'Chiedi di contattarla',
+    asking: 'Invio in corso…',
+    askError: 'La richiesta non è stata inviata. Controlla la connessione e riprova.',
+    sent: 'Richiesta di contatto n. {{number}} inviata: il Call Center la prenderà in carico.',
+    take: 'Prendi in carico',
+    takeTarget: 'la richiesta di contatto n. {{number}}',
+    taken: 'Hai preso in carico la richiesta di contatto n. {{number}}.',
+    takeError:
+      'La richiesta di contatto n. {{number}} non è stata presa in carico. Controlla la connessione e riprova.',
+    fields: {
+      companyName: 'Nome dell’azienda',
+      zoneId: 'Zona',
+      businessCategoryId: 'Categoria merceologica',
+    },
+    hints: {
+      companyName: 'Come la conosci: per esempio «Pizzeria da Mario».',
+      zoneId: 'La zona dove si trova l’azienda.',
+      businessCategoryId: 'Facoltativa.',
+    },
+    chooseZone: 'Scegli la zona',
+    noCategory: 'Nessuna',
+    errors: {
+      companyName: 'Scrivi il nome dell’azienda',
+      zoneId: 'Scegli la zona',
+    },
+    submit: 'Invia la richiesta',
+    checking: 'Controllo dei nomi simili…',
+    similar: {
+      heading: 'Aziende con un nome simile',
+      intro_one:
+        'In NEXUS c’è già un’azienda con un nome simile a «{{name}}». Se è quella, chiedi di contattare lei; altrimenti conferma che l’azienda è nuova.',
+      intro_other:
+        'In NEXUS ci sono già {{count}} aziende con un nome simile a «{{name}}». Se è una di queste, chiedi di contattare lei; altrimenti conferma che l’azienda è nuova.',
+      askThis: 'Chiedi di contattare questa',
+      askThisTarget: '{{name}}',
+      confirmNew: 'No, è un’azienda nuova: invia la richiesta',
+      back: 'Correggi il nome',
+    },
   },
   /** Aziende per il Tutor (US-511): elenco in sola lettura con i dati essenziali. */
   companyDirectory: {
@@ -2351,6 +2424,24 @@ export const it = {
       description:
         'Hai effettuato l’accesso, ma il tuo account non è abilitato a NEXUS oppure è stato disattivato.',
       action: 'Per essere abilitato contatta l’amministratore di NEXUS della cooperativa.',
+    },
+    myContactRequests: {
+      title: 'Le mie richieste',
+      heading: 'Le mie richieste',
+      intro:
+        'Le aziende che hai chiesto al Call Center di contattare, dalla più recente. Per un’azienda già in NEXUS usa «Chiedi di contattarla» nella sua scheda.',
+    },
+    contactRequestNew: {
+      title: 'Richiesta di contatto',
+      heading: 'Chiedi di contattare un’azienda nuova',
+      intro:
+        'Per un’azienda che non è ancora in NEXUS. Prima dell’invio ti mostriamo le aziende con un nome simile, per evitare doppioni.',
+    },
+    contactRequests: {
+      title: 'Richieste di contatto',
+      heading: 'Richieste di contatto',
+      intro:
+        'Le aziende che i Tutor chiedono di contattare, dalla richiesta più vecchia. Un operatore qualsiasi la prende in carico.',
     },
     companies: {
       title: 'Aziende',

@@ -1744,3 +1744,43 @@ passandoci sopra con il mouse compare «Nave scuola».
      restano su una riga.
   > Nota (26/11): T-39.6 e T-39.7 riuscite dal PO sul suo PC, con il collaudo della PR #216 (`8c610e8`). Unita con la
   > #216 (`119cb88`) e in produzione con il deploy del 26/11 sera.
+
+## 40. Richiesta di contatto di un'azienda dal Tutor (Sprint 19)
+
+Sul collaudo del PC, prima del merge (http://localhost:8090, password `collaudo-nexus-2026`). Nei dati finti `tutor1`
+ha già due richieste: una aperta, per l'azienda nuova «Officina Meccanica Demo del Ponte», e una in carico a
+`operatore.cc`, per «Demo Logistica S.r.l.».
+
+- [ ] **T-40.1 Le richieste per il Call Center (US-507)**
+  1. Entra come `operatore.cc`. **Atteso:** nel menu la voce «Richieste di contatto» con il numero 1.
+  2. Aprila. **Atteso:** le due richieste, dalla più vecchia. Per ognuna ci sono il Tutor (Tutor Uno), la zona, lo stato
+     e l'operatore. «Demo Logistica S.r.l.» apre la scheda dell'azienda; l'officina ha l'etichetta «nuova».
+  3. Premi «Prendi in carico» sull'officina. **Atteso:** «Hai preso in carico la richiesta di contatto n. …»; la
+     richiesta mostra il tuo nome e il numero nel menu sparisce.
+
+- [ ] **T-40.2 Richiesta per un'azienda già presente (US-507)**
+  1. Esci ed entra come `tutor2`; apri «Aziende» e la scheda di «Demo Ristorazione S.n.c.». **Atteso:** il pulsante
+     «Chiedi di contattarla».
+  2. Premilo. **Atteso:** si apre «Le mie richieste» con «Richiesta di contatto n. … inviata: il Call Center la
+     prenderà in carico.» e la richiesta aperta, con il nome che apre la scheda dell'azienda.
+  3. Come `tutor1`, apri «Richieste» nel menu. **Atteso:** la pagina «Le mie richieste» con le sue due richieste,
+     l'officina in carico all'operatore; non quella di `tutor2`.
+
+- [ ] **T-40.3 Richiesta per un'azienda nuova, con i nomi simili (US-507)**
+  1. Come `tutor2`, in «Richieste» premi «Chiedi di contattare un'azienda nuova» e poi «Invia la richiesta»
+     senza scrivere niente. **Atteso:** il riepilogo indica il nome e la zona; la categoria è facoltativa.
+  2. Scrivi «Demo Ristorazioni», scegli una zona e invia. **Atteso:** prima dell'invio compare «Aziende con un nome
+     simile», con «Demo Ristorazione S.n.c.» e il suo bollino della nave scuola. Puoi aprirne la scheda, chiedere di
+     contattare quella o confermare che l'azienda è nuova.
+  3. Premi «Correggi il nome», scrivi un nome che non somiglia a nessuno, per esempio «Ferramenta Lunghi e Figli», e
+     invia. **Atteso:** la richiesta parte subito e compare in «Le mie richieste» con l'etichetta «nuova».
+  4. Come `operatore.cc`, apri «Richieste di contatto». **Atteso:** in fondo all'elenco le due richieste di `tutor2`,
+     ancora aperte; nel menu il numero 2.
+
+- [ ] **T-40.4 Menu, smartphone e tema scuro (US-507)**
+  1. Come `admin`, apri «Amministrazione» nel menu. **Atteso:** in testa «Richieste di contatto», con il numero di
+     quelle da prendere in carico; la riga del menu era piena.
+  2. Con la finestra larga meno di 1280 pixel. **Atteso:** il menu è il pulsante ☰, con le voci, nome e ruolo dentro;
+     prima, tra 1024 e 1279 pixel, le voci dell'ADMIN finivano sotto la campanella.
+  3. Prova le due pagine delle richieste con la finestra stretta come uno smartphone e con il tema scuro (🌙).
+     **Atteso:** tutto leggibile; la tabella scorre di lato e i nomi delle aziende restano su una riga.

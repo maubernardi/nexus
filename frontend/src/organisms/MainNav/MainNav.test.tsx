@@ -1,10 +1,16 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+import { fetchOpenContactRequestCount } from '@/config/api/contactRequestApi';
 
 import { MainNav } from '@/organisms/MainNav/MainNav';
 import { expectNoAxeViolations } from '@/tests/axe';
 import { renderWithProviders } from '@/tests/renderWithProviders';
+
+vi.mock('@/config/api/contactRequestApi', () => ({
+  fetchOpenContactRequestCount: vi.fn().mockResolvedValue(2),
+}));
 
 describe('<MainNav>', () => {
   it('espone un landmark nav etichettato con la pagina corrente marcata', async () => {
@@ -52,7 +58,7 @@ describe('<MainNav>', () => {
     await expectNoAxeViolations();
   });
 
-  it('ADMIN: Utenti, Cataloghi, Modelli e Calendario nel sottomenu «Amministrazione», che si chiude con Esc', async () => {
+  it('ADMIN: richieste di contatto, Utenti, Cataloghi, Modelli e Calendario nel sottomenu «Amministrazione», che si chiude con Esc', async () => {
     renderWithProviders(<MainNav roles={['ADMIN']} />);
     const user = userEvent.setup();
     const toggle = screen.getByRole('button', { name: 'Amministrazione' });
@@ -63,11 +69,12 @@ describe('<MainNav>', () => {
     await user.click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
     const submenu = document.getElementById(toggle.getAttribute('aria-controls') ?? '') as HTMLElement;
+    // le richieste di contatto in testa (US-507): nella riga del menu non c'è più spazio
     expect(
       within(submenu)
         .getAllByRole('link')
-        .map((l) => l.textContent),
-    ).toEqual(['Utenti', 'Cataloghi', 'Modelli dei documenti', 'Testi dei messaggi', 'Calendario']);
+        .map((l) => l.getAttribute('href')),
+    ).toEqual(['/richieste-contatto', '/utenti', '/cataloghi', '/modelli', '/testi', '/calendario']);
     await expectNoAxeViolations();
 
     await user.keyboard('{Escape}');
@@ -78,5 +85,32 @@ describe('<MainNav>', () => {
   it('il Tutor non ha il sottomenu', () => {
     renderWithProviders(<MainNav roles={['TUTOR']} />);
     expect(screen.queryByRole('button', { name: 'Amministrazione' })).not.toBeInTheDocument();
+  });
+
+  it('richieste di contatto: «Richieste» per il Tutor, per il Call Center la voce con il numero (US-507)', async () => {
+    const { unmount } = renderWithProviders(<MainNav roles={['TUTOR']} />);
+    expect(screen.getByRole('link', { name: 'Richieste' })).toHaveAttribute('href', '/richieste');
+    expect(fetchOpenContactRequestCount).not.toHaveBeenCalled();
+    unmount();
+
+    renderWithProviders(<MainNav roles={['CALL_CENTER']} />);
+    const link = await screen.findByRole('link', { name: 'Richieste di contatto (2 da prendere in carico)' });
+    expect(link).toHaveAttribute('href', '/richieste-contatto');
+    expect(screen.queryByRole('link', { name: 'Richieste' })).not.toBeInTheDocument();
+    await expectNoAxeViolations();
+  });
+
+  it('per l’ADMIN le richieste di contatto stanno nel sottomenu «Amministrazione», con il numero', async () => {
+    renderWithProviders(<MainNav roles={['ADMIN']} />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Amministrazione' }));
+    const submenu = document.getElementById(
+      screen.getByRole('button', { name: 'Amministrazione' }).getAttribute('aria-controls') ?? '',
+    );
+    expect(
+      await within(submenu as HTMLElement).findByRole('link', {
+        name: 'Richieste di contatto (2 da prendere in carico)',
+      }),
+    ).toHaveAttribute('href', '/richieste-contatto');
   });
 });
