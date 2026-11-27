@@ -1,7 +1,7 @@
 # Sprint 19 — 27 – 29 novembre 2026
 
-**Stato:** 🔨 in corso dal 27/11. In produzione dal 27/11, a `6aa35c3`: US-507 (5 punti su 10). US-1311 tolta dallo
-sprint e rimessa nel backlog (PO, 27/11).
+**Stato:** ✅ impegno completo il 27/11 (10 punti su 10), in produzione a `16789ed`: US-507 e US-512. US-1311 tolta
+dallo sprint e rimessa nel backlog (PO, 27/11). Review alla fine dello sprint.
 **Planning:** 27/11, dalla [review dello Sprint 18](sprint-18-review.md) (§8, §9).
 
 ## Obiettivo
@@ -14,7 +14,7 @@ sprint e rimessa nel backlog (PO, 27/11).
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
 | US-507 | Richiesta di contatto di un'azienda dal Tutor | 5 | 🎉 Done | `add-company-contact-requests` (archiviata) | [#219](https://github.com/maubernardi/nexus/pull/219) |
-| US-512 | Tentativi di contatto ed esito della richiesta | 5 | 🔨 In corso | `add-contact-attempts-and-outcome` | [#221](https://github.com/maubernardi/nexus/pull/221) |
+| US-512 | Tentativi di contatto ed esito della richiesta | 5 | 🎉 Done | `add-contact-attempts-and-outcome` (archiviata) | [#221](https://github.com/maubernardi/nexus/pull/221) |
 
 **Ordine** (proposta della review, §9):
 1. **US-507, poi US-512**: la seconda usa le richieste della prima.
@@ -41,7 +41,7 @@ Sotto la media (23,2), per lasciare spazio a quello che arriverà dall'uso.
 
 ## Per il PO
 
-- [ ] Collaudo di ogni storia sul PC prima del merge.
+- [x] Collaudo di ogni storia sul PC prima del merge.
 
 ## Burndown
 
@@ -50,3 +50,4 @@ Sotto la media (23,2), per lasciare spazio a quello che arriverà dall'uso.
 | Inizio (27/11) | 13 |
 | US-507 Done: collaudo T-40.1 … T-40.4 sul PC e deploy `6aa35c3` (27/11) | 8 |
 | US-1311 tolta dallo sprint e rimessa nel backlog (PO, 27/11) | 5 |
+| US-512 Done: collaudo T-41.1 … T-41.4 sul PC e deploy `16789ed` (27/11) | 0 |

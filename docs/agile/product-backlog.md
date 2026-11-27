@@ -112,7 +112,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-509](#us-509) | E5 | Categoria merceologica e attività dell'azienda | Must | 3 | R4 | 🎉 Done (Sprint 15) |
 | [US-510](#us-510) | E5 | Referenti e recapiti dell'azienda | Must | 5 | R4 | 🎉 Done (Sprint 15) |
 | [US-511](#us-511) | E5 | Zona dell'azienda e aziende per il Tutor | Must | 5 | R4 | 🎉 Done (Sprint 18) |
-| [US-512](#us-512) | E5 | Tentativi di contatto ed esito della richiesta | Should | 5 | — | 🔨 In corso (Sprint 19) |
+| [US-512](#us-512) | E5 | Tentativi di contatto ed esito della richiesta | Should | 5 | — | 🎉 Done (Sprint 19) |
 | [US-513](#us-513) | E5 | Elenco delle aziende a pagine | Must | 3 | R4 | 🎉 Done (Sprint 17) |
 | [US-514](#us-514) | E5 | Affidabilità e interesse al progetto dell'azienda | Must | 5 | R4 | 🎉 Done (Sprint 18) |
 | [US-515](#us-515) | E5 | Azienda «nave scuola» | Must | 5 | R4 | 🎉 Done (Sprint 18) |
@@ -841,7 +841,7 @@ Criteri di accettazione:
 Dipendenze: US-106, US-509, US-1007, US-514
 
 #### US-512
-**Tentativi di contatto ed esito della richiesta** · Should · 5 punti · release da decidere · 🔨 In corso (Sprint 19)
+**Tentativi di contatto ed esito della richiesta** · Should · 5 punti · release da decidere · 🎉 Done (Sprint 19)
 
 Come **Call Center** voglio registrare ogni tentativo di contatto con l'azienda e chiudere la richiesta con l'esito,
 così che il Tutor sappia com'è andata (analisi con il PO, 23/11).
