@@ -9,8 +9,8 @@ Il documento si aggiorna a ogni storia consegnata: le prove nuove sono segnate c
 | | |
 |---|---|
 | **Ambiente** | dal 24/11: le storie nuove sul **PC del PO**, prima del merge (`infra/collaudo/collaudo.sh`, EN-11); dopo il deploy, un controllo veloce in produzione su https://portalenexus.it, senza dati finti. Fino al 24/11: la demo su https://portalenexus.it |
-| **Versione in produzione** | `6aa35c3` (27/11/2026), su **PostgreSQL 19**, con i dati veri dal passaggio del 24/11 (US-1306): Sprint 1–18; dello Sprint 19 la richiesta di contatto di un'azienda dal Tutor (US-507, V56). Dello Sprint 18, affidabilità e interesse al progetto delle aziende (US-514, V52), tema a scelta con l'intestazione fissa delle schede (US-1312), zona dell'azienda e aziende per il Tutor (US-511, V53), valutazione dell'azienda alla fine del tirocinio (US-1104, V54), azienda «nave scuola» e ragione sociale in evidenza negli elenchi (US-515, V55). Prima, dal 26/11 notte, `119cb88`; dal 26/11 sera, `5095004`; dal 26/11 pomeriggio, `3a64364`; dal 26/11 mattina, `1603fcc`; dal 24/11, `8139e84` |
-| **Ultimo aggiornamento** | 27/11/2026 (T-40.1 … T-40.4: richiesta di contatto di un'azienda dal Tutor, riuscite sul collaudo prima del merge; deploy `6aa35c3`); 26/11/2026 (T-39.1 … T-39.7: azienda «nave scuola», bollino ben visibile e ragione sociale in evidenza negli elenchi, riuscite sul collaudo prima del merge; deploy `119cb88`; T-38.1 … T-38.4: valutazione dell'azienda alla fine del tirocinio, riuscite sul collaudo prima del merge; deploy `5095004`; T-37.1 … T-37.4: zona dell'azienda, aziende per il Tutor e «Azzera i filtri», riuscite sul collaudo prima del merge; deploy `3a64364`; T-35.6 riuscita in produzione dopo il deploy `1603fcc`; T-36.1 … T-36.3: tema a scelta e intestazione fissa delle schede, riuscite sul collaudo del PC prima del merge; T-35.1 … T-35.5: affidabilità e interesse al progetto delle aziende, riuscite sul collaudo del PC prima del merge; T-35.6 in produzione dopo il deploy); 25/11/2026 (T-27.3 riuscita: backup della notte dopo il passaggio, US-1306 chiusa); 24/11/2026 (T-34.1 … T-34.4: correzione dei dati di un utente, riuscite sul collaudo del PC prima del merge; T-34.5 riuscita in produzione dopo il deploy `8139e84`; T-33.1 … T-33.3 riuscite il 24/11); 23/11/2026 (collaudo prima del passaggio finito dal PO il 23/11: T-24, T-25, T-28, T-29 e T-30.1 … T-30.3 riusciti; restano T-30.4, il backup della notte sulla 19, e dopo il passaggio T-26.3 e T-27; T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, fatto il 23/11 sulla demo `47fe414`; T-30.3 corretta: le aziende si provano come `operatore.cc`; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
+| **Versione in produzione** | `16789ed` (27/11/2026), su **PostgreSQL 19**, con i dati veri dal passaggio del 24/11 (US-1306): Sprint 1–18; dello Sprint 19 la richiesta di contatto di un'azienda dal Tutor (US-507, V56) e i tentativi di contatto con l'esito (US-512, V57). Dello Sprint 18, affidabilità e interesse al progetto delle aziende (US-514, V52), tema a scelta con l'intestazione fissa delle schede (US-1312), zona dell'azienda e aziende per il Tutor (US-511, V53), valutazione dell'azienda alla fine del tirocinio (US-1104, V54), azienda «nave scuola» e ragione sociale in evidenza negli elenchi (US-515, V55). Prima, dal 27/11 pomeriggio, `6aa35c3`; dal 26/11 notte, `119cb88`; dal 26/11 sera, `5095004`; dal 26/11 pomeriggio, `3a64364`; dal 26/11 mattina, `1603fcc`; dal 24/11, `8139e84` |
+| **Ultimo aggiornamento** | 27/11/2026 (T-41.1 … T-41.4: tentativi di contatto ed esito della richiesta, riuscite sul collaudo prima del merge; deploy `16789ed`; T-40.1 … T-40.4: richiesta di contatto di un'azienda dal Tutor, riuscite sul collaudo prima del merge; deploy `6aa35c3`); 26/11/2026 (T-39.1 … T-39.7: azienda «nave scuola», bollino ben visibile e ragione sociale in evidenza negli elenchi, riuscite sul collaudo prima del merge; deploy `119cb88`; T-38.1 … T-38.4: valutazione dell'azienda alla fine del tirocinio, riuscite sul collaudo prima del merge; deploy `5095004`; T-37.1 … T-37.4: zona dell'azienda, aziende per il Tutor e «Azzera i filtri», riuscite sul collaudo prima del merge; deploy `3a64364`; T-35.6 riuscita in produzione dopo il deploy `1603fcc`; T-36.1 … T-36.3: tema a scelta e intestazione fissa delle schede, riuscite sul collaudo del PC prima del merge; T-35.1 … T-35.5: affidabilità e interesse al progetto delle aziende, riuscite sul collaudo del PC prima del merge; T-35.6 in produzione dopo il deploy); 25/11/2026 (T-27.3 riuscita: backup della notte dopo il passaggio, US-1306 chiusa); 24/11/2026 (T-34.1 … T-34.4: correzione dei dati di un utente, riuscite sul collaudo del PC prima del merge; T-34.5 riuscita in produzione dopo il deploy `8139e84`; T-33.1 … T-33.3 riuscite il 24/11); 23/11/2026 (collaudo prima del passaggio finito dal PO il 23/11: T-24, T-25, T-28, T-29 e T-30.1 … T-30.3 riusciti; restano T-30.4, il backup della notte sulla 19, e dopo il passaggio T-26.3 e T-27; T-30.1 … T-30.4: aggiornamento a PostgreSQL 19, fatto il 23/11 sulla demo `47fe414`; T-30.3 corretta: le aziende si provano come `operatore.cc`; T-29.1 … T-29.3: testi dei messaggi, sulla demo `e8223da`; T-28.1 … T-28.3: avvisi di fine tirocinio; T-27.1 … T-27.3: dopo il passaggio in produzione; T-26.1 e T-26.2: backup e ripristino fatti insieme il 21/11, da spuntare; T-26.3: il controllo delle 9 del 22/11; T-25.1 … T-25.3 e T-25.5 da provare sulla demo; T-25.4 in locale, sul PC del PO; T-24.1 … T-24.6, T-23.1 … T-23.4 e T-22.1 … T-22.4 da provare) |
 
 > **Dopo il passaggio in produzione** (24/11) il sito ha i dati veri e gli utenti demo (`tutor1`, `operatore.cc`, …)
 > non ci sono più: le prove fino alla sezione 32 restano come storico. Le storie nuove si collaudano sul PC del PO, dal
@@ -1794,14 +1794,14 @@ Sul collaudo del PC, prima del merge (http://localhost:8090, password `collaudo-
 http://localhost:8025). Nei dati finti `tutor1` ha due richieste: «Officina Meccanica Demo del Ponte», aperta, e «Bar
 Pasticceria Demo Stella», in carico a `operatore.cc`, con un tentativo «Non raggiungibile» di ieri.
 
-- [ ] **T-41.1 La pagina della richiesta (US-512)**
+- [x] **T-41.1 La pagina della richiesta (US-512)**
   1. Entra come `operatore.cc`, apri «Richieste di contatto» e premi il numero del bar. **Atteso:** la pagina «Richiesta
      di contatto n. …» con i dati, il tentativo di ieri con la nota e chi l'ha segnato, e sotto «Nuovo tentativo» e
      «Chiudi la richiesta».
   2. Torna all'elenco e apri l'officina, ancora aperta. **Atteso:** il pulsante «Prendi in carico» e nessun modulo;
      premilo. **Atteso:** «Hai preso in carico la richiesta di contatto n. …».
 
-- [ ] **T-41.2 Tentativi (US-512)**
+- [x] **T-41.2 Tentativi (US-512)**
   1. Nella pagina del bar premi «Segna il tentativo» senza scegliere l'esito. **Atteso:** il riepilogo indica l'esito.
   2. Scegli una data futura. **Atteso:** «La data non può essere futura».
   3. Segna un tentativo di oggi «Disponibile a ospitare tirocini» con una nota. **Atteso:** «Tentativo segnato.» e il
@@ -1809,7 +1809,7 @@ Pasticceria Demo Stella», in carico a `operatore.cc`, con un tentativo «Non ra
   4. Come `admin`, apri la stessa richiesta da «Amministrazione» → «Richieste di contatto». **Atteso:** «In carico a
      Operatore Call Center: …», senza moduli.
 
-- [ ] **T-41.3 Chiusura con l'esito e l'azienda (US-512)**
+- [x] **T-41.3 Chiusura con l'esito e l'azienda (US-512)**
   1. Come `operatore.cc`, in «Aziende» crea l'azienda finta «Bar Pasticceria Demo Stella», con una partita IVA finta.
   2. Torna alla richiesta del bar e premi «Chiudi la richiesta» senza compilare. **Atteso:** il riepilogo indica
      l'esito finale e la nota.
@@ -1819,7 +1819,7 @@ Pasticceria Demo Stella», in carico a `operatore.cc`, con un tentativo «Non ra
   4. Conferma. **Atteso:** «Richiesta chiusa: il Tutor riceve l'avviso con l'esito e la nota.»; la pagina mostra
      «Esito» con la nota e il collegamento all'azienda; la richiesta non è più in «Richieste di contatto».
 
-- [ ] **T-41.4 L'avviso e «Le mie richieste» del Tutor (US-512)**
+- [x] **T-41.4 L'avviso e «Le mie richieste» del Tutor (US-512)**
   1. Esci ed entra come `tutor1`; apri le notifiche. **Atteso:** «Il Call Center ha chiuso la tua richiesta di
      contatto n. …: Disponibile a ospitare tirocini. Nota: …», con «Apri la richiesta di contatto n. …».
   2. Premi il collegamento. **Atteso:** la pagina della richiesta in sola lettura, con l'esito, la nota, l'azienda e
@@ -1829,3 +1829,5 @@ Pasticceria Demo Stella», in carico a `operatore.cc`, con un tentativo «Non ra
      della richiesta di contatto», l'esito, la nota, il collegamento alla richiesta e la firma «Portale Nexus».
   5. Come `admin`, in «Testi dei messaggi» c'è «Esito della richiesta di contatto», con i segnaposto `{numero}`,
      `{esito}` e `{nota}`.
+  > Nota (27/11): T-41.1 … T-41.4 riuscite dal PO sul suo PC, con il collaudo della PR #221 (`f7757f3`). Unita con la
+  > #221 (`ee824c7`) e in produzione con il deploy `16789ed`.
