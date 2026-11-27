@@ -165,7 +165,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | 🎉 Done (Sprint 10) |
 | [US-1309](#us-1309) | E13 | Importazione dal database attuale | Must | 8 | R4 | 🎉 Done (Sprint 15) |
 | [US-1310](#us-1310) | E13 | Sessione attiva finché NEXUS è aperto | Must | 3 | R4 | 🎉 Done (Sprint 17) |
-| [US-1311](#us-1311) | E13 | Avvisi affidabili su sito e backup | Must | 3 | R4 | ✅ Ready |
+| [US-1311](#us-1311) | E13 | Avvisi affidabili su sito e backup | Must | 3 | R4 | 📋 Backlog |
 | [US-1312](#us-1312) | E13 | Tema chiaro o scuro a scelta e intestazione fissa delle schede | Must | 3 | R4 | 🎉 Done (Sprint 18) |
 | [US-1313](#us-1313) | E13 | Azzeramento della pre-produzione | Must | 5 | R4 | 📋 Backlog |
 
@@ -1858,7 +1858,10 @@ Criteri di accettazione:
 Dipendenze: US-1307
 
 #### US-1311
-**Avvisi affidabili su sito e backup** · Must · 3 punti · R4 · ✅ Ready
+**Avvisi affidabili su sito e backup** · Must · 3 punti · R4 · 📋 Backlog
+
+Tolta dallo Sprint 19 e rimessa nel backlog dal PO il 27/11: la riprende quando lo dice lui. È già Ready: i servizi
+sono scelti (UptimeRobot e Healthchecks.io) e restano i criteri qui sotto.
 
 Come **PO** voglio un avviso in pochi minuti se il sito non risponde, e entro le 9 se manca il backup della notte, per
 saperlo prima di chi usa NEXUS. I controlli pianificati di GitHub non bastano: dall'8/11 il controllo del sito parte 2

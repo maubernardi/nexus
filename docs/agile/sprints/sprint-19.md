@@ -1,25 +1,25 @@
 # Sprint 19 — 27 – 29 novembre 2026
 
-**Stato:** 🔨 in corso dal 27/11. In produzione dal 27/11, a `6aa35c3`: US-507 (5 punti su 13).
+**Stato:** 🔨 in corso dal 27/11. In produzione dal 27/11, a `6aa35c3`: US-507 (5 punti su 10). US-1311 tolta dallo
+sprint e rimessa nel backlog (PO, 27/11).
 **Planning:** 27/11, dalla [review dello Sprint 18](sprint-18-review.md) (§8, §9).
 
 ## Obiettivo
 
-> Il Tutor chiede al Call Center di contattare un'azienda e segue la richiesta fino all'esito; gli avvisi su sito e
-> backup arrivano in tempo.
+> Il Tutor chiede al Call Center di contattare un'azienda e segue la richiesta fino all'esito. (Fino al 27/11: «gli
+> avvisi su sito e backup arrivano in tempo», con US-1311, rimessa nel backlog.)
 
-## Impegno (13 punti)
+## Impegno (10 punti)
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
 | US-507 | Richiesta di contatto di un'azienda dal Tutor | 5 | 🎉 Done | `add-company-contact-requests` (archiviata) | [#219](https://github.com/maubernardi/nexus/pull/219) |
-| US-512 | Tentativi di contatto ed esito della richiesta | 5 | ✅ Ready | — | — |
-| US-1311 | Avvisi affidabili su sito e backup | 3 | ✅ Ready | — | — |
+| US-512 | Tentativi di contatto ed esito della richiesta | 5 | 🔨 In corso | `add-contact-attempts-and-outcome` | [#221](https://github.com/maubernardi/nexus/pull/221) |
 
 **Ordine** (proposta della review, §9):
 1. **US-507, poi US-512**: la seconda usa le richieste della prima.
-2. **US-1311**: UptimeRobot per il sito e Healthchecks.io per il backup (PO, 27/11). Gli account li crea il PO; il
-   segnale del backup va solo nel `.env` del server.
+2. ~~**US-1311**~~: tolta dallo sprint e rimessa nel backlog (PO, 27/11): il PO dice quando riprenderla. I servizi
+   scelti restano UptimeRobot per il sito e Healthchecks.io per il backup.
 
 Sotto la media (23,2), per lasciare spazio a quello che arriverà dall'uso.
 
@@ -35,13 +35,12 @@ Sotto la media (23,2), per lasciare spazio a quello che arriverà dall'uso.
 ## Come li faccio
 
 - Ogni storia: una change OpenSpec, una PR verso `main` (A45), il collaudo sul PC del PO prima del merge (EN-11).
-- Prossima migrazione: **V56**, probabilmente una per US-507 e una per US-512.
+- Migrazioni: **V56** (US-507) e **V57** (US-512); la prossima è **V58**.
 - Elementi nuovi negli elenchi provati con testi lunghi come quelli veri, in chiaro e in scuro (A47).
 - Nello sprint, senza punti: la ricerca dei dati che si inseriscono ma non si correggono dall'app (A42).
 
 ## Per il PO
 
-- [ ] Creare gli account di UptimeRobot e Healthchecks.io, quando arriva US-1311.
 - [ ] Collaudo di ogni storia sul PC prima del merge.
 
 ## Burndown
@@ -50,3 +49,4 @@ Sotto la media (23,2), per lasciare spazio a quello che arriverà dall'uso.
 |---|---|
 | Inizio (27/11) | 13 |
 | US-507 Done: collaudo T-40.1 … T-40.4 sul PC e deploy `6aa35c3` (27/11) | 8 |
+| US-1311 tolta dallo sprint e rimessa nel backlog (PO, 27/11) | 5 |
