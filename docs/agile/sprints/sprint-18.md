@@ -1,7 +1,7 @@
 # Sprint 18 — 26 – 28 novembre 2026
 
-**Stato:** ✅ impegno completo il 26/11 (23 punti su 23), in produzione a `119cb88`: US-514, US-1312, US-511, US-1104 e
-US-515. **Review:** [sprint-18-review](sprint-18-review.md) (26/11), velocity 23.
+**Stato:** 🎉 concluso il 26/11: 23 punti su 23 completati (US-514, US-1312, US-511, US-1104, US-515), in produzione a
+`119cb88`. Chiuso dal PO il 27/11 con velocity 23; [review](sprint-18-review.md).
 **Planning:** 25 – 26/11, dalla [review dello Sprint 17](sprint-17-review.md) (§8, §9).
 
 ## Obiettivo

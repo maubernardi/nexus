@@ -192,6 +192,8 @@ da altre.
 *Proposta:* Sprint 18 chiuso con velocity **23**: le cinque storie sono fatte, collaudate e in produzione. Questa PR
 aggiorna il file dello sprint.
 
+> ✅ **Deciso (PO, 27/11):** Sprint 18 chiuso con velocity 23.
+
 ### 8.2 Il servizio degli avvisi (US-1311)
 US-1311 non è Ready finché non scegli il servizio. Riassumo il confronto del 26/11, fatto sulle pagine ufficiali di
 prezzi, condizioni e privacy:
@@ -212,6 +214,8 @@ prezzi, condizioni e privacy:
 *Proposta:* **B**. Se la cooperativa è una non profit, conviene chiedere a Healthchecks.io il piano gratuito per le
 non profit. In tutti e due i casi gli account li crei tu, e gli indirizzi dei segnali vanno solo nel `.env` del server.
 
+> ✅ **Deciso (PO, 27/11):** **B**, UptimeRobot per il sito e Healthchecks.io per il backup. US-1311 è ✅ Ready.
+
 ### 8.3 Azzeramento della pre-produzione
 Hai deciso che portalenexus.it, per ora, è una pre-produzione da azzerare più avanti (review dello Sprint 17, §8.3).
 L'azzeramento tocca tre cose:
@@ -224,10 +228,21 @@ come quello del passaggio, con il backup prima e i conteggi dopo. La metto nel b
 quando fissi la data. Ti chiedo anche se, oltre a te, qualcuno usa già la pre-produzione: in quel caso l'azzeramento
 va concordato con loro.
 
+> ✅ **Deciso (PO, 27/11):** US-1313 entra nel backlog. **Precisazione del PO:** nel passaggio del 24/11 i dati sono
+> stati svuotati, ma i numeri sono rimasti «sporchi»: vanno azzerati anche quelli.
+>
+> È andata così. La pulizia della demo ha svuotato le tabelle con `TRUNCATE`, ma non ha fatto ripartire i contatori
+> del database. Il numero delle segnalazioni («n.») e quello degli annunci della bacheca («#») ripartono da dove era
+> arrivata la demo. Nell'azzeramento **tutti i contatori ripartono da 1**, compresi quelli che arriveranno nel
+> frattempo, come le richieste di contatto di US-507, e lo script lo controlla. Gli identificativi interni, quelli
+> negli indirizzi delle pagine, nascono dall'ora e non hanno un ordine da azzerare.
+
 ### 8.4 Contenuto dello Sprint 19
 *Proposta:* il resto della richiesta di contatto, US-507 e US-512, e gli avvisi, US-1311, se scegli il servizio:
 **13 punti** in tutto (§9). Sotto la media, per lasciare spazio a quello che arriverà dall'uso, come negli ultimi due
 sprint. Nello sprint anche la ricerca A42, senza punti.
+
+> ✅ **Deciso (PO, 27/11):** Sprint 19 come al §9: US-507, US-512 e US-1311, 13 punti ([sprint-19](sprint-19.md)).
 
 ## 9. Proposta per lo Sprint 19
 
@@ -248,8 +263,9 @@ tuo PC prima del merge (EN-11), e i deploy li decidi tu.
 ## 10. Azioni a carico del PO
 
 - [x] Attivare il sottocriterio `PQ` di SSH sul server (26/11).
-- [ ] Decidere i punti §8.1 … §8.4.
-- [ ] Scegliere il servizio degli avvisi e creare gli account (§8.2).
+- [x] Decidere i punti §8.1 … §8.4 (27/11).
+- [x] Scegliere il servizio degli avvisi (§8.2): UptimeRobot e Healthchecks.io (27/11).
+- [ ] Creare gli account di UptimeRobot e Healthchecks.io, quando arriva US-1311 (§8.2).
 - [ ] Unire questa PR dopo le decisioni.
 - [ ] Gli account degli utenti, dopo l'azzeramento (§8.3).
 - [ ] Il blocco automatico dello schermo dei PC del Call Center, dopo pochi minuti, con chi gestisce i PC (US-1310).

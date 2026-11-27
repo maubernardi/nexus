@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 109 elementi, 450 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-17](sprints/sprint-17.md), il 25/11 ([review](sprints/sprint-17-review.md)); in corso lo [Sprint 18](sprints/sprint-18.md), dal 26/11.
+**Totale: 110 elementi, 455 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-18](sprints/sprint-18.md), il 26/11 ([review](sprints/sprint-18-review.md)); in corso lo [Sprint 19](sprints/sprint-19.md), dal 27/11.
 
 ## Epiche
 
@@ -165,8 +165,9 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-1308](#us-1308) | E13 | Recupero password | Should | 2 | R4 | 🎉 Done (Sprint 10) |
 | [US-1309](#us-1309) | E13 | Importazione dal database attuale | Must | 8 | R4 | 🎉 Done (Sprint 15) |
 | [US-1310](#us-1310) | E13 | Sessione attiva finché NEXUS è aperto | Must | 3 | R4 | 🎉 Done (Sprint 17) |
-| [US-1311](#us-1311) | E13 | Avvisi affidabili su sito e backup | Must | 3 | R4 | 📋 Backlog |
+| [US-1311](#us-1311) | E13 | Avvisi affidabili su sito e backup | Must | 3 | R4 | ✅ Ready |
 | [US-1312](#us-1312) | E13 | Tema chiaro o scuro a scelta e intestazione fissa delle schede | Must | 3 | R4 | 🎉 Done (Sprint 18) |
+| [US-1313](#us-1313) | E13 | Azzeramento della pre-produzione | Must | 5 | R4 | 📋 Backlog |
 
 ## Dettaglio per epica
 
@@ -1858,7 +1859,7 @@ Criteri di accettazione:
 Dipendenze: US-1307
 
 #### US-1311
-**Avvisi affidabili su sito e backup** · Must · 3 punti · R4 · 📋 Backlog
+**Avvisi affidabili su sito e backup** · Must · 3 punti · R4 · ✅ Ready
 
 Come **PO** voglio un avviso in pochi minuti se il sito non risponde, e entro le 9 se manca il backup della notte, per
 saperlo prima di chi usa NEXUS. I controlli pianificati di GitHub non bastano: dall'8/11 il controllo del sito parte 2
@@ -1866,14 +1867,17 @@ o 3 volte al giorno invece di 72, e quello del backup delle 9:07 parte tra le 16
 §8.2).
 
 Criteri di accettazione:
-- Un **servizio esterno** controlla il sito ogni pochi minuti, giorno e notte, con le tre verifiche di oggi: la PWA
-  risponde, Keycloak risponde, l'API risponde 401 senza accesso. Se una fallisce, il PO riceve un'email.
-- Dopo ogni backup riuscito il server manda un **segnale** al servizio. Se il segnale non arriva entro le 9, ora
-  italiana, il PO riceve un'email. Se il backup fallisce, l'avviso parte subito.
+- **UptimeRobot** controlla il sito ogni 5 minuti, giorno e notte: la PWA risponde, Keycloak risponde, il backend
+  risponde. Il piano gratuito non controlla la risposta 401 dell'API, quindi NEXUS ha un indirizzo pubblico che dice
+  solo «attivo», senza dati e senza accesso. Se un controllo fallisce, il PO riceve un'email.
+- Dopo ogni backup riuscito il server manda un **segnale** a **Healthchecks.io**. Se il segnale non arriva entro le 9,
+  ora italiana, il PO riceve un'email. Se il backup fallisce, l'avviso parte subito.
 - Al servizio arrivano solo gli indirizzi pubblici del sito e il segnale, senza dati. L'account lo crea il PO;
   l'indirizzo del segnale va solo nel `.env` del server, mai nel repository.
 - I controlli di GitHub (US-1307, US-1302) restano come seconda rete. T-26.3 si riscrive con il servizio scelto.
-- Domanda aperta, da chiudere al planning: Better Stack oppure Healthchecks.io (review dello Sprint 17, §8.2).
+- Servizi scelti dal PO il 27/11 (review dello Sprint 18, §8.2): UptimeRobot per il sito e Healthchecks.io per il
+  backup, con i piani gratuiti. Se la cooperativa è una non profit, il PO chiede a Healthchecks.io il piano per le non
+  profit.
 
 Dipendenze: US-1302, US-1307
 
@@ -1897,3 +1901,29 @@ Criteri di accettazione:
   (WCAG 2.4.11). Soglia confermata dal PO dopo il collaudo: sotto circa 512 px di altezza (26/11).
 - Fatto il 26/11 (deploy `1603fcc`). Sotto i 375 px di larghezza la barra in alto mostra solo il logo, senza la
   scritta: a 320 px i pulsanti si sovrapponevano.
+
+#### US-1313
+**Azzeramento della pre-produzione** · Must · 5 punti · R4 · 📋 Backlog
+
+Come **PO** voglio azzerare la pre-produzione quando lo decido, e ripartire con i dati veri del database attuale, per
+dare gli account a Tutor e Call Center su un NEXUS pulito (review dello Sprint 18, §8.3). Dal 25/11 portalenexus.it è
+una pre-produzione: i dati inseriti per prova non devono arrivare agli utenti.
+
+Criteri di accettazione:
+- Uno **script una tantum**, come quello del passaggio in produzione (US-1306), lanciato dal PO sul server:
+  - prima fa un backup;
+  - poi svuota segnalazioni, beneficiari, utenti, aziende e tutto quello che ne dipende, comprese valutazioni, zone e
+    navi scuola;
+  - poi rifà l'importazione dal database attuale (US-1309), con le regole sui simboli dei nomi (US-514);
+  - infine stampa solo conteggi.
+  Restano la configurazione e i cataloghi.
+- **Tutti i contatori ripartono da 1**: il numero delle segnalazioni, quello degli annunci della bacheca e quelli
+  aggiunti nel frattempo (per esempio le richieste di contatto di US-507). Lo script li trova da solo nel database e
+  controlla che il prossimo numero sia 1. Il passaggio del 24/11 non li aveva azzerati (PO, 27/11).
+- Gli utenti si tolgono da NEXUS e da Keycloak; il primo ADMIN si ricrea come nel passaggio (US-1306). Domanda aperta,
+  da chiudere prima del Ready: tenere l'ADMIN di oggi, con il suo accesso, oppure ricrearlo con un invito nuovo.
+- Tutto in una transazione: se un controllo non torna, non cambia niente. Lo script si prova nella CI, su un server
+  finto, come quello del passaggio.
+- La data la decide il PO; l'azzeramento si concorda con chi usa già la pre-produzione.
+
+Dipendenze: US-1306, US-1309
