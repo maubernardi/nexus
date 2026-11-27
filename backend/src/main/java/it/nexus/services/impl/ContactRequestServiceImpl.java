@@ -23,13 +23,11 @@ import it.nexus.domain.enumeration.ContactRequestStatus;
 import it.nexus.mapper.ReferenceMapper;
 import it.nexus.mapper.TsidMapper;
 import it.nexus.repository.BusinessCategoryRepository;
-import it.nexus.repository.CompanyRepository;
 import it.nexus.repository.ContactRequestRepository;
 import it.nexus.repository.ZoneRepository;
 import it.nexus.services.AuditService;
 import it.nexus.services.ContactRequestService;
 import it.nexus.services.CurrentAppUserService;
-import it.nexus.web.errors.BadRequestException;
 import it.nexus.web.errors.ConflictException;
 import it.nexus.web.errors.FieldValidationException;
 import it.nexus.web.errors.NotFoundException;
@@ -41,7 +39,6 @@ import lombok.RequiredArgsConstructor;
 public class ContactRequestServiceImpl implements ContactRequestService {
 
     private final ContactRequestRepository repository;
-    private final CompanyRepository companyRepository;
     private final ZoneRepository zoneRepository;
     private final BusinessCategoryRepository businessCategoryRepository;
     private final CurrentAppUserService currentAppUserService;
@@ -52,35 +49,20 @@ public class ContactRequestServiceImpl implements ContactRequestService {
     @Override
     public ContactRequestDTO create(ContactRequestFormDTO form) {
         AppUser tutor = currentAppUserService.getCurrentAppUser();
+        // solo aziende non ancora in anagrafica (PO, 27/11): i doppioni li evitano i nomi simili prima dell'invio
         String name = form.companyName() == null || form.companyName().isBlank() ? null : form.companyName().strip();
-        ContactRequest request;
-        AuditChanges changes = AuditChanges.of();
-        if (form.companyId() != null && !form.companyId().isBlank()) {
-            if (name != null) {
-                throw new BadRequestException("Indica l'azienda già presente oppure il nome di una nuova, non tutti e due");
-            }
-            // azienda già presente: solo attiva, come nella lista del Tutor (US-511)
-            Company company = Optional.ofNullable(TsidMapper.toInternal(form.companyId()))
-                    .flatMap(companyRepository::findById)
-                    .filter(Company::isActive)
-                    .orElseThrow(() -> new NotFoundException("Azienda non trovata"));
-            request = ContactRequest.forCompany(tutor, company);
-            changes.value("companyId", null, TsidMapper.toExternal(company.getId()));
-        } else {
-            if (name == null) {
-                throw new FieldValidationException("companyName", "Scrivi il nome dell'azienda");
-            }
-            Zone zone = activeEntry(form.zoneId(), zoneRepository, "zoneId", "Scegli la zona");
-            BusinessCategory category = form.businessCategoryId() == null || form.businessCategoryId().isBlank() ? null
-                    : activeEntry(form.businessCategoryId(), businessCategoryRepository, "businessCategoryId", null);
-            request = ContactRequest.forNewCompany(tutor, name, zone, category);
-            changes.value("companyName", null, name)
-                    .value("zone", null, zone.getCode())
-                    .value("businessCategory", null, category == null ? null : category.getCode());
+        if (name == null) {
+            throw new FieldValidationException("companyName", "Scrivi il nome dell'azienda");
         }
-        ContactRequest saved = repository.saveAndFlush(request);
-        auditService.record(AuditEntityType.CONTACT_REQUEST, saved.getId(), "CREATE",
-                changes.value("status", null, ContactRequestStatus.APERTA.name()), null);
+        Zone zone = activeEntry(form.zoneId(), zoneRepository, "zoneId", "Scegli la zona");
+        BusinessCategory category = form.businessCategoryId() == null || form.businessCategoryId().isBlank() ? null
+                : activeEntry(form.businessCategoryId(), businessCategoryRepository, "businessCategoryId", null);
+        ContactRequest saved = repository.saveAndFlush(ContactRequest.forNewCompany(tutor, name, zone, category));
+        auditService.record(AuditEntityType.CONTACT_REQUEST, saved.getId(), "CREATE", AuditChanges.of()
+                .value("companyName", null, name)
+                .value("zone", null, zone.getCode())
+                .value("businessCategory", null, category == null ? null : category.getCode())
+                .value("status", null, ContactRequestStatus.APERTA.name()), null);
         return toDto(saved);
     }
 
@@ -136,9 +118,9 @@ public class ContactRequestServiceImpl implements ContactRequestService {
                 r.getCreatedAt(),
                 fullName(r.getRequestedBy()),
                 company == null ? null : TsidMapper.toExternal(company.getId()),
-                company == null ? r.getCompanyName() : company.getName(),
-                referenceMapper.toDto(company == null ? r.getZone() : company.getZone()),
-                referenceMapper.toDto(company == null ? r.getBusinessCategory() : company.getBusinessCategory()),
+                r.getCompanyName(),
+                referenceMapper.toDto(r.getZone()),
+                referenceMapper.toDto(r.getBusinessCategory()),
                 r.getStatus(),
                 r.getAssignedOperator() == null ? null : fullName(r.getAssignedOperator()),
                 r.getTakenAt(),

@@ -47,8 +47,8 @@ import it.nexus.repository.ZoneRepository;
 import jakarta.persistence.EntityManager;
 
 /**
- * Richieste di contatto di un'azienda dal Tutor al Call Center (US-507): invio per un'azienda già presente o nuova,
- * nomi simili, elenco del Call Center con il numero delle aperte, presa in carico, «Le mie richieste», audit.
+ * Richieste di contatto di un'azienda dal Tutor al Call Center (US-507): invio solo per un'azienda non ancora in
+ * anagrafica, nomi simili, elenco del Call Center con il numero delle aperte, presa in carico, «Le mie richieste», audit.
  */
 @SpringBootTest
 @Transactional
@@ -106,11 +106,6 @@ class ContactRequestResourceIT {
                 .formatted(name, TsidMapper.toExternal(zone.getId()), TsidMapper.toExternal(category.getId()));
     }
 
-    private String existing(Company company) {
-        return """
-                {"companyId": "%s"}""".formatted(TsidMapper.toExternal(company.getId()));
-    }
-
     private ResultActions take(String user, String id, long version) throws Exception {
         return mockMvc.perform(post(API + "/" + id + "/take").header(USER, user)
                 .contentType(MediaType.APPLICATION_JSON).content("{\"version\": %d}".formatted(version)));
@@ -123,6 +118,7 @@ class ContactRequestResourceIT {
                 .andExpect(jsonPath("$.number").isNumber())
                 .andExpect(jsonPath("$.status").value("APERTA"))
                 .andExpect(jsonPath("$.companyName").value("Officina del Ponte"))
+                // l'azienda dell'anagrafica la collega l'operatore alla chiusura (US-512)
                 .andExpect(jsonPath("$.companyId").doesNotExist())
                 .andExpect(jsonPath("$.zone.code").value("Z507"))
                 .andExpect(jsonPath("$.businessCategory.code").value(category.getCode()))
@@ -132,7 +128,7 @@ class ContactRequestResourceIT {
         String id = JsonPath.read(json, "$.id");
         int number = JsonPath.read(json, "$.number");
         // il numero successivo è il seguente
-        send("tutor1", existing(ristorazione)).andExpect(jsonPath("$.number").value(number + 1));
+        send("tutor1", newCompany("Bar Centrale")).andExpect(jsonPath("$.number").value(number + 1));
 
         em.flush();
         assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.CONTACT_REQUEST,
@@ -147,17 +143,11 @@ class ContactRequestResourceIT {
     }
 
     @Test
-    void aziendaGiaPresente_collegata_conNomeEZonaDellAzienda() throws Exception {
-        send("tutor1", existing(ristorazione))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.companyId").value(TsidMapper.toExternal(ristorazione.getId())))
-                .andExpect(jsonPath("$.companyName").value("Trattoria Bianchi S.n.c."))
-                .andExpect(jsonPath("$.zone.code").value("Z507"));
-        // un'azienda disattivata non si chiede
-        Company closed = TestEntities.company("99050700002");
-        closed.setActive(false);
-        companies.save(closed);
-        send("tutor1", existing(closed)).andExpect(status().isNotFound());
+    void soloAziendeNonInAnagrafica_lAziendaPresenteNonSiChiede() throws Exception {
+        // PO, 27/11: il contatto si chiede solo per le aziende che NEXUS non ha; l'azienda dell'anagrafica non basta
+        send("tutor1", "{\"companyId\": \"%s\"}".formatted(TsidMapper.toExternal(ristorazione.getId())))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("companyName"));
     }
 
     @Test
@@ -178,10 +168,6 @@ class ContactRequestResourceIT {
         send("tutor1", "{\"companyName\": \"%s\", \"zoneId\": \"%s\"}"
                 .formatted("x".repeat(201), TsidMapper.toExternal(zone.getId())))
                 .andExpect(status().isBadRequest());
-        // azienda presente e nome nuovo insieme: una delle due
-        send("tutor1", "{\"companyId\": \"%s\", \"companyName\": \"Altro\"}"
-                .formatted(TsidMapper.toExternal(ristorazione.getId())))
-                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -198,13 +184,13 @@ class ContactRequestResourceIT {
     void elencoDalPiuVecchio_numeroDelleAperte_presaInCarico_leMieRichieste() throws Exception {
         String first = JsonPath.read(send("tutor1", newCompany("Officina del Ponte"))
                 .andReturn().getResponse().getContentAsString(), "$.id");
-        send("tutor2", existing(ristorazione)).andExpect(status().isCreated());
+        send("tutor2", newCompany("Trattoria Bianchi Due")).andExpect(status().isCreated());
         send("tutor1", newCompany("Bar Centrale")).andExpect(status().isCreated());
 
         mockMvc.perform(get(API).header(USER, "operatore.cc"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[*].companyName",
-                        contains("Officina del Ponte", "Trattoria Bianchi S.n.c.", "Bar Centrale")))
+                        contains("Officina del Ponte", "Trattoria Bianchi Due", "Bar Centrale")))
                 .andExpect(jsonPath("$[1].requestedByName").value("Ugo Tutor"));
         mockMvc.perform(get(API + "/open-count").header(USER, "operatore.cc")).andExpect(jsonPath("$").value(3));
 
@@ -230,7 +216,7 @@ class ContactRequestResourceIT {
                 .andExpect(jsonPath("$[*].companyName", contains("Bar Centrale", "Officina del Ponte")))
                 .andExpect(jsonPath("$[1].status").value("IN_CARICO"))
                 .andExpect(jsonPath("$[1].assignedOperatorName").value("Olga Operatrice"))
-                .andExpect(jsonPath("$[*].companyName", not(hasItem("Trattoria Bianchi S.n.c."))));
+                .andExpect(jsonPath("$[*].companyName", not(hasItem("Trattoria Bianchi Due"))));
 
         em.flush();
         assertThat(audit.findByEntityTypeAndEntityIdOrderByCreatedAtAscIdAsc(AuditEntityType.CONTACT_REQUEST,

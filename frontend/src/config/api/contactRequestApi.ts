@@ -6,8 +6,9 @@ import type { ReferenceItem } from '@/config/api/referenceApi';
 export type ContactRequestStatus = 'APERTA' | 'IN_CARICO' | 'CHIUSA';
 
 /**
- * Richiesta di contatto di un'azienda dal Tutor al Call Center (US-507). Con `companyId` l'azienda è già presente, e
- * nome, zona e categoria sono i suoi; altrimenti sono quelli scritti dal Tutor. L'API omette i campi vuoti.
+ * Richiesta di contatto di un'azienda dal Tutor al Call Center (US-507), per un'azienda non ancora in anagrafica: nome,
+ * zona e categoria come li ha scritti il Tutor. `companyId` c'è quando l'operatore, alla chiusura, la collega
+ * all'anagrafica (US-512). L'API omette i campi vuoti.
  */
 export type ContactRequest = {
   id: string;
@@ -24,9 +25,8 @@ export type ContactRequest = {
   version: number;
 };
 
-/** Richiesta per un'azienda già presente, oppure nuova con nome e zona (categoria facoltativa). */
-export type ContactRequestForm =
-  { companyId: string } | { companyName: string; zoneId: string; businessCategoryId: string | null };
+/** Richiesta per un'azienda non ancora in anagrafica (PO, 27/11): nome e zona, categoria facoltativa. */
+export type ContactRequestForm = { companyName: string; zoneId: string; businessCategoryId: string | null };
 
 export const createContactRequest = async (form: ContactRequestForm): Promise<ContactRequest> => {
   const { data } = await axiosInstance.post<ContactRequest>(ENDPOINTS.contactRequests, form);

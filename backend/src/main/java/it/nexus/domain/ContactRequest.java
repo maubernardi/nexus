@@ -20,9 +20,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * Richiesta di contatto di un'azienda dal Tutor al Call Center (US-507): generale, senza beneficiario né segnalazione.
- * Riguarda un'azienda già presente ({@code company}) oppure una nuova (nome e zona, categoria facoltativa).
- * {@code number} è il progressivo leggibile assegnato dal database.
+ * Richiesta di contatto di un'azienda dal Tutor al Call Center (US-507): generale, senza beneficiario né segnalazione,
+ * solo per un'azienda non ancora in anagrafica (PO, 27/11): nome e zona, categoria facoltativa. {@code company} la
+ * collega l'operatore alla chiusura (US-512). {@code number} è il progressivo leggibile assegnato dal database.
  */
 @Getter
 @Entity
@@ -41,17 +41,17 @@ public class ContactRequest extends AbstractTsidEntity {
     @JoinColumn(name = "requested_by_id", nullable = false, updatable = false)
     private AppUser requestedBy;
 
-    /** Azienda già presente; assente per un'azienda nuova. */
+    /** Azienda dell'anagrafica collegata alla chiusura (US-512); assente fino ad allora. */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", updatable = false)
+    @JoinColumn(name = "company_id")
     private Company company;
 
-    /** Azienda nuova: nome, zona e categoria facoltativa. */
-    @Column(name = "company_name", updatable = false, length = 200)
+    /** L'azienda come l'ha indicata il Tutor: nome, zona e categoria facoltativa. */
+    @Column(name = "company_name", nullable = false, updatable = false, length = 200)
     private String companyName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "zone_id", updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "zone_id", nullable = false, updatable = false)
     private Zone zone;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -73,15 +73,7 @@ public class ContactRequest extends AbstractTsidEntity {
     @Column(name = "version", nullable = false)
     private long version;
 
-    /** Richiesta per un'azienda già presente. */
-    public static ContactRequest forCompany(AppUser tutor, Company company) {
-        ContactRequest request = new ContactRequest();
-        request.requestedBy = tutor;
-        request.company = company;
-        return request;
-    }
-
-    /** Richiesta per un'azienda nuova. */
+    /** Richiesta per un'azienda non ancora in anagrafica. */
     public static ContactRequest forNewCompany(AppUser tutor, String name, Zone zone, BusinessCategory category) {
         ContactRequest request = new ContactRequest();
         request.requestedBy = tutor;

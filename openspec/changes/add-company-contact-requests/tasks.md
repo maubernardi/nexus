@@ -20,7 +20,7 @@
       Center, ADMIN) con il numero (verifica: test di `MainNav`)
 - [x] 2.2 Pagina «Le mie richieste» e pagina della richiesta per un'azienda nuova, con i nomi simili prima dell'invio
       (verifica: test con axe)
-- [x] 2.3 «Chiedi di contattarla» nella scheda del Tutor (verifica: test con axe)
+- [x] 2.3 Niente «Chiedi di contattarla» nella scheda del Tutor: solo aziende non in anagrafica (PO, 27/11)
 - [x] 2.4 Pagina «Richieste di contatto» del Call Center con «Prendi in carico» (verifica: test con axe)
 
 ## 3. Dati dimostrativi, prove e verifiche

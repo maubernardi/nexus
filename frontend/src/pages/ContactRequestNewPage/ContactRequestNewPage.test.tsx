@@ -114,18 +114,25 @@ describe('<ContactRequestNewPage>', () => {
     );
   });
 
-  it('nomi simili: si chiede di contattare quella già presente', async () => {
+  it('nomi simili: l’azienda già in NEXUS non si chiede, se ne apre la scheda (PO, 27/11)', async () => {
     vi.mocked(fetchSimilarCompanies).mockResolvedValue([{ id: 'C1', name: 'Trattoria Bianchi S.n.c.' }]);
     const user = userEvent.setup();
     renderPage();
     await fill(user, 'Trattoria Bianki');
     await user.click(screen.getByRole('button', { name: 'Invia la richiesta' }));
-    await user.click(
-      await screen.findByRole('button', { name: 'Chiedi di contattare questa Trattoria Bianchi S.n.c.' }),
+    const region = await screen.findByRole('region', { name: 'Aziende con un nome simile' });
+    expect(region).toHaveTextContent('Se è quella, è già in anagrafica e la richiesta non serve');
+    expect(within(region).getByRole('link', { name: 'Trattoria Bianchi S.n.c.' })).toHaveAttribute(
+      'href',
+      '/aziende/C1',
     );
-    await waitFor(() =>
-      expect(vi.mocked(createContactRequest).mock.calls[0][0]).toEqual({ companyId: 'C1' }),
-    );
+    // nessun pulsante per chiedere di contattare l'azienda già presente
+    expect(
+      within(region)
+        .getAllByRole('button')
+        .map((b) => b.textContent),
+    ).toEqual(['No, è un’azienda nuova: invia la richiesta', 'Correggi il nome']);
+    expect(createContactRequest).not.toHaveBeenCalled();
   });
 
   it('cambiato il nome, i nomi simili spariscono; «Correggi il nome» riporta al campo', async () => {

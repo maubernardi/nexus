@@ -745,11 +745,10 @@ e un operatore la prenda in carico (PO, 15/11). Oggi passa tutto a voce o per em
 
 Criteri di accettazione:
 - La richiesta è **generale**: non riguarda un beneficiario né una segnalazione.
-- **Azienda nuova**: il Tutor scrive il nome e sceglie la zona del catalogo (US-106), tutti e due obbligatori; il
-  settore (categoria merceologica, US-509) è facoltativo. Se ci sono aziende con un nome simile, NEXUS le mostra prima
-  dell'invio, per evitare doppioni.
-- **Azienda già presente**: dalla scheda dell'azienda (US-511), «Chiedi di contattarla». La richiesta nasce collegata
-  all'azienda.
+- **Solo aziende non ancora in anagrafica** (PO, 27/11): per un'azienda già in NEXUS il contatto non si chiede. Il
+  Tutor scrive il nome e sceglie la zona del catalogo (US-106), tutti e due obbligatori; il settore (categoria
+  merceologica, US-509) è facoltativo. Se ci sono aziende con un nome simile, NEXUS le mostra prima dell'invio, con la
+  loro scheda: se è una di quelle, la richiesta non serve.
 - Il Call Center ha l'elenco **«Richieste di contatto»**, dalla più vecchia, con il numero di quelle aperte nel menu.
   Nessuna email agli operatori.
 - Un **operatore qualsiasi** la prende in carico; la richiesta mostra chi ce l'ha.

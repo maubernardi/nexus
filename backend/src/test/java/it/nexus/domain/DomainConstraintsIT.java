@@ -1373,32 +1373,27 @@ class DomainConstraintsIT {
         }
 
         @Test
-        void aziendaPresenteOppureNuovaConNomeEZona() {
-            insert(1, null, g.company().getId(), null, null, "APERTA", null);
-            insert(2, null, null, "Officina del Ponte", g.zone().getId(), "IN_CARICO", g.tutor().getId());
+        void nomeEZona_lAziendaDellAnagraficaSoloSeCollegata() {
+            insert(1, null, null, "Officina del Ponte", g.zone().getId(), "APERTA", null);
+            // collegata all'anagrafica alla chiusura (US-512)
+            insert(2, null, g.company().getId(), "Bar Centrale", g.zone().getId(), "CHIUSA", g.tutor().getId());
             assertThat(jdbc.queryForObject("SELECT count(*) FROM contact_request", Long.class)).isEqualTo(2);
         }
 
         @Test
-        void aziendaPresenteENomeNuovoInsieme() {
-            assertViolates("ck_contact_request_company",
-                    () -> insert(1, null, g.company().getId(), "Officina", null, "APERTA", null));
+        void senzaNome() {
+            assertViolates("company_name", () -> insert(1, null, null, null, g.zone().getId(), "APERTA", null));
         }
 
         @Test
-        void nessunaAzienda() {
-            assertViolates("ck_contact_request_company", () -> insert(1, null, null, null, null, "APERTA", null));
-        }
-
-        @Test
-        void nomeNuovoSenzaZona() {
-            assertViolates("ck_contact_request_company", () -> insert(1, null, null, "Officina", null, "APERTA", null));
-        }
-
-        @Test
-        void nomeNuovoVuoto() {
-            assertViolates("ck_contact_request_company",
+        void nomeVuoto() {
+            assertViolates("ck_contact_request_company_name",
                     () -> insert(1, null, null, "  ", g.zone().getId(), "APERTA", null));
+        }
+
+        @Test
+        void senzaZona() {
+            assertViolates("zone_id", () -> insert(1, null, null, "Officina", null, "APERTA", null));
         }
 
         @Test

@@ -32,9 +32,10 @@ const toPayload = (v: Values): ContactRequestForm => ({
 });
 
 /**
- * Richiesta di contatto per un'azienda nuova (US-507): nome e zona obbligatori, categoria facoltativa. Prima dell'invio
- * mostra le aziende attive con un nome simile: il Tutor ne apre la scheda, chiede di contattare una di quelle oppure
- * conferma che l'azienda è nuova. Dopo l'invio torna a «Le mie richieste», con il numero della richiesta.
+ * Richiesta di contatto per un'azienda non ancora in anagrafica (US-507, PO 27/11): nome e zona obbligatori, categoria
+ * facoltativa. Prima dell'invio mostra le aziende attive con un nome simile: se è una di quelle è già in NEXUS e la
+ * richiesta non serve (il Tutor ne apre la scheda); altrimenti conferma che l'azienda è nuova. Dopo l'invio torna a «Le
+ * mie richieste», con il numero della richiesta.
  */
 export const ContactRequestNewPage = () => {
   const { t } = useTranslation();
@@ -248,17 +249,6 @@ export const ContactRequestNewPage = () => {
                     </p>
                   )}
                 </div>
-                <Button
-                  variant="outline"
-                  disabled={create.isPending}
-                  onClick={() => void send({ companyId: c.id })}
-                >
-                  {t('contactRequest.similar.askThis')}
-                  {/* spazio come nodo a sé: «Chiedi di contattare questa Pizzeria da Mario» */}{' '}
-                  <span className="sr-only">
-                    {t('contactRequest.similar.askThisTarget', { name: c.name })}
-                  </span>
-                </Button>
               </li>
             ))}
           </ul>

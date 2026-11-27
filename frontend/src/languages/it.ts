@@ -888,8 +888,6 @@ export const it = {
       operator: 'Operatore',
       actions: 'Azioni',
     },
-    newCompany: 'nuova',
-    newCompanyLabel: 'Azienda nuova, non ancora in NEXUS',
     none: '—',
     myCaption: 'Le tue richieste di contatto, dalla più recente',
     queueCaption: 'Richieste di contatto aperte e in carico, dalla più vecchia',
@@ -902,7 +900,6 @@ export const it = {
     openCount_one: '1 da prendere in carico',
     openCount_other: '{{count}} da prendere in carico',
     newRequest: 'Chiedi di contattare un’azienda nuova',
-    askCompany: 'Chiedi di contattarla',
     asking: 'Invio in corso…',
     askError: 'La richiesta non è stata inviata. Controlla la connessione e riprova.',
     sent: 'Richiesta di contatto n. {{number}} inviata: il Call Center la prenderà in carico.',
@@ -932,11 +929,9 @@ export const it = {
     similar: {
       heading: 'Aziende con un nome simile',
       intro_one:
-        'In NEXUS c’è già un’azienda con un nome simile a «{{name}}». Se è quella, chiedi di contattare lei; altrimenti conferma che l’azienda è nuova.',
+        'In NEXUS c’è già un’azienda con un nome simile a «{{name}}». Se è quella, è già in anagrafica e la richiesta non serve: puoi aprirne la scheda. Altrimenti conferma che l’azienda è nuova.',
       intro_other:
-        'In NEXUS ci sono già {{count}} aziende con un nome simile a «{{name}}». Se è una di queste, chiedi di contattare lei; altrimenti conferma che l’azienda è nuova.',
-      askThis: 'Chiedi di contattare questa',
-      askThisTarget: '{{name}}',
+        'In NEXUS ci sono già {{count}} aziende con un nome simile a «{{name}}». Se è una di queste, è già in anagrafica e la richiesta non serve: puoi aprirne la scheda. Altrimenti conferma che l’azienda è nuova.',
       confirmNew: 'No, è un’azienda nuova: invia la richiesta',
       back: 'Correggi il nome',
     },
@@ -2429,13 +2424,13 @@ export const it = {
       title: 'Le mie richieste',
       heading: 'Le mie richieste',
       intro:
-        'Le aziende che hai chiesto al Call Center di contattare, dalla più recente. Per un’azienda già in NEXUS usa «Chiedi di contattarla» nella sua scheda.',
+        'Le aziende non ancora in NEXUS che hai chiesto al Call Center di contattare, dalla più recente.',
     },
     contactRequestNew: {
       title: 'Richiesta di contatto',
       heading: 'Chiedi di contattare un’azienda nuova',
       intro:
-        'Per un’azienda che non è ancora in NEXUS. Prima dell’invio ti mostriamo le aziende con un nome simile, per evitare doppioni.',
+        'Per un’azienda che non è ancora in NEXUS. Prima dell’invio ti mostriamo le aziende già in NEXUS con un nome simile, per evitare doppioni.',
     },
     contactRequests: {
       title: 'Richieste di contatto',

@@ -1,8 +1,8 @@
 ## ADDED Requirements
 
 ### Requirement: Richieste di contatto dimostrative
-I dati dimostrativi SHALL avere due richieste di contatto di `tutor1`, per il collaudo: una aperta per un'azienda nuova
-e una già in carico all'operatore per un'azienda presente. Le richieste dimostrative cambiate a mano MUST NOT cambiare
+I dati dimostrativi SHALL avere due richieste di contatto di `tutor1` per aziende non ancora in anagrafica, per il
+collaudo: una aperta e una già in carico all'operatore. Le richieste dimostrative cambiate a mano MUST NOT cambiare
 al riavvio.
 
 #### Scenario: Collaudo nuovo

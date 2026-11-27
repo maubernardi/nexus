@@ -1,24 +1,20 @@
 ## Purpose
-Permette al Tutor di chiedere al Call Center di contattare un'azienda, nuova o già presente, e al Call Center di
-prendere in carico la richiesta, con una traccia che non si perde.
+Permette al Tutor di chiedere al Call Center di contattare un'azienda che non è ancora in anagrafica, e al Call Center
+di prendere in carico la richiesta, con una traccia che non si perde.
 
 ## ADDED Requirements
 
 ### Requirement: Richiesta di contatto dal Tutor
-Il Tutor SHALL poter chiedere al Call Center di contattare un'azienda. La richiesta è generale: MUST NOT riguardare un
-beneficiario né una segnalazione. Ogni richiesta SHALL avere un numero progressivo, «Richiesta di contatto n. N», e lo
-stato «aperta» all'invio. La richiesta indica l'azienda in uno di due modi:
-- **azienda già presente**: dalla scheda dell'azienda del Tutor, con «Chiedi di contattarla». La richiesta nasce
-  collegata all'azienda, che MUST essere attiva;
-- **azienda nuova**: il Tutor scrive il nome e sceglie la zona del catalogo, tutti e due obbligatori; la categoria
-  merceologica è facoltativa. La zona e la categoria MUST essere voci attive del catalogo.
+Il Tutor SHALL poter chiedere al Call Center di contattare un'azienda che non è ancora in anagrafica (PO, 27/11): per
+un'azienda già presente la richiesta MUST NOT esserci. La richiesta è generale: MUST NOT riguardare un beneficiario né
+una segnalazione. Il Tutor scrive il nome e sceglie la zona del catalogo, tutti e due obbligatori; la categoria
+merceologica è facoltativa. La zona e la categoria MUST essere voci attive del catalogo. Ogni richiesta SHALL avere un
+numero progressivo, «Richiesta di contatto n. N», e lo stato «aperta» all'invio. L'invio SHALL entrare nell'audit con
+autore e istante. Solo il Tutor MUST poter inviare una richiesta.
 
-L'invio SHALL entrare nell'audit con autore e istante. Solo il Tutor MUST poter inviare una richiesta.
-
-#### Scenario: Azienda già presente
-- **WHEN** il Tutor apre la scheda di un'azienda e preme «Chiedi di contattarla»
-- **THEN** nasce la richiesta aperta collegata all'azienda, con il suo numero, e il Tutor la trova in «Le mie
-  richieste»
+#### Scenario: Nessuna richiesta dalla scheda
+- **WHEN** il Tutor apre la scheda di un'azienda già in anagrafica
+- **THEN** non trova un pulsante per chiedere di contattarla
 
 #### Scenario: Azienda nuova
 - **WHEN** il Tutor scrive il nome «Trattoria del Ponte», sceglie una zona e invia
@@ -33,15 +29,16 @@ L'invio SHALL entrare nell'audit con autore e istante. Solo il Tutor MUST poter 
 - **THEN** riceve un rifiuto per mancanza di permessi
 
 ### Requirement: Nomi simili prima dell'invio
-Prima di inviare una richiesta per un'azienda nuova, il sistema SHALL mostrare al Tutor le aziende attive con un nome
-simile, al massimo cinque, anche con piccole differenze di scrittura. Per ognuna il Tutor SHALL poter aprire la scheda
-oppure chiedere di contattare quella; altrimenti conferma che l'azienda è nuova e la richiesta parte. Senza nomi
-simili la richiesta parte subito. Il Tutor MUST vedere solo i dati essenziali delle aziende, come nella sua lista.
+Prima dell'invio il sistema SHALL mostrare al Tutor le aziende attive con un nome simile, al massimo cinque, anche con
+piccole differenze di scrittura. Se è una di quelle, l'azienda è già in anagrafica e la richiesta non serve: il Tutor
+ne SHALL poter aprire la scheda, e MUST NOT poter chiedere di contattarla. Altrimenti conferma che l'azienda è nuova e
+la richiesta parte. Senza nomi simili la richiesta parte subito. Il Tutor MUST vedere solo i dati essenziali delle
+aziende, come nella sua lista.
 
 #### Scenario: Nome simile
-- **WHEN** il Tutor scrive «Demo Ristorazione» e invia
-- **THEN** prima dell'invio vede «Demo Ristorazione S.n.c.» tra le aziende con un nome simile, e la richiesta parte
-  solo se conferma che l'azienda è nuova o se sceglie quella esistente
+- **WHEN** il Tutor scrive «Demo Ristorazioni» e invia
+- **THEN** prima dell'invio vede «Demo Ristorazione S.n.c.» tra le aziende con un nome simile, con la sua scheda, e la
+  richiesta parte solo se conferma che l'azienda è nuova
 
 #### Scenario: Nessun nome simile
 - **WHEN** il Tutor scrive un nome che non somiglia a nessuna azienda e invia
@@ -49,8 +46,7 @@ simili la richiesta parte subito. Il Tutor MUST vedere solo i dati essenziali de
 
 ### Requirement: Richieste di contatto del Call Center
 Il Call Center e l'ADMIN SHALL vedere la pagina «Richieste di contatto» con le richieste aperte e in carico, dalla più
-vecchia: numero, data, Tutor, azienda (con il collegamento alla scheda se è già presente, altrimenti nome, zona e
-categoria), stato e operatore. Nel menu, accanto alla voce, SHALL comparire il numero delle richieste aperte, cioè
+vecchia: numero, data, Tutor, azienda (nome, zona e categoria scritti dal Tutor), stato e operatore. Nel menu, accanto alla voce, SHALL comparire il numero delle richieste aperte, cioè
 ancora da prendere in carico. Il numero MUST essere anche nel nome accessibile della voce. Per una richiesta nuova
 MUST NOT partire nessuna email agli operatori.
 

@@ -1,7 +1,8 @@
 -- Richieste di contatto di un'azienda dal Tutor al Call Center (US-507, analisi con il PO del 23/11). La richiesta è
--- generale: niente beneficiario né segnalazione. Riguarda un'azienda già presente (company_id) oppure un'azienda nuova
--- (nome e zona obbligatori, categoria facoltativa). Stati: aperta, in carico (a un operatore qualsiasi), chiusa (con
--- US-512). Invio e presa in carico vanno nell'audit (EN-2).
+-- generale: niente beneficiario né segnalazione. Solo per aziende non ancora in anagrafica (PO, 27/11): nome e zona
+-- obbligatori, categoria facoltativa. company_id resta vuota finché l'operatore, alla chiusura, non collega la
+-- richiesta all'azienda che ha creato o trovato (US-512). Stati: aperta, in carico (a un operatore qualsiasi), chiusa
+-- (con US-512). Invio e presa in carico vanno nell'audit (EN-2).
 
 -- nomi simili prima dell'invio (pg_trgm): estensione «trusted», la crea il proprietario del database
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
@@ -13,8 +14,8 @@ CREATE TABLE contact_request (
     number                bigint       NOT NULL DEFAULT nextval('contact_request_number_seq'),
     requested_by_id       bigint       NOT NULL,
     company_id            bigint,
-    company_name          varchar(200),
-    zone_id               bigint,
+    company_name          varchar(200) NOT NULL,
+    zone_id               bigint       NOT NULL,
     business_category_id  bigint,
     status                varchar(20)  NOT NULL,
     assigned_operator_id  bigint,
@@ -33,10 +34,7 @@ CREATE TABLE contact_request (
         REFERENCES business_category (id),
     CONSTRAINT fk_contact_request_assigned_operator FOREIGN KEY (assigned_operator_id) REFERENCES app_user (id),
     CONSTRAINT ck_contact_request_status CHECK (status IN ('APERTA', 'IN_CARICO', 'CHIUSA')),
-    -- un'azienda già presente, oppure una nuova con nome e zona (la categoria solo per quella nuova)
-    CONSTRAINT ck_contact_request_company CHECK (
-        (company_id IS NOT NULL AND company_name IS NULL AND zone_id IS NULL AND business_category_id IS NULL)
-        OR (company_id IS NULL AND company_name IS NOT NULL AND btrim(company_name) <> '' AND zone_id IS NOT NULL)),
+    CONSTRAINT ck_contact_request_company_name CHECK (btrim(company_name) <> ''),
     -- aperta: nessun operatore; in carico o chiusa: l'operatore e l'istante della presa in carico
     CONSTRAINT ck_contact_request_assigned CHECK (
         (status = 'APERTA' AND assigned_operator_id IS NULL AND taken_at IS NULL)

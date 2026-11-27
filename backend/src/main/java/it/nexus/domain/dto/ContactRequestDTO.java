@@ -5,8 +5,8 @@ import java.time.Instant;
 import it.nexus.domain.enumeration.ContactRequestStatus;
 
 /**
- * Richiesta di contatto (US-507). Per un'azienda già presente c'è {@code companyId}, con nome, zona e categoria
- * dell'azienda; per una nuova solo quelli scritti dal Tutor. Gli assenti sono omessi dall'API.
+ * Richiesta di contatto (US-507) con l'azienda come l'ha indicata il Tutor. {@code companyId} c'è quando l'operatore
+ * l'ha collegata all'anagrafica, alla chiusura (US-512). Gli assenti sono omessi dall'API.
  */
 public record ContactRequestDTO(
         String id,

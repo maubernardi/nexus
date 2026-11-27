@@ -8,7 +8,7 @@ import it.nexus.domain.dto.ContactRequestFormDTO;
 /** Richieste di contatto di un'azienda dal Tutor al Call Center (US-507). */
 public interface ContactRequestService {
 
-    /** Invio da parte del Tutor corrente: azienda già presente e attiva, oppure nuova con nome e zona. */
+    /** Invio da parte del Tutor corrente, per un'azienda non ancora in anagrafica: nome e zona, categoria facoltativa. */
     ContactRequestDTO create(ContactRequestFormDTO form);
 
     /** Le richieste del Tutor corrente, dalla più recente. */

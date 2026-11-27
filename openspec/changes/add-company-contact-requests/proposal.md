@@ -8,12 +8,13 @@ traccia, non si sa chi se ne occupa e a volte si perde.
 
 - **Richiesta di contatto**, generale: non riguarda un beneficiario né una segnalazione. Ha un numero progressivo, «Richiesta
   di contatto n. N», e uno stato: aperta, in carico, chiusa. La chiusura arriva con US-512.
-- **Azienda nuova**, da «Le mie richieste» del Tutor:
+- **Solo aziende non ancora in anagrafica** (PO, 27/11), da «Le mie richieste» del Tutor:
   - nome e zona del catalogo obbligatori, categoria merceologica facoltativa;
-  - prima dell'invio NEXUS mostra le aziende attive con un nome simile. Il Tutor può aprirne la scheda, chiedere di
-    contattare una di quelle, oppure confermare che l'azienda è nuova.
-- **Azienda già presente**: nella scheda dell'azienda del Tutor (US-511) il pulsante «Chiedi di contattarla». La
-  richiesta nasce collegata all'azienda.
+  - prima dell'invio NEXUS mostra le aziende attive con un nome simile. Se è una di quelle, è già in anagrafica e la
+    richiesta non serve: il Tutor ne apre la scheda. Altrimenti conferma che l'azienda è nuova.
+
+  Il criterio «azienda già presente: «Chiedi di contattarla» dalla scheda» dell'analisi del 23/11 è tolto: per
+  un'azienda in anagrafica il contatto non si chiede.
 - **Call Center**:
   - la pagina «Richieste di contatto», dalla più vecchia;
   - nel menu il numero delle richieste ancora da prendere in carico;
@@ -45,8 +46,9 @@ traccia, non si sa chi se ne occupa e a volte si perde.
 ## Impact
 
 - **Database: V56**:
-  - tabella `contact_request` con il contatore `contact_request_number_seq`, stato, azienda o nome e zona della
-    azienda nuova, categoria facoltativa, Tutor, operatore e istante della presa in carico;
+  - tabella `contact_request` con il contatore `contact_request_number_seq`, stato, nome e zona dell'azienda,
+    categoria facoltativa, Tutor, operatore e istante della presa in carico, e l'azienda dell'anagrafica che
+    l'operatore collegherà alla chiusura (US-512);
   - vincoli con nome esplicito, testati in `DomainConstraintsIT`;
   - estensione `pg_trgm` per i nomi simili. È un'estensione «trusted»: la crea il proprietario del database, ed entra
     nel backup perché il dump è dell'intero database.
@@ -58,7 +60,6 @@ traccia, non si sa chi se ne occupa e a volte si perde.
   - pagine «Le mie richieste» e nuova richiesta, per il Tutor;
   - pagina «Richieste di contatto» per il Call Center;
   - voci del menu, con il numero;
-  - pulsante «Chiedi di contattarla» nella scheda del Tutor;
   - testi in `it.ts`.
 - **Accessibilità**:
   - numero del menu anche nel nome accessibile della voce;

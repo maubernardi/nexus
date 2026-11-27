@@ -36,8 +36,7 @@ describe('<ContactRequestsPage>', () => {
   beforeEach(() => {
     vi.mocked(fetchContactRequestQueue).mockResolvedValue([
       contactRequest(1, {
-        companyId: 'C1',
-        companyName: 'Trattoria Bianchi S.n.c.',
+        companyName: 'Bar Pasticceria Stella',
         status: 'IN_CARICO',
         assignedOperatorName: 'Olga Operatrice',
         requestedByName: 'Ugo Tutor',
@@ -52,7 +51,7 @@ describe('<ContactRequestsPage>', () => {
     const table = await screen.findByRole('table', { name: /Richieste di contatto aperte e in carico/ });
     expect(screen.getByText('2 richieste: 1 da prendere in carico')).toBeInTheDocument();
     const [, first, second] = within(table).getAllByRole('row');
-    expect(within(first).getByRole('rowheader')).toHaveTextContent('Trattoria Bianchi S.n.c.');
+    expect(within(first).getByRole('rowheader')).toHaveTextContent('Bar Pasticceria Stella');
     expect(within(first).getAllByRole('cell')[3]).toHaveTextContent('Ugo Tutor');
     expect(within(first).getAllByRole('cell')[6]).toHaveTextContent('Olga Operatrice');
     expect(within(first).queryByRole('button')).not.toBeInTheDocument();

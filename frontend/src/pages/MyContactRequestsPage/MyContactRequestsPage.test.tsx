@@ -29,32 +29,34 @@ describe('<MyContactRequestsPage>', () => {
     vi.mocked(fetchMyContactRequests).mockResolvedValue([
       contactRequest(3),
       contactRequest(2, {
-        companyId: 'C1',
-        companyName: 'Trattoria Bianchi S.n.c.',
+        companyName: 'Bar Pasticceria Stella',
         status: 'IN_CARICO',
         assignedOperatorName: 'Olga Operatrice',
       }),
+      // chiusa e collegata all'anagrafica dall'operatore (US-512): il nome apre la scheda
+      contactRequest(1, { companyId: 'C1', companyName: 'Trattoria Bianchi', status: 'CHIUSA' }),
     ]);
   });
 
-  it('le richieste con lo stato in testo e l’operatore; l’azienda presente apre la scheda (US-507)', async () => {
+  it('le richieste con lo stato in testo e l’operatore; collegata all’anagrafica apre la scheda (US-507)', async () => {
     renderPage();
     const table = await screen.findByRole('table', { name: /Le tue richieste di contatto/ });
-    const [header, nuova, presente] = within(table).getAllByRole('row');
+    const [header, nuova, inCarico, collegata] = within(table).getAllByRole('row');
     expect(
       within(header)
         .getAllByRole('columnheader')
         .map((h) => h.textContent),
     ).toEqual(['N.', 'Azienda', 'Zona', 'Categoria', 'Inviata il', 'Stato', 'Operatore']);
     expect(within(nuova).getByRole('rowheader')).toHaveTextContent('Officina del Ponte');
-    expect(within(nuova).getByText('Azienda nuova, non ancora in NEXUS')).toHaveClass('sr-only');
     expect(within(nuova).getAllByRole('cell')[4]).toHaveTextContent('Aperta');
-    expect(within(presente).getByRole('link', { name: 'Trattoria Bianchi S.n.c.' })).toHaveAttribute(
+    expect(within(inCarico).getAllByRole('cell')[4]).toHaveTextContent('In carico');
+    expect(within(inCarico).getAllByRole('cell')[5]).toHaveTextContent('Olga Operatrice');
+    expect(within(inCarico).queryByRole('link')).not.toBeInTheDocument();
+    expect(within(collegata).getByRole('link', { name: 'Trattoria Bianchi' })).toHaveAttribute(
       'href',
       '/aziende/C1',
     );
-    expect(within(presente).getAllByRole('cell')[4]).toHaveTextContent('In carico');
-    expect(within(presente).getAllByRole('cell')[5]).toHaveTextContent('Olga Operatrice');
+    expect(within(collegata).getAllByRole('cell')[4]).toHaveTextContent('Chiusa');
     expect(screen.getByRole('link', { name: 'Chiedi di contattare un’azienda nuova' })).toHaveAttribute(
       'href',
       '/richieste/nuova',

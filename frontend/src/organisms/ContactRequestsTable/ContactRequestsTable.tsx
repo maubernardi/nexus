@@ -20,8 +20,9 @@ type ContactRequestsTableProps = {
 };
 
 /**
- * Richieste di contatto di un'azienda (US-507), per il Tutor («Le mie richieste») e per il Call Center: l'azienda già
- * presente apre la sua scheda; quella nuova ha il nome scritto dal Tutor e l'etichetta «nuova». Lo stato è in testo.
+ * Richieste di contatto di un'azienda non ancora in anagrafica (US-507), per il Tutor («Le mie richieste») e per il Call
+ * Center, con il nome scritto dal Tutor; collegata all'anagrafica alla chiusura (US-512), il nome apre la scheda. Lo
+ * stato è in testo.
  */
 export const ContactRequestsTable = ({
   requests,
@@ -82,18 +83,13 @@ export const ContactRequestsTable = ({
             <tr key={r.id} className="border-b border-border last:border-b-0">
               <td className={`${td} tabular-nums`}>{r.number}</td>
               <th scope="row" className={`${td} text-left font-semibold`}>
+                {/* collegata all'anagrafica alla chiusura (US-512): il nome apre la scheda */}
                 {r.companyId ? (
                   <Link to={`/aziende/${r.companyId}`} className="text-primary underline underline-offset-4">
                     {r.companyName}
                   </Link>
                 ) : (
-                  <>
-                    {r.companyName}{' '}
-                    <span className="inline-block rounded-full border border-input px-2 py-0.5 text-xs font-semibold whitespace-nowrap">
-                      <span aria-hidden="true">{t('contactRequest.newCompany')}</span>
-                      <span className="sr-only">{t('contactRequest.newCompanyLabel')}</span>
-                    </span>
-                  </>
+                  r.companyName
                 )}
               </th>
               <td className={td}>{r.zone?.name ?? t('contactRequest.none')}</td>

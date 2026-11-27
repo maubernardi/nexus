@@ -1747,35 +1747,34 @@ passandoci sopra con il mouse compare «Nave scuola».
 
 ## 40. Richiesta di contatto di un'azienda dal Tutor (Sprint 19)
 
-Sul collaudo del PC, prima del merge (http://localhost:8090, password `collaudo-nexus-2026`). Nei dati finti `tutor1`
-ha già due richieste: una aperta, per l'azienda nuova «Officina Meccanica Demo del Ponte», e una in carico a
-`operatore.cc`, per «Demo Logistica S.r.l.».
+Sul collaudo del PC, prima del merge (http://localhost:8090, password `collaudo-nexus-2026`). La richiesta di contatto
+si fa solo per un'azienda che non è ancora in NEXUS (PO, 27/11). Nei dati finti `tutor1` ha già due richieste: una
+aperta, per «Officina Meccanica Demo del Ponte», e una in carico a `operatore.cc`, per «Bar Pasticceria Demo Stella».
 
 - [ ] **T-40.1 Le richieste per il Call Center (US-507)**
   1. Entra come `operatore.cc`. **Atteso:** nel menu la voce «Richieste di contatto» con il numero 1.
-  2. Aprila. **Atteso:** le due richieste, dalla più vecchia. Per ognuna ci sono il Tutor (Tutor Uno), la zona, lo stato
-     e l'operatore. «Demo Logistica S.r.l.» apre la scheda dell'azienda; l'officina ha l'etichetta «nuova».
+  2. Aprila. **Atteso:** le due richieste, dalla più vecchia, con il Tutor (Tutor Uno), la zona, lo stato e
+     l'operatore.
   3. Premi «Prendi in carico» sull'officina. **Atteso:** «Hai preso in carico la richiesta di contatto n. …»; la
      richiesta mostra il tuo nome e il numero nel menu sparisce.
 
-- [ ] **T-40.2 Richiesta per un'azienda già presente (US-507)**
-  1. Esci ed entra come `tutor2`; apri «Aziende» e la scheda di «Demo Ristorazione S.n.c.». **Atteso:** il pulsante
-     «Chiedi di contattarla».
-  2. Premilo. **Atteso:** si apre «Le mie richieste» con «Richiesta di contatto n. … inviata: il Call Center la
-     prenderà in carico.» e la richiesta aperta, con il nome che apre la scheda dell'azienda.
-  3. Come `tutor1`, apri «Richieste» nel menu. **Atteso:** la pagina «Le mie richieste» con le sue due richieste,
-     l'officina in carico all'operatore; non quella di `tutor2`.
+- [ ] **T-40.2 Nessuna richiesta per le aziende già in NEXUS (US-507)**
+  1. Esci ed entra come `tutor2`; apri «Aziende» e la scheda di «Demo Ristorazione S.n.c.». **Atteso:** nessun pulsante
+     per chiedere di contattarla: è già in anagrafica.
+  2. Come `tutor1`, apri «Richieste» nel menu. **Atteso:** la pagina «Le mie richieste» con le sue due richieste, tutte
+     e due in carico all'operatore.
 
 - [ ] **T-40.3 Richiesta per un'azienda nuova, con i nomi simili (US-507)**
-  1. Come `tutor2`, in «Richieste» premi «Chiedi di contattare un'azienda nuova» e poi «Invia la richiesta»
-     senza scrivere niente. **Atteso:** il riepilogo indica il nome e la zona; la categoria è facoltativa.
+  1. Come `tutor2`, apri «Richieste», premi «Chiedi di contattare un'azienda nuova» e poi «Invia la richiesta» senza
+     scrivere niente. **Atteso:** il riepilogo indica il nome e la zona; la categoria è facoltativa.
   2. Scrivi «Demo Ristorazioni», scegli una zona e invia. **Atteso:** prima dell'invio compare «Aziende con un nome
-     simile», con «Demo Ristorazione S.n.c.» e il suo bollino della nave scuola. Puoi aprirne la scheda, chiedere di
-     contattare quella o confermare che l'azienda è nuova.
+     simile», con «Demo Ristorazione S.n.c.», il suo bollino della nave scuola e il collegamento alla scheda. Il testo
+     dice che, se è quella, è già in anagrafica e la richiesta non serve. Ci sono solo «No, è un'azienda nuova: invia
+     la richiesta» e «Correggi il nome».
   3. Premi «Correggi il nome», scrivi un nome che non somiglia a nessuno, per esempio «Ferramenta Lunghi e Figli», e
-     invia. **Atteso:** la richiesta parte subito e compare in «Le mie richieste» con l'etichetta «nuova».
-  4. Come `operatore.cc`, apri «Richieste di contatto». **Atteso:** in fondo all'elenco le due richieste di `tutor2`,
-     ancora aperte; nel menu il numero 2.
+     invia. **Atteso:** la richiesta parte subito e compare in «Le mie richieste», aperta.
+  4. Come `operatore.cc`, apri «Richieste di contatto». **Atteso:** in fondo all'elenco la richiesta di `tutor2`,
+     aperta; nel menu il numero 1.
 
 - [ ] **T-40.4 Menu, smartphone e tema scuro (US-507)**
   1. Come `admin`, apri «Amministrazione» nel menu. **Atteso:** in testa «Richieste di contatto», con il numero di

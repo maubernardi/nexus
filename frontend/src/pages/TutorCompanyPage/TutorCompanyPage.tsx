@@ -1,7 +1,5 @@
-import { useState } from 'react';
-import { PhoneOutgoing } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 
 import { PageHeading } from '@/atoms/PageHeading/PageHeading';
 import { RatingDisplay } from '@/atoms/RatingDisplay/RatingDisplay';
@@ -9,23 +7,17 @@ import { TrainingShipBadge } from '@/atoms/TrainingShipBadge/TrainingShipBadge';
 import { Button } from '@/components/ui/button';
 import { apiError } from '@/config/api/errors';
 import { useCompanyDirectoryItem } from '@/config/hooks/useCompanies';
-import { useCreateContactRequest } from '@/config/hooks/useContactRequests';
 import { BackLink } from '@/molecules/BackLink/BackLink';
 import { PageHeader } from '@/molecules/PageHeader/PageHeader';
 import { CompanyReviewsSection } from '@/organisms/CompanyReviewsSection/CompanyReviewsSection';
-import type { ContactRequestSentState } from '@/pages/MyContactRequestsPage/MyContactRequestsPage';
 
 /**
  * Scheda di un'azienda per il Tutor (US-1104), in sola lettura: i dati della sua lista (US-511) e le valutazioni dei
- * tirocini, con il nome del Tutor che le ha date. Niente partita IVA, recapiti, referenti, note o mansioni. Con «Chiedi
- * di contattarla» il Tutor chiede al Call Center di contattarla (US-507).
+ * tirocini, con il nome del Tutor che le ha date. Niente partita IVA, recapiti, referenti, note o mansioni.
  */
 export const TutorCompanyPage = () => {
   const { t } = useTranslation();
   const { id = '' } = useParams();
-  const navigate = useNavigate();
-  const ask = useCreateContactRequest();
-  const [askFailed, setAskFailed] = useState(false);
   const company = useCompanyDirectoryItem(id);
 
   if (company.isError) {
@@ -66,32 +58,6 @@ export const TutorCompanyPage = () => {
           </>
         )}
       </PageHeader>
-      <div className="space-y-2">
-        <Button
-          size="lg"
-          disabled={ask.isPending}
-          aria-busy={ask.isPending}
-          onClick={() => {
-            setAskFailed(false);
-            ask.mutate(
-              { companyId: c.id },
-              {
-                onSuccess: (saved) =>
-                  navigate('/richieste', { state: { sent: saved.number } satisfies ContactRequestSentState }),
-                onError: () => setAskFailed(true),
-              },
-            );
-          }}
-        >
-          <PhoneOutgoing aria-hidden="true" />
-          {ask.isPending ? t('contactRequest.asking') : t('contactRequest.askCompany')}
-        </Button>
-        {askFailed && (
-          <p role="alert" className="font-medium text-destructive">
-            {t('contactRequest.askError')}
-          </p>
-        )}
-      </div>
       <section
         aria-labelledby="tutor-company-data"
         className="space-y-3 rounded-xl border border-border bg-card p-4"
