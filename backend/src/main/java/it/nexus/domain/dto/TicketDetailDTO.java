@@ -50,5 +50,9 @@ public record TicketDetailDTO(
         /** Il Tutor della segnalazione può indicare o correggere il tipo: fino all'avvio del tirocinio. */
         boolean canChangeInternshipType,
         /** I tipi che il Tutor può scegliere (vuoto se non può cambiarlo). */
-        List<ReferenceItemDTO> internshipTypes) {
+        List<ReferenceItemDTO> internshipTypes,
+        /** Il Tutor della segnalazione corregge la richiesta (US-309): prima della proposta o da riaperta. */
+        boolean canCorrectRequest,
+        /** ...e anche il progetto: solo prima della proposta; nella riaperta si corregge la mansione (PO, 28/11). */
+        boolean canCorrectProject) {
 }

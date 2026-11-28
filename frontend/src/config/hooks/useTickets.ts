@@ -29,6 +29,7 @@ import {
   approveCategory,
   changeCompetenceSite,
   changeInternshipType,
+  correctTicketRequest,
   rejectCategory,
   rejectProposal,
   startInternship,
@@ -44,6 +45,7 @@ import {
   type TicketEvent,
   type TicketListItem,
   type TicketListQuery,
+  type TicketRequestCorrection,
 } from '@/config/api/ticketApi';
 
 export const TICKETS_KEY = ['tickets'] as const;
@@ -310,6 +312,19 @@ export const useChangeInternshipType = (): UseMutationResult<
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: changeInternshipType,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
+  });
+};
+
+/** Correzione di progetto e mansione richiesta del Tutor (US-309). */
+export const useCorrectTicketRequest = (): UseMutationResult<
+  TicketDetail,
+  unknown,
+  { id: string; form: TicketRequestCorrection }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: correctTicketRequest,
     onSettled: () => queryClient.invalidateQueries({ queryKey: TICKETS_KEY }),
   });
 };

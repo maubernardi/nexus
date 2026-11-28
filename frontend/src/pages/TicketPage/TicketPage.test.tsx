@@ -4,7 +4,12 @@ import { AxiosError, AxiosHeaders } from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { fetchCompany } from '@/config/api/companyApi';
-import { fetchJobCategories, fetchZones } from '@/config/api/referenceApi';
+import {
+  fetchJobCategories,
+  fetchMyProjects,
+  fetchProjectInternshipTypes,
+  fetchZones,
+} from '@/config/api/referenceApi';
 import { fetchBoardPost } from '@/config/api/boardPostApi';
 import {
   acceptProposal,
@@ -21,6 +26,7 @@ import {
   fetchTicketHistory,
   changeCompetenceSite,
   changeInternshipType,
+  correctTicketRequest,
   matchTicket,
   takeOverTicket,
   type JobSlotMatch,
@@ -53,6 +59,7 @@ vi.mock('@/config/api/ticketApi', () => ({
   rejectFastTrack: vi.fn(),
   changeCompetenceSite: vi.fn(),
   changeInternshipType: vi.fn(),
+  correctTicketRequest: vi.fn(),
 }));
 vi.mock('@/config/api/boardPostApi', () => ({ fetchBoardPost: vi.fn() }));
 vi.mock('@/config/api/referenceApi', () => ({
@@ -60,6 +67,7 @@ vi.mock('@/config/api/referenceApi', () => ({
   fetchJobCategories: vi.fn(),
   fetchMyProjects: vi.fn(),
   fetchProjects: vi.fn(),
+  fetchProjectInternshipTypes: vi.fn(),
   fetchCompetenceSites: vi.fn(async () => [
     { id: 'S1', code: 'FIRENZE', name: 'Firenze' },
     { id: 'S2', code: 'SESTO_FIORENTINO', name: 'Sesto Fiorentino' },
@@ -170,6 +178,8 @@ const detail = (overrides: Partial<TicketDetail> = {}): TicketDetail => ({
   canChangeCompetenceSite: false,
   internshipType: { id: 'IT2', code: 'EXTRACURRICULARE', name: 'Extracurriculare' },
   canChangeInternshipType: false,
+  canCorrectRequest: false,
+  canCorrectProject: false,
   ...overrides,
 });
 
@@ -1115,5 +1125,195 @@ describe('<TicketPage>', () => {
     const outcome = await screen.findByText('Tipo di tirocinio: Di inclusione.');
     await waitFor(() => expect(outcome).toHaveFocus());
     expect(vi.mocked(changeInternshipType).mock.calls[1][0]).toEqual({ id: 'T9', internshipTypeId: 'IT3' });
+  });
+
+  describe('correzione di progetto e mansione (US-309)', () => {
+    const POLIS = { id: 'P2', code: 'POLIS', name: 'POLIS' };
+    const CAM = { id: 'J2', code: 'CAMERIERE', name: 'Cameriere di sala e addetto al servizio ai tavoli' };
+    const EXTRA = { id: 'IT2', code: 'EXTRACURRICULARE', name: 'Extracurriculare' };
+
+    beforeEach(() => {
+      vi.mocked(fetchCurrentUser).mockResolvedValue({
+        id: 'tutor1',
+        username: 'tutor1',
+        firstName: 'Tutor',
+        lastName: 'Uno',
+        roles: ['TUTOR'],
+      });
+      vi.mocked(fetchMyProjects).mockResolvedValue([{ id: 'P1', code: 'GOL', name: 'GOL' }, POLIS]);
+      vi.mocked(fetchJobCategories).mockResolvedValue([MAG, CAM]);
+      vi.mocked(fetchProjectInternshipTypes).mockResolvedValue([
+        { id: 'IT1', code: 'CURRICULARE', name: 'Curriculare' },
+        EXTRA,
+      ]);
+      vi.mocked(correctTicketRequest).mockReset();
+    });
+
+    it('il Tutor cambia progetto e mansione: sede e tipo del progetto nuovo, esito con il focus', async () => {
+      const user = userEvent.setup();
+      vi.mocked(fetchTicket).mockResolvedValue(
+        detail({
+          status: 'NUOVA',
+          myTicket: true,
+          canCorrectRequest: true,
+          canCorrectProject: true,
+          assignedOperatorName: null,
+          assignedToMe: false,
+          competenceSite: { id: 'S9', code: 'EMPOLI', name: 'Empoli' },
+        }),
+      );
+      vi.mocked(correctTicketRequest).mockResolvedValue(
+        detail({ project: POLIS, requestedJobCategory: CAM, canCorrectRequest: true }),
+      );
+      renderPage();
+
+      await user.click(await screen.findByRole('button', { name: 'Correggi progetto e mansione' }));
+      const form = screen.getByRole('form', { name: 'Correzione di progetto e mansione' });
+      const project = within(form).getByRole('combobox', { name: /^Progetto/ });
+      await waitFor(() => expect(project).toHaveFocus());
+      expect(project).toHaveValue('P1');
+      expect(within(form).getByRole('combobox', { name: /^Mansione richiesta/ })).toHaveValue('J1');
+      // con lo stesso progetto sede e tipo restano: niente campi
+      expect(within(form).queryByRole('combobox', { name: /^Sede di competenza/ })).toBeNull();
+      expect(within(form).queryByRole('combobox', { name: /^Tipo di tirocinio/ })).toBeNull();
+
+      await user.selectOptions(project, 'P2');
+      const site = await within(form).findByRole('combobox', { name: /^Sede di competenza/ });
+      // il tipo della segnalazione resta, perché il progetto nuovo lo ammette
+      await waitFor(() =>
+        expect(within(form).getByRole('combobox', { name: /^Tipo di tirocinio/ })).toHaveValue('IT2'),
+      );
+      await user.click(within(form).getByRole('button', { name: 'Salva la correzione' }));
+      const summary = await within(form).findByRole('alert');
+      expect(summary).toHaveTextContent('Sede di competenza: Campo obbligatorio');
+      expect(correctTicketRequest).not.toHaveBeenCalled();
+      await expectNoAxeViolations();
+
+      await user.selectOptions(site, 'S2');
+      await user.selectOptions(within(form).getByRole('combobox', { name: /^Mansione richiesta/ }), 'J2');
+      await user.click(within(form).getByRole('button', { name: 'Salva la correzione' }));
+      await waitFor(() =>
+        expect(vi.mocked(correctTicketRequest).mock.calls[0][0]).toEqual({
+          id: 'T9',
+          form: {
+            version: 2,
+            projectId: 'P2',
+            jobCategoryId: 'J2',
+            jobFreeText: null,
+            competenceSiteId: 'S2',
+            internshipTypeId: 'IT2',
+          },
+        }),
+      );
+      const outcome = await screen.findByText(
+        'Correzione salvata: progetto POLIS, mansione Cameriere di sala e addetto al servizio ai tavoli.',
+      );
+      await waitFor(() => expect(outcome).toHaveFocus());
+      expect(screen.queryByRole('form', { name: 'Correzione di progetto e mansione' })).toBeNull();
+    });
+
+    it('nuova tipologia in attesa: si corregge il testo; un rifiuto del server si annuncia', async () => {
+      const user = userEvent.setup();
+      vi.mocked(fetchTicket).mockResolvedValue(
+        detail({
+          status: 'IN_ATTESA_APPROVAZIONE',
+          requestedJobCategory: null,
+          requestedJobFreeText: 'Adetto al banco',
+          myTicket: true,
+          canCorrectRequest: true,
+          canCorrectProject: true,
+        }),
+      );
+      vi.mocked(correctTicketRequest).mockRejectedValue(
+        new AxiosError('409', 'ERR_BAD_REQUEST', undefined, undefined, {
+          status: 409,
+          statusText: 'Conflict',
+          headers: new AxiosHeaders(),
+          config: { headers: new AxiosHeaders() },
+          data: {
+            status: 409,
+            message: 'Dopo la proposta all’azienda progetto e mansione non si correggono più',
+          },
+        }),
+      );
+      renderPage();
+
+      await user.click(await screen.findByRole('button', { name: 'Correggi progetto e mansione' }));
+      const text = await screen.findByRole('textbox', { name: /^Nuova tipologia di mansione/ });
+      expect(text).toHaveValue('Adetto al banco');
+      expect(screen.queryByRole('combobox', { name: /^Mansione richiesta/ })).toBeNull();
+      await user.clear(text);
+      await user.type(text, '  Addetto al banco del pesce ');
+      await user.click(screen.getByRole('button', { name: 'Salva la correzione' }));
+      await waitFor(() =>
+        expect(vi.mocked(correctTicketRequest).mock.calls[0][0].form).toEqual({
+          version: 2,
+          projectId: 'P1',
+          jobCategoryId: null,
+          jobFreeText: 'Addetto al banco del pesce',
+          competenceSiteId: null,
+          internshipTypeId: null,
+        }),
+      );
+      const refusal = await screen.findByRole('alert');
+      expect(refusal).toHaveTextContent(
+        'Dopo la proposta all’azienda progetto e mansione non si correggono più',
+      );
+      await waitFor(() => expect(refusal).toHaveFocus());
+    });
+
+    it('riaperta: si corregge solo la mansione, il progetto resta', async () => {
+      const user = userEvent.setup();
+      vi.mocked(fetchTicket).mockResolvedValue(
+        detail({ status: 'RIAPERTO', myTicket: true, canCorrectRequest: true }),
+      );
+      vi.mocked(correctTicketRequest).mockResolvedValue(
+        detail({ status: 'RIAPERTO', requestedJobCategory: CAM, canCorrectRequest: true }),
+      );
+      renderPage();
+
+      await user.click(await screen.findByRole('button', { name: 'Correggi la mansione' }));
+      const form = screen.getByRole('form', { name: 'Correzione della mansione' });
+      expect(form).toHaveTextContent('il progetto resta GOL');
+      expect(within(form).queryByRole('combobox', { name: /^Progetto/ })).toBeNull();
+      const job = within(form).getByRole('combobox', { name: /^Mansione richiesta/ });
+      await waitFor(() => expect(job).toHaveFocus());
+      await user.selectOptions(job, 'J2');
+      await user.click(within(form).getByRole('button', { name: 'Salva la correzione' }));
+      await waitFor(() =>
+        expect(vi.mocked(correctTicketRequest).mock.calls[0][0].form).toEqual({
+          version: 2,
+          projectId: 'P1',
+          jobCategoryId: 'J2',
+          jobFreeText: null,
+          competenceSiteId: null,
+          internshipTypeId: null,
+        }),
+      );
+      const outcome = await screen.findByText(
+        'Correzione salvata: mansione Cameriere di sala e addetto al servizio ai tavoli.',
+      );
+      await waitFor(() => expect(outcome).toHaveFocus());
+      await expectNoAxeViolations();
+    });
+
+    it('annullando il focus torna sul comando; senza permesso nessun comando', async () => {
+      const user = userEvent.setup();
+      vi.mocked(fetchTicket).mockResolvedValue(
+        detail({ myTicket: true, canCorrectRequest: true, canCorrectProject: true }),
+      );
+      const { unmount } = renderPage();
+      await user.click(await screen.findByRole('button', { name: 'Correggi progetto e mansione' }));
+      await user.click(await screen.findByRole('button', { name: 'Annulla' }));
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: 'Correggi progetto e mansione' })).toHaveFocus(),
+      );
+      unmount();
+
+      vi.mocked(fetchTicket).mockResolvedValue(detail({ myTicket: true, status: 'PROPOSTA_AZIENDA' }));
+      renderPage();
+      expect(await screen.findByText('Magazziniere')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Correggi progetto e mansione' })).toBeNull();
+    });
   });
 });

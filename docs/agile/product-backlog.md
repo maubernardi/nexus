@@ -96,7 +96,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-306](#us-306) | E3 | Segnalazione speciale dalla bacheca | Must | 3 | R2 | 🎉 Done (Sprint 7) |
 | [US-307](#us-307) | E3 | Scadenza nella Home del Tutor | Must | 2 | R2 | 🎉 Done (Sprint 6) |
 | [US-308](#us-308) | E3 | Sede di competenza della segnalazione | Must | 3 | R4 | 🎉 Done (Sprint 12) |
-| [US-309](#us-309) | E3 | Correzione del progetto e della mansione richiesta di una segnalazione | Must | 3 | R4 | ✅ Ready |
+| [US-309](#us-309) | E3 | Correzione del progetto e della mansione richiesta di una segnalazione | Must | 3 | R4 | 🔨 In corso (Sprint 20) |
 | [US-401](#us-401) | E4 | Coda FIFO | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | 🎉 Done (Sprint 7) |
@@ -613,14 +613,16 @@ Criteri di accettazione:
 - Fatto il 10/11: vale anche per la candidatura dalla bacheca; con una sola sede nel progetto è già selezionata.
 
 #### US-309
-**Correzione del progetto e della mansione richiesta di una segnalazione** · Must · 3 punti · R4 · ✅ Ready
+**Correzione del progetto e della mansione richiesta di una segnalazione** · Must · 3 punti · R4 · 🔨 In corso (Sprint 20)
 
 Come **Tutor** voglio correggere il progetto e la mansione richiesta di una segnalazione inviata per sbaglio, senza
 chiedere a qualcuno di intervenire sul database (ricerca A42, review dello Sprint 19).
 
 Criteri di accettazione:
-- Il **Tutor della segnalazione** corregge progetto e mansione richiesta finché la segnalazione non ha una proposta
-  all'azienda. **Call Center e ADMIN** li correggono anche dopo, fino all'avvio del tirocinio.
+- Dopo l'invio, **solo il Tutor della segnalazione** corregge progetto e mansione richiesta, finché la segnalazione non
+  ha una proposta all'azienda. Call Center e ADMIN non li correggono (PO, 28/11).
+- Nella segnalazione **riaperta** il Tutor corregge la mansione richiesta, per le nuove proposte; il progetto resta
+  (PO, 28/11).
 - **Progetto**: uno dei progetti del Tutor della segnalazione. Se la sede di competenza (US-308) o il tipo di tirocinio
   (US-605) non valgono per il progetto nuovo, NEXUS chiede di sceglierli di nuovo, tra quelli del progetto.
 - **Mansione richiesta**: una tipologia attiva del catalogo. Il testo libero si corregge solo mentre la segnalazione

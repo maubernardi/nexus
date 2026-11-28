@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -58,6 +59,7 @@ import it.nexus.domain.dto.InternshipToCloseDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
+import it.nexus.domain.dto.TicketRequestCorrectionDTO;
 import it.nexus.domain.dto.TicketEventDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.dto.TicketSpecialCreateDTO;
@@ -244,6 +246,95 @@ public class TicketServiceImpl implements TicketService {
         if (ticketInternshipTypeService.change(ticket, type, false)) {
             // la scheda ha lo stesso tipo della segnalazione
             internshipRepository.findByTicketId(ticket.getId()).ifPresent(i -> i.setInternshipType(type));
+        }
+        return detail(ticket, me);
+    }
+
+    @Override
+    public TicketDetailDTO correctRequest(String ticketId, TicketRequestCorrectionDTO dto) {
+        AppUser me = currentAppUserService.getCurrentAppUser();
+        Ticket ticket = ownTicket(ticketId, me, "correggere progetto e mansione");
+        if (!canCorrectRequest(ticket, me)) {
+            throw new ConflictException(ticket.getType() == TicketType.SPECIAL
+                    ? "La candidatura dalla bacheca ha la mansione dell'annuncio: progetto e mansione non si correggono"
+                    : "Dopo la proposta all'azienda progetto e mansione non si correggono più, finché la "
+                            + "segnalazione non è riaperta");
+        }
+        if (ticket.getVersion() != dto.version()) {
+            throw new ConflictException("La segnalazione n. %d è cambiata nel frattempo: ricarica la pagina",
+                    ticket.getNumber());
+        }
+        AuditChanges changes = AuditChanges.of();
+        boolean changed = false;
+        Project projectBefore = ticket.getProject();
+        if (!canCorrectProject(ticket)) {
+            // riaperta: si corregge la mansione per le nuove proposte, il progetto resta (PO, 28/11)
+            if (!projectBefore.getId().equals(TsidMapper.toInternal(dto.projectId().strip()))) {
+                throw new FieldValidationException("projectId",
+                        "Nella segnalazione riaperta si corregge solo la mansione: il progetto resta %s"
+                                .formatted(projectBefore.getName()));
+            }
+        } else {
+            Project project = assignedProject(dto.projectId(), me);
+            if (!project.equals(projectBefore)) {
+                // con il progetto nuovo, sede e tipo devono valere per lui (US-308, US-605)
+                CompetenceSite siteBefore = ticket.getCompetenceSite();
+                CompetenceSite site = competenceSite(project, dto.competenceSiteId());
+                InternshipType typeBefore = ticket.getInternshipType();
+                InternshipType type = internshipTypeRules.choose(dto.internshipTypeId(), typeBefore, project,
+                        ticket.getBeneficiary());
+                if (type == null) {
+                    throw new FieldValidationException(InternshipTypeRules.FIELD, "Scegli il tipo di tirocinio");
+                }
+                if (!InternshipTypeRules.allowedFor(project, type)) {
+                    throw new FieldValidationException(InternshipTypeRules.FIELD,
+                            "Il tipo «%s» non è ammesso dal progetto %s".formatted(type.getName(),
+                                    project.getName()));
+                }
+                ticket.setProject(project);
+                ticket.setCompetenceSite(site);
+                ticket.setInternshipType(type);
+                changes.value("project", projectBefore.getName(), project.getName());
+                if (!Objects.equals(siteBefore, site)) {
+                    changes.value("competenceSite", siteBefore == null ? null : siteBefore.getName(),
+                            site == null ? null : site.getName());
+                }
+                if (!type.equals(typeBefore)) {
+                    changes.value("internshipType", typeBefore == null ? null : typeBefore.getName(),
+                            type.getName());
+                    internshipRepository.findByTicketId(ticket.getId()).ifPresent(i -> i.setInternshipType(type));
+                }
+                changed = true;
+            }
+        }
+        if (ticket.getRequestedJobCategory() != null) {
+            if (isBlank(dto.jobCategoryId())) {
+                throw new FieldValidationException("jobCategoryId", "Scegli la mansione");
+            }
+            JobCategory before = ticket.getRequestedJobCategory();
+            // quella già scelta resta anche se nel frattempo disattivata; una nuova deve essere attiva
+            if (!before.getId().equals(TsidMapper.toInternal(dto.jobCategoryId().strip()))) {
+                JobCategory category = activeJobCategory(dto.jobCategoryId().strip());
+                ticket.setRequestedJobCategory(category);
+                changes.value("requestedJobCategory", before.getName(), category.getName());
+                changed = true;
+            }
+        } else {
+            // tipologia nuova in attesa di approvazione (US-302): si corregge il testo
+            String text = dto.jobFreeText() == null ? "" : dto.jobFreeText().strip();
+            if (text.isEmpty()) {
+                throw new FieldValidationException("jobFreeText", "Scrivi la mansione");
+            }
+            String before = ticket.getRequestedJobFreeText();
+            if (!text.equals(before)) {
+                ticket.setRequestedJobFreeText(text);
+                changes.value("requestedJobFreeText", before, text);
+                changed = true;
+            }
+        }
+        if (changed) {
+            ticketRepository.saveAndFlush(ticket);
+            auditService.record(AuditEntityType.TICKET, ticket.getId(), "REQUEST_CORRECTED", changes, null);
         }
         return detail(ticket, me);
     }
@@ -493,6 +584,23 @@ public class TicketServiceImpl implements TicketService {
                 .toList();
     }
 
+    /** Le correzioni di progetto e mansione (US-309), con prima e dopo: «Progetto: GOL → POLIS; Mansione: …». */
+    private String corrections(AuditEvent event) {
+        Map<String, String> labels = new LinkedHashMap<>();
+        labels.put("project", "Progetto");
+        labels.put("requestedJobCategory", "Mansione");
+        labels.put("requestedJobFreeText", "Mansione");
+        labels.put("competenceSite", "Sede di competenza");
+        labels.put("internshipType", "Tipo di tirocinio");
+        String text = labels.entrySet().stream()
+                .filter(e -> event.getChanges().containsKey(e.getKey()))
+                .map(e -> "%s: %s → %s".formatted(e.getValue(),
+                        Optional.ofNullable(changed(event, e.getKey(), "before")).orElse("—"),
+                        Optional.ofNullable(changed(event, e.getKey(), "after")).orElse("—")))
+                .collect(Collectors.joining("; "));
+        return text.isEmpty() ? null : text;
+    }
+
     /** Dettaglio leggibile di un evento: chi ha preso in carico, a chi è passata, quale proposta. */
     private String describe(AuditEvent event) {
         return switch (event.getAction()) {
@@ -508,6 +616,7 @@ public class TicketServiceImpl implements TicketService {
             case "COMPETENCE_SITE_CHANGED" -> Optional.ofNullable(changed(event, "competenceSite", "before"))
                     .map(before -> before + " → " + changed(event, "competenceSite", "after"))
                     .orElse(changed(event, "competenceSite", "after"));
+            case "REQUEST_CORRECTED" -> corrections(event);
             case "INTERNSHIP_TYPE_CHANGED" -> Optional.ofNullable(changed(event, "internshipType", "before"))
                     .map(before -> before + " → " + changed(event, "internshipType", "after"))
                     .orElse(changed(event, "internshipType", "after"));
@@ -969,7 +1078,27 @@ public class TicketServiceImpl implements TicketService {
                 referenceMapper.toDto(t.getInternshipType()),
                 canChangeInternshipType(t, me),
                 canChangeInternshipType(t, me)
-                        ? internshipTypeRules.choosable(t.getProject(), t.getInternshipType()) : List.of());
+                        ? internshipTypeRules.choosable(t.getProject(), t.getInternshipType()) : List.of(),
+                canCorrectRequest(t, me),
+                canCorrectRequest(t, me) && canCorrectProject(t));
+    }
+
+    /** Stati prima della proposta all'azienda (US-309): progetto e mansione si correggono ancora. */
+    private static final Set<TicketStatus> BEFORE_PROPOSAL =
+            Set.of(TicketStatus.NUOVA, TicketStatus.IN_ATTESA_APPROVAZIONE, TicketStatus.IN_LAVORAZIONE);
+
+    /**
+     * Solo il Tutor della segnalazione normale (US-309, PO 28/11): prima della proposta, oppure riaperta per cercare
+     * un'altra mansione.
+     */
+    private static boolean canCorrectRequest(Ticket t, AppUser me) {
+        return t.getTutor().getId().equals(me.getId()) && t.getType() == TicketType.NORMAL
+                && (BEFORE_PROPOSAL.contains(t.getStatus()) || t.getStatus() == TicketStatus.RIAPERTO);
+    }
+
+    /** Il progetto si corregge solo prima della proposta; nella riaperta resta (PO, 28/11). */
+    private static boolean canCorrectProject(Ticket t) {
+        return BEFORE_PROPOSAL.contains(t.getStatus());
     }
 
     /** Il Tutor della segnalazione, fino all'avvio del tirocinio (US-605). */
