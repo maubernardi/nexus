@@ -94,6 +94,11 @@ public class InternshipTypeRules {
         return missing;
     }
 
+    /** Il tipo vale per il progetto (US-309: correzione del progetto della segnalazione). */
+    public static boolean allowedFor(Project project, InternshipType type) {
+        return allowed(project, type);
+    }
+
     /** Un progetto senza tipi indicati li ammette tutti (fino al censimento dei progetti). */
     private static boolean allowed(Project project, InternshipType type) {
         return project.getAllowedInternshipTypes().isEmpty() || project.getAllowedInternshipTypes().contains(type);

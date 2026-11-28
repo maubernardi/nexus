@@ -35,6 +35,7 @@ import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketSpecialCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
+import it.nexus.domain.dto.TicketRequestCorrectionDTO;
 import it.nexus.domain.dto.TicketEventDTO;
 import it.nexus.domain.dto.VersionDTO;
 import it.nexus.domain.enumeration.TicketListView;
@@ -146,6 +147,14 @@ public class TicketResource {
     public ResponseEntity<TicketDetailDTO> changeInternshipType(@PathVariable String id,
             @RequestBody @Valid InternshipTypeChangeDTO body) {
         return ResponseEntity.ok(ticketService.changeInternshipType(id, body));
+    }
+
+    @PutMapping("/{id}/request")
+    @PreAuthorize("hasRole(@requestsAuthorizer.TUTOR)")
+    @Operation(summary = "Corregge progetto e mansione richiesta (US-309): il Tutor della segnalazione, prima della proposta")
+    public ResponseEntity<TicketDetailDTO> correctRequest(@PathVariable String id,
+            @RequestBody @Valid TicketRequestCorrectionDTO body) {
+        return ResponseEntity.ok(ticketService.correctRequest(id, body));
     }
 
     @PutMapping("/{id}/competence-site")

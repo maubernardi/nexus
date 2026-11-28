@@ -11,7 +11,7 @@
 
 | ID | Storia | Punti | Stato | Change OpenSpec | PR |
 |---|---|---|---|---|---|
-| US-309 | Correzione del progetto e della mansione richiesta di una segnalazione | 3 | ✅ Ready | — | — |
+| US-309 | Correzione del progetto e della mansione richiesta di una segnalazione | 3 | 🔨 In corso | `add-ticket-request-correction` | — |
 | US-804 | Correzione dell'appuntamento registrato | 2 | ✅ Ready | — | — |
 | US-606 | Togliere l'esclusione di un'azienda per una segnalazione | 3 | ✅ Ready | — | — |
 

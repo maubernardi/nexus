@@ -207,7 +207,7 @@ export const it = {
         'Solo i beneficiari che hai registrato. Chi ha già una segnalazione aperta non è selezionabile: ne è ammessa una alla volta.',
       project: 'Solo i progetti a cui sei assegnato.',
       competenceSite:
-        'Il luogo dei documenti di fine tirocinio. Dopo l’invio la correggono solo l’amministrazione e il Coordinatore del progetto.',
+        'Il luogo dei documenti di fine tirocinio. Dopo l’invio la correggono l’amministrazione e il Coordinatore del progetto; tu la scegli di nuovo se correggi il progetto, prima della proposta all’azienda.',
       internshipType:
         'Solo i tipi ammessi dal progetto. «Di inclusione» richiede l’ente e il case manager nella scheda del beneficiario. Si può cambiare fino all’avvio del tirocinio.',
       jobCategory: 'Il tipo di lavoro che il beneficiario desidera svolgere.',
@@ -1272,6 +1272,18 @@ export const it = {
       cancel: 'Annulla',
       saved: 'Tipo di tirocinio: {{name}}.',
     },
+    requestCorrection: {
+      change: 'Correggi progetto e mansione',
+      form: 'Correzione di progetto e mansione',
+      hint: 'Puoi correggerli fino alla proposta all’azienda. La correzione resta nella cronologia.',
+      projectHint:
+        'Solo i progetti a cui sei assegnato. Se lo cambi, scegli la sede di competenza e il tipo di tirocinio del progetto nuovo.',
+      jobFreeTextHint:
+        'La nuova tipologia aspetta l’approvazione del Call Center: puoi correggerne il testo.',
+      save: 'Salva la correzione',
+      cancel: 'Annulla',
+      saved: 'Correzione salvata: progetto {{project}}, mansione {{job}}.',
+    },
     noInternshipType:
       'Il tipo di tirocinio non è indicato: la mansione non si può proporre finché il Tutor non lo indica nella segnalazione.',
     competenceSite: {
@@ -1460,6 +1472,7 @@ export const it = {
       DOCUMENT_GENERATED: 'Documento scaricato',
       COMPETENCE_SITE_CHANGED: 'Sede di competenza corretta',
       INTERNSHIP_TYPE_CHANGED: 'Tipo di tirocinio cambiato',
+      REQUEST_CORRECTED: 'Progetto e mansione corretti dal Tutor',
       CATEGORY_APPROVE: 'Nuova tipologia approvata',
       CATEGORY_REJECT: 'Tipologia cambiata dal Call Center',
       STATUS: 'Cambio di stato',

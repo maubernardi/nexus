@@ -46,6 +46,7 @@ import { ClosureReportView } from '@/organisms/ClosureReportView/ClosureReportVi
 import { CompetenceSiteCorrection } from '@/organisms/CompetenceSiteCorrection/CompetenceSiteCorrection';
 import { InternshipTypeCorrection } from '@/organisms/InternshipTypeCorrection/InternshipTypeCorrection';
 import { MatchDetailsDialog } from '@/organisms/MatchDetailsDialog/MatchDetailsDialog';
+import { TicketRequestCorrection } from '@/organisms/TicketRequestCorrection/TicketRequestCorrection';
 import type { BeneficiaryLinkState } from '@/pages/BeneficiaryPage/BeneficiaryPage';
 import { BackLink } from '@/molecules/BackLink/BackLink';
 import { PageHeader } from '@/molecules/PageHeader/PageHeader';
@@ -518,6 +519,7 @@ const KNOWN_ACTIONS = [
   'DOCUMENT_GENERATED',
   'COMPETENCE_SITE_CHANGED',
   'INTERNSHIP_TYPE_CHANGED',
+  'REQUEST_CORRECTED',
   'STATUS',
 ] as const;
 
@@ -1215,6 +1217,7 @@ const TicketData = ({ ticket: d, manage }: { ticket: TicketDetail; manage: boole
           </>
         )}
       </dl>
+      {d.canCorrectRequest && <TicketRequestCorrection ticket={d} />}
       {d.canChangeCompetenceSite && <CompetenceSiteCorrection ticket={d} />}
       {d.canChangeInternshipType && <InternshipTypeCorrection ticket={d} />}
     </section>

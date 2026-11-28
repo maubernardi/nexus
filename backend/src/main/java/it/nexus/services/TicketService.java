@@ -19,6 +19,7 @@ import it.nexus.domain.dto.InternshipToCloseDTO;
 import it.nexus.domain.dto.TicketCreateDTO;
 import it.nexus.domain.dto.TicketDTO;
 import it.nexus.domain.dto.TicketDetailDTO;
+import it.nexus.domain.dto.TicketRequestCorrectionDTO;
 import it.nexus.domain.dto.TicketEventDTO;
 import it.nexus.domain.dto.TicketListItemDTO;
 import it.nexus.domain.dto.TicketSpecialCreateDTO;
@@ -47,6 +48,12 @@ public interface TicketService {
 
     /** Il Tutor della segnalazione indica o corregge il tipo di tirocinio, fino all'avvio (US-605). */
     TicketDetailDTO changeInternshipType(String ticketId, InternshipTypeChangeDTO dto);
+
+    /**
+     * Correzione del progetto e della mansione richiesta (US-309): solo il Tutor della segnalazione, prima della proposta
+     * all'azienda, nelle segnalazioni normali.
+     */
+    TicketDetailDTO correctRequest(String ticketId, TicketRequestCorrectionDTO dto);
 
 
     /** Presa in carico da parte dell'operatore corrente (US-402); 409 se un collega l'ha già presa. */

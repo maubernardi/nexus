@@ -167,6 +167,8 @@ export type TicketDetail = {
   canChangeInternshipType: boolean;
   /** I tipi che il Tutor può scegliere. */
   internshipTypes?: ReferenceItem[];
+  /** Il Tutor della segnalazione corregge progetto e mansione richiesta (US-309): prima della proposta. */
+  canCorrectRequest: boolean;
 };
 
 /**
@@ -493,6 +495,33 @@ export const changeInternshipType = async ({
   const { data } = await axiosInstance.put<TicketDetail>(
     `${ENDPOINTS.tickets}/${encodeURIComponent(id)}/internship-type`,
     { internshipTypeId },
+  );
+  return data;
+};
+
+/**
+ * Correzione di progetto e mansione richiesta (US-309): solo il Tutor della segnalazione, prima della proposta. Sede e
+ * tipo servono se cambia il progetto; il testo libero se la tipologia nuova aspetta l'approvazione.
+ */
+export type TicketRequestCorrection = {
+  version: number;
+  projectId: string;
+  jobCategoryId: string | null;
+  jobFreeText: string | null;
+  competenceSiteId: string | null;
+  internshipTypeId: string | null;
+};
+
+export const correctTicketRequest = async ({
+  id,
+  form,
+}: {
+  id: string;
+  form: TicketRequestCorrection;
+}): Promise<TicketDetail> => {
+  const { data } = await axiosInstance.put<TicketDetail>(
+    `${ENDPOINTS.tickets}/${encodeURIComponent(id)}/request`,
+    form,
   );
   return data;
 };
