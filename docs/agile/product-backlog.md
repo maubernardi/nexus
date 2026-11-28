@@ -3,7 +3,7 @@
 Ordinato per priorità dal Product Owner. Stime in story point (Fibonacci); stato: 📋 Backlog · ✅ Ready · 🔨 In corso · 👀 In review · 🎉 Done.
 Metodo di lavoro, Definition of Ready e Definition of Done: [README](README.md). Release: [Roadmap](roadmap.md).
 
-**Totale: 110 elementi, 455 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-18](sprints/sprint-18.md), il 26/11 ([review](sprints/sprint-18-review.md)); in corso lo [Sprint 19](sprints/sprint-19.md), dal 27/11.
+**Totale: 113 elementi, 463 punti**. La fondazione tecnica (Sprint 0) è già completata: vedi [sprint-00](sprints/sprint-00.md). Ultimo sprint concluso: [sprint-19](sprints/sprint-19.md), il 27/11 ([review](sprints/sprint-19-review.md)); in corso lo [Sprint 20](sprints/sprint-20.md), dal 28/11.
 
 ## Epiche
 
@@ -96,6 +96,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-306](#us-306) | E3 | Segnalazione speciale dalla bacheca | Must | 3 | R2 | 🎉 Done (Sprint 7) |
 | [US-307](#us-307) | E3 | Scadenza nella Home del Tutor | Must | 2 | R2 | 🎉 Done (Sprint 6) |
 | [US-308](#us-308) | E3 | Sede di competenza della segnalazione | Must | 3 | R4 | 🎉 Done (Sprint 12) |
+| [US-309](#us-309) | E3 | Correzione del progetto e della mansione richiesta di una segnalazione | Must | 3 | R4 | ✅ Ready |
 | [US-401](#us-401) | E4 | Coda FIFO | Must | 5 | R1 | 🎉 Done (Sprint 1) |
 | [US-402](#us-402) | E4 | Presa in carico | Must | 2 | R1 | 🎉 Done (Sprint 2) |
 | [US-403](#us-403) | E4 | Approvazione fast-track | Must | 5 | R2 | 🎉 Done (Sprint 7) |
@@ -121,6 +122,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-603](#us-603) | E6 | Esclusione di un'azienda | Should | 2 | R2 | 🎉 Done (Sprint 5) |
 | [US-604](#us-604) | E6 | Dettagli di azienda e mansione durante l'abbinamento | Must | 5 | R1 | 🎉 Done (Sprint 4) |
 | [US-605](#us-605) | E6 | Una mansione per più segnalazioni, una per tipo di tirocinio | Must | 8 | R4 | 🎉 Done (Sprint 15) |
+| [US-606](#us-606) | E6 | Togliere l'esclusione di un'azienda per una segnalazione | Must | 3 | R4 | ✅ Ready |
 | [US-701](#us-701) | E7 | Accettazione della proposta | Must | 3 | R2 | 🎉 Done (Sprint 4) |
 | [US-702](#us-702) | E7 | Rifiuto della proposta | Should | 3 | R2 | 🎉 Done (Sprint 5) |
 | [US-703](#us-703) | E7 | Calendario dei giorni lavorativi | Must | 3 | R2 | 🎉 Done (Sprint 4) |
@@ -129,6 +131,7 @@ Bloccano la *Definition of Ready* delle storie indicate.
 | [US-801](#us-801) | E8 | Appuntamento preso | Must | 2 | R2 | 🎉 Done (Sprint 5) |
 | [US-802](#us-802) | E8 | Appuntamento fallito | Must | 3 | R2 | 🎉 Done (Sprint 5) |
 | [US-803](#us-803) | E8 | Rilancio in bacheca | Must | 5 | R2 | 🎉 Done (Sprint 6) |
+| [US-804](#us-804) | E8 | Correzione dell'appuntamento registrato | Must | 2 | R4 | ✅ Ready |
 | [US-901](#us-901) | E9 | Bacheca per il Tutor | Must | 3 | R2 | 🎉 Done (Sprint 6) |
 | [US-902](#us-902) | E9 | Gestione della bacheca | Must | 5 | R2 | 🎉 Done (Sprint 6) |
 | [US-903](#us-903) | E9 | Sblocco a tutti dopo 7 giorni | Must | 2 | R2 | 🎉 Done (Sprint 6) |
@@ -609,6 +612,23 @@ Criteri di accettazione:
 - Si vede nel dettaglio della segnalazione. Le segnalazioni già esistenti restano senza sede.
 - Fatto il 10/11: vale anche per la candidatura dalla bacheca; con una sola sede nel progetto è già selezionata.
 
+#### US-309
+**Correzione del progetto e della mansione richiesta di una segnalazione** · Must · 3 punti · R4 · ✅ Ready
+
+Come **Tutor** voglio correggere il progetto e la mansione richiesta di una segnalazione inviata per sbaglio, senza
+chiedere a qualcuno di intervenire sul database (ricerca A42, review dello Sprint 19).
+
+Criteri di accettazione:
+- Il **Tutor della segnalazione** corregge progetto e mansione richiesta finché la segnalazione non ha una proposta
+  all'azienda. **Call Center e ADMIN** li correggono anche dopo, fino all'avvio del tirocinio.
+- **Progetto**: uno dei progetti del Tutor della segnalazione. Se la sede di competenza (US-308) o il tipo di tirocinio
+  (US-605) non valgono per il progetto nuovo, NEXUS chiede di sceglierli di nuovo, tra quelli del progetto.
+- **Mansione richiesta**: una tipologia attiva del catalogo. Il testo libero si corregge solo mentre la segnalazione
+  aspetta l'approvazione della nuova tipologia (US-302).
+- Ogni correzione entra nell'audit con prima e dopo (EN-2) e compare nello storico della segnalazione.
+
+Dipendenze: US-302, US-308, US-605
+
 ### E4 — Coda Call Center e fast-track (fase 3)
 
 _Il Call Center lavora le segnalazioni in ordine FIFO, con priorità alle segnalazioni speciali._
@@ -1012,6 +1032,21 @@ Criteri di accettazione:
 
 Dipendenze: US-301, US-602, US-115, US-206
 
+#### US-606
+**Togliere l'esclusione di un'azienda per una segnalazione** · Must · 3 punti · R4 · ✅ Ready
+
+Come **Call Center** voglio togliere l'esclusione di un'azienda per una segnalazione, quando è stata messa per sbaglio
+o le cose sono cambiate, perché l'azienda torni tra le mansioni compatibili (ricerca A42, review dello Sprint 19).
+
+Criteri di accettazione:
+- **Call Center e ADMIN** tolgono un'esclusione dall'elenco delle aziende escluse della segnalazione, con un motivo
+  obbligatorio. Vale anche per l'esclusione nata dal rifiuto della proposta da parte del Tutor (US-702).
+- L'azienda torna tra le mansioni compatibili della segnalazione.
+- L'esclusione non si cancella: resta nello storico della segnalazione come tolta, con chi, quando e il motivo.
+- La rimozione entra nell'audit (EN-2).
+
+Dipendenze: US-603, US-702
+
 ### E7 — Proposta e timer (fase 5)
 
 _Il Tutor valuta la proposta; i tempi di risposta sono presidiati da un timer di 7 giorni lavorativi._
@@ -1110,6 +1145,21 @@ Criteri di accettazione:
 - Il Call Center riceve una notifica.
 
 Dipendenze: US-802, US-1201
+
+#### US-804
+**Correzione dell'appuntamento registrato** · Must · 2 punti · R4 · ✅ Ready
+
+Come **Tutor** voglio correggere la nota dell'appuntamento fissato con l'azienda, per esempio data e ora, se l'ho
+scritta male o l'appuntamento è stato spostato (ricerca A42, review dello Sprint 19).
+
+Criteri di accettazione:
+- Il **Tutor della segnalazione** corregge la nota finché la segnalazione è in «Appuntamento», cioè prima dell'avvio
+  del tirocinio.
+- La correzione compare nello storico della segnalazione, con l'autore e l'istante, e la vede anche l'operatore.
+  Nessun avviso nuovo.
+- La correzione entra nell'audit (EN-2): la nota è testo libero, quindi solo «cambiata».
+
+Dipendenze: US-801
 
 ### E9 — Bacheca opportunità
 
