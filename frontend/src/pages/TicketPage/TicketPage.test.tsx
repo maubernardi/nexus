@@ -179,6 +179,7 @@ const detail = (overrides: Partial<TicketDetail> = {}): TicketDetail => ({
   internshipType: { id: 'IT2', code: 'EXTRACURRICULARE', name: 'Extracurriculare' },
   canChangeInternshipType: false,
   canCorrectRequest: false,
+  canCorrectProject: false,
   ...overrides,
 });
 
@@ -1155,6 +1156,7 @@ describe('<TicketPage>', () => {
           status: 'NUOVA',
           myTicket: true,
           canCorrectRequest: true,
+          canCorrectProject: true,
           assignedOperatorName: null,
           assignedToMe: false,
           competenceSite: { id: 'S9', code: 'EMPOLI', name: 'Empoli' },
@@ -1219,6 +1221,7 @@ describe('<TicketPage>', () => {
           requestedJobFreeText: 'Adetto al banco',
           myTicket: true,
           canCorrectRequest: true,
+          canCorrectProject: true,
         }),
       );
       vi.mocked(correctTicketRequest).mockRejectedValue(
@@ -1259,9 +1262,46 @@ describe('<TicketPage>', () => {
       await waitFor(() => expect(refusal).toHaveFocus());
     });
 
+    it('riaperta: si corregge solo la mansione, il progetto resta', async () => {
+      const user = userEvent.setup();
+      vi.mocked(fetchTicket).mockResolvedValue(
+        detail({ status: 'RIAPERTO', myTicket: true, canCorrectRequest: true }),
+      );
+      vi.mocked(correctTicketRequest).mockResolvedValue(
+        detail({ status: 'RIAPERTO', requestedJobCategory: CAM, canCorrectRequest: true }),
+      );
+      renderPage();
+
+      await user.click(await screen.findByRole('button', { name: 'Correggi la mansione' }));
+      const form = screen.getByRole('form', { name: 'Correzione della mansione' });
+      expect(form).toHaveTextContent('il progetto resta GOL');
+      expect(within(form).queryByRole('combobox', { name: /^Progetto/ })).toBeNull();
+      const job = within(form).getByRole('combobox', { name: /^Mansione richiesta/ });
+      await waitFor(() => expect(job).toHaveFocus());
+      await user.selectOptions(job, 'J2');
+      await user.click(within(form).getByRole('button', { name: 'Salva la correzione' }));
+      await waitFor(() =>
+        expect(vi.mocked(correctTicketRequest).mock.calls[0][0].form).toEqual({
+          version: 2,
+          projectId: 'P1',
+          jobCategoryId: 'J2',
+          jobFreeText: null,
+          competenceSiteId: null,
+          internshipTypeId: null,
+        }),
+      );
+      const outcome = await screen.findByText(
+        'Correzione salvata: mansione Cameriere di sala e addetto al servizio ai tavoli.',
+      );
+      await waitFor(() => expect(outcome).toHaveFocus());
+      await expectNoAxeViolations();
+    });
+
     it('annullando il focus torna sul comando; senza permesso nessun comando', async () => {
       const user = userEvent.setup();
-      vi.mocked(fetchTicket).mockResolvedValue(detail({ myTicket: true, canCorrectRequest: true }));
+      vi.mocked(fetchTicket).mockResolvedValue(
+        detail({ myTicket: true, canCorrectRequest: true, canCorrectProject: true }),
+      );
       const { unmount } = renderPage();
       await user.click(await screen.findByRole('button', { name: 'Correggi progetto e mansione' }));
       await user.click(await screen.findByRole('button', { name: 'Annulla' }));

@@ -1274,8 +1274,12 @@ export const it = {
     },
     requestCorrection: {
       change: 'Correggi progetto e mansione',
+      changeJob: 'Correggi la mansione',
       form: 'Correzione di progetto e mansione',
+      formJob: 'Correzione della mansione',
       hint: 'Puoi correggerli fino alla proposta all’azienda. La correzione resta nella cronologia.',
+      hintReopened:
+        'La segnalazione è riaperta: puoi correggere la mansione per le nuove proposte, il progetto resta {{project}}. La correzione resta nella cronologia.',
       projectHint:
         'Solo i progetti a cui sei assegnato. Se lo cambi, scegli la sede di competenza e il tipo di tirocinio del progetto nuovo.',
       jobFreeTextHint:
@@ -1283,6 +1287,7 @@ export const it = {
       save: 'Salva la correzione',
       cancel: 'Annulla',
       saved: 'Correzione salvata: progetto {{project}}, mansione {{job}}.',
+      savedJob: 'Correzione salvata: mansione {{job}}.',
     },
     noInternshipType:
       'Il tipo di tirocinio non è indicato: la mansione non si può proporre finché il Tutor non lo indica nella segnalazione.',
@@ -1472,7 +1477,7 @@ export const it = {
       DOCUMENT_GENERATED: 'Documento scaricato',
       COMPETENCE_SITE_CHANGED: 'Sede di competenza corretta',
       INTERNSHIP_TYPE_CHANGED: 'Tipo di tirocinio cambiato',
-      REQUEST_CORRECTED: 'Progetto e mansione corretti dal Tutor',
+      REQUEST_CORRECTED: 'Correzione del Tutor',
       CATEGORY_APPROVE: 'Nuova tipologia approvata',
       CATEGORY_REJECT: 'Tipologia cambiata dal Call Center',
       STATUS: 'Cambio di stato',

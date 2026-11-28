@@ -621,6 +621,8 @@ chiedere a qualcuno di intervenire sul database (ricerca A42, review dello Sprin
 Criteri di accettazione:
 - Dopo l'invio, **solo il Tutor della segnalazione** corregge progetto e mansione richiesta, finché la segnalazione non
   ha una proposta all'azienda. Call Center e ADMIN non li correggono (PO, 28/11).
+- Nella segnalazione **riaperta** il Tutor corregge la mansione richiesta, per le nuove proposte; il progetto resta
+  (PO, 28/11).
 - **Progetto**: uno dei progetti del Tutor della segnalazione. Se la sede di competenza (US-308) o il tipo di tirocinio
   (US-605) non valgono per il progetto nuovo, NEXUS chiede di sceglierli di nuovo, tra quelli del progetto.
 - **Mansione richiesta**: una tipologia attiva del catalogo. Il testo libero si corregge solo mentre la segnalazione

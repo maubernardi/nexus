@@ -2,8 +2,10 @@
 
 ### Requirement: Correzione del progetto e della mansione richiesta
 Dopo l'invio solo il Tutor della segnalazione SHALL poter correggere il progetto e la mansione richiesta, finché la
-segnalazione non ha una proposta all'azienda: nuova, in attesa dell'approvazione della tipologia o in lavorazione. Call
-Center e ADMIN MUST NOT poterli correggere, né il Tutor dopo la prima proposta o in una candidatura dalla bacheca.
+segnalazione non ha una proposta all'azienda: nuova, in attesa dell'approvazione della tipologia o in lavorazione. Nella
+segnalazione riaperta il Tutor SHALL poter correggere la mansione richiesta, per le nuove proposte, ma non il progetto.
+Call Center e ADMIN MUST NOT poterli correggere, né il Tutor negli altri stati dopo la prima proposta o in una
+candidatura dalla bacheca.
 - Il progetto SHALL essere uno dei progetti del Tutor. Se cambia, la sede di competenza e il tipo di tirocinio SHALL
   valere per il progetto nuovo: la sede tra le sue sedi attive, obbligatoria se ne ha; il tipo tra quelli ammessi.
 - La mansione richiesta SHALL essere una tipologia attiva del catalogo; se la segnalazione aspetta l'approvazione della
@@ -22,6 +24,11 @@ La correzione SHALL entrare nell'audit con prima e dopo e comparire nello storic
 #### Scenario: Dopo la proposta
 - **WHEN** la segnalazione ha già una proposta all'azienda
 - **THEN** il Tutor non può più correggere progetto e mansione
+
+#### Scenario: Segnalazione riaperta
+- **WHEN** il Tutor corregge la mansione di una sua segnalazione riaperta
+- **THEN** la segnalazione resta riaperta con la mansione nuova
+- **AND** se prova a cambiare il progetto, la correzione non si salva e il campo del progetto è indicato
 
 #### Scenario: Altri ruoli
 - **WHEN** un operatore del Call Center o l'ADMIN prova a correggere progetto e mansione

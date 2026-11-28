@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useForm, useWatch, type FieldPath } from 'react-hook-form';
+import { useForm, useWatch, type FieldPath, type UseFormRegisterReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
@@ -41,10 +41,12 @@ const withCurrent = (items: ReferenceItem[], current: ReferenceItem | null | und
 /**
  * Correzione di progetto e mansione richiesta (US-309): solo il Tutor della segnalazione, fino alla proposta
  * all'azienda (PO, 28/11). Cambiando progetto si scelgono di nuovo sede di competenza e tipo di tirocinio; se la nuova
- * tipologia aspetta l'approvazione si corregge il testo. La correzione finisce nella cronologia.
+ * tipologia aspetta l'approvazione si corregge il testo. Nella segnalazione riaperta si corregge solo la mansione, per le
+ * nuove proposte (PO, 28/11). La correzione finisce nella cronologia.
  */
 export const TicketRequestCorrection = ({ ticket }: { ticket: TicketDetail }) => {
   const { t } = useTranslation();
+  const onlyJob = !ticket.canCorrectProject;
   const [open, setOpen] = useState(false);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const feedbackRef = useRef<HTMLParagraphElement>(null);
@@ -76,12 +78,12 @@ export const TicketRequestCorrection = ({ ticket }: { ticket: TicketDetail }) =>
           ticket={ticket}
           onSaved={(saved) => {
             setOpen(false);
+            const job = saved.requestedJobCategory?.name ?? saved.requestedJobFreeText ?? '';
             setFeedback({
               kind: 'status',
-              text: t('work.requestCorrection.saved', {
-                project: saved.project.name,
-                job: saved.requestedJobCategory?.name ?? saved.requestedJobFreeText ?? '',
-              }),
+              text: onlyJob
+                ? t('work.requestCorrection.savedJob', { job })
+                : t('work.requestCorrection.saved', { project: saved.project.name, job }),
             });
           }}
           onRefused={(text) => {
@@ -104,7 +106,7 @@ export const TicketRequestCorrection = ({ ticket }: { ticket: TicketDetail }) =>
             setOpen(true);
           }}
         >
-          {t('work.requestCorrection.change')}
+          {t(onlyJob ? 'work.requestCorrection.changeJob' : 'work.requestCorrection.change')}
         </Button>
       )}
     </div>
@@ -169,6 +171,8 @@ const CorrectionFields = ({
   const [version] = useState(ticket.version);
   // in attesa dell'approvazione della nuova tipologia (US-302) si corregge il testo, non si sceglie dal catalogo
   const freeText = !ticket.requestedJobCategory;
+  // riaperta: il progetto resta, si corregge la mansione (PO, 28/11)
+  const onlyJob = !ticket.canCorrectProject;
   const currentTypeId = ticket.internshipType?.id ?? '';
   const {
     register,
@@ -190,7 +194,16 @@ const CorrectionFields = ({
     shouldFocusError: false,
   });
   const { summaryRef, requestSummaryFocus } = useErrorSummaryFocus(submitCount, errors);
-  const firstFieldRef = useRef<HTMLSelectElement | null>(null);
+  // il focus va al primo campo: il progetto, oppure la mansione se il progetto resta
+  const firstFieldRef = useRef<HTMLElement | null>(null);
+  // la registrazione del campo, con il riferimento anche per il focus iniziale
+  const withFocus = <R extends UseFormRegisterReturn>(registration: R, first: boolean): R => ({
+    ...registration,
+    ref: (element: HTMLElement | null) => {
+      registration.ref(element);
+      if (first) firstFieldRef.current = element;
+    },
+  });
 
   useEffect(() => {
     firstFieldRef.current?.focus();
@@ -229,7 +242,6 @@ const CorrectionFields = ({
     const message = errors[field]?.message;
     return message ? [{ fieldId: fieldId(field), message: `${labels[field]}: ${message}` }] : [];
   });
-  const { ref: projectRef, ...projectField } = register('projectId', { required });
 
   const onValid = async (values: CorrectionValues): Promise<void> => {
     setGenericError(false);
@@ -239,7 +251,7 @@ const CorrectionFields = ({
           id: ticket.id,
           form: {
             version,
-            projectId: values.projectId,
+            projectId: onlyJob ? ticket.project.id : values.projectId,
             jobCategoryId: freeText ? null : values.jobCategoryId,
             jobFreeText: freeText ? values.jobFreeText.trim() : null,
             competenceSiteId: siteOptions.length > 0 ? values.competenceSiteId : null,
@@ -270,11 +282,15 @@ const CorrectionFields = ({
   return (
     <form
       noValidate
-      aria-label={t('work.requestCorrection.form')}
+      aria-label={t(onlyJob ? 'work.requestCorrection.formJob' : 'work.requestCorrection.form')}
       onSubmit={handleSubmit(onValid, requestSummaryFocus)}
       className="space-y-4 rounded-md border border-border p-4"
     >
-      <p className="text-sm text-muted-foreground">{t('work.requestCorrection.hint')}</p>
+      <p className="text-sm text-muted-foreground">
+        {onlyJob
+          ? t('work.requestCorrection.hintReopened', { project: ticket.project.name })
+          : t('work.requestCorrection.hint')}
+      </p>
       {submitCount > 0 && <ErrorSummary ref={summaryRef} errors={summary} />}
       {genericError && (
         <p role="alert" className="rounded-md border-2 border-destructive p-3 font-medium text-destructive">
@@ -282,30 +298,25 @@ const CorrectionFields = ({
         </p>
       )}
       <div className="grid max-w-md gap-4">
-        <FormField
-          id={fieldId('projectId')}
-          label={labels.projectId}
-          hint={t('work.requestCorrection.projectHint')}
-          required
-          error={errors.projectId?.message}
-        >
-          {(p) => (
-            <NativeSelect
-              {...p}
-              {...projectField}
-              ref={(element) => {
-                projectRef(element);
-                firstFieldRef.current = element;
-              }}
-            >
-              {withCurrent(projects, ticket.project).map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.name}
-                </option>
-              ))}
-            </NativeSelect>
-          )}
-        </FormField>
+        {!onlyJob && (
+          <FormField
+            id={fieldId('projectId')}
+            label={labels.projectId}
+            hint={t('work.requestCorrection.projectHint')}
+            required
+            error={errors.projectId?.message}
+          >
+            {(p) => (
+              <NativeSelect {...p} {...withFocus(register('projectId', { required }), true)}>
+                {withCurrent(projects, ticket.project).map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.name}
+                  </option>
+                ))}
+              </NativeSelect>
+            )}
+          </FormField>
+        )}
         {siteOptions.length > 0 && (
           <FormField
             id={fieldId('competenceSiteId')}
@@ -368,10 +379,13 @@ const CorrectionFields = ({
               <Input
                 {...p}
                 autoComplete="off"
-                {...register('jobFreeText', {
-                  validate: (v) => v.trim() !== '' || t('form.errors.required'),
-                  maxLength: { value: 200, message: t('form.errors.maxLength', { max: 200 }) },
-                })}
+                {...withFocus(
+                  register('jobFreeText', {
+                    validate: (v) => v.trim() !== '' || t('form.errors.required'),
+                    maxLength: { value: 200, message: t('form.errors.maxLength', { max: 200 }) },
+                  }),
+                  onlyJob,
+                )}
               />
             )}
           </FormField>
@@ -384,7 +398,7 @@ const CorrectionFields = ({
             error={errors.jobCategoryId?.message}
           >
             {(p) => (
-              <NativeSelect {...p} {...register('jobCategoryId', { required })}>
+              <NativeSelect {...p} {...withFocus(register('jobCategoryId', { required }), onlyJob)}>
                 <option value="">{t('form.select')}</option>
                 {withCurrent(categories, ticket.requestedJobCategory).map((category) => (
                   <option key={category.id} value={category.id}>

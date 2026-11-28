@@ -1835,8 +1835,8 @@ Pasticceria Demo Stella», in carico a `operatore.cc`, con un tentativo «Non ra
 ## 42. Correzione di progetto e mansione della segnalazione (Sprint 20)
 
 Sul collaudo del PC, prima del merge (http://localhost:8090, password `collaudo-nexus-2026`). Li corregge solo il
-Tutor della segnalazione, fino alla proposta all'azienda; Call Center e ADMIN no (PO, 28/11). Nei dati finti `tutor2`
-è in GOL e POLIS, `tutor1` solo in GOL.
+Tutor della segnalazione, fino alla proposta all'azienda; nella segnalazione riaperta solo la mansione. Call Center e
+ADMIN no (PO, 28/11). Nei dati finti `tutor2` è in GOL e POLIS, `tutor1` solo in GOL.
 
 - [ ] **T-42.1 Progetto, sede e mansione (US-309)**
   1. Entra come `tutor2` e apri la segnalazione di «Demo Quattro Beneficiaria» (POLIS, in lavorazione, Curriculare).
@@ -1848,7 +1848,7 @@ Tutor della segnalazione, fino alla proposta all'azienda; Call Center e ADMIN no
   4. Scegli «Firenze», «Extracurriculare» e la mansione «Cameriere di sala»; salva. **Atteso:** «Correzione salvata:
      progetto GOL - Garanzia Occupabilità dei Lavoratori, mansione Cameriere di sala.» con il focus; i dati mostrano
      GOL, Firenze, Extracurriculare e Cameriere di sala.
-  5. Guarda la cronologia. **Atteso:** «Progetto e mansione corretti dal Tutor», con «Progetto: POLIS - … → GOL - …;
+  5. Guarda la cronologia. **Atteso:** «Correzione del Tutor», con «Progetto: POLIS - … → GOL - …;
      Mansione: Addetto alle pulizie → Cameriere di sala; Sede di competenza: — → Firenze; Tipo di tirocinio:
      Curriculare → Extracurriculare» e il tuo nome.
   6. Esci ed entra come `tutor1`, che ora vede la segnalazione perché è in GOL. **Atteso:** nessun «Correggi progetto e
@@ -1866,8 +1866,8 @@ Tutor della segnalazione, fino alla proposta all'azienda; Call Center e ADMIN no
 - [ ] **T-42.3 Quando non si corregge (US-309)**
   1. Come `tutor2`, apri la segnalazione di «Demo Cinque Beneficiario» (proposta all'azienda). **Atteso:** nessun
      «Correggi progetto e mansione».
-  2. Come `tutor1`, apri la candidatura dalla bacheca di «Demo Tre Beneficiario» e la segnalazione riaperta di «Demo
-     Sei Beneficiaria». **Atteso:** nessun «Correggi progetto e mansione».
+  2. Come `tutor1`, apri la candidatura dalla bacheca di «Demo Tre Beneficiario». **Atteso:** nessun «Correggi
+     progetto e mansione».
   3. Come `operatore.cc` e poi come `admin`, apri la segnalazione nuova di «Demo Uno Beneficiario». **Atteso:** nessun
      «Correggi progetto e mansione» (la sede la correggono ancora ADMIN e Coordinatore, come prima).
   4. Come `tutor1`, apri la segnalazione di «Demo Uno Beneficiario» in due schede e premi «Correggi progetto e
@@ -1875,6 +1875,15 @@ Tutor della segnalazione, fino alla proposta all'azienda; Call Center e ADMIN no
      salva. **Atteso:** nella seconda «La segnalazione n. … è cambiata nel frattempo: ricarica la pagina»; la mansione
      resta «Giardiniere».
 
-- [ ] **T-42.4 Smartphone e tema scuro (US-309)**
+- [ ] **T-42.4 Segnalazione riaperta: solo la mansione (US-309)**
+  1. Come `tutor1`, apri la segnalazione riaperta di «Demo Sei Beneficiaria» (Magazziniere). **Atteso:** il pulsante
+     «Correggi la mansione», non «Correggi progetto e mansione».
+  2. Premilo. **Atteso:** il modulo con la sola mansione e il focus lì; il testo dice che il progetto resta GOL - ….
+  3. Scegli «Giardiniere» e salva. **Atteso:** «Correzione salvata: mansione Giardiniere.»; la segnalazione resta
+     riaperta e in cronologia c'è «Correzione del Tutor» con «Mansione: Magazziniere → Giardiniere».
+  4. Come `operatore.cc`, apri la stessa segnalazione. **Atteso:** la mansione richiesta è «Giardiniere», nessun comando
+     di correzione; le mansioni compatibili partono da Giardiniere.
+
+- [ ] **T-42.5 Smartphone e tema scuro (US-309)**
   1. Apri il modulo con la finestra stretta come uno smartphone e con il tema scuro (🌙). **Atteso:** campi, suggerimenti
      ed esito leggibili, nessuno scorrimento di lato.

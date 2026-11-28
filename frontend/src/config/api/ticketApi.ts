@@ -167,8 +167,10 @@ export type TicketDetail = {
   canChangeInternshipType: boolean;
   /** I tipi che il Tutor può scegliere. */
   internshipTypes?: ReferenceItem[];
-  /** Il Tutor della segnalazione corregge progetto e mansione richiesta (US-309): prima della proposta. */
+  /** Il Tutor della segnalazione corregge la richiesta (US-309): prima della proposta o da riaperta. */
   canCorrectRequest: boolean;
+  /** ...e anche il progetto: solo prima della proposta; nella riaperta si corregge la mansione (PO, 28/11). */
+  canCorrectProject: boolean;
 };
 
 /**

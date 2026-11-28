@@ -141,7 +141,8 @@ class TicketRequestCorrectionIT {
     void progettoSedeEMansione_conAuditEStorico() throws Exception {
         String ticketId = submit(null);
         mockMvc.perform(get("/api/v1/tickets/" + ticketId).header(USER, "tutor1"))
-                .andExpect(jsonPath("$.canCorrectRequest").value(true));
+                .andExpect(jsonPath("$.canCorrectRequest").value(true))
+                .andExpect(jsonPath("$.canCorrectProject").value(true));
 
         Map<String, Object> form = correction(ticketId);
         form.put("projectId", id(polis.getId()));
@@ -256,7 +257,7 @@ class TicketRequestCorrectionIT {
                 .andExpect(jsonPath("$.canCorrectRequest").value(true));
 
         for (TicketStatus after : new TicketStatus[] {TicketStatus.PROPOSTA_AZIENDA, TicketStatus.APPUNTAMENTO,
-                TicketStatus.RIAPERTO}) {
+                TicketStatus.IN_TIROCINIO}) {
             t = ticket(ticketId);
             t.setStatus(after);
             tickets.saveAndFlush(t);
@@ -264,9 +265,43 @@ class TicketRequestCorrectionIT {
                     .andExpect(jsonPath("$.canCorrectRequest").value(false));
             form.put("version", ticket(ticketId).getVersion());
             correct("tutor1", ticketId, form).andExpect(status().isConflict())
-                    .andExpect(jsonPath("$.message")
-                            .value("Dopo la proposta all'azienda progetto e mansione non si correggono più"));
+                    .andExpect(jsonPath("$.message").value("Dopo la proposta all'azienda progetto e mansione non "
+                            + "si correggono più, finché la segnalazione non è riaperta"));
         }
+    }
+
+    @Test
+    void riaperta_siCorreggeSoloLaMansione() throws Exception {
+        String ticketId = submit(null);
+        Ticket t = ticket(ticketId);
+        t.setStatus(TicketStatus.RIAPERTO);
+        tickets.saveAndFlush(t);
+        mockMvc.perform(get("/api/v1/tickets/" + ticketId).header(USER, "tutor1"))
+                .andExpect(jsonPath("$.canCorrectRequest").value(true))
+                .andExpect(jsonPath("$.canCorrectProject").value(false));
+
+        Map<String, Object> form = correction(ticketId);
+        form.put("projectId", id(polis.getId()));
+        form.put("competenceSiteId", id(prato.getId()));
+        correct("tutor1", ticketId, form).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("projectId"))
+                .andExpect(jsonPath("$.fieldErrors[0].message").value(
+                        "Nella segnalazione riaperta si corregge solo la mansione: il progetto resta "
+                                + gol.getName()));
+
+        form = correction(ticketId);
+        form.put("jobCategoryId", id(cameriere.getId()));
+        correct("tutor1", ticketId, form).andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("RIAPERTO"))
+                .andExpect(jsonPath("$.project.id").value(id(gol.getId())))
+                .andExpect(jsonPath("$.requestedJobCategory.id").value(id(cameriere.getId())));
+        mockMvc.perform(get("/api/v1/tickets/" + ticketId + "/history").header(USER, "tutor1"))
+                .andExpect(jsonPath("$[?(@.action == 'REQUEST_CORRECTED')].detail").value(
+                        "Mansione: %s → %s".formatted(place.category().getName(), cameriere.getName())));
+        // al Call Center no, anche nella riaperta
+        mockMvc.perform(get("/api/v1/tickets/" + ticketId).header(USER, "operatore.cc"))
+                .andExpect(jsonPath("$.canCorrectRequest").value(false))
+                .andExpect(jsonPath("$.canCorrectProject").value(false));
     }
 
     @Test
